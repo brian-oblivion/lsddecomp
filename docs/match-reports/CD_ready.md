@@ -56,7 +56,7 @@ extern u8 D_8008B3D4[];
 extern u8 D_8008B3DC[];                /* 8-byte record, this function's second flag's snapshot buffer */
 
 extern void (*D_8006D600)(s32 arg0, void *arg1);
-extern void (*D_8006D5FC)(s32 arg0, void *arg1);
+extern void (*CD_cbsync)(s32 arg0, void *arg1);
 
 extern s32 VSync(s32 arg0);
 extern void puts(const char *arg0);
@@ -129,8 +129,8 @@ skip_timeout:
                     }
                 }
                 if (flags & 2) {
-                    if (D_8006D5FC != NULL) {
-                        D_8006D5FC(*state, D_8008B3CC);
+                    if (CD_cbsync != NULL) {
+                        CD_cbsync(*state, D_8008B3CC);
                     }
                 }
             }

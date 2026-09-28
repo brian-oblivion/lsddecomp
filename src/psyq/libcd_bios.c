@@ -192,7 +192,7 @@ extern u8 D_8008B3D4[];
 extern u8 D_8008B3DC[];                /* 8-byte record, this function's second flag's snapshot buffer */
 
 extern void (*D_8006D600)(s32 arg0, void *arg1);
-extern void (*D_8006D5FC)(s32 arg0, void *arg1);
+extern void (*CD_cbsync)(s32 arg0, void *arg1);
 
 extern void CD_flush(void);
 extern s32 getintr(void);
@@ -261,8 +261,8 @@ skip_timeout:
                     }
                 }
                 if (flags & 2) {
-                    if (D_8006D5FC != NULL) {
-                        D_8006D5FC(*state, D_8008B3CC);
+                    if (CD_cbsync != NULL) {
+                        CD_cbsync(*state, D_8008B3CC);
                     }
                 }
             }
@@ -343,7 +343,7 @@ extern u8 D_8008B3CC[];
 extern u8 D_8008B3D4[];
 
 extern void (*D_8006D600)(s32 arg0, void *arg1);
-extern void (*D_8006D5FC)(s32 arg0, void *arg1);
+extern void (*CD_cbsync)(s32 arg0, void *arg1);
 
 extern void CD_flush(void);
 extern s32 getintr(void);
@@ -454,8 +454,8 @@ skip_timeout3:
                         }
                     }
                     if (flags & 2) {
-                        if (D_8006D5FC != NULL) {
-                            D_8006D5FC(*state, D_8008B3CC);
+                        if (CD_cbsync != NULL) {
+                            CD_cbsync(*state, D_8008B3CC);
                         }
                     }
                 }
@@ -486,7 +486,7 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_cw);
 /* Driver state: plain scalar and pointer globals, not object fields. */
 
 extern s32 D_8006D8A4;
-extern s32 D_8006D5FC;
+extern s32 CD_cbsync;
 extern s32 D_8006D600;
 extern s32 D_8006D604;
 extern s32 D_8006D60C;
@@ -583,8 +583,8 @@ void CD_shell(void) {
     s32 counter = 0;
 
     if (D_8006D904 < D_8006D614) {
-        saved = D_8006D5FC;
-        D_8006D5FC = 0;
+        saved = CD_cbsync;
+        CD_cbsync = 0;
 
         while (D_8006D60C & 0x10) {
             if ((u8)counter == 0) {
@@ -599,7 +599,7 @@ void CD_shell(void) {
             puts(D_80010A50);
         }
 
-        D_8006D5FC = saved;
+        CD_cbsync = saved;
         D_8006D904 = D_8006D614;
     }
 }
@@ -657,7 +657,7 @@ void CD_initintr(void) {
     s32 i;
 
     D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbsync = 0;
     D_8006D610 = 0;
     D_8006D60C = 0;
     p = D_8006D8DC;
@@ -687,7 +687,7 @@ s32 CD_init(void) {
     D_8006D61D = 0;
     D_8006D61C = 0;
     D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbsync = 0;
     D_8006D610 = 0;
     D_8006D60C = 0;
     p = &D_8006D8DC;
@@ -723,8 +723,8 @@ s32 CD_init(void) {
     }
 
     if (D_8006D904 < D_8006D614) {
-        saved = D_8006D5FC;
-        D_8006D5FC = 0;
+        saved = CD_cbsync;
+        CD_cbsync = 0;
 
         while (D_8006D60C & 0x10) {
             if ((u8)counter == 0) {
@@ -739,7 +739,7 @@ s32 CD_init(void) {
             puts(D_80010A50);
         }
 
-        D_8006D5FC = saved;
+        CD_cbsync = saved;
         D_8006D904 = D_8006D614;
     }
 
@@ -774,7 +774,7 @@ s32 cd_read_retry(void) {
     tmp = D_8006D8DC;
     n = *tmp;
     D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
 
@@ -788,8 +788,8 @@ s32 cd_read_retry(void) {
                 printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
 
                 if (D_8006D904 < D_8006D614) {
-                    saved = D_8006D5FC;
-                    D_8006D5FC = 0;
+                    saved = CD_cbsync;
+                    CD_cbsync = 0;
 
                     while (D_8006D60C & 0x10) {
                         if ((u8)counter == 0) {
@@ -804,7 +804,7 @@ s32 cd_read_retry(void) {
                         puts(D_80010A50);
                     }
 
-                    D_8006D5FC = saved;
+                    CD_cbsync = saved;
                     D_8006D904 = D_8006D614;
                 }
 
@@ -907,7 +907,7 @@ join:
 }
     D_8006D8E0 = arg1;
     D_8006D8DC[0] = 8;
-    D_8006D8FC = D_8006D5FC;
+    D_8006D8FC = CD_cbsync;
     D_8006D900 = D_8006D600;
 
     if (D_8006D60C & 0xE0) {
@@ -987,8 +987,8 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
                 if ((flags & 4) && D_8006D600 != 0) {
                     ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
                 }
-                if ((flags & 2) && D_8006D5FC != 0) {
-                    ((void (*)(s32, u8 *))D_8006D5FC)(p8D8[0], D_8008B3CC);
+                if ((flags & 2) && CD_cbsync != 0) {
+                    ((void (*)(s32, u8 *))CD_cbsync)(p8D8[0], D_8008B3CC);
                 }
             }
             /* MATCHING: a known-bad construct, do not copy it. p6A0 and pF8
@@ -1125,8 +1125,8 @@ void callback(void) {
             }
         }
         if (flags & 2) {
-            if (D_8006D5FC != 0) {
-                ((void (*)(s32, u8 *))D_8006D5FC)(D_8006D8D8[0], D_8008B3CC);
+            if (CD_cbsync != 0) {
+                ((void (*)(s32, u8 *))CD_cbsync)(D_8006D8D8[0], D_8008B3CC);
             }
         }
     }
@@ -1169,7 +1169,7 @@ shared: {
     }
 
     if ((*(new_var = &D_8006D8F4)) <= 0) {
-        D_8006D5FC = D_8006D8FC;
+        CD_cbsync = D_8006D8FC;
         D_8006D600 = D_8006D900;
         CD_cw(9, 0, 0, 0);
         if (D_8006D604 != 0) {

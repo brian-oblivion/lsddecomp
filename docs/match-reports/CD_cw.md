@@ -71,7 +71,7 @@ extern u8 D_8008B3CC[];
 extern u8 D_8008B3D4[];
 
 extern void (*D_8006D600)(s32 arg0, void *arg1);
-extern void (*D_8006D5FC)(s32 arg0, void *arg1);
+extern void (*CD_cbsync)(s32 arg0, void *arg1);
 
 extern s32 VSync(s32 arg0);
 extern void puts(const char *arg0);
@@ -185,8 +185,8 @@ skip_timeout3:
                         }
                     }
                     if (flags & 2) {
-                        if (D_8006D5FC != NULL) {
-                            D_8006D5FC(*state, D_8008B3CC);
+                        if (CD_cbsync != NULL) {
+                            CD_cbsync(*state, D_8008B3CC);
                         }
                     }
                 }
@@ -293,7 +293,7 @@ down from 4.
 attempt does not repeat it:** enabling this change made `funcdiff.py`'s
 "differs outside this range" byte count go UP (298262 bytes, vs 253209
 before), and `build/lsdde.map` showed several unrelated data symbols
-(`D_8006D604`, `D_8006D608`, the whole `D_8006D5FC.. D_8006D8D9` cluster)
+(`D_8006D604`, `D_8006D608`, the whole `CD_cbsync.. D_8006D8D9` cluster)
 linked 4 bytes earlier than their expected addresses. This LOOKED exactly
 like CLAUDE.md's "a struct edit for one function's sake silently breaks a
 different, already-matched function" hazard, and cost a real diagnostic

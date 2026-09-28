@@ -7,7 +7,7 @@
 Thread entry point registered by `CD_initintr`/`CD_init` via
 `func_80024D40(2, callback)`. Loops on `getintr()` (still
 `INCLUDE_ASM`/BLOCKED in `libcd_bios`) dispatching two optional callbacks
-(`D_8006D600` and `D_8006D5FC`, both function pointers) based on flag bits,
+(`D_8006D600` and `CD_cbsync`, both function pointers) based on flag bits,
 until `getintr()` returns 0, then restores the driver's saved status
 byte into `*D_8006D8C0`.
 
@@ -39,8 +39,8 @@ void callback(void)
             }
         }
         if (flags & 2) {
-            if (D_8006D5FC != 0) {
-                ((void (*)(s32, u8 *))D_8006D5FC)(D_8006D8D8, D_8008B3CC);
+            if (CD_cbsync != 0) {
+                ((void (*)(s32, u8 *))CD_cbsync)(D_8006D8D8, D_8008B3CC);
             }
         }
     }
@@ -133,13 +133,13 @@ the report's claim precisely: retail does NOT hoist `D_8006D8D8`'s
 address despite it being loop-invariant (apparently a register-pressure
 choice, not a correctness one -- `$s0`/`$s1`/`$s2` are already spoken for
 by `flags`/`status`/`pd9`, leaving no fourth callee-saved slot, and
-retail's compiler evidently preferred to keep `D_8006D600`/`D_8006D5FC`
+retail's compiler evidently preferred to keep `D_8006D600`/`CD_cbsync`
 un-hoisted too rather than hoist a fourth value), and just needs the
 UNFOLDED 3-instruction address-then-load shape reproduced without
 inviting the hoist.
 
 **One correction to the report's preserved "best C" body**: it calls
-`((void (*)(s32, u8 *))D_8006D5FC)(D_8006D8D8, D_8008B3CC);` -- passing
+`((void (*)(s32, u8 *))CD_cbsync)(D_8006D8D8, D_8008B3CC);` -- passing
 the bare array (decaying to a pointer, then implicit-int-truncated by the
 call, with a compiler warning) rather than `D_8006D8D8[0]` (a dereferenced
 byte, matching retail's `lbu`). Checked whether this was the actual
@@ -194,7 +194,7 @@ Directly tested the type/width lever against this function's own
 disassembly. `D_8006D8D8` loads via `lbu` (unsigned byte, matching its
 `u8[2]` declaration exactly); the OTHER callback's argument,
 `D_8006D8D9`, also loads via `lbu` (matching its `u8` declaration);
-`D_8006D5FC`/`D_8006D600` (function-pointer globals) and
+`CD_cbsync`/`D_8006D600` (function-pointer globals) and
 `D_8006D8C0` (a `volatile u8 *`, itself loaded via `lw` since it is a
 POINTER, then dereferenced via `lbu`/`sb` for the byte it points to) all
 match their current declared types exactly, opcode for opcode. No room
@@ -226,7 +226,7 @@ assuming that generalizes):
    volatile u8 D_8006D8D8[2];` instead of plain `u8[2]`).
 2. Both callback pointers precomputed **before** their null-check
    (`handler = D_8006D600; if (handler != 0) { cb = (cast)handler; ... }`
-   for one branch, `cb = (cast)D_8006D5FC; if (D_8006D5FC != 0) {
+   for one branch, `cb = (cast)CD_cbsync; if (CD_cbsync != 0) {
    cb(...); }` for the other -- note the asymmetry between the two
    branches is itself part of the winning shape, not noise).
 
@@ -378,8 +378,8 @@ the permuter's winning candidate reach the unfolded address form:
 
 ```c
 if (flags & 2) {
-    cb2 = (void (*)(s32, u8 *))D_8006D5FC;
-    if (D_8006D5FC != 0) {
+    cb2 = (void (*)(s32, u8 *))CD_cbsync;
+    if (CD_cbsync != 0) {
         cb2(D_8006D8D8[0], D_8008B3CC);
     }
 }
@@ -569,7 +569,7 @@ x->y; p->z = 0;` where `p` already holds `x->y` from earlier in the same
 block) against this function's body before spending an attempt, per this
 round's own instruction to read a register-identity/addressing residue for
 it first.** It does not apply: every value this function touches
-(`D_8006D8C0`, `D_8006D8D9`/`pd9`, `D_8006D600`, `D_8006D5FC`,
+(`D_8006D8C0`, `D_8006D8D9`/`pd9`, `D_8006D600`, `CD_cbsync`,
 `D_8006D8D8`) is read exactly once per site with no earlier same-block load
 of the same address to make redundant. The residue here is confirmed
 instruction-SELECTION (folded vs. unfolded addressing for `D_8006D8D8`'s
@@ -650,9 +650,9 @@ pointer for `D_8006D8D8`'s address in the second callback branch:
 
 ```c
 if (flags & 2) {
-    if (D_8006D5FC != 0) {
+    if (CD_cbsync != 0) {
         pd9 = D_8006D8D8;
-        ((void (*)(s32, u8 *))D_8006D5FC)(pd9[0], D_8008B3CC);
+        ((void (*)(s32, u8 *))CD_cbsync)(pd9[0], D_8008B3CC);
     }
 }
 ```
@@ -684,9 +684,9 @@ reusing it for the same address-computation idiom instead of `pd9`:
 
 ```c
 if (flags & 2) {
-    if (D_8006D5FC != 0) {
+    if (CD_cbsync != 0) {
         handler = (s32)D_8006D8D8;
-        ((void (*)(s32, u8 *))D_8006D5FC)(((u8 *)handler)[0], D_8008B3CC);
+        ((void (*)(s32, u8 *))CD_cbsync)(((u8 *)handler)[0], D_8008B3CC);
     }
 }
 ```

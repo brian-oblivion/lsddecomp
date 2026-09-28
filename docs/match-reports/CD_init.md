@@ -61,7 +61,7 @@ s32 CD_init(void)
     D_8006D61D = 0;
     D_8006D61C = 0;
     D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbsync = 0;
     D_8006D610 = 0;
     D_8006D60C = 0;
     p = &D_8006D8DC;
@@ -96,8 +96,8 @@ s32 CD_init(void)
     }
 
     if (D_8006D904 < D_8006D614) {
-        saved = D_8006D5FC;
-        D_8006D5FC = 0;
+        saved = CD_cbsync;
+        CD_cbsync = 0;
 
         while (D_8006D60C & 0x10) {
             if ((u8)counter == 0) {
@@ -112,7 +112,7 @@ s32 CD_init(void)
             puts(D_80010A50);
         }
 
-        D_8006D5FC = saved;
+        CD_cbsync = saved;
         D_8006D904 = D_8006D614;
     }
 
@@ -521,7 +521,7 @@ s32 CD_init(void)
     D_8006D61D = 0;
     D_8006D61C = 0;
     D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbsync = 0;
     D_8006D610 = 0;
     D_8006D60C = 0;
     p = &D_8006D8DC;
@@ -557,8 +557,8 @@ s32 CD_init(void)
     }
 
     if (D_8006D904 < D_8006D614) {
-        saved = D_8006D5FC;
-        D_8006D5FC = 0;
+        saved = CD_cbsync;
+        CD_cbsync = 0;
 
         while (D_8006D60C & 0x10) {
             if ((u8)counter == 0) {
@@ -573,7 +573,7 @@ s32 CD_init(void)
             puts(D_80010A50);
         }
 
-        D_8006D5FC = saved;
+        CD_cbsync = saved;
         D_8006D904 = D_8006D614;
     }
 

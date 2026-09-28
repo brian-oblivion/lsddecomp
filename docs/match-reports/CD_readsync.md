@@ -213,7 +213,7 @@ button/callback dispatch loop, copy 8 bytes, then conditionally chain to
   — declared here as `extern s32 func_80024E64(void);`); if nonzero, saves
   `*D_8006D8C0 & 3`, runs the same button-dispatch loop as
   `callback`/`CD_datasync` (bit 4 → `D_8006D600(D_8006D8D8[1],
-  D_8008B3D4)`, bit 2 → `D_8006D5FC(D_8006D8D8[0], D_8008B3CC)`, until
+  D_8008B3D4)`, bit 2 → `CD_cbsync(D_8006D8D8[0], D_8008B3CC)`, until
   `getintr()` returns 0), then restores the saved status byte.
 - Copies 8 bytes from `D_8008B3D4` into `*(u8 *)arg1` — but ONLY if `arg1 !=
   0` (a null-destination guard retail has that is easy to miss reading the
@@ -307,8 +307,8 @@ s32 CD_readsync(s32 arg0, s32 arg1)
                 if ((flags & 4) && D_8006D600 != 0) {
                     ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
                 }
-                if ((flags & 2) && D_8006D5FC != 0) {
-                    ((void (*)(s32, u8 *))D_8006D5FC)(p8D8[0], D_8008B3CC);
+                if ((flags & 2) && CD_cbsync != 0) {
+                    ((void (*)(s32, u8 *))CD_cbsync)(p8D8[0], D_8008B3CC);
                 }
             }
             *D_8006D8C0 = status;
@@ -720,8 +720,8 @@ s32 CD_readsync(s32 arg0, s32 arg1)
                 if ((flags & 4) && D_8006D600 != 0) {
                     ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
                 }
-                if ((flags & 2) && D_8006D5FC != 0) {
-                    ((void (*)(s32, u8 *))D_8006D5FC)(p8D8[0], D_8008B3CC);
+                if ((flags & 2) && CD_cbsync != 0) {
+                    ((void (*)(s32, u8 *))CD_cbsync)(p8D8[0], D_8008B3CC);
                 }
             }
             *D_8006D8C0 = status;
@@ -943,8 +943,8 @@ s32 CD_readsync(s32 arg0, s32 arg1)
                 if ((flags & 4) && D_8006D600 != 0) {
                     ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
                 }
-                if ((flags & 2) && D_8006D5FC != 0) {
-                    ((void (*)(s32, u8 *))D_8006D5FC)(p8D8[0], D_8008B3CC);
+                if ((flags & 2) && CD_cbsync != 0) {
+                    ((void (*)(s32, u8 *))CD_cbsync)(p8D8[0], D_8008B3CC);
                 }
             }
             /* permuter-found: forcing p6A0/pF8 to be read here (both arms

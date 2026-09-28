@@ -61,7 +61,7 @@ s32 cd_read_retry(void)
     tmp = &D_8006D8DC;
     n = *tmp;
     D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
 
@@ -75,8 +75,8 @@ s32 cd_read_retry(void)
                 printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
 
                 if (D_8006D904 < D_8006D614) {
-                    saved = D_8006D5FC;
-                    D_8006D5FC = 0;
+                    saved = CD_cbsync;
+                    CD_cbsync = 0;
 
                     while (D_8006D60C & 0x10) {
                         if ((u8)counter == 0) {
@@ -91,7 +91,7 @@ s32 cd_read_retry(void)
                         puts(D_80010A50);
                     }
 
-                    D_8006D5FC = saved;
+                    CD_cbsync = saved;
                     D_8006D904 = D_8006D614;
                 }
 
@@ -333,7 +333,7 @@ prologue's own register numbers, accounting for essentially all of the
 21 remaining word mismatches. **Tried two reshapes, both regressed
 severely rather than helping** (declaration-order swap of `n`/`tmp`: no
 change at all, 202/223 unchanged; reordering
-`D_8006D600=0;D_8006D5FC=0;` to before the load: catastrophic
+`D_8006D600=0;CD_cbsync=0;` to before the load: catastrophic
 regression to 9/223, i.e. this exact statement order is otherwise
 load-bearing and fragile). Not spending further attempts on this --
 register-identity-driven pseudo-allocation choices for a function's
@@ -365,7 +365,7 @@ s32 cd_read_retry(void)
     tmp = &D_8006D8DC;
     n = *tmp;
     D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
 
@@ -379,8 +379,8 @@ s32 cd_read_retry(void)
                 printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
 
                 if (D_8006D904 < D_8006D614) {
-                    saved = D_8006D5FC;
-                    D_8006D5FC = 0;
+                    saved = CD_cbsync;
+                    CD_cbsync = 0;
 
                     while (D_8006D60C & 0x10) {
                         if ((u8)counter == 0) {
@@ -395,7 +395,7 @@ s32 cd_read_retry(void)
                         puts(D_80010A50);
                     }
 
-                    D_8006D5FC = saved;
+                    CD_cbsync = saved;
                     D_8006D904 = D_8006D614;
                 }
 
@@ -795,7 +795,7 @@ s32 cd_read_retry(void)
     tmp = &D_8006D8DC;
     n = *tmp;
     D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
 
@@ -809,8 +809,8 @@ s32 cd_read_retry(void)
                 printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
 
                 if (D_8006D904 < D_8006D614) {
-                    saved = D_8006D5FC;
-                    D_8006D5FC = 0;
+                    saved = CD_cbsync;
+                    CD_cbsync = 0;
 
                     while (D_8006D60C & 0x10) {
                         if ((u8)counter == 0) {
@@ -825,7 +825,7 @@ s32 cd_read_retry(void)
                         puts(D_80010A50);
                     }
 
-                    D_8006D5FC = saved;
+                    CD_cbsync = saved;
                     D_8006D904 = D_8006D614;
                 }
 
@@ -921,7 +921,7 @@ if (tmp || n) {
 } else {
     D_8006D600 = 0;
 }
-D_8006D5FC = 0;
+CD_cbsync = 0;
 *tmp = n - 1;
 __asm__("");
 ```
@@ -1056,7 +1056,7 @@ if (n) {
 ```
 
 `n` (the retry counter) is not read again until `tail:` overwrites it
-outright; `saved` (used earlier to stash `D_8006D5FC` around the timeout
+outright; `saved` (used earlier to stash `CD_cbsync` around the timeout
 retry loop) is already restored and consumed by this point. Reusing both
 as throwaway sinks for a boolean and a pointer is legal, has no
 observable effect on ANY execution path, and unlike the `output-215-1`
@@ -1136,7 +1136,7 @@ s32 cd_read_retry(void)
     tmp = D_8006D8DC;
     n = *tmp;
     D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
 
@@ -1150,8 +1150,8 @@ s32 cd_read_retry(void)
                 printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
 
                 if (D_8006D904 < D_8006D614) {
-                    saved = D_8006D5FC;
-                    D_8006D5FC = 0;
+                    saved = CD_cbsync;
+                    CD_cbsync = 0;
 
                     while (D_8006D60C & 0x10) {
                         if ((u8)counter == 0) {
@@ -1166,7 +1166,7 @@ s32 cd_read_retry(void)
                         puts(D_80010A50);
                     }
 
-                    D_8006D5FC = saved;
+                    CD_cbsync = saved;
                     D_8006D904 = D_8006D614;
                 }
 
@@ -1383,7 +1383,7 @@ me, not on the round-17 label.
   block is a permuter find (round 41, candidate `output-235-1`). Reviewed
   here against the report's own correctness argument and re-confirmed:
   `n` (the retry counter) is not read again until `tail:` unconditionally
-  overwrites it, and `saved` (holding a stashed `D_8006D5FC`) is already
+  overwrites it, and `saved` (holding a stashed `CD_cbsync`) is already
   consumed earlier on this same path before being reused as `(s32)&buf` --
   both are freshly written on every pass through this code before their
   next read, with no loop-carried path back to a stale value. This is the

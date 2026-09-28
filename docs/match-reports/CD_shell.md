@@ -7,10 +7,10 @@
 ## What it does
 
 If `D_8006D904 < D_8006D614` (a periodic-service counter is behind), saves
-and clears the `D_8006D5FC` callback, prints a one-shot "waiting" message
+and clears the `CD_cbsync` callback, prints a one-shot "waiting" message
 while `D_8006D60C & 0x10` stays set (calling `CD_cw(1,0,0,0)` each
 iteration), then retries `CD_cw(0x16, D_8006D908, 0, 0)` printing a
-"still waiting" message until it succeeds, restores `D_8006D5FC`, and
+"still waiting" message until it succeeds, restores `CD_cbsync`, and
 catches `D_8006D904` up to `D_8006D614`.
 
 ## The C
@@ -22,8 +22,8 @@ void CD_shell(void)
     s32 counter = 0;
 
     if (D_8006D904 < D_8006D614) {
-        saved = D_8006D5FC;
-        D_8006D5FC = 0;
+        saved = CD_cbsync;
+        CD_cbsync = 0;
 
         while (D_8006D60C & 0x10) {
             if ((u8)counter == 0) {
@@ -38,7 +38,7 @@ void CD_shell(void)
             func_80025AE4(D_80010A50);
         }
 
-        D_8006D5FC = saved;
+        CD_cbsync = saved;
         D_8006D904 = D_8006D614;
     }
 }
