@@ -114,7 +114,7 @@ cast documents the mismatch rather than hiding it.
 
 Two separate spots in this function needed the identical fix, and it is
 the same one CLAUDE.md's stalled-and-rescued `FillRVectors3` guidance and
-this round's `ObjM__EnterState5` report both independently rediscovered://
+this round's `ObjM__EnterLinkDynamic` report both independently rediscovered://
 **GCC 2.6.3 -O2 hoists a load that both arms of an if/else need in common
 to BEFORE the branch, but only when the source hands it a name to hoist.**
 
@@ -134,7 +134,7 @@ to BEFORE the branch, but only when the source hands it a name to hoist.**
    (`if (== 1) {A} else {B}`) put `A` as the fallthrough instead (GCC's
    ordinary if/else lowering places the `if`-arm as the fallthrough and the
    `else`-arm as the branch target) -- the SAME polarity lesson as
-   `ObjM__EnterState5` in this unit, this round. Inverting the source condition
+   `ObjM__EnterLinkDynamic` in this unit, this round. Inverting the source condition
    and swapping the two arms (`if (!= 1) {B} else {A}`) fixed it.
 3. The identical hoist was needed AGAIN for `newObj->methods->slotD4(...)`
    after the `ret == 0` branch -- but reusing the SAME local (`m`) for both

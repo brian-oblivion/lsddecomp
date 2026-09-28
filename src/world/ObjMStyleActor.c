@@ -866,7 +866,7 @@ void ObjM__EnterTimeUp(ObjM *self) {
     ObjM__StartFadeUp(self, DREAM_COLOR_BLACK, 0, 5, 1);
 }
 
-void ObjM__EnterState5(ObjM *self) {
+void ObjM__EnterLinkDynamic(ObjM *self) {
     s32 color;
 
     if (self->dreamSys->currentStage < 0) {

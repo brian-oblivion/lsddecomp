@@ -1,4 +1,6 @@
-# ObjM__EnterState5 -- MATCHED
+# ObjM__EnterLinkDynamic -- MATCHED
+
+> Renamed from `ObjM__EnterState5` on 2026-09-28 (tools/rename.py). Address 0x80053be8.
 
 > Renamed from `func_80053BE8` on 2026-09-24 (tools/rename.py). Address 0x80053be8.
 
@@ -9,13 +11,13 @@ Unit: `src/world/ObjMStyleActor.c`. Runner: echo, round 16.
 ## Signature
 
 ```c
-void ObjM__EnterState5(Obj87034_3bb8c_l *self);
+void ObjM__EnterLinkDynamic(Obj87034_3bb8c_l *self);
 ```
 
 ## Final C
 
 ```c
-void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
+void ObjM__EnterLinkDynamic(Obj87034_3bb8c_l *self) {
     s32 color;
 
     if (self->unk3C->unk164 < 0) {
@@ -45,7 +47,7 @@ void ObjM__EnterState5(Obj87034_3bb8c_l *self) {
 - `ObjM__StartFadeUp` is the sibling-unit helper (`ObjMStyleActor`, matched by
   echo round 15) already forward-declared in this file for
   `ObjM__EnterState6`'s use; that `extern` declaration was moved earlier in the
-  file (still unit-local, not the shared header) since `ObjM__EnterState5`
+  file (still unit-local, not the shared header) since `ObjM__EnterLinkDynamic`
   (ROM-earlier) now needs it too. No behavior change, pure reordering.
 
 ## Non-obvious lever: branch/block polarity
@@ -79,7 +81,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier | evidence |
 | --- | --- | --- | --- |
-| `func_80053BE8` | `ObjM__EnterState5` | B | see below |
+| `func_80053BE8` | `ObjM__EnterLinkDynamic` | B | see below |
 
 **Evidence.** vtable slot +0x098. Sets `self->phase = 5`; same evidence as `ObjM__EnterTimeUp`.
 

@@ -83,7 +83,7 @@ every step).
   and `slotA0`/`slotA4`/`slotA8`/`slotAC` (all `void (*)(Obj87034_3bb8c_l
   *self)`), splitting `pad90[0x09C-0x090]` and `padA0[0x0C0-0x0A0]`.
   `slot9C` already existed (added by a PRIOR unit's function,
-  `ObjM__EnterState5`) -- extended its comment to note this function ALSO
+  `ObjM__EnterLinkDynamic`) -- extended its comment to note this function ALSO
   calls it, rather than declaring a duplicate member.
 - `DreamSysObj_3bb8c_l` (self->unk3C's pointee): added `s32 unk44` at
   +0x044, splitting `pad04[0x164-0x004]` into `pad04[0x040]` + `unk44` +
@@ -109,7 +109,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- | --- |
 | `func_80053984` | `ObjM__OnDreamSysNotify` | B | see below |
 
-**Evidence.** vtable slot +0x090. The class's own state-transition dispatcher: gated on `self->phase == 0`, switches on `code - 0xA` (`jtbl_8001174C`, codes 0xA..0x11) and routes each case onto the SAME class's own `slot94`..`slotAC` -- i.e. `ObjM__EnterTimeUp`, `ObjM__EnterState5`, `ObjM__EnterState6` (this unit) and `ObjM__EnterState7`, `ObjM__EnterState8`, `ObjM__EnterStateA`, `ObjM__NotifyParentsCodeB` (sibling unit ObjMStyleActor) one-to-one, confirmed directly off `tools/classtable.py 0x80087034`'s slot list. When `phase != 0` and `code >= 9` it instead clears `self->target->unk44`.
+**Evidence.** vtable slot +0x090. The class's own state-transition dispatcher: gated on `self->phase == 0`, switches on `code - 0xA` (`jtbl_8001174C`, codes 0xA..0x11) and routes each case onto the SAME class's own `slot94`..`slotAC` -- i.e. `ObjM__EnterTimeUp`, `ObjM__EnterLinkDynamic`, `ObjM__EnterState6` (this unit) and `ObjM__EnterState7`, `ObjM__EnterState8`, `ObjM__EnterStateA`, `ObjM__NotifyParentsCodeB` (sibling unit ObjMStyleActor) one-to-one, confirmed directly off `tools/classtable.py 0x80087034`'s slot list. When `phase != 0` and `code >= 9` it instead clears `self->target->unk44`.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
