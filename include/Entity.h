@@ -96,7 +96,7 @@ struct Entity {
     /* +0x0F8 */ s32 soundCueActive; /* startSoundCue / stopSoundCue */
     /* +0x0FC */ s32 moodTimer;      /* zeroed by startSoundCue, counted by Entity__TickSoundCue */
     /* +0x100 */ FadeBox *fadeBox; /* made by Entity__GetOrCreateFadeBox (New_FadeBox); released by Entity__Finalize */
-    /* +0x104 */ BasicClass *unk104; /* released by Entity__Finalize, never set in Entity code: nothing shows its class. The object is 0x108 bytes (New_Entity) */
+    /* +0x104 */ BasicClass *ownedObject; /* NULLed by the ctor and released by Entity__Finalize; no code sets it, so nothing shows its class. The object is 0x108 bytes (New_Entity) */
 };
 
 /* playTod (+0x12C) is TodActor's slot and returns the flag its occupant
@@ -226,7 +226,7 @@ s32 Entity__UpdateActivationState(Entity *self);
 s32 Entity__UpdateDeactivationState(Entity *self);
 s32 Entity__UpdateTargetProximity(Entity *self);
 s32 Entity__UpdateSoundCueStart(Entity *self);
-void Entity__NotifyIfTargetInRange(Entity *self, s32 arg1);
+void Entity__NotifyIfTargetInRange(Entity *self, s32 unused);
 s32 Entity__IsTargetInRange(Entity *self, s32 range);
 s32 Entity__UpdateSoundCueStop(Entity *self);
 

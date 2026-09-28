@@ -122,7 +122,7 @@ Entity *Entity__Entity(Entity *self, s32 moodIndex, void *desc, void *sound) {
         self->moodIndex = moodIndex;
         self->soundCueSet.tag = 0;
         self->fadeBox = NULL;
-        self->unk104 = NULL;
+        self->ownedObject = NULL;
         self->methods->reset(self);
         return self;
     }
@@ -163,8 +163,8 @@ void Entity__Finalize(Entity *self) {
     if (self->fadeBox != NULL) {
         self->fadeBox->methods->release(self->fadeBox);
     }
-    if (self->unk104 != NULL) {
-        self->unk104->methods->release(self->unk104);
+    if (self->ownedObject != NULL) {
+        self->ownedObject->methods->release(self->ownedObject);
     }
     GetTodActorMethods()->finalize((TodActor *)self);
 }
