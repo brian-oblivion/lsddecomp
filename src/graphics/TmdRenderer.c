@@ -111,7 +111,7 @@ s32 GetBMemPMgrBusy(void) {
 extern s32 D_8008E248;              /* GsLOFF */
 extern s32 D_80090C18;              /* GsDIV1..5: subdivision level */
 extern s32 gSortUseGlobalLightMode; /* GsLLMOD */
-extern s32 gSortLightMode;          /* GsFOG | GsMATE */
+extern s32 sSortLightMode;          /* GsFOG | GsMATE */
 
 /* MATCHING: three s8s, so SortTmdObject's copy of gTexturedFaceColor is a
  * 3-byte block move (`la`, three `lb`, three `sb`). */
@@ -313,12 +313,12 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     D_80090C18 = (obj->attribute >> 9) & 0x7;
     D_8008E248 = (obj->attribute >> 6) & 0x1;
     gSortUseGlobalLightMode = (obj->attribute >> 5) & 0x1;
-    gSortLightMode = (obj->attribute >> 3) & 0x3;
+    sSortLightMode = (obj->attribute >> 3) & 0x3;
     ctx->unk8 = 10;
 
     ctx->faceColor = gTexturedFaceColor;
 
-    if ((gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) || gSortLightMode != 0) {
+    if ((gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) || sSortLightMode != 0) {
         dpShift = DP_CLUT_SHIFT_CUED;
     } else {
         dpShift = DP_CLUT_SHIFT_NONE;

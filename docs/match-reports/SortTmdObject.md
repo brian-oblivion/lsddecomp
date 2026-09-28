@@ -505,7 +505,7 @@ position.
  * cross-unit-declaration rule. */
 extern s32 D_80090C18;
 extern s32 gSortUseGlobalLightMode;
-extern s32 gSortLightMode;
+extern s32 sSortLightMode;
 extern s32 GsLIGHT_MODE;
 extern s8 gTexturedFaceColor[3];
 extern void *GsOUT_PACKET_P;
@@ -616,7 +616,7 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
     D_80090C18 = (*(u32 *)obj >> 9) & 0x7;
     D_8008E248 = (*(u32 *)obj >> 6) & 0x1;
     gSortUseGlobalLightMode = (*(u32 *)obj >> 5) & 0x1;
-    gSortLightMode = (*(u32 *)obj >> 3) & 0x3;
+    sSortLightMode = (*(u32 *)obj >> 3) & 0x3;
 
     {
         s8 *tint = gTexturedFaceColor;
@@ -628,7 +628,7 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
 
     if (gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) {
         dpShift = 9;
-    } else if (gSortLightMode != 0) {
+    } else if (sSortLightMode != 0) {
         dpShift = 9;
     } else {
         dpShift = 0x10;
@@ -1299,7 +1299,7 @@ register" above.
 extern void *GsOUT_PACKET_P;
 extern s32 D_80090C18;
 extern s32 gSortUseGlobalLightMode;
-extern s32 gSortLightMode;
+extern s32 sSortLightMode;
 extern s32 GsLIGHT_MODE;
 extern s8 gTexturedFaceColor[3];
 
@@ -1467,7 +1467,7 @@ void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
         D_80090C18 = (raw >> 9) & 0x7;
         D_8008E248 = (raw >> 6) & 0x1;
         gSortUseGlobalLightMode = (raw >> 5) & 0x1;
-        gSortLightMode = (raw >> 3) & 0x3;
+        sSortLightMode = (raw >> 3) & 0x3;
     }
     prim[0x34] = gTexturedFaceColor[0];
     prim[0x35] = gTexturedFaceColor[1];
@@ -1475,7 +1475,7 @@ void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
 
     if (gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) {
         v0 = 9;
-    } else if (gSortLightMode != 0) {
+    } else if (sSortLightMode != 0) {
         v0 = 9;
     } else {
         v0 = 0x10;
@@ -2063,7 +2063,7 @@ Byte-identical after every step; the three oracles green at each commit.
   GsOUT_PACKET_P buffer and the OT. "Sort" is libgs's verb for that.
 - `D_800902E0` -> `GsLIGHT_MODE`: Sony's, pinned in `psyq-objects.ld` by eight
   libgs objects; `rename.py` names it as the only allowed rename.
-- `D_8008E24C` -> `gSortLightMode`, tier B: attribute bits 3-4 (GsFOG|GsMATE).
+- `D_8008E24C` -> `sSortLightMode`, tier B: attribute bits 3-4 (GsFOG|GsMATE).
 - `D_8008E250` -> `gSortUseGlobalLightMode`, tier B: attribute bit 5
   (GsLLMOD); the object is depth-cued when it is set and GsLIGHT_MODE is
   non-zero.
