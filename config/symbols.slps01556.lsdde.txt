@@ -3125,7 +3125,7 @@ SsUtVibrateOff = 0x8002E300; // type:func
 D_8006DAD8 = 0x8006DAD8;
 SetDataDirectory = 0x800270AC; // type:func
 GetDataDirectory = 0x800270B8; // type:func
-gDataDirectory = 0x8008A854;
+sDataDirectory = 0x8008A854;
 gFileTableRegistered = 0x8008A850;
 gDefaultDataDirectory = 0x8008A960;
 // identified (round 99, echo's evidence, head's rename): as _svm_okon2 --

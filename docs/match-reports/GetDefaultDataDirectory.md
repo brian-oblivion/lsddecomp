@@ -24,7 +24,7 @@ s32 GetDefaultDataDirectory(void) {
 Round 82 (bravo, naming pass). Left as `func_`, tier C. It is mechanically a
 pure getter (which would ordinarily be tier A), but its target `gDefaultDataDirectory`
 has no established purpose: its only consumer is `SetDataDirectory` (GameApplicationFileResource.c,
-deliberately left unnamed by that unit -- "a getter/setter pair for gDataDirectory
+deliberately left unnamed by that unit -- "a getter/setter pair for sDataDirectory
 ... left unnamed"), which just stores it into a second, equally unnamed
 small-data global at GameApplication construction time. There is nothing here to
 name the getter FOR, so `Get<Something>` would be a guess, not evidence.

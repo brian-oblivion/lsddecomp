@@ -645,14 +645,14 @@ s32 RegisterFileTableEntries(CdFileEntry *table, s32 count) {
     return 1;
 }
 
-extern char *gDataDirectory;
+extern char *sDataDirectory;
 
 void SetDataDirectory(char *dir) {
-    gDataDirectory = dir;
+    sDataDirectory = dir;
 }
 
 char *GetDataDirectory(void) {
-    return gDataDirectory;
+    return sDataDirectory;
 }
 
 char *BuildFileName(char *dest, char *name, char *dir, char *ext) {

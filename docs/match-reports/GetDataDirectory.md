@@ -6,7 +6,7 @@
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
 > `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
 > the whole image is byte-exact with the flags on, and this function was one of
-> the live tests -- `return gDataDirectory;`, as this report predicted. The C is in `src/app/GameApplicationFileResource.c`. Everything below is the
+> the live tests -- `return sDataDirectory;`, as this report predicted. The C is in `src/app/GameApplicationFileResource.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
 > **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was
@@ -24,24 +24,24 @@
 
 ## What it does
 
-A getter: `return gDataDirectory;` — the read side of `SetDataDirectory`'s setter.
-See that report for what's known about `gDataDirectory` itself.
+A getter: `return sDataDirectory;` — the read side of `SetDataDirectory`'s setter.
+See that report for what's known about `sDataDirectory` itself.
 
 ## Residue
 
-Same root cause as `LockActiveDataSource` / `SetDataDirectory`: `gDataDirectory` is a real
+Same root cause as `LockActiveDataSource` / `SetDataDirectory`: `sDataDirectory` is a real
 `.sdata` global (file `0x7b008`) that retail addresses with a single
-`lw $v0, %gp_rel(gDataDirectory)($gp)`, which this project's pinned `-G0`
+`lw $v0, %gp_rel(sDataDirectory)($gp)`, which this project's pinned `-G0`
 prevents cc1 from ever emitting. See `LockActiveDataSource.md` for the isolated
 reproducer.
 
 ## Preserved body
 
 ```c
-extern void *gDataDirectory;
+extern void *sDataDirectory;
 
 void *GetDataDirectory(void) {
-    return gDataDirectory;
+    return sDataDirectory;
 }
 ```
 
@@ -54,7 +54,7 @@ See `LockActiveDataSource.md`.
 Round 52 (alpha), FINISHING-PLAN track 3.
 
 Not renamed -- see `SetDataDirectory.md` (its setter), which carries the full
-evidence and reasoning. Same `gDataDirectory` global, same absence of usage
+evidence and reasoning. Same `sDataDirectory` global, same absence of usage
 evidence, same conclusion.
 
 ## Naming (round 99, charlie, track 7)

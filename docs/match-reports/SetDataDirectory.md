@@ -6,7 +6,7 @@
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
 > `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
 > the whole image is byte-exact with the flags on, and this function was one of
-> the live tests -- `gDataDirectory = value;`, as this report predicted. The C is in `src/app/GameApplicationFileResource.c`. Everything below is the
+> the live tests -- `sDataDirectory = value;`, as this report predicted. The C is in `src/app/GameApplicationFileResource.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
 > **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was
@@ -24,19 +24,19 @@
 
 ## What it does
 
-A setter: `gDataDirectory = value;`. `gDataDirectory` is another slot in the same
+A setter: `sDataDirectory = value;`. `sDataDirectory` is another slot in the same
 `.sdata` region as `sActiveDataSource` (file `0x7b008`; see
 `asm/data/7B008.sdata.s`), initialized in retail to `0x8006D4A8` — a pointer
 value. `D_8006D4A8` itself sits right at the tail of the `gFileResourceMethods` method
 table as splat has that table carved (see `include/GameApplicationFileResource.h`), which may
-mean the table's boundary was drawn one word short and `gDataDirectory` actually
+mean the table's boundary was drawn one word short and `sDataDirectory` actually
 points at the start of a separate, still-unidentified global — not resolved
 here.
 
 ## Residue
 
-Retail: `sw $a0, %gp_rel(gDataDirectory)($gp)` — one instruction. Compiling
-`extern void *gDataDirectory; void SetDataDirectory(void *value) { gDataDirectory = value; }`
+Retail: `sw $a0, %gp_rel(sDataDirectory)($gp)` — one instruction. Compiling
+`extern void *sDataDirectory; void SetDataDirectory(void *value) { sDataDirectory = value; }`
 under this project's pinned `-G0` produces the two-instruction absolute
 `lui`/`sw` form instead — same root cause as `LockActiveDataSource` (full isolated
 reproducer there): cc1's own `-G` value gates whether it emits the
@@ -52,10 +52,10 @@ else in the unit.
 ## Preserved body
 
 ```c
-extern void *gDataDirectory;
+extern void *sDataDirectory;
 
 void SetDataDirectory(void *value) {
-    gDataDirectory = value;
+    sDataDirectory = value;
 }
 ```
 
@@ -74,8 +74,8 @@ before trusting anything downstream.
 
 Round 52 (alpha), FINISHING-PLAN track 3.
 
-Not renamed. `SetDataDirectory` is a setter (`gDataDirectory = value;`) and
-`GetDataDirectory` its getter (`return gDataDirectory;`). `gDataDirectory` is a real
+Not renamed. `SetDataDirectory` is a setter (`sDataDirectory = value;`) and
+`GetDataDirectory` its getter (`return sDataDirectory;`). `sDataDirectory` is a real
 `.sdata` global initialized to `0x8006D4A8`, which sits at (or just past)
 the tail of the gFileResourceMethods method table as splat has it carved -- possibly
 meaning the table boundary is one word short and this actually points at a
@@ -96,7 +96,7 @@ state before these renames.
 | --- | --- | --- |
 | `func_800270AC` | `SetDataDirectory` | A |
 | `func_800270B8` | `GetDataDirectory` | A |
-| `D_8008A854` | `gDataDirectory` | A |
+| `D_8008A854` | `sDataDirectory` | A |
 
 **Evidence.** Round 52 found no caller. There are three now, and they agree:
 
@@ -110,7 +110,7 @@ state before these renames.
   returns `gDefaultDataDirectory`, whose retail initialiser is `&D_8008A958`, the
   `.sdata` string `"CDI\\"`. That string ends in the separator, which is
   what the readers need, because they put nothing between it and the name.
-- **Default.** `gDataDirectory`'s retail initialiser is `0x8006D4A8`. The
+- **Default.** `sDataDirectory`'s retail initialiser is `0x8006D4A8`. The
   byte there is `0x00`, so the value is an empty string and paths resolve
   from the disc root until the application installs `"CDI\\"`. That word is
   also the last word of `gFileResourceMethods` as splat has that table
