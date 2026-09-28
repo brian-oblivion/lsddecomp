@@ -18,18 +18,20 @@
 #include "common.h"
 #include "StageGrid.h"
 
-/* The dimensions table has 14 entries: GetStageGridDimensionsCount returns it,
- * GetStageGridDimensionsTable writes it out, and GetStageChunkFromMood bounds its
- * stage loop by it. */
-#define STAGE_GRID_DIMENSIONS_COUNT 14
+/* The number of stages, STG00 to STG13 on the disc: one entry each in
+ * sStageGridDimensions and sStageChunkMoods (sStage00ChunkMoods ..
+ * sStage13ChunkMoods). GetStageGridDimensionsCount returns it,
+ * GetStageGridDimensionsTable writes it out, and GetStageChunkFromMood bounds
+ * its stage loop by it. */
+#define STAGE_COUNT 14
 
 s32 GetStageGridDimensionsCount(void) {
-    return STAGE_GRID_DIMENSIONS_COUNT;
+    return STAGE_COUNT;
 }
 
 StageGridDimensions *GetStageGridDimensionsTable(s32 *count) {
     if (count != NULL) {
-        *count = STAGE_GRID_DIMENSIONS_COUNT;
+        *count = STAGE_COUNT;
     }
     return sStageGridDimensions;
 }
@@ -46,7 +48,7 @@ s32 GetStageChunkFromMood(StageChunk *chunk, MoodGraphPoint *mood) {
     s32 rows;
     s32 columns;
 
-    for (stage = 0; stage < STAGE_GRID_DIMENSIONS_COUNT; stage++) {
+    for (stage = 0; stage < STAGE_COUNT; stage++) {
         chunkMood = sStageChunkMoods[stage];
         rows = sStageGridDimensions[stage].rows;
         columns = sStageGridDimensions[stage].columns;

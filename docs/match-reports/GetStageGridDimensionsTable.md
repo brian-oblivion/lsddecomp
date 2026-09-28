@@ -32,7 +32,7 @@ written as an ordinary `if` body in C.
 ```c
 StageGridDimensions *GetStageGridDimensionsTable(s32 *count) {
     if (count != NULL) {
-        *count = STAGE_GRID_DIMENSIONS_COUNT;
+        *count = STAGE_COUNT;
     }
     return sStageGridDimensions;
 }

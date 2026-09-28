@@ -40,3 +40,11 @@ has, and the wider codebase's existing `Get*Count(void)` convention
 (`GetFileTableCount`, `GetOpenVabCount`). No caller exists anywhere in the
 extracted asm (checked: no `jal` to its address outside its own `.s`), so the
 name rests on behaviour alone, not on a call site.
+
+**Constant `STAGE_GRID_DIMENSIONS_COUNT` -> `STAGE_COUNT` (round 101, track 7).**
+The value is the length of two parallel per-stage tables at once
+(`sStageGridDimensions` and `sStageChunkMoods`, whose 14 pointers go to
+`sStage00ChunkMoods` .. `sStage13ChunkMoods`, the stages the disc keeps as
+`STG00` .. `STG13`), so it counts stages, not dimension entries. Defined in
+`src/StageGrid.c`, the only unit that uses it; the derivation above keeps the
+name it was matched under.

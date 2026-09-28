@@ -18,7 +18,7 @@ s32 GetStageChunkFromMood(StageChunk *chunk, MoodGraphPoint *mood) {
     s32 rows;
     s32 columns;
 
-    for (stage = 0; stage < STAGE_GRID_DIMENSIONS_COUNT; stage++) {
+    for (stage = 0; stage < STAGE_COUNT; stage++) {
         chunkMood = sStageChunkMoods[stage];
         rows = sStageGridDimensions[stage].rows;
         columns = sStageGridDimensions[stage].columns;
