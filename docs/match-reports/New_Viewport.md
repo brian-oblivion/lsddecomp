@@ -44,7 +44,7 @@ falling off the end of the function relying on the allocator's own `$v0`)
 was chosen over the `New_GameApplication`/no-explicit-return idiom because
 retail's own `beqz`-delay-slot zeroes `$v0` explicitly right at the branch
 (redundant with the allocator's own already-zero return on failure) --
-the same explicit-return shape `DayTaskStageMap.c`'s `New_DayTask` uses, and
+the same explicit-return shape `dream_day.c`'s `New_DayTask` uses, and
 the byte match confirms the reading.
 
 ## Provenance

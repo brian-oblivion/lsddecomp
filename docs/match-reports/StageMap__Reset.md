@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004AA10` on 2026-09-22 (tools/rename.py). Address 0x8004aa10.
 
-**Unit:** `DayTaskStageMap` · **Size:** 23 words · **Status:** MATCHED, 23/23 exact.
+**Unit:** `dream_day` · **Size:** 23 words · **Status:** MATCHED, 23/23 exact.
 
 Previously filed as blocked by `gp_rel` (round 42 reopen note); that blocker
 was RESOLVED in round 42 by `maspsx --gp-symbols`, pinned in the Makefile.
@@ -43,7 +43,7 @@ void StageMap__Reset(StageMap *self)
   with no other reference anywhere in the image (checked with
   `grep -rl sDefaultGridSpan asm/`). It sits in an unnamed top-level `sdata`
   segment, not owned by any carved unit, so it is declared `extern s32`
-  directly in `src/world/DayTaskStageMap.c` -- same pattern already used for
+  directly in `src/world/dream_day.c` -- same pattern already used for
   `sDefaultOrigin` in this same file. `%gp_rel(sDefaultGridSpan)($gp)` loads its
   *value*, not its address, so the call argument is a plain `s32`, not a
   pointer.
@@ -51,7 +51,7 @@ void StageMap__Reset(StageMap *self)
   instruction order, and slot `+0x0DC` had no prior occupant or
   declaration -- added to `StageMapMethods` as `slotDC(StageMap*, s32)`,
   splitting the padding that used to run `0xD4..0xF4` at `0xDC`.
-  `include/DayTaskStageMap.h` updated (was already shared only within this
+  `include/dream_day.h` updated (was already shared only within this
   runner's assignment this round; no cross-runner contention).
 - Offsets `0x1CC`/`0x1D0`/`0x1D4`/`0x1D8` were inside the `StageMap`
   struct's `pad1C4[0x1E0-0x1C4]` catch-all padding; split into four new
@@ -78,16 +78,16 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AA10` | `StageMap__Reset` | B | Occupant of vtable slot `+0x040`. Body does nothing but put the object back to a known state: clears `config`, `acceptedTags` and `rectCount`, re-applies the default grid span, and writes the four `-1` sentinels at `+0x1CC..+0x1D8`. The sibling table `gDayTaskMethods` names its own `+0x040` occupant `resetUnk3C` (`include/DayTaskStageMap.h`), so `+0x040` is a reset slot in this family. Tier B and not A because nothing establishes WHEN a reset is wanted -- its one known caller is `StageMap__SetConfig`. |
+| `func_8004AA10` | `StageMap__Reset` | B | Occupant of vtable slot `+0x040`. Body does nothing but put the object back to a known state: clears `config`, `acceptedTags` and `rectCount`, re-applies the default grid span, and writes the four `-1` sentinels at `+0x1CC..+0x1D8`. The sibling table `gDayTaskMethods` names its own `+0x040` occupant `resetUnk3C` (`include/dream_day.h`), so `+0x040` is a reset slot in this family. Tier B and not A because nothing establishes WHEN a reset is wanted -- its one known caller is `StageMap__SetConfig`. |
 | `D_8008A980` | `sDefaultGridSpan` | B | Value `0x0000A000`, and this is its only reader in the whole image. It is handed straight to `setGridSpan`, which derives `span >> 11 == 20` -- the byte-verified grid row stride -- and `span >> 12 == 10`. See `StageMap__SetGridSpan.md` for the full arithmetic. |
 
 Field names established here:
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `StageMap+0x068` | `config` | B | Cleared here, set by `StageMap__SetConfig`, read by `StageMap__ApplyToSenderFootprint` as `config->unk4`; `DayTaskStageMap` reads the same pointee as `{s16 divisor, s16 count, s32 unk4}` from four functions -- a small parameter block, not an object. |
+| `StageMap+0x068` | `config` | B | Cleared here, set by `StageMap__SetConfig`, read by `StageMap__ApplyToSenderFootprint` as `config->unk4`; `dream_day` reads the same pointee as `{s16 divisor, s16 count, s32 unk4}` from four functions -- a small parameter block, not an object. |
 | `StageMap+0x0E8` | `acceptedTags` | A | See `StageMap__ForwardAcceptedCommand.md`: its only reader walks it as a NUL-terminated list of vtable header words and uses it to accept or reject a sender. |
-| `StageMap+0x088` | `rectCount` | A | Its only writers set it to 1 (`StageMap__SetFootprintRect`) or save/restore it around a walk (`StageMap__ApplyToSenderFootprint`), and its only readers bound a loop over `rects[]` (here, and `DayTaskStageMap`'s matched `StageMap__SetFootprintVisible`). |
+| `StageMap+0x088` | `rectCount` | A | Its only writers set it to 1 (`StageMap__SetFootprintRect`) or save/restore it around a walk (`StageMap__ApplyToSenderFootprint`), and its only readers bound a loop over `rects[]` (here, and `dream_day`'s matched `StageMap__SetFootprintVisible`). |
 
 `unk1CC`/`unk1D0`/`unk1D4`/`unk1D8` deliberately keep placeholder names: all
 that is known is that they are four consecutive words set to `-1` here and

@@ -474,7 +474,7 @@ afterward.
   real build's residue (one word long, same register-role class), and the
   permuter's debug diff reproduces the SAME structural shape (address
   cached before the loop, s0/s1/s2 rotated) rather than a contradictory one
-  the way the `DayTaskStageMap` family's void scaffolds did in round 46. No
+  the way the `dream_day` family's void scaffolds did in round 46. No
   disagreement to flag.
 
 **Verdict: search DECLINED, per the round-47 brief's explicit warning to

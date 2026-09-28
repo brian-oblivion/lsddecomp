@@ -487,7 +487,7 @@ This is the Gate 1b "rebuild before trusting" check, and it matters here
 because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
-four preserved bodies in `DayTaskStageMap` were rebuilt this round and all four
+four preserved bodies in `dream_day` were rebuilt this round and all four
 are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
 `StageMap__LoadChunksAround` 125/140, `StageMap__PopulateSlotCells` 130/150. No stale figure and no
 never-linked body in this unit.
@@ -552,7 +552,7 @@ order. Whatever retail's source does here, it does it once.
 
 **69/70, exact length, one word remaining** at vram `0x8004C500` -- the mirror
 `addu` in the second bounds comparison, the one the asymmetry protects. The
-`INCLUDE_ASM` is restored and the preserved body in `src/world/DayTaskStageMap.c` has
+`INCLUDE_ASM` is restored and the preserved body in `src/world/dream_day.c` has
 been updated to the 69/70 form.
 
 ### Proposed learning
@@ -570,7 +570,7 @@ Rebuilt round 38's 69/70 body directly (flip `#if 0`->`#if 1`, comment out the
 `INCLUDE_ASM`) before touching anything, per Gate 1b: **confirmed 69/70,
 exact length, single-word diff at vram `0x8004C500`** (retail
 `addu $v0,$v1,$s4` / built `addu $v0,$s4,$v1`) -- identical to the round 38
-report's own recorded figure and diff site. Objdump of `build/src/DayTaskStageMap.c.o`
+report's own recorded figure and diff site. Objdump of `build/src/dream_day.c.o`
 confirms every OTHER instruction in the function byte-matches retail one for
 one; the residue is exactly the single operand-order flip on this one `addu`,
 nothing else moved.
@@ -658,7 +658,7 @@ Parameters and locals, tier A: `arg1` -> `pos`, `tol` -> `span` (a chunk's width
 
 Constants: 0xA000 -> `STAGE_CHUNK_SIZE`; loop bound 7 -> `CHUNK_NEIGHBOUR_COUNT`; 0x800 -> the unit-local `VERTICAL_LAYER_HEIGHT` (2048). Not `STAGE_CELL_SIZE`: nothing shows a vertical layer is one cell tall, only that the value is the same.
 
-The comment that stood above the function in `src/world/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
+The comment that stood above the function in `src/world/dream_day.c`, moved here verbatim (its local names are the pre-track-7 ones):
 
 ```c
 /* MATCH, round 73 (bravo): 70/70. The last word was the operand order

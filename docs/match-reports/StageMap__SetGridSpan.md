@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004B32C` on 2026-09-22 (tools/rename.py). Address 0x8004b32c.
 
-**Unit:** DayTaskStageMap · **Size:** 6 words · **Status:** MATCHED (6/6 words)
+**Unit:** dream_day · **Size:** 6 words · **Status:** MATCHED (6/6 words)
 
 ## What it does
 
@@ -49,7 +49,7 @@ The three numbers, and why they are not a guess:
 - `gridHalfCells = span >> 12` = `0xA000 >> 12` = **10**.
 - The constructor places grid cells `0x800` apart on both axes, and
   `0xA000 / 0x800` = **20**.
-- `DayTaskStageMap`'s `StageMap__SetFootprintVisible` is BYTE-MATCHED and indexes the same cell
+- `dream_day`'s `StageMap__SetFootprintVisible` is BYTE-MATCHED and indexes the same cell
   block with a row stride of **20** (`e->unk10 + slot->h4 + slot->h6 * 20`,
   and `cell += 20 - slot->h8` at each row's end).
 - `StageMap__SetFootprintRect` treats `0x13` = 19 as the last valid column
@@ -61,7 +61,7 @@ an arbitrary bit slice. That is what the names record.
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `StageMap+0x074` | `gridSpan` | B | Stored raw here; `DayTaskStageMap`'s `StageMap__ComputeFootprintFromRotation` copies it into a matrix-query template. The world-space extent reading is from the arithmetic above. |
+| `StageMap+0x074` | `gridSpan` | B | Stored raw here; `dream_day`'s `StageMap__ComputeFootprintFromRotation` copies it into a matrix-query template. The world-space extent reading is from the arithmetic above. |
 | `StageMap+0x078` | `gridHalfCells` | B | `span >> 12`, half of `gridCells`. |
 | `StageMap+0x07A` | `gridCells` | B | `span >> 11`; equals the byte-verified row stride. |
 
@@ -78,7 +78,7 @@ so not mine to edit):
 | `Obj866E8` | `unk7A` | `gridCells` | B | as above |
 
 Also posted to the round broadcast. Nothing in THIS unit's build depends on
-them; they are offered because `DayTaskStageMap` reads all three and currently has
+them; they are offered because `dream_day` reads all three and currently has
 only offset names for them.
 
 ## Track 6 (2026-09-26, round 93, alpha)

@@ -99,5 +99,5 @@ This function: `StageMap__ResetChildRate` -> `StageMap__ResetCellScale` (`python
 Parameter `item` -> `cell`. `D_800869CC` -> `sScaleOne` (tools/rename.py,
 first as sScaleOneStep, then sScaleOne; tier A: 1/1, 1/1, 1/1, set with
 updateScale's `set` = 1). Its extern moved from include/class_3bb8c.h into
-DayTaskStageMap.c, the only reader. SceneNode's sSceneNodeScaleOne holds the same
+dream_day.c, the only reader. SceneNode's sSceneNodeScaleOne holds the same
 values at another address.

@@ -1,17 +1,17 @@
-#ifndef DAYTASKSTAGEMAP_H
-#define DAYTASKSTAGEMAP_H
+#ifndef DREAM_DAY_H
+#define DREAM_DAY_H
 
 #include "common.h"
 #include "DayTask.h"
 
 /*
- * Declarations src/world/DayTaskStageMap.c's DayTask, TimedTask and
+ * Declarations src/world/dream_day.c's DayTask, TimedTask and
  * RegisterRecordTableFiles use (the .c's banner says what it holds): the
  * functions they call that no header it includes declares. DayTask and
  * TimedTask themselves are include/DayTask.h and include/TimedTask.h.
  */
 
-/* Defined in src/world/DayTaskStageMap.c, after DayTask's methods; game_shell.c
+/* Defined in src/world/dream_day.c, after DayTask's methods; game_shell.c
  * declares it too. */
 extern s32 RegisterRecordTableFiles(s32 all);
 

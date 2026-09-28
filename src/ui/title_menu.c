@@ -26,7 +26,7 @@
  * operations, and last its state machine, its getter and
  * StampSaveTitleFileLetter.
  *
- * NodeGuardedViewport and GridCell belong with DayTaskStageMap.c's code:
+ * NodeGuardedViewport and GridCell belong with dream_day.c's code:
  * DayTask's ctor makes the NodeGuardedViewport and StageMap is GridCell's
  * only maker.
  */

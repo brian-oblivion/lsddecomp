@@ -18,7 +18,7 @@
  * one at +0x010 (initArgs->frameClock, or New_FrameClock()), adds it as a child of
  * itself, of the viewport and of the LightRig, and IntermediateBase__OnDrawSystemEvent
  * calls its tick on the DrawSystem's event 2. DayTask__DayTask
- * (src/world/DayTaskStageMap.c) makes the one handed in as initArgs->frameClock.
+ * (src/world/dream_day.c) makes the one handed in as initArgs->frameClock.
  *
  * Its listeners, all dispatching on the sender's class nibble 5:
  * IntermediateBase's update counts every event; Viewport__OnFrameClockEvent

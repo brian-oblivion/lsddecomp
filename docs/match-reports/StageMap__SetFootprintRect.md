@@ -8,7 +8,7 @@ REVISITED, round 71: MATCHED (4 builds); names/types used (parameters renamed
 ## Round 71 (charlie) — the match
 
 **Rebuilt as given first.** The round-47 preserved body (the `#if 0` block
-that sat in `src/world/DayTaskStageMap.c`) rebuilt at **22/52, insertions 5 /
+that sat in `src/world/dream_day.c`) rebuilt at **22/52, insertions 5 /
 deletions 5, 18 positional skeleton diffs** — the recorded score was
 current, but the recorded CAUSE ("the oversized frame") was a symptom: the
 old body carried four `s16` locals, two `s8` locals and a dead trailing
@@ -35,7 +35,7 @@ because of anything the permuter could reach.
 Build history: 22/52 (as given) -> 11/52 length-off (reload) -> 4/4
 ins/del (copies added) -> 51/52 (branch sense + span as height) -> 52/52.
 
-The matched C is the live definition in `src/world/DayTaskStageMap.c`; not repeated
+The matched C is the live definition in `src/world/dream_day.c`; not repeated
 here.
 
 ### Proposed learning
@@ -245,7 +245,7 @@ differs from first" residues before re-deriving from scratch.
 ## Provenance
 
 round 2026-09-02 (head-requested extension, second pass after the initial
-6-function batch merged to main), runner ALPHA, unit DayTaskStageMap. Seven
+6-function batch merged to main), runner ALPHA, unit dream_day. Seven
 attempts, hard stop not reached but diminishing returns — moved on to stay
 within budget for the remaining assigned functions. Restored to
 `INCLUDE_ASM`.
@@ -380,7 +380,7 @@ Differences: 28 (5)`, `Stack Differences: 172 (1)`. This is FAR from
 **(c) does the scaffold's signature agree with the real build's own
 residue -- checked instead of declining outright, and this is the
 discriminator that justified searching anyway.** Dropped the exact same
-seed body into `src/world/DayTaskStageMap.c` in place of the `INCLUDE_ASM`,
+seed body into `src/world/dream_day.c` in place of the `INCLUDE_ASM`,
 rebuilt through the real oracle, and compared: the in-tree build ALSO
 scores 19/52 with the IDENTICAL 6 insertions/6 deletions (`asm-differ`
 shows the same extra `move s4,zero` + `sll/sra` sign-extend pair
@@ -475,7 +475,7 @@ function's own range. `asm-differ` score dropped from ~1330 (base) to
 1107 for this candidate specifically.
 
 **Still not byte-exact; `INCLUDE_ASM` restored,** this new 22/52 body is
-what `src/world/DayTaskStageMap.c` now preserves in `#if 0`. The frame-size gap
+what `src/world/dream_day.c` now preserves in `#if 0`. The frame-size gap
 (`raw3`'s extra stack slot) and the remaining `b3`-side sign-extend
 residue are unchanged from every prior round's analysis -- this is an
 incremental win on the SAME open residue, not a new mechanism.
@@ -610,7 +610,7 @@ the race to the log's tail.
 
 Still not byte-exact; best reached remains **22/52** (round 47's figure,
 re-confirmed, unchanged by this search). `INCLUDE_ASM` in place,
-`src/world/DayTaskStageMap.c` untouched beyond the verification rebuilds (all
+`src/world/dream_day.c` untouched beyond the verification rebuilds (all
 reverted, `git diff --stat` clean throughout).
 
 ### Proposed learning
@@ -712,7 +712,7 @@ sighting of that 20.
 Round 67 renamed this unit's struct fields. The preserved bodies in THIS
 report are left in their original spelling -- preserved code is a record of
 what was tried, not doctrine -- but they will not compile as written against
-the current `include/DayTaskStageMap.h`. The mapping, for whoever rebuilds one:
+the current `include/dream_day.h`. The mapping, for whoever rebuilds one:
 
 | old | current |
 | --- | --- |
@@ -729,7 +729,7 @@ the current `include/DayTaskStageMap.h`. The mapping, for whoever rebuilds one:
 | `HistoryEntry_3ac78` / `HistoryBlock_3ac78` | `GridRect_3ac78` / `GridRectList_3ac78` |
 | `->methods->unk04(...)` | `->methods->release(...)` |
 
-The `#if 0` copy that lives in `src/world/DayTaskStageMap.c` WAS updated to the current
+The `#if 0` copy that lives in `src/world/dream_day.c` WAS updated to the current
 names in the same round, so that one still compiles; only identifiers changed
 and the recorded score is unaffected.
 

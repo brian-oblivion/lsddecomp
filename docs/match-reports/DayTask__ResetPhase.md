@@ -8,7 +8,7 @@
 
 > Renamed from `func_80049A14` on 2026-09-23 (tools/rename.py). Address 0x80049a14.
 
-**Unit:** DayTaskStageMap · **Size:** 2 words (0x8 bytes) · **Status:** MATCHED (2/2 words)
+**Unit:** dream_day · **Size:** 2 words (0x8 bytes) · **Status:** MATCHED (2/2 words)
 
 ## What it does
 
@@ -31,7 +31,7 @@ void DayTask__ResetPhase(Obj865C8 *self) {
 ```
 
 `Obj865C8` and its field `unk3C` are established in the new unit header
-`include/DayTaskStageMap.h`, added this round.
+`include/dream_day.h`, added this round.
 
 ## Proposed learning
 
@@ -43,4 +43,4 @@ None beyond what's already documented for this residue-free shape.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Renamed from Obj865C8__ResetState. The field is `phase` (+0x03C): IntermediateBase already names +0x020 `state`, a different field. This is the +0x040 resetCounters override and clears only phase. Tier A.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__ResetState. The field is `phase` (+0x03C): IntermediateBase already names +0x020 `state`, a different field. This is the +0x040 resetCounters override and clears only phase. Tier A.

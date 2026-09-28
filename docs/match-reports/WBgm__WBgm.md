@@ -28,7 +28,7 @@ this pass started). Recorded as proposals for the head to apply with
 - `GetDrawSystem` (defined `src/graphics/draw_system.c`, returns `Class6C070 *`): called
   here only as `addChild`/`removeChild`'s argument, registering `WBgm` as a
   child of that singleton for lifecycle notification -- the same pattern
-  `DayTaskStageMap.c` and `tim_image.c` use it for. No WBgm-specific evidence for
+  `dream_day.c` and `tim_image.c` use it for. No WBgm-specific evidence for
   its own name; not proposing one.
 - `New_RequestedFile` (defined `src/graphics/sprite.c`, an un-matched `INCLUDE_ASM`
   stall, signature `SeqData *New_RequestedFile(s32 arg)`): the only function that

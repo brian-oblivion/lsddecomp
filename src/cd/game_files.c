@@ -7,7 +7,7 @@
  * map chunk, STGnn\Mnnn.LBD.
  *
  * sRecordTable is an array of 0x1C-byte records (CdFileEntry), each a file path
- * padded with zeros; DayTaskStageMap.c's RegisterRecordTableFiles hands them to
+ * padded with zeros; dream_day.c's RegisterRecordTableFiles hands them to
  * the CD driver. In order:
  *  - the seven sound banks' SND\name.VH/VB pairs and SND\SE.VH/VB;
  *  - each stage's files, from sStageFirstRecord[stage]: its four textures

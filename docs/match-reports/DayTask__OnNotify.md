@@ -73,7 +73,7 @@ void DayTask__OnNotify(Obj865C8 *self, EventArg *arg1, s32 arg2) {
 }
 ```
 
-## New struct knowledge (`include/DayTaskStageMap.h`)
+## New struct knowledge (`include/dream_day.h`)
 
 - New opaque types `HeaderObj` (one field, `header`) and `EventArg` (one
   field, `target`, a `HeaderObj *`) — `arg1` is a pointer to a small wrapper
@@ -129,4 +129,4 @@ the full signature before trusting an empty-body occupant's parameter count.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Prefix only. Its sender argument is typed BasicClass * (EventArg/HeaderObj were BasicClass/BasicClassMethods::header views): the two tags it tests are 0x1F34 (DreamSys) and 0x2F230 (gObjMMethods, the ObjM this class builds), so the slots it dispatches to are named onDreamSysNotify (+0x080) and onObjMNotify (+0x084).
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Prefix only. Its sender argument is typed BasicClass * (EventArg/HeaderObj were BasicClass/BasicClassMethods::header views): the two tags it tests are 0x1F34 (DreamSys) and 0x2F230 (gObjMMethods, the ObjM this class builds), so the slots it dispatches to are named onDreamSysNotify (+0x080) and onObjMNotify (+0x084).

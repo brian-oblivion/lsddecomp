@@ -43,7 +43,7 @@ Needs the unit-local `Class6C070` view at the top of `src/graphics/draw_system.c
 `VSync(unk20)`, an optional per-frame callback, then `notifyParents(self, 2)`
 (BasicClass's own tick-broadcast slot) -- so every BasicClass object that
 `addChild`s this singleton gets event 2 once per VSync (`wbgm.c`'s
-`WBgm__WBgm`, `DayTaskStageMap.c`'s `StageMap__StageMap`, both do). +0x10 is
+`WBgm__WBgm`, `dream_day.c`'s `StageMap__StageMap`, both do). +0x10 is
 named `running`: `DrawSystem__Start` sets it and enters this loop,
 `DrawSystem__Stop` clears it.
 

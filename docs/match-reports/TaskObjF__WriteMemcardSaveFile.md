@@ -27,7 +27,7 @@ counted as the same register). Blocker screen clean (no `gp_rel`, no
 LENGTH are settled** — the best attempt compiles to exactly 51 words with
 **zero address drift** (no "differs outside this range" warning), the
 same "confirmed zero-drift register PERMUTATION" signature CLAUDE.md
-documents for `StageMap__BuildFootprintRects` in the `DayTaskStageMap`/`_c` header family.
+documents for `StageMap__BuildFootprintRects` in the `dream_day`/`_c` header family.
 Retail's own register assignment: `self`→`$fp`, `a1`→`$s3`, `handle`→
 `$s2`, `a3`→`$s7`, `arg5`→`$s6`, `arg6`→`$s5`, `arg7`→`$s4`, plus `$s1`
 (retry counter) and `$s0` (result). The best attempt reached (preserved
@@ -100,7 +100,7 @@ and `StampSaveTitleFileLetter`'s extern (declared in `include/class_3bb8c.h`).
 ## Proposed learning
 
 **A second confirmed instance of the zero-drift register-PERMUTATION
-class outside the `DayTaskStageMap`/`_c` header family it was first
+class outside the `dream_day`/`_c` header family it was first
 documented in** (this is `title_menu`) — this residue is not specific
 to one header's functions; it recurs whenever a function has ~8-9
 simultaneously-live values and GCC 2.6.3 happens to pick a different

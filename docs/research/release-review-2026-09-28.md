@@ -11,7 +11,7 @@ Line numbers are as of commit b23bdf545 and drift; search for the name.
 **Verdict.** The function bodies are in good shape: one-line `MATCHING:`
 notes, Sony types under Sony's names, few raw casts. draw_system.c,
 flat_light_obj.c, tim_image.c, pad.c, cd_stream.c, application.c, stage_grid.c,
-tod_actor.c, DayTaskStageMap.c, wbgm.c and screen_widgets.c's FadeBox code
+tod_actor.c, dream_day.c, wbgm.c and screen_widgets.c's FadeBox code
 are close to release quality. The debt is in declarations, a few
 conventions, names the code has outgrown, and headers written as analysis
 rather than API.
@@ -19,7 +19,7 @@ rather than API.
 ## Track 10 `prototypes`: one declaration per name
 
 - **Allocator.** `BMemPMgrAlloc` is re-declared locally in about 20 units
-  and in dream_sys.h:376, entity.h:308, DayTaskStageMap.h:30, task.h:27.
+  and in dream_sys.h:376, entity.h:308, dream_day.h:30, task.h:27.
   `BMemPMgrFree` returns `void` in entity.h:309 and
   data_source.h:16 but `void *` in bmem_pmgr.h:83 and task.h:28,
   so any unit including two of them fails with conflicting types. main.c:28
@@ -47,7 +47,7 @@ rather than API.
   (input_dialogs.c:155, 629; PlacementGridVabSound.c:185, with `const`);
   `GetSsSizeTableBuf` (`void *` vs `char *`); `GetSsTicksPerSecond` (wbgm.c:21
   only); `LockCd`/`UnlockCd` declared `s32` at game_shell.c:535,
-  defined `void`; `SetActiveDataSourceDriverMode` `s32` in DayTaskStageMap.h:57
+  defined `void`; `SetActiveDataSourceDriverMode` `s32` in dream_day.h:57
   vs `void` definition; `GetSoundEffectDir(s32)` vs `(void)`;
   `IsStyleVariantEven` `bool` vs `s32`; `ReleaseBasicClassArray` in task.h:32
   `(void *, void *)` vs `(BasicClass **, s32)` at tmd_renderer.c:86 (plus three
@@ -71,7 +71,7 @@ rather than API.
   kernel.h does declare them, and plain `grep` missed it because the file's
   SJIS bytes make grep treat it as binary (`grep -a` finds them).
 - **Duplicate types.** `RotationRatio(s)` (dream_sys.h:172) is `Ratio16`;
-  `SubObjE` (DayTaskStageMap.h:18) is a DrawSystem view; `SlotEntry`/`SrcDesc`
+  `SubObjE` (dream_day.h:18) is a DrawSystem view; `SlotEntry`/`SrcDesc`
   (task.c:658, 670) are one record; `CdStreamFile` (cd_stream.h:44) is
   `CdlFILE`; a signed 3-byte colour is defined six times (`BgLayerRgb`,
   `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `ColorRgb`, `ViewportRgb`):
@@ -166,7 +166,7 @@ rather than API.
   comments; `unknown_values_0x922` looks like padding); dream_aux's
   `sDreamAuxSlots2` alias; `TestForStageTransition` and
   `EnableTeleportsForKind` goto ladders over raw stage/mood numbers with no
-  MATCHING line; `*(s32 *)((u8 *)out + 4)` at DayTaskStageMap.c:1096.
+  MATCHING line; `*(s32 *)((u8 *)out + 4)` at dream_day.c:1096.
 - **ui/sound:** class ids `0x10`/`0x20` and `kind == 2/5` at
   title_menu.c:589-611, 1284-1296 (PAD_/FRAMECLOCK_CLASS_ID exist),
   `setState(self, 5/0xA/0xB/0xF)` where TASKCORE_STATE_* exist;
@@ -190,7 +190,7 @@ so merge by hand, one commit per type, the accessors from the compiler.
   `ViewportRgb`) into one, in a graphics header (BoxFill.h is ui's, and
   this item may edit it for that).
 - **world:** `RotationRatio(s)` (dream_sys.h) into `Ratio16`; `SubObjE`
-  (DayTaskStageMap.h) into its DrawSystem type; dream_sys.h's
+  (dream_day.h) into its DrawSystem type; dream_sys.h's
   `CinematicCall` and game_files.c's `RecPick` into one packed pair (this
   item may edit game_files.c/h for it; `GetSpecialDayOrEventRecord` stays
   unprototyped, see its MATCHING line); IntermediateBase's `frameClock` /
@@ -240,7 +240,7 @@ reads them, so nothing names them).
   `args->unk0..unkC`; NullDriver.h and task.h name one file twice; cd_driver.h
   "that unit still spells them as literals"; basic_class.h "all 59 method
   tables" (60).
-- Unit-private headers (DayTaskStageMap.h, data_source.h,
+- Unit-private headers (dream_day.h, data_source.h,
   dream_aux.h) fold into their .c files or become real class headers first,
   so the pass documents public API only.
 - `types.h:4` `typedef char int8_t` is unsigned under `-funsigned-char`

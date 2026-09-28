@@ -6,7 +6,7 @@
 
 > Renamed from `func_80049EB4` on 2026-09-23 (tools/rename.py). Address 0x80049eb4.
 
-Unit: `DayTaskStageMap` · Size: 107 words (0x1AC bytes) · Round 23 (2026-09-07),
+Unit: `dream_day` · Size: 107 words (0x1AC bytes) · Round 23 (2026-09-07),
 head. **Third of the five `REOPENED -- ASSIGNABLE` functions closed this round**
 (with `TaskCore__OnPadEvent` and `TaskCore__SetState`).
 
@@ -91,11 +91,11 @@ Two corroborating details, both needed before writing it that way:
 - **Only the `s16` at +2 is ever read** (`lh $v0, 0x12($sp)`), and its sign
   selects between two `unk28` codes. So the struct's full shape is NOT
   established, which is why `struct SubObjDPos` is declared in
-  `src/world/DayTaskStageMap.c` and not in `include/DayTaskStageMap.h` — a sibling unit could
+  `src/world/dream_day.c` and not in `include/dream_day.h` — a sibling unit could
   not reuse it unchanged. The header records the return type by name and says
   where the definition lives.
 
-## Struct knowledge added to `include/DayTaskStageMap.h`
+## Struct knowledge added to `include/dream_day.h`
 
 - **`SubObjDMethods::slot1BC`** carved out of `pad1BC[0x1E0 - 0x1BC]`. Split is
   additive and preserves the 0x24 total (4 + `pad1C0` of 0x20).
@@ -164,7 +164,7 @@ the 4-byte struct compiles to the same frame.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Renamed from Obj865C8__OnTag2Notify: own slot +0x084, which DayTask__OnNotify calls for a sender whose id & 0xFFFFF is 0x2F230 (gObjMMethods, the ObjM StartObjM builds). Events 4/0xC/0xD end the day through the DreamSys and set TimedTask's `result` then setState(3); 5..8 and 0xA set phase 3.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__OnTag2Notify: own slot +0x084, which DayTask__OnNotify calls for a sender whose id & 0xFFFFF is 0x2F230 (gObjMMethods, the ObjM StartObjM builds). Events 4/0xC/0xD end the day through the DreamSys and set TimedTask's `result` then setState(3); 5..8 and 0xA set phase 3.
 
 ## Naming (track 7, round 99, charlie)
 

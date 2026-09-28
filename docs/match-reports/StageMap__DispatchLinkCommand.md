@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004AB88` on 2026-09-22 (tools/rename.py). Address 0x8004ab88.
 
-**Unit:** DayTaskStageMap · **Size:** 18 words · **Status:** MATCHED (18/18 words)
+**Unit:** dream_day · **Size:** 18 words · **Status:** MATCHED (18/18 words)
 
 ## What it does
 
@@ -44,7 +44,7 @@ same `s32 header` field convention used across every `*Methods` struct in
 this project) — `lbu` on a little-endian 32-bit field is exactly its low
 byte, so `(u8)other->methods->header == 0x34` reproduces it without pointer
 casts. `GenericObject`/`GenericMethodsHeader` (new, minimal, in
-`include/DayTaskStageMap.h`) model only that one field; `other`'s real class is
+`include/dream_day.h`) model only that one field; `other`'s real class is
 unconfirmed. Several *different* class tables share this low byte (0x230,
 0x114, 0x34, 0x1F34 all end in `0x34`), so this reads as a family/base-class
 membership check, not an exact-class check — noted in the header comment.

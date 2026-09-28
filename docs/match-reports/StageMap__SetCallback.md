@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004ADC4` on 2026-09-22 (tools/rename.py). Address 0x8004adc4.
 
-**Unit:** DayTaskStageMap · **Size:** 3 words · **Status:** MATCHED (3/3 words)
+**Unit:** dream_day · **Size:** 3 words · **Status:** MATCHED (3/3 words)
 
 ## What it does
 
@@ -20,7 +20,7 @@ jr $ra
 ```
 
 A two-field setter, both `s32` (plain `sw`, no shift/sign-extend). Field
-offsets and the `StageMap` type come from `include/DayTaskStageMap.h`
+offsets and the `StageMap` type come from `include/dream_day.h`
 (established this round; see `TimedTask__PlaySound.md` for how the class was
 identified via `tools/classtable.py gStageMapMethods`).
 
@@ -34,7 +34,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004ADC4` | `StageMap__SetCallback` | A | Occupant of vtable slot `+0x0C8`; a two-word setter whose stores land at `+0x060` and `+0x064`. `DayTaskStageMap`'s MATCHED `StageMap__ComputeChunkLoadEntry` invokes exactly that pair as `unk60(unk64, value, 0, 0)` and stores the result -- so the first word is a function pointer and the second its context. A pure setter whose mechanics are its purpose. |
+| `func_8004ADC4` | `StageMap__SetCallback` | A | Occupant of vtable slot `+0x0C8`; a two-word setter whose stores land at `+0x060` and `+0x064`. `dream_day`'s MATCHED `StageMap__ComputeChunkLoadEntry` invokes exactly that pair as `unk60(unk64, value, 0, 0)` and stores the result -- so the first word is a function pointer and the second its context. A pure setter whose mechanics are its purpose. |
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |

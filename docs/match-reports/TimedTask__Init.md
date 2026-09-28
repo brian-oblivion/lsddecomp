@@ -5,7 +5,7 @@
 > Renamed from `func_8004A2C4` on 2026-09-23 (tools/rename.py). Address 0x8004a2c4.
 
 `Obj865C8`'s vtable slot +0x044 (`TimedTaskMethods`, i.e. the sibling class
-`gTimedTaskMethods` overriding `gDayTaskMethods`'s +0x044 — see `DayTaskStageMap.h`'s existing
+`gTimedTaskMethods` overriding `gDayTaskMethods`'s +0x044 — see `dream_day.h`'s existing
 note that this function is one of gTimedTaskMethods's known overrides at
 +0x008/+0x00C/+0x040/+0x044/+0x048).
 
@@ -47,7 +47,7 @@ s32 TimedTask__Init(Obj865C8 *self, s32 arg1, s32 arg2) {
 
 ## Header change
 
-`include/DayTaskStageMap.h`'s `IntermediateBaseMethods` (the view of
+`include/dream_day.h`'s `IntermediateBaseMethods` (the view of
 `GetIntermediateBaseMethods()`'s table, `gIntermediateBaseMethods`) had no `+0x044` slot typed yet —
 only `dtor` (+0x00C), `slot48` (+0x048), `slot60` (+0x060). Added:
 

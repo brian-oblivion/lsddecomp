@@ -35,7 +35,7 @@ FilePathRecord *GetStageRecords(s32 index) {
   (`s32 unused`): PickSoundBank passes one in `$a1`, as game_shell's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
-  (DayTaskStageMap.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
+  (dream_day.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
 
 ## Naming
 

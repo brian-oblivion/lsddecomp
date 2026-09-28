@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004A7C0` on 2026-09-22 (tools/rename.py). Address 0x8004a7c0.
 
-**Unit:** DayTaskStageMap · **Size:** 113 instructions · **Status:** MATCHED,
+**Unit:** dream_day · **Size:** 113 instructions · **Status:** MATCHED,
 whole-image green. See "Round 19 (echo): MATCHED" at the end of this
 report for the winning source, the two idioms recovered from the
 already-matched sibling ctor `StageMap__StageMap`, and the one word-count
@@ -182,7 +182,7 @@ just one attempt at it.
 ## Provenance
 
 round 2026-09-02 (head-requested extension), runner ALPHA, unit
-DayTaskStageMap. Struct/vtable knowledge for the whole function fully derived
+dream_day. Struct/vtable knowledge for the whole function fully derived
 and cross-checked against `StageMap__UnloadAllSlots`'s already-established
 `unkEC[]`/generic-slot patterns; three control-flow-equivalent source
 attempts on the one scan loop that drifts, all byte-identical to each
@@ -195,7 +195,7 @@ Re-verified the "62/113, drifted" claim first: the preserved body above
 does NOT compile as-is against the CURRENT header (`GetDrawSystem` and
 `GetLightRigMethods` have both since been given real, no-argument signatures
 by the sibling ctor `StageMap__StageMap`'s own successful match -- see
-`src/world/DayTaskStageMap.c`'s own declarations, `extern s32 GetDrawSystem(void);`
+`src/world/dream_day.c`'s own declarations, `extern s32 GetDrawSystem(void);`
 and `extern BaseCtorTable_3ac78 *GetLightRigMethods(void);` -- rather than the
 `(self)`-taking guesses this report's preserved body used). This alone
 means the round-13 62/113 score was measuring a body that would not even
@@ -203,7 +203,7 @@ build against today's header; it was not re-derivable verbatim.
 
 **The decisive resource was the ALREADY-MATCHED sibling ctor,
 `StageMap__StageMap` (same unit, same class, right above this function in
-`src/world/DayTaskStageMap.c`), which allocates and fills the SAME `entry->unk10`
+`src/world/dream_day.c`), which allocates and fills the SAME `entry->unk10`
 0x668-byte array this function tears down.** Its own byte-exact source
 was read directly rather than re-guessing the idiom from scratch:
 
@@ -256,7 +256,7 @@ p += 4;
 Result: **113/113, `build exit=0`, whole-image `OK: build matches retail
 SLPS_015.56`.** Full match.
 
-Final source (verbatim, now in `src/world/DayTaskStageMap.c` in place of the
+Final source (verbatim, now in `src/world/dream_day.c` in place of the
 `INCLUDE_ASM`):
 
 ```c
@@ -308,7 +308,7 @@ void StageMap__Finalize(StageMap *self)
 }
 ```
 
-`include/DayTaskStageMap.h` updated: `StageMapMethods::dtor` and the
+`include/dream_day.h` updated: `StageMapMethods::dtor` and the
 ctor/dtor summary comment marked MATCHED; `UnkSlotEntry_3ac78::unk10`'s
 comment extended to note the dtor also treats it as a flat 0x668-byte
 array of cells (consistent with, not contradicting, `StageMap__DispatchToRectCells`'s
@@ -348,7 +348,7 @@ Round 67 (track 3, naming pass).
 | --- | --- | --- | --- |
 | `func_8004A7C0` | `StageMap__Finalize` | A | Occupant of vtable slot `+0x00C`. `include/code_8220.h` establishes that slot as `BasicClassMethods::finalize` (the virtual teardown), distinct from `+0x004` `release` (finalize, then free self). This body matches: it tears down every `elems[]` entry and tail-calls the base table's own `+0x00C`. This CORRECTS the inherited hypothesis -- the field and this report both called it `dtor`, which is `release`'s job, not this slot's. |
 
-Slot name changed in `include/DayTaskStageMap.h` accordingly:
+Slot name changed in `include/dream_day.h` accordingly:
 `StageMapMethods::dtor` -> `finalize`.
 
 This function is also the second independent witness that the shared

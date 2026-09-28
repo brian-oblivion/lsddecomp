@@ -377,7 +377,7 @@ half's assignment target did. This means writing directly to the struct
 field (vs. through a local) perturbed cc1's block-layout choice for the
 WHOLE function, not just the second half — the two halves are not
 independently compiled the way their separately-diagnosed residues implied.
-Reverted (`git checkout -- src/world/DayTaskStageMap.c`; clean `OK: build matches
+Reverted (`git checkout -- src/world/dream_day.c`; clean `OK: build matches
 retail` confirmed immediately after).
 
 **Disposition unchanged: `INCLUDE_ASM`, still 25/28 (best-attempt body from
@@ -596,4 +596,4 @@ load-bearing shapes.
   `D_800869B4` `sScaleStepDownSlow` (-1/64), `D_800869C0`
   `sScaleStepDownFast` (-1/4); x and z 0/1 in each. Unit-static data: this
   unit alone reads them, so their externs moved from include/class_3bb8c.h
-  into DayTaskStageMap.c.
+  into dream_day.c.

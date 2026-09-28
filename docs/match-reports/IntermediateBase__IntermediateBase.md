@@ -41,7 +41,7 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
   function calls through after installing its own vtable -- it IS
   `IntermediateBase__ResetCounters`, already matched elsewhere in this unit.
 - The explicit cast `(Obj86B60Methods *)GetIntermediateBaseMethods()` mirrors
-  `src/world/DayTaskStageMap.c`'s own `self->methods = (DayTaskMethods *)
+  `src/world/dream_day.c`'s own `self->methods = (DayTaskMethods *)
   GetTimedTaskMethods();` -- assigning a shared/generic table getter's return
   into a locally-typed `methods` field is an established idiom in this
   codebase, not a workaround.
@@ -60,14 +60,14 @@ runner alpha). Tier A: `include/task.h` independently documents
 `D_8006E878+0x008 = func_8003DFDC` -- i.e. this function IS the `ctor` slot
 occupant of the shared "IntermediateBase" ancestor table (named identically,
 independently, in `include/TaskViewport.h`, `include/task.h` and
-`include/DayTaskStageMap.h`, per this project's own established convention for
+`include/dream_day.h`, per this project's own established convention for
 that class). Named `Class__Class` per the constructor convention, matching
 the already-established `BasicClass__BasicClass` precedent at the
 equivalent slot in `BasicClass`'s own table. It is not `Obj86B60`-specific
 despite this local view typing `self` as `Obj86B60 *` -- it is carved here
 only because its address (0x8003DFDC) falls in this unit's window; the
 function itself is the shared ancestor's own ctor, called from at least
-three unrelated class hierarchies (`task.c`, `DayTaskStageMap.c`, and this
+three unrelated class hierarchies (`task.c`, `dream_day.c`, and this
 unit).
 
 ## Track 4 (2026-09-25, round 82, charlie)

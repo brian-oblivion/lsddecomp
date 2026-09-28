@@ -38,7 +38,7 @@ void LbdFile__CancelRequests(DataSrc39094 *self) {
   unit is a whole number of 0x1C-byte records into that table, so the unit
   types the table as `FilePathRecord` (size only). The record's fields are unknown.
 - Callers in other units still declare their own prototypes (`s32` returns in
-  DayTaskStageMap.h / class_3bb8c.h); those are independent declarations and were
+  dream_day.h / class_3bb8c.h); those are independent declarations and were
   not touched.
 
 ## Naming

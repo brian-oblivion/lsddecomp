@@ -90,8 +90,8 @@ Not `LongVec3` (the words are a pointer, a string and a flag) and not Sony's
 
 Several unit-local views of this same descriptor remain, under other names:
 `ResourceSource` and `ResourceSourceArgs` (graphics_resources.c),
-`DreamAuxLoadReq` (dream_aux.h), `LoadRequest` (DayTaskStageMap.h),
-`LoadModelRequest` (game_shell), `ResourceSourceRequest` (DayTaskStageMap.c). Some are
+`DreamAuxLoadReq` (dream_aux.h), `LoadRequest` (dream_day.h),
+`LoadModelRequest` (game_shell), `ResourceSourceRequest` (dream_day.c). Some are
 0x10-byte locals, where the stack slot size may be what matches, so merging
 them is a head decision (proposed below), not a rename.
 

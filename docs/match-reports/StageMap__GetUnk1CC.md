@@ -30,7 +30,7 @@ void *StageMap__GetUnk1CC(Obj866E8 *self) {
   is ever taken here. No caller exists in this executable to cross-check
   against, so the field type is a placeholder (matches the project's
   convention for address-of-only fields, e.g. `StageMap::unk1C0` in
-  `include/DayTaskStageMap.h`).
+  `include/dream_day.h`).
 
 ## Attempts
 
@@ -46,7 +46,7 @@ None new.
 caller found anywhere in the executable. `unk1CC` itself is left
 unrenamed: `StageMap__GetUnk1CC` only ever takes its address, never
 reads through it, so its real type (and therefore any real name) is not
-established from this unit -- DayTaskStageMap's own independent view of the
+established from this unit -- dream_day's own independent view of the
 same offset (`StageMap__Reset`: "set to -1") does not clarify it
 either. Following the "GetSetUnk10Field0"-style precedent for a field
 whose meaning is unknown but whose offset is fixed.
@@ -81,6 +81,6 @@ an operator decision; not hand-reverted).
 
 ## Round 96 (track 7, delta)
 
-Nothing changed. `unk1CC` stays: StageMap__Reset (DayTaskStageMap.c) sets it and
+Nothing changed. `unk1CC` stays: StageMap__Reset (dream_day.c) sets it and
 the three words after it to -1, and this getter takes its address; no code
 reads it, so nothing names it.

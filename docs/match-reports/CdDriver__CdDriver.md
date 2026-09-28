@@ -23,7 +23,7 @@ void CdDriver__CdDriver(Obj6D4E8 *self)
 ```
 
 Standard "further-base constructor first" idiom (same shape as
-`DayTaskStageMap.c`'s own local `BaseCtorTable_3ac78`, independently
+`dream_day.c`'s own local `BaseCtorTable_3ac78`, independently
 established for a different class hierarchy in that unit): `GetFileResourceMethods`
 (still `INCLUDE_ASM` in the `code_179d8` remainder) returns a further-base
 class's own ctor-dispatch table, called through its `+0x008` slot with

@@ -71,7 +71,7 @@ Allocation size `0x4C` is `sizeof(TextEntry)` (the struct ends with
 `panelSprite` at +0x048). Zero bytes changed.
 
 Moved here from the unit banner of src/ui/input_dialogs.c (history, not
-documentation): "input_dialogs -- third carved slice of the DayTaskStageMap
+documentation): "input_dialogs -- third carved slice of the dream_day
 block, 20 functions, carved round 14. All 20 are TextEntry methods
 (gTextEntryMethods, `D_80086ED0`, 42 slots; `tools/classtable.py
 gTextEntryMethods`) ... routes a numeric command switch (HandleCommand) to

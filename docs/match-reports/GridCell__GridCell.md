@@ -31,7 +31,7 @@ void GridCell__GridCell(GridCell *self)
 ## Notes on GetSceneNodeMethods's declared arity
 
 `GetSceneNodeMethods` is already declared elsewhere in the codebase
-(`include/DayTaskStageMap.h`) with a two-argument signature,
+(`include/dream_day.h`) with a two-argument signature,
 `void *GetSceneNodeMethods(StageMap *self, s32 arg1)`. This unit's own call
 site never sets up a second argument register (`$a1`) before the `jal` --
 the instruction immediately after is a plain `lw` on the return value, not
@@ -66,7 +66,7 @@ jr    $ra
 It reads **neither `$a0` nor `$a1`**. It takes **no arguments** and returns
 `&gSceneNodeMethods` — the plain no-parameter vtable getter already documented in
 `docs/research/class-framework.md`, the same shape as `GetGameApplicationMethods`. So the
-2-argument declaration in `src/world/DayTaskStageMap.c` and the 1-argument declaration
+2-argument declaration in `src/world/dream_day.c` and the 1-argument declaration
 in `include/class_3bb8c.h` are **both wrong about the function**, and both are
 **right about their own call site**, and both units are byte-exact.
 

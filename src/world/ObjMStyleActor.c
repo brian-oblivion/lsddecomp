@@ -28,7 +28,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "DayTaskStageMap.h"
+#include "dream_day.h"
 #include "TimedTask.h"
 #include "TextRow.h"
 #include "tim_image.h"

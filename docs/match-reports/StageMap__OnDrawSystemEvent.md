@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004BD14` on 2026-09-24 (tools/rename.py). Address 0x8004bd14.
 
-**Unit:** DayTaskStageMap · **Size:** 80 words · **Status:** MATCHED (first attempt).
+**Unit:** dream_day · **Size:** 80 words · **Status:** MATCHED (first attempt).
 
 ## Result
 
@@ -45,7 +45,7 @@ void StageMap__OnDrawSystemEvent(Obj866E8 *self, void *arg1, s32 mode) {
 ```
 
 `self->arr[7]` walk with stride `0x1C` (matching `Elem`'s already-established
-size). `arg1` (the DayTaskStageMap independent view of this same slot,
+size). `arg1` (the dream_day independent view of this same slot,
 `slot100`, is `void (*)(StageMap *self, void *arg1, s32 arg2)`) is truly
 unused here -- confirmed by register tracing, `$a1` is never read.
 
@@ -59,7 +59,7 @@ the time of the final store the field no longer holds `1`.
 This function is also where `ElemTarget`'s `+0x02A`/`+0x02C`/`+0x02E` fields
 (all read/written through `e->unk4`) were established, and where
 `Obj866E8Methods::slot88`/`slot104` got their signatures (both cross-checked
-against DayTaskStageMap's independent view of the same vtable, which names them
+against dream_day's independent view of the same vtable, which names them
 identically in arity if not in exact parameter types).
 
 ### Proposed learning
@@ -81,7 +81,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BD14` | `StageMap__OnDrawSystemEvent` | B | Occupant of `gStageMapMethods` +0x100 (`slot100`). `DayTaskStageMap`'s `StageMap__OnNotify` (already matched) dispatches this slot, unconditionally, only when `(sender->methods->header & 0xF) == 1` -- i.e. only for one sender class tag. Follows the SAME "OnNotifyTagN" naming convention already established elsewhere in this codebase for identical per-tag dispatch targets (`Viewport__OnFrameClockEvent`/`Viewport__OnDrawSystemEvent`, `src/app/task.c`). `mode` here is the caller's own `command`, but the body itself early-returns unless `mode == 2` -- narrower than "every tag-1 notification", which the name does not claim (only that this IS the tag-1 dispatch target). |
+| `func_8004BD14` | `StageMap__OnDrawSystemEvent` | B | Occupant of `gStageMapMethods` +0x100 (`slot100`). `dream_day`'s `StageMap__OnNotify` (already matched) dispatches this slot, unconditionally, only when `(sender->methods->header & 0xF) == 1` -- i.e. only for one sender class tag. Follows the SAME "OnNotifyTagN" naming convention already established elsewhere in this codebase for identical per-tag dispatch targets (`Viewport__OnFrameClockEvent`/`Viewport__OnDrawSystemEvent`, `src/app/task.c`). `mode` here is the caller's own `command`, but the body itself early-returns unless `mode == 2` -- narrower than "every tag-1 notification", which the name does not claim (only that this IS the tag-1 dispatch target). |
 
 ## Track 6 (2026-09-26, round 93, alpha)
 

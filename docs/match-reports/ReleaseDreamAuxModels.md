@@ -115,7 +115,7 @@ invokes it once at that point.
 **ReleaseDreamAuxModels** (was TickDreamAuxSlots) -- tier A. The method
 table slot it calls, +0x004, is BasicClass's `release` (finalize, free,
 return NULL), not a tick, and the slots hold the ModelData InitDreamAux made.
-Its only caller is DayTask__Finalize (src/world/DayTaskStageMap.c), right after the
+Its only caller is DayTask__Finalize (src/world/dream_day.c), right after the
 other releases, mirroring DayTask's ctor calling InitDreamAux. The call is
 now `model->methods->release(model)` through ModelData's own table;
 DreamAuxObj/DreamAuxTickFn are gone. `done` -> `i`, bound

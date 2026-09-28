@@ -50,6 +50,6 @@ s32 LinkResource__GetModel(Obj6F13C *self, s32 index) {
 fills with `New_TmdModel` results, so entry `index` is a TmdModel; the two
 callers that use the value confirm it: tod_actor.c's TOD model-id packet
 passes it to `SceneNode__LinkModel` (whose `model` field holds a TmdModel,
-include/scene_node.h), and DayTaskStageMap.c's StageMap__PopulateSlotCells
+include/scene_node.h), and dream_day.c's StageMap__PopulateSlotCells
 reads its +0x010 (TmdModel's `object`) through PlacementGrid__ResolveEntry. The
 slot is `getModel`, returning `TmdModel *` (include/LinkResource.h).

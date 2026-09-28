@@ -269,7 +269,7 @@ The header banner:
  * DespawnDreamAuxEntity, backed by sDreamAuxSlots / sDreamAuxSlots2) and can
  * gate the game's teleport flag (EnableTeleportsForKind, SetTeleportsEnabled
  * in dream_sys.c). InitDreamAux/TickDreamAuxSlots/TickDreamAuxSlots2 are the
- * construct/tick/destruct hooks a caller in DayTaskStageMap.c and
+ * construct/tick/destruct hooks a caller in dream_day.c and
  * ObjMStyleActor.c drives this subsystem through. `sDreamAuxStage`,
  * `sDreamAuxWorld` and three sibling globals SetDreamAuxWorld installs are
  * the shared context every other function in the unit reads.

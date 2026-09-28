@@ -8,7 +8,7 @@
 
 > Renamed from `func_8004A3EC` on 2026-09-23 (tools/rename.py). Address 0x8004a3ec.
 
-**Unit:** DayTaskStageMap · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED (27/27 words)
+**Unit:** dream_day · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED (27/27 words)
 
 ## What it does
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004A534` on 2026-09-22 (tools/rename.py). Address 0x8004a534.
 
-Unit `DayTaskStageMap`, 177-line body, `StageMapMethods::ctor` (the occupant
+Unit `dream_day`, 177-line body, `StageMapMethods::ctor` (the occupant
 of the ctor slot, dispatched by `New_StageMap`'s `New_StageMap`
 allocator). 8 distinct callee-saved registers (`$s0`-`$s7`, fully
 saturated) -- flagged by the head as being in the band that was 0
@@ -125,7 +125,7 @@ more dispatches on `self->methods` (`slot10` with a fresh `GetDrawSystem()`
 value, then `slot40`, already known gp_rel-blocked as a CALLEE -- irrelevant
 here since this function only DISPATCHES to it, never inlines its body).
 
-## New struct ground opened (all additive; DayTaskStageMap.h is unique to this unit)
+## New struct ground opened (all additive; dream_day.h is unique to this unit)
 
 - `StageMapMethods::slot10` (+0x010, replacing a 4-byte pad) -- the ctor's
   own dispatch, `(self, s32 arg1)`.
@@ -217,24 +217,24 @@ Round 67 (track 3, naming pass).
 | `D_8008682C` | `sDefaultOrigin` | A | Its only use is this ctor's fallback when `arg1 == NULL`: `self->origin = sDefaultOrigin`. `asm/data/76DC8.data.s` shows the three words are all zero, so it is literally the default origin. |
 
 Field names this function established (all unit-local -- the compiler listed
-no accessor outside `src/world/DayTaskStageMap.c`):
+no accessor outside `src/world/dream_day.c`):
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
 | `StageMap+0x054` | `origin` | B | A 3-word block, copied here from `arg1` or `sDefaultOrigin`, then passed as the THIRD argument of `cellParent->methods->slot4C(cellParent, self, &self->origin)`. The same parameter position in the sibling call one loop deeper receives `buf = {x, 0, z}`, a literal world position on the 0x800 lattice -- so the slot takes a position and this field is one. |
-| `StageMap+0x0EC` | `elems[7]` | A | Seven 0x1C-byte records, walked 0..6 here, in `StageMap__Finalize` and in `StageMap__UnloadAllSlots`; `DayTaskStageMap` reaches the same array from four more functions and calls it `arr[7]`. |
-| `UnkSlotEntry+0x000` | `flag` | B | Zeroed here and in `StageMap__UnloadAllSlots`; `DayTaskStageMap`'s independent view names the same halfword `Elem::flag`. |
-| `UnkSlotEntry+0x002` | `key` | B | Set to the loop index here and copied on into `target->key`; `DayTaskStageMap`'s `StageMap__LoadChunksAround` copies a caller-supplied key byte into the same field. |
-| `UnkSlotEntry+0x004` | `target` | B | `DayTaskStageMap` types the same pointer `ElemTarget *` from six functions. |
+| `StageMap+0x0EC` | `elems[7]` | A | Seven 0x1C-byte records, walked 0..6 here, in `StageMap__Finalize` and in `StageMap__UnloadAllSlots`; `dream_day` reaches the same array from four more functions and calls it `arr[7]`. |
+| `UnkSlotEntry+0x000` | `flag` | B | Zeroed here and in `StageMap__UnloadAllSlots`; `dream_day`'s independent view names the same halfword `Elem::flag`. |
+| `UnkSlotEntry+0x002` | `key` | B | Set to the loop index here and copied on into `target->key`; `dream_day`'s `StageMap__LoadChunksAround` copies a caller-supplied key byte into the same field. |
+| `UnkSlotEntry+0x004` | `target` | B | `dream_day` types the same pointer `ElemTarget *` from six functions. |
 | `UnkSlotEntry+0x008` | `list` | C-ish/B | Built here by `New_PlacementGrid(0)`; the name records only that it is the list object the entry owns. |
 | `UnkSlotEntry+0x00C` | `cellParent` | B | Initialized here with `slot4C(cellParent, self, &self->origin)` and then passed as the PARENT argument of every grid cell's own `slot4C(cell, cellParent, buf)`. Its role in this function is exactly "the node the cells hang off". |
-| `UnkSlotEntry+0x010` | `cells` | A | 0x668 raw bytes allocated here and filled with freshly built cell objects, one per 4 bytes; `StageMap__Finalize` walks the same span tearing them down; `DayTaskStageMap`'s byte-matched `StageMap__SetFootprintVisible` indexes the same block as a 2D grid. |
+| `UnkSlotEntry+0x010` | `cells` | A | 0x668 raw bytes allocated here and filled with freshly built cell objects, one per 4 bytes; `StageMap__Finalize` walks the same span tearing them down; `dream_day`'s byte-matched `StageMap__SetFootprintVisible` indexes the same block as a 2D grid. |
 
 **The 21-vs-20 discrepancy, recorded not resolved.** This ctor's placement
 loop wraps X after 21 columns (`x = 0x400 + k * 0x800`, reset when
 `x > 0xA400`), and 0x668 bytes is 410 cell pointers -- neither `20 * 20` nor a
 whole number of 21-cell rows. The grid's INDEX stride is 20, byte-verified
-twice over (`DayTaskStageMap`'s matched `StageMap__SetFootprintVisible`, and
+twice over (`dream_day`'s matched `StageMap__SetFootprintVisible`, and
 `sDefaultGridSpan >> 11`). This function is byte-exact, so both constants are
 certainly right; what the extra column and the 10 spare pointers are for is
 unknown. Do not "correct" the stride to 21 on this function's evidence alone.

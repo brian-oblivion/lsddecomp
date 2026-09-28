@@ -13,7 +13,7 @@
  * (LinkResource__MapModel: GsMapModelingData(&file->flags)) and build and
  * return the TmdModel objects the callers LINK -- tod_actor.c's TOD
  * model-id packet passes getModel's result to SceneNode__LinkModel, and
- * DayTaskStageMap.c links the TmdObject behind it with GsLinkObject4.
+ * dream_day.c links the TmdObject behind it with GsLinkObject4.
  *
  * Holders: ModelData's `linkResource` (ModelData__BuildResources, over the
  * TMD sub-block of a MOM file), PlacementGrid's `linkResource`

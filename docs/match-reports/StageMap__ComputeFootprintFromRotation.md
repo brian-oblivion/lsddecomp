@@ -167,7 +167,7 @@ its base pointer is loaded) before filing a register-class residue.
 ---
 
 
-**Unit:** DayTaskStageMap · **Status:** STALL — register-class/frame-size gap (same class as `StageMap__SplitFootprintRect`)
+**Unit:** dream_day · **Status:** STALL — register-class/frame-size gap (same class as `StageMap__SplitFootprintRect`)
 
 > **ROUND 34 UPDATE.** Re-derived from scratch (shallow attempt history per
 > this round's brief: only 2 hand attempts and a round-18 review with no new
@@ -304,7 +304,7 @@ value computations check out against `asm-differ`) — this is not a logic
 or CFG miss. The residue is address drift caused by a **missing
 register**: retail's frame is `-0x98` and saves NINE registers (`$s0`-`$s7`
 PLUS `$fp` — confirmed by
-`grep -oE 'sw +\$s[0-9]|sw +\$fp' asm/nonmatchings/DayTaskStageMap/StageMap__ComputeFootprintFromRotation.s | sort -u | wc -l`
+`grep -oE 'sw +\$s[0-9]|sw +\$fp' asm/nonmatchings/dream_day/StageMap__ComputeFootprintFromRotation.s | sort -u | wc -l`
 → 9, one past the "8 means no spare register" saturation point CLAUDE.md's
 `TaskCore__RefreshSlotView` lesson describes). Every C shape tried compiles to a
 `-0x90` frame using only `$s0`-`$s7` (8 registers, no `$fp` spill) — one
@@ -648,7 +648,7 @@ Notes on the derivation, for whoever revisits this:
 
 - **Retype**: `Unk6CObj::unk14` changed from `void *` to the new
   `Unk6C14Obj *`. The only OTHER reader, `StageMap__GetTargetDescriptor` (already matched,
-  in `DayTaskStageMap.c`), immediately casts it to `(u8 *)` before doing
+  in `dream_day.c`), immediately casts it to `(u8 *)` before doing
   pointer arithmetic, so this does not change that function's compiled
   bytes — verified with a full rebuild (`./build-and-verify.sh` stays
   green after the retype, independent of this function's own stall).
@@ -720,7 +720,7 @@ same class, already exhausted the two most obvious levers).
 
 Track 1b promotion. Score re-verified unchanged (85/165, 3 words short,
 no outside-range drift) before promoting. Placed the existing round-34
-preserved body (carried in `src/world/DayTaskStageMap.c`) inside `#ifdef
+preserved body (carried in `src/world/dream_day.c`) inside `#ifdef
 NON_MATCHING`, with `INCLUDE_ASM` restored in the `#else`. No source
 change beyond the wrapper and comment; both oracles green:
 `./build-and-verify.sh` (exit 0, `OK: build matches retail`) and
@@ -775,10 +775,10 @@ function copies `D_8008E98C`, zeroes `t[0]`/`t[1]`, sets `t[2]` to
 `ApplyMatrixLV(&mat, t, t)` rotates (0, 0, gridSpan) in place (retail passes
 `$a1` and `$a2` both as `sp+0x54`, i.e. `&mat.t`). The type is deleted; the
 local is `MATRIX mat`, `unk14`/`unk18`/`unk1C` are `t[0]`/`t[1]`/`t[2]`, and
-the two libgte prototypes come from `<libgte.h>`, which DayTaskStageMap.c now
+the two libgte prototypes come from `<libgte.h>`, which dream_day.c now
 includes (the header's own `void RotMatrix(void *, QueryTemplate866E8 *)` and
 `void ApplyMatrixLV(QueryTemplate866E8 *, s32 *, s32 *)` re-declarations are
-gone). `extern MATRIX D_8008E98C;` moved into DayTaskStageMap.c, its only
+gone). `extern MATRIX D_8008E98C;` moved into dream_day.c, its only
 reader. Byte-exact, zero bytes changed.
 
 ## Round 96 (track 7, delta)

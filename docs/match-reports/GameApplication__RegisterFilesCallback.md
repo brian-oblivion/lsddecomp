@@ -30,7 +30,7 @@ callee's return value passes straight through in the register. Per
 CLAUDE.md ("the byte match tells you NOTHING about the return type" for a
 one-line tail-call wrapper), the *bytes* alone don't distinguish `void
 GameApplication__RegisterFilesCallback(void)` from a value-returning one. Positive evidence that
-`RegisterRecordTableFiles` itself returns a value: its own body (`asm/DayTaskStageMap.s`,
+`RegisterRecordTableFiles` itself returns a value: its own body (`asm/dream_day.s`,
 around `RegisterRecordTableFiles`) ends with `beqz $v0, .L8004A104` gating the loop
 exit on `$v0`, i.e. it's actively computed and meaningful, not incidentally
 left in the register. Written to forward it:
@@ -64,7 +64,7 @@ completion".
 
 ### Naming
 
-**`GameApplication__RegisterFilesCallback` -- tier A** (renamed from `GameApplication__LoaderTaskDoneCallback` with tools/rename.py). Evidence: the body is RegisterRecordTableFiles(0) (DayTaskStageMap.c, registers sRecordTable's files with the CD driver); its one use is ShowImage's setCallback, the TaskCore's view callback, which refreshViewValue calls as the image ends.
+**`GameApplication__RegisterFilesCallback` -- tier A** (renamed from `GameApplication__LoaderTaskDoneCallback` with tools/rename.py). Evidence: the body is RegisterRecordTableFiles(0) (dream_day.c, registers sRecordTable's files with the CD driver); its one use is ShowImage's setCallback, the TaskCore's view callback, which refreshViewValue calls as the image ends.
 
-Body changes, all byte-identical: RegisterRecordTableFiles's extern parameter a0 -> all, as DayTaskStageMap.h declares it.
+Body changes, all byte-identical: RegisterRecordTableFiles's extern parameter a0 -> all, as dream_day.h declares it.
 

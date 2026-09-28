@@ -159,7 +159,7 @@ Read each named class's header first; its banner points to the units.
   dream's trigger entities;
   `StageMap` keeps the seven map chunks around its target loaded, each
   chunk's `PlacementGrid` linked into a lattice of `GridCell`s. `DayTask` runs one day around the
-  DreamSys's startDay/endDay (both classes in `src/world/DayTaskStageMap.c`) and
+  DreamSys's startDay/endDay (both classes in `src/world/dream_day.c`) and
   builds an `ObjM` per stage (`src/world/ObjMStyleActor.c`, with the style layer
   and `StyleEffect`).
 - **Screens and menus.** `IntermediateBase` runs one attached job to a

@@ -57,7 +57,7 @@ object is a camera, only that this curve is read out of it.
 
 Renamed from `DreamSys__SetHeightCurve`, and the field it sets from
 `heightCurve` (DreamSysUnk5C *) to `viewport` (struct Viewport *). The
-object is a Viewport: DayTask__Init (DayTaskStageMap) passes it the
+object is a Viewport: DayTask__Init (dream_day) passes it the
 New_NodeGuardedViewport it built (a Viewport subclass) and DayTask__Deinit passes
 NULL; Entity__MoodCue74 calls +0x064 of its table, Viewport's
 setClearColor; and the offsets DreamSysUnk5C named are refView's (GsRVIEW2

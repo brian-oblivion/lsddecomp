@@ -1,5 +1,5 @@
 /*
- * DayTaskStageMap -- the dream day's task and the stage map it builds: DayTask,
+ * dream_day -- the dream day's task and the stage map it builds: DayTask,
  * RegisterRecordTableFiles, TimedTask (DayTask's parent, and ObjM's) and
  * StageMap, in that ROM order.
  *
@@ -34,7 +34,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "DayTaskStageMap.h"
+#include "dream_day.h"
 #include "VabStreamObj.h"
 #include "NodeGuardedViewport.h"
 #include "StageMap.h"

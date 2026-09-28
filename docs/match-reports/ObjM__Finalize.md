@@ -26,13 +26,13 @@ void ObjM__Finalize(Obj865C8 *self)
 
 This class's `dtor` override forwards straight to the shared base class
 dtor (`GetTimedTaskMethods()->dtor(self)`, `TimedTaskMethods::dtor`,
-`include/DayTaskStageMap.h`), the same pattern already documented there for
-`TimedTask__Finalize` (`DayTaskStageMap`'s own sibling override). `Obj865C8` and
-`GetTimedTaskMethods` are both already declared in `include/DayTaskStageMap.h`, so
+`include/dream_day.h`), the same pattern already documented there for
+`TimedTask__Finalize` (`dream_day`'s own sibling override). `Obj865C8` and
+`GetTimedTaskMethods` are both already declared in `include/dream_day.h`, so
 this function needed no new struct at all -- `self` is typed directly as
 the base class's own object type rather than inventing a `Class87034`
 wrapper, since nothing here reads any field specific to this unit's own
-class. `#include "DayTaskStageMap.h"` added to this unit's includes for this
+class. `#include "dream_day.h"` added to this unit's includes for this
 declaration (and `Obj865C8`/`GetTimedTaskMethods` used by nothing else in this
 unit). Matched first attempt.
 

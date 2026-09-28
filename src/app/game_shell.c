@@ -45,7 +45,7 @@
 #include "bmem_pmgr.h"
 #include "game_files.h"
 #include <strings.h>
-#include "DayTaskStageMap.h"
+#include "dream_day.h"
 
 /* The table getters of every class SetActiveDataSource rebinds, NULL-
  * terminated; it sits right after gFileResourceMethods's last slot. */

@@ -141,7 +141,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `self->unkC` was IntermediateBase::initArgs (its unk0 is read), `world` the viewport (setProjection +0x054, attachViewChild), `unk14` the StageMap (setAmbientColor +0x0BC, setChildParams, setConfig, setGridSpan, setAcceptedTags), `unk34` TimedTask::sound, `unk10` the FrameClock.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `self->unkC` was IntermediateBase::initArgs (its unk0 is read), `world` the viewport (setProjection +0x054, attachViewChild), `unk14` the StageMap (setAmbientColor +0x0BC, setChildParams, setConfig, setGridSpan, setAcceptedTags), `unk34` TimedTask::sound, `unk10` the FrameClock.
 
 ## Round 94 (track 6, charlie)
 
@@ -165,10 +165,10 @@ returning `ScreenDims *`. The body now reads
 comment, moved here:
 
 > initArgs->unk0 as SetupSceneStyle reads it: its +0x07C returns a pointer
-> to one word (DayTaskStageMap.h's SubObjE is the same call from
+> to one word (dream_day.h's SubObjE is the same call from
 > DayTask__OnInit).
 
-Proposed for the head: DayTaskStageMap.h's `SubObjE` is the same DrawSystem
+Proposed for the head: dream_day.h's `SubObjE` is the same DrawSystem
 call and can go the same way.
 
 Comment history moved from the unit's externs:

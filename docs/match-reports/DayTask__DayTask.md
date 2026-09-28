@@ -170,7 +170,7 @@ needed anywhere in this 107-word function.
   earlier this round) already established as a uniform `SubObjG` family via
   `->methods->slot4`. These are almost certainly six DIFFERENT real
   classes under the hood (`New_StageMap` is independently and fully typed
-  in `DayTaskStageMap.h` as returning `StageMap *`, a much richer type with
+  in `dream_day.h` as returning `StageMap *`, a much richer type with
   its own documented `ctor`/`slot38`/`slot40`/`slot80`/`slotD0`) — `SubObjG`
   is this unit's own minimal, deliberately-unified LOCAL view (only the
   slots this unit's own functions actually reach: `slot4`, and now
@@ -190,7 +190,7 @@ needed anywhere in this 107-word function.
   `DayTask__StartObjM` used earlier this round for the opposite question (an
   argument that looked unused turning out to be real).
 
-## New struct/extern knowledge (`include/DayTaskStageMap.h`)
+## New struct/extern knowledge (`include/dream_day.h`)
 
 - `SubObjGMethods` extended with `slot5C` and `slot78` (both `void
   (*)(SubObjG *self)`, return discarded at both call sites here).
@@ -216,7 +216,7 @@ needed anywhere in this 107-word function.
   other five (`GetSoundEffectDir`, `InitDreamAux`, `New_TimImage`,
   `PickSoundBank`, `New_WBgm`, `New_NodeGuardedViewport`, `New_FrameClock`) are
   new to the project entirely (the first is a genuine one-off; the rest
-  come from uncarved Psy-Q segments or `DayTaskStageMap`).
+  come from uncarved Psy-Q segments or `dream_day`).
 
 ## Attempts
 
@@ -259,7 +259,7 @@ session matched within 1-2.
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/tim_image.h`); `include/DayTaskStageMap.h`'s local
+TimImage is unified (`include/tim_image.h`); `include/dream_day.h`'s local
 `extern SubObjG *New_TimImage(const char *)` is deleted. `unk44` is a
 TimImage but keeps Obj865C8's own `SubObjG *` type (Obj865C8's view is that
 class's job): the result is cast to `SubObjG *`, and the two calls cast
@@ -269,11 +269,11 @@ occupant TimImage__Upload) through `TimImageUploadFn`, +0x05C is
 
 ## Track 4 (2026-09-26, round 88, delta: FrameClock)
 
-`New_D8006EF50` is now `New_FrameClock` (include/FrameClock.h), returning `FrameClock *`; the store into `Obj0C::unk8` (`SubObjG *`, field unchanged) upcasts it, and DayTaskStageMap.h's own `SubObjG *` extern of it is gone. Byte-identical.
+`New_D8006EF50` is now `New_FrameClock` (include/FrameClock.h), returning `FrameClock *`; the store into `Obj0C::unk8` (`SubObjG *`, field unchanged) upcasts it, and dream_day.h's own `SubObjG *` extern of it is gone. Byte-identical.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Renamed from Obj865C8__Obj865C8. Accessors now use the parent's names: unk0C -> initArgs, Obj0C::unk8/unkC/unk10 -> IntermediateBaseInitArgs unk8/unkC/viewport, subB -> sound, slot10 -> addChild, resetState -> resetCounters. Own fields named from this body: dreamSys (+0x038, arg2), etcTim (+0x044, New_TimImage("ETC\ETC.TIM"), TimImage *), dreamerTmd (+0x048, New_LinkResource("ETC\DREAMER.TMD")), bgm (+0x040, New_WBgm, WBgm *; the WBgm runner's proposal in New_WBgm.md). Byte-identical.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__Obj865C8. Accessors now use the parent's names: unk0C -> initArgs, Obj0C::unk8/unkC/unk10 -> IntermediateBaseInitArgs unk8/unkC/viewport, subB -> sound, slot10 -> addChild, resetState -> resetCounters. Own fields named from this body: dreamSys (+0x038, arg2), etcTim (+0x044, New_TimImage("ETC\ETC.TIM"), TimImage *), dreamerTmd (+0x048, New_LinkResource("ETC\DREAMER.TMD")), bgm (+0x040, New_WBgm, WBgm *; the WBgm runner's proposal in New_WBgm.md). Byte-identical.
 
 ## Track 6 (2026-09-26, round 94, alpha): the class name
 
@@ -300,13 +300,13 @@ startDay/endDay, which are FirecatFG's names (tier-B hypotheses by rule).
 The `task` suffix follows the project's other IntermediateBase jobs run to
 a result (StreamTask) and its parent, TimedTask.
 
-The unit banner (include/DayTaskStageMap.h) no longer carries "track 4, round
+The unit banner (include/dream_day.h) no longer carries "track 4, round
 88/89"; that history is this section and the Track 4 sections above.
 
 ## Track 6 (round 96, delta): the request local is ResourceSourceRequest
 
-include/DayTaskStageMap.h `LoadRequest`, `{ s32 type; const char *path; s32 unk08; s32 unk0C; }`, is the same
-0x10-byte record as DayTaskStageMap.c's and the third caller's: the body writes
+include/dream_day.h `LoadRequest`, `{ s32 type; const char *path; s32 unk08; s32 unk0C; }`, is the same
+0x10-byte record as dream_day.c's and the third caller's: the body writes
 `type = 0` (ResourceSource's NULL `buffer`: no buffer to adopt) and `path`
 (its `name`: the file to request) and passes it to New_LinkResource. It
 retired onto include/FileResource.h's `ResourceSourceRequest` (a

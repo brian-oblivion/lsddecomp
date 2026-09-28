@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004A070` on 2026-09-27 (tools/rename.py). Address 0x8004a070.
 
-**Unit:** DayTaskStageMap · **Size:** 48 words (0xC0 bytes)
+**Unit:** dream_day · **Size:** 48 words (0xC0 bytes)
 
 Filed as a `gp_rel`-blocked stub before round 15. That blocker was RESOLVED
 in round 42 (`--gp-symbols`, pinned in the Makefile).
@@ -61,7 +61,7 @@ s32 RegisterRecordTableFiles(s32 arg0)
 `extern` declaration, per the project's rule against writing C for
 SDK-owned functions.
 
-The return type had to be `s32`, not `void`: `include/DayTaskStageMap.h`
+The return type had to be `s32`, not `void`: `include/dream_day.h`
 already carries `extern s32 RegisterRecordTableFiles(s32 arg1);` (this unit's own
 prior local view, noting "already declared elsewhere as `extern s32
 RegisterRecordTableFiles(s32 a0)`"), and the definition here must match it exactly or

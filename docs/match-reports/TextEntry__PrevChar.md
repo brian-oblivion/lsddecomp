@@ -9,7 +9,7 @@ Unit: `src/ui/input_dialogs.c` (input_dialogs, newly carved round 15).
 ## Class identity
 
 **ROUND 75 CORRECTION.** This section originally claimed `self` is
-`Obj866E8` (the class established across DayTaskStageMap/c/etc, vtable
+`Obj866E8` (the class established across dream_day/c/etc, vtable
 `gStageMapMethods`) and that the header additions below went onto that type.
 That was wrong, caught by `tools/classtable.py gStageMapMethods` (which does
 NOT contain this function's address at any of its 80 slots) versus
@@ -41,7 +41,7 @@ shared `Obj86ED0`/`Obj86ED0Methods` in `include/class_3bb8c.h`, established
 by input_dialogs. (The paragraph that used to describe additive edits to
 `Obj866E8`/`Obj866E8Methods` here described edits to the WRONG type --
 see the correction above. `Obj866E8`/`Obj866E8Methods` are untouched,
-correctly used elsewhere by DayTaskStageMap/etc.)
+correctly used elsewhere by dream_day/etc.)
 
 `unk10`/`unk14`/`unk18`/`unk1C`/`unk20`/`unk48` -- already named on
 `Obj86ED0`.

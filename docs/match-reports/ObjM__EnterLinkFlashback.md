@@ -9,11 +9,11 @@
 ## Context
 
 First function of `ObjMStyleActor`, the fourth 20-function slice carved from
-the tail of the large `DayTaskStageMap` block (0x44518..0x44F14). This unit's
+the tail of the large `dream_day` block (0x44518..0x44F14). This unit's
 `self` object (`ObjM`, `include/class_3bb8c.h`) is a NEW, independent type —
 its field offsets (0x10, 0x14, 0x18, 0x20, 0x3C, 0x80, 0x84) and its own
 vtable slots (0x10, 0x14, 0x30, 0xB8, 0xD4) don't correspond to anything
-already established for `DayTaskStageMap`'s `Obj866E8`, so it is kept
+already established for `dream_day`'s `Obj866E8`, so it is kept
 separate per the project's multiple-independent-local-views convention.
 
 `self->unk3C` is a pointer to a second class (`FieldM3C`) with a rich
@@ -67,7 +67,7 @@ round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
 
 ## Track 7 (2026-09-27, round 98, delta)
 
