@@ -492,7 +492,7 @@ extern s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 
 /* The viewport's view point and reference point (attachViewChild), the
  * StageMap's bounds on stage 0, and one DreamSys setPendingExtra value per
  * stage. */
-extern LongVec3 gObjMViewPoint;
+extern LongVec3 sObjMViewPoint;
 extern LongVec3 gObjMViewRefPoint;
 extern s32 gStagePendingExtras[];
 extern CellBounds gStage0Bounds;
@@ -518,7 +518,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
     record = PickStageTexture(self->stage, 0, day);
     self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc(record);
 
-    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &gObjMViewPoint,
+    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sObjMViewPoint,
                                  &gObjMViewRefPoint, 0);
 
     self->cachedViewport = vp;
@@ -722,7 +722,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     width = drawSystem->methods->getDims(drawSystem, NULL)->w;
     vp->methods->setProjection(vp, width / 2 * 5 / 3 + sObjMProjectionBias);
 
-    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &gObjMViewPoint,
+    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sObjMViewPoint,
                                  &gObjMViewRefPoint, 0);
 
     SetDreamAuxWorld(self->stage, (StageMap *)self->lightRig, self->dreamSys,
