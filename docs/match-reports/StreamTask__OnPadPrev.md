@@ -10,7 +10,7 @@
 
 A one-line forwarder: fetches the sibling class's method table via
 `Get_vtable_TaskCore()` (returns `&gTaskCoreMethods`, `GameApplication.h`'s `LoaderTaskMethods`
--- see `Get_vtable_StreamTask`'s report for how the delegation between the two
+-- see `GetStreamTaskMethods`'s report for how the delegation between the two
 sibling classes was established) and calls its slot `+0x080`, passing
 `self` straight through. Occupies `gStreamTaskMethods` slot `+0x080` itself.
 
@@ -49,13 +49,13 @@ specifically was found to confirm either way -- flagged for whoever adds one.
 
 Added `include/Task.h`'s `TaskCoreMethods` (this unit's own local view
 of `gTaskCoreMethods`, independent of `GameApplication.h`'s `LoaderTaskMethods`, same
-precedent as `Get_vtable_StreamTask`'s report) with slot `+0x080` typed
+precedent as `GetStreamTaskMethods`'s report) with slot `+0x080` typed
 `void (*)(StreamTaskObj *self)`.
 
 ## Proposed learning
 
 See `StreamTask__OnPadNext`'s report (same shape, slot `+0x084`) and
-`Get_vtable_StreamTask`'s (the delegation pattern itself).
+`GetStreamTaskMethods`'s (the delegation pattern itself).
 
 ## Naming
 

@@ -129,7 +129,7 @@ typedef void (*StreamTaskInitFn)(StreamTask *self, IntermediateBaseInitArgs *arg
                                  s32 streamGroup, s32 autoPlay);
 
 extern StreamTaskMethods gStreamTaskMethods;
-extern StreamTaskMethods *Get_vtable_StreamTask(void); /* returns &gStreamTaskMethods */
+extern StreamTaskMethods *GetStreamTaskMethods(void); /* returns &gStreamTaskMethods */
 
 StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound,
                            DrawRect *initData);

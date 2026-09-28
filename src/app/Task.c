@@ -39,7 +39,7 @@ StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicCla
 
     self = BMemPMgrAlloc(sizeof(StreamTask));
     if (self != NULL) {
-        Get_vtable_StreamTask()->ctor(self, target, soundBankPath, sound, initData);
+        GetStreamTaskMethods()->ctor(self, target, soundBankPath, sound, initData);
         return self;
     }
     return NULL;
@@ -48,7 +48,7 @@ StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicCla
 void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soundBankPath,
                             BasicClass *sound, DrawRect *initData) {
     Get_vtable_TaskCore()->ctor((TaskCore *)self, target, soundBankPath, sound);
-    self->methods = Get_vtable_StreamTask();
+    self->methods = GetStreamTaskMethods();
     if (initData != NULL) {
         self->initData = *initData;
     } else {
@@ -182,7 +182,7 @@ void StreamTask__SetAbortBeforeFade(StreamTask *self, s32 enable) {
     self->abortBeforeFade = enable;
 }
 
-StreamTaskMethods *Get_vtable_StreamTask(void) {
+StreamTaskMethods *GetStreamTaskMethods(void) {
     return &gStreamTaskMethods;
 }
 

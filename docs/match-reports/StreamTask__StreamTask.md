@@ -11,12 +11,12 @@
 This is `StreamTaskObj`'s constructor — occupies `gStreamTaskMethods`'s own slot
 `+0x008` (per `classtable.py gStreamTaskMethods`, confirming the earlier header
 comment that named this function as the ctor reached through
-`Get_vtable_StreamTask()`'s slot).
+`GetStreamTaskMethods()`'s slot).
 
 ```c
 void StreamTask__StreamTask(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
     Get_vtable_TaskCore()->slot08(self, a1, a2, a3);
-    self->methods = Get_vtable_StreamTask();
+    self->methods = GetStreamTaskMethods();
     if (a4 != NULL) {
         self->unkA8 = *a4;
     } else {
@@ -76,7 +76,7 @@ load-all-then-store-all form exactly.
 ## Third-learning check (per head's request)
 
 **Not needed here** in the "value read then re-read after a `jalr`" sense —
-`self->methods` IS written mid-function (`self->methods = Get_vtable_StreamTask();`)
+`self->methods` IS written mid-function (`self->methods = GetStreamTaskMethods();`)
 and read again at the very end after two more calls
 (`GetDefaultMovieFrame`/`New_MoviePlayer`) for `self->methods->slot40(self)`, but that
 final read is a **plain, single, natural field dereference** with no earlier

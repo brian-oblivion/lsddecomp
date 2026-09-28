@@ -16,12 +16,12 @@ turned out to be ordinary field setters, not BIOS trampolines or anything
 toolchain-blocked (checked first per the runner brief: no `jr $t2`, no
 `gp_rel`, no `addiu $at,$at,%lo`).
 
-All five (plus `Get_vtable_StreamTask` right after them) are consecutive slots
+All five (plus `GetStreamTaskMethods` right after them) are consecutive slots
 `+0x124`.."+0x134` of this class's own method table `gStreamTaskMethods` (confirmed
 with `tools/classtable.py gStreamTaskMethods`), which is how their object type was
 identified: `New_StreamTask`'s allocator call sizes the object at `0xDC`
-bytes and constructs it through `Get_vtable_StreamTask`'s slot `+0x008`, so all five
-setters, plus `Get_vtable_StreamTask` itself, operate on that same `0xDC`-byte
+bytes and constructs it through `GetStreamTaskMethods`'s slot `+0x008`, so all five
+setters, plus `GetStreamTaskMethods` itself, operate on that same `0xDC`-byte
 class (already named `StreamTask`/`StreamTaskMethods` in
 `include/GameApplication.h`, established independently by a different unit from
 `New_StreamTask`'s cross-unit call site).

@@ -1,4 +1,6 @@
-# Get_vtable_StreamTask
+# GetStreamTaskMethods
+
+> Renamed from `Get_vtable_StreamTask` on 2026-09-28 (tools/rename.py). Address 0x8003be84.
 
 > Renamed from `Get_vtable_StreamTaskObj` on 2026-09-26 (tools/rename.py). Address 0x8003be84.
 
@@ -32,7 +34,7 @@ jr    $ra
 ```
 
 ```c
-StreamTaskObjMethods *Get_vtable_StreamTask(void) {
+StreamTaskObjMethods *GetStreamTaskMethods(void) {
     return &gStreamTaskMethods;
 }
 ```
@@ -64,7 +66,7 @@ second accessor and calls straight through it.
 
 ## Naming
 
-**Get_vtable_StreamTask** -- tier A. The class's own "GetMethods"
+**GetStreamTaskMethods** -- tier A. The class's own "GetMethods"
 accessor (returns `&gStreamTaskMethods`, no other side effect), matching
 the established `Get_vtable_<Class>` convention exactly
 (`GetEntityMethods`, `Get_vtable_TaskCore`, `GetIntermediateBaseMethods`).
