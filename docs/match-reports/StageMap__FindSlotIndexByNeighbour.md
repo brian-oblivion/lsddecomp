@@ -60,7 +60,7 @@ s32 StageMap__FindSlotIndexByNeighbour(Obj866E8 *self, s32 key) {
 ## New struct knowledge
 
 None new (reuses `Elem`/`ElemTarget::unk32`, both already established by
-`class_3bb8c.c`'s `StageMap__FindSlotByNeighbour`/`StageMap__CountPendingLoads`).
+`class_39e08.c`'s `StageMap__FindSlotByNeighbour`/`StageMap__CountPendingLoads`).
 
 ## Attempts
 
@@ -93,14 +93,14 @@ Pure linear-search leaf: the body IS the evidence -- walk `self->arr`,
 compare `e->unk4->unk32` to `key`, return the matching index (default 0).
 Named by the field it searches on (`unk32`, still unrenamed -- it is a
 cross-unit `ElemTarget` field, also read by `StageMap__FindSlotByNeighbour` in
-class_3bb8c.c, so this unit does not own it) rather than by a guessed
+class_39e08.c, so this unit does not own it) rather than by a guessed
 purpose, per this project's "name what the code does" rule.
 
 ## Proposed field names
 
-**Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that StageMap__ComputeFootprintDescriptor sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (class_3bb8c.c), where all readers are in one unit.
+**Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that StageMap__ComputeFootprintDescriptor sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (class_39e08.c), where all readers are in one unit.
 
-`ElemTarget::unk32` (also read by class_3bb8c.c's `StageMap__FindSlotByNeighbour`, so
+`ElemTarget::unk32` (also read by class_39e08.c's `StageMap__FindSlotByNeighbour`, so
 cross-unit -- not renamed here). Proposed: `key` -- it is exactly what
 both `FindElemIndexByUnk32` and its caller-side context treat it as, a
 value compared for equality to select an element. Evidence: this
@@ -147,7 +147,7 @@ The unit banner was rewritten (what the file holds); the old one, verbatim:
 ```c
 /*
  * class_3bb8c_b -- the last third of StageMap (include/StageMap.h),
- * sharing include/class_3bb8c.h with class_3bb8c.c.
+ * sharing include/class_3bb8c.h with class_39e08.c.
  *
  *  - FindSlotIndexByNeighbour, FindSlotIndexByChunk: slot lookups.
  *  - The footprint: once every chunk is loaded, RefreshFootprint sets bit

@@ -381,7 +381,7 @@ seed rather than a long blind search.
 Per the coordinator's standing request, checked this function's residue
 against the commutative-add operand/destination-register class confirmed
 this round in `CalcDreamColor` (this same unit) and five prior instances
-across `libsnd_ssinit`/`class_3bb8c`. **Not a match.** This function's two
+across `libsnd_ssinit`/`class_39e08`. **Not a match.** This function's two
 divergences are both delay-slot-FILL CHOICES -- which independent
 instruction (the hoisted `li $v0,0x1` return-value constant vs. retail's
 `addiu $a1,$sp,0x10`/a genuine `nop`) occupies a branch's delay slot --

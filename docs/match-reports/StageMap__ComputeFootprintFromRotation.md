@@ -648,7 +648,7 @@ Notes on the derivation, for whoever revisits this:
 
 - **Retype**: `Unk6CObj::unk14` changed from `void *` to the new
   `Unk6C14Obj *`. The only OTHER reader, `StageMap__GetTargetDescriptor` (already matched,
-  in `class_3bb8c.c`), immediately casts it to `(u8 *)` before doing
+  in `class_39e08.c`), immediately casts it to `(u8 *)` before doing
   pointer arithmetic, so this does not change that function's compiled
   bytes — verified with a full rebuild (`./build-and-verify.sh` stays
   green after the retype, independent of this function's own stall).

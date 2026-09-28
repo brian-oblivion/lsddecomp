@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004BD14` on 2026-09-24 (tools/rename.py). Address 0x8004bd14.
 
-**Unit:** class_3bb8c · **Size:** 80 words · **Status:** MATCHED (first attempt).
+**Unit:** class_39e08 · **Size:** 80 words · **Status:** MATCHED (first attempt).
 
 ## Result
 

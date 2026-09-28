@@ -123,7 +123,7 @@ renamed):
 ## Proposed field names
 
 Not applied: every accessor outside `src/GameFiles.c` is in StageMap's
-units (class_3bb8c.c, class_3bb8c_b.c), outside this job. For the head to
+units (class_39e08.c, class_3bb8c_b.c), outside this job. For the head to
 apply by type scope.
 
 - `LbdFile.ownerRate` (+0x030) -> `chunkIndex`. StageMap__ApplyChunkLoads
@@ -133,7 +133,7 @@ apply by type scope.
   tests `>= 0`); StageMap__SplitChunkIndex splits it into column
   (`% divisor`) and row (`/ divisor`); StageMap__FindSlotIndexByChunk
   finds the element holding a given chunk by it. Accessors: GameFiles.c
-  (LbdFile__LbdFile, LbdFile__ReleaseHeader), class_3bb8c.c
+  (LbdFile__LbdFile, LbdFile__ReleaseHeader), class_39e08.c
   (ApplyRateEntries, ResetElementCells, ComputeFootprintDescriptor,
   GetLastTargetRateSplit), class_3bb8c_b.c (FindElemIndexByUnk30).
 - `LbdFile.ownerKey` (+0x032) -> `elemKey`. StageMap's ctor writes the
@@ -145,4 +145,4 @@ apply by type scope.
   `placementsOffset` / `placementsSize`. StageMap__PopulateSlotCells
   points the element's PlacementGrid (a 20x20 grid of placement records) at
   header + gridOffset and builds its LinkResource from header + gridOffset +
-  gridSize, i.e. right after the placements. Accessor: class_3bb8c.c only.
+  gridSize, i.e. right after the placements. Accessor: class_39e08.c only.

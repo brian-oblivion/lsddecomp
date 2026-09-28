@@ -8,7 +8,7 @@ Get-vtable helper for the class whose method table is `gStageMapMethods`
 (`Obj866E8` in this unit's header, `StageMap` in `class_39e08.h`'s
 independent view of the SAME table). This is the SAME real function
 `class_39e08.h` already documents an `extern` prototype for (`"Get-vtable
-helper for StageMap. Still raw asm... lives in class_3bb8c"`) — it now
+helper for StageMap. Still raw asm... lives in class_39e08"`) — it now
 has a real body, contributed by this unit.
 
 ## Disassembly
@@ -61,7 +61,7 @@ get-vtable helper. Matches this project's established
 `GetTimedTaskMethods`, `GetItemListMethods`, `GetNodeGuardedViewportMethods`),
 which class_39e08.h's own extern for this SAME real function already
 anticipated under this exact name pattern (previously documented there as
-an unnamed extern for "the get-vtable helper... lives in class_3bb8c").
+an unnamed extern for "the get-vtable helper... lives in class_39e08").
 
 ## Track 6 (2026-09-26, round 93, alpha)
 

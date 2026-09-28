@@ -877,7 +877,7 @@ stores that in the GridCell's `flags36`, whose bit 0x80 NotifyGridCell tests
 and whose low seven bits DreamSys__NotifyLinkAttempt reads as a voice
 select. Named for where it goes; what the bits mean in the map is not
 established. `CellPlacement.unk2E` -> `cellFlags` is PROPOSED, not applied:
-its reader is in class_3bb8c.c. `unk1` / `unk2C` stay: written here, read
+its reader is in class_39e08.c. `unk1` / `unk2C` stay: written here, read
 nowhere.
 
 ## Track 7 (round 100, delta)

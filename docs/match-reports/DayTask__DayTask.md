@@ -216,7 +216,7 @@ needed anywhere in this 107-word function.
   other five (`GetSoundEffectDir`, `InitDreamAux`, `New_TimImage`,
   `PickSoundBank`, `New_WBgm`, `New_NodeGuardedViewport`, `New_FrameClock`) are
   new to the project entirely (the first is a genuine one-off; the rest
-  come from uncarved Psy-Q segments or `class_3bb8c`).
+  come from uncarved Psy-Q segments or `class_39e08`).
 
 ## Attempts
 
@@ -306,7 +306,7 @@ The unit banner (include/class_39e08.h) no longer carries "track 4, round
 ## Track 6 (round 96, delta): the request local is ResourceSourceRequest
 
 include/class_39e08.h `LoadRequest`, `{ s32 type; const char *path; s32 unk08; s32 unk0C; }`, is the same
-0x10-byte record as class_3bb8c.c's and the third caller's: the body writes
+0x10-byte record as class_39e08.c's and the third caller's: the body writes
 `type = 0` (ResourceSource's NULL `buffer`: no buffer to adopt) and `path`
 (its `name`: the file to request) and passes it to New_LinkResource. It
 retired onto include/FileResource.h's `ResourceSourceRequest` (a

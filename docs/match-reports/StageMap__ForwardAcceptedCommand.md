@@ -142,7 +142,7 @@ slots as `(self, sender, event)`. Renamed `list` -> `sender`,
 `count` -> `command`, in the definition, the slot declarations and the two
 callers. Byte-neutral, oracle green.
 
-Posted to the round broadcast, because `class_3bb8c`'s own view of these
+Posted to the round broadcast, because `class_39e08`'s own view of these
 slots inherits the same wrong word.
 
 ## Track 6 (2026-09-26, round 93, alpha)

@@ -333,7 +333,7 @@ one real call site, `StageMap__OnNotifyTag1`'s `self->methods->slot104(self, e)`
 - `EntryChildObj::unk36` -- `s16` at `+0x036`, carved out of the old
   `pad24[0x38-0x24]` (20 bytes -> 18 + 2, same total).
 - Forward typedefs only for `LinkTarget866E8`, `ResInfo866E8`, `EntryGpu`
-  (top-of-file block) -- their FULL bodies live in `class_3bb8c.c`, not the
+  (top-of-file block) -- their FULL bodies live in `class_39e08.c`, not the
   header, since none of the 11 sibling units touch them. This is the
   "own local view, own file" half of the project's shared-header
   discipline; only the field additions on the three already-shared types
@@ -712,7 +712,7 @@ This is the Gate 1b "rebuild before trusting" check, and it matters here
 because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
-four preserved bodies in `class_3bb8c` were rebuilt this round and all four
+four preserved bodies in `class_39e08` were rebuilt this round and all four
 are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
 `StageMap__LoadChunksAround` 125/140, `StageMap__PopulateSlotCells` 130/150. No stale figure and no
 never-linked body in this unit.
@@ -739,7 +739,7 @@ premature**:
 **A permuter scaffold's `base.c` is NOT the project's C.**
 `tools/setup-permuter.sh` emits a FLATTENED translation unit -- the function
 plus its own inlined preamble of typedefs. Pasting that body straight into
-`src/class_3bb8c.c` cannot work, because this function's local types live in
+`src/class_39e08.c` cannot work, because this function's local types live in
 this report's `#if 0` block, not in the unit. Bring the declarations across
 with the body, build, *then* believe the figure.
 
@@ -804,7 +804,7 @@ sibling it was worth 12 words.
 
 The head applied it and the build failed: ``LinkResource' undeclared``. The
 permuter's `base.c` is a FLATTENED scaffold with its own preamble, so its body
-is not directly pasteable into `src/class_3bb8c.c` -- this function's local
+is not directly pasteable into `src/class_39e08.c` -- this function's local
 types live in this report's own `#if 0` block and must come across with it.
 That is a ten-minute job and a runner's, not a head's, and doing it badly
 would have produced a figure that measured the wrong thing.

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004B38C` on 2026-09-24 (tools/rename.py). Address 0x8004b38c.
 
-**Unit:** class_3bb8c · **Size:** 35 words · **Status:** MATCHED.
+**Unit:** class_39e08 · **Size:** 35 words · **Status:** MATCHED.
 
 ## Result
 
@@ -90,7 +90,7 @@ to apply by type scope.
 | `Obj866E8::unkBC` | `descriptor` | B | Whole-struct-copied from a caller `Descriptor10*` in `StageMap__SetTargetAndLoadChunks`; overwritten wholesale (44 bytes, past the declared field into trailing padding -- see `StageMap__UpdateFootprintTracking.md`'s own derivation) and read back (`StageMap__GetTargetDescriptor` returns `&self->unkBC` directly) as "the object's current footprint descriptor". Not tested for cross-unit accessors this round (only `unk6C` was); the head should re-run the same compiler check before applying. |
 
 **Head disposition, round 78.** `unk6C` applied by type scope as `target`
-(3 accessors: class_3bb8c.c x2, class_3bb8c_b.c x1), not `posSource`: this
+(3 accessors: class_39e08.c x2, class_3bb8c_b.c x1), not `posSource`: this
 function (`SetTarget...`) stores it and `GetTargetDescriptor` reads it, so the
 unit's own function names already call it the target. `unkBC` -> `descriptor`
 DECLINED: it restates the field's type (`Descriptor10`), round 77's precedent.

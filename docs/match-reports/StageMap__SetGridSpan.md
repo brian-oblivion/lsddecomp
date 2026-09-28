@@ -61,7 +61,7 @@ an arbitrary bit slice. That is what the names record.
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `StageMap+0x074` | `gridSpan` | B | Stored raw here; `class_3bb8c`'s `StageMap__ComputeFootprintFromRotation` copies it into a matrix-query template. The world-space extent reading is from the arithmetic above. |
+| `StageMap+0x074` | `gridSpan` | B | Stored raw here; `class_39e08`'s `StageMap__ComputeFootprintFromRotation` copies it into a matrix-query template. The world-space extent reading is from the arithmetic above. |
 | `StageMap+0x078` | `gridHalfCells` | B | `span >> 12`, half of `gridCells`. |
 | `StageMap+0x07A` | `gridCells` | B | `span >> 11`; equals the byte-verified row stride. |
 
@@ -78,7 +78,7 @@ so not mine to edit):
 | `Obj866E8` | `unk7A` | `gridCells` | B | as above |
 
 Also posted to the round broadcast. Nothing in THIS unit's build depends on
-them; they are offered because `class_3bb8c` reads all three and currently has
+them; they are offered because `class_39e08` reads all three and currently has
 only offset names for them.
 
 ## Track 6 (2026-09-26, round 93, alpha)

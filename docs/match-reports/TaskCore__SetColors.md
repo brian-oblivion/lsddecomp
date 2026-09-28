@@ -69,7 +69,7 @@ the same original `Task` monolith** (`Task`, `code_2cc8c_b`,
 `Task`, `ScreenWidgets`, `code_2cc8c_f` -- all carved from one
 segment across earlier rounds). I have not tried this lever, or seen it
 tried, anywhere outside that family (`Entity.c`, `DreamSys.c`,
-`class_3bb8c*.c`, etc.), so I cannot personally attest it holds there.
+`class_39e08*.c`, etc.), so I cannot personally attest it holds there.
 
 Within that scope, though, the evidence is broader than "one struct's
 idiom" and worth stating precisely:

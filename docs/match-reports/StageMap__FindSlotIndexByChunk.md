@@ -104,18 +104,18 @@ rules, this is left for the head to reconcile rather than edited directly
 on a miss. Named the same way and for the same reason -- by the field it
 searches, since `unk30`/`unk2C` are cross-unit `ElemTarget` fields this
 unit does not own (also read by `StageMap__OnNotifyTag1`/`StageMap__ClearSlotCells` in
-class_3bb8c.c).
+class_39e08.c).
 
 ## Proposed field names
 
-**Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that StageMap__ComputeFootprintDescriptor sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (class_3bb8c.c), where all readers are in one unit.
+**Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that StageMap__ComputeFootprintDescriptor sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (class_39e08.c), where all readers are in one unit.
 
-`ElemTarget::unk30` and `ElemTarget::unk2C` (also read by class_3bb8c.c's
+`ElemTarget::unk30` and `ElemTarget::unk2C` (also read by class_39e08.c's
 `StageMap__OnNotifyTag1`/`StageMap__ClearSlotCells` -- cross-unit, not renamed here).
 Proposed: `unk30` -> `key` (same reasoning as `unk32` above -- compared
 for equality against this function's own `key` argument);
 `unk2C` -> `enabled` (gates this function's match with a nonzero test,
-and class_3bb8c.c's `StageMap__OnNotifyTag1` gates its own dispatch on the same
+and class_39e08.c's `StageMap__OnNotifyTag1` gates its own dispatch on the same
 field the same way -- a plain "is this target live" flag is the simplest
 reading that fits both call sites, though neither establishes it beyond
 "nonzero enables").

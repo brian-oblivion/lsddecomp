@@ -11,7 +11,7 @@
 view of the same table already exists in `include/class_39e08.h` as
 `StageMapMethods`; see `include/class_3bb8c.h`'s header comment for why
 this unit keeps its own, per the project's multiple-local-views
-convention). This is the first function of `class_3bb8c`'s newly-carved
+convention). This is the first function of `class_39e08`'s newly-carved
 first slice, and the first match report for it.
 
 ## Disassembly

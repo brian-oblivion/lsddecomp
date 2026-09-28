@@ -52,14 +52,14 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AB24` | `StageMap__UpdateIfEnabled` | B | Occupant of vtable slot `+0x098`. The gate field is `+0x070`, and `class_3bb8c`'s two matched accessors pin its meaning exactly: `StageMap__Enable` sets it to 1 and `StageMap__Disable` runs `slotC0` and then clears it to 0 -- an enable/disable pair. When enabled this function dispatches `slotF4` then `slot13C`; `slot13C` is `class_3bb8c_b`'s matched `StageMap__StepScaleRamp`, which decrements a per-object countdown and sweeps every element's cells, i.e. periodic work. Tier B: "update" describes what the two dispatched slots do, not a purpose anyone has established. |
+| `func_8004AB24` | `StageMap__UpdateIfEnabled` | B | Occupant of vtable slot `+0x098`. The gate field is `+0x070`, and `class_39e08`'s two matched accessors pin its meaning exactly: `StageMap__Enable` sets it to 1 and `StageMap__Disable` runs `slotC0` and then clears it to 0 -- an enable/disable pair. When enabled this function dispatches `slotF4` then `slot13C`; `slot13C` is `class_3bb8c_b`'s matched `StageMap__StepScaleRamp`, which decrements a per-object countdown and sweeps every element's cells, i.e. periodic work. Tier B: "update" describes what the two dispatched slots do, not a purpose anyone has established. |
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `StageMap+0x070` | `enabled` | A | Set to 1 / cleared to 0 by a matched setter pair in `class_3bb8c`, and used as a plain boolean gate here. A pure flag whose mechanics are its purpose. |
+| `StageMap+0x070` | `enabled` | A | Set to 1 / cleared to 0 by a matched setter pair in `class_39e08`, and used as a plain boolean gate here. A pure flag whose mechanics are its purpose. |
 
 `slotF4` and `slot13C` keep their `slotNN` names: their occupants
-(`StageMap__UpdateFootprintTracking`, `StageMap__StepScaleRamp`) are still `func_` in `class_3bb8c`, and
+(`StageMap__UpdateFootprintTracking`, `StageMap__StepScaleRamp`) are still `func_` in `class_39e08`, and
 the convention is to name a slot after the method it dispatches to.
 
 ## Track 6 (2026-09-26, round 93, alpha)

@@ -46,7 +46,7 @@ The key to the residue-free read: `DayTask__StartObjM`'s own incoming `arg1`
 spill, but because that slot IS the o32 outgoing-argument home for a call's
 5th parameter, and `New_ObjM` takes 5 args (4 in `$a0-$a3`, the 5th on
 the stack, confirmed from `New_ObjM`'s own prologue in
-`asm/class_3bb8c.s`, which loads its 5th param from `0x48($sp)` against its
+`asm/class_39e08.s`, which loads its 5th param from `0x48($sp)` against its
 own `0x38`-byte frame). `arg1` is silently forwarded, never touched by name
 inside this function's body.
 
@@ -87,7 +87,7 @@ committed source.)
   (`Obj865C8::unk4C->methods->slot44(unk4C, self->unk0C, self->unk38)`).
   Same "vtable at offset 0, only the reached slot named" policy as this
   unit's existing `SubObjA`/`SubObjB`.
-- `New_ObjM` (uncarved, unit `class_3bb8c`) declared locally:
+- `New_ObjM` (uncarved, unit `class_39e08`) declared locally:
   `Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);` — its
   own disassembly is a `New_X`-shaped allocator (0x88-byte alloc via
   `BMemPMgrAlloc`, ctor via `GetObjMMethods`, then dispatches its new

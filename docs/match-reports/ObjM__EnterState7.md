@@ -7,7 +7,7 @@
 ## Context
 
 First function of `class_3bb8c_m`, the fourth 20-function slice carved from
-the tail of the large `class_3bb8c` block (0x44518..0x44F14). This unit's
+the tail of the large `class_39e08` block (0x44518..0x44F14). This unit's
 `self` object (`ObjM`, `include/class_3bb8c.h`) is a NEW, independent type —
 its field offsets (0x10, 0x14, 0x18, 0x20, 0x3C, 0x80, 0x84) and its own
 vtable slots (0x10, 0x14, 0x30, 0xB8, 0xD4) don't correspond to anything

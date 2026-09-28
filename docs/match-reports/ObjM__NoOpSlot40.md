@@ -34,7 +34,7 @@ The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_800870
 The unit banner of `src/class_3bb8c_l.c` was rewritten as documentation.
 Its history, moved here verbatim in substance:
 
-> class_3bb8c_l -- sixth carved slice of the class_3bb8c block
+> class_3bb8c_l -- sixth carved slice of the class_39e08 block
 > (0x435E0..0x44518, vram 0x80052DE0..0x80053D18), 20 functions, ALL
 > MATCHED. Carved round 15; fully matched by round 45.
 > This slice is entirely ObjM's own methods (gObjMMethods, include/ObjM.h;

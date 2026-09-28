@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004B5BC` on 2026-09-24 (tools/rename.py). Address 0x8004b5bc.
 
-Unit `class_3bb8c`. Slot `Obj866E8Methods::slotF4` (verified against
+Unit `class_39e08`. Slot `Obj866E8Methods::slotF4` (verified against
 `tools/classtable.py 0x800866E8`, which resolves `gStageMapMethods`'s own
 `+0x0F4` entry directly to `StageMap__UpdateFootprintTracking`).
 

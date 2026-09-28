@@ -377,14 +377,14 @@ the report and to the preserved body's identifiers, not to the shipped bytes.
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `StageMap+0x0BC` | `cellTag` | C-ish/B | Copied verbatim into `curCellTag` before every cell visit and never otherwise touched here. `class_3bb8c` reads the same offset as the first halfword of a 10-byte `Descriptor10` that `StageMap__SetTargetAndLoadChunks` block-copies in. The name records only "the tag stamped onto each visited cell". |
+| `StageMap+0x0BC` | `cellTag` | C-ish/B | Copied verbatim into `curCellTag` before every cell visit and never otherwise touched here. `class_39e08` reads the same offset as the first halfword of a 10-byte `Descriptor10` that `StageMap__SetTargetAndLoadChunks` block-copies in. The name records only "the tag stamped onto each visited cell". |
 | `StageMap+0x1C0` | `curCellTag` | B | Written per cell visit; `StageMap__GetCurrentCellKey` returns its address. |
 | `StageMap+0x1C2` | `curCellCol` | A | Written per cell visit with the rectangle's start column plus the inner loop offset. |
 | `StageMap+0x1C3` | `curCellRow` | A | Same, row. |
-| `StageMap+0x038` | `nextInCell` | B | The chain this function walks off each grid cell; `class_3bb8c`'s `StageMap__SetFootprintVisible` walks the identical chain off `EntryChildObj::unk38`. |
+| `StageMap+0x038` | `nextInCell` | B | The chain this function walks off each grid cell; `class_39e08`'s `StageMap__SetFootprintVisible` walks the identical chain off `EntryChildObj::unk38`. |
 
 **Type caveat, recorded not fixed.** This unit declares the cell type as
-`StageMap *`. `class_3bb8c`'s independently derived view says
+`StageMap *`. `class_39e08`'s independently derived view says
 `EntryChildObj *`, and its evidence is better: the ctor here ORs `0x80000000`
 into each freshly built cell's `+0x010`, which is `EntryChildObj::unk10`
 exactly (`StageMap__ClearSlotCells` sets the same bit, matched `StageMap__SetFootprintVisible` clears

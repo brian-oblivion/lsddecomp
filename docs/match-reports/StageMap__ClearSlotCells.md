@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004C0AC` on 2026-09-24 (tools/rename.py). Address 0x8004c0ac.
 
-**Unit:** class_3bb8c · **Size:** 43 words · **Status:** MATCHED (5 attempts).
+**Unit:** class_39e08 · **Size:** 43 words · **Status:** MATCHED (5 attempts).
 
 ## Result
 
