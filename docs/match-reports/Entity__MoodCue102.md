@@ -132,12 +132,12 @@ names sort in table order.
 `SCALE_EIGHTH` (0x80089E20) and `SCALE_QUARTER` (0x80089DCC), both cascade
 arms in this function's `moodTimer`-threshold chain, decoded directly from
 `disk/SLPS_015.56` as four s16 `{num,den}` pairs (X/Y(yaw)/Z/W, matching
-`sScaleHalf`/`SCALE_SIX`'s own layout):
+`sScaleHalf`/`sScaleSix`'s own layout):
 
 - `SCALE_EIGHTH`: `(1,8, 1,8, 1,8, 1,8)` -- uniform X=Y=Z=1/8, the same
   unit-fraction-word convention as `sScaleHalf` (1/2).
 - `SCALE_QUARTER`: `(1,4, 1,4, 1,4, 1,2)` -- uniform X=Y=Z=1/4, W=1/2
-  (ignored per the established `sScaleHalf`/`SCALE_SIX`/
+  (ignored per the established `sScaleHalf`/`sScaleSix`/
   `sRotationYawMinus120` precedent that the 4th pair is never reflected
   in the name).
 

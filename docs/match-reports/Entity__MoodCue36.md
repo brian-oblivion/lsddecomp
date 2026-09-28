@@ -13,7 +13,7 @@ void Entity__MoodCue36(Entity *this) {
 
     if (this->unk44 == 0) {
         roll = rand();
-        arg2 = SCALE_SIX;
+        arg2 = sScaleSix;
         if ((roll & 1) != 0) {
             arg2 = sScaleDouble;
         }
@@ -29,7 +29,7 @@ void Entity__MoodCue36(Entity *this) {
 
 ## Notes
 
-- **Attempt 1 (stored `arg2 = SCALE_SIX;` BEFORE calling `rand()`) scored
+- **Attempt 1 (stored `arg2 = sScaleSix;` BEFORE calling `rand()`) scored
   2/51 with an oversized frame** (retail saves only `$s0`/`$ra` in a 0x20
   frame; the first attempt added a spurious `$s1` save). Cause: with the
   default pointer assigned before `rand()`, that pointer local has to
@@ -90,4 +90,4 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 4b (round 93, charlie) — 2026-09-26
 
-The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `arg2`, which holds `SCALE_SIX` or `sScaleDouble` and is passed to `updateScale`, is now `Ratio16 *` (was `u8 *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green.
+The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `arg2`, which holds `sScaleSix` or `sScaleDouble` and is passed to `updateScale`, is now `Ratio16 *` (was `u8 *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green.

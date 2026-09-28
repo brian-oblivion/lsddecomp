@@ -10,14 +10,14 @@ No hits.
 
 ## What it does
 
-`gEntityMoodHandlerTable` handler row; `out` unused. `slot48(this, 1, SCALE_SIX)` --
+`gEntityMoodHandlerTable` handler row; `out` unused. `slot48(this, 1, sScaleSix)` --
 the same row pointer `Entity__MoodCue98` also reaches.
 
 ## The C
 
 ```c
 void Entity__MoodCue117(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, SCALE_SIX);
+    this->methods->slot48(this, 1, sScaleSix);
 }
 ```
 

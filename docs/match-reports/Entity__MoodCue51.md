@@ -12,7 +12,7 @@ void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out) {
     void *table;
 
     if (this->unkFC == 0 && rand() % 5 == 0 && this->unk44 == 0) {
-        this->methods->slot48(this, 1, SCALE_SIX);
+        this->methods->slot48(this, 1, sScaleSix);
         this->methods->slotCC(this, 0x320, 0);
         this->unk44 = 0xB;
     }

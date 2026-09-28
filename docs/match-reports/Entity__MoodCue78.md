@@ -231,7 +231,7 @@ Reading this function's `out->` writes with the proposed `SoundCueSet` field nam
 
 **Data/global renamed this round:** `D_80089D0C` -> `ROTATION_XPLUS90` (first {num,den} pair = (90,1), the X slot by the same X/Y/Z decoding as `Entity__MoodCue68`'s report), tier B. `D_8008ACCC` -> `sMoodCue78TransitionDone`, tier B: a one-shot s32 flag local to this function -- cleared at `out->unk4==0`, set when the `moodState==0xB` branch fires at `unk4==0x1FE`, read once more at `unk4==0x208` to gate a second `stopSoundCue`/`moodState` reset. No other file in `src/` references it.
 
-**`SCALE_UNIT` left unnamed this round.** s16-pair-decoded it reads (1,1, 1,1, 1,1, 1,8) -- X=Y=Z=1 (no scale change on the three named axes), only the 4th/W pair differs (1,8). Every named `SCALE_*` table so far is named for its X/Y/Z content and ignores W (e.g. `sScaleHalf`'s own W is (4,5), `SCALE_SIX`'s is (2,5)), so this table reads as an X/Y/Z-identity scale and there is no precedent for naming one on its W value alone.
+**`SCALE_UNIT` left unnamed this round.** s16-pair-decoded it reads (1,1, 1,1, 1,1, 1,8) -- X=Y=Z=1 (no scale change on the three named axes), only the 4th/W pair differs (1,8). Every named `SCALE_*` table so far is named for its X/Y/Z content and ignores W (e.g. `sScaleHalf`'s own W is (4,5), `sScaleSix`'s is (2,5)), so this table reads as an X/Y/Z-identity scale and there is no precedent for naming one on its W value alone.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

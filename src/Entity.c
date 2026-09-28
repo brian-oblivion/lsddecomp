@@ -968,7 +968,7 @@ void Entity__MoodCue27(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue119(Entity *this) {
-    this->methods->updateScale(this, 1, SCALE_SIX);
+    this->methods->updateScale(this, 1, sScaleSix);
 }
 
 void Entity__MoodCue29(Entity *this) {
@@ -1113,7 +1113,7 @@ void Entity__MoodCue36(Entity *this) {
 
     if (this->state == 0) {
         roll = rand();
-        scaleTemplate = SCALE_SIX;
+        scaleTemplate = sScaleSix;
         if ((roll & 1) != 0) {
             scaleTemplate = sScaleDouble;
         }
@@ -1355,7 +1355,7 @@ void Entity__MoodCue46(Entity *this, SoundCueSet *out) {
         } else if (dayYearPhase != 1) {
             goto skipScaleBump;
         }
-        this->methods->updateScale(this, 1, SCALE_SIX);
+        this->methods->updateScale(this, 1, sScaleSix);
     }
 skipScaleBump:
     if (out->tick == 0) {
@@ -1465,7 +1465,7 @@ void Entity__MoodCue51(Entity *this, SoundCueSet *out) {
     Ratio16 *table;
 
     if (this->moodTimer == 0 && rand() % 5 == 0 && this->state == 0) {
-        this->methods->updateScale(this, 1, SCALE_SIX);
+        this->methods->updateScale(this, 1, sScaleSix);
         this->methods->moveLocalY(this, 800, 0);
         this->state = 11;
     }
@@ -1712,7 +1712,7 @@ tail:
  * startSoundCue, on the cue set's own `tick`, or on todFrame, the frame of
  * its TOD animation, and sends the dream an EntityEffect through
  * notifyParents. Entity__MoodCue108 (below) runs Entity__MoodCue71 and
- * then sets its scale to SCALE_SIX.
+ * then sets its scale to sScaleSix.
  *
  * The literals are left unnamed where they are one handler's tuning: tick
  * counts, distances in world units, TOD frame numbers, VAB program numbers,
@@ -2540,7 +2540,7 @@ void Entity__MoodCue94(Entity *this, SoundCueSet *out) {
         this->methods->setTod(this, 1);
         if (this->state != 0) {
             if ((rand() & 1) == 0) {
-                this->methods->updateScale(this, 1, SCALE_SIX);
+                this->methods->updateScale(this, 1, sScaleSix);
                 this->methods->moveLocalY(this, 2048, 0);
             }
         }
@@ -2722,7 +2722,7 @@ void Entity__MoodCue106(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue108(Entity *this, SoundCueSet *out) {
     Entity__MoodCue71(this, out);
-    this->methods->updateScale(this, 1, SCALE_SIX);
+    this->methods->updateScale(this, 1, sScaleSix);
 }
 
 void Entity__MoodCue109(Entity *this, SoundCueSet *out) {
@@ -2831,11 +2831,11 @@ void Entity__MoodCue114(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue117(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, SCALE_SIX);
+    this->methods->updateScale(this, 1, sScaleSix);
 }
 
 void Entity__MoodCue118(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, SCALE_SIX);
+    this->methods->updateScale(this, 1, sScaleSix);
 }
 
 void Entity__MoodCue121(Entity *this, SoundCueSet *out) {
