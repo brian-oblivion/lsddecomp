@@ -84,7 +84,7 @@ extern s32 gDreamAuxStage;
 extern StageMap *gDreamAuxStageMap;
 extern DreamSys *gDreamAuxWorld;
 extern struct VabStreamObj *gDreamAuxSound;
-extern struct FrameClock *gDreamAuxFrameClock;
+extern struct FrameClock *sDreamAuxFrameClock;
 
 void SetTeleportsEnabled(s32 stage);
 
@@ -97,7 +97,7 @@ void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct Vab
     gDreamAuxStageMap = stageMap;
     gDreamAuxWorld = world;
     gDreamAuxSound = sound;
-    gDreamAuxFrameClock = frameClock;
+    sDreamAuxFrameClock = frameClock;
 
     for (i = 0; i < ARRAY_COUNT(gDreamAuxSlots); i++) {
         s32 desc[4]; /* New_Entity's descriptor: word +0x00C the ModelData */
@@ -448,7 +448,7 @@ bool SpawnDreamAuxTriggerEntity(s32 moodIndex, void *desc, DreamAuxTriggerEntry 
         gDreamAuxStageMap->methods->computeCellOffsets(gDreamAuxStageMap, worldPos, &cellDesc);
         entity->methods->updateRotation(entity, 1, gDreamAuxSpawnRotations[spawn->rotationIndex]);
         ((TodActorAttachToParentFn)entity->methods->attachToParent)(
-            (TodActor *)entity, (TodActor *)gDreamAuxWorld, gDreamAuxFrameClock,
+            (TodActor *)entity, (TodActor *)gDreamAuxWorld, sDreamAuxFrameClock,
             (void *)gDreamAuxStageMap, worldPos);
         return false;
     }
@@ -464,7 +464,7 @@ void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *slot) {
         slot->entity->methods->detachFromParent(slot->entity);
         SceneNode__LocalOffsetToWorldPos((SceneNode *)gDreamAuxWorld, worldPos, slot->pos, 0);
         ((TodActorAttachToParentFn)slot->entity->methods->attachToParent)(
-            (TodActor *)slot->entity, (TodActor *)gDreamAuxWorld, gDreamAuxFrameClock,
+            (TodActor *)slot->entity, (TodActor *)gDreamAuxWorld, sDreamAuxFrameClock,
             (void *)gDreamAuxStageMap, worldPos);
         SceneNode__FaceTarget((SceneNode *)slot->entity, (SceneNode *)gDreamAuxWorld, 1, 0, NULL);
     }

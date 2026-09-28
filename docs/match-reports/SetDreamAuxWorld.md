@@ -25,7 +25,7 @@ extern s32 gDreamAuxStage;
 extern s32 gDreamAuxStageMap;
 extern s32 gDreamAuxWorld;
 extern s32 gDreamAuxSound;
-extern s32 gDreamAuxFrameClock;
+extern s32 sDreamAuxFrameClock;
 
 void SetTeleportsEnabled(s32 triggerType);
 
@@ -38,7 +38,7 @@ void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
     gDreamAuxStageMap = a1;
     gDreamAuxWorld = a2;
     gDreamAuxSound = a3;
-    gDreamAuxFrameClock = a4;
+    sDreamAuxFrameClock = a4;
 
     for (i = 0; i < 1; i++) {
         s32 buf[4];
@@ -138,7 +138,7 @@ ObjM.h: unk14 the StageMap, unk10 the FrameClock, TimedTask's sound the
 VabStreamObj): a0..a4 -> stage, stageMap, world, sound, frameClock. The
 globals it installs were renamed with tools/rename.py: D_8008ABFC ->
 gDreamAuxStageMap (tier A), D_8008AC04 -> gDreamAuxSound (tier A, New_Entity's
-`sound`), D_8008AC08 -> gDreamAuxFrameClock (tier A, TodActor's attachToParent
+`sound`), D_8008AC08 -> sDreamAuxFrameClock (tier A, TodActor's attachToParent
 `companion`), and typed `struct VabStreamObj *` / `struct FrameClock *`. The
 entity's mood row is DREAM_AUX_FIRST_MOOD + i (98); `buf` -> `desc`
 (New_Entity's descriptor, ModelData in word +0x00C). Byte-identical.
