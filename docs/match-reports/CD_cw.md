@@ -453,3 +453,25 @@ function regressed -- check whether the STRUCTURAL (missing/extra
 instruction) count changed, separately from the register-identity-only
 diff count, before deciding whether a length-fixing lever is worth
 keeping over a cleaner near-miss with residual drift.
+
+## History (moved from src/libcd_bios.c, comments pass)
+
+A comment inside CD_cw's preserved `#if 0` body, on `D_8006D8D8`, read:
+
+> round 37: permuter-found lever, see match report -- volatile here
+> (and on state/state1 below) closes 3 of the 4 missing words
+
+The comment above CD_cw's preserved `#if 0` body read:
+
+> Round 37 (echo): STALL, now 282/282 (LENGTH exact, no drift into
+> anything downstream) -- up from 278/282, via two stacked permuter-found
+> levers: (1) declaring D_8006D8D8 (and the two local pointers into it,
+> `state`/`state1`) `volatile` closed 3 of the original 4 missing words
+> (278->281/282); (2) a second search from that improved body found that
+> materializing `table[state[1]]` into `src` as its own statement just
+> before the timeout printf call (a dead store -- `src` is unconditionally
+> overwritten before its value is ever read) closes the last word
+> (281->282/282). Raw word-match went DOWN in the process (132/282 ->
+> 98/282) even as length became exact -- see the match report's honest
+> discussion of why LENGTH is still the right thing to have adopted here.
+> Restored to INCLUDE_ASM per project rule.

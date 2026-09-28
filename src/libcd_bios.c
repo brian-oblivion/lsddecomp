@@ -19,18 +19,6 @@
  *     sector-read state machine and its DMA transfer;
  *   - CD_set_test_parmnum, callback, cb_read: a one-word setter, the interrupt
  *     handler, and the per-sector read callback.
- *
- * What decided its edges (python3 tools/tuboundary.py):
- *   - start: the object in front, libcd/sys, ends here ("start edge
- *     possible"), and getintr is bios.c's first function;
- *   - CD_sync and CD_vol, once the first functions of their own carve units,
- *     are proven to be the SAME file as what precedes them by the rodata
- *     ("start edge IMPOSSIBLE", strings 0x800109F8 > 0x80010984 and
- *     0x80010A38 > 0x80010984), so the three carve slices are merged here;
- *   - end: the placed object libcd/iso9660 follows cb_read.
- *
- * The history of the three carve slices this file was merged from is in
- * docs/match-reports/getintr.md, "File history".
  */
 #include "common.h"
 
@@ -72,9 +60,8 @@ extern const char D_800109D8[]; /* "CDROM: unknown intr" */
 extern const char D_800109EC[]; /* "(%d)\n" */
 
 /* 8-byte response copy with a null guard on dst (2.6.3 does not fold
- * `&array != NULL`).  It must be an INLINE FUNCTION, not a macro: as a
- * do{}while(0) macro every site swapped the dst and counter registers
- * (round 70); the inline's parameter pseudos give retail's allocation. */
+ * `&array != NULL`). MATCHING: an inline function, not a do{}while(0)
+ * macro, which swaps the dst and counter registers at every site. */
 static __inline__ void copy8(u8 *d, const u8 *s) {
     s32 i;
     if (d != NULL) {
@@ -186,15 +173,8 @@ s32 getintr(void) {
 
 INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_sync);
 
-/* Round 37 (echo): re-splice of the round-35 rebuild, verbatim, to confirm
- * the recorded 178/180 score before a permuter search -- per CLAUDE.md's
- * "build the inherited body before you trust its score" discipline. See
- * docs/match-reports/CD_ready.md for the full derivation; this is a
- * STALL (2 words short, both instances of a redundant `andi` mask after an
- * already-zero-extending `lbu` that GCC's instruction selection elides by
- * choosing the load's destination register directly). Restored to
- * INCLUDE_ASM per project rule -- no score short of byte-exact stays in
- * src/. */
+/* CD_ready's near-miss body, kept for reading: a stall, 2 words short
+ * (docs/match-reports/CD_ready.md). */
 #if 0
 extern s32 D_8006D608;
 extern u8 D_8006D61D;
@@ -334,18 +314,8 @@ ret1:
 #endif
 INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_ready);
 
-/* Round 37 (echo): STALL, now 282/282 (LENGTH exact, no drift into
- * anything downstream) -- up from 278/282, via two stacked permuter-found
- * levers: (1) declaring D_8006D8D8 (and the two local pointers into it,
- * `state`/`state1`) `volatile` closed 3 of the original 4 missing words
- * (278->281/282); (2) a second search from that improved body found that
- * materializing `table[state[1]]` into `src` as its own statement just
- * before the timeout printf call (a dead store -- `src` is unconditionally
- * overwritten before its value is ever read) closes the last word
- * (281->282/282). Raw word-match went DOWN in the process (132/282 ->
- * 98/282) even as length became exact -- see the match report's honest
- * discussion of why LENGTH is still the right thing to have adopted here.
- * Restored to INCLUDE_ASM per project rule. */
+/* CD_cw's near-miss body, kept for reading: a stall, length exact
+ * (docs/match-reports/CD_cw.md). */
 #if 0
 extern s32 D_8006D608;
 extern u8 D_8006D61C;
@@ -362,8 +332,8 @@ extern s32 D_8006D840[];               /* "does this command need a param" flag 
 extern volatile u8 *D_8006D8C0;
 extern volatile u8 *D_8006D8C4;
 extern volatile u8 *D_8006D8C8;
-extern volatile u8 D_8006D8D8[3];      /* round 37: permuter-found lever, see match report -- volatile here
-                                         * (and on state/state1 below) closes 3 of the 4 missing words */
+extern volatile u8 D_8006D8D8[3];      /* volatile here and on state/state1
+                                         * below brings the body closer to CD_cw */
 extern u8 D_8006D8D9;
 
 extern s32 D_8008B3E4;
@@ -574,7 +544,7 @@ extern volatile s32 *D_8006D92C;
 extern volatile s32 *D_8006D930;
 extern volatile s32 *D_8006D934;
 
-/* Still INCLUDE_ASM elsewhere -- not this unit's to carve. */
+/* Defined in other objects. */
 extern void ResetCallback(void);                                          /* lib/libetc/intr.o */
 extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void); /* lib/libetc/intr.o, per libsnd_ssinit.c */
 extern s32 VSync(s32 arg0);                                               /* asm/psyq_15d04.s */
@@ -582,12 +552,11 @@ extern void puts(const char *arg0);                                       /* asm
 extern void printf(const char *fmt, ...);                                 /* Psy-Q printf wrapper */
 extern s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in libcd_bios */
 extern s32 CD_sync(s32 arg0, s32 arg1); /* defined in libcd_bios, per libcd_bios.c */
-extern s32 getintr(void);               /* libcd_bios.c, MATCHED round 70
-                                                                   (libcd getintr by its strings) */
+extern s32 getintr(void);               /* defined above */
 extern s32 CheckCallback(void);         /* lib/libetc/intr.o -- trivial
                                                                    (u16)D_8006C272 getter */
-/* Still INCLUDE_ASM in THIS unit (not yet converted) -- INCLUDE_ASM leaves no
- * C-level prototype of its own, so callers within this file need one. */
+/* Defined below as INCLUDE_ASM, which gives no C prototype, and called
+ * before that. */
 extern s32 cd_read_retry(void);
 extern s32 CD_datasync(s32 arg0);
 
@@ -701,11 +670,10 @@ void CD_initintr(void) {
 }
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 171/196 words, length exact. Residue: pure list-scheduling
- * (round-25 --debug breakdown: Reorderings: 3, Register Differences: 0) --
- * retail splits CD_cw(1,0,0,0)'s argument materialization from its
- * own a3/jal by ~90 bytes; neither call position tried reproduces the split
- * (docs/match-reports/CD_init.md). Hand-derived. */
+/* NON_MATCHING: 171/196 words, length exact. Residue: list scheduling:
+ * retail splits CD_cw(1,0,0,0)'s argument set-up from its own a3/jal by
+ * about 90 bytes, and neither call position tried reproduces it
+ * (docs/match-reports/CD_init.md). */
 s32 CD_init(void) {
     s32 *p;
     s32 i;
@@ -788,16 +756,11 @@ INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_init);
 #endif
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 215/223 words, length exact. Residue: two small isolated
- * clusters -- a loop-setup scheduling swap at 0x8002AABC (p2 computed from
- * $a0 before vs. after the move into $s5) and a register-identity swap in
- * the final D_8006D8F4=-1 block at 0x8002ADAC -- neither reachable by any
- * reorder or spelling variant tried (docs/match-reports/cd_read_retry.md).
- * Hand-derived structure (rounds 17-39); the n/saved throwaway-sink reuse
- * a few lines below is a permuter find (round 41) reviewed here and
- * confirmed sound (both are freshly written on every path before their
- * next read) against a rejected sibling candidate that hoisted a value
- * across a loop boundary unsoundly. */
+/* NON_MATCHING: 215/223 words, length exact. Residue: a loop-setup
+ * scheduling swap (p2 computed from $a0 before vs. after the move into $s5)
+ * and a register-identity swap in the final D_8006D8F4 = -1 block
+ * (docs/match-reports/cd_read_retry.md). The n/saved sinks below are
+ * written on every path before their next read. */
 s32 cd_read_retry(void) {
     s32 n;
     s32 *tmp;
@@ -915,15 +878,10 @@ s32 CD_readm(s32 arg0, s32 arg1, s32 arg2) {
     *p = arg2;
     t = *p & 0x30;
 
-    /* Retail keeps all three D_8006D8F0 stores as separate, unmerged blocks
-     * (three distinct address computations -- two folded through $at, one
-     * unfolded through a real GPR) instead of the single shared store GCC's
-     * cross-jump/tail-merge pass produces from the equivalent if/else-if/else
-     * or switch. The match report records how the `goto` layout and the
-     * local `volatile s32 *` pointers below were found to keep the stores
-     * apart. A bare `__asm__("")` after case1's store, once part of that
-     * recipe, was retired in round 89: removing it left the object
-     * byte-identical. */
+    /* MATCHING: the goto layout and the local `volatile s32 *` pointers
+     * keep the three D_8006D8F0 stores as separate blocks, each with its
+     * own address computation; an if/else chain or a switch lets GCC merge
+     * them into one store. */
     if (t == 0) {
         goto case1;
     }
@@ -1004,10 +962,8 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
         /* Keeps both p8D8 byte loads directly after the puts call, ahead of
          * the printf argument loads; without it the p8D8[0] load sinks below them. */
         __asm__("");
-        /* &D_8008B3EC routed through a local pointer -- forces the same
-         * unfolded lui/addiu addressing retail uses for this argument;
-         * a plain `D_8008B3EC` reference here compiles FOLDED instead.
-         * See docs/match-reports/CD_readsync.md's round-36 entry. */
+        /* MATCHING: &D_8008B3EC through a local pointer keeps retail's
+         * unfolded lui/addiu for this argument; a plain reference folds. */
         pEC = &D_8008B3EC;
         printf(D_80010994, *pEC, D_8006D620[D_8006D61D], p6A0[idx0], p6A0[idx1]);
         CD_flush();
@@ -1035,59 +991,12 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
                     ((void (*)(s32, u8 *))D_8006D5FC)(p8D8[0], D_8008B3CC);
                 }
             }
-            /* ------------------------------------------------------------
-             * KNOWN-BAD CONSTRUCT, KEPT ONLY BECAUSE IT IS BYTE-EXACT.
-             * DO NOT COPY THIS SHAPE INTO ANOTHER FUNCTION.
-             *
-             * `p6A0` and `pF8` are both addresses of globals, so the
-             * condition is a TAUTOLOGY and both arms are IDENTICAL. GCC
-             * 2.6.3 cross-jumps the two arms back into the single `sb`
-             * retail has, so this compiles to no extra instruction -- its
-             * whole effect is to perturb register allocation, forcing
-             * `status` into $s1 across the inner loop. Worth 12 words:
-             * 162/174 without it, 174/174 with it.
-             *
-             * docs/PARALLEL-RUNS.md Gate 3 names duplicate-arm forms
-             * alongside UB as the signature of an EXHAUSTED class rather
-             * than a solution, and says a permuter zero is a LEAD to be
-             * translated into idiomatic C and re-verified. Round 39's head
-             * tried eleven such translations and none reached 174/174 --
-             * every declaration- and assignment-order permutation of the
-             * four pointer locals, `status` retyped to s32, a real
-             * (non-tautological) guard, a re-masked store, and an explicit
-             * live-range extension. All tabulated in the match report.
-             *
-             * THE MIS-MODELLING LEAD IS TESTED AND THE ANSWER IS SPLIT
-             * (round 40, head). The round-39 form of this comment said a
-             * tautological null check is what a mis-modelled global looks
-             * like, and asked whether either operand is really a POINTER
-             * global. Measured from the DATA, not from attempts:
-             *
-             *   - D_8006D6A0 is a fixed 8-element table of rodata string
-             *     addresses (asm/data/5DDFC.data.s:121). An array.
-             *   - D_8006D8F8 is one zero word that the sibling
-             *     cb_read stores VSync()'s return into
-             *     (cb_read.s:49-51). An s32 timestamp.
-             *
-             * Neither is a pointer global, so the condition CANNOT become
-             * an honest null test by that route. That half is closed.
-             *
-             * A DIFFERENT mis-modelling was real and IS now corrected:
-             * `pF8[-1]` (used four times below) reaches D_8006D8F4 by
-             * negative indexing off D_8006D8F8, which nobody writes -- the
-             * ten consecutive words ARE one array, as the zeroing walk in
-             * CD_readm already implied. They are now declared
-             * `s32 D_8006D8DC[10]` and indexed, and that model is
-             * BYTE-IDENTICAL (174/174, whole image green).
-             *
-             * BUT IT DOES NOT DISSOLVE THIS CONSTRUCT. Under the corrected
-             * model, removing the construct still scores 162/174 -- the
-             * same figure as before -- and every residual diff is a pure
-             * register swap ($s2/$s3, $a0/$a2, $v0/$v1). So the 12 words
-             * are REGISTER ALLOCATION, not data modelling, and the data
-             * model was never what this construct was standing in for.
-             * Do not re-run the data-modelling axis; it is measured.
-             * ------------------------------------------------------------ */
+            /* MATCHING: a known-bad construct, do not copy it. p6A0 and pF8
+             * are both addresses of globals, so the test is always true and
+             * both arms are the same store; cross-jumping folds them into
+             * retail's single sb, and the construct only steers register
+             * allocation (`status` in $s1 across the loop). The report has
+             * the alternatives tried. */
             if (p6A0 || pF8) {
                 *D_8006D8C0 = status;
             } else {
@@ -1123,9 +1032,7 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
 /* NON_MATCHING: 49/91 words, length exact. Residue: register identity
  * (the three hoisted pointers p620/p6A0/p8D8 land in different
  * callee-saved registers than retail's $s3/$s1/$s0) (docs/match-reports/
- * CD_datasync.md). Structure is hand-derived; the diagnostic call's
- * `ok =` sink is a permuter find (round 36), reviewed as a semantically
- * inert dead-store reuse and oracle-confirmed. */
+ * CD_datasync.md). */
 s32 CD_datasync(s32 arg0) {
     s32 now;
     s32 ok;
@@ -1153,10 +1060,8 @@ s32 CD_datasync(s32 arg0) {
         }
         if (!ok) {
             puts(D_80010984);
-            /* retail reuses the (dead, about-to-be-overwritten) `ok` slot as
-             * the register target for this last argument's value -- a fresh
-             * local here compiles worse (45/91 vs 49/91); see this report's
-             * round-36 entry. */
+            /* NON_MATCHING: the last argument reuses the dead `ok` as its
+             * register target; a fresh local compiles further from retail. */
             printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D], ok = p6A0[p8D8[0]]);
             CD_flush();
             return -1;
@@ -1196,9 +1101,9 @@ void CD_set_test_parmnum(s32 arg0) {
 }
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 30/56 words, length 1 short. Residue: instruction-selection
- * (retail computes &D_8006D8D8 unfolded inside the loop; this folds it)
- * (docs/match-reports/callback.md). Hand-derived. */
+/* NON_MATCHING: 30/56 words, length 1 short. Residue: instruction
+ * selection (retail computes &D_8006D8D8 unfolded inside the loop; this
+ * folds it) (docs/match-reports/callback.md). */
 void callback(void) {
     u8 status;
     s32 flags;

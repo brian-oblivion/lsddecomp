@@ -145,3 +145,17 @@ in the current source no pair of the three stores re-merges without it; the
 "barrier only on case1" part of the combination above is no longer load-bearing.
 The in-source comment was updated to say so. `CD_readm` now carries no
 `__asm__`.
+
+## History (moved from src/libcd_bios.c, comments pass)
+
+The comment above the three D_8006D8F0 stores read:
+
+> Retail keeps all three D_8006D8F0 stores as separate, unmerged blocks
+> (three distinct address computations -- two folded through $at, one
+> unfolded through a real GPR) instead of the single shared store GCC's
+> cross-jump/tail-merge pass produces from the equivalent if/else-if/else
+> or switch. The match report records how the `goto` layout and the
+> local `volatile s32 *` pointers below were found to keep the stores
+> apart. A bare `__asm__("")` after case1's store, once part of that
+> recipe, was retired in round 89: removing it left the object
+> byte-identical.

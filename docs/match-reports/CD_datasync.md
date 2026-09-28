@@ -640,3 +640,21 @@ confirmed inert to every reorder axis tried (declaration order, assignment
 order, first-use order) across rounds 19/20/39/41.
 
 NON_MATCHING body promoted, round 68.
+
+## History (moved from src/libcd_bios.c, comments pass)
+
+A comment inside the NON_MATCHING body, on the diagnostic printf's last argument, read:
+
+> retail reuses the (dead, about-to-be-overwritten) `ok` slot as
+> the register target for this last argument's value -- a fresh
+> local here compiles worse (45/91 vs 49/91); see this report's
+> round-36 entry.
+
+The comment above this function's NON_MATCHING body in src/libcd_bios.c read:
+
+> NON_MATCHING: 49/91 words, length exact. Residue: register identity
+> (the three hoisted pointers p620/p6A0/p8D8 land in different
+> callee-saved registers than retail's $s3/$s1/$s0) (docs/match-reports/
+> CD_datasync.md). Structure is hand-derived; the diagnostic call's
+> `ok =` sink is a permuter find (round 36), reviewed as a semantically
+> inert dead-store reuse and oracle-confirmed.

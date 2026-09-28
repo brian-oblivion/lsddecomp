@@ -671,3 +671,13 @@ in C type -- and the pre-existing `CD_cw` int-from-pointer warning
 this unit already carries in `CD_shell`).
 
 NON_MATCHING body promoted, round 68.
+
+## History (moved from src/libcd_bios.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libcd_bios.c read:
+
+> NON_MATCHING: 171/196 words, length exact. Residue: pure list-scheduling
+> (round-25 --debug breakdown: Reorderings: 3, Register Differences: 0) --
+> retail splits CD_cw(1,0,0,0)'s argument materialization from its
+> own a3/jal by ~90 bytes; neither call position tried reproduces the split
+> (docs/match-reports/CD_init.md). Hand-derived.

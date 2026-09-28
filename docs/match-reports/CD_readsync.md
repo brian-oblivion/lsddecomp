@@ -994,3 +994,68 @@ issues `lbu a0,0(s3)` and `lbu v0,1(s3)` (the two `p8D8` bytes) directly after
 the `puts` call; without the barrier the `p8D8[0]` load sinks below the
 `D_8008B3EC` and `D_8006D61D` loads for the `printf` arguments, and the index
 arithmetic reshuffles around it. Instruction order.
+
+## History (moved from src/libcd_bios.c, comments pass)
+
+The warning above the tautological `if (p6A0 || pF8)` read, in full:
+
+> ------------------------------------------------------------
+> KNOWN-BAD CONSTRUCT, KEPT ONLY BECAUSE IT IS BYTE-EXACT.
+> DO NOT COPY THIS SHAPE INTO ANOTHER FUNCTION.
+>
+> `p6A0` and `pF8` are both addresses of globals, so the
+> condition is a TAUTOLOGY and both arms are IDENTICAL. GCC
+> 2.6.3 cross-jumps the two arms back into the single `sb`
+> retail has, so this compiles to no extra instruction -- its
+> whole effect is to perturb register allocation, forcing
+> `status` into $s1 across the inner loop. Worth 12 words:
+> 162/174 without it, 174/174 with it.
+>
+> docs/PARALLEL-RUNS.md Gate 3 names duplicate-arm forms
+> alongside UB as the signature of an EXHAUSTED class rather
+> than a solution, and says a permuter zero is a LEAD to be
+> translated into idiomatic C and re-verified. Round 39's head
+> tried eleven such translations and none reached 174/174 --
+> every declaration- and assignment-order permutation of the
+> four pointer locals, `status` retyped to s32, a real
+> (non-tautological) guard, a re-masked store, and an explicit
+> live-range extension. All tabulated in the match report.
+>
+> THE MIS-MODELLING LEAD IS TESTED AND THE ANSWER IS SPLIT
+> (round 40, head). The round-39 form of this comment said a
+> tautological null check is what a mis-modelled global looks
+> like, and asked whether either operand is really a POINTER
+> global. Measured from the DATA, not from attempts:
+>
+>   - D_8006D6A0 is a fixed 8-element table of rodata string
+>     addresses (asm/data/5DDFC.data.s:121). An array.
+>   - D_8006D8F8 is one zero word that the sibling
+>     cb_read stores VSync()'s return into
+>     (cb_read.s:49-51). An s32 timestamp.
+>
+> Neither is a pointer global, so the condition CANNOT become
+> an honest null test by that route. That half is closed.
+>
+> A DIFFERENT mis-modelling was real and IS now corrected:
+> `pF8[-1]` (used four times below) reaches D_8006D8F4 by
+> negative indexing off D_8006D8F8, which nobody writes -- the
+> ten consecutive words ARE one array, as the zeroing walk in
+> CD_readm already implied. They are now declared
+> `s32 D_8006D8DC[10]` and indexed, and that model is
+> BYTE-IDENTICAL (174/174, whole image green).
+>
+> BUT IT DOES NOT DISSOLVE THIS CONSTRUCT. Under the corrected
+> model, removing the construct still scores 162/174 -- the
+> same figure as before -- and every residual diff is a pure
+> register swap ($s2/$s3, $a0/$a2, $v0/$v1). So the 12 words
+> are REGISTER ALLOCATION, not data modelling, and the data
+> model was never what this construct was standing in for.
+> Do not re-run the data-modelling axis; it is measured.
+> ------------------------------------------------------------
+
+The comment on `pEC = &D_8008B3EC` read:
+
+> &D_8008B3EC routed through a local pointer -- forces the same
+> unfolded lui/addiu addressing retail uses for this argument;
+> a plain `D_8008B3EC` reference here compiles FOLDED instead.
+> See docs/match-reports/CD_readsync.md's round-36 entry.
