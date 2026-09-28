@@ -30,7 +30,8 @@ screened for process text, which track 12 moves to the match reports:
             the header's class doc and the functions' own docs
 
 A comment whose text starts `MATCHING:` in a .c is the sanctioned one-line
-note (FINISHING-PLAN §3) and is exempt; in a header it is a `process` hit,
+note (FINISHING-PLAN §3) and is exempt if it spans at most two lines (a
+wrapped line); in a header it is a `process` hit,
 because a header holds no matching notes. The patterns are a floor, never the
 definition of documented: a `@brief` that restates the name has met nothing.
 
@@ -77,7 +78,7 @@ PROCESS_RE = [
                              r"INCLUDE_ASM|funcdiff|pycparser|codegen)\b|\bcompil(?:er|es|ed|ing)\b", re.I)),
     ("retail", re.compile(r"\bretail\b|\bbyte[- ](?:exact|identical|for[- ]byte|match)|\bnon[-_ ]?matching\b|"
                           r"\bmatch(?:es|ed)? (?:retail|the bytes)|\bstall(?:s|ed)?\b", re.I)),
-    ("project", re.compile(r"\bround \d+|\brunners?\b|\bmatch[- ]reports?\b|\bFirecatFG\b|\bthe head\b|"
+    ("project", re.compile(r"\bround \d+|\brunners?\b|\bmatch[- ]reports?\b|\bFirecatFG\b|"
                            r"\bthe operator\b|\bFINISHING-PLAN\b|\bCLAUDE\.md\b|\bplan revision\b|\(no code\)", re.I)),
     ("path", re.compile(r"\b(?:tools|docs|asm|config|build)/[\w./-]+")),
     ("placeholder", re.compile(r"\b(?:func|D|jtbl)_(?:800)?[0-9A-Fa-f]{5,8}\b")),
@@ -273,7 +274,8 @@ def census(files=None):
         if e.file not in want:
             continue
         t = T(e.file)
-        if e.line > len(t.lines) or not re.search(rf"\b{re.escape(e.name)}\b", t.lines[e.line - 1]) \
+        code = re.sub(r"/\*.*?(\*/|$)", "", t.lines[e.line - 1]) if e.line <= len(t.lines) else ""
+        if e.line > len(t.lines) or not re.search(rf"\b{re.escape(e.name)}\b", code) \
                 and e.name != "(anonymous)":
             continue                        # a member a macro expands: documented at the macro
         a, b = t.span(e.line)
@@ -307,6 +309,8 @@ def census(files=None):
             if body.startswith("MATCHING:"):
                 if not is_c:
                     hits[f].append((a, "process", "MATCHING: note in a header (it belongs in the .c)"))
+                elif b - a > 1:
+                    hits[f].append((a, "process", f"MATCHING: note of {b - a + 1} lines (one line; the rest to the report)"))
                 continue
             if is_c and b - a + 1 > BANNER_LINES:
                 hits[f].append((a, "banner", f"{b - a + 1}-line comment"))
