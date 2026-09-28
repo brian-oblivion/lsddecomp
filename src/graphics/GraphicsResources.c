@@ -599,13 +599,6 @@ void Tod__Finalize(Tod *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* A TOD file: an 8-byte header (id, version, resolution, frame count),
- * then the frames. */
-typedef struct TodFile {
-    /* +0x00 */ u8 pad0[8];
-    /* +0x08 */ u32 frames[1];
-} TodFile;
-
 /* +0x078: scanTodPackets over the TOD's first frame. */
 u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *tmdId) {
     return self->methods->scanTodPackets(self, out, tmdId, ((TodFile *)self->buffer)->frames);
@@ -617,13 +610,6 @@ typedef struct TodFrame {
     /* +0x00 */ u8 pad0[2];
     /* +0x02 */ u16 packetCount;
 } TodFrame;
-
-/* A TOD packet: the header word DecodeTodPacketWord splits, then the data;
- * a TMD-id packet's data starts with the id. */
-typedef struct TodPacket {
-    /* +0x00 */ u8 pad0[4];
-    /* +0x04 */ u16 tmdId;
-} TodPacket;
 
 /* scanTodPackets (+0x07C, both tables): walk the TOD frame at `data`.
  * Returns the number of object-create packets, whose object ids go to `out`
