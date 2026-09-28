@@ -46,11 +46,11 @@ void StyleBuildDecorSet(void) {
     ObjSlotAC *self2;
     void *result;
 
-    if (gStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == 0) {
         return;
     }
     paramA = *(PairXY *) &sStyleDecorPosX;
-    if (gStyleDecorVariant == 2) {
+    if (sStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
     paramB = *(PairXY *) &sStyleDecorSizeW;
@@ -98,10 +98,10 @@ both a single source-shape difference and are CLOSED; names/types not relevant
 Round 46 named two effects and round 47 re-affirmed both:
 
 1. *"A stack-resident local (`paramA[1]`) gets reloaded from memory in retail
-   immediately after an intervening `gStyleDecorVariant` check reuses the register that
+   immediately after an intervening `sStyleDecorVariant` check reuses the register that
    held it ... register-pressure-driven, not something a source rewrite
    obviously controls."*
-2. Retail also reloads `gStyleDecorVariant` itself for the `== 2` test rather than
+2. Retail also reloads `sStyleDecorVariant` itself for the `== 2` test rather than
    reusing the value the guard already read.
 
 Neither is register pressure and both are the same thing: **retail copies each
@@ -114,7 +114,7 @@ typedef struct PairXY { s32 x; s32 y; } PairXY;
 PairXY paramA, paramB;
 
 paramA = *(PairXY *) &sStyleDecorPosX;      /* NOT paramA[0] = ..; paramA[1] = ..; */
-if (gStyleDecorVariant == 2) {
+if (sStyleDecorVariant == 2) {
     paramA.y += 0x1E;
 }
 paramB = *(PairXY *) &sStyleDecorSizeW;
@@ -124,7 +124,7 @@ paramB = *(PairXY *) &sStyleDecorSizeW;
 cannot reason about the extent of a BLKmode destination, so `invalidate()`
 falls back to `invalidate_memory()` -- it throws away **every** cached memory
 value in the hash table, not just the ones that could overlap. So the read of
-`gStyleDecorVariant` the guard performed is no longer available for the `== 2` test
+`sStyleDecorVariant` the guard performed is no longer available for the `== 2` test
 (reload 2), and the value just written into `paramA.y` is no longer available
 for the `+= 0x1E` (reload 1). Written as scalar stores, the stack slot is a
 fixed frame address, CSE keeps everything, and **both reloads vanish** -- which
@@ -136,7 +136,7 @@ reloads, load-delay `nop` and all:
 ```
 45070  lw    v0,%gp_rel(sStyleDecorPosX)     45078  sw  v0,0x10(sp)
 45074  lw    v1,%gp_rel(sStyleDecorPosY)     4507c  sw  v1,0x14(sp)
-45080  lw    v1,%gp_rel(gStyleDecorVariant)   <-- reload 2
+45080  lw    v1,%gp_rel(sStyleDecorVariant)   <-- reload 2
 45084  li    v0,0x2
 45088  bne   v1,v0,450a0
 4508c   li   a2,0x1fff
@@ -221,7 +221,7 @@ side effect of the image moving. The honest figures are the two in the title:
 ## Preserved near-miss body (1 word short, `#if 0` in `src/world/ObjMStyleActor.c`)
 
 Needs, already present earlier in the unit in strict ROM order:
-`extern s32 gStyleDecorVariant, sStyleDecorPosX, sStyleDecorPosY, sStyleDecorSizeW, sStyleDecorSizeH,
+`extern s32 sStyleDecorVariant, sStyleDecorPosX, sStyleDecorPosY, sStyleDecorSizeW, sStyleDecorSizeH,
 gStyleSceneRefs, sStyleDecorColors;`, `extern void *sStyleDecorSlots[];`,
 `extern void *New_BoxFill(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
@@ -245,11 +245,11 @@ void StyleBuildDecorSet(void) {
     ObjSlotAC *self2;
     void *result;
 
-    if (gStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == 0) {
         return;
     }
     paramA = *(PairXY *) &sStyleDecorPosX;
-    if (gStyleDecorVariant == 2) {
+    if (sStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
     paramB = *(PairXY *) &sStyleDecorSizeW;
@@ -312,7 +312,7 @@ stopped on it. The discriminator here costs one build.
 
 **`StyleBuildDecorSet`, tier B.**
 
-Guarded by `gStyleDecorVariant` (set only for `gStyleVariant == 0` by
+Guarded by `sStyleDecorVariant` (set only for `gStyleVariant == 0` by
 `PickStyleFallbackConfig`). Allocates 18 `New_BoxFill` instances into
 `sStyleDecorSlots`, walking two position pairs (`paramA`/`paramB`) that step
 by a fixed per-iteration delta. Released by `StyleReleaseDecorSet`,
@@ -337,7 +337,7 @@ sStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` vi
 | `gStyleCueSelf` | `gStyleGrid` | A | RegisterStyleConfig stores its arg0; its one caller passes ObjM's `unk14`, the StageMap (IntermediateBase.h, ObjM.h); this unit calls StageMap's computeCellOffsets on it and parents every effect under it. |
 | `0x12` | `STYLE_DECOR_BANDS` (18) | A | the band count: New_BoxFill loop bound, ReleaseBasicClassArray count, the colour tables' 18 triples. |
 | `0x1FFF` | `STYLE_DECOR_PRI` | A | New_BoxFill's pri argument; 13 bits, the mask BoxFill__Reset's setMask(13) sets. Hex: a mask-shaped value. |
-| `0x1E` | `STYLE_DECOR_VARIANT2_DROP` (30) | B | added to the y position when `gStyleDecorVariant == 2`, here and in StyleUpdateDecorSet. |
+| `0x1E` | `STYLE_DECOR_VARIANT2_DROP` (30) | B | added to the y position when `sStyleDecorVariant == 2`, here and in StyleUpdateDecorSet. |
 
 Local views replaced by the real classes: the `+0x0AC` slot on `gStyleSceneRefs`'s `+0x00C` is Viewport's getSubHandle (that word is ObjM's `cachedViewport`; `StyleSceneRefs`); the band objects are BoxFill. Locals: `pos`, `size`, `band`, `viewport`, `parent`.
 
@@ -351,7 +351,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * WHOLE-STRUCT assignment rather than field by field.  That is not a style
  * choice -- it is load-bearing.  A BLKmode set makes gcc 2.6.3's cse.c call
  * invalidate_memory(), dropping every cached memory value, which is what
- * produces retail's otherwise inexplicable reload of gStyleDecorVariant for the
+ * produces retail's otherwise inexplicable reload of sStyleDecorVariant for the
  * `== 2` test and its reload of the pair's second word right after writing
  * it.  Written as two scalar stores, neither reload appears and the body is
  * several words short.  Round 61; see docs/match-reports/StyleBuildDecorSet.md. */

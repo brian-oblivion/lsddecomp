@@ -328,7 +328,7 @@ done would have produced.
 ## Preserved near-miss body (79/81, `#if 0` in `src/world/ObjMStyleActor.c`)
 
 ```c
-extern s32 gStyleDecorVariant;
+extern s32 sStyleDecorVariant;
 extern s32 sStyleDecorColors;
 extern u8 sStyleDecorColorsB[];
 extern u8 gStyleSpawnOffsetX[];
@@ -350,7 +350,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     u8 **q;
 
     SetupStyleSpawnParamsRandom(arg1, (void *) gStyleSpawnYChoice2);
-    if (gStyleDecorVariant != 0 && sStyleDecorColors == (s32) sStyleDecorColorsB) {
+    if (sStyleDecorVariant != 0 && sStyleDecorColors == (s32) sStyleDecorColorsB) {
         *(s32 *) gStyleSpawnOffsetX = 0xFFFF5000;
         gStyleSpawnOffsetY = -0x2000;
         gStyleSpawnOffsetZ = 0;

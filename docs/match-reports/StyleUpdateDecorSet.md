@@ -19,8 +19,8 @@ pos = *(PairXY *) &sStyleDecorPosX;      /* NOT pos.x = sStyleDecorPosX; pos.y =
 A struct assignment is a BLKmode `set`, and gcc 2.6.3's `cse.c` answers a
 BLKmode destination by calling `invalidate_memory()` -- it discards **every**
 cached memory value rather than the ones that might overlap. That is the
-entire reason retail reloads `gStyleDecorVariant` for its `== 2` test (`lw v1,
-%gp_rel(gStyleDecorVariant)` at 0x45220, after the guard already read it at 0x451A8)
+entire reason retail reloads `sStyleDecorVariant` for its `== 2` test (`lw v1,
+%gp_rel(sStyleDecorVariant)` at 0x45220, after the guard already read it at 0x451A8)
 and reloads `pos.y` from the stack immediately after writing it (`lw v0,
 0x1C(sp)` at 0x45230). Rounds 46 and 47 both classified those two reloads as
 *"register-pressure-driven, not something a source rewrite obviously
@@ -74,7 +74,7 @@ void StyleUpdateDecorSet(void) {
     void **wp;
     ObjSlotB8B8 *obj;
 
-    if (gStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == 0) {
         return;
     }
     self = *(ObjAC7CSub **) (gStyleSceneRefs + 0xC);
@@ -85,7 +85,7 @@ void StyleUpdateDecorSet(void) {
     }
     pos = *(PairXY *) &sStyleDecorPosX;
     i = 0;
-    if (gStyleDecorVariant == 2) {
+    if (sStyleDecorVariant == 2) {
         pos.y += 0x1E;
     }
     wp = sStyleDecorSlots;
@@ -133,7 +133,7 @@ made this cheap.
 
 **`StyleUpdateDecorSet`, tier B.**
 
-Sibling of `StyleBuildDecorSet` (same `gStyleDecorVariant` guard, same
+Sibling of `StyleBuildDecorSet` (same `sStyleDecorVariant` guard, same
 `sStyleDecorSlots` array, same `paramA`/`paramB`-shaped position pair).
 Computes a time-based `shift` from an `ObjAC7CSub` object's `field18`/
 `field24` delta, then per-element recolors (`AdjustRgbByDelta`) and

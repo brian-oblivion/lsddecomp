@@ -29,7 +29,7 @@ extern u8 sStyleDecorColorsB[];        /* address only taken */
 extern u8 gStylePalette[];        /* 3-byte-stride table, indexed by a byte field */
 extern s32 sStyleDecorColors;
 extern u8 sStyleDecorColorsA[];        /* address only taken */
-extern s32 gStyleDecorVariant;
+extern s32 sStyleDecorVariant;
 ```
 
 ## Body
@@ -62,9 +62,9 @@ void *PickStyleFallbackConfig(void) {
         }
         sStyleDecorColors = (s32) tab;
         if (remainder < 4) {
-            gStyleDecorVariant = 1;
+            sStyleDecorVariant = 1;
         } else if (remainder < 6) {
-            gStyleDecorVariant = 2;
+            sStyleDecorVariant = 2;
         }
     }
     return result;

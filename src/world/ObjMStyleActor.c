@@ -1303,7 +1303,7 @@ extern u8 sStyleDecorColorsB[];
 extern u8 gStylePalette[][3];
 extern const u8 *sStyleDecorColors;
 extern u8 sStyleDecorColorsA[];
-extern s32 gStyleDecorVariant;
+extern s32 sStyleDecorVariant;
 
 /* The config for a stage without a fixed one: the variant from
  * gStyleVariantPicks[(day + stage) & 0xF], then record (day + stage) % count
@@ -1336,9 +1336,9 @@ void *PickStyleFallbackConfig(void) {
         }
         sStyleDecorColors = decorColors;
         if (index < 4) {
-            gStyleDecorVariant = 1;
+            sStyleDecorVariant = 1;
         } else if (index < 6) {
-            gStyleDecorVariant = 2;
+            sStyleDecorVariant = 2;
         }
     }
     return config;
@@ -1372,11 +1372,11 @@ void StyleBuildDecorSet(void) {
     Viewport *viewport;
     SceneNode *parent;
 
-    if (gStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == 0) {
         return;
     }
     pos = *(PairXY *)&sStyleDecorPosX;
-    if (gStyleDecorVariant == 2) {
+    if (sStyleDecorVariant == 2) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
     size = *(PairXY *)&sStyleDecorSizeW;
@@ -1413,7 +1413,7 @@ void StyleUpdateDecorSet(void) {
     BoxFill **slot;
     BoxFill *band;
 
-    if (gStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == 0) {
         return;
     }
     viewport = ((StyleSceneRefs *)gStyleSceneRefs)->viewport;
@@ -1424,7 +1424,7 @@ void StyleUpdateDecorSet(void) {
     }
     pos = *(PairXY *)&sStyleDecorPosX;
     i = 0;
-    if (gStyleDecorVariant == 2) {
+    if (sStyleDecorVariant == 2) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
     slot = sStyleDecorSlots;
@@ -1453,14 +1453,14 @@ void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
 }
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
-extern s32 gStyleDecorVariant;
+extern s32 sStyleDecorVariant;
 extern BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
 
 /* Releases the bands, if StyleBuildDecorSet made them. */
 void StyleReleaseDecorSet(void) {
-    if (gStyleDecorVariant != 0) {
+    if (sStyleDecorVariant != 0) {
         ReleaseBasicClassArray((void **)sStyleDecorSlots, ARRAY_COUNT(sStyleDecorSlots));
-        gStyleDecorVariant = 0;
+        sStyleDecorVariant = 0;
     }
 }
 
@@ -1654,7 +1654,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     PtrBoxK3 *rotation;
 
     SetupStyleSpawnParamsRandom(pos, gStyleSpawnYChoice2);
-    if (gStyleDecorVariant != 0 && sStyleDecorColors == sStyleDecorColorsB) {
+    if (sStyleDecorVariant != 0 && sStyleDecorColors == sStyleDecorColorsB) {
         gStyleSpawnOffsetX = -45056;
         gStyleSpawnOffsetY = -8192;
         gStyleSpawnOffsetZ = 0;
