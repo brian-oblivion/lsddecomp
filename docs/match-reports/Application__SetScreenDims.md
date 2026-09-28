@@ -10,7 +10,7 @@
 
 Slot `+0x040` of gApplicationMethods. Copies an 8-byte pair into `self+0x0C` and
 stores the third argument at `self+0x14`. The ctor (Application__Application) calls it
-as `setDims(self, &gDefaultScreenDims, 0)`, and gDefaultScreenDims in sdata is
+as `setDims(self, &sDefaultScreenDims, 0)`, and sDefaultScreenDims in sdata is
 `{0x140, 0xF0}` = {320, 240}: a screen size. Application__InitSystems later hands
 `&self->dims` and `self->dimsArg` to its source object's `+0x044` slot.
 
@@ -31,7 +31,7 @@ Whole-struct assignment of a 4-aligned 8-byte struct gives the
 **Round 81 (delta), track 3.** Renamed `func_8003B02C` -> `Application__SetScreenDims`.
 **Tier B**: the mechanics (copy an 8-byte pair + a third word into `self`)
 are a plain setter, but the name also claims what the pair MEANS. That claim
-rests on the ctor's default argument being `gDefaultScreenDims` =
+rests on the ctor's default argument being `sDefaultScreenDims` =
 `{0x140, 0xF0}` = {320, 240}, the PS1's standard NTSC/PAL frame-buffer
 resolution -- strong but single-source evidence, not two agreeing callers,
 so kept at B rather than A. What the stored pair is later used FOR (it is

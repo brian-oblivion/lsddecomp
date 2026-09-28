@@ -15,7 +15,7 @@ The gApplicationMethods constructor (slot `+0x008`). GameApplication__GameApplic
 2. installs its own table (GetApplicationMethods);
 3. one-time `CdInit()`, guarded by the sdata flag sCdInitDone (gp_rel);
 4. clears `initialized` (+0x18) and calls `SetActiveDataSource(source)`;
-5. calls its own `+0x040` slot with the {320, 240} default (gDefaultScreenDims).
+5. calls its own `+0x040` slot with the {320, 240} default (sDefaultScreenDims).
 
 ```c
 void Application__Application(Application *self, s32 source) {
@@ -27,7 +27,7 @@ void Application__Application(Application *self, s32 source) {
     }
     self->initialized = 0;
     SetActiveDataSource(source);
-    self->methods->setDims(self, &gDefaultScreenDims, 0);
+    self->methods->setDims(self, &sDefaultScreenDims, 0);
 }
 ```
 
@@ -50,7 +50,7 @@ ctor, install own table, one-time CdInit, clear `initialized`,
 SetActiveDataSource, default screen dims), not a guess about purpose.
 
 Globals `sCdInitDone` (tier A: guards the one-time `CdInit()` call, mechanics
-is the purpose) and `gDefaultScreenDims` (tier B: a `{0x140, 0xF0}` = {320, 240}
+is the purpose) and `sDefaultScreenDims` (tier B: a `{0x140, 0xF0}` = {320, 240}
 ScreenDims constant, the "default" claim is evident from being the ctor's
 own default argument to `setDims`) renamed via `tools/rename.py`: referenced
 only from this unit (`grep -rn` over `src/`), so in this unit's ownership

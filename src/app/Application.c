@@ -10,7 +10,7 @@
 #include "Application.h"
 
 extern s32 sCdInitDone;               /* CdInit has been called */
-extern ScreenDims gDefaultScreenDims; /* {320, 240} */
+extern ScreenDims sDefaultScreenDims; /* {320, 240} */
 
 /* Psy-Q LIBCD.H / LIBSND.H / LIBGS.H prototypes. */
 extern int CdInit(void);
@@ -29,7 +29,7 @@ void Application__Application(Application *self, s32 dataSource) {
     }
     self->initialized = 0;
     SetActiveDataSource(dataSource);
-    self->methods->setScreenDims(self, &gDefaultScreenDims, 0);
+    self->methods->setScreenDims(self, &sDefaultScreenDims, 0);
 }
 
 void Application__Finalize(Application *self) {}

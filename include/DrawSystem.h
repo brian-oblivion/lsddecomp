@@ -39,7 +39,7 @@ typedef struct DrawSystemMethods DrawSystemMethods;
 
 /* A {width, height} pair: the screen size initGraph hands to GsInitGraph
  * and getDims returns. Application keeps one (its default is
- * gDefaultScreenDims = {320, 240}) and passes it to initGraph. */
+ * sDefaultScreenDims = {320, 240}) and passes it to initGraph. */
 typedef struct ScreenDims {
     /* +0x0 */ s32 w;
     /* +0x4 */ s32 h;
