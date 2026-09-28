@@ -1,5 +1,5 @@
-#ifndef CLASS_DREAMSYS
-#define CLASS_DREAMSYS
+#ifndef DREAMSYS_H
+#define DREAMSYS_H
 
 /*
  * DreamSys -- the dream in progress (class id 0x1F34, method table
