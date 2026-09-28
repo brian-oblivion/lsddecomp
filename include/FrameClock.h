@@ -60,8 +60,8 @@ struct FrameClockMethods {
     /* +0x048 */ s32 (*getFrameCount)(FrameClock *self); /* FrameClock__GetFrameCount */
     /* +0x04C */ void (*pause)(FrameClock *self); /* FrameClock__Pause: ObjM__AdvancePauseSetup */
     /* +0x050 */ void (*resume)(FrameClock *self); /* FrameClock__Resume: ObjM__TeardownPauseOverlay */
-    /* +0x054 */ s32 (*isPaused)(FrameClock *self); /* FrameClock__IsPaused */
-    /* +0x058 */ void (*setFlag14)(FrameClock *self); /* FrameClock__SetFlag14: ticks then send event 4 */
+    /* +0x054 */ s32 (*isPaused)(FrameClock *self);   /* FrameClock__IsPaused */
+    /* +0x058 */ void (*setFlag14)(FrameClock *self); /* FrameClock__Stop: ticks then send event 4 */
 };
 
 struct FrameClock {
@@ -87,6 +87,6 @@ s32 FrameClock__GetFrameCount(FrameClock *self);
 void FrameClock__Pause(FrameClock *self);
 void FrameClock__Resume(FrameClock *self);
 s32 FrameClock__IsPaused(FrameClock *self);
-void FrameClock__SetFlag14(FrameClock *self);
+void FrameClock__Stop(FrameClock *self);
 
 #endif

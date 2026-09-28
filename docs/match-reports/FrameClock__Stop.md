@@ -1,4 +1,6 @@
-# FrameClock__SetFlag14 -- MATCHED (3/3 words), round 82
+# FrameClock__Stop -- MATCHED (3/3 words), round 82
+
+> Renamed from `FrameClock__SetFlag14` on 2026-09-28 (tools/rename.py). Address 0x80042678.
 
 > Renamed from `D8006EF50__SetFlag14` on 2026-09-26 (tools/rename.py). Address 0x80042678.
 
@@ -20,14 +22,14 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 ```c
 /* gFrameClockMethods slot +0x058. */
-void FrameClock__SetFlag14(D_8006EF50Obj *self) {
+void FrameClock__Stop(D_8006EF50Obj *self) {
     self->flag14 = 1;
 }
 ```
 
 ## Naming
 
-- `FrameClock__SetFlag14` -- tier A. Slot +0x058: sets flag14 = 1. Pure setter.
+- `FrameClock__Stop` -- tier A. Slot +0x058: sets flag14 = 1. Pure setter.
 
 ## Track 4 (2026-09-26, round 88, delta)
 

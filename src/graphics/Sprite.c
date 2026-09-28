@@ -423,7 +423,7 @@ s32 FrameClock__IsPaused(FrameClock *self) {
 }
 
 /* gFrameClockMethods slot +0x058. */
-void FrameClock__SetFlag14(FrameClock *self) {
+void FrameClock__Stop(FrameClock *self) {
     self->flag14 = 1;
 }
 
