@@ -44,18 +44,18 @@ s16 SsUtChangeADSR(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
     s32 dead[2];
 
     if ((u16)idx < 0x18) {
-        if (_svm_voice[idx].unk16 != p1) {
+        if (_svm_voice[idx].vabId != p1) {
             return -1;
         }
-        if (_svm_voice[idx].unk12 != p2) {
+        if (_svm_voice[idx].prog != p2) {
             return -1;
         }
-        if (_svm_voice[idx].unk0C != p3) {
+        if (_svm_voice[idx].note != p3) {
             return -1;
         }
-        _svm_sreg_buf[idx].unk8 = p4;
-        _svm_sreg_buf[idx].unkA = p5;
-        _svm_sreg_dirty[idx] |= 0x30;
+        _svm_sreg_buf[idx].adsr1 = p4;
+        _svm_sreg_buf[idx].adsr2 = p5;
+        _svm_sreg_dirty[idx] |= SVM_SREG_DIRTY_ADSR;
         return 0;
     }
     if (0) {
@@ -79,9 +79,9 @@ s16 SsUtSetDetVVol(s16 idx, s16 p1, s16 p2) {
     s32 unused[2];
 
     if ((u16)idx < 0x18) {
-        _svm_sreg_buf[idx].unk2 = p2;
-        _svm_sreg_dirty[idx] |= 3;
-        _svm_sreg_buf[idx].unk0 = p1;
+        _svm_sreg_buf[idx].volR = p2;
+        _svm_sreg_dirty[idx] |= SVM_SREG_DIRTY_VOL;
+        _svm_sreg_buf[idx].volL = p1;
         return 0;
     }
     return -1;
@@ -110,9 +110,9 @@ s16 SsUtSetVVol(s16 idx, s16 p1, s16 p2) {
     if ((u16)idx < 0x18) {
         t1 = p1 * 129;
         t2 = p2 * 129;
-        _svm_sreg_buf[idx].unk2 = t2;
-        _svm_sreg_dirty[idx] |= 3;
-        _svm_sreg_buf[idx].unk0 = t1;
+        _svm_sreg_buf[idx].volR = t2;
+        _svm_sreg_dirty[idx] |= SVM_SREG_DIRTY_VOL;
+        _svm_sreg_buf[idx].volL = t1;
         return 0;
     }
     return -1;

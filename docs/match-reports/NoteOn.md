@@ -1,4 +1,13 @@
-# NoteOn -- STALL: length EXACT 70/70; 62/70 raw word-match (round 47, up from 61/70); first real diff at word 1
+# NoteOn -- STALL: length EXACT 70/70; 59/70 words equal at the same index (2026-09-28, after the note-argument fix below; 62/70 by funcdiff at round 47)
+
+> 2026-09-28: the preserved body passed the velocity (`a3`) where retail
+> passes the note (`a2`; the delay-slot `addu $a3, $a2, $zero` before
+> `andi $a3, $a3, 0xFF`) as SpuVmKeyOn's and SpuVmKeyOff's fourth
+> argument. Corrected, with the locals named for what they hold
+> (`channel`, `channelVol`, `vol`, `pan`, `vabId`, `program`). Measured on
+> `build/nonmatching/`'s object with relocated fields masked: 61 of 70
+> words equal before the fix, 59 after; length 70 both times. The
+> round-47 figures below are for the body with the wrong argument.
 
 > Renamed from `func_800344FC` on 2026-09-23 (tools/rename.py). Address 0x800344fc.
 

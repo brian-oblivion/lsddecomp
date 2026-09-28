@@ -113,13 +113,13 @@ void FadeBox__SetStep(FadeBox *self, s32 step) {
 /* MATCHING: both StartFade functions pass their own arguments on to
  * configure; a `(self)`-only call reorders the instructions. */
 void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32 mode) {
-    s32 mask;
+    s32 storedChannels;
 
     if (self->state != FADEBOX_STATE_IDLE) {
         return;
     }
-    mask = self->methods->configure(self, source, channels, mode);
-    self->methods->setColor(self, 1, &sFadeBoxMaskColors[mask * 3]);
+    storedChannels = self->methods->configure(self, source, channels, mode);
+    self->methods->setColor(self, 1, &sFadeBoxMaskColors[storedChannels * 3]);
     self->state = FADEBOX_STATE_FADING_DOWN;
     self->step = -self->step;
 }
@@ -155,7 +155,7 @@ s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 mode
         rate = BOXFILL_SEMITRANS_RATE(GsATWO);
         self->channels = FADEBOX_CHANNELS_ALL;
     }
-    /* MATCHING: retail stores the mask twice; one store drops four instructions. */
+    /* MATCHING: retail stores `channels` twice; one store drops four instructions. */
     self->channels = channels;
     if (channels == 0) {
         self->channels = FADEBOX_CHANNELS_ALL;

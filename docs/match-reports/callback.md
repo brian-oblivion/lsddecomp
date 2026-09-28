@@ -40,7 +40,7 @@ void callback(void)
         }
         if (flags & 2) {
             if (CD_cbsync != 0) {
-                ((void (*)(s32, u8 *))CD_cbsync)(D_8006D8D8, D_8008B3CC);
+                ((void (*)(s32, u8 *))CD_cbsync)(D_8006D8D8, Result);
             }
         }
     }
@@ -139,7 +139,7 @@ UNFOLDED 3-instruction address-then-load shape reproduced without
 inviting the hoist.
 
 **One correction to the report's preserved "best C" body**: it calls
-`((void (*)(s32, u8 *))CD_cbsync)(D_8006D8D8, D_8008B3CC);` -- passing
+`((void (*)(s32, u8 *))CD_cbsync)(D_8006D8D8, Result);` -- passing
 the bare array (decaying to a pointer, then implicit-int-truncated by the
 call, with a compiler warning) rather than `D_8006D8D8[0]` (a dereferenced
 byte, matching retail's `lbu`). Checked whether this was the actual
@@ -216,7 +216,7 @@ iteration 2095** (`permuter-work/callback/output-0-1`), well within
 the 300s bound.
 
 The winning source makes two substantive changes beyond this report's
-body (plus assorted permuter noise -- a pointless `if (D_8008B3CC) {...}
+body (plus assorted permuter noise -- a pointless `if (Result) {...}
 else {...}` duplicating the `getintr()` call, and a dead
 `if (1) {}` after the `break` -- neither of these two noise items changed
 the score either way when isolated, but see the caution below about
@@ -380,7 +380,7 @@ the permuter's winning candidate reach the unfolded address form:
 if (flags & 2) {
     cb2 = (void (*)(s32, u8 *))CD_cbsync;
     if (CD_cbsync != 0) {
-        cb2(D_8006D8D8[0], D_8008B3CC);
+        cb2(D_8006D8D8[0], Result);
     }
 }
 ```
@@ -652,7 +652,7 @@ pointer for `D_8006D8D8`'s address in the second callback branch:
 if (flags & 2) {
     if (CD_cbsync != 0) {
         pd9 = D_8006D8D8;
-        ((void (*)(s32, u8 *))CD_cbsync)(pd9[0], D_8008B3CC);
+        ((void (*)(s32, u8 *))CD_cbsync)(pd9[0], Result);
     }
 }
 ```
@@ -686,7 +686,7 @@ reusing it for the same address-computation idiom instead of `pd9`:
 if (flags & 2) {
     if (CD_cbsync != 0) {
         handler = (s32)D_8006D8D8;
-        ((void (*)(s32, u8 *))CD_cbsync)(((u8 *)handler)[0], D_8008B3CC);
+        ((void (*)(s32, u8 *))CD_cbsync)(((u8 *)handler)[0], Result);
     }
 }
 ```

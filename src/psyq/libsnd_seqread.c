@@ -14,8 +14,8 @@
  * Each sequence's play state is an SsScore (include/SsScore.h), reached as
  * _ss_score[access][seq]; the (a0, a1) pair the event handlers take is that
  * (access, seq) pair. Per-channel state (pan, program, volume) is indexed by
- * the event's MIDI channel, unk12. SeqPlay is the per-tick scheduler. GetSeqData
- * decodes one event from the byte stream at rec->unk4 and dispatches it to:
+ * the event's MIDI channel, channel. SeqPlay is the per-tick scheduler. GetSeqData
+ * decodes one event from the byte stream at rec->readPos and dispatches it to:
  *   - NoteOn / SetProgramChange / SetPitchBend, the channel-voice events;
  *   - _SsSetControlChange, the MIDI CC dispatcher, which routes to the Cont*
  *     handlers: data entry, portamento, NRPN/RPN, reset-all-controllers;
@@ -41,10 +41,10 @@
 s32 SpuVmPitchBend(s32 packed, s16 a1, u8 vol, u8 bend);
 
 /* Shared delta-time decoder: reads a MIDI variable-length value (7 bits
- * per byte, big-endian, continuation bit first) from rec->unk4 (advancing the cursor as it goes), scales the
- * decoded magnitude by 10, adds it to rec->unk80, and returns the scaled
+ * per byte, big-endian, continuation bit first) from rec->readPos (advancing the cursor as it goes), scales the
+ * decoded magnitude by 10, adds it to rec->ticksPlayed, and returns the scaled
  * delta.  A first byte of 0 is a sentinel for "no delta" -- returns 0
- * without touching rec->unk80 at all. */
+ * without touching rec->ticksPlayed at all. */
 extern s32 ReadDeltaValue(s16 channel, s16 slot);
 
 /* GetSeqData is defined below; SeqPlay's catch-up loop calls it with the
@@ -52,12 +52,12 @@ extern s32 ReadDeltaValue(s16 channel, s16 slot);
 extern void GetSeqData(s16 channel, s16 slot);
 
 /* Catch-up scheduler tick.  When the re-armed counter is still reloading
- * its threshold (remain == 0) it copies the threshold rec->unk70 into the
+ * its threshold (remain == 0) it copies the threshold rec->ticksPerCall into the
  * counter. */
 void SeqPlay(s16 a0, s16 a1) {
     SsScore *rec = &_ss_score[a0][a1];
-    s16 last = rec->unk70;
-    s32 elapsed = rec->unk88;
+    s16 last = rec->ticksPerCall;
+    s32 elapsed = rec->deltaLeft;
     s32 delta = elapsed - last;
     s16 remain;
     s32 sum;
@@ -65,17 +65,17 @@ void SeqPlay(s16 a0, s16 a1) {
     s16 last2;
 
     if (delta > 0) {
-        remain = rec->unk6E;
+        remain = rec->callsPerTick;
         if (remain > 0) {
-            rec->unk6E = remain - 1;
+            rec->callsPerTick = remain - 1;
             return;
         }
         if (remain == 0) {
-            rec->unk6E = last;
-            rec->unk88 = rec->unk88 - 1;
+            rec->callsPerTick = last;
+            rec->deltaLeft = rec->deltaLeft - 1;
             return;
         }
-        rec->unk88 = delta;
+        rec->deltaLeft = delta;
         return;
     }
     if (last < elapsed) {
@@ -84,14 +84,14 @@ void SeqPlay(s16 a0, s16 a1) {
     sum = elapsed;
     for (;;) {
         GetSeqData(a0, a1);
-        step = rec->unk88;
+        step = rec->deltaLeft;
         if (step != 0) {
-            last2 = rec->unk70;
+            last2 = rec->ticksPerCall;
             sum += step;
             if (sum < last2) {
                 continue;
             }
-            rec->unk88 = sum - last2;
+            rec->deltaLeft = sum - last2;
             break;
         }
     }
@@ -107,14 +107,14 @@ extern void SetPitchBend(s16 a0, s16 a1);
 extern void GetMetaEvent(s16 a0, s16 a1, u8 a2);
 
 /* A per-channel/slot "sequencer voice" event-stream byte reader.  Reads one
- * byte from rec->unk4 (advancing the cursor); if it has the high bit set it
- * is a new MIDI-style status byte -- the low nibble becomes rec->unk12 (the
+ * byte from rec->readPos (advancing the cursor); if it has the high bit set it
+ * is a new MIDI-style status byte -- the low nibble becomes rec->channel (the
  * MIDI channel) and the high nibble selects which
  * kind of event follows, consuming however many further data bytes that
- * kind needs and recording the high nibble into rec->unk11 as "running
+ * kind needs and recording the high nibble into rec->runningStatus as "running
  * status" (0xFF standing in for the 0xF0 kind).  If the high bit is clear,
  * the byte just read is itself the first DATA byte of a new event of
- * whichever kind rec->unk11 last recorded (MIDI running status) -- same
+ * whichever kind rec->runningStatus last recorded (MIDI running status) -- same
  * dispatch, one fewer byte consumed since this byte already stood in for
  * the first data byte.
  *
@@ -130,46 +130,46 @@ void GetSeqData(s16 a0, s16 a1) {
     u8 raw;
     u8 note, vel;
 
-    p = rec->unk4;
-    rec->unk4 = p + 1;
+    p = rec->readPos;
+    rec->readPos = p + 1;
     raw = *p;
     if (raw & 0x80) {
-        rec->unk12 = raw & 0xF;
+        rec->channel = raw & 0xF;
         switch (raw & 0xF0) {
             case 0x90:
-                p = rec->unk4;
-                rec->unk11 = 0x90;
-                rec->unk4 = p + 1;
+                p = rec->readPos;
+                rec->runningStatus = 0x90;
+                rec->readPos = p + 1;
                 note = *p;
-                rec->unk4 = p + 2;
+                rec->readPos = p + 2;
                 vel = *(p + 1);
-                rec->unk88 = ReadDeltaValue(a0, a1);
+                rec->deltaLeft = ReadDeltaValue(a0, a1);
                 NoteOn(a0, a1, note, vel);
                 return;
             case 0xB0:
-                p = rec->unk4;
-                rec->unk11 = 0xB0;
-                rec->unk4 = p + 1;
+                p = rec->readPos;
+                rec->runningStatus = 0xB0;
+                rec->readPos = p + 1;
                 note = *p;
                 _SsSetControlChange(a0, a1, note);
                 return;
             case 0xC0:
-                p = rec->unk4;
-                rec->unk11 = 0xC0;
-                rec->unk4 = p + 1;
+                p = rec->readPos;
+                rec->runningStatus = 0xC0;
+                rec->readPos = p + 1;
                 note = *p;
                 SetProgramChange(a0, a1, note);
                 return;
             case 0xE0:
-                rec->unk11 = 0xE0;
-                rec->unk4 = rec->unk4 + 1;
+                rec->runningStatus = 0xE0;
+                rec->readPos = rec->readPos + 1;
                 SetPitchBend(a0, a1);
                 return;
             case 0xF0:
-                p = rec->unk4;
-                rec->unk11 = 0xFF;
-                rec->unk12 = raw & 0xF;
-                rec->unk4 = p + 1;
+                p = rec->readPos;
+                rec->runningStatus = 0xFF;
+                rec->channel = raw & 0xF;
+                rec->readPos = p + 1;
                 note = *p;
                 GetMetaEvent(a0, a1, note);
                 return;
@@ -177,11 +177,11 @@ void GetSeqData(s16 a0, s16 a1) {
                 return;
         }
     } else {
-        switch (rec->unk11) {
+        switch (rec->runningStatus) {
             case 0x90:
-                vel = *rec->unk4;
-                rec->unk4 = rec->unk4 + 1;
-                rec->unk88 = ReadDeltaValue(a0, a1);
+                vel = *rec->readPos;
+                rec->readPos = rec->readPos + 1;
+                rec->deltaLeft = ReadDeltaValue(a0, a1);
                 NoteOn(a0, a1, raw, vel);
                 return;
             case 0xB0:
@@ -206,33 +206,33 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_seqread", GetSeqData);
 #endif
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 62/70 words, length exact. Residue: register identity
- * ($t0<->$a2 for the a0 copy kept live across the two calls, $a3/$s1<->$t0
- * for the masked-a3 copy), not a logic or CFG difference
+/* NON_MATCHING: length exact (70 words), 59 equal at the same index.
+ * Residue: register identity for the a0 copy kept live across the calls
+ * and the masked velocity copy, not a logic or CFG difference
  * (docs/match-reports/NoteOn.md). */
-void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3) {
+void NoteOn(s16 a0, s16 a1, s32 note, s32 vel) {
     SsScore *rec = &_ss_score[a0][a1];
-    u8 offset = rec->unk12;
-    s16 speed = rec->unk4E[offset];
-    s32 divided = ((u8)a3 * (s32)speed) / 127;
-    u16 flag = rec->unk74;
-    u8 status = rec->unk17[offset];
+    u8 channel = rec->channel;
+    s16 channelVol = rec->channelVol[channel];
+    s32 vol = ((u8)vel * (s32)channelVol) / 127;
+    u16 seqVolL = rec->volL;
+    u8 pan = rec->pan[channel];
 
-    speed = a3;
-    if (flag == 0) {
+    channelVol = vel;
+    if (seqVolL == 0) {
         return;
     }
-    if ((u8)a3 != 0) {
+    if ((u8)vel != 0) {
         s16 packed = (a1 << 8) | a0;
-        s16 note = rec->unk4C;
-        u8 vol = rec->unk2C[offset];
-        SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status);
-        rec->unkA8 = (u8)speed;
+        s16 vabId = rec->vabId;
+        u8 program = rec->program[channel];
+        SpuVmKeyOn(packed, vabId, program, (u8)note, (u16)vol, pan);
+        rec->lastVelocity = (u8)channelVol;
     } else {
         s16 packed = (a1 << 8) | a0;
-        s16 note = rec->unk4C;
-        u8 vol = rec->unk2C[offset];
-        SpuVmKeyOff(packed, note, vol, (u8)a3);
+        s16 vabId = rec->vabId;
+        u8 program = rec->program[channel];
+        SpuVmKeyOff(packed, vabId, program, (u8)note);
     }
 }
 #else
@@ -242,8 +242,8 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_seqread", NoteOn);
 void SetProgramChange(s16 a0, s16 a1, u8 a2) {
     SsScore *rec = &_ss_score[a0][a1];
 
-    rec->unk2C[rec->unk12] = a2;
-    rec->unk88 = ReadDeltaValue(a0, a1);
+    rec->program[rec->channel] = a2;
+    rec->deltaLeft = ReadDeltaValue(a0, a1);
 }
 
 /* Forward declarations for the handlers defined later in this unit. */
@@ -276,16 +276,16 @@ extern void ContResetAll(s16 a0, s16 a1);
  */
 void _SsSetControlChange(s16 a0, s16 a1, u8 a2) {
     SsScore *rec = &_ss_score[a0][a1];
-    u8 *p = rec->unk4;
-    u8 offset = rec->unk12;
+    u8 *p = rec->readPos;
+    u8 offset = rec->channel;
     u8 val;
 
-    rec->unk4 = p + 1;
+    rec->readPos = p + 1;
     val = *p;
     switch (a2) {
         case 0:
-            rec->unk4C = val;
-            rec->unk88 = ReadDeltaValue(a0, a1);
+            rec->vabId = val;
+            rec->deltaLeft = ReadDeltaValue(a0, a1);
             return;
         case 6:
             ContDataEntry(a0, a1, val);
@@ -294,30 +294,30 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2) {
             u16 o = offset;
             s32 packed = (a1 << 8) | a0;
 
-            SpuVmSetVol(packed, rec->unk4C, rec->unk2C[o], val, rec->unk17[o]);
-            rec->unk4E[o] = val;
-            rec->unk88 = ReadDeltaValue(a0, a1);
+            SpuVmSetVol(packed, rec->vabId, rec->program[o], val, rec->pan[o]);
+            rec->channelVol[o] = val;
+            rec->deltaLeft = ReadDeltaValue(a0, a1);
             return;
         }
         case 10: {
             s32 packed = (a1 << 8) | a0;
             u16 o = offset;
-            /* MATCHING: reaching unk2C/unk17 through one base pointer keeps
-             * retail's register allocation; rec->unk2C[o] does not. */
+            /* MATCHING: reaching program/pan through one base pointer keeps
+             * retail's register allocation; rec->program[o] does not. */
             u8 *blk = (u8 *)rec + o;
-            s16 wide = rec->unk4E[o];
+            s16 wide = rec->channelVol[o];
 
-            SpuVmSetVol(packed, rec->unk4C, blk[offsetof(SsScore, unk2C)], wide, val);
-            blk[offsetof(SsScore, unk17)] = val;
-            rec->unk88 = ReadDeltaValue(a0, a1);
+            SpuVmSetVol(packed, rec->vabId, blk[offsetof(SsScore, program)], wide, val);
+            blk[offsetof(SsScore, pan)] = val;
+            rec->deltaLeft = ReadDeltaValue(a0, a1);
             return;
         }
         case 11: {
             u16 o = offset;
 
-            SpuVmSetProgVol(rec->unk4C, rec->unk2C[o], val);
-            SpuVmSetVol((a1 << 8) | a0, rec->unk4C, rec->unk2C[o], rec->unk4E[o], rec->unk17[o]);
-            rec->unk88 = ReadDeltaValue(a0, a1);
+            SpuVmSetProgVol(rec->vabId, rec->program[o], val);
+            SpuVmSetVol((a1 << 8) | a0, rec->vabId, rec->program[o], rec->channelVol[o], rec->pan[o]);
+            rec->deltaLeft = ReadDeltaValue(a0, a1);
             return;
         }
         case 64:
@@ -351,7 +351,7 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2) {
         default:
             break;
     }
-    rec->unk88 = ReadDeltaValue(a0, a1);
+    rec->deltaLeft = ReadDeltaValue(a0, a1);
 }
 
 /* The three per-controller VagAtr editors below share one shape: fetch the
@@ -369,13 +369,13 @@ void ContModulation(s16 a0, s16 a1, u8 a2) {
     VagAtr scratch;
     s32 i;
 
-    SsUtGetProgAtr(rec->unk4C, rec->unk2C[offset = rec->unk12], &list);
+    SsUtGetProgAtr(rec->vabId, rec->program[offset = rec->channel], &list);
     for (i = 0; i < list.tones; i++) {
-        SsUtGetVagAtr(rec->unk4C, rec->unk2C[offset], (s16)i, &scratch);
+        SsUtGetVagAtr(rec->vabId, rec->program[offset], (s16)i, &scratch);
         scratch.vibW = a2;
-        SsUtSetVagAtr(rec->unk4C, rec->unk2C[offset], (s16)i, &scratch);
+        SsUtSetVagAtr(rec->vabId, rec->program[offset], (s16)i, &scratch);
     }
-    rec->unk88 = ReadDeltaValue(a0, a1);
+    rec->deltaLeft = ReadDeltaValue(a0, a1);
 }
 
 /* The value becomes every tone's portamento time (porT). */
@@ -386,13 +386,13 @@ void ContPortaTime(s16 a0, s16 a1, u8 a2) {
     VagAtr scratch;
     s32 i;
 
-    SsUtGetProgAtr(rec->unk4C, rec->unk2C[offset = rec->unk12], &list);
+    SsUtGetProgAtr(rec->vabId, rec->program[offset = rec->channel], &list);
     for (i = 0; i < list.tones; i++) {
-        SsUtGetVagAtr(rec->unk4C, rec->unk2C[offset], (s16)i, &scratch);
+        SsUtGetVagAtr(rec->vabId, rec->program[offset], (s16)i, &scratch);
         scratch.porT = a2;
-        SsUtSetVagAtr(rec->unk4C, rec->unk2C[offset], (s16)i, &scratch);
+        SsUtSetVagAtr(rec->vabId, rec->program[offset], (s16)i, &scratch);
     }
-    rec->unk88 = ReadDeltaValue(a0, a1);
+    rec->deltaLeft = ReadDeltaValue(a0, a1);
 }
 
 /* CC65 (portamento): a value below 0x40 sets every tone's play mode
@@ -405,9 +405,9 @@ void ContPortamento(s16 a0, s16 a1, s32 a2) {
     s32 i;
     s32 wrap;
 
-    SsUtGetProgAtr(rec->unk4C, rec->unk2C[offset = rec->unk12], &list);
+    SsUtGetProgAtr(rec->vabId, rec->program[offset = rec->channel], &list);
     for (i = 0; i < list.tones; i++) {
-        SsUtGetVagAtr(rec->unk4C, rec->unk2C[offset], (s16)i, &scratch);
+        SsUtGetVagAtr(rec->vabId, rec->program[offset], (s16)i, &scratch);
         if ((u8)a2 < 0x40) {
             scratch.mode = 2;
         } else {
@@ -416,9 +416,9 @@ void ContPortamento(s16 a0, s16 a1, s32 a2) {
                 scratch.mode = 0;
             }
         }
-        SsUtSetVagAtr(rec->unk4C, rec->unk2C[offset], (s16)i, &scratch);
+        SsUtSetVagAtr(rec->vabId, rec->program[offset], (s16)i, &scratch);
     }
-    rec->unk88 = ReadDeltaValue(a0, a1);
+    rec->deltaLeft = ReadDeltaValue(a0, a1);
 }
 
 void ContResetAll(s16 a0, s16 a1) {
@@ -427,35 +427,35 @@ void ContResetAll(s16 a0, s16 a1) {
     SsUtReverbOff();
     SpuVmDamperOff();
 
-    rec->unk2C[rec->unk12] = rec->unk12;
-    rec->unk13 = 0;
-    rec->unk14 = 0;
-    rec->unk4E[rec->unk12] = 0x7F;
-    rec->unk17[rec->unk12] = 0x40;
-    rec->unk88 = ReadDeltaValue(a0, a1);
+    rec->program[rec->channel] = rec->channel;
+    rec->rpnLsb = 0;
+    rec->rpnMsb = 0;
+    rec->channelVol[rec->channel] = 0x7F;
+    rec->pan[rec->channel] = 0x40;
+    rec->deltaLeft = ReadDeltaValue(a0, a1);
 }
 
 /* CC98 (NRPN LSB). While a loop start set by ContNrpn2's kind 0x14 still
- * waits for its count (unk27 == 1, unk10 == 0), the value becomes the loop
- * count unk28. Otherwise, unless the current NRPN kind is 0x14 or 0x1E, it
- * is cached in unk15 and bumps the unk2A step counter. Under kind 0x28 the
+ * waits for its count (loopOpen == 1, loopCountSet == 0), the value becomes the loop
+ * count loopCount. Otherwise, unless the current NRPN kind is 0x14 or 0x1E, it
+ * is cached in nrpnLsb and bumps the nrpnBytes step counter. Under kind 0x28 the
  * value also goes to the sequence's mark callback. */
 void ContNrpn1(s16 a0, s16 a1, u8 a2) {
     SsScore *rec = &_ss_score[a0][a1];
     u8 kind;
     SsMarkCallbackProc fn;
 
-    if (rec->unk27 == 1 && rec->unk10 == 0) {
-        rec->unk28 = a2;
-        rec->unk10 = 1;
+    if (rec->loopOpen == 1 && rec->loopCountSet == 0) {
+        rec->loopCount = a2;
+        rec->loopCountSet = 1;
     } else {
-        kind = rec->unk16;
+        kind = rec->nrpnMsb;
         if (kind != 0x1E && kind != 0x14) {
-            rec->unk15 = a2;
-            rec->unk2A = rec->unk2A + 1;
+            rec->nrpnLsb = a2;
+            rec->nrpnBytes = rec->nrpnBytes + 1;
         }
     }
-    if (rec->unk16 == 0x28) {
+    if (rec->nrpnMsb == 0x28) {
         s16 ch = a0;
         s16 sl = a1;
 
@@ -464,7 +464,7 @@ void ContNrpn1(s16 a0, s16 a1, u8 a2) {
             fn(ch, sl, a2);
         }
     }
-    rec->unk88 = ReadDeltaValue(a0, a1);
+    rec->deltaLeft = ReadDeltaValue(a0, a1);
 }
 
 void ContNrpn2(s16 a0, s16 a1, u8 a2) {
@@ -474,60 +474,60 @@ void ContNrpn2(s16 a0, s16 a1, u8 a2) {
 
     switch (kind) {
         case 0x14:
-            rec->unk16 = a2;
-            rec->unk27 = 1;
+            rec->nrpnMsb = a2;
+            rec->loopOpen = 1;
             result = ReadDeltaValue(a0, a1);
-            rec->unk88 = result;
-            rec->unkC = rec->unk4;
+            rec->deltaLeft = result;
+            rec->loopPos = rec->readPos;
             return;
         case 0x1E:
-            rec->unk16 = a2;
-            if (rec->unk28 == 0) {
-                rec->unk10 = 0;
-                rec->unk88 = ReadDeltaValue(a0, a1);
+            rec->nrpnMsb = a2;
+            if (rec->loopCount == 0) {
+                rec->loopCountSet = 0;
+                rec->deltaLeft = ReadDeltaValue(a0, a1);
                 return;
             }
-            if (rec->unk28 < 0x7F) {
-                rec->unk28--;
+            if (rec->loopCount < 0x7F) {
+                rec->loopCount--;
                 result = ReadDeltaValue(a0, a1);
-                rec->unk88 = result;
-                if (rec->unk28 != 0) {
-                    rec->unk4 = rec->unkC;
+                rec->deltaLeft = result;
+                if (rec->loopCount != 0) {
+                    rec->readPos = rec->loopPos;
                 } else {
-                    rec->unk10 = 0;
+                    rec->loopCountSet = 0;
                 }
                 return;
             }
             ReadDeltaValue(a0, a1);
-            rec->unk4 = rec->unkC;
-            rec->unk88 = 0;
+            rec->readPos = rec->loopPos;
+            rec->deltaLeft = 0;
             return;
         default:
-            rec->unk16 = a2;
-            rec->unk2A = rec->unk2A + 1;
-            rec->unk88 = ReadDeltaValue(a0, a1);
+            rec->nrpnMsb = a2;
+            rec->nrpnBytes = rec->nrpnBytes + 1;
+            rec->deltaLeft = ReadDeltaValue(a0, a1);
             return;
     }
 }
 
 void ContRpn1(s16 a0, s16 a1, u8 a2) {
     SsScore *rec = &_ss_score[a0][a1];
-    u8 counter = rec->unk29;
+    u8 counter = rec->rpnBytes;
 
-    rec->unk13 = a2;
+    rec->rpnLsb = a2;
     counter = counter + 1;
-    rec->unk29 = counter;
-    rec->unk88 = ReadDeltaValue(a0, a1);
+    rec->rpnBytes = counter;
+    rec->deltaLeft = ReadDeltaValue(a0, a1);
 }
 
 void ContRpn2(s16 a0, s16 a1, u8 a2) {
     SsScore *rec = &_ss_score[a0][a1];
-    u8 counter = rec->unk29;
+    u8 counter = rec->rpnBytes;
 
-    rec->unk14 = a2;
+    rec->rpnMsb = a2;
     counter = counter + 1;
-    rec->unk29 = counter;
-    rec->unk88 = ReadDeltaValue(a0, a1);
+    rec->rpnBytes = counter;
+    rec->deltaLeft = ReadDeltaValue(a0, a1);
 }
 
 /* The SPU envelope registers ADSR1/ADSR2 (VagAtr.adsr1/adsr2) split into
@@ -548,14 +548,14 @@ typedef struct {
 } AdsrFields;
 
 /* SsUtGetProgAtr's fill at function entry. From +0x10 the SAME memory is
- * both the VagAtr buffer the unk29==2 loops hand to SsUtGet/SetVagAtr
+ * both the VagAtr buffer the rpnBytes==2 loops hand to SsUtGet/SetVagAtr
  * (retail addresses it at sp+0x58 = list+0x10) and, with the 18 bytes
  * after it, the two by-value arguments of Snd_setVabAttr. */
 typedef struct {
     ProgAtr prog; /* +0x00: SsUtGetProgAtr's fill */
 
     VagAtr vag; /* +0x10: passed by value to Snd_setVabAttr, and the
-                 * SsUtGet/SetVagAtr buffer of the unk29==2 loops */
+                 * SsUtGet/SetVagAtr buffer of the rpnBytes==2 loops */
 
     AdsrFields adsr; /* +0x30: passed by value to Snd_setVabAttr */
 } DataEntryLocals;
@@ -577,34 +577,34 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
     s16 ch = a0;
     s16 slot = a1;
     SsScore *rec = &_ss_score[ch][slot];
-    u8 off = rec->unk12;
+    u8 off = rec->channel;
     DataEntryLocals list;
     s32 i;
     u8 kind;
 
-    SsUtGetProgAtr(rec->unk4C, rec->unk2C[off], &list);
+    SsUtGetProgAtr(rec->vabId, rec->program[off], &list);
 
-    if (rec->unk27 == 1 && rec->unk10 == 0) {
-        rec->unk28 = a2;
-        rec->unk10 = 1;
-        rec->unk88 = ReadDeltaValue(ch, slot);
+    if (rec->loopOpen == 1 && rec->loopCountSet == 0) {
+        rec->loopCount = a2;
+        rec->loopCountSet = 1;
+        rec->deltaLeft = ReadDeltaValue(ch, slot);
         return;
     }
-    if (rec->unk16 != 0x1E && rec->unk16 != 0x14) {
-        rec->unk15 = a2;
-        rec->unk2A = rec->unk2A + 1;
-        rec->unk88 = ReadDeltaValue(ch, slot);
+    if (rec->nrpnMsb != 0x1E && rec->nrpnMsb != 0x14) {
+        rec->nrpnLsb = a2;
+        rec->nrpnBytes = rec->nrpnBytes + 1;
+        rec->deltaLeft = ReadDeltaValue(ch, slot);
         return;
     }
-    if (rec->unk29 == 2) {
-        if (rec->unk13 == 0 && rec->unk14 == 0) {
+    if (rec->rpnBytes == 2) {
+        if (rec->rpnLsb == 0 && rec->rpnMsb == 0) {
             for (i = 0; i < list.prog.tones; i++) {
-                SsUtGetVagAtr(rec->unk4C, rec->unk2C[off], i, &list.vag);
+                SsUtGetVagAtr(rec->vabId, rec->program[off], i, &list.vag);
                 list.vag.pbmin = list.vag.pbmax = a2 & 0x7F;
-                SsUtSetVagAtr(rec->unk4C, rec->unk2C[off], i, &list.vag);
+                SsUtSetVagAtr(rec->vabId, rec->program[off], i, &list.vag);
             }
         }
-        if (rec->unk13 == 1 && rec->unk14 == 0) {
+        if (rec->rpnLsb == 1 && rec->rpnMsb == 0) {
             s32 unused; /* computed and never read, as in retail */
             if ((u8)(a2 - 0x41) < 0x3F) {
                 if (((a2 & 0xFF) * 100) >= 0) {
@@ -616,12 +616,12 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
                 unused = 0;
             }
             for (i = 0; i < list.prog.tones; i++) {
-                SsUtGetVagAtr(rec->unk4C, rec->unk2C[off], i, &list.vag);
+                SsUtGetVagAtr(rec->vabId, rec->program[off], i, &list.vag);
                 list.vag.shift = list.vag.shift;
-                SsUtSetVagAtr(rec->unk4C, rec->unk2C[off], i, &list.vag);
+                SsUtSetVagAtr(rec->vabId, rec->program[off], i, &list.vag);
             }
         }
-        if (rec->unk13 == 2 && rec->unk14 == 0) {
+        if (rec->rpnLsb == 2 && rec->rpnMsb == 0) {
             s32 unused; /* computed and never read, as in retail */
             if ((u8)(a2 - 0x40) < 0x40) {
                 unused = ((a2 & 0xFF) * 25) << 8;
@@ -629,30 +629,31 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
                 unused = 0;
             }
             for (i = 0; i < list.prog.tones; i++) {
-                SsUtGetVagAtr(rec->unk4C, rec->unk2C[off], i, &list.vag);
+                SsUtGetVagAtr(rec->vabId, rec->program[off], i, &list.vag);
                 list.vag.center = list.vag.center;
-                SsUtSetVagAtr(rec->unk4C, rec->unk2C[off], i, &list.vag);
+                SsUtSetVagAtr(rec->vabId, rec->program[off], i, &list.vag);
             }
         }
-        rec->unk88 = ReadDeltaValue(ch, slot);
-        rec->unk29 = 0;
+        rec->deltaLeft = ReadDeltaValue(ch, slot);
+        rec->rpnBytes = 0;
         return;
     }
-    if (rec->unk2A == 2) {
-        kind = rec->unk16;
+    if (rec->nrpnBytes == 2) {
+        kind = rec->nrpnMsb;
         if (kind == 0x10) {
             for (i = 0; i < list.prog.tones; i++) {
-                Snd_setVabAttr(rec->unk4C, rec->unk2C[off], i, list.vag, list.adsr, rec->unk15, a2 & 0xFF);
+                Snd_setVabAttr(rec->vabId, rec->program[off], i, list.vag, list.adsr, rec->nrpnLsb,
+                               a2 & 0xFF);
             }
         } else {
-            Snd_setVabAttr(rec->unk4C, rec->unk2C[off], (s16)kind, list.vag, list.adsr, rec->unk15,
-                           a2 & 0xFF);
+            Snd_setVabAttr(rec->vabId, rec->program[off], (s16)kind, list.vag, list.adsr,
+                           rec->nrpnLsb, a2 & 0xFF);
         }
-        rec->unk88 = ReadDeltaValue(ch, slot);
-        rec->unk2A = 0;
+        rec->deltaLeft = ReadDeltaValue(ch, slot);
+        rec->nrpnBytes = 0;
         return;
     }
-    rec->unk88 = ReadDeltaValue(ch, slot);
+    rec->deltaLeft = ReadDeltaValue(ch, slot);
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_seqread", ContDataEntry);
@@ -800,19 +801,19 @@ void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, AdsrFields 
 
 void SetPitchBend(s16 a0, s16 a1) {
     SsScore *rec = &_ss_score[a0][a1];
-    u8 *cursor = rec->unk4;
+    u8 *cursor = rec->readPos;
     s32 packed;
     u8 b;
     u8 vol;
 
-    b = rec->unk12;
-    rec->unk4 = cursor;
+    b = rec->channel;
+    rec->readPos = cursor;
     packed = (a1 << 8) | a0;
-    rec->unk4 = rec->unk4 + 1;
-    vol = rec->unk2C[b];
+    rec->readPos = rec->readPos + 1;
+    vol = rec->program[b];
     b = *cursor;
-    SpuVmPitchBend(packed, rec->unk4C, vol, b);
-    rec->unk88 = ReadDeltaValue(a0, a1);
+    SpuVmPitchBend(packed, rec->vabId, vol, b);
+    rec->deltaLeft = ReadDeltaValue(a0, a1);
 }
 
 /* libsnd/next. */
@@ -823,29 +824,29 @@ extern void _SsSndNextSep(s32 a0, s32 a1);
  * meta-event TYPE byte. Only two types are understood; everything else is
  * silently ignored:
  *
- * 0x2F (End of Track): bumps the repeat counter (unk48). unk46 == 0 means
- * "loop forever" -- rewind unk4 to the saved track start (unk8) and keep
- * going. Otherwise, while the counter is still under the limit (unk46),
- * rewind BOTH unk4 and unkC. Once the limit is reached, clear the
- * playback-state flags (unk90), rewind unkC one more time, and run the
- * stop-sequence callbacks (_SsSndNextSep gated on unk3C != 0xFF, then an
- * unconditional SpuVmSeqKeyOff notify) before priming unk88 from unk70 for
+ * 0x2F (End of Track): bumps the repeat counter (playsDone). playCount == 0 means
+ * "loop forever" -- rewind readPos to the saved track start (trackStart) and keep
+ * going. Otherwise, while the counter is still under the limit (playCount),
+ * rewind BOTH readPos and loopPos. Once the limit is reached, clear the
+ * playback-state flags (flags), rewind loopPos one more time, and run the
+ * stop-sequence callbacks (_SsSndNextSep gated on nextSepAccess != 0xFF, then an
+ * unconditional SpuVmSeqKeyOff notify) before priming deltaLeft from ticksPerCall for
  * the next tick.
  *
  * 0x51 (Set Tempo): reads a 3-byte big-endian microseconds-per-quarter-note
  * value, converts it to a BPM-like rate (60000000 / value -- the standard
- * MIDI tempo formula) into unk8C, then recomputes the scheduling
- * threshold (unk6E/unk70) against unk4A and the global tick-rate constant
+ * MIDI tempo formula) into tempo, then recomputes the scheduling
+ * threshold (callsPerTick/ticksPerCall) against ticksPerBeat and the global tick-rate constant
  * VBLANK_MINUS, in whichever of two regimes avoids losing precision to
  * integer truncation (the `else` regime also derives a rounding bit from
- * the division's remainder). unk6E doubles as a mode flag: -1 means
- * "unk70 holds the reciprocal-regime value", any other value means
- * "unk70 holds the same value unk6E does". */
+ * the division's remainder). callsPerTick doubles as a mode flag: -1 means
+ * "ticksPerCall holds the reciprocal-regime value", any other value means
+ * "ticksPerCall holds the same value callsPerTick does". */
 #ifdef NON_MATCHING
 /* NON_MATCHING: 211/213 words, length 2 short. Residue: register identity:
- * retail's second divu re-reads rec->unk4A with a plain `lh`, and this body
+ * retail's second divu re-reads rec->ticksPerBeat with a plain `lh`, and this body
  * keeps the first read live in a register (docs/match-reports/GetMetaEvent.md).
- * The volatile on the word-sized unk8C, below, defeats GCC's div/mod fusion. */
+ * The volatile on the word-sized tempo, below, defeats GCC's div/mod fusion. */
 void GetMetaEvent(s16 a0, s16 a1, u8 a2) {
     SsScore *rec = &_ss_score[a0][a1];
 
@@ -854,74 +855,74 @@ void GetMetaEvent(s16 a0, s16 a1, u8 a2) {
             return;
         }
         {
-            u8 *p = rec->unk4;
+            u8 *p = rec->readPos;
             s32 tempo;
             s32 bpm;
             u32 base;
             u32 divisor;
 
-            rec->unk4 = p + 1;
+            rec->readPos = p + 1;
             tempo = (s32)p[0] << 16;
-            rec->unk4 = p + 2;
+            rec->readPos = p + 2;
             tempo |= (s32)p[1] << 8;
-            rec->unk4 = p + 3;
+            rec->readPos = p + 3;
             tempo |= p[2];
 
             bpm = 60000000 / tempo;
             base = VBLANK_MINUS * 15;
             divisor = base * 4;
-            rec->unk8C = bpm;
-            if (rec->unk4A * rec->unk8C * 10 < divisor) {
-                rec->unk6E = (VBLANK_MINUS * 600) / (rec->unk4A * rec->unk8C);
-                rec->unk70 = rec->unk6E;
+            rec->tempo = bpm;
+            if (rec->ticksPerBeat * rec->tempo * 10 < divisor) {
+                rec->callsPerTick = (VBLANK_MINUS * 600) / (rec->ticksPerBeat * rec->tempo);
+                rec->ticksPerCall = rec->callsPerTick;
             } else {
                 /* NON_MATCHING: only the word-sized field is volatile; that
                  * defeats GCC's div/mod fusion and leaves the plain `lh` for
-                 * unk4A alone. */
-                volatile s32 *pbpm = &rec->unk8C;
-                s32 q = (rec->unk4A * *pbpm * 10) / divisor;
-                s32 r = (rec->unk4A * *pbpm * 10) % divisor;
+                 * ticksPerBeat alone. */
+                volatile s32 *pbpm = &rec->tempo;
+                s32 q = (rec->ticksPerBeat * *pbpm * 10) / divisor;
+                s32 r = (rec->ticksPerBeat * *pbpm * 10) % divisor;
 
-                rec->unk6E = -1;
-                rec->unk70 = (base * 2 < r) ? q + 1 : q;
+                rec->callsPerTick = -1;
+                rec->ticksPerCall = (base * 2 < r) ? q + 1 : q;
             }
         }
-        rec->unk88 = ReadDeltaValue(a0, a1);
+        rec->deltaLeft = ReadDeltaValue(a0, a1);
         return;
     }
     {
-        u16 newCount = rec->unk48 + 1;
-        s16 limit = rec->unk46;
+        u16 newCount = rec->playsDone + 1;
+        s16 limit = rec->playCount;
 
-        rec->unk48 = newCount;
+        rec->playsDone = newCount;
         if (limit == 0) {
-            rec->unk80 = 0;
-            rec->unk27 = 0;
-            rec->unk88 = 0;
-            rec->unk4 = rec->unk8;
+            rec->ticksPlayed = 0;
+            rec->loopOpen = 0;
+            rec->deltaLeft = 0;
+            rec->readPos = rec->trackStart;
             return;
         }
         if ((s16)newCount < limit) {
-            rec->unk80 = 0;
-            rec->unk27 = 0;
-            rec->unk88 = 0;
-            rec->unk4 = rec->unk8;
-            rec->unkC = rec->unk8;
+            rec->ticksPlayed = 0;
+            rec->loopOpen = 0;
+            rec->deltaLeft = 0;
+            rec->readPos = rec->trackStart;
+            rec->loopPos = rec->trackStart;
             return;
         }
-        _ss_score[a0][a1].unk90 &= ~1;
-        _ss_score[a0][a1].unk90 &= ~8;
-        _ss_score[a0][a1].unk90 &= ~2;
-        _ss_score[a0][a1].unk90 |= 0x200;
-        _ss_score[a0][a1].unk90 |= 0x4;
-        rec->unkC = rec->unk8;
+        _ss_score[a0][a1].flags &= ~1;
+        _ss_score[a0][a1].flags &= ~8;
+        _ss_score[a0][a1].flags &= ~2;
+        _ss_score[a0][a1].flags |= 0x200;
+        _ss_score[a0][a1].flags |= 0x4;
+        rec->loopPos = rec->trackStart;
         rec->unk2B = 0;
-        if (rec->unk3C != 0xFF) {
-            _SsSndNextSep(rec->unk3C, rec->unk0);
+        if (rec->nextSepAccess != 0xFF) {
+            _SsSndNextSep(rec->nextSepAccess, rec->nextSepSeq);
             rec->unk2B = 0;
         }
         SpuVmSeqKeyOff((a1 << 8) | a0);
-        rec->unk88 = rec->unk70;
+        rec->deltaLeft = rec->ticksPerCall;
     }
 }
 #else
@@ -934,13 +935,13 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_seqread", GetMetaEvent);
  * register. */
 s32 ReadDeltaValue(s16 a0, s16 a1) {
     SsScore *rec = &_ss_score[a0][a1];
-    u8 *cursor = rec->unk4;
+    u8 *cursor = rec->readPos;
     s32 acc;
     s32 val;
     s32 result;
     u8 nb;
 
-    rec->unk4 = cursor + 1;
+    rec->readPos = cursor + 1;
     acc = *cursor;
     if (acc == 0) {
         return 0;
@@ -951,14 +952,14 @@ s32 ReadDeltaValue(s16 a0, s16 a1) {
     }
     acc &= 0x7F;
     do {
-        cursor = rec->unk4;
-        rec->unk4 = cursor + 1;
+        cursor = rec->readPos;
+        rec->readPos = cursor + 1;
         nb = *cursor;
         acc = (acc << 7) + (nb & 0x7F);
     } while (nb & 0x80);
     val = acc * 4;
 combine:
     result = (val + acc) * 2;
-    rec->unk80 += result;
+    rec->ticksPlayed += result;
     return result;
 }

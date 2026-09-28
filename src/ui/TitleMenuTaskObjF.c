@@ -307,7 +307,7 @@ void TitleMenu__Finalize(TitleMenu *self) {
 
 void TitleMenu__OnNotify(TitleMenu *self, BasicClass *sender, s32 event) {
     GetTaskCoreMethods()->onNotify((TaskCore *)self, sender, event);
-    if ((sender->methods->header & 0xF) == TASKOBJF_CLASS_ID) {
+    if ((sender->methods->header & CLASS_ID_ROOT_MASK) == TASKOBJF_CLASS_ID) {
         self->methods->onCardEvent(self, sender, event);
     }
 }
@@ -467,7 +467,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
     self->saveTitle->methods->setColor(self->saveTitle, &rgb);
 }
 
-/* setState(5)'s and a finished card operation's: the save title's text reloaded,
+/* setState(ACTIVE)'s and a finished card operation's: the save title's text reloaded,
  * FLASHBACK's lock recomputed, the widgets re-attached and SHAKE's cursor
  * set from DreamSys's setting; then the entry that was active is
  * reselected. */
@@ -487,9 +487,9 @@ void TitleMenu__RefreshMenu(TitleMenu *self) {
     self->methods->updateSlotElements(self, self->lightRig);
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
     self->activeSlot = TITLEMENU_SHAKE;
-    self->methods->setState(self, 0xB);
+    self->methods->setState(self, TASKCORE_STATE_SLOT_CONFIRMED);
     self->methods->setSlotCursor(self, shake, 1);
-    self->methods->setState(self, 0xF);
+    self->methods->setState(self, TASKCORE_STATE_ITEM_CONFIRMED);
     self->methods->setActiveSlot(self, origSlot, 0);
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
 }
@@ -649,11 +649,11 @@ void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
         self->tickSource = child;
         return;
     }
-    if ((classId & 0xFF) == 0x10) {
+    if ((u8)classId == TEXTENTRY_CLASS_ID) {
         self->textEntry = (struct TextEntry *)child;
         return;
     }
-    if ((classId & 0xFF) == 0x20) {
+    if ((u8)classId == ITEMLIST_CLASS_ID) {
         self->itemList = (struct ItemList *)child;
     }
 }
@@ -669,9 +669,9 @@ void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child) {
         self->inputSource = NULL;
     } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->tickSource = NULL;
-    } else if ((classId & 0xFF) == 0x10) {
+    } else if ((u8)classId == TEXTENTRY_CLASS_ID) {
         self->textEntry = NULL;
-    } else if ((classId & 0xFF) == 0x20) {
+    } else if ((u8)classId == ITEMLIST_CLASS_ID) {
         self->itemList = NULL;
     }
     GetBasicClassMethods()->removeChild((BasicClass *)self, child);
@@ -820,10 +820,10 @@ s32 TaskObjF__ProbeMemcardFile(TaskObjF *self, char *destTitle, char *suffix) {
 }
 
 s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destTitle, char *suffix) {
-    char pathBuf[32];
+    char pathBuf[MEMCARD_PATH_SIZE];
     char *path;
     s32 handle;
-    void *header;
+    McSaveHeader *header;
 
     path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, suffix);
     handle = open(path, O_RDONLY);
@@ -833,7 +833,7 @@ s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destTitle, char *suff
     if (destTitle != NULL) {
         header = BMemPMgrAlloc(MEMCARD_SECTOR_SIZE);
         read(handle, header, MEMCARD_SECTOR_SIZE);
-        strcpy(destTitle, (char *)header + 4); /* the save header's title */
+        strcpy(destTitle, header->title);
         BMemPMgrFree(header);
     }
     close(handle);
@@ -886,7 +886,7 @@ s32 TaskObjF__CheckCardSpace(TaskObjF *self, u8 iconFrames, s32 size) {
 /* Creates, then deletes, a file big enough for `size` bytes of save data
  * after the save header: nonzero when the card has room. */
 s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size) {
-    char pathBuf[32];
+    char pathBuf[MEMCARD_PATH_SIZE];
     char *path;
     s32 handle;
     s32 blocks;
@@ -933,47 +933,6 @@ s32 WaitForReadyEvent(s32 *events, s32 count);
 /* The PS-X BIOS file calls (open, read, lseek, close, write, delete) and the
  * kernel event calls are Sony's libapi: include/psyq/kernel.h. */
 
-/* Half of the icon's 16-colour CLUT.
- * MATCHING: all-s16 (alignment 2) makes the whole-struct copy retail's
- * unaligned lwl/lwr + swl/swr pairs. */
-typedef struct IconPaletteHalf {
-    s16 color[8];
-} IconPaletteHalf;
-
-/* One 16x16 4bpp icon frame, one sector.
- * MATCHING: a byte array (alignment 1) makes the whole-struct copy retail's
- * runtime-alignment-checked copy loop. */
-typedef struct IconFrame {
-    u8 raw[MEMCARD_SECTOR_SIZE];
-} IconFrame;
-
-/* The icon TimImage's file buffer, a 4bpp TIM with one 16-colour CLUT: the
- * pads are the TIM header with the CLUT block header, and the pixel block
- * header. Only the CLUT and the first three frames of pixels are read. */
-typedef struct McIconSource {
-    u8 pad0[0x14];
-    IconPaletteHalf palette[2]; /* +0x14 */
-    u8 pad34[0x40 - 0x34];
-    IconFrame frame0; /* +0x40 */
-    IconFrame frame1; /* +0xC0 */
-    IconFrame frame2; /* +0x140 */
-} McIconSource;
-
-/* The PS-X memory-card save header, MEMCARD_SAVE_HEADER_SIZE bytes: the
- * title sector ('S', 'C', the icon display flag, the file's size in blocks,
- * the title field, the CLUT), then up to three icon frames. */
-typedef struct McSaveHeader {
-    u8 magic0;
-    u8 magic1;
-    u8 iconDisplayFlag;
-    u8 blockCount;
-    char title[92]; /* +0x04..+0x5F: the format's 64-byte title and its reserved bytes */
-    IconPaletteHalf palette[2];
-    IconFrame frame0;
-    IconFrame frame1;
-    IconFrame frame2;
-} McSaveHeader;
-
 s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
     s32 retries;
     s32 result;
@@ -989,7 +948,7 @@ s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 ou
 }
 
 s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
-    char pathBuf[32];
+    char pathBuf[MEMCARD_PATH_SIZE];
     char *path;
     s32 handle;
     McSaveHeader *header;
@@ -1045,7 +1004,7 @@ extern char sFileNotCreatedMsg[]; /* "File not create in WriteFile\n" */
 
 s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, u8 iconFrames,
                                       struct TimImage *icon, void *data, s32 size) {
-    char pathBuf[32];
+    char pathBuf[MEMCARD_PATH_SIZE];
     char *path;
     s32 fileHandle;
     s32 openMode;
@@ -1335,19 +1294,17 @@ void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
     base = GetBasicClassMethods();
     base->onNotify((BasicClass *)self, sender, event);
 
-    /* Pad's class id is 0x2 and FrameClock's 0x5, matched with their
-     * subclasses on the low nibble; TextEntry's is 0x10, ItemList's 0x20. */
     tag = ((BasicClass *)sender)->methods->header;
-    kind = tag & 0xF;
-    if (kind == 0x2) {
+    kind = tag & CLASS_ID_ROOT_MASK;
+    if (kind == PAD_CLASS_ID) {
         methods->onInputEvent(self, sender, event);
-    } else if (kind == 0x5) {
+    } else if (kind == FRAMECLOCK_CLASS_ID) {
         methods->tickStateDelay(self, sender, event);
     } else {
-        kind = tag & 0xFF;
-        if (kind == 0x10) {
+        kind = (u8)tag;
+        if (kind == TEXTENTRY_CLASS_ID) {
             methods->onTextEntryResult(self, sender, event);
-        } else if (kind == 0x20) {
+        } else if (kind == ITEMLIST_CLASS_ID) {
             methods->onItemListResult(self, sender, event);
         }
     }

@@ -103,7 +103,7 @@ missed condition or wrong constant anywhere):
    writing a small status byte (`D_8006D8D8[0]` and/or `D_8006D8D9`,
    depending on the case and mirrored between them in cases 4/5) and
    copying the 8-byte response into one or two of three contiguous 8-byte
-   mailboxes (`D_8008B3CC`, `D_8008B3D4`, `D_8008B3DC`), returning a small
+   mailboxes (`Result`, `D_8008B3D4`, `D_8008B3DC`), returning a small
    bit-flag-shaped result (0, 1, 2, 4, 6, or -1) -- confirmed against
    caller sites in `asm/code_179d8_mid.s`, which `andi` the result against
    `0x2` and `0x4`, consistent with a flag word.

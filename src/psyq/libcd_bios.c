@@ -90,13 +90,14 @@ extern s32 D_8006D904;
 extern u8 D_8006D908[];
 extern u8 D_8006D90C[];
 
-/* Each interrupt's 8-byte result: sync, ready, and the second ready. */
-extern u8 D_8008B3CC[];
-extern u8 D_8008B3D4[];
-extern u8 D_8008B3DC[];
+/* Each interrupt's 8-byte result: [0] sync, [1] ready, [2] the second
+ * ready. */
+extern u8 Result[3][8];
 
 /* The timeout of the wait in progress: its deadline in VSync ticks, a spin
- * count, and the waiting function's name for the diagnostic. */
+ * count, and the waiting function's name for the diagnostic. bios.o calls
+ * the group Alarm; it stays three words here.
+ * MATCHING: a struct over them makes CD_readsync share one base register. */
 extern s32 D_8008B3E4;
 extern s32 D_8008B3E8;
 extern char *D_8008B3EC;
@@ -196,16 +197,16 @@ s32 getintr(void) {
         case 3:
             if (flags != 0) {
                 *(volatile u8 *)D_8006D8D8 = 5;
-                copy8(D_8008B3CC, resp);
+                copy8(Result[0], resp);
                 return 2;
             }
             if (D_8006D6C0[CD_com] != 0) {
                 *(volatile u8 *)D_8006D8D8 = 3;
-                copy8(D_8008B3CC, resp);
+                copy8(Result[0], resp);
                 return 1;
             }
             *(volatile u8 *)D_8006D8D8 = 2;
-            copy8(D_8008B3CC, resp);
+            copy8(Result[0], resp);
             return 2;
 
         case 2: {
@@ -216,27 +217,27 @@ s32 getintr(void) {
                 v = 2;
             }
             D_8006D8D8[0] = v;
-            copy8(D_8008B3CC, resp);
+            copy8(Result[0], resp);
             return 2;
         }
 
         case 1:
             D_8006D8D9 = (flags != 0) ? 5 : 1;
-            copy8(D_8008B3D4, resp);
+            copy8(Result[1], resp);
             return 4;
 
         case 4:
             D_8006D8DA = 4;
             *(volatile u8 *)&D_8006D8D9 = D_8006D8DA;
-            copy8(D_8008B3DC, resp);
-            copy8(D_8008B3D4, resp);
+            copy8(Result[2], resp);
+            copy8(Result[1], resp);
             return 4;
 
         case 5:
             D_8006D8D9 = 5;
             *(volatile u8 *)D_8006D8D8 = D_8006D8D9;
-            copy8(D_8008B3CC, resp);
-            copy8(D_8008B3D4, resp);
+            copy8(Result[0], resp);
+            copy8(Result[1], resp);
             return 6;
 
         default:
@@ -305,12 +306,12 @@ s32 CD_ready(s32 arg0, s32 arg1) {
                 }
                 if (flags & 4) {
                     if (CD_cbready != NULL) {
-                        CD_cbready(*state1, D_8008B3D4);
+                        CD_cbready(*state1, Result[1]);
                     }
                 }
                 if (flags & 2) {
                     if (CD_cbsync != NULL) {
-                        CD_cbsync(*state, D_8008B3CC);
+                        CD_cbsync(*state, Result[0]);
                     }
                 }
             }
@@ -323,7 +324,7 @@ s32 CD_ready(s32 arg0, s32 arg1) {
         }
         *state2 = 0;
         __asm__("");
-        src = D_8008B3DC;
+        src = Result[2];
         if (arg1 == 0) {
             goto ret2;
         }
@@ -344,7 +345,7 @@ s32 CD_ready(s32 arg0, s32 arg1) {
         state2[-1] = 0;
         __asm__("");
         dst = (u8 *)arg1;
-        src = D_8008B3D4;
+        src = Result[1];
         if (dst == 0) {
             goto ret1;
         }
@@ -364,8 +365,8 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_ready);
 #endif
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 284 words against retail's 282; the report records a
- * length-exact body (docs/match-reports/CD_cw.md). */
+/* NON_MATCHING: 284 words against retail's 282, 97 equal at the same
+ * index (docs/match-reports/CD_cw.md). */
 s32 CD_cw(s32 arg0, u8 *arg1, u8 *arg2, s32 arg3) {
     char **table;
     volatile u8 *state;
@@ -459,12 +460,12 @@ s32 CD_cw(s32 arg0, u8 *arg1, u8 *arg2, s32 arg3) {
                     }
                     if (flags & 4) {
                         if (CD_cbready != NULL) {
-                            CD_cbready(*state1, D_8008B3D4);
+                            CD_cbready(*state1, Result[1]);
                         }
                     }
                     if (flags & 2) {
                         if (CD_cbsync != NULL) {
-                            CD_cbsync(*state, D_8008B3CC);
+                            CD_cbsync(*state, Result[0]);
                         }
                     }
                 }
@@ -478,7 +479,7 @@ s32 CD_cw(s32 arg0, u8 *arg1, u8 *arg2, s32 arg3) {
     }
 
     dst = (u8 *)arg2;
-    src = D_8008B3CC;
+    src = Result[0];
     if (dst != NULL) {
         for (i = 7; i != -1; i--) {
             *dst = *src;
@@ -912,10 +913,10 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
                     break;
                 }
                 if ((flags & 4) && CD_cbready != 0) {
-                    CD_cbready(p8D9[0], D_8008B3D4);
+                    CD_cbready(p8D9[0], Result[1]);
                 }
                 if ((flags & 2) && CD_cbsync != 0) {
-                    CD_cbsync(p8D8[0], D_8008B3CC);
+                    CD_cbsync(p8D8[0], Result[0]);
                 }
             }
             /* MATCHING: a known-bad construct, do not copy it. p6A0 and pF8
@@ -932,7 +933,7 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
         }
 
         dst = (u8 *)arg1;
-        src = D_8008B3D4;
+        src = Result[1];
         if (dst != 0) {
             for (i = 7; i != -1; i--) {
                 *dst = *src;
@@ -1046,12 +1047,12 @@ void callback(void) {
         if (flags & 4) {
             handler = CD_cbready;
             if (handler != 0) {
-                handler(*pd9, D_8008B3D4);
+                handler(*pd9, Result[1]);
             }
         }
         if (flags & 2) {
             if (CD_cbsync != 0) {
-                CD_cbsync(D_8006D8D8[0], D_8008B3CC);
+                CD_cbsync(D_8006D8D8[0], Result[0]);
             }
         }
     }

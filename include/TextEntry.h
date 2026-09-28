@@ -39,6 +39,11 @@
 struct VabStreamObj;
 struct TextRow;
 
+/* TextEntry's class id (gTextEntryMethods word +0x000). Two nibbles, so
+ * `(u8)header == TEXTENTRY_CLASS_ID` is its is-kind-of test (TaskObjF's
+ * addChild/removeChild/onNotify). */
+#define TEXTENTRY_CLASS_ID 0x10
+
 typedef struct TextEntry TextEntry;
 typedef struct TextEntryMethods TextEntryMethods;
 
@@ -74,7 +79,7 @@ struct TextEntryMethods {
                                    s32 event); /* TextEntry__TickState (reads only self; see the banner) */
     /* +0x05C */ void (*handleCommand)(TextEntry *self, void *sender, s32 command); /* TextEntry__HandleCommand */
     /* +0x060 */ void (*playSound)(TextEntry *self, s32 tone); /* TextEntry__PlaySound */
-    /* +0x064 */ void *slot64[9];                              /* NULL */
+    /* +0x064 */ void *pad64[9];                               /* NULL; nothing calls them */
     /* +0x088 */ void (*moveCursorRight)(TextEntry *self);     /* TextEntry__MoveCursorRight */
     /* +0x08C */ void (*moveCursorLeft)(TextEntry *self);      /* TextEntry__MoveCursorLeft */
     /* +0x090 */ void (*nextChar)(TextEntry *self);            /* TextEntry__NextChar */

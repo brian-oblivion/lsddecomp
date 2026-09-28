@@ -129,14 +129,14 @@ struct TaskObjF {
     /* +0x054 */ void *data;   /* beginLoad/beginSave: the save block read into or written from */
     /* +0x058 */ s32 dataSize; /* its size in bytes */
     /* +0x05C */ s32 waitCounter; /* setState zeroes; tickStateDelay counts to 6 */
-    /* +0x060 */ BasicClass *inputSource; /* AddChild: the child whose class id's low nibble is 2; its events go to onInputEvent */
-    /* +0x064 */ BasicClass *tickSource; /* ... low nibble 5; its events go to tickStateDelay */
+    /* +0x060 */ BasicClass *inputSource; /* AddChild: the child of class PAD_CLASS_ID (a Pad); its events go to onInputEvent */
+    /* +0x064 */ BasicClass *tickSource; /* ... of class FRAMECLOCK_CLASS_ID (a FrameClock); its events go to tickStateDelay */
     /* +0x068 */ struct SceneNode *spriteParent; /* init; the widgets' and the card icon's sprite parent; with inputSource, gates attach/detach */
     /* +0x06C */ struct VabStreamObj *sound; /* init; playSound's playTone target, the widgets' target too */
     /* +0x070 */ struct ScreenSprite *cardIcon; /* loadCardIcon: New_ScreenSprite of a CARD\*.TIM; releaseCardIcon */
     /* +0x074 */ s32 ownsWidget; /* attachTextEntry/attachItemList set it when they made the widget; detach then releases it */
-    /* +0x078 */ struct TextEntry *textEntry; /* attachTextEntry: New_TextEntry(title + 2 * titleEditPos, 1); AddChild's class 0x10 */
-    /* +0x07C */ struct ItemList *itemList; /* attachItemList: New_ItemList(titles, 1); AddChild's class 0x20 */
+    /* +0x078 */ struct TextEntry *textEntry; /* attachTextEntry: New_TextEntry(title + 2 * titleEditPos, 1); AddChild's TEXTENTRY_CLASS_ID child */
+    /* +0x07C */ struct ItemList *itemList; /* attachItemList: New_ItemList(titles, 1); AddChild's ITEMLIST_CLASS_ID child */
     /* +0x080 */ s32 selectedIndex; /* onItemListResult: the list's getCursorIndex */
 };
 
@@ -220,6 +220,51 @@ extern TaskObjFMethods *GetTaskObjFMethods(void); /* returns &gTaskObjFMethods *
 typedef struct McDevicePath {
     s8 b0, b1, b2, b3, b4, b5;
 } McDevicePath;
+
+/* The buffer a card file's full path ("bu00:" plus the file name) is built
+ * in, on the stack of each file call. */
+#define MEMCARD_PATH_SIZE 32
+
+/* Half of the icon's 16-colour CLUT.
+ * MATCHING: all-s16 (alignment 2) makes the whole-struct copy retail's
+ * unaligned lwl/lwr + swl/swr pairs. */
+typedef struct IconPaletteHalf {
+    s16 color[8];
+} IconPaletteHalf;
+
+/* One 16x16 4bpp icon frame, one sector.
+ * MATCHING: a byte array (alignment 1) makes the whole-struct copy retail's
+ * runtime-alignment-checked copy loop. */
+typedef struct IconFrame {
+    u8 raw[MEMCARD_SECTOR_SIZE];
+} IconFrame;
+
+/* The icon TimImage's file buffer, a 4bpp TIM with one 16-colour CLUT: the
+ * pads are the TIM header with the CLUT block header, and the pixel block
+ * header. Only the CLUT and the first three frames of pixels are read. */
+typedef struct McIconSource {
+    u8 pad0[0x14];
+    IconPaletteHalf palette[2]; /* +0x14 */
+    u8 pad34[0x40 - 0x34];
+    IconFrame frame0; /* +0x40 */
+    IconFrame frame1; /* +0xC0 */
+    IconFrame frame2; /* +0x140 */
+} McIconSource;
+
+/* The PS-X memory-card save header, MEMCARD_SAVE_HEADER_SIZE bytes: the
+ * title sector ('S', 'C', the icon display flag, the file's size in blocks,
+ * the title field, the CLUT), then up to three icon frames. */
+typedef struct McSaveHeader {
+    u8 magic0;
+    u8 magic1;
+    u8 iconDisplayFlag;
+    u8 blockCount;
+    char title[92]; /* +0x04..+0x5F: the format's 64-byte title and its reserved bytes */
+    IconPaletteHalf palette[2];
+    IconFrame frame0;
+    IconFrame frame1;
+    IconFrame frame2;
+} McSaveHeader;
 
 /* Game code (src/ui/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it
  * around its retry loop, and with (arg, 0) when the loop gives up. The BIOS

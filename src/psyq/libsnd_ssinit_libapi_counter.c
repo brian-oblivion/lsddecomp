@@ -17,6 +17,7 @@
 #include "common.h"
 #include "libsnd_internal.h"
 #include <libetc.h>
+#include <kernel.h>
 
 /* VBLANK_MINUS values SsSetTickMode's rate table selects between.
  * _snd_video_mode (Psy-Q `GetVideoMode`) is 0/1, and cases 0/4/5 pick between
@@ -30,7 +31,7 @@
 void SsSetTickMode(long a0) {
     s32 cmd;
 
-    if (a0 & 0x1000) {
+    if (a0 & SS_NOTICK) {
         _snd_seq_no_tick = 1;
         _snd_seq_tick_mode = a0 & 0xFFF;
     } else {
@@ -40,32 +41,32 @@ void SsSetTickMode(long a0) {
 
     cmd = _snd_seq_tick_mode;
 
-    if (cmd < 6) {
-        if ((u32)cmd < 6) {
+    if (cmd < SS_TICKMODE_MAX) {
+        if ((u32)cmd < SS_TICKMODE_MAX) {
             switch (cmd) {
-                case 4:
+                case SS_TICK50:
                     VBLANK_MINUS = SEQ_TICKRATE_50;
                     if (_snd_video_mode == 1) {
-                        _snd_seq_tick_mode = 5;
+                        _snd_seq_tick_mode = SS_TICKVSYNC;
                     } else {
                         _snd_seq_tick_mode = SEQ_TICKRATE_50;
                     }
                     return;
-                case 1:
+                case SS_TICK60:
                     VBLANK_MINUS = SEQ_TICKRATE_60;
                     if (_snd_video_mode == 0) {
-                        _snd_seq_tick_mode = 5;
+                        _snd_seq_tick_mode = SS_TICKVSYNC;
                     } else {
                         _snd_seq_tick_mode = SEQ_TICKRATE_60;
                     }
                     return;
-                case 3:
+                case SS_TICK120:
                     VBLANK_MINUS = SEQ_TICKRATE_120;
                     return;
-                case 2:
+                case SS_TICK240:
                     VBLANK_MINUS = SEQ_TICKRATE_240;
                     return;
-                case 5:
+                case SS_TICKVSYNC:
                     if (_snd_video_mode == 0) {
                         VBLANK_MINUS = SEQ_TICKRATE_60;
                     } else if (_snd_video_mode == 1) {
@@ -74,7 +75,7 @@ void SsSetTickMode(long a0) {
                         VBLANK_MINUS = SEQ_TICKRATE_60;
                     }
                     return;
-                case 0:
+                case SS_NOTICK0:
                     if (_snd_video_mode == 0) {
                         VBLANK_MINUS = SEQ_TICKRATE_60;
                     } else if (_snd_video_mode == 1) {
@@ -104,9 +105,7 @@ void SsStart2(void) {
     _SsStart(0);
 }
 
-extern void EnterCriticalSection(void);
 extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void);
-extern void ExitCriticalSection(void);
 
 void SsEnd(void) {
     s32 v;
@@ -183,8 +182,8 @@ typedef struct {
 
 extern RCntEntry *D_8006DCB0;
 
-s32 SetRCnt(s32 n, s16 target, u32 mode) {
-    s32 idx = (u16)n;
+long SetRCnt(unsigned long spec, unsigned short target, long mode) {
+    s32 idx = (u16)spec;
     u16 md = 0x48;
     u32 isLow;
 
@@ -197,19 +196,19 @@ s32 SetRCnt(s32 n, s16 target, u32 mode) {
     D_8006DCB0[idx].target = target;
 
     if (isLow) {
-        if (mode & 0x10) {
+        if (mode & RCntMdGATE) {
             md = 0x49;
         }
-        if (!(mode & 1)) {
+        if (!(mode & RCntMdSC)) {
             md |= 0x100;
         }
     } else if (idx == 2) {
-        if (!(mode & 1)) {
+        if (!(mode & RCntMdSC)) {
             md = 0x248;
         }
     }
 
-    if (mode & 0x1000) {
+    if (mode & RCntMdINTR) {
         md |= 0x10;
     }
 
@@ -217,8 +216,8 @@ s32 SetRCnt(s32 n, s16 target, u32 mode) {
     return 1;
 }
 
-s32 GetRCnt(s32 n) {
-    s32 idx = (u16)n;
+long GetRCnt(unsigned long spec) {
+    s32 idx = (u16)spec;
     RCntEntry *base;
 
     if (idx >= 3) {
@@ -242,24 +241,24 @@ typedef struct {
 extern IrqRegs *D_8006DCAC;
 extern u32 D_8006DCB4[4];
 
-s32 StartRCnt(u16 which) {
-    s32 idx = which;
+long StartRCnt(unsigned long spec) {
+    s32 idx = (u16)spec;
     IrqRegs *reg = D_8006DCAC;
 
     reg->mask |= D_8006DCB4[idx];
     return idx < 3;
 }
 
-s32 StopRCnt(u16 which) {
-    s32 idx = which;
+long StopRCnt(unsigned long spec) {
+    s32 idx = (u16)spec;
     IrqRegs *reg = D_8006DCAC;
 
     reg->mask &= ~D_8006DCB4[idx];
     return 1;
 }
 
-s32 ResetRCnt(s32 n) {
-    s32 idx = (u16)n;
+long ResetRCnt(unsigned long spec) {
+    s32 idx = (u16)spec;
     RCntEntry *base;
 
     if (idx >= 3) {

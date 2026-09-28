@@ -20,7 +20,7 @@
  *    window's edges), scrollLeft/Right move `column` inside every string; the
  *    cursor row is coloured sItemListCursorColor, the others
  *    sItemListRowColor.
- *  - handleInputCode (the tag-2 child's notifications): 25 closes with
+ *  - handleInputCode (the PAD_CLASS_ID child's notifications): 25 closes with
  *    result 2, 23 with result 3; setState(4) then passes `result` to
  *    notifyParents, and the parent reads the chosen item with getCursorIndex.
  *
@@ -54,6 +54,11 @@ struct TextRow;
 struct TimImage;
 struct SpriteRgb;
 struct VabStreamObj;
+
+/* ItemList's class id (gItemListMethods word +0x000). Two nibbles, so
+ * `(u8)header == ITEMLIST_CLASS_ID` is its is-kind-of test (TaskObjF's
+ * addChild/removeChild/onNotify). */
+#define ITEMLIST_CLASS_ID 0x20
 
 typedef struct ItemList ItemList;
 typedef struct ItemListMethods ItemListMethods;
@@ -92,7 +97,7 @@ struct ItemListMethods {
                                      s32 event); /* ItemList__TickClosing (reads only self; see the banner) */
     /* +0x05C */ void (*handleInputCode)(ItemList *self, void *source, s32 code); /* ItemList__HandleInputCode */
     /* +0x060 */ void (*playSound)(ItemList *self, s32 tone); /* ItemList__PlaySound */
-    /* +0x064 */ void *slot64[6];                             /* NULL */
+    /* +0x064 */ void *pad64[6];                              /* NULL; nothing calls them */
     /* +0x07C */ void (*scrollRight)(ItemList *self);         /* ItemList__ScrollRight */
     /* +0x080 */ void (*scrollLeft)(ItemList *self);          /* ItemList__ScrollLeft */
     /* +0x084 */ void (*cursorUp)(ItemList *self);   /* ItemList__CursorUp (see the banner) */

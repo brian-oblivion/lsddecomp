@@ -46,15 +46,15 @@ void SsUtAllKeyOff(s16 mode) {
 
     for (i = 0; i < spuVmMaxVoice; i++) {
         woff = i * 8;
-        _svm_voice[i].unk02 = 0x18;
-        _svm_voice[i].unk00 = 0xFF;
-        _svm_voice[i].unk1B = 0;
-        _svm_voice[i].unk04 = 0;
-        _svm_voice[i].unk06 = 0;
-        _svm_voice[i].unk0E = 0xFF;
-        _svm_voice[i].unk10 = 0;
-        _svm_voice[i].unk12 = 0;
-        _svm_voice[i].unk14 = 0xFF;
+        _svm_voice[i].age = 0x18;
+        _svm_voice[i].vag = 0xFF;
+        _svm_voice[i].keyState = 0;
+        _svm_voice[i].pitch = 0;
+        _svm_voice[i].envx = 0;
+        _svm_voice[i].seq = 0xFF;
+        _svm_voice[i].progIndex = 0;
+        _svm_voice[i].prog = 0;
+        _svm_voice[i].tone = 0xFF;
 
         _svm_sreg[woff + 3] = 0x200;
         _svm_sreg[woff + 2] = 0x1000;
@@ -73,9 +73,9 @@ void SsUtAllKeyOff(s16 mode) {
             bitHi = 1u << (bitpos - 0x10);
         }
 
-        _svm_voice[bitpos & 0xFFFF].unk1B = 0;
-        _svm_voice[bitpos & 0xFFFF].unk04 = 0;
-        _svm_voice[bitpos & 0xFFFF].unk00 = 0;
+        _svm_voice[bitpos & 0xFFFF].keyState = 0;
+        _svm_voice[bitpos & 0xFFFF].pitch = 0;
+        _svm_voice[bitpos & 0xFFFF].vag = 0;
 
         hw0 = _svm_okof1;
         hw1 = _svm_okof2;
