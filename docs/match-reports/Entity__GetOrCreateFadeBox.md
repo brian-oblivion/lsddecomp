@@ -15,7 +15,7 @@ through it: `slot50(sub)`, `slot4C(sub, this, arg2-or-default)`,
 `slotD0(sub, arg3)`. Returns the object (new or cached), or NULL if
 allocation failed.
 
-`name` defaults to `gEntityFadeBoxDefaultSize` (`{320, 240}`) and `arg2` defaults to
+`name` defaults to `sEntityFadeBoxDefaultSize` (`{320, 240}`) and `arg2` defaults to
 `sEntityFadeBoxDefaultOffset` (`{-100, -100}`) when the caller passes NULL — both plain
 2-word data buffers, not strings, in `asm/data/7B3F8.sdata.s`.
 
@@ -43,7 +43,7 @@ Unk100Obj *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void
     cached = this->unk100;
     if (cached == NULL) {
         if (name == NULL) {
-            name = gEntityFadeBoxDefaultSize;
+            name = sEntityFadeBoxDefaultSize;
         }
         sub = New_FadeBox(name, 0, arg4);
         if (sub == NULL) {
@@ -149,7 +149,7 @@ use the unified names: slot50 -> `detachFromParent`
 (BoxFill__AttachToParent, `this` upcast to `SceneNode *`), slotD0 ->
 `setStep` (FadeBox__SetStep; `arg3` passed `(s32)`, no code). What the
 arguments are, from the occupants: `name` is New_FadeBox's SIZE (read as
-two low halfwords into boxW/boxH; the default gEntityFadeBoxDefaultSize is
+two low halfwords into boxW/boxH; the default sEntityFadeBoxDefaultSize is
 {320, 240}), `arg2` is the attach position (BoxFill__AttachToParent's
 BoxFillPos; default {-100, -100}, the relative top-left, the same pair
 Viewport passes, gFadeBoxAttachPos) and `arg3` the fade step. The parameter names
@@ -162,6 +162,6 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Polish (round 96, bravo, track 7)
 
-- Step 3: parameters name, arg2, arg3, arg4 -> size, offset, step, pri (from what their receivers do with them: New_FadeBox's size and pri, BoxFill__AttachToParent's offset, FadeBox__SetStep's step); locals sub, m, dispatchArg2 -> box, boxMethods, attachOffset. The two defaults were renamed by tools/rename.py: gEntityDefaultPos -> gEntityFadeBoxDefaultSize (it is New_FadeBox's size, {320, 240}, not a position), gEntityDefaultOffset -> sEntityFadeBoxDefaultOffset. Tier A for both: the body substitutes each for its NULL argument.
+- Step 3: parameters name, arg2, arg3, arg4 -> size, offset, step, pri (from what their receivers do with them: New_FadeBox's size and pri, BoxFill__AttachToParent's offset, FadeBox__SetStep's step); locals sub, m, dispatchArg2 -> box, boxMethods, attachOffset. The two defaults were renamed by tools/rename.py: gEntityDefaultPos -> sEntityFadeBoxDefaultSize (it is New_FadeBox's size, {320, 240}, not a position), gEntityDefaultOffset -> sEntityFadeBoxDefaultOffset. Tier A for both: the body substitutes each for its NULL argument.
 
 - Step 5: Entity.h's comment on the two defaults said they are "both plain 2-word buffers (asm/data/7B3F8.sdata.s): {0x140, 0xF0} (320, 240)"; the comment now gives the values in decimal and the data file location lives here. The body keeps one MATCHING line for its three load-bearing locals (see the attempt log above).

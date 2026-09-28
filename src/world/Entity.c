@@ -126,7 +126,7 @@ FadeBox *Entity__GetOrCreateFadeBox(Entity *this, void *size, void *offset, void
     cached = this->fadeBox; /* MATCHING: `cached`, `boxMethods` and `attachOffset` are each load-bearing */
     if (cached == NULL) {
         if (size == NULL) {
-            size = gEntityFadeBoxDefaultSize;
+            size = sEntityFadeBoxDefaultSize;
         }
         box = New_FadeBox(size, 0, pri);
         if (box == NULL) {
