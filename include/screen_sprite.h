@@ -1,5 +1,5 @@
-#ifndef SCREENSPRITE_H
-#define SCREENSPRITE_H
+#ifndef SCREEN_SPRITE_H
+#define SCREEN_SPRITE_H
 
 #include "sprite.h"
 

@@ -14,7 +14,7 @@ Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/sprite.c`. Fr
 ## Source
 
 ```c
-#include "ScreenSprite.h"
+#include "screen_sprite.h"
 
 /* gCharSpriteMethods and gScreenSpriteMethods slot +0x04C (attachToParent): when not yet
  * attached, attach through Sprite's with a zero offset, then hand the
@@ -34,4 +34,4 @@ void ScreenSprite__AttachToParent(ScreenSprite *self, SceneNode *parent, ScreenS
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): class unified in `include/ScreenSprite.h`. Renamed from `D8006ED4C__AttachToParent`, tier A: the attachToParent slot (+0x04C). The name is the slot's: the body does attach (through the base, with a zero 3-D offset), and its one addition is handing the third argument to setPosition, recorded here rather than in the name. `self` is `ScreenSprite *`, the third argument a `ScreenSpritePos *` (SceneNode's slot types it `LongVec3 *offset`; include/ScreenSprite.h, "Not settled"). The callers' pairs are percentages: (-70, -60) at sCardIconPos and sTextEntryPanelPos, (-100, -60) at sItemListPanelPos. The Source block above is the unified spelling. Image byte-identical.
+2026-09-25, round 84 (charlie): class unified in `include/screen_sprite.h`. Renamed from `D8006ED4C__AttachToParent`, tier A: the attachToParent slot (+0x04C). The name is the slot's: the body does attach (through the base, with a zero 3-D offset), and its one addition is handing the third argument to setPosition, recorded here rather than in the name. `self` is `ScreenSprite *`, the third argument a `ScreenSpritePos *` (SceneNode's slot types it `LongVec3 *offset`; include/screen_sprite.h, "Not settled"). The callers' pairs are percentages: (-70, -60) at sCardIconPos and sTextEntryPanelPos, (-100, -60) at sItemListPanelPos. The Source block above is the unified spelling. Image byte-identical.

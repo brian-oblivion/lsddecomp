@@ -123,4 +123,4 @@ Renamed from Obj86B60__UpdateSlotElements (tools/rename.py): the class prefix. O
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-task.c's local `SlotPos` ({s32 x, y}) is gone: the positions are ScreenSprite.h's `ScreenSpritePos`, the same two words, which setPosition takes, and `TaskCoreTarget::slotPositions` is `ScreenSpritePos *` (was `u8 *`). Byte-identical.
+task.c's local `SlotPos` ({s32 x, y}) is gone: the positions are screen_sprite.h's `ScreenSpritePos`, the same two words, which setPosition takes, and `TaskCoreTarget::slotPositions` is `ScreenSpritePos *` (was `u8 *`). Byte-identical.

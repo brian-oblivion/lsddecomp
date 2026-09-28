@@ -14,7 +14,7 @@ Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/sprite.c`. Fre
 ## Source
 
 ```c
-#include "ScreenSprite.h"
+#include "screen_sprite.h"
 
 /* gCharSpriteMethods and gScreenSpriteMethods slot +0x0C0: when attached, move the sprite's
  * pivot: 0 centre, 1 left, 2 right, 3 top, 4 bottom. */
@@ -48,8 +48,8 @@ void ScreenSprite__SetPivotAnchor(ScreenSprite *self, u32 anchor) {
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): class unified in `include/ScreenSprite.h`. Renamed from `D8006ED4C__SetPivotAnchor`, tier A: the +0x0C0 slot's occupant, named `setPivotAnchor` in include/ScreenSprite.h. `self` is `ScreenSprite *` (was `Sprite *`); the accessors are unchanged, `parent` and `sprite.mx/my/w/h`. The Source block above is the unified spelling. Image byte-identical.
+2026-09-25, round 84 (charlie): class unified in `include/screen_sprite.h`. Renamed from `D8006ED4C__SetPivotAnchor`, tier A: the +0x0C0 slot's occupant, named `setPivotAnchor` in include/screen_sprite.h. `self` is `ScreenSprite *` (was `Sprite *`); the accessors are unchanged, `parent` and `sprite.mx/my/w/h`. The Source block above is the unified spelling. Image byte-identical.
 
 ## Track 7 (round 99, charlie)
 
-Case labels spelled with `enum ScreenSpriteAnchor` (include/ScreenSprite.h, added this round): CENTRE 0, LEFT 1, RIGHT 2, TOP 3, BOTTOM 4, each read off the case body (mx/my set to w/2,h/2; mx 0; mx w; my 0; my h). Byte-exact.
+Case labels spelled with `enum ScreenSpriteAnchor` (include/screen_sprite.h, added this round): CENTRE 0, LEFT 1, RIGHT 2, TOP 3, BOTTOM 4, each read off the case body (mx/my set to w/2,h/2; mx 0; mx w; my 0; my h). Byte-exact.

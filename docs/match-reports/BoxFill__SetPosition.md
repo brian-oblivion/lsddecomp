@@ -114,7 +114,7 @@ green with no errors): every use is a whole-record copy. The fields stay
 `s32` rather than becoming padding because the 4-byte alignment is what
 makes those copies `lw`/`sw` pairs.
 
-Not unified with ScreenSprite's `ScreenSpritePos` (include/ScreenSprite.h),
+Not unified with ScreenSprite's `ScreenSpritePos` (include/screen_sprite.h),
 which has the same layout: the old banner's "gTextRowMethods's layout loops
 use the same record" was already stale (TextRow's methods take
 ScreenSpritePos since round 86), and the two do not mean the same thing.
@@ -125,7 +125,7 @@ a BoxFillPos is that only while `relative` is set, and pixels after
 (task.c) passes one local SlotPos to both a BoxFill and its
 TextRows, so a single `ScreenPos` in scene_node.h is a reasonable proposal
 for the head; it cannot be done through `renametype.py` (the new name
-already exists) and would touch ScreenSprite.h and scene_node.h, outside
+already exists) and would touch screen_sprite.h and scene_node.h, outside
 this job.
 
 Image byte-identical.

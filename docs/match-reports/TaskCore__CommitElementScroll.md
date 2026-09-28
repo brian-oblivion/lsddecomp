@@ -695,4 +695,4 @@ TitleMenu's `D_80086CA8`: savedCursor 0, cursorColor (128, 128, 0), pos
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-task.c's local `SlotPos` ({s32 x, y}) is gone: the positions are ScreenSprite.h's `ScreenSpritePos`, the same two words, which setPosition takes, and `TaskCoreTarget::slotPositions` is `ScreenSpritePos *` (was `u8 *`). Byte-identical.
+task.c's local `SlotPos` ({s32 x, y}) is gone: the positions are screen_sprite.h's `ScreenSpritePos`, the same two words, which setPosition takes, and `TaskCoreTarget::slotPositions` is `ScreenSpritePos *` (was `u8 *`). Byte-identical.

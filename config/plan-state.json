@@ -1030,7 +1030,7 @@
         "gScreenSpriteMethods": {
           "class": "ScreenSprite",
           "date": "2026-09-25",
-          "header": "include/ScreenSprite.h"
+          "header": "include/screen_sprite.h"
         },
         "gSpriteMethods": {
           "class": "Sprite",

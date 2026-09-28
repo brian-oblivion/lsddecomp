@@ -32,7 +32,7 @@
 #include "pad.h"
 #include "frame_clock.h"
 #include "item_list.h"
-#include "ScreenSprite.h"
+#include "screen_sprite.h"
 #include "bmem_pmgr.h"
 #include "full_width_sjis.h"
 #include "data_source.h"
@@ -150,7 +150,7 @@ void TextEntry__SetText(TextEntry *self, char *text, s32 mode) {
 }
 
 /* LoadCardResources' data. Positions are percent of half the screen from
- * the centre (include/ScreenSprite.h). */
+ * the centre (include/screen_sprite.h). */
 
 extern char sStrComInput[];                /* "COMINPUT" */
 extern char sStrFontIcon[];                /* "FONTICON" */

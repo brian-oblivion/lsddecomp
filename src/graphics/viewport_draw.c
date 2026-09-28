@@ -44,7 +44,7 @@
 #include "bg_layer.h"
 #include "box_fill.h"
 #include "sprite.h"
-#include "ScreenSprite.h"
+#include "screen_sprite.h"
 #include "Viewport.h"
 #include "tmd_renderer.h"
 

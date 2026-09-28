@@ -304,7 +304,7 @@ cross-unit sibling with the same call skeleton first.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (ItemListHandle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&sItemListPanelRect, 0)`: sItemListPanelRect is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position sItemListPanelPos = (-100, -60). Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/screen_sprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (ItemListHandle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&sItemListPanelRect, 0)`: sItemListPanelRect is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position sItemListPanelPos = (-100, -60). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88)
 
@@ -341,4 +341,4 @@ Data this function reads, renamed with tools/rename.py:
 The path buffer's 0x20 is `CARD_TIM_PATH_SIZE` (32, unit-local). The two
 data externs are typed as what they are (`SpriteRect`, `ScreenSpritePos`,
 were `s32`), so the rect needs no cast; the position keeps its `LongVec3 *`
-cast, which SceneNode's attachToParent slot demands (include/ScreenSprite.h).
+cast, which SceneNode's attachToParent slot demands (include/screen_sprite.h).

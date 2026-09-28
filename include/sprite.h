@@ -11,7 +11,7 @@
  * screen-space for 0x144 (ScreenSprite and below), otherwise world-space,
  * projected from the inherited coordinate. Methods in src/graphics/sprite.c; four
  * classes derive from it (`typeviews.py --tree`): ScreenSprite (0x144, the
- * screen-space sprite, include/ScreenSprite.h), CharSprite (0x1144, one 8x8
+ * screen-space sprite, include/screen_sprite.h), CharSprite (0x1144, one 8x8
  * font character, include/char_sprite.h), TextRow (0x11144) and gVariantSpriteMethods (0x1F44,
  * dream_scene/q/t).
  *

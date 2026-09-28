@@ -152,7 +152,7 @@ or cache-fill.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern (which typed the return `ChildObj86ED0 *`) is gone. The call reads `newVal = (Class86E00Unk70Obj_3bb8c_g *)New_ScreenSprite(handle, (SpriteRect *)&sCardIconRect, 0)`: sCardIconRect is the rect (words 0, 160, 120). The unit's baseline "assignment from incompatible pointer type" was this line and is gone. `cardIcon`'s type, Class86E00Unk70Obj_3bb8c_g, is Class86E00's view of a ScreenSprite (release at +0x004, attachToParent at +0x04C with the screen position sCardIconPos = (-70, -60)); it is Class86E00's field and is left as it is. Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/screen_sprite.h`; the unit includes it and its local extern (which typed the return `ChildObj86ED0 *`) is gone. The call reads `newVal = (Class86E00Unk70Obj_3bb8c_g *)New_ScreenSprite(handle, (SpriteRect *)&sCardIconRect, 0)`: sCardIconRect is the rect (words 0, 160, 120). The unit's baseline "assignment from incompatible pointer type" was this line and is gone. `cardIcon`'s type, Class86E00Unk70Obj_3bb8c_g, is Class86E00's view of a ScreenSprite (release at +0x004, attachToParent at +0x04C with the screen position sCardIconPos = (-70, -60)); it is Class86E00's field and is left as it is. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88)
 

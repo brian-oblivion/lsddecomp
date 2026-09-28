@@ -1,7 +1,7 @@
 #ifndef CHAR_SPRITE_H
 #define CHAR_SPRITE_H
 
-#include "ScreenSprite.h"
+#include "screen_sprite.h"
 
 /*
  * CharSprite -- one character of an 8x8 font (class id 0x1144, method table

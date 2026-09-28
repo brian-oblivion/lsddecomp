@@ -153,7 +153,7 @@ three-value swap was resolved by touching only the non-persistent one.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&sTextEntryPanelRect, 0)`: sTextEntryPanelRect is the rect (words 0, 224, 120), and unk48's +0x04C call passes the screen position sTextEntryPanelPos = (-70, -60). Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/screen_sprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&sTextEntryPanelRect, 0)`: sTextEntryPanelRect is the rect (words 0, 224, 120), and unk48's +0x04C call passes the screen position sTextEntryPanelPos = (-70, -60). Image byte-identical.
 
 2026-09-26, round 86 (bravo): CharSprite (class 0x1144, formerly D_8006EC74) is unified in `include/char_sprite.h`. The local `extern ChildObj86ED0 *New_CharSprite(ChildObj86ED0 *, s32)` is gone; the unit includes the header and casts the result to `unk40`'s `ChildObj86ED0 *`, as it does for New_ScreenSprite. The 0x5F cell it asks for on FONTICON.TIM is '_', one of the facts behind the class name. Image byte-identical.
 

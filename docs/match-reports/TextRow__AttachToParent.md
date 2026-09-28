@@ -220,7 +220,7 @@ advances), not for that specific guess.
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/char_sprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->attachToParent((CharSprite *)self, (SceneNode *)a1, (LongVec3 *)a2)`, through the prototyped inherited slot (was the unprototyped `slot4C`); the argument casts are to SceneNode's slot types, and its occupant, ScreenSprite__AttachToParent, reads the third as a ScreenSpritePos (ScreenSprite.h, "Not settled"). No code. Image byte-identical.
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/char_sprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->attachToParent((CharSprite *)self, (SceneNode *)a1, (LongVec3 *)a2)`, through the prototyped inherited slot (was the unprototyped `slot4C`); the argument casts are to SceneNode's slot types, and its occupant, ScreenSprite__AttachToParent, reads the third as a ScreenSpritePos (screen_sprite.h, "Not settled"). No code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 

@@ -51,7 +51,7 @@
 #include "basic_class.h"
 #include "pad.h"
 #include "frame_clock.h"
-#include "ScreenSprite.h"
+#include "screen_sprite.h"
 #include "TextEntry.h"
 #include "item_list.h"
 #include "bmem_pmgr.h"

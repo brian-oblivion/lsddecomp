@@ -14,7 +14,7 @@ Round 82, runner alpha (third re-staffed slot of the round). Unit `src/graphics/
 ## Source
 
 ```c
-#include "ScreenSprite.h"
+#include "screen_sprite.h"
 
 /* gCharSpriteMethods and gScreenSpriteMethods slot +0x0BC. */
 void ScreenSprite__SetPosition(ScreenSprite *self, ScreenSpritePos *pos) {
@@ -30,4 +30,4 @@ void ScreenSprite__SetPosition(ScreenSprite *self, ScreenSpritePos *pos) {
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): class unified in `include/ScreenSprite.h`. Renamed from `D8006ED4C__SetPosition`, and the tier is now A: the +0x0BC slot's occupant, named `setPosition` in include/ScreenSprite.h. What `screenPos` is is settled by its reader, Viewport__DrawNode (viewport_draw.c): for `(tag & 0xFFF) == 0x144` it sets the GsSPRITE's x/y to `(half screen size * 100) / (10000 / screenPos)`, i.e. percent of half the screen, plus the pivot. `self` is `ScreenSprite *`, `pos` a `ScreenSpritePos *` (the former Pair_322b4, the same 8-byte two-word struct, so the lw,lw,sw,sw copy is unchanged). The Source block above is the unified spelling. Image byte-identical.
+2026-09-25, round 84 (charlie): class unified in `include/screen_sprite.h`. Renamed from `D8006ED4C__SetPosition`, and the tier is now A: the +0x0BC slot's occupant, named `setPosition` in include/screen_sprite.h. What `screenPos` is is settled by its reader, Viewport__DrawNode (viewport_draw.c): for `(tag & 0xFFF) == 0x144` it sets the GsSPRITE's x/y to `(half screen size * 100) / (10000 / screenPos)`, i.e. percent of half the screen, plus the pivot. `self` is `ScreenSprite *`, `pos` a `ScreenSpritePos *` (the former Pair_322b4, the same 8-byte two-word struct, so the lw,lw,sw,sw copy is unchanged). The Source block above is the unified spelling. Image byte-identical.
