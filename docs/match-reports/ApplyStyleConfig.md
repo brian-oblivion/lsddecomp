@@ -16,7 +16,7 @@ splat into two adjacent labels `sStyleConfig`/`gStyleKind2AltColor` purely becau
 something else references the middle of it -- the object is one 0x20-byte
 struct). Then does its own separate raw-byte read of `cfg[1]`/`cfg[2]`: if
 `cfg[1] >= 4`, stores a `gStylePalette[cfg[2]]` colour-table entry pointer into
-`gStyleDecorColor`. Always returns `&sStyleConfig`.
+`sStyleDecorColor`. Always returns `&sStyleConfig`.
 
 ```c
 struct StyleM;   /* forward tag; full definition stays where it already is,
@@ -27,7 +27,7 @@ extern s8 *sStyleStageConfigs[];
 extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
 extern u8 gStylePalette[][3];
-extern const u8 *gStyleDecorColor;
+extern const u8 *sStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
     s8 *cfg = sStyleStageConfigs[gStyleStage];
@@ -37,7 +37,7 @@ void *ApplyStyleConfig(void) {
     }
     FillStyleFromConfig((struct StyleM *) &sStyleConfig, cfg);
     if (cfg[1] >= 4) {
-        gStyleDecorColor = gStylePalette[cfg[2]];
+        sStyleDecorColor = gStylePalette[cfg[2]];
     }
     return &sStyleConfig;
 }
@@ -51,7 +51,7 @@ First attempt wrote the natural-looking guard form:
 if (cfg[1] < 4) {
     return &sStyleConfig;
 }
-gStyleDecorColor = gStylePalette[cfg[2]];
+sStyleDecorColor = gStylePalette[cfg[2]];
 return &sStyleConfig;
 ```
 

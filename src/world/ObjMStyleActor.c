@@ -1154,7 +1154,7 @@ extern StyleStageConfig *sStyleStageConfigs[];
 extern void *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg);
 extern u8 gStylePalette[][3];
-extern const u8 *gStyleDecorColor;
+extern const u8 *sStyleDecorColor;
 
 /* The stage's fixed config, or with none PickStyleFallbackConfig's, into
  * sStyleConfig, whose first three words (the StageMap's light settings)
@@ -1167,7 +1167,7 @@ void *ApplyStyleConfig(void) {
     }
     FillStyleFromConfig(&sStyleConfig, cfg);
     if (cfg->fogLevel >= STYLE_DECOR_FOG_LEVEL) {
-        gStyleDecorColor = gStylePalette[cfg->farColorIndex];
+        sStyleDecorColor = gStylePalette[cfg->farColorIndex];
     }
     return &sStyleConfig;
 }
@@ -1202,8 +1202,8 @@ extern BoxFillPos sStyleDecorBoxPos; /* (-100, -100), as Viewport's own fade box
 void ApplyStyleDecorationIfSet(void) {
     SceneNode *fadeBox;
 
-    if (gStyleDecorColor != 0) {
-        gStyleDecorObj = (s32)New_BoxFill(sStyleDecorBoxSize, (BoxFillRgb *)gStyleDecorColor, 0);
+    if (sStyleDecorColor != 0) {
+        gStyleDecorObj = (s32)New_BoxFill(sStyleDecorBoxSize, (BoxFillRgb *)sStyleDecorColor, 0);
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTransOn((BoxFill *)gStyleDecorObj, 1);
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTransRate((BoxFill *)gStyleDecorObj, 0);
 
@@ -1280,14 +1280,14 @@ void ApplyStyleDecorationIfSet(void) {
 #define STYLE_DECOR_B_PALETTE_INDEX 18
 
 
-extern const u8 *gStyleDecorColor;
+extern const u8 *sStyleDecorColor;
 extern s32 gStyleDecorObj; /* a BoxFill */
 
 /* Releases the decoration box, if ApplyStyleDecorationIfSet made one. */
 void StyleFlushDecoration(void) {
-    if (gStyleDecorColor != 0) {
+    if (sStyleDecorColor != 0) {
         ((BoxFill *)gStyleDecorObj)->methods->release((BoxFill *)gStyleDecorObj);
-        gStyleDecorColor = 0;
+        sStyleDecorColor = 0;
     }
 }
 

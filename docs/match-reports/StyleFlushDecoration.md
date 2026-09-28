@@ -13,7 +13,7 @@ no `mflo`/`mfhi` hazard, not a trampoline).
 ## Derivation
 
 ```
-/* 44F14 80054714 4C03828F */  lw    $v0, %gp_rel(gStyleDecorColor)($gp)
+/* 44F14 80054714 4C03828F */  lw    $v0, %gp_rel(sStyleDecorColor)($gp)
 /* 44F18 80054718 E8FFBD27 */  addiu $sp, $sp, -0x18
 /* 44F1C 8005471C 0A004010 */  beqz  $v0, .L80054748
 /* 44F20 80054720 1000BFAF */   sw   $ra, 0x10($sp)
@@ -21,15 +21,15 @@ no `mflo`/`mfhi` hazard, not a trampoline).
 /* 44F2C 8005472C 0000828C */  lw    $v0, 0x0($a0)
 /* 44F34 80054734 0400428C */  lw    $v0, 0x4($v0)
 /* 44F3C 8005473C 09F84000 */  jalr  $v0
-/* 44F44 80054744 4C0380AF */  sw    $zero, %gp_rel(gStyleDecorColor)($gp)
+/* 44F44 80054744 4C0380AF */  sw    $zero, %gp_rel(sStyleDecorColor)($gp)
 .L80054748:
 ...
 jr $ra
 ```
 
-`gStyleDecorColor` is a `.sdata` pointer, already established in
-`src/world/ObjMStyleActor.c` as `extern const u8 *gStyleDecorColor;`, and used there as an
-actual colour-table pointer (`gStyleDecorColor = gStylePalette[cfg[2]];`). Here it is
+`sStyleDecorColor` is a `.sdata` pointer, already established in
+`src/world/ObjMStyleActor.c` as `extern const u8 *sStyleDecorColor;`, and used there as an
+actual colour-table pointer (`sStyleDecorColor = gStylePalette[cfg[2]];`). Here it is
 only ever tested against zero, so it reads as a one-shot "pending" flag on
 top of the same storage. `gStyleDecorObj` is that unit's `LocalM4D0Obj *`
 (round 15's own local type, unrelated to this unit) with named slots at
@@ -49,13 +49,13 @@ struct ObjAB54 {
     ObjAB54Methods *methods; /* +0x000 */
 };
 
-extern const u8 *gStyleDecorColor;
+extern const u8 *sStyleDecorColor;
 extern s32 gStyleDecorObj;
 
 void StyleFlushDecoration(void) {
-    if (gStyleDecorColor != 0) {
+    if (sStyleDecorColor != 0) {
         ((ObjAB54 *) gStyleDecorObj)->methods->slot4((ObjAB54 *) gStyleDecorObj);
-        gStyleDecorColor = 0;
+        sStyleDecorColor = 0;
     }
 }
 ```
@@ -76,11 +76,11 @@ already well covered by existing entries on struct-offset mistakes.
 
 **`StyleFlushDecoration`, tier B.**
 
-Guards `gStyleDecorColor` (formerly `D_8008AB54`), dispatches
+Guards `sStyleDecorColor` (formerly `D_8008AB54`), dispatches
 `gStyleDecorObj->methods->slot4()`, then clears the guard -- the same
 test/dispatch/clear shape as `StyleReleaseDecorSet`/`StyleReleaseEffectSlots`
 below (all three called together, in this order, from `StyleTeardown`).
-`gStyleDecorColor` and `gStyleDecorObj` are both established members of
+`sStyleDecorColor` and `gStyleDecorObj` are both established members of
 ObjMStyleActor.c's already-named "Style" subsystem
 (`RegisterStyleConfig`/`ApplyStyleConfig`/`ApplyStyleDecorationIfSet`, round
 69) -- that cross-unit naming is the evidence for the `Style` prefix, not a

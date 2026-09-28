@@ -7,9 +7,9 @@ before this round.
 
 ## What it does
 
-Takes no arguments; gated entirely on the global `gStyleDecorColor` (set by
+Takes no arguments; gated entirely on the global `sStyleDecorColor` (set by
 `ApplyStyleConfig`, matched earlier this round). If it's non-NULL: builds an
-object via `New_BoxFill(&sStyleDecorBoxSize, gStyleDecorColor, 0)` (already known
+object via `New_BoxFill(&sStyleDecorBoxSize, sStyleDecorColor, 0)` (already known
 elsewhere as returning `ClassEAC0Obj *` from `include/Task.h`, a header
 this unit doesn't own -- see below), stashes it in `gStyleDecorObj`, and
 dispatches three method calls on it (`slot64(obj,1)`, `slot68(obj,0)`,
@@ -57,8 +57,8 @@ extern LocalM4D0Obj *New_BoxFill(void *a0, void *a1, s32 a2);
 void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
-    if (gStyleDecorColor != 0) {
-        gStyleDecorObj = (s32) New_BoxFill(&sStyleDecorBoxSize, (void *) gStyleDecorColor, 0);
+    if (sStyleDecorColor != 0) {
+        gStyleDecorObj = (s32) New_BoxFill(&sStyleDecorBoxSize, (void *) sStyleDecorColor, 0);
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot64((LocalM4D0Obj *) gStyleDecorObj, 1);
         ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot68((LocalM4D0Obj *) gStyleDecorObj, 0);
 
@@ -126,7 +126,7 @@ logic, only a different way of naming the same values.
 
 ## Naming
 
-**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `gStyleDecorColor` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_BoxFill`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`gStyleSceneRefs`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.
+**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `sStyleDecorColor` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_BoxFill`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`gStyleSceneRefs`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
@@ -163,7 +163,7 @@ copies; retyping the `gStyleSceneRefs` global from `s32` to
 | `D_8008AB58` | `sStyleDecorBoxPos` | A | (-100, -100), the box's attachToParent position; now declared `BoxFillPos`, no cast (Viewport places its own fade box there) |
 | `D_8008AB60` | `sStyleDecorBoxSize` | A | (320, 240), New_BoxFill's size pair; now `s32[2]` |
 
-The colour goes in as `(BoxFillRgb *)gStyleDecorColor` (BoxFill.h's
+The colour goes in as `(BoxFillRgb *)sStyleDecorColor` (BoxFill.h's
 record, this round) instead of `(void *)`. Zero bytes. The comment "(track
 4b's to retype)" on gStyleDecorObj is gone; the declaration says it holds
 a BoxFill *.
