@@ -38,7 +38,6 @@ TmdModel: warning: `size' might be used uninitialized in this function
 TmdModel: warning: unused variable `unused'
 TodActor: warning: unused variable `unused'
 ViewportDraw: warning: unused variable `scr'
-libcd_bios: warning: passing arg 2 of `CD_cw' makes integer from pointer without a cast
 libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop: warning: unused variable `unused'
 libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop: warning: unused variable `unused'
 libsnd_vmanager: warning: comparison between signed and unsigned

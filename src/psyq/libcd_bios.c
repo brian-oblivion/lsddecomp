@@ -22,42 +22,117 @@
  */
 #include "common.h"
 
-/* getintr -- CD-ROM interrupt-cause dispatcher.  This is libcd's
- * bios.c `getintr` (build 1.71, 1995-12, on no SDK disc, so it cannot be
- * linked as an object -- docs/research/psyq-sdk-objects.md) and is matched
- * as C instead.  Declarations are this unit's own view. */
+#include <libetc.h>
+#include <stdio.h>
+
+/* A CD interrupt callback, as the driver calls it: the interrupt's status
+ * byte and the 8-byte result it read. */
+typedef void (*CdIntrCallback)(u8 status, u8 *result);
+
+/* bios.o's named globals. CD_status and CD_status1 are the first two
+ * response bytes of the last interrupt; CD_nopen counts shell openings. */
+extern CdIntrCallback CD_cbsync;  /* called on a command's completion */
+extern CdIntrCallback CD_cbready; /* called when data is ready */
+extern CdIntrCallback CD_cbread;  /* called when a CD_readm read ends */
+extern s32 CD_debug;              /* diagnostic print level */
+extern s32 CD_status;
 extern s32 CD_status1;
 extern s32 CD_nopen;
-extern u8 CD_com;
-extern s32 D_8006D6C0[]; /* 0/1 flag table, selector 0..0x1B, same index family as CD_comstr */
-extern s32 D_8006D7C0[]; /* 0/1 flag table, selector 0..0x1B */
+extern u8 CD_pos[4];      /* the position CdlSetloc (command 2) last set */
+extern u8 CD_mode;        /* the mode CdlSetmode (command 0xE) last set */
+extern u8 CD_com;         /* the command last issued */
+extern char *CD_comstr[]; /* each command's name, for the diagnostics */
+extern char *CD_intstr[]; /* each interrupt state's name */
 
-extern s32 CD_status; /* last status byte (resp[0]) */
-extern s32 CD_debug;
-extern char *CD_comstr[];
+/* bios.o's unnamed per-command tables, 32 words each, indexed by the
+ * command. CD_cw reads D_8006D840 both directly and as
+ * D_8006D740[cmd + 0x40] (docs/match-reports/CD_cw.md). */
+extern s32 D_8006D6C0[]; /* nonzero: a second interrupt, not the acknowledge, completes the command */
+extern s32 D_8006D740[]; /* nonzero: issuing the command clears the ready state */
+extern s32 D_8006D7C0[]; /* nonzero: the command's acknowledge interrupt updates CD_status */
+extern s32 D_8006D840[]; /* the number of parameter bytes the command takes */
 
-/* CD-ROM controller port pointers. */
-extern volatile u8 *D_8006D8C0;
-extern volatile u8 *D_8006D8C4;
-extern volatile u8 *D_8006D8C8;
-extern volatile u8 *D_8006D8CC;
-extern u8 D_8006D8D8[2];
+/* Pointers to the hardware registers the driver uses. */
+extern volatile u8 *D_8006D8C0;  /* 0x1F801800, the CD-ROM controller's index/status port */
+extern volatile u8 *D_8006D8C4;  /* 0x1F801801 */
+extern volatile u8 *D_8006D8C8;  /* 0x1F801802 */
+extern volatile u8 *D_8006D8CC;  /* 0x1F801803 */
+extern volatile s32 *D_8006D8D0; /* 0x1F801020, the common bus delay */
+extern volatile u16 *D_8006D8D4; /* 0x1F801C00, the SPU's register block, indexed by halfword */
+extern volatile s32 *D_8006D924; /* 0x1F801018, the CD-ROM bus delay */
+extern volatile s32 *D_8006D928; /* 0x1F8010F0, the DMA control register */
+extern volatile s32 *D_8006D92C; /* 0x1F8010B0, DMA channel 3 (CD-ROM): address */
+extern volatile s32 *D_8006D930; /* 0x1F8010B4, block control */
+extern volatile s32 *D_8006D934; /* 0x1F8010B8, channel control */
+
+/* The state getintr leaves for each kind of interrupt: [0] sync, [1] ready,
+ * [2] the second ready flag CD_ready tests. The functions that store [1]
+ * and [2] directly do it through their own symbols. */
+extern u8 D_8006D8D8[3];
 extern volatile u8 D_8006D8D9;
 extern volatile u8 D_8006D8DA;
 
-/* Per-cause last-response mailboxes, 8 bytes each, contiguous. */
+/* The read state machine (CD_readm, cd_read_retry, cb_read). */
+extern s32 D_8006D8A4;     /* CD_set_test_parmnum's word */
+extern s32 D_8006D8DC[10]; /* first of 10 consecutive words zeroed by a pointer walk;
+                            * D_8006D8E0..D_8006D904 are the other nine, each
+                            * already individually named -- not a real array. */
+extern s32 D_8006D8E0;
+extern s32 D_8006D8E4;
+extern volatile s32 D_8006D8E8;
+extern volatile s32 D_8006D8EC;
+extern volatile s32 D_8006D8F0;
+extern volatile s32 D_8006D8F4;
+extern s32 D_8006D8F8;
+extern CdIntrCallback D_8006D8FC; /* CD_cbsync, saved while a read runs */
+extern CdIntrCallback D_8006D900; /* CD_cbready, saved while a read runs */
+extern s32 D_8006D904;
+extern u8 D_8006D908[];
+extern u8 D_8006D90C[];
+
+/* Each interrupt's 8-byte result: sync, ready, and the second ready. */
 extern u8 D_8008B3CC[];
 extern u8 D_8008B3D4[];
 extern u8 D_8008B3DC[];
 
-extern void puts(const char *arg0);
-extern void printf(const char *fmt, ...);
+/* The timeout of the wait in progress: its deadline in VSync ticks, a spin
+ * count, and the waiting function's name for the diagnostic. */
+extern s32 D_8008B3E4;
+extern s32 D_8008B3E8;
+extern char *D_8008B3EC;
 
-/* Debug/log strings, all in FD8.rodata, referenced as symbols. */
-extern const char D_800109B0[]; /* "DiskError: " */
-extern const char D_800109BC[]; /* "com=%s,code=(%02x:%02x)\n" */
-extern const char D_800109D8[]; /* "CDROM: unknown intr" */
-extern const char D_800109EC[]; /* "(%d)\n" */
+/* Diagnostic strings. */
+extern char D_80010984[];
+extern char D_80010994[];
+extern char D_800109B0[]; /* "DiskError: " */
+extern char D_800109BC[]; /* "com=%s,code=(%02x:%02x)\n" */
+extern char D_800109D8[]; /* "CDROM: unknown intr" */
+extern char D_800109EC[]; /* "(%d)\n" */
+extern char D_80010A14[]; /* "CD_ready" */
+extern char D_80010A20[]; /* "%s...\n" */
+extern char D_80010A28[]; /* "%s: no param\n" */
+extern char D_80010A38[]; /* "CD_cw" */
+extern char D_80010A40[];
+extern char D_80010A50[];
+extern char D_80010A94[];
+extern char D_80010AA0[];
+extern char D_80010AAC[];
+extern char D_80010ABC[];
+extern char D_80010AD8[];
+extern char D_80010AE0[];
+
+/* libetc's intr.o; <libetc.h> does not declare it. */
+extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void);
+
+/* This file's own functions, used before their definitions. */
+s32 getintr(void);
+s32 CD_sync(s32 arg0, s32 arg1);
+s32 CD_cw(s32 arg0, u8 *arg1, u8 *arg2, s32 arg3);
+void CD_flush(void);
+s32 cd_read_retry(void);
+s32 CD_datasync(s32 arg0);
+void callback(void);
+void cb_read(s32 arg0, s32 arg1);
 
 /* 8-byte response copy with a null guard on dst (2.6.3 does not fold
  * `&array != NULL`). MATCHING: an inline function, not a do{}while(0)
@@ -173,37 +248,11 @@ s32 getintr(void) {
 
 INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_sync);
 
-/* CD_ready's near-miss body, kept for reading: a stall, 2 words short
+#ifdef NON_MATCHING
+/* NON_MATCHING: 178 words against retail's 180
  * (docs/match-reports/CD_ready.md). */
-#if 0
-extern s32 CD_debug;
-extern u8 CD_com;
-extern const char *CD_comstr[];
-extern const char *CD_intstr[];
-
-extern volatile u8 *D_8006D8C0;
-extern u8 D_8006D8D8[3];
-
-extern s32 D_8008B3E4;
-extern s32 D_8008B3E8;
-extern const char *D_8008B3EC;
-extern u8 D_8008B3CC[];
-extern u8 D_8008B3D4[];
-extern u8 D_8008B3DC[];                /* 8-byte record, this function's second flag's snapshot buffer */
-
-extern void (*CD_cbready)(s32 arg0, void *arg1);
-extern void (*CD_cbsync)(s32 arg0, void *arg1);
-
-extern void CD_flush(void);
-extern s32 getintr(void);
-
-extern const char D_80010984[];
-extern const char D_80010994[];
-extern const char D_80010A14[];        /* "CD_ready" */
-
-s32 CD_ready(s32 arg0, s32 arg1)
-{
-    const char **table;
+s32 CD_ready(s32 arg0, s32 arg1) {
+    char **table;
     u8 *state;
     u8 *state1;
     u8 *state2;
@@ -234,16 +283,15 @@ s32 CD_ready(s32 arg0, s32 arg1)
         if (counter <= 0x1E0000) {
             goto success;
         }
-timeout:
+    timeout:
         puts(D_80010984);
-        printf(D_80010994, D_8008B3EC, CD_comstr[CD_com],
-                      table[state[0]], table[state[1]]);
+        printf(D_80010994, D_8008B3EC, CD_comstr[CD_com], table[state[0]], table[state[1]]);
         CD_flush();
         result = -1;
         goto skip_timeout;
-success:
+    success:
         result = 0;
-skip_timeout:
+    skip_timeout:
         if (result != 0) {
             return result;
         }
@@ -285,10 +333,10 @@ skip_timeout:
             dst++;
             src++;
         }
-ret2:
+    ret2:
         return flag2;
 
-checkFlag1:
+    checkFlag1:
         flag1 = state2[-1];
         if (flag1 == 0) {
             continue;
@@ -305,59 +353,21 @@ checkFlag1:
             dst++;
             src++;
         }
-ret1:
+    ret1:
         return flag1;
     } while (arg0 == 0);
 
     return 0;
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_ready);
+#endif
 
-/* CD_cw's near-miss body, kept for reading: a stall, length exact
- * (docs/match-reports/CD_cw.md). */
-#if 0
-extern s32 CD_debug;
-extern u8 CD_mode;
-extern u8 CD_com;
-extern const char *CD_comstr[];
-extern const char *CD_intstr[];
-extern u8 CD_pos[4];               /* 4-byte record, written here for cmd == 2 */
-extern s32 D_8006D740[];               /* flag table, indexed by cmd; cmd+0x40 reaches the "needs param" table's
-                                         * memory (see the addressing note in the match report) -- do NOT re-split
-                                         * this into a second D_8006D840[cmd] access for the cmd+0x40 case */
-extern s32 D_8006D840[];               /* "does this command need a param" flag table, indexed by cmd; ONLY
-                                         * correct as a direct access at its own (non-+0x40) call site */
-
-extern volatile u8 *D_8006D8C0;
-extern volatile u8 *D_8006D8C4;
-extern volatile u8 *D_8006D8C8;
-extern volatile u8 D_8006D8D8[3];      /* volatile here and on state/state1
-                                         * below brings the body closer to CD_cw */
-extern u8 D_8006D8D9;
-
-extern s32 D_8008B3E4;
-extern s32 D_8008B3E8;
-extern const char *D_8008B3EC;
-extern u8 D_8008B3CC[];
-extern u8 D_8008B3D4[];
-
-extern void (*CD_cbready)(s32 arg0, void *arg1);
-extern void (*CD_cbsync)(s32 arg0, void *arg1);
-
-extern void CD_flush(void);
-extern s32 getintr(void);
-extern s32 CD_sync(s32 arg0, s32 arg1);          /* defined earlier in this unit, ROM order */
-
-extern const char D_80010984[];
-extern const char D_80010994[];
-extern const char D_80010A20[];        /* "%s...\n" */
-extern const char D_80010A28[];        /* "%s: no param\n" */
-extern const char D_80010A38[];        /* "CD_cw" */
-
-s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
-{
-    const char **table;
+#ifdef NON_MATCHING
+/* NON_MATCHING: 284 words against retail's 282; the report records a
+ * length-exact body (docs/match-reports/CD_cw.md). */
+s32 CD_cw(s32 arg0, u8 *arg1, u8 *arg2, s32 arg3) {
+    char **table;
     volatile u8 *state;
     volatile u8 *state1;
     s32 counter;
@@ -389,7 +399,7 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
         }
     }
 
-    D_8006D8D8[0] = 0;
+    ((volatile u8 *)D_8006D8D8)[0] = 0;
 
     if (D_8006D740[arg0 & 0xFF] != 0) {
         D_8006D8D9 = 0;
@@ -427,17 +437,16 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
             if (counter <= 0x1E0000) {
                 goto success3;
             }
-timeout3:
+        timeout3:
             puts(D_80010984);
             src = table[state[1]];
-            printf(D_80010994, D_8008B3EC, CD_comstr[CD_com],
-                          table[state[0]], src);
+            printf(D_80010994, D_8008B3EC, CD_comstr[CD_com], table[state[0]], src);
             CD_flush();
             result = -1;
             goto skip_timeout3;
-success3:
+        success3:
             result = 0;
-skip_timeout3:
+        skip_timeout3:
             if (result != 0) {
                 return result;
             }
@@ -464,7 +473,7 @@ skip_timeout3:
         } while (*state == 0);
     }
 
-    if (D_8006D8D8[0] == 2 && (arg0 & 0xFF) == 0xE) {
+    if (((volatile u8 *)D_8006D8D8)[0] == 2 && (arg0 & 0xFF) == 0xE) {
         CD_mode = *(u8 *)arg1;
     }
 
@@ -478,94 +487,12 @@ skip_timeout3:
         }
     }
 
-    return (D_8006D8D8[0] == 5) ? -1 : 0;
+    return (((volatile u8 *)D_8006D8D8)[0] == 5) ? -1 : 0;
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_cw);
+#endif
 
-/* Driver state: plain scalar and pointer globals, not object fields. */
-
-extern s32 D_8006D8A4;
-extern s32 CD_cbsync;
-extern s32 CD_cbready;
-extern s32 CD_cbread;
-extern s32 CD_status;
-extern s32 CD_status1;
-extern s32 CD_nopen;
-extern u8 CD_pos;
-extern u8 D_8006D619;
-extern u8 D_8006D61A;
-extern u8 CD_mode;
-extern u8 CD_com;
-extern s32 CD_intstr[]; /* lookup table, indexed by a byte field << 2 */
-
-extern volatile u8 *D_8006D8C0;
-extern volatile u8 *D_8006D8C4;
-extern volatile u8 *D_8006D8C8;
-extern volatile u8 *D_8006D8CC;
-extern volatile s32 *D_8006D8D0;
-extern volatile u16 *D_8006D8D4; /* HW register block; offsets are byte offsets */
-extern u8 D_8006D8D8[2];
-extern u8 D_8006D8D9;
-extern volatile u8 D_8006D8DA;
-extern s32 D_8006D8DC[10]; /* first of 10 consecutive words zeroed by a pointer walk;
-                          * D_8006D8E0..D_8006D900 are the other nine, each
-                          * already individually named -- not a real array. */
-extern s32 D_8006D8E0;
-extern s32 D_8006D8E4;
-extern volatile s32 D_8006D8E8;
-extern volatile s32 D_8006D8EC;
-extern volatile s32 D_8006D8F0;
-extern volatile s32 D_8006D8F4;
-extern s32 D_8006D8F8;
-extern s32 D_8006D8FC;
-extern s32 D_8006D900;
-extern s32 D_8006D904;
-extern u8 D_8008B3CC[];
-extern u8 D_8008B3D4[];
-extern s32 D_8008B3E4;
-extern s32 D_8008B3E8;
-extern s32 D_8008B3EC;
-extern u8 D_80010AE0[];
-extern u8 D_80010AD8[];
-extern u8 D_80010984[];
-extern u8 D_80010994[];
-extern u8 D_80010A40[];
-extern u8 D_80010A50[];
-extern u8 D_80010A94[];
-extern u8 D_80010AA0[];
-extern u8 D_80010AAC[];
-extern u8 D_80010ABC[];
-extern u8 D_8006D908[];
-extern u8 D_8006D90C[];
-extern volatile s32 *D_8006D924;
-extern volatile s32 *D_8006D928;
-extern volatile s32 *D_8006D92C;
-extern volatile s32 *D_8006D930;
-extern volatile s32 *D_8006D934;
-
-/* Defined in other objects. */
-extern void ResetCallback(void);                                          /* lib/libetc/intr.o */
-extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void); /* lib/libetc/intr.o, per libsnd_ssinit.c */
-extern s32 VSync(s32 arg0);                                               /* asm/psyq_15d04.s */
-extern void puts(const char *arg0);                                       /* asm/psyq_15d04.s */
-extern void printf(const char *fmt, ...);                                 /* Psy-Q printf wrapper */
-extern s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3); /* defined in libcd_bios */
-extern s32 CD_sync(s32 arg0, s32 arg1); /* defined in libcd_bios, per libcd_bios.c */
-extern s32 getintr(void);               /* defined above */
-extern s32 CheckCallback(void);         /* lib/libetc/intr.o -- trivial
-                                                                   (u16)D_8006C272 getter */
-/* Defined below as INCLUDE_ASM, which gives no C prototype, and called
- * before that. */
-extern s32 cd_read_retry(void);
-extern s32 CD_datasync(s32 arg0);
-
-/* Forward declarations: taken by address before their own ROM-order definition
- * further down this file (CD_initintr/CD_init hand callback to
- * InterruptCallback as a thread entry; cd_read_retry hands cb_read to
- * CD_cbready as a callback). */
-void callback(void);
-void cb_read(s32 arg0, s32 arg1);
 
 s32 CD_vol(u8 *arg0) {
     *D_8006D8C0 = 2;
@@ -579,7 +506,7 @@ s32 CD_vol(u8 *arg0) {
 }
 
 void CD_shell(void) {
-    s32 saved;
+    CdIntrCallback saved;
     s32 counter = 0;
 
     if (D_8006D904 < CD_nopen) {
@@ -678,7 +605,7 @@ s32 CD_init(void) {
     s32 *p;
     s32 i;
     volatile u8 *q;
-    s32 saved;
+    CdIntrCallback saved;
     s32 counter;
 
     puts(D_80010A94);
@@ -690,7 +617,7 @@ s32 CD_init(void) {
     CD_cbsync = 0;
     CD_status1 = 0;
     CD_status = 0;
-    p = &D_8006D8DC;
+    p = D_8006D8DC;
     for (i = 9; i != -1; i--) {
         *p = 0;
         p++;
@@ -785,10 +712,10 @@ s32 cd_read_retry(void) {
             if (*pRetry < 7) {
                 counter = 0;
                 puts(D_80010AAC);
-                printf(D_80010ABC, *pRetry, CD_pos, D_8006D619, D_8006D61A);
+                printf(D_80010ABC, *pRetry, CD_pos[0], CD_pos[1], CD_pos[2]);
 
                 if (D_8006D904 < CD_nopen) {
-                    saved = CD_cbsync;
+                    saved = (s32)CD_cbsync;
                     CD_cbsync = 0;
 
                     while (CD_status & 0x10) {
@@ -804,14 +731,14 @@ s32 cd_read_retry(void) {
                         puts(D_80010A50);
                     }
 
-                    CD_cbsync = saved;
+                    CD_cbsync = (CdIntrCallback)saved;
                     D_8006D904 = CD_nopen;
                 }
 
                 if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (CD_cw(2, (s32)&CD_pos, 0, 0) != 0) {
+                if (CD_cw(2, CD_pos, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -839,13 +766,13 @@ s32 cd_read_retry(void) {
                 n = ((u8)v0 != CD_mode);
                 if (n) {
                     saved = (s32)&buf;
-                    if (CD_cw(0xE, saved, 0, 0) != 0) {
+                    if (CD_cw(0xE, (u8 *)saved, 0, 0) != 0) {
                         goto tail;
                     }
                 }
             }
 
-            CD_cbready = (s32)cb_read;
+            CD_cbready = (CdIntrCallback)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -921,9 +848,9 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
     s32 now;
     s32 old;
     s32 flags;
-    s32 *pEC;
+    char **pEC;
     u8 status;
-    s32 *p6A0;
+    char **p6A0;
     u8 *p8D8;
     u8 *p8D9;
     s32 *pF8;
@@ -942,7 +869,7 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
 
     D_8008B3E4 = now + 0x1E0;
     D_8008B3E8 = 0;
-    D_8008B3EC = (s32)D_80010AD8;
+    D_8008B3EC = D_80010AD8;
 
     for (;;) {
         now = VSync(-1);
@@ -985,10 +912,10 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
                     break;
                 }
                 if ((flags & 4) && CD_cbready != 0) {
-                    ((void (*)(s32, u8 *))CD_cbready)(p8D9[0], D_8008B3D4);
+                    CD_cbready(p8D9[0], D_8008B3D4);
                 }
                 if ((flags & 2) && CD_cbsync != 0) {
-                    ((void (*)(s32, u8 *))CD_cbsync)(p8D8[0], D_8008B3CC);
+                    CD_cbsync(p8D8[0], D_8008B3CC);
                 }
             }
             /* MATCHING: a known-bad construct, do not copy it. p6A0 and pF8
@@ -1038,14 +965,14 @@ s32 CD_datasync(s32 arg0) {
     s32 ok;
     char **p620;
     u8 *p8D8;
-    s32 *p6A0;
+    char **p6A0;
 
     D_8008B3E4 = VSync(-1) + 0x1E0;
     p620 = CD_comstr;
     p6A0 = CD_intstr;
     p8D8 = D_8006D8D8;
     D_8008B3E8 = 0;
-    D_8008B3EC = (s32)D_80010AE0;
+    D_8008B3EC = D_80010AE0;
 
     for (;;) {
         now = VSync(-1);
@@ -1062,7 +989,7 @@ s32 CD_datasync(s32 arg0) {
             puts(D_80010984);
             /* NON_MATCHING: the last argument reuses the dead `ok` as its
              * register target; a fresh local compiles further from retail. */
-            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[CD_com], ok = p6A0[p8D8[0]]);
+            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[CD_com], ok = (s32)p6A0[p8D8[0]]);
             CD_flush();
             return -1;
         }
@@ -1107,8 +1034,8 @@ void CD_set_test_parmnum(s32 arg0) {
 void callback(void) {
     u8 status;
     s32 flags;
-    s32 handler;
-    u8 *pd9;
+    CdIntrCallback handler;
+    volatile u8 *pd9;
 
     status = (*D_8006D8C0) & 3;
     pd9 = &D_8006D8D9;
@@ -1121,12 +1048,12 @@ void callback(void) {
         if (flags & 4) {
             handler = CD_cbready;
             if (handler != 0) {
-                ((void (*)(s32, u8 *))handler)(*pd9, D_8008B3D4);
+                handler(*pd9, D_8008B3D4);
             }
         }
         if (flags & 2) {
             if (CD_cbsync != 0) {
-                ((void (*)(s32, u8 *))CD_cbsync)(D_8006D8D8[0], D_8008B3CC);
+                CD_cbsync(D_8006D8D8[0], D_8008B3CC);
             }
         }
     }
@@ -1178,7 +1105,7 @@ shared: {
             } else {
                 code = 5;
             }
-            ((void (*)(s32, s32))CD_cbread)(code, arg1);
+            CD_cbread(code, (u8 *)arg1);
         }
     }
 }
