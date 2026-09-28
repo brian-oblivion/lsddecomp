@@ -1316,7 +1316,7 @@ segments:
       # slot, split out above with its `pad`.
       - [0x3030C, c, psyq/libgs_gs_101]     # GsSetNearClip (was func_8003FB0C)
       - [0x3031C, o, libgs/gs_123]      # Gssub_make_matrix (was func_8003FB1C)
-      - [0x303E4, c, libgs_gs_124]     # GsSetWorkBase (was func_8003FBE4)
+      - [0x303E4, c, psyq/libgs_gs_124]     # GsSetWorkBase (was func_8003FBE4)
       - [0x303F4, o, libgs/gs_111]      # GsDrawOt        (was func_8003FBF4)
       - [0x30418, o, libgs/gs_113]      # GsClearOt       (was func_8003FC18)
       - [0x30470, o, libgs/gs_108]      # GsSetLightMode  (was func_8003FC70)
