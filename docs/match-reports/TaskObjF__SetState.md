@@ -199,3 +199,10 @@ The unit banner this pass replaced ended: "Every function in the unit is
 matched C. What each numeric `state` code means in game terms is not
 established. See each function's own match report for its evidence." The
 second sentence is what the icon table now answers.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/title_menu.c`:
+
+> "MATCHING: `methods` is cached, and the cases are in retail's code order
+> (the entry actions before the widgets)." Now one line.

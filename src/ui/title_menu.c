@@ -1,33 +1,21 @@
 /*
- * title_menu.c -- the menu between days and its memory-card task:
- * TitleMenu and TaskObjF, led in by the constructors and table methods of
- * two small classes, NodeGuardedViewport and GridCell.
+ * title_menu.c -- the menu between days and its memory-card controller,
+ * led in by two small classes. In ROM order:
  *
- * NodeGuardedViewport (include/node_guarded_viewport.h) is a Viewport whose
- * update skips the frame while no view node is attached or the ordering
- * table is not ready; its seven table methods, New_ and the table getter are
- * all here. GridCell (include/grid_cell.h, a SceneNode) is one cell of
- * StageMap's grid, carrying the model placed there; its five table methods,
- * New_ and the getter are all here too. Each New_X allocates the object and
- * calls the ctor through the class's table; the ctor chains the parent's
- * ctor, then installs its own table.
+ * - NodeGuardedViewport (include/node_guarded_viewport.h), the Viewport
+ *   DayTask builds, which skips its frame while no view node is attached;
+ * - GridCell (include/grid_cell.h), one cell of StageMap's grid;
+ * - TitleMenu (include/title_menu.h), the TaskCore menu between days, with
+ *   UpdateFlashbackLock, which locks or unlocks its FLASHBACK entry from the
+ *   save block, and StampSaveTitleDay, which writes the day into the save
+ *   title ("LSD   Day001");
+ * - TaskObjF (include/task_objf.h), the memory-card controller TitleMenu's
+ *   SAVE and LOAD drive, then StampSaveTitleFileLetter.
  *
- * TitleMenu (include/title_menu.h, a TaskCore) is the menu between days:
- * its allocator and ctor with two save-title helpers, then its methods and
- * getter, each run introduced below. Two free functions serve it:
- * UpdateFlashbackLock (called from TitleMenu__RefreshMenu) locks or unlocks
- * the menu's FLASHBACK entry from two words of the save block, and
- * StampSaveTitleDay (called from the ctor with the current day) writes the
- * day as three full-width digits into the save title, "LSD   Day001".
- *
- * TaskObjF (include/task_objf.h) is the memory-card task TitleMenu's SAVE
- * and LOAD drive: its allocator and ctor, then its child links, card
- * events, checks and file probes, then its file I/O, buffers and the two
- * operations, and last its state machine, its getter and
- * StampSaveTitleFileLetter.
- *
- * NodeGuardedViewport and GridCell belong with dream_day.c's code:
- * DayTask's ctor makes the NodeGuardedViewport and StageMap is GridCell's
+ * Each class runs from its New_ (allocate, then the ctor through the
+ * class's table) to its table getter; a ctor chains to its parent's, then
+ * installs its own table. The first two belong with dream_day.c's code:
+ * DayTask's ctor makes the NodeGuardedViewport, and StageMap is GridCell's
  * only maker.
  */
 #include "common.h"
@@ -82,9 +70,8 @@ extern const char sTitleMenuSoundBankPath[];
 /* "ETC\TITLE.TIM", TitleMenu__Reset's path for setSubHandle. */
 extern const char sTitleTimPath[];
 
-/* "CARD\FILEICN1.TIM", TitleMenu__BeginCardAccess's path for New_TimImage.
- * A string splat already emitted as a symbol: a literal would emit a
- * second copy. */
+/* "CARD\FILEICN1.TIM", TitleMenu__BeginCardAccess's path for New_TimImage. */
+/* MATCHING: the string's symbol, not a literal; a literal adds a second copy of the bytes. */
 extern const char sSaveIconTimPath[];
 
 /* The two 320 x 240 display buffers, stacked in VRAM at y 0 and y 240:
@@ -100,10 +87,9 @@ extern struct ScreenSpritePos sSaveTitleOffset;
 /*
  * The save file's name and title, as TaskObjF's beginSave/beginLoad take
  * them (`fileName`, `title`): TitleMenu__SaveToCard and
- * TitleMenu__LoadFromCard pass both. The ROM image points them into the
- * rodata block at D_80011434: sSaveFileName at "BISLPS-01556xxx", which
- * SaveToCard empties on a new game; sSaveTitle at the full-width
- * "LSD   Day001" followed by 19 full-width spaces, which
+ * TitleMenu__LoadFromCard pass both. sSaveFileName points at
+ * "BISLPS-01556xxx", which SaveToCard empties on a new game; sSaveTitle at
+ * the full-width "LSD   Day001" followed by 19 full-width spaces, which
  * TitleMenu__CreateSaveTitle reblanks from its 12th character on a new game
  * and StampSaveTitleDay writes the day into.
  */
@@ -111,8 +97,8 @@ extern char *sSaveFileName;
 extern char *sSaveTitle;
 
 /* The buffer StampSaveTitleDay formats the day into
- * (FormatFullWidthNumber) before copying it into sSaveTitle's title. The
- * ROM image points it at the "7654321" string D_8008AA1C. */
+ * (FormatFullWidthNumber) before copying it into sSaveTitle's title; it
+ * starts as the string "7654321". */
 extern void *sDayDigits;
 
 /* 19 full-width spaces, the tail TitleMenu__CreateSaveTitle copies over
@@ -120,16 +106,16 @@ extern void *sDayDigits;
  * sSaveFileName's string). */
 extern char *sSaveTitleBlanks;
 
-/* TaskObjF's init `namePrefix` (TitleMenu__BeginCardAccess): the ROM image
- * points it at the product code "BISLPS-01556" in D_80011434. */
+/* TaskObjF's init `namePrefix` (TitleMenu__BeginCardAccess): the product
+ * code "BISLPS-01556", a string of its own 16 bytes before sSaveFileName's. */
 extern char *sCardFilePrefix;
 
 /* TaskObjF's init `nameSuffixes` (TitleMenu__BeginCardAccess): the 15 file
- * suffixes "-01" (D_8008AA0C) to "-15" (D_8008A9D4), then NULL. */
+ * suffixes "-01" to "-15", then NULL. */
 extern char *sSaveFileSuffixes[];
 
-/* TitleMenu__CycleSaveTitleColor's index (0, 1, 2) into its 3-byte colour.
- * The storage is a word; every access is a byte (lbu/sb). */
+/* TitleMenu__CycleSaveTitleColor's index (0, 1, 2) into its 3-byte colour,
+ * read and written as a byte of a word. */
 extern u8 sSaveTitleColorChannel;
 
 /* TitleMenu__CycleSaveTitleColor's frame counter (wraps to 0 at 0x101). */
@@ -245,6 +231,7 @@ void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     self->saveBlock = dreamSys->methods->getSaveBlock(dreamSys, &self->saveBlockSize);
     StampSaveTitleDay(dreamSys->methods->getCurrentDayAndYear(dreamSys, NULL));
     self->methods->setTarget(self, &sTitleMenuTarget);
+    /* MATCHING: resetCounters is called with dreamSys too, which its (self) occupant ignores. */
     ((TitleMenuResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
 
@@ -253,8 +240,9 @@ void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
 #define FLASHBACK_UNLOCK_SCORE 9999999
 
 /* FLASHBACK stays locked unless the unlock score is past the threshold and at
- * least one flashback is stored. `dreamSys` is unread: TitleMenu__RefreshMenu
- * passes self->dreamSys, and retail loads it into $a2 for the call. */
+ * least one flashback is stored. TitleMenu__RefreshMenu passes
+ * self->dreamSys, which is unread. */
+/* MATCHING: the unread dreamSys parameter; RefreshMenu's call loads it. */
 void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSys *dreamSys) {
     DreamSaveBlock *save = (DreamSaveBlock *)self->saveBlock;
     s32 locked = 1;
@@ -275,6 +263,7 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSy
  * copies them into the save title's day number, characters 9..11. */
 void StampSaveTitleDay(s32 day) {
     FormatFullWidthNumber(sDayDigits, day, SAVE_TITLE_DAY_DIGITS, 0);
+    /* MATCHING: FullWidthChar's byte members (alignment 1) set how the copy is done. */
     *(FullWidthChars3 *)&((FullWidthChar *)sSaveTitle)[SAVE_TITLE_DAY] = *(FullWidthChars3 *)sDayDigits;
 }
 
@@ -289,9 +278,9 @@ void StampSaveTitleDay(s32 day) {
  * exit (stores SHAKE's setting), the four overrides that manage
  * the save-title TextRow in place of TaskCore's slot widgets, refreshMenu,
  * and the memory-card methods that drive `saveCtrl`, a TaskObjF, for SAVE
- * and LOAD. The header's banner describes the class.
+ * and LOAD. The header's class doc describes the class.
  *
- * The data they share is in include/title_menu.h: sSaveTitle, the
+ * The data they share is declared at the top of this file: sSaveTitle, the
  * full-width save title the TextRow shows and the card save carries;
  * sSaveFileName; the card's name prefix and suffix table; and the colour
  * cycle's channel and frame counters.
@@ -435,9 +424,8 @@ void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
 /* The broadcastToSlots override, once a frame: the save title's colour.
  * While the menu takes input it is black with one channel lit, the channel
  * moving each frame; otherwise `color` with red lifted for the first frames
- * of each cycle and the moving channel after.
- * MATCHING: `channels` is taken before the first call (it lives in $s1)
- * and `rgb = *color` is one struct copy. */
+ * of each cycle and the moving channel after. */
+/* MATCHING: `channels` is taken before the first call, and `rgb = *color` is one struct copy. */
 void TitleMenu__CycleSaveTitleColor(TitleMenu *self, ColorRgb *color) {
     ColorRgb rgb;
     u8 *channels;
@@ -586,29 +574,12 @@ void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
 /*
  * TaskObjF's child links, card events, card checks and file probes
  * (include/task_objf.h: slots +0x00C..+0x018 and +0x040..+0x060, and the
- * helpers they call), in address order:
- *
- * - Children. TaskObjF__AddChild files a child by its class id into one of
- *   four links: a Pad as inputSource, a FrameClock as tickSource, a
- *   TextEntry, an ItemList. TaskObjF__RemoveChild and
- *   TaskObjF__RemoveAllChildren clear them; TaskObjF__ClearLinks clears
- *   them and spriteParent at construction.
- * - The card. TaskObjF__SetCardSlot picks slot 0 or 1 and its BIOS channel.
- *   TaskObjF__OpenEvents opens one SwCARD event per sCardEventSpecs entry;
- *   TaskObjF__CloseEvents closes them.
- * - Card checks. TaskObjF__CheckCardStatus retries
- *   TaskObjF__CardInfoAndLoadStatus, which asks _card_info whether a card is
- *   there and new (TaskObjF__CardInfoStatus), then _card_load whether it is
- *   formatted (TaskObjF__CardLoadStatus). TaskObjF__FormatCard retries
- *   format().
- * - Files, named "bu00:"/"bu10:" plus a prefix and a suffix
- *   (BuildMemcardPath). TaskObjF__ProbeMemcardFile opens one and can copy
- *   out its title (TaskObjF__OpenAndReadMemcardFile);
- *   TaskObjF__FindUnusedMemcardName and
- *   TaskObjF__CollectExistingMemcardFiles probe a list of suffixes through
- *   the probeMemcardFile slot. TaskObjF__CheckCardSpace retries
- *   TaskObjF__ProbeCardFreeSpace, which creates and deletes a TEMP file of
- *   the save's size.
+ * helpers they call), in address order: the children filed by class; the
+ * card slot and its four SwCARD events; the card checks (_card_info for a
+ * new card, _card_load for a formatted one) and format(); and the file
+ * probes over "bu00:"/"bu10:" plus a prefix and a suffix
+ * (BuildMemcardPath), ending with the free-space test, which creates and
+ * deletes a TEMP file of the save's size.
  *
  * A retried call is tried once, then up to MEMCARD_RETRIES more times while
  * it fails (TaskObjF__ProbeMemcardFile's loop: no more times).
@@ -724,8 +695,7 @@ s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 
     retries = MEMCARD_RETRIES;
     *cardChanged = 0;
     result = TaskObjF__CardInfoAndLoadStatus(self, error, &firstChanged, formatted);
-    /* MATCHING: the retry count is tested after the call; testing it first
-     * cross-jumps the two calls into one. */
+    /* MATCHING: the retry count is tested after the call; testing it first merges the two calls. */
     while (result == 0 || *error != 0 || *formatted == 0) {
         result = TaskObjF__CardInfoAndLoadStatus(self, error, cardChanged, formatted);
         if (retries-- == 0) {
@@ -736,9 +706,9 @@ s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 
     return result;
 }
 
-/* Returns whatever the last call left in $v0: CardInfoStatus's 0, or
- * CardLoadStatus's status.
- * MATCHING: an explicit return adds two words. */
+/* Returns the last call's result, CardInfoStatus's 0 or CardLoadStatus's
+ * status, with no return statement. */
+/* MATCHING: no return statement; an explicit return adds two words. */
 s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 *formatted) {
     if (TaskObjF__CardInfoStatus(self, error, cardChanged) != 0) {
         TaskObjF__CardLoadStatus(self, error, formatted);
@@ -909,22 +879,16 @@ s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size) {
  * (include/task_objf.h: slots +0x064..+0x078 and the +0x038 onNotify
  * override), in address order:
  *
- * - Memory-card files. TaskObjF__ReadMemcardFile and
- *   TaskObjF__WriteMemcardSaveFile retry TaskObjF__TryReadMemcardFile and
- *   TaskObjF__TryWriteMemcardSaveFile up to MEMCARD_RETRIES more times.
- *   Both open a "bu00:"/"bu10:" path (BuildMemcardPath) with the BIOS file
- *   calls: the write builds the PS-X save header (McSaveHeader) from the
- *   title and the icon TIM, and the read seeks past it.
- * - Card events. TaskObjF__EnableEvents/DisableEvents/TestEvents apply one
- *   kernel call to each of `events` through TaskObjF__ForEachEvent;
- *   WaitForReadyEvent spins until one tests ready.
- * - TaskObjF__Init and TaskObjF__Deinit.
- * - TaskObjF__BeginLoad and TaskObjF__BeginSave store the request, check
- *   the card (TaskObjF__Validate) and choose the next TaskObjFState;
- *   TaskObjF__AllocBuffers/FreeUnusedBuffers/FreeBuffers manage the load's
- *   title buffers.
- * - TaskObjF__OnNotify routes a child's notification by the child's class
- *   id, the way TaskObjF__AddChild files the children.
+ * - Memory-card files: a read and a write, each retrying a single try up
+ *   to MEMCARD_RETRIES more times. The write builds the PS-X save header
+ *   (McSaveHeader) from the title and the icon TIM; the read seeks past it.
+ * - Card events: enable, disable and test all four through
+ *   TaskObjF__ForEachEvent; WaitForReadyEvent spins until one tests ready.
+ * - Init and Deinit; BeginLoad and BeginSave, which store the request,
+ *   check the card (TaskObjF__Validate) and choose the next TaskObjFState;
+ *   and the load's title buffers.
+ * - TaskObjF__OnNotify, which routes a child's notification by the child's
+ *   class id, the way TaskObjF__AddChild files the children.
  */
 
 /* Defined below, called earlier in address order. */
@@ -964,8 +928,8 @@ s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32
     header = BMemPMgrAlloc(MEMCARD_SECTOR_SIZE);
     read(handle, header, MEMCARD_SECTOR_SIZE);
     iconFlag = header->iconDisplayFlag;
-    /* The data follows the title sector and the icon frames.
-     * MATCHING: (iconFlag - 0xF) * MEMCARD_SECTOR_SIZE reorders the arithmetic. */
+    /* The data follows the title sector and the icon frames. */
+    /* MATCHING: (iconFlag - 0xF) * MEMCARD_SECTOR_SIZE reorders the arithmetic. */
     seekPos =
         (iconFlag << MEMCARD_SECTOR_SHIFT) - ((MEMCARD_ICON_FLAG_BASE - 1) << MEMCARD_SECTOR_SHIFT);
     BMemPMgrFree(header);
@@ -998,10 +962,8 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, 
 extern char sFileNotCreatedMsg[]; /* "File not create in WriteFile\n" */
 
 /* Deletes the file, creates it at its full size in blocks, then reopens it
- * to write the save header and the data, each rounded up to whole sectors.
- * MATCHING: iconFrames is u8: retail keeps the incoming word and its
- * zero-extended copy in two registers. */
-
+ * to write the save header and the data, each rounded up to whole sectors. */
+/* MATCHING: iconFrames is u8, so the incoming word and its zero-extended copy are both kept. */
 s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, u8 iconFrames,
                                       struct TimImage *icon, void *data, s32 size) {
     char pathBuf[MEMCARD_PATH_SIZE];
@@ -1033,13 +995,14 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
     header->iconDisplayFlag = iconFrames + MEMCARD_ICON_FLAG_BASE;
     header->blockCount = ((u32)size + (MEMCARD_BLOCK_SIZE - 1)) >> MEMCARD_BLOCK_SHIFT;
     strcpy(header->title, title);
+    /* MATCHING: IconPaletteHalf (halfwords) and IconFrame (bytes) set how each whole-struct copy is done. */
     header->palette[0] = iconSrc->palette[0];
     header->palette[1] = iconSrc->palette[1];
     header->frame0 = iconSrc->frame0;
     header->frame1 = iconSrc->frame1;
     header->frame2 = iconSrc->frame2;
-    /* The title sector and the icon frames.
-     * MATCHING: (iconFrames + 1) * MEMCARD_SECTOR_SIZE reorders the arithmetic. */
+    /* The title sector and the icon frames. */
+    /* MATCHING: (iconFrames + 1) * MEMCARD_SECTOR_SIZE reorders the arithmetic. */
     write(fileHandle, header, (iconFrames << MEMCARD_SECTOR_SHIFT) + MEMCARD_SECTOR_SIZE);
     BMemPMgrFree(header);
     write(fileHandle, data,
@@ -1056,6 +1019,7 @@ char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix) {
     } else {
         device = &sMcDevicePath0;
     }
+    /* MATCHING: McDevicePath's byte members (alignment 1) set how the copy is done. */
     *dest = *device;
     strcat((char *)dest, suffix);
     return (char *)dest;
@@ -1206,9 +1170,8 @@ void TaskObjF__FreeBuffers(TaskObjF *self) {
 
 /* An existing file first asks to overwrite; confirming re-enters from
  * SAVE_OVERWRITE_WARNING to edit the title, and the edited title re-enters
- * from EDIT_TITLE to save.
- * MATCHING: each branch makes its own setState call, which GCC cross-jumps
- * to one; the function returns nothing. */
+ * from EDIT_TITLE to save. */
+/* MATCHING: one setState call per branch, which the build merges into one. */
 void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleEditPos,
                          u8 iconFrames, struct TimImage *icon, void *data, s32 size) {
     s32 state;
@@ -1245,9 +1208,8 @@ void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleE
 }
 
 /* Returns 1 when checkCardStatus succeeds on a formatted, unchanged card;
- * otherwise sets the state that says why and returns 0.
- * MATCHING: the unreachable `formatted` branch and the one setState call
- * reached by goto keep retail's branch layout. */
+ * otherwise sets the state that says why and returns 0. */
+/* MATCHING: the unreachable `formatted` branch and the goto to one setState call set the branch layout. */
 s32 TaskObjF__Validate(TaskObjF *self) {
     s32 error;
     s32 cardChanged;
@@ -1327,8 +1289,7 @@ void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
  * onTextEntryResult and onItemListResult.
  */
 
-/* MATCHING: `methods` is cached, and the cases are in retail's code order
- * (the entry actions before the widgets). */
+/* MATCHING: `methods` is cached, and the cases stay in this order (entry actions before widgets). */
 void TaskObjF__SetState(TaskObjF *self, s32 state) {
     TaskObjFMethods *methods = self->methods;
     s32 ok;
@@ -1404,8 +1365,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
     TimImage *tim;
     ScreenSprite *icon;
 
-    /* MATCHING: `path` and `icon` keep the buffer and the sprite in saved
-     * registers across the calls. */
+    /* MATCHING: `path` and `icon` hold the buffer and the sprite across the calls. */
     if (index >= ARRAY_COUNT(sCardIconNames)) {
         return;
     }
@@ -1507,8 +1467,8 @@ void TaskObjF__AbortFromState(TaskObjF *self) {
 }
 
 /* Waits until `waitCounter` (zeroed by setState) passes 6, then runs the
- * state's action. MATCHING: `old` and `count` apart, and one call per
- * branch. */
+ * state's action. */
+/* MATCHING: `old` and `count` kept apart, and one setState call per branch. */
 void TaskObjF__TickStateDelay(TaskObjF *self) {
     s32 old;
     s32 count;
@@ -1641,9 +1601,8 @@ extern FullWidthChar *sSaveTitleGlyphs;
  * o for -15) and a space, followed by "Day", and a space goes after the day
  * number. With no file name it only blanks the letter field. -08 and -09
  * are parsed from their second digit, which atoi would otherwise read as
- * octal. Returns a pointer into sSaveTitleGlyphs that no caller reads.
- * MATCHING:
- * `glyphs` is the return value, not a second read of the global. */
+ * octal. Returns a pointer into sSaveTitleGlyphs that no caller reads. */
+/* MATCHING: `glyphs` is the return value, not a second read of the global. */
 s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
     FullWidthChar *title = (FullWidthChar *)titleText;
     s32 numberPos;
@@ -1654,6 +1613,7 @@ s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
         numberPos = ((u32)(fileName[SAVE_FILE_NAME_NUMBER + 1] - '8') < 2) ? SAVE_FILE_NAME_NUMBER + 1
                                                                            : SAVE_FILE_NAME_NUMBER;
 
+        /* MATCHING: FullWidthChar's byte members (alignment 1) set how these copies are done. */
         title[SAVE_TITLE_PADDING] = sSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
         *(FullWidthChars6 *)&title[SAVE_TITLE_LETTER_FIELD] =
             *(FullWidthChars6 *)&sSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];

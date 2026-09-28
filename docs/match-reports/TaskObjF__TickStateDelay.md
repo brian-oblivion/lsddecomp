@@ -120,3 +120,10 @@ Local `newVal` -> `count`; the states are FORMATTING/SAVING/LOADING and
 their actions FORMAT/WRITE/READ (`enum TaskObjFState`). 6 stays a literal
 (a tick count, decimal). The derivation above keeps one line: `MATCHING:
 old and count apart, and one call per branch`. Image byte-identical.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/title_menu.c`:
+
+> "MATCHING: `old` and `count` apart, and one call per branch." Now its own
+> one-line comment.

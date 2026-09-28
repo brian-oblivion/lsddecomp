@@ -661,3 +661,8 @@ From `include/task_objf.h`:
 > 
 > The prototype named the fourth parameter `a3` (`u8 a3`); track 12 renamed it
 > to the definition's `iconFrames` (names only, no bytes).
+
+From `src/ui/title_menu.c`:
+
+> "MATCHING: iconFrames is u8: retail keeps the incoming word and its
+> zero-extended copy in two registers." Now one line.

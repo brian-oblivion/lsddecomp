@@ -136,3 +136,10 @@ sSaveIconTimPath casts away `const` for New_TimImage's `char *` and stays.
 
 IntermediateBase's `unk10` -> `frameClock` and `unk14` -> `lightRig`
 (see TitleMenu__RefreshMenu's report).
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/title_menu.c`:
+
+> sSaveIconTimPath's comment: "A string splat already emitted as a symbol: a
+> literal would emit a second copy." Now a one-line MATCHING comment.

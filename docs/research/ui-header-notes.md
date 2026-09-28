@@ -91,3 +91,24 @@ round 106)".
 - The TitleMenu::dreamSys field comment named the DreamSys slots the class
   calls by offset: "its +0x0F0/+0x19C/+0x1A0/+0x1A8/+0x1AC/+0x1B0 are
   called"; the field doc now names what they are for.
+
+### src/ui/title_menu.c (data comments)
+
+The comments on title_menu.c's data named the rodata placeholders they
+point into; the names are gone from the source:
+
+- sSaveFileName and sSaveTitle: "The ROM image points them into the rodata
+  block at D_80011434".
+- sDayDigits: "The ROM image points it at the "7654321" string
+  D_8008AA1C."
+- sCardFilePrefix: "the ROM image points it at the product code
+  "BISLPS-01556" in D_80011434." Measured in round 106 from
+  asm/data/7B12C.sdata.s: sCardFilePrefix holds 0x80011454 and
+  sSaveFileName 0x80011464, two separate strings 16 bytes apart.
+- sSaveFileSuffixes: "the 15 file suffixes "-01" (D_8008AA0C) to "-15"
+  (D_8008A9D4), then NULL."
+
+The file banner and the two TaskObjF section banners were cut under 20
+lines; their per-function lists are now the prototypes' docs in
+include/task_objf.h. The TitleMenu section comment said the shared data is
+"in include/title_menu.h"; it is declared at the top of title_menu.c.

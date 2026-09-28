@@ -514,3 +514,10 @@ Replaced in the unit by a MATCHING line:
  * epilogue with Validate's own $v0 -- and each of the three leaves makes its
  * own setState call, which GCC cross-jumps down to one shared `jalr`. */
 ```
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/title_menu.c`:
+
+> "MATCHING: each branch makes its own setState call, which GCC cross-jumps
+> to one; the function returns nothing." Now one line.
