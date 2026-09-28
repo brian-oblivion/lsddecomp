@@ -409,7 +409,7 @@ typedef struct DreamSysInterpPoint {
 
 /* 3x3 lookup table indexed by [dynamicClass][upperClass], each axis
    classified into {0,1,2} by CalcDreamColor first (round 2026-08-30-d). */
-extern s8 DREAM_COLOR_TABLE[9];
+extern s8 sDreamColorTable[9];
 
 /* Byte tables indexed by DreamSys::voiceSelect (already bounded to [0,0x18) at
    the write site -- see that field's own comment). DreamSys__StartVoice

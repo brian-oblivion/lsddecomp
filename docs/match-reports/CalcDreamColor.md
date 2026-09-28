@@ -1,6 +1,6 @@
 # CalcDreamColor -- MATCHED 35/35 (round 73, runner bravo): a 2-D subscript through a named `s8 (*)[3]` row-pointer local
 
-REVISITED, round 73: MATCHED 35/35 (was STALL 28/35, exact length); names/types used (DREAM_COLOR_TABLE read as the 3x3 [dynamic][upper] table it is, through a local `s8 (*table)[3]` view; the shared header's `s8 DREAM_COLOR_TABLE[9]` is untouched)
+REVISITED, round 73: MATCHED 35/35 (was STALL 28/35, exact length); names/types used (sDreamColorTable read as the 3x3 [dynamic][upper] table it is, through a local `s8 (*table)[3]` view; the shared header's `s8 sDreamColorTable[9]` is untouched)
 
 ## Round 73 (2026-09-23, runner bravo): MATCHED
 
@@ -23,24 +23,24 @@ table base) is ordinary allocation after `mood` dies, the same in both builds.
 
 Builds, in order (the flat-table forms each through `./build-and-verify.sh`):
 
-1. `return ((s8 (*)[3])DREAM_COLOR_TABLE)[dynamic][upper];` (cast inline):
+1. `return ((s8 (*)[3])sDreamColorTable)[dynamic][upper];` (cast inline):
    26/35, ins/del 0/0. The symbol folds into `%lo(TABLE)($at)` addressing.
-2. `return (DREAM_COLOR_TABLE + dynamic * 3)[upper];`: 26/35, same fold.
-3. `return *(DREAM_COLOR_TABLE + dynamic * 3 + upper);`: 26/35, same fold.
-4. `entry = DREAM_COLOR_TABLE; entry += dynamic * 3; return entry[upper];`:
+2. `return (sDreamColorTable + dynamic * 3)[upper];`: 26/35, same fold.
+3. `return *(sDreamColorTable + dynamic * 3 + upper);`: 26/35, same fold.
+4. `entry = sDreamColorTable; entry += dynamic * 3; return entry[upper];`:
    26/35, ins/del 2/2.
 5. Same as 4 with `index` split out before `entry = TABLE`: 26/35.
 6. Same as 4 with `index` split out after `entry = TABLE`: 26/35.
-7. `entry = &DREAM_COLOR_TABLE[dynamic * 3]; return entry[upper];` (no
+7. `entry = &sDreamColorTable[dynamic * 3]; return entry[upper];` (no
    `index` local): 28/35, the old residue.
-8. **`s8 (*tbl)[3] = (void *)DREAM_COLOR_TABLE; entry = tbl[dynamic];
+8. **`s8 (*tbl)[3] = (void *)sDreamColorTable; entry = tbl[dynamic];
    return entry[upper];`: 35/35, build exit=0.**
 9. `(d << 1) + d` as the index: 28/35. `d + d * 2`: 27/35.
 10. `*(entry + upper)`: 28/35. `upper` hoisted into its own `s32 u`: 28/35.
-11. **`s8 (*table)[3] = (s8 (*)[3])DREAM_COLOR_TABLE;
+11. **`s8 (*table)[3] = (s8 (*)[3])sDreamColorTable;
     return table[dynamic][upper];`: 35/35, build exit=0.** Kept: it reads
     as what the table is.
-12. `row = ((s8 (*)[3])DREAM_COLOR_TABLE)[dynamic]; return row[upper];`
+12. `row = ((s8 (*)[3])sDreamColorTable)[dynamic]; return row[upper];`
     (the cast inline, no pointer local): 28/35. So the NAMED pointer local is
     the load-bearing part, not the 2-D subscript by itself.
 
@@ -121,7 +121,7 @@ CalcDreamColor — STALL: exact length (35/35 instructions, zero address drift),
 Already documented: `@brief Calculates the DreamColor for a given mood.`
 Classifies each of the mood's two axis bytes into `{0,1,2}` (via
 thresholds `<-3`, `[-3,4)`, `>=4`) in a local copy, then indexes a 3x3
-lookup table `DREAM_COLOR_TABLE[dynamicClass*3 + upperClass]`.
+lookup table `sDreamColorTable[dynamicClass*3 + upperClass]`.
 
 ## Best-reached body (does NOT compile to retail bytes)
 
@@ -151,14 +151,14 @@ DreamColors CalcDreamColor(MoodGraphPoint *mood)
 		s8 *entry;
 
 		index = local.axis.dynamic * 3;
-		entry = &DREAM_COLOR_TABLE[index];
+		entry = &sDreamColorTable[index];
 		return entry[local.axis.upper];
 	}
 }
 #endif
 ```
 
-(`DREAM_COLOR_TABLE`'s `extern s8 DREAM_COLOR_TABLE[9];` declaration is kept live.)
+(`sDreamColorTable`'s `extern s8 sDreamColorTable[9];` declaration is kept live.)
 
 ## Two real fixes landed; one residue didn't move
 
@@ -173,10 +173,10 @@ FIRST, matching retail's actual branch-taken/fallthrough split) fixed the
 whole first half of the function (word 0-22 all match) on one try.
 
 **Fix 2 (worked): splitting the double-indexed table lookup.** The single
-expression `DREAM_COLOR_TABLE[dynamicClass*3 + upperClass]` computed the FULL
+expression `sDreamColorTable[dynamicClass*3 + upperClass]` computed the FULL
 index before adding the array base, one instruction shorter and 5 words
 off from retail. Splitting into an intermediate `s8 *entry =
-&DREAM_COLOR_TABLE[dynamicClass*3];` then `entry[upperClass]` matched the total
+&sDreamColorTable[dynamicClass*3];` then `entry[upperClass]` matched the total
 instruction COUNT (28/35 -> correct 35-word size, no more outside-range
 drift) and got 5 more words matching.
 
@@ -191,13 +191,13 @@ all (28/35, same size, same total instruction count).
 
 Reshapes tried on JUST this residue, all four producing the identical
 28/35 result:
-1. `s8 *entry = &DREAM_COLOR_TABLE[idx]; return entry[upper];` (shown above).
+1. `s8 *entry = &sDreamColorTable[idx]; return entry[upper];` (shown above).
 2. Same, with `upper` pulled into its own named local, assigned AFTER
    `entry` (to force the read to happen later in source order).
 3. `dynamic*3` pulled into its own named `index` local before computing
    `entry` (shown above -- this is what's kept live).
 4. Two independent named index locals (`idx1 = dynamic*3; idx2 = upper;
-   return DREAM_COLOR_TABLE[idx1+idx2];`) -- this one actually regressed to the
+   return sDreamColorTable[idx1+idx2];`) -- this one actually regressed to the
    single-expression form's 23/35, confirming the intermediate-pointer
    split (attempts 1-3) is the right general shape, just not fully
    reachable.
@@ -272,7 +272,7 @@ assigning it to `entry`:
 	s8 *entry;
 
 	index = local.axis.dynamic * 3;
-	p = &DREAM_COLOR_TABLE[index];
+	p = &sDreamColorTable[index];
 	entry = p;
 	return entry[local.axis.upper];
 }
@@ -311,7 +311,7 @@ about:
    (renamed `entry`->`base` for local style only):
    ```c
    index = local.axis.dynamic * 3;
-   p = &DREAM_COLOR_TABLE[index];
+   p = &sDreamColorTable[index];
    base = p;
    return base[local.axis.upper];
    ```
@@ -329,7 +329,7 @@ about:
    after loading `dynamic` and BEFORE the `sll`/`addu` that forms
    `dynamic*3`:**
    ```c
-   base = DREAM_COLOR_TABLE;
+   base = sDreamColorTable;
    index = local.axis.dynamic * 3;
    return base[index + local.axis.upper];
    ```
@@ -337,7 +337,7 @@ about:
    statement, is not sufficient here -- GCC 2.6.3 schedules the two
    differently depending on how the base and index are FUSED in the source
    expression, not just what order they're written in. The known-good
-   28/35 form (`entry = &DREAM_COLOR_TABLE[index]; return entry[upper];`, base and
+   28/35 form (`entry = &sDreamColorTable[index]; return entry[upper];`, base and
    index summed in one fused address-of expression rather than as two
    separate prior statements) remains the best C reached; this round did
    not find anything better.
@@ -495,7 +495,7 @@ NON_MATCHING body promoted, round 70.
 Replaced in the source by a comment that says what the code does; kept here as written.
 
 ```c
-/* DREAM_COLOR_TABLE is a 3x3 table, [dynamic class][upper class]. The
+/* sDreamColorTable is a 3x3 table, [dynamic class][upper class]. The
  * row-pointer view is load-bearing: indexing the flat s8[9] as
  * `&TABLE[d * 3]` then `[u]` loads `upper` early and swaps the two final
  * `addu` registers; a 2-D subscript through a named `s8 (*)[3]` local is
