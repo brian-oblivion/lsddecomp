@@ -125,7 +125,7 @@ zeroed and otherwise untouched" from scratch.
 
 - `Class6D430` -> `FileResource` (`renametype.py`, the whole family: type,
   `Class6D430Methods`, `CLASS6D430_FIELDS`/`_SLOTS`, the `Class6D430__`
-  methods, `GetClass6D430Methods`, the header `include/FileResource.h`), and
+  methods, `GetClass6D430Methods`, the header `include/file_resource.h`), and
   `D_8006D430` -> `gFileResourceMethods` (`rename.py`). **Tier A.** Evidence:
   the body of `FileResource__LoadFile` alone (open a name, size it with
   `seek(0, 2)`, allocate, read the whole file, close), and every non-driver
@@ -158,14 +158,14 @@ zeroed and otherwise untouched" from scratch.
   `struct { u_char minute, second, sector, track; }` compiles to the same
   `lwl`/`lwr` + `swl`/`swr` as `CdLoc16`, at a 4-aligned field and from a
   pointer. The blocker is the include: adding `<libcd.h>` to
-  `include/FileResource.h` (measured with `MAKEFLAGS=-k`) makes exactly four
+  `include/file_resource.h` (measured with `MAKEFLAGS=-k`) makes exactly four
   units fail with `conflicting types`, each re-declaring Cd* functions its
   own way: CdDriver (CdSearchFile, CdControl, CdSync, CdRead,
   CdReadSync), CdDriver (CdControlB, CdSearchFile), code_179d8_r
   (CdControlF, CdRead, CdReadSync, CdSync), CdDriver (CdControl,
   CdIntToPos, CdPosToInt, CdRead, CdReadSync, CdSearchFile, CdSync). Those
   are those units' polish passes (`sonyheaders.py`). Once they take Sony's
-  prototypes, `CdLoc16` is deleted, `FileResource.h` includes `<libcd.h>`,
+  prototypes, `CdLoc16` is deleted, `file_resource.h` includes `<libcd.h>`,
   and `renametype.py --any-stem CdLoc16 CdlLOC` (or a hand edit of the four
   users: cd_driver.h, code_179d8_s/q/s) finishes it; no field accessor
   changes, since the halves are never read apart.

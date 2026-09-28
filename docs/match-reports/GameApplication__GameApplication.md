@@ -214,7 +214,7 @@ src/app/game_shell.c `LoadModelRequest`, `{ s32 type; const char *path; s32 unk0
 0x10-byte record as dream_day.c's and the third caller's: the body writes
 `type = 0` (ResourceSource's NULL `buffer`: no buffer to adopt) and `path`
 (its `name`: the file to request) and passes it to New_LinkResource. It
-retired onto include/FileResource.h's `ResourceSourceRequest` (a
+retired onto include/file_resource.h's `ResourceSourceRequest` (a
 `ResourceSource src` then 8 bytes of padding; tier A: the fields are the
 ctor's own descriptor, read by LinkResource__LinkResource as `src->buffer`
 and `src->name`). The body now writes `req.src.buffer = NULL` and
@@ -224,7 +224,7 @@ size is kept (8 changes the frame, measured on StageMap__PopulateSlotCells).
 ## Track 6 (round 97, alpha): the request local is ResourceRequest
 
 `ResourceSourceRequest` is deleted. The local is now `ResourceRequest req;`
-(include/FileResource.h, 0x0C) with `mode` left unset; the body is
+(include/file_resource.h, 0x0C) with `mode` left unset; the body is
 unchanged (`req.src...` writes, `&req.src` to New_LinkResource). A plain
 `ResourceSource` (8 bytes) was measured to shrink this function's frame by
 8 and move every callee-save slot, and an unused pad local is dropped by

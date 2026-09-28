@@ -18,7 +18,7 @@ Slot +0x008 (ctor) of gLbdFileMethods: runs the active data source's ctor on sel
 ## Source
 
 Declarations it needs are the local views at the top of `src/cd/game_files.c`
-(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/FileResource.h`.
+(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/file_resource.h`.
 
 ```c
 /* slot +0x008 of gLbdFileMethods (ctor) */

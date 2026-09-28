@@ -1,7 +1,7 @@
 #ifndef PLACEMENTGRID_H
 #define PLACEMENTGRID_H
 
-#include "FileResource.h"
+#include "file_resource.h"
 
 /*
  * PlacementGrid -- the model placements of one grid element's 20 x 20

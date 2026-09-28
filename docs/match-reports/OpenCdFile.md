@@ -532,7 +532,7 @@ name[16]` -- and it is the output of `CdSearchFile`, whose Sony prototype
 takes a `CdlFILE *`. The type was deleted and the unit now includes
 `<libcd.h>`; the accessors `statBuf.pos`/`statBuf.size` keep their names as
 Sony's own fields. `CdDriver::pos` is still the project's `CdLoc16`
-(include/FileResource.h), so the copy is spelled `*(CdLoc16 *)&statBuf.pos`,
+(include/file_resource.h), so the copy is spelled `*(CdLoc16 *)&statBuf.pos`,
 the round 96 precedent in `src/cd/cd_driver.c`'s `ResolveFileEntries`.
 Byte-exact; whole-image SHA1 green.
 

@@ -47,7 +47,7 @@ That mechanics difference is why this is tier B and not A.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Now `void PlacementGrid__OnRequestDone(PlacementGrid *self)`, the type of slot +0x064 (`setFlag`, include/FileResource.h), byte-identical. `self[0xC]` is `loaded` (+0x030), zeroed by the ctor. `BaseTable6D940` was the active driver's table, `FileResourceMethods`; the call is `GetActiveDataSourceMethods()->setFlag`.
+Now `void PlacementGrid__OnRequestDone(PlacementGrid *self)`, the type of slot +0x064 (`setFlag`, include/file_resource.h), byte-identical. `self[0xC]` is `loaded` (+0x030), zeroed by the ctor. `BaseTable6D940` was the active driver's table, `FileResourceMethods`; the call is `GetActiveDataSourceMethods()->setFlag`.
 
 
 ## Track 6 (2026-09-26, round 93, charlie)

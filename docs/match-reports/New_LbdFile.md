@@ -18,7 +18,7 @@ Allocator for the gLbdFileMethods object: BMemPMgrAlloc(0x3C), and when non-NULL
 ## Source
 
 Declarations it needs are the local views at the top of `src/cd/game_files.c`
-(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/FileResource.h`.
+(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/file_resource.h`.
 
 ```c
 /* allocator: new gLbdFileMethods object */

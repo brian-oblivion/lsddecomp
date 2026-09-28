@@ -930,7 +930,7 @@
         "gFileResourceMethods": {
           "class": "FileResource",
           "date": "2026-09-25",
-          "header": "include/FileResource.h"
+          "header": "include/file_resource.h"
         },
         "gFlatLightObjMethods": {
           "class": "FlatLightObj",

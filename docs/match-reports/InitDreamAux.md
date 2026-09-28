@@ -231,7 +231,7 @@ alone, hence tier B rather than A.
 
 ### Track 6 (round 97, alpha)
 
-The request local (was `DreamAuxLoadReq {flag, name, mode}`; word 0 is the buffer, NULL here) is now include/FileResource.h's `ResourceRequest`
+The request local (was `DreamAuxLoadReq {flag, name, mode}`; word 0 is the buffer, NULL here) is now include/file_resource.h's `ResourceRequest`
 (`{ ResourceSource src; s32 mode; }`), and ResourceRequest__Set's prototype
 comes from that header. The unit's own view of the record and its local
 extern are gone. `req.buffer`/`req.name` become `req.src.buffer`/`req.src.name`, and

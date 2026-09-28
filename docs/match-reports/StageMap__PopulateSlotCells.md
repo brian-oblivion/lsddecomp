@@ -940,7 +940,7 @@ other names: include/dream_day.h `LoadRequest` and src/app/game_shell.c
 unk0C; }`, whose callers write `type = 0` (ResourceSource's NULL `buffer`)
 and `path` (its `name`) before `New_LinkResource`. One
 `ResourceSourceRequest { void *buffer; char *name; u8 pad8[8]; }` in the
-header owning ResourceSource (LinkResource.h, or FileResource.h, the
+header owning ResourceSource (LinkResource.h, or file_resource.h, the
 common parent of the five ctors that take it, once ResourceSource itself
 moves out of graphics_resources.c) would retire all three; field renames
 `type` -> `buffer`, `path` -> `name`. The three-word ResourceRequest__Set descriptors
@@ -951,7 +951,7 @@ at 0x0C and are left to that job.
 ## Track 6 (round 96, delta, second job): ResourceSourceRequest unified
 
 The proposal above, applied. `ResourceSource` moved from
-src/graphics/graphics_resources.c to include/FileResource.h (the parent of the five
+src/graphics/graphics_resources.c to include/file_resource.h (the parent of the five
 ctors that take it), and one `ResourceSourceRequest` sits beside it:
 
 ```c
@@ -981,7 +981,7 @@ SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX
 ## Track 6 (round 97, alpha): the request local is ResourceRequest
 
 `ResourceSourceRequest` is deleted. The local is now `ResourceRequest req;`
-(include/FileResource.h, 0x0C) with `mode` left unset; the body is
+(include/file_resource.h, 0x0C) with `mode` left unset; the body is
 unchanged (`req.src...` writes, `&req.src` to New_LinkResource). A plain
 `ResourceSource` (8 bytes) was measured to shrink this function's frame by
 8 and move every callee-save slot, and an unused pad local is dropped by

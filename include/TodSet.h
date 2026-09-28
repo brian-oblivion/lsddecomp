@@ -33,7 +33,7 @@
  * The ctor returns self or NULL (New_TodSet tests it), but TOD_SLOTS
  * declares +0x008 returning void, as Tod's own ctor does; the allocator
  * reaches it through graphics_resources.c's unprototyped UnprototypedCtorTable view, as every
- * allocator in that unit does. The descriptor is include/FileResource.h's
+ * allocator in that unit does. The descriptor is include/file_resource.h's
  * ResourceSource.
  */
 

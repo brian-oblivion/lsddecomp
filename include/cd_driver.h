@@ -1,7 +1,7 @@
 #ifndef CD_DRIVER_H
 #define CD_DRIVER_H
 
-#include "FileResource.h"
+#include "file_resource.h"
 
 /*
  * CdDriver -- the CD-ROM data-source driver (class id 0x13 = DATASOURCE_CD,

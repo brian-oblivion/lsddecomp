@@ -59,7 +59,7 @@ does for the setFlag call), so the source call has no arguments.
 ## Proposed field names
 
 `self->unk2A` is NOT a `DataSrc39094`-local field: it is FileResource's own
-last field (`include/FileResource.h`, `/* +0x02A */ u16 unk2A`), a UNIFIED
+last field (`include/file_resource.h`, `/* +0x02A */ u16 unk2A`), a UNIFIED
 shared header this unit does not own and must not edit. This unit gives it a
 clear, consistent meaning across four of its own functions
 (LbdFile__AdvanceLoadState, LbdFile__CancelRequests, LbdFile__LoadHeader,
@@ -69,7 +69,7 @@ block load in flight.
 - **Proposed name:** `loadState`
 - **Tier:** B (mechanics -- three-value state used consistently as a
   load-in-progress marker -- established only from this one subclass's
-  usage; FileResource.h's own comment says only that it is the last field
+  usage; file_resource.h's own comment says only that it is the last field
   before a subclass's own fields start, with no meaning of its own).
 - **Evidence:** every read/write of `unk2A` in `src/cd/game_files.c` (this
   report; LbdFile__CancelRequests, LbdFile__LoadHeader,

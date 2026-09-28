@@ -1,7 +1,7 @@
 #ifndef MODELDATA_H
 #define MODELDATA_H
 
-#include "FileResource.h"
+#include "file_resource.h"
 #include "TodSet.h"
 
 /*
@@ -37,7 +37,7 @@
  * does; the allocators reach the ctor through graphics_resources.c's unprototyped
  * UnprototypedCtorTable view instead.
  *
- * The ctor's descriptor is include/FileResource.h's ResourceSource ({buffer
+ * The ctor's descriptor is include/file_resource.h's ResourceSource ({buffer
  * to adopt, file name to request}).
  */
 

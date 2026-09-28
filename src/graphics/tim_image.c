@@ -19,7 +19,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "FileResource.h"
+#include "file_resource.h"
 #include "draw_system.h"
 #include "tim_image.h"
 #include "bmem_pmgr.h"

@@ -39,7 +39,7 @@
  * MODELDATA_SLOTS declares +0x008 returning void, as FileResource's own ctor
  * does; the allocator reaches it through graphics_resources.c's unprototyped
  * UnprototypedCtorTable view, as every allocator in that unit does. The descriptor is
- * include/FileResource.h's ResourceSource ({buffer to adopt, file name to request}).
+ * include/file_resource.h's ResourceSource ({buffer to adopt, file name to request}).
  */
 
 struct ResourceSource;

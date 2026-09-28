@@ -259,7 +259,7 @@ and the local's `/* never assigned: see the store below */` became
 
 The local `idx` is now `fileIndex` (FindCdFileIndex's result, passed as
 EnqueueCdRequest's `fileIndex`). `self->flags |= 4` is
-`CD_FLAG_NONE_PENDING` (FileResource.h): the synchronous load is done and
+`CD_FLAG_NONE_PENDING` (file_resource.h): the synchronous load is done and
 `pendingRequests` is 0, the same condition RunRequestQueue sets it on.
 
 **The build warnings.** cd_driver.c's compile printed 13 warnings

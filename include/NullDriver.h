@@ -1,7 +1,7 @@
 #ifndef NULLDRIVER_H
 #define NULLDRIVER_H
 
-#include "FileResource.h"
+#include "file_resource.h"
 
 /*
  * NullDriver -- the data-source driver whose every method is empty (class

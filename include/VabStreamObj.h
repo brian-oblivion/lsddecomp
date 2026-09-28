@@ -1,7 +1,7 @@
 #ifndef VABSTREAMOBJ_H
 #define VABSTREAMOBJ_H
 
-#include "FileResource.h"
+#include "file_resource.h"
 
 /*
  * VabStreamObj -- one VAB sound bank, loaded from disc through the active

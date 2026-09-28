@@ -16,7 +16,7 @@ Record lookup: `sStageFirstRecord` is an s16 table of record indices; returns `&
 ## Source
 
 Declarations it needs are the local views at the top of `src/cd/game_files.c`
-(`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
+(`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/file_resource.h`.
 
 ```c
 FilePathRecord *GetStageRecords(s32 index) {

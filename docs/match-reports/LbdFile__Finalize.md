@@ -18,7 +18,7 @@ Slot +0x00C (finalize) of gLbdFileMethods: calls its own slot +0x084 (LbdFile__R
 ## Source
 
 Declarations it needs are the local views at the top of `src/cd/game_files.c`
-(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/FileResource.h`.
+(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/file_resource.h`.
 
 ```c
 /* slot +0x00C of gLbdFileMethods (finalize) */

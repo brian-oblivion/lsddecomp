@@ -1,7 +1,7 @@
 #ifndef TILEATLAS_H
 #define TILEATLAS_H
 
-#include "FileResource.h"
+#include "file_resource.h"
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>

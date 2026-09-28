@@ -1,7 +1,7 @@
 #ifndef TOD_H
 #define TOD_H
 
-#include "FileResource.h"
+#include "file_resource.h"
 
 /*
  * Tod -- a FileResource data source (class id 0x4F03, method table gTodMethods)
@@ -33,7 +33,7 @@
  * array); ModelData__ForwardScanPackets casts it (an inherited slot keeps
  * the parent's name).
  *
- * The ctor's descriptor is include/FileResource.h's ResourceSource ({buffer
+ * The ctor's descriptor is include/file_resource.h's ResourceSource ({buffer
  * to adopt, file name to request}). The allocators reach the ctor through graphics_resources.c's unprototyped
  * UnprototypedCtorTable view.
  */

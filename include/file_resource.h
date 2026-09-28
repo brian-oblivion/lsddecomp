@@ -1,5 +1,5 @@
-#ifndef FILERESOURCE_H
-#define FILERESOURCE_H
+#ifndef FILE_RESOURCE_H
+#define FILE_RESOURCE_H
 
 #include "common.h"
 #include <libcd.h>

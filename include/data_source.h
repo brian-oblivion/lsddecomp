@@ -7,10 +7,10 @@
  * include/NullDriver.h), and the data directory file names are built in.
  * The classes the file defines are declared by their own headers:
  * GameApplication in include/GameApplication.h, FileResource and
- * ResourceRequest in include/FileResource.h. */
+ * ResourceRequest in include/file_resource.h. */
 
 #include "common.h"
-#include "FileResource.h"
+#include "file_resource.h"
 
 struct CdFileEntry; /* include/cd_driver.h */
 

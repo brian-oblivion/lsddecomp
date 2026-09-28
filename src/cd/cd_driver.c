@@ -1025,7 +1025,7 @@ void SetCdState(s32 state) {
  * Nothing in the executable calls the install/destroy pair or NoOp2, NoOp3
  * and NoOp4 (no jal, stored pointer or built address reaches them).
  */
-/* FileResource and its table come from include/FileResource.h, through data_source.h. */
+/* FileResource and its table come from include/file_resource.h, through data_source.h. */
 
 extern char sCdFileNotFoundFmt[];   /* "File not found. path = %s\n" */
 extern char sCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix */

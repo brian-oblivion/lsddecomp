@@ -16,7 +16,7 @@ Record accessor: base is record 0x23E (byte +0x3EC8) of GetRecordTable's table, 
 ## Source
 
 Declarations it needs are the local views at the top of `src/cd/game_files.c`
-(`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
+(`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/file_resource.h`.
 
 ```c
 FilePathRecord *GetSpecialDayRecords(s32 *countOut, s32 n) {

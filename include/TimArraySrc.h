@@ -1,7 +1,7 @@
 #ifndef TIMARRAYSRC_H
 #define TIMARRAYSRC_H
 
-#include "FileResource.h"
+#include "file_resource.h"
 
 /*
  * TimArraySrc -- a FileResource data source (class id 0xC03, method table

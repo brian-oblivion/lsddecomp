@@ -24,7 +24,7 @@
  * config->playStreams. GetGameApplicationMethods, the table's getter, ends
  * the class.
  *
- * FileResource (include/FileResource.h): see the section banner below.
+ * FileResource (include/file_resource.h): see the section banner below.
  */
 #include "common.h"
 #include <libgte.h>
@@ -340,7 +340,7 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
  * FileResource's own methods, the active-data-source dispatch
  * layer on top of them, and the data directory that CD paths are built in.
  *
- * FileResource (include/FileResource.h) is the base of every class the
+ * FileResource (include/file_resource.h) is the base of every class the
  * game loads from a file: a BasicClass subclass owning one file buffer
  * (FileResource__LoadFile reads a whole named file into it, FreeBuffer
  * releases it) and declaring the file-I/O interface that the CD driver

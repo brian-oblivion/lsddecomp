@@ -57,7 +57,7 @@ a wrong tier-A guess here would be worse than the placeholder.
 
 Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
 gNullDriverMethods --vs gFileResourceMethods` puts this function at `+0x054`, one of
-FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
+FileResource's run-time-bound driver-interface slots (`include/file_resource.h`
 names it `read`; the CD driver's occupant is `CdDriver__Read`).
 `SetActiveDataSource` (game_shell.c) copies the active driver's interface
 slots into FileResource's table and every client table, and takes this table

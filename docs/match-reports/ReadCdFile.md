@@ -501,5 +501,5 @@ CdSync result buffer `buf` is `syncResult`).
   `syncResult[16]` stay literals, decimal: `scratch` is never touched and
   only sizes the frame, so a sector name would claim a use nobody has seen.
 - Left: the `(u_char *)&self->pos` cast. `CdControl`'s parameter is Sony's
-  `u_char *`, and `pos` is the project's `CdLoc16` (FileResource.h) rather
+  `u_char *`, and `pos` is the project's `CdLoc16` (file_resource.h) rather
   than `CdlLOC`; the cast goes when track 6 gives FileResource Sony's type.

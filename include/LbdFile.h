@@ -1,7 +1,7 @@
 #ifndef LBDFILE_H
 #define LBDFILE_H
 
-#include "FileResource.h"
+#include "file_resource.h"
 
 /*
  * LbdFile -- one of the stage's map-chunk files, STGnn\Mnnn.LBD, loaded for

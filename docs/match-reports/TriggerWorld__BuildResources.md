@@ -84,7 +84,7 @@ Retyped in the same round: `self` is `TriggerWorld *`, +0x038 is `modelDataCount
 
 ### Track 6 (round 97, alpha)
 
-The request local is now include/FileResource.h's `ResourceRequest`
+The request local is now include/file_resource.h's `ResourceRequest`
 (`{ ResourceSource src; s32 mode; }`), and ResourceRequest__Set's prototype
 comes from that header. The unit's own view of the record and its local
 extern are gone. `req.buffer`/`req.name` become `req.src.buffer`/`req.src.name`, and

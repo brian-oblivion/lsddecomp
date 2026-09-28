@@ -111,7 +111,7 @@ them is a head decision (proposed below), not a rename.
 
 ### Track 6 (round 97, alpha): one definition
 
-`ResourceRequest` now lives in `include/FileResource.h`, beside the
+`ResourceRequest` now lives in `include/file_resource.h`, beside the
 `ResourceSource` it extends, as `{ ResourceSource src; s32 mode; }`, with
 `ResourceRequest__Set`'s one prototype under it. `include/data_source.h` no
 longer defines it. The body reads `this->src.buffer = buffer;
@@ -123,7 +123,7 @@ TriggerWorld__BuildResources, TodSet__BuildTods) and include/dream_aux.h's
 cast became `&req.src`. `mode` stays tier B: every caller passes 1 and no
 code reads it. Image byte-identical after every step.
 
-Kept: `ResourceSourceRequest` (FileResource.h, 0x10 bytes; StageMap__PopulateSlotCells,
+Kept: `ResourceSourceRequest` (file_resource.h, 0x10 bytes; StageMap__PopulateSlotCells,
 DayTask__DayTask, GameApplication__GameApplication). Its callers write only
 `src.buffer` and never call ResourceRequest__Set. Measured this round:
 shrinking its pad to 4 bytes (so it is 0x0C, ResourceRequest's size) still
@@ -135,7 +135,7 @@ TodActor__AcquireModelData.md.
 
 ### Track 6 (round 97, alpha, second job): ResourceSourceRequest retired
 
-`ResourceSourceRequest` is deleted from include/FileResource.h. Its three
+`ResourceSourceRequest` is deleted from include/file_resource.h. Its three
 locals are now `ResourceRequest req;` with `mode` never written:
 
 | function | retail frame | words written | passed |
@@ -154,5 +154,5 @@ array and the frame still shrinks by 8, so the only honest spelling that
 keeps the frame is an existing type of 9..16 bytes, and ResourceRequest is
 the one this descriptor already has. Each local carries a MATCHING line
 saying mode is unset and why the type is not ResourceSource. The
-ResourceRequest comment in FileResource.h now names the three hand-filled
+ResourceRequest comment in file_resource.h now names the three hand-filled
 callers. Image byte-identical after every step.

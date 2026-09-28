@@ -24,7 +24,7 @@ TimImageMethods *GetTimImageMethods(void) {
 The unit-local view it needs, from the top of `src/graphics/tim_image.c`:
 
 ```c
-#include "FileResource.h"
+#include "file_resource.h"
 
 typedef struct D_8006E558Obj {
     FILERESOURCE_FIELDS(FileResourceMethods);

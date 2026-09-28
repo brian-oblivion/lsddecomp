@@ -26,7 +26,7 @@
  *  - MoviePlayer, CD-streamed and MDEC-decoded FMV (CdStream frames,
  *    DecDCTvlc, then DecDCTin/DecDCTout in 16-pixel strips uploaded as they
  *    finish), one movie at a time (sActiveMoviePlayer).
- * The ctors take include/FileResource.h's ResourceSource; the build steps
+ * The ctors take include/file_resource.h's ResourceSource; the build steps
  * that make them fill one as a ResourceRequest's `src`. The unit's own
  * types: UnprototypedCtorTable, the view the allocators call a ctor slot
  * through when they test its result; TimBlockHeader (and its byte copy,
@@ -43,7 +43,7 @@
 #include <libpress.h>
 #include "basic_class.h"
 #include "scene_node.h"
-#include "FileResource.h"
+#include "file_resource.h"
 #include "TimBlockSrc.h"
 #include "ModelData.h"
 #include "Tod.h"

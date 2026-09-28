@@ -238,7 +238,7 @@ derived for the same Sony function, and it is `sizeof(CdlFILE)`.
 CdlLOC's four bytes under another name, so the copy is spelled
 `entries->pos = *(CdLoc16 *)&info.pos;`. Byte-exact: the access type (and so
 the 2-byte-aligned `lwl`/`lwr` copy) is unchanged. Proposed at the head:
-replace `CdLoc16` with `CdlLOC` in include/FileResource.h once its includers
+replace `CdLoc16` with `CdlLOC` in include/file_resource.h once its includers
 can take `<libcd.h>` (CdDriver/_s, CdStream still re-declare libcd).
 
 ## Track 7 (round 101, echo): comments moved here, and names

@@ -29,7 +29,7 @@ void TimImage__SetFlag(TimImage *self) {
 The unit-local view it needs, from the top of `src/graphics/tim_image.c`:
 
 ```c
-#include "FileResource.h"
+#include "file_resource.h"
 
 typedef struct TimImage {
     FILERESOURCE_FIELDS(FileResourceMethods);

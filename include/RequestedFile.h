@@ -1,7 +1,7 @@
 #ifndef REQUESTEDFILE_H
 #define REQUESTEDFILE_H
 
-#include "FileResource.h"
+#include "file_resource.h"
 
 /*
  * RequestedFile -- one whole file, requested from the active data-source

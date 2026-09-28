@@ -11,7 +11,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** slot +0x088 of gLbdFileMethods (`tools/classtable.py gLbdFileMethods`).
-- **What:** setter: stores the second argument at `self+0x38`. The object is a local view `DataSrc39094` (FileResource fields from the unified `include/FileResource.h`, then `pad2C[0xC]`, `s32 autoLoadData`).
+- **What:** setter: stores the second argument at `self+0x38`. The object is a local view `DataSrc39094` (FileResource fields from the unified `include/file_resource.h`, then `pad2C[0xC]`, `s32 autoLoadData`).
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 

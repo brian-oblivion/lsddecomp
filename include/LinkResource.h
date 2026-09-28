@@ -1,7 +1,7 @@
 #ifndef LINKRESOURCE_H
 #define LINKRESOURCE_H
 
-#include "FileResource.h"
+#include "file_resource.h"
 
 /*
  * LinkResource -- a FileResource data source (class id 0xD03, method table
@@ -36,7 +36,7 @@
  *          allocation fails, else 0 after the active driver's onRequestDone.
  *   +0x078 processBuffer (NULL in FileResource): LinkResource__MapModel(self).
  *
- * The ctor's descriptor is ResourceSource (include/FileResource.h): a buffer
+ * The ctor's descriptor is ResourceSource (include/file_resource.h): a buffer
  * to adopt, else a file name to request.
  */
 

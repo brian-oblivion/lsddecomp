@@ -85,7 +85,7 @@ New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct R
 
 ### Track 6 (round 97, alpha)
 
-The request local is now include/FileResource.h's `ResourceRequest`
+The request local is now include/file_resource.h's `ResourceRequest`
 (`{ ResourceSource src; s32 mode; }`), and ResourceRequest__Set's prototype
 comes from that header. The unit's own view of the record and its local
 extern are gone. `req.buffer`/`req.name` become `req.src.buffer`/`req.src.name`, and

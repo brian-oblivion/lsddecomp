@@ -1,7 +1,7 @@
 #ifndef TIMBLOCKSRC_H
 #define TIMBLOCKSRC_H
 
-#include "FileResource.h"
+#include "file_resource.h"
 #include "draw_system.h"
 
 /*
