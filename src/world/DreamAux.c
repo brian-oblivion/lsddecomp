@@ -40,7 +40,7 @@
 
 extern s8 sSpecialColors[];
 
-const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
+const char sMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
 const char sMomPathSymDog[] = "ETC\\SYMDOG.MOM";
 
 void InitDreamAux(void) {
@@ -54,7 +54,7 @@ void InitDreamAux(void) {
         }
     }
 
-    ResourceRequest__Set(&req, 0, (char *)gMomPathSymSpy, 1);
+    ResourceRequest__Set(&req, 0, (char *)sMomPathSymSpy, 1);
 
     for (i = 0; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
         sDreamAuxSlots[i].model = New_ModelData(&req.src);
