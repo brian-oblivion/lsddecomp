@@ -90,3 +90,11 @@ The class is unified in `include/graph_room.h` (class id 0x2F130, table `gGraphR
 ## Track 6 (2026-09-27, round 98, delta): `GraphPointColor` -> `BoxFillRgb`
 
 The local `GraphPointColor` (round 97) is retired onto include/box_fill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (screen_widgets's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `sGraphPointNewestColor`, `sGraphPointBaseColor`, `sGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/graph_room.h`'s class banner (the header now says it reads
+frameCounter as unsigned):
+
+> TickHighlight compares frameCounter unsigned (`sltiu`, `divu`) and casts
+> it to u32

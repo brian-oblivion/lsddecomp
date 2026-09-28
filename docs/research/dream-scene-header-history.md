@@ -63,3 +63,15 @@ sActorLocalMoveZ); the header now names the symbol only:
  * and which nothing calls. `tools/classtable.py gVariantSpriteMethods --vs
  * gSpriteMethods` lists the inherited slots it overrides (see the banner). */
 ```
+
+`include/graph_room.h`, the class banner:
+
+```c
+ * GraphRoom -- class id 0x2F130, method table gGraphRoomMethods, a TaskCore
+ * subclass (`tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`:
+ * nine overrides and one slot of its own). No class derives from it.
+```
+
+The banner also listed each override with its occupant in a table, and
+said GraphRoomResetCallFn was "No code"; the method table's doc block and
+the prototypes' @briefs now carry the overrides.

@@ -3223,9 +3223,7 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
 }
 
 /* A graph point's colour is New_BoxFill's colour argument, a ColorRgb
- * (include/box_fill.h).
- * MATCHING: exactly three bytes, so the whole-struct copy of `rgb` below is
- * three lb/sb pairs. */
+ * (include/box_fill.h). */
 extern s32 sGraphPointSize[2];
 extern ColorRgb sGraphPointNewestColor;
 extern ColorRgb sGraphPointBaseColor;
@@ -3235,7 +3233,7 @@ void GraphRoom__BuildGraphPoints(GraphRoom *self) {
     s32 i;
 
     self->points[0] = New_BoxFill(sGraphPointSize, &sGraphPointNewestColor, 0);
-    rgb = sGraphPointBaseColor;
+    rgb = sGraphPointBaseColor; /* MATCHING: a 3-byte struct copy, byte by byte */
     for (i = 1; i < ARRAY_COUNT(self->points); i++) {
         s32 step;
 
@@ -3330,10 +3328,8 @@ extern MoodGraphPoint sGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT];
 /* Whether every sGraphScoreMoods entry appears among the plotted days (the
  * window PopulateGraphPoints walks, newest first), recording in
  * matchedDayIndices the oldest dot holding each. Fails at once when
- * graphScored is set, and sets it on success.
- * MATCHING: the `targets`/`days` caches, the dead else branch and the
- * chained assignment are all inert; without any one, cc1 strength-reduces
- * sGraphScoreMoods[i] into a pointer hoisted across the outer loop. */
+ * graphScored is set, and sets it on success. */
+/* MATCHING: the targets/days caches, dead else and chained assignment keep the table unhoisted */
 s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
     u32 i;
     MoodGraphPoint *days;
