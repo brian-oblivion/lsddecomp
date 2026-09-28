@@ -44,17 +44,18 @@ extern GameApplication *gGameApplication;
 extern GameApplicationConfig gGameApplicationConfig;
 
 void main(void) {
-    DrawSystem *obj;
+    DrawSystem *drawSystem;
     Pad *pad;
 
     SetMem(2);
     gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
     gGameApplication = New_GameApplication(&gGameApplicationConfig);
-    obj = New_DrawSystem();
+    drawSystem = New_DrawSystem();
     pad = New_Pad(0, 0);
     /* GameApplication__InitSystems takes no 4th argument: include/GameApplication.h. */
-    ((GameApplicationInitSystemsFn)gGameApplication->methods->initSystems)(gGameApplication, obj, pad);
+    ((GameApplicationInitSystemsFn)gGameApplication->methods->initSystems)(gGameApplication,
+                                                                           drawSystem, pad);
     gGameApplication->methods->runMainLoop(gGameApplication);
 }
 
