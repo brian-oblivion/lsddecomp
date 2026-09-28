@@ -17,7 +17,7 @@
  *    stores `screenPos`, setPivotAnchor (+0x0C0) moves (mx, my). Its
  *    attachToParent override attaches with a zero 3-D offset and hands its
  *    third argument to setPosition instead; the callers pass pairs like
- *    (-70, -60) and (-100, -60) (sCardIconPos, gItemListPanelPos), percentages.
+ *    (-70, -60) and (-100, -60) (sCardIconPos, sItemListPanelPos), percentages.
  *
  * The ctor chains to Sprite's first (GetSpriteMethods()->ctor with abr 0 and
  * a NULL fourth argument), and CharSprite's ctor chains to this one, so the

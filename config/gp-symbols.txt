@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gItemListPanelPos
 gItemListRowColor
 gItemListRowOriginX
 gItemListRowOriginY
@@ -183,6 +182,7 @@ sHitHeightGate
 sInstantTeleportersEnabled
 sItemListCardPathPrefix
 sItemListCursorColor
+sItemListPanelPos
 sItemListTimExt
 sLinkAngle180
 sListViewColor

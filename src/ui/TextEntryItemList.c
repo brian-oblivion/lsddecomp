@@ -631,11 +631,11 @@ extern const char sStrSelect[];              /* "SELECT" */
 extern const char sItemListCardPathPrefix[]; /* "CARD\\" */
 extern const char sItemListTimExt[];         /* ".TIM" */
 extern SpriteRect gItemListPanelRect;        /* SELECT's cell: 256 x 160 from (0, 0) */
-extern ScreenSpritePos gItemListPanelPos;    /* (-100, -60) */
+extern ScreenSpritePos sItemListPanelPos;    /* (-100, -60) */
 extern const char sItemListStrFontIcon[];    /* "FONTICON" */
 
 /*
- * Loads CARD\SELECT.TIM as the panel sprite, placed at gItemListPanelPos
+ * Loads CARD\SELECT.TIM as the panel sprite, placed at sItemListPanelPos
  * under `parent`, and has createRows build the rows from CARD\FONTICON.TIM.
  * Does nothing without a parent or when already loaded. The same shape as
  * TextEntry__LoadCardResources (TextEntryItemList).
@@ -661,7 +661,7 @@ void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
     ((TimImageUploadFn)panelTim->methods->processBuffer)(panelTim);
     self->panelSprite = New_ScreenSprite(panelTim, &gItemListPanelRect, 0);
     panelTim->methods->release(panelTim);
-    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&gItemListPanelPos);
+    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&sItemListPanelPos);
 
     fontTim = New_TimImage(BuildFileName(path, sItemListStrFontIcon, dir, ext));
     ((TimImageUploadFn)fontTim->methods->processBuffer)(fontTim);
