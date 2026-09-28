@@ -126,7 +126,7 @@ extern s32 sSortLightMode;          /* GsFOG | GsMATE */
 typedef struct PolyDrawCtx {
     /* +0x000 */ GsOT_TAG *otBase;  /* the GsOT's org */
     /* +0x004 */ s32 otShift;       /* otz >> otShift indexes otBase */
-    /* +0x008 */ s32 unk8;          /* set to 10 per object; no reader in carved code */
+    /* +0x008 */ s32 unk8;          /* set to 10 per object; nothing reads it */
     /* +0x00C */ SVECTOR *vertices; /* the TMD object's vertex array */
     /* +0x010 */ SVECTOR *normals;  /* the TMD object's normal array */
     /* +0x014 */ u8 primLen;        /* SetupPrimCode's cached P_TAG length byte */
