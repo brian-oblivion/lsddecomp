@@ -15,7 +15,8 @@
  * Nothing calls New_CdDriver: the driver's slots are copied into its
  * clients' tables by SetActiveDataSource (CdDriver.h), so the class's
  * request methods run on other objects. The rest of the class is in
- * CdDriver.c (the request methods) and CdDriver.c.
+ * CdDriver.c, which this file belongs in by content: the merge waits only
+ * on a yaml edit (CdDriver.c's .rodata attach moves here), the head's.
  */
 #include "common.h"
 #include "CdDriver.h"

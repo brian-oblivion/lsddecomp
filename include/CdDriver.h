@@ -12,16 +12,17 @@
  *
  *   src/code_179d8_o.c  New_CdDriver, the ctor (FileResource's ctor, then
  *                       InitCdDrive), Finalize, NoOpSlot40
- *   src/CdDriver.c  Open, Close, Seek, NoOpSlot50, Read, LoadFile,
+ *   src/CdDriver.c      everything else, in four parts:
+ *                       1. Open, Close, Seek, NoOpSlot50, Read, LoadFile,
  *                       RunRequestQueue: each enqueues a CD_OP_* request, or
  *                       starts it when RunRequestQueue dispatches it back
- *   src/CdDriver.c  RequestLoadFile, StopService, CancelRequests, the
+ *                       2. RequestLoadFile, StopService, CancelRequests, the
  *                       getter; the queue front end (EnqueueCdRequest), the
  *                       file table's setters, ResolveFileEntries, the lock
  *                       and the VSync service tick (ServiceCdDriver)
- *   src/CdDriver.c  the read state machine, AllocCdRequestNode /
+ *                       3. the read state machine, AllocCdRequestNode /
  *                       FreeCdRequestNode, the file-table lookups
- *   src/CdDriver.c  the synchronous OpenCdFile / CloseCdFile /
+ *                       4. the synchronous OpenCdFile / CloseCdFile /
  *                       GetCdFileSize / ReadCdFile the methods call when
  *                       the driver is not in async mode
  *

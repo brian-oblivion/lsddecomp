@@ -1,11 +1,29 @@
 /*
- * CdDriver's request methods: open, close, seek, read and loadFile (slots
- * +0x044..+0x058 of gCdDriverMethods, with the empty slot +0x050) and
- * runRequestQueue (+0x068), which feeds the queued requests back to them.
- * The class, its table and the queue's types are include/CdDriver.h's; the
- * constructor is in code_179d8_o.c, the queue front end and the service tick
- * in code_179d8_q.c, the state machines in code_179d8_r.c, the blocking file
- * calls in code_179d8_h.c.
+ * CdDriver.c -- the CD driver (class CdDriver, include/CdDriver.h), all of
+ * it but the allocator, ctor and finalize (still code_179d8_o.c). Four
+ * parts, in ROM order:
+ *   1. the request methods (this banner, below);
+ *   2. the module level: the three request methods that are not
+ *      per-request, the queue's front end, the driver mode, the file table
+ *      and the service tick;
+ *   3. the read state machines, the queue's nodes, the file-table lookups;
+ *   4. the blocking file calls.
+ *
+ * What decided its edges (tools/tuboundary.py, round 101). The rodata makes
+ * parts 2, 3 and 4 one file with part 1: each was a carve unit whose start
+ * edge is IMPOSSIBLE, because part 1's jump tables (0x80010810,
+ * 0x80010828) lie after the strings of parts 2 and 4 (0x800107D8,
+ * 0x800107F4). The file ends where libcd_bios, Sony's libcd, begins. The
+ * edge with code_179d8_o.c is "boundary possible", and the one forced
+ * boundary near it (tables 0x80010354 / 0x80010810) is already met by the
+ * Sony objects before code_179d8_o; content (one class) puts that file in
+ * this one. It stays separate only because the merge moves this file's
+ * .rodata attach onto it, a yaml edit that is the head's.
+ *
+ * Part 1: CdDriver's request methods, open, close, seek, read and loadFile
+ * (slots +0x044..+0x058 of gCdDriverMethods, with the empty slot +0x050)
+ * and runRequestQueue (+0x068), which feeds the queued requests back to
+ * them.
  *
  * `self` is never a CdDriver of its own: SetActiveDataSource copies these
  * slots into every FileResource client's table, so `self` is the TimImage,
@@ -365,7 +383,7 @@ void CdDriver__RunRequestQueue(void) {
     UnlockCd();
 }
 
-/* ---- merged from code_179d8_q ---- */
+/* ---- part 2: the module level ---- */
 
 /*
  * The CD driver's module level: the three request methods that are not
@@ -373,8 +391,8 @@ void CdDriver__RunRequestQueue(void) {
  * front end, the driver mode, the file table and the service tick. The
  * class, the queue's types and the shared module state are
  * include/CdDriver.h's; the constructor is in code_179d8_o.c, the other
- * request methods in CdDriver.c, the state machines and the queue's
- * nodes in code_179d8_r.c, the blocking file calls in code_179d8_h.c.
+ * request methods in part 1, the state machines and the queue's nodes in
+ * part 3, the blocking file calls in part 4.
  *
  *   - The driver mode. SetCdDriverMode sets gCdAsyncEnabled (requests are
  *     queued and run in the background), gCdSyncQueueMode (queued, but each
@@ -411,7 +429,7 @@ void UnlockCd(void);
 s32 ServiceCdDriver(void);
 void StopCdServiceIfIdle(void);
 
-/* code_179d8_r.c: the request list, the state machines, the file-table lookup. */
+/* Part 3, below: the request list, the state machines, the file-table lookup. */
 extern CdRequestNode *AllocCdRequestNode(void);     /* allocate and link at the tail */
 extern void FreeCdRequestNode(CdRequestNode *node); /* unlink and free */
 extern void ResetCdStateMachine(void);              /* end the operation, mark idle */
@@ -419,7 +437,7 @@ extern void TickCdStateMachine(void);               /* CD_TICK_STATE_MACHINE */
 extern void TickCdLoadFileStateMachine(void);       /* CD_TICK_LOAD_FILE */
 extern s32 FindCdFileIndex(char *name);             /* name -> gFileTable index */
 
-/* code_179d8_h.c */
+/* Part 4, below. */
 extern char *BuildCdFilePath(char *dest, char *name); /* "\\<data directory><name>;1" */
 
 /* TmdRenderer.c */
@@ -429,7 +447,7 @@ extern void printf(const char *fmt, ...);
 
 extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
 
-/* This unit's module state; code_179d8_r/_s see it only through the
+/* Part 2's module state; parts 1 and 3 see it only through the
  * functions below. */
 extern s32 sCdDriveInited;       /* InitCdDrive has set the drive's mode */
 extern s32 sCdLock;              /* LockCd / UnlockCd */
@@ -535,7 +553,7 @@ s32 GetCdState(void) {
 
 /* gCdSyncQueueMode is written only by SetCdDriverMode's second argument.
  * With it set and gCdAsyncEnabled clear, the request methods
- * (CdDriver.c) still queue each request but run it as a blocking spin
+ * (part 1) still queue each request but run it as a blocking spin
  * when runRequestQueue dispatches it; with both clear they skip the queue. */
 
 s32 GetCdDriverMode(s32 *outSyncQueueMode) {
@@ -616,7 +634,7 @@ s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
 
 /* The driver's re-entrancy lock, and its one reader is ServiceCdDriver
  * below: the service tick returns immediately while sCdLock is set, so every
- * public entry point in this unit and in code_179d8_r/_s brackets its body
+ * public entry point in parts 1 to 3 brackets its body
  * with LockCd()/UnlockCd() to keep the VSync-driven tick out of a
  * half-updated queue. Not a mutex -- nothing spins or blocks on it. */
 
@@ -709,7 +727,7 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
     StartCdService();
 }
 
-/* ---- merged from code_179d8_r ---- */
+/* ---- part 3: the state machines, the queue's nodes, the file table ---- */
 
 /*
  * The CD driver's read state machine, its request-queue nodes and its
@@ -717,9 +735,9 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
  * include/CdDriver.h's).
  *
  * The state machine takes one step each time ServiceCdDriver
- * (CdDriver.c, a VSync callback) runs: it calls TickCdStateMachine or
+ * (part 2, a VSync callback) runs: it calls TickCdStateMachine or
  * TickCdLoadFileStateMachine as gCdTickStep says, after a CdDriver method
- * (CdDriver.c) has started an operation with StartCdOperation and set
+ * (part 1) has started an operation with StartCdOperation and set
  * gCdSeekParam, gCdReadSectorCount and gCdReadBuffer. gCdState walks
  * CD_STATE_SETLOC (CdControlF(CdlSetloc) to gCdSeekParam->pos),
  * CD_STATE_SETLOC_WAIT (poll CdSync), CD_STATE_READ (CdRead) and
@@ -736,15 +754,15 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
  * gCdSavedSeekParam.
  *
  * AllocCdRequestNode appends a zeroed node to gCdRequestQueue and
- * FreeCdRequestNode unlinks one; EnqueueCdRequest (CdDriver.c) fills
- * them and CdDriver__RunRequestQueue (CdDriver.c) consumes them from the
+ * FreeCdRequestNode unlinks one; EnqueueCdRequest (part 2) fills
+ * them and CdDriver__RunRequestQueue (part 1) consumes them from the
  * head. FindCdFileEntry and FindCdFileIndex look a name up in gFileTable by
  * substring, GetCdFileEntry indexes it. Every function but the three
  * state setters brackets its body with LockCd / UnlockCd, which makes
  * ServiceCdDriver skip its tick in between.
  */
 
-/* Defined in CdDriver.c. */
+/* Part 2's, above. */
 extern void LockCd(void);
 extern void UnlockCd(void);
 
@@ -1000,14 +1018,14 @@ void SetCdState(s32 state) {
     gCdTimeoutCounter = 0;
 }
 
-/* ---- merged from code_179d8_h ---- */
+/* ---- part 4: the blocking file calls ---- */
 
 /*
  * The CD driver's blocking file access, and a pair that turns a FileResource
  * into a CD driver.
  *
  * OpenCdFile, CloseCdFile, GetCdFileSize and ReadCdFile are what CdDriver's
- * open, close, seek and read slots (CdDriver.c) call when the driver is
+ * open, close, seek and read slots (part 1) call when the driver is
  * not in async mode. Like those slots they run on whichever FileResource
  * object called them (CdDriver.h's banner) and use only its isOpen, pos and
  * size. OpenCdFile looks the name up with CdSearchFile under the path
