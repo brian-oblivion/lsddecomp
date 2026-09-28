@@ -7,14 +7,14 @@
 ## What it does
 
 `s32 TaskObjF__FormatCard(Node3bb8cE *self)`. Retries up to 10 times: pick one of
-two candidate path/name constants (`gMcDevicePath1` or `sMcDevicePath0`) based on
+two candidate path/name constants (`sMcDevicePath1` or `sMcDevicePath0`) based on
 `self->unkC`'s truth value, call `func_80050918` on it, and stop as soon
 as it returns nonzero or the retry budget is exhausted.
 
 ## Result
 
 Reached 25/27 first try with the tag values swapped (my ternary picked
-`sMcDevicePath0` when `unkC != 0`; retail picks `gMcDevicePath1`). Swapping the
+`sMcDevicePath0` when `unkC != 0`; retail picks `sMcDevicePath1`). Swapping the
 ternary arms matched immediately:
 
 ```c
@@ -26,7 +26,7 @@ s32 TaskObjF__FormatCard(Node3bb8cE *self)
 
     retries = 10;
     do {
-        path = self->unkC != 0 ? &gMcDevicePath1 : &sMcDevicePath0;
+        path = self->unkC != 0 ? &sMcDevicePath1 : &sMcDevicePath0;
         result = func_80050918(path);
     } while (result == 0 && retries-- != 0);
     return result;
@@ -47,11 +47,11 @@ this same unit share the shape).
 
 ## Naming (round 78, track 3)
 
-`func_8004E940` -> `TaskObjF__FormatCard`. **Tier A.** Sits at `gTaskObjFMethods` +0x050. Retries up to 10 times: pick `gMcDevicePath1`/`sMcDevicePath0` (BIOS device names "bu10:"/"bu00:", asm/data/7B12C.sdata.s) by `self->cardSlot`, and call the linked BIOS `format()` on it. Direct call to a BIOS function named `format` -- tier A.
+`func_8004E940` -> `TaskObjF__FormatCard`. **Tier A.** Sits at `gTaskObjFMethods` +0x050. Retries up to 10 times: pick `sMcDevicePath1`/`sMcDevicePath0` (BIOS device names "bu10:"/"bu00:", asm/data/7B12C.sdata.s) by `self->cardSlot`, and call the linked BIOS `format()` on it. Direct call to a BIOS function named `format` -- tier A.
 
 ## Track 4b (2026-09-25, round 85)
 
-`sMcDevicePath0`/`gMcDevicePath1` were declared `s32` here and
+`sMcDevicePath0`/`sMcDevicePath1` were declared `s32` here and
 `McDevicePath` in `include/class_3bb8c.h`. This unit now includes that
 header, `path` is a `McDevicePath *`, and `format()` is declared with the
 BIOS's device-name parameter (`char *`). Byte-identical; no new `-Wall`

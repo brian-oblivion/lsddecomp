@@ -801,7 +801,7 @@ s32 TaskObjF__FormatCard(TaskObjF *self) {
 
     retries = MEMCARD_RETRIES;
     do {
-        path = self->cardSlot != 0 ? &gMcDevicePath1 : &sMcDevicePath0;
+        path = self->cardSlot != 0 ? &sMcDevicePath1 : &sMcDevicePath0;
         result = format((char *)path); /* the device name, "bu00:" or "bu10:" */
     } while (result == 0 && retries-- != 0);
     return result;
@@ -1101,7 +1101,7 @@ char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix) {
     McDevicePath *device;
 
     if (cardSlot) {
-        device = &gMcDevicePath1;
+        device = &sMcDevicePath1;
     } else {
         device = &sMcDevicePath0;
     }

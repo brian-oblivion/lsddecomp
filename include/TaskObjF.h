@@ -226,7 +226,7 @@ typedef struct McDevicePath {
     s8 b0, b1, b2, b3, b4, b5;
 } McDevicePath;
 
-extern McDevicePath gMcDevicePath1; /* "bu10:" */
+extern McDevicePath sMcDevicePath1; /* "bu10:" */
 extern McDevicePath sMcDevicePath0; /* "bu00:" */
 
 /* Game code (src/ui/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it

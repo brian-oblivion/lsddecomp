@@ -2288,7 +2288,7 @@ TaskObjF__CollectExistingMemcardFiles = 0x8004EB88; // type:func
 TaskObjF__CheckCardSpace = 0x8004EC5C; // type:func
 TaskObjF__ProbeCardFreeSpace = 0x8004ECCC; // type:func
 TaskObjF__ClearLinks = 0x8004E3F4; // type:func
-gMcDevicePath1 = 0x8008AA9C;
+sMcDevicePath1 = 0x8008AA9C;
 sMcDevicePath0 = 0x8008AAA4;
 sMcTempFileSuffix = 0x8008AAAC;
 // identified: fingerprint EXACT (8w, 4-way AMBIGUOUS) vs libsnd/ssinit SsInit (3.3); position decides: inside the libsnd/ssinit slot right after _SsInit, between placed vm_vsu and sstable; body is _SsInit(0), which only SsInit of the tied names does. Header LIBSND.H. Round 78.
