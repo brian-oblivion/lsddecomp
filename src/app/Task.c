@@ -1437,10 +1437,10 @@ void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
 
 extern s32 gDefaultViewportWidth;
 extern s32 gDefaultViewportHeight;
-extern ViewportRgb gDefaultViewportColor;
+extern ViewportRgb sDefaultViewportColor;
 /* MATCHING: a second name for the same symbol, so cc1 cannot share one
  * address computation between the two copies; retail loads it twice. */
-extern ViewportRgb gDefaultViewportColorAlias __asm__("gDefaultViewportColor");
+extern ViewportRgb gDefaultViewportColorAlias __asm__("sDefaultViewportColor");
 
 /* InitDefaults' values. The OT has 1 << VIEWPORT_DEFAULT_OT_LENGTH (8192)
  * tags; with the near and far defaults Update's zDiv comes out 8. The packet
@@ -1453,7 +1453,7 @@ extern ViewportRgb gDefaultViewportColorAlias __asm__("gDefaultViewportColor");
 #define VIEWPORT_DEFAULT_FAR_Z 65536
 #define VIEWPORT_DEFAULT_FOG_NEAR 20000
 
-/* Every field's default; both colours start black (gDefaultViewportColor). */
+/* Every field's default; both colours start black (sDefaultViewportColor). */
 void Viewport__InitDefaults(Viewport *self) {
     self->clockEventCount = 0;
     self->otReady = 0;
@@ -1471,7 +1471,7 @@ void Viewport__InitDefaults(Viewport *self) {
     self->farZ = VIEWPORT_DEFAULT_FAR_Z;
     self->lightMode = GsLMODE_NORMAL;
     self->fogNear = VIEWPORT_DEFAULT_FOG_NEAR;
-    self->farColor = gDefaultViewportColor;
+    self->farColor = sDefaultViewportColor;
     self->clearColor = gDefaultViewportColorAlias;
     self->extraSwap = 0;
     self->drawEnabled = 1;
