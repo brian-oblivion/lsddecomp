@@ -875,7 +875,7 @@ void Entity__MoodCue23(Entity *this) {
     } else if (this->moodTimer == 0) {
         this->methods->addTranslation(this, sTranslateYMinus4096);
     } else if (this->moodTimer < 65) {
-        this->methods->addTranslation(this, TRANSLATE_Y_PLUS64);
+        this->methods->addTranslation(this, sTranslateYPlus64);
     } else if (this->moodTimer < 71) {
         this->methods->addTranslation(this, sTranslateYMinus64);
         this->methods->moveLocalZ(this, -30, 0);
@@ -1103,7 +1103,7 @@ void Entity__MoodCue35(Entity *this) {
     if (rem500 < 32) {
         this->methods->addTranslation(this, sTranslateYMinus64);
     } else if (rem500 < 64) {
-        this->methods->addTranslation(this, TRANSLATE_Y_PLUS64);
+        this->methods->addTranslation(this, sTranslateYPlus64);
     }
 }
 

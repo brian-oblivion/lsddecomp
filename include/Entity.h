@@ -277,7 +277,7 @@ extern Ratio16 sRotationZMinus90[];
 extern LongVec3 sTranslateYPlus256[];
 extern LongVec3 sTranslateYMinus4096[];
 extern LongVec3 sTranslateYMinus512[];
-extern LongVec3 TRANSLATE_Y_PLUS64[];
+extern LongVec3 sTranslateYPlus64[];
 extern LongVec3 sTranslateYPlus8[];
 extern LongVec3 sTranslateYMinus64[];
 extern LongVec3 sTranslateYMinus256[];
