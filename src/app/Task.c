@@ -1440,7 +1440,7 @@ extern s32 sDefaultViewportHeight;
 extern ViewportRgb sDefaultViewportColor;
 /* MATCHING: a second name for the same symbol, so cc1 cannot share one
  * address computation between the two copies; retail loads it twice. */
-extern ViewportRgb gDefaultViewportColorAlias __asm__("sDefaultViewportColor");
+extern ViewportRgb sDefaultViewportColorAlias __asm__("sDefaultViewportColor");
 
 /* InitDefaults' values. The OT has 1 << VIEWPORT_DEFAULT_OT_LENGTH (8192)
  * tags; with the near and far defaults Update's zDiv comes out 8. The packet
@@ -1472,7 +1472,7 @@ void Viewport__InitDefaults(Viewport *self) {
     self->lightMode = GsLMODE_NORMAL;
     self->fogNear = VIEWPORT_DEFAULT_FOG_NEAR;
     self->farColor = sDefaultViewportColor;
-    self->clearColor = gDefaultViewportColorAlias;
+    self->clearColor = sDefaultViewportColorAlias;
     self->extraSwap = 0;
     self->drawEnabled = 1;
 }
