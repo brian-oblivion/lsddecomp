@@ -43,12 +43,20 @@ extern BMemPMgr *gStartupBMemPMgr;
 extern GameApplication *gGameApplication;
 extern GameApplicationConfig gGameApplicationConfig;
 
+/* SetMem's argument: the RAM size in megabytes (Psy-Q libapi takes 2, a
+ * retail console, or 8, a development board). */
+#define CONSOLE_RAM_MB 2
+
+/* Bytes of blocks in the game's one BMemPMgr pool, BMemPMgrInit's poolSize
+ * (0x166C00): every BMemPMgrAlloc in the game is carved from it. */
+#define DEFAULT_POOL_SIZE (1435 * 1024)
+
 void main(void) {
     DrawSystem *drawSystem;
     Pad *pad;
 
-    SetMem(2);
-    gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
+    SetMem(CONSOLE_RAM_MB);
+    gStartupBMemPMgr = BMemPMgrInit(DEFAULT_POOL_SIZE, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
     gGameApplication = New_GameApplication(&gGameApplicationConfig);
     drawSystem = New_DrawSystem();
