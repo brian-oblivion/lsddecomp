@@ -2503,12 +2503,12 @@ void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, 
 }
 
 /* Lay the two model children out in a row: child i sits at (i + 1) *
- * gModelChildSpacing[modelChildLayout], along x (scaled by scale's x
+ * sModelChildSpacing[modelChildLayout], along x (scaled by scale's x
  * numerator) for layouts 1-2 and along y for 3-4. reuse = 0 creates them
  * (New_Actor, sharing the owner's model, attached to the owner);
  * reuse = 1 only resets their translation (setTranslation). */
 extern LongVec3 sModelChildOffsetInit;
-extern s32 gModelChildSpacing[];
+extern s32 sModelChildSpacing[];
 
 void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
     LongVec3 childPos;
@@ -2523,9 +2523,9 @@ void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
     slot = self->modelChildren;
     for (i = 0; i < ARRAY_COUNT(self->modelChildren); i++, slot++) {
         if (layout < 3) {
-            childPos.x += self->params.scale[0].num * gModelChildSpacing[layout];
+            childPos.x += self->params.scale[0].num * sModelChildSpacing[layout];
         } else {
-            childPos.y += gModelChildSpacing[layout];
+            childPos.y += sModelChildSpacing[layout];
         }
         if (reuse) {
             Actor *child = *slot;
