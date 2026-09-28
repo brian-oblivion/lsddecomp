@@ -67,7 +67,7 @@ extern s32 sCdQueueEnabled;      /* ServiceCdDriver runs the request queue */
 
 void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
     s32 *unassigned; /* never assigned: see the store below */
-    s32 idx;
+    s32 fileIndex;
 
     LockCd();
 
@@ -77,8 +77,8 @@ void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
              * register (whatever the caller left in $s2), a bug in the
              * original; which object it meant to reach is unknowable. */
             unassigned[1] = 1;
-            idx = FindCdFileIndex(name);
-            EnqueueCdRequest(self, idx, CD_OP_LOAD_FILE, 0, 0);
+            fileIndex = FindCdFileIndex(name);
+            EnqueueCdRequest(self, fileIndex, CD_OP_LOAD_FILE, 0, 0);
         } else {
             self->methods->loadFile(self, name);
 
@@ -98,19 +98,19 @@ void CdDriver__StopService(void) {
 }
 
 void CdDriver__CancelRequests(CdDriver *self) {
-    CdRequestNode *entry;
+    CdRequestNode *head;
     CdRequestNode *node;
     CdRequestNode *next;
     CdFileEntry *saved;
 
     LockCd();
 
-    entry = gCdRequestQueue;
+    head = gCdRequestQueue;
 
-    if (entry != NULL && self->pendingRequests != 0) {
+    if (head != NULL && self->pendingRequests != 0) {
         self->flags = 0;
 
-        if (entry->owner == self && entry->active != 0 && gCdIdle == 0) {
+        if (head->owner == self && head->active != 0 && gCdIdle == 0) {
             CdFlush();
             ResetCdStateMachine();
             saved = gCdSavedSeekParam;
@@ -171,34 +171,34 @@ s32 GetCdState(void) {
  * (code_179d8_s.c) still queue each request but run it as a blocking spin
  * when runRequestQueue dispatches it; with both clear they skip the queue. */
 
-s32 GetCdDriverMode(s32 *outMode2) {
-    if (outMode2 != NULL) {
-        *outMode2 = gCdSyncQueueMode;
+s32 GetCdDriverMode(s32 *outSyncQueueMode) {
+    if (outSyncQueueMode != NULL) {
+        *outSyncQueueMode = gCdSyncQueueMode;
     }
     return gCdAsyncEnabled;
 }
 
-s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
-    DrawSystem *obj;
+s32 SetCdDriverMode(s32 async, s32 syncQueueMode, s32 useVSyncCallback) {
+    DrawSystem *drawSystem;
 
     if (gCdBusy == 0) {
         if (useVSyncCallback == 0) {
-            obj = GetDrawSystem();
+            drawSystem = GetDrawSystem();
 
             if (gCdAsyncEnabled == 0) {
                 if (async != 0) {
-                    obj->methods->setCallback(obj, (void (*)(void))ServiceCdDriver);
+                    drawSystem->methods->setCallback(drawSystem, (void (*)(void))ServiceCdDriver);
                 }
             } else {
                 if (async == 0) {
-                    obj->methods->setCallback(obj, 0);
+                    drawSystem->methods->setCallback(drawSystem, 0);
                 }
             }
         }
 
         gCdUseVSyncCallback = useVSyncCallback;
         gCdAsyncEnabled = async;
-        gCdSyncQueueMode = mode2;
+        gCdSyncQueueMode = syncQueueMode;
 
         return 1;
     }
@@ -330,13 +330,13 @@ void DisableCdQueue(void) {
  * MATCHING: the stores are in retail's order (+0x08, +0x14, +0x0C, +0x10,
  * +0x18); this compiler keeps statement order. */
 void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1) {
-    CdRequestNode *entry = AllocCdRequestNode();
+    CdRequestNode *node = AllocCdRequestNode();
 
-    entry->op = op;
-    entry->param0 = param0;
-    entry->owner = owner;
-    entry->fileIndex = fileIndex;
-    entry->param1 = param1;
+    node->op = op;
+    node->param0 = param0;
+    node->owner = owner;
+    node->fileIndex = fileIndex;
+    node->param1 = param1;
 
     owner->pendingRequests++;
     owner->flags = 0;
