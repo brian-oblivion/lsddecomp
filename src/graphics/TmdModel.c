@@ -1,5 +1,5 @@
 /*
- * TmdModel.c -- the TmdModel class (include/TmdModel.h; method table
+ * TmdModel (include/TmdModel.h; method table
  * gTmdModelMethods, class tag 9): one object of a TMD file (the "model"
  * SceneNode__LinkModel, src/graphics/SceneNode.c, links into a GsDOBJ2). Its
  * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
