@@ -211,3 +211,18 @@ Outside this job's edit set (the head applies them by type scope):
   address; it is BoxFill's position record (setPosition, attachToParent,
   TextRow's layout) and belongs to BoxFill.h's job, not this one.
 
+
+## History (moved from src/ScreenWidgets.c, comments pass)
+
+The file's banner carried its edge evidence and the reason it is parked:
+
+> What decided its edges (python3 tools/tuboundary.py): the placed object
+> libgte/fog_01 precedes it ("start edge possible") and psyq_memset follows
+> it; every edge inside is "boundary possible". The forced boundary the tool
+> reports between jump tables 0x80011108 (Task.c) and 0x800111dc (Sprite.c)
+> is met by those two object edges. Content decided: BoxFill's methods
+> straddled the old carve edge between code_2cc8c_e and code_2cc8c_f
+> (allocator, ctor and Reset before it), so the two were merged. PARKED: the
+> content would put a file boundary before New_TextRow (and perhaps before
+> the Shift-JIS helpers); a split is a new carve, so the file keeps them and
+> is named for all it holds.
