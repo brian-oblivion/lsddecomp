@@ -128,23 +128,14 @@ void SetTeleportsEnabled(s32 stage) {
 
 /* Mood rows 11, 56, 78 and 93 turn the instant teleporters on. */
 void EnableTeleportsForKind(s32 moodIndex) {
-    if (moodIndex == 78) {
-        goto call;
+    switch (moodIndex) {
+        case 11:
+        case 56:
+        case 78:
+        case 93:
+            SetInstantTeleportersEnabled(1);
+            break;
     }
-    if (moodIndex < 79) {
-        if (moodIndex == 11) {
-            goto call;
-        }
-        if (moodIndex == 56) {
-            goto call;
-        }
-        return;
-    }
-    if (moodIndex != 93) {
-        return;
-    }
-call:
-    SetInstantTeleportersEnabled(1);
 }
 
 void ReleaseDreamAuxEntities(void) {
