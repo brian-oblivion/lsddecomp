@@ -1799,7 +1799,7 @@ s32 StageMap__InitFootprintRect(StageMap *self, s32 unused, s32 index, s32 chunk
     CellRect *rect;
 
     rect = &self->rects.e[index];
-    *rect = gFullSlotRect;
+    *rect = sFullSlotRect;
     rect->slotIndex = self->methods->findSlotIndexByChunk(self, chunkIndex);
     return index + 1;
 }
