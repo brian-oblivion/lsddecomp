@@ -108,6 +108,6 @@ loop).
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_80087204` | `sStyleKind1Scale` | A | stored as the params' scale for every kind-1 effect. |
-| `D_80087330` | `sStyleSpawnYChoice2` | A | the word at `gStyleSpawnYChoices[2]` (-0x3800), a separate splat symbol; spelling it as the array element changes StyleFillEffectKind2's bytes (measured round 93), so the symbol stays. |
+| `D_80087330` | `sStyleSpawnYChoice2` | A | the word at `sStyleSpawnYChoices[2]` (-0x3800), a separate splat symbol; spelling it as the array element changes StyleFillEffectKind2's bytes (measured round 93), so the symbol stays. |
 
 Locals: `slots`, `count`, `pos`, `offsetY`.

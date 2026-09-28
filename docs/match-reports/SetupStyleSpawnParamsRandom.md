@@ -160,7 +160,7 @@ the retype, so the retype cost it nothing.
 ### The matched body
 
 ```c
-extern s32 gStyleSpawnYChoices[];
+extern s32 sStyleSpawnYChoices[];
 extern s32 sStyleSpawnOffsetX;
 extern s32 sStyleSpawnOffsetY;
 extern s32 sStyleSpawnOffsetZ;
@@ -170,7 +170,7 @@ extern s32 sStyleSpawnModelLayout;
 
 void SetupStyleSpawnParamsRandom(void *arg0, void *arg1) {
     if (arg1 == 0) {
-        arg1 = (void *) gStyleSpawnYChoices[rand() & 3];
+        arg1 = (void *) sStyleSpawnYChoices[rand() & 3];
     }
     sStyleSpawnOffsetY = (s32) arg1;
     sStyleSpawnOffsetX = (rand() % 23) << 11;
@@ -320,7 +320,7 @@ an unrelated modulo test. MATCHED, 110/110, ins 0/del 0.
 
 ### Naming
 
-Parameters: `(LongVec3 *pos, s32 offsetY)` -- the type StyleFillEffectKind0's shared function pointer calls both setups with (round 93; `void *` before). `pos` is unused; `offsetY == 0` picks one of `gStyleSpawnYChoices`.
+Parameters: `(LongVec3 *pos, s32 offsetY)` -- the type StyleFillEffectKind0's shared function pointer calls both setups with (round 93; `void *` before). `pos` is unused; `offsetY == 0` picks one of `sStyleSpawnYChoices`.
 
 ### Comments moved here from src/world/ObjMStyleActor.c
 

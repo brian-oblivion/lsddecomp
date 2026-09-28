@@ -125,7 +125,7 @@ the output array walked and returned one slot advanced (the same
 
 ```c
 extern u8 sStyleSpawnScales[];
-extern s32 gStyleSpawnYChoices[];
+extern s32 sStyleSpawnYChoices[];
 extern u8 *sStyleSpawnScale;
 extern s32 sStyleSpawnTableIndex;
 extern u8 sStyleSpawnOffsetX[];
@@ -145,7 +145,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     sStyleSpawnScale = (u8 *) sStyleSpawnScales + ((u32) rand() % 5) * 12;
     t3 = (u32) rand() % 5;
     if (t3 != 0) {
-        t3 = gStyleSpawnYChoices[t3];
+        t3 = sStyleSpawnYChoices[t3];
     }
     fp = SetupStyleSpawnParamsDayMod7;
     if (sStyleDay % 7 != 0) {
@@ -165,7 +165,7 @@ Every value confirmed directly off the raw bytes:
 - `rand() % 7` uses the signed reciprocal `0x92492493`/`sra 2` (the standard
   GCC signed-divide-by-7 idiom); `rand() % 5` (twice) uses the unsigned
   reciprocal `0xCCCCCCCD`/`srl 2`.
-- The `gStyleSpawnYChoices` table lookup is a **word**-stride array (`sll v0,s1,2`
+- The `sStyleSpawnYChoices` table lookup is a **word**-stride array (`sll v0,s1,2`
   before the `lw`), and the guard `beqz s1,...` skips the lookup only when
   the `rand()%5` remainder is exactly 0 -- matching the `if (t3 != 0)`
   reassignment shape.
@@ -254,7 +254,7 @@ iteration via a `sStyleDay % 7` test. STALL, 93/99, whole-function
 | --- | --- | --- | --- |
 | `D_8008E0A4`..`D_8008E0C0` | `sStyleSpawnOffsetX`, `...OffsetY`, `...OffsetZ`, `sStyleSpawnRotation`, `sStyleSpawnScale`, `sStyleSpawnModelLayout`, `sStyleSpawnTableIndex`, `sStyleSpawnColors` | A | the 0x24-byte block passed to New_StyleEffect as its `StyleEffectParams` (include/StyleEffect.h, which names each member: offset x/y/z, rotation, scale, modelChildLayout, tableIndex, color/altColor). Kept as separate symbols: SetupStyleSpawnParamsRandom's match depends on the scalar declarations. |
 | `D_800871C8` | `sStyleSpawnScales` | A | 5 Ratio16 triples, one picked by `rand() % 5` into the params' scale. |
-| `D_80087328` | `gStyleSpawnYChoices` | A | 4 words {-0x1800, -0x2800, -0x3800, -0x5000}: the offset-y values SetupStyleSpawnParamsRandom picks from. |
+| `D_80087328` | `sStyleSpawnYChoices` | A | 4 words {-0x1800, -0x2800, -0x3800, -0x5000}: the offset-y values SetupStyleSpawnParamsRandom picks from. |
 
 Note: the offset-y pick is `rand() % 5`, and 0 means "let SetupStyleSpawnParamsRandom choose"; index 4 reads one word past the 4-entry table (0x80087338, the next symbol, D_80087338: 0x0A0A0200). That is retail's behaviour, reproduced as written.
 

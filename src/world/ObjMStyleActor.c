@@ -1574,7 +1574,7 @@ void StyleTeardown(void) {
 }
 
 extern Ratio16 sStyleSpawnScales[][3];
-extern s32 gStyleSpawnYChoices[];
+extern s32 sStyleSpawnYChoices[];
 extern Ratio16 *sStyleSpawnScale;
 extern s32 sStyleSpawnTableIndex;
 /* The first word of the StyleEffectParams block every effect is built from
@@ -1585,7 +1585,7 @@ extern void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY);
 
 /* Fills `count` slots with kind-0 effects: a table index and scale for all
  * of them, an offset y (0: each setup picks one; a pick of 4 reads the word
- * after gStyleSpawnYChoices, as retail does), and per slot
+ * after sStyleSpawnYChoices, as retail does), and per slot
  * SetupStyleSpawnParamsRandom, or B on every seventh day. Returns the next slot. */
 StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
@@ -1596,7 +1596,7 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
     sStyleSpawnScale = sStyleSpawnScales[(u32)rand() % 5];
     offsetY = (u32)rand() % 5;
     if (offsetY != 0) {
-        offsetY = gStyleSpawnYChoices[offsetY];
+        offsetY = sStyleSpawnYChoices[offsetY];
     }
     setup = SetupStyleSpawnParamsDayMod7;
     if (sStyleDay % 7 != 0) {
@@ -1736,7 +1736,7 @@ extern s32 sStyleSpawnModelLayout;
  * decay is kept in a saved register across the rand() calls). */
 void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
     if (offsetY == 0) {
-        offsetY = gStyleSpawnYChoices[rand() & 3];
+        offsetY = sStyleSpawnYChoices[rand() & 3];
     }
     sStyleSpawnOffsetY = offsetY;
     sStyleSpawnOffsetX = (rand() % 23) << 11;
