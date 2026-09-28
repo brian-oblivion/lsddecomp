@@ -677,7 +677,7 @@ typedef struct {
  * that opens a scrolled list of items (TitleMenu's: D_80086CA8). */
 typedef struct SlotEntry {
     u8 pad000[0x004];
-    s32 savedCursor;       /* +0x004 the committed item cursor */
+    s32 savedCursor;      /* +0x004 the committed item cursor */
     ColorRgb cursorColor; /* +0x008 the colour of the item under the cursor while scrolling */
     u8 pad00B[0x010 - 0x00B];
     /* +0x010 where the cursor's row is drawn; the list starts savedCursor rows

@@ -925,7 +925,7 @@ typedef struct ChunkCoord {
  * text, the TextRow's position (attachToParent) and its colour (setColor). */
 extern char sPauseText[];             /* "Pause" */
 extern ScreenSpritePos sPauseTextPos; /* (-20, -50) */
-extern ColorRgb sPauseTextColor;     /* red: (255, 0, 0) */
+extern ColorRgb sPauseTextColor;      /* red: (255, 0, 0) */
 
 void ObjM__EnterLinkFlashback(ObjM *self) {
     DreamColors color;
