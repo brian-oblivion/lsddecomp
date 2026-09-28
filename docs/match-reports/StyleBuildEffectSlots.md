@@ -16,7 +16,7 @@ void StyleBuildEffectSlots(void *arg0);
 ```c
 extern void SetStyleEffectSources(s32 arg0, void *arg1, s32 arg2, s32 arg3); /* ObjMStyleActor.c, ALREADY MATCHED */
 extern s32 rand(void);                                               /* libc, shared local view used project-wide */
-extern s8 gStyleKind0Counts[];                                              /* 4-entry table, forward-indexed by rand()&3 */
+extern s8 sStyleKind0Counts[];                                              /* 4-entry table, forward-indexed by rand()&3 */
 extern void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);        /* forward decl, own unit, cold */
 extern void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2);      /* forward decl, own unit, ALREADY MATCHED this round */
 extern void StyleFillEffectKind3(void *arg0, void *arg1);                   /* forward decl, own unit, cold */
@@ -45,7 +45,7 @@ void StyleBuildEffectSlots(void *arg0) {
     }
     base = gStyleSceneRefs;
     SetStyleEffectSources(gStyleVariant, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
-    val = gStyleKind0Counts[rand() & 3];
+    val = sStyleKind0Counts[rand() & 3];
     count = (gStyleVariant == 2) ? 0x10 - val : 0;
     sStyleEffectSlotCount = val + count;
     filled = (void **) StyleFillEffectKind0(sStyleEffectSlots, val, arg0);
@@ -104,7 +104,7 @@ for the SEPARATE `sStyleEffectSlots` array (a different object class --
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_80087324` | `gStyleKind0Counts` | A | 4 bytes {0, 3, 8, 16} picked by `rand() & 3`, passed as StyleFillEffectKind0's count. |
+| `D_80087324` | `sStyleKind0Counts` | A | 4 bytes {0, 3, 8, 16} picked by `rand() & 3`, passed as StyleFillEffectKind0's count. |
 | `gStyleTargetObj` | `gStyleSceneRefs` | A | RegisterStyleConfig stores its arg2 there, and its one caller passes `&ObjM::ctorSound`, the start of the sound/dreamerTmd/etcTim/cachedViewport block (`StyleSceneRefs`); kept `s32` because ObjMStyleActor.c declares it so. |
 | `0x10` | `STYLE_VARIANT2_EFFECTS` (16) | B | variant 2 fills kind 1 up to this many kind-0 plus kind-1 effects. |
 
