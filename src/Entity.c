@@ -1630,7 +1630,7 @@ void Entity__MoodCue58(Entity *this, SoundCueSet *out) {
             out->slots[0].program = 18;
             out->attenuation = 0;
             out->slots[1].program = 3;
-            this->methods->updateRotation(this, 1, ROTATION_ZMINUS90);
+            this->methods->updateRotation(this, 1, sRotationZMinus90);
             this->methods->moveLocalX(this, 2400, 0);
             this->methods->moveLocalY(this, 1500, 0);
             this->parts[1]->methods->setDisplay(this->parts[1], 0);
