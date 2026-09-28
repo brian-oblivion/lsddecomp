@@ -10,19 +10,19 @@
  * queue, the file table and the module state its units share (track 4b,
  * round 85).
  *
- *   src/CdDriver.c  New_CdDriver, the ctor (FileResource's ctor, then
+ *   src/CdDriver.c      the whole class, in five parts:
+ *                       1. New_CdDriver, the ctor (FileResource's ctor, then
  *                       InitCdDrive), Finalize, NoOpSlot40
- *   src/CdDriver.c      everything else, in four parts:
- *                       1. Open, Close, Seek, NoOpSlot50, Read, LoadFile,
+ *                       2. Open, Close, Seek, NoOpSlot50, Read, LoadFile,
  *                       RunRequestQueue: each enqueues a CD_OP_* request, or
  *                       starts it when RunRequestQueue dispatches it back
- *                       2. RequestLoadFile, StopService, CancelRequests, the
+ *                       3. RequestLoadFile, StopService, CancelRequests, the
  *                       getter; the queue front end (EnqueueCdRequest), the
  *                       file table's setters, ResolveFileEntries, the lock
  *                       and the VSync service tick (ServiceCdDriver)
- *                       3. the read state machine, AllocCdRequestNode /
+ *                       4. the read state machine, AllocCdRequestNode /
  *                       FreeCdRequestNode, the file-table lookups
- *                       4. the synchronous OpenCdFile / CloseCdFile /
+ *                       5. the synchronous OpenCdFile / CloseCdFile /
  *                       GetCdFileSize / ReadCdFile the methods call when
  *                       the driver is not in async mode
  *
