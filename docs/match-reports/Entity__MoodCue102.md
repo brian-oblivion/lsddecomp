@@ -43,7 +43,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC >= 0x30D) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         if (this->unkFC >= 0x790) {
-            a2 = SCALE_UNIT;
+            a2 = sScaleUnit;
         } else if (this->unkFC >= 0x78B) {
             a2 = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
         } else if (this->unkFC >= 0x786) {
@@ -153,7 +153,7 @@ elsewhere in this unit -- same symbol, not redecoded per call site.
   fractional-degree rotation constant has a name anywhere in the project
   yet, so inventing one here (`ROTATION_YAW_MINUS_THIRD`-style) would be a
   new naming style, not an application of an existing one.
-- `SCALE_UNIT` (`updateScale` arg, `moodTimer >= 0x790` arm): decoded
+- `sScaleUnit` (`updateScale` arg, `moodTimer >= 0x790` arm): decoded
   `(1,1, 1,1, 1,1, 1,8)` -- uniform X=Y=Z=1/1, i.e. the same VALUE as the
   existing (structurally distinct, different address, 0xC-byte/3-entry)
   `sSceneNodeScaleOne` used by `SceneNode__UpdateScale`. Not renamed to `sSceneNodeScaleOne`
@@ -187,7 +187,7 @@ Not a phase of this handler: nothing here reads `state == 1`, and the value
 is the one `Entity__UpdateActivationState` (`this->active == 0 &&
 this->state != 1`) and `Entity__UpdateSoundCueStart` read as "done, do not
 reactivate or restart the cue". By 2000 ticks the scale has settled at
-`SCALE_UNIT` (from 1936) and the handler stops its own `moveLocalZ`; setting
+`sScaleUnit` (from 1936) and the handler stops its own `moveLocalZ`; setting
 1 also stops the `state == 0` link-stage trigger from firing. The same
 value is stored without a `deactivate` by `Entity__MoodCue123` and by
 Entity's MoodCue after `stopSoundCue`, so the header comment's "after

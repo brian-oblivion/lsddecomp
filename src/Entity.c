@@ -2101,7 +2101,7 @@ void Entity__MoodCue78(Entity *this, SoundCueSet *out) {
             rollOrDy = (this->state == 12) ? 400 : 0;
             this->state = 13;
         } else {
-            table = SCALE_UNIT;
+            table = sScaleUnit;
             if (this->state == 13) {
                 rollOrDy = -400;
             }
@@ -2639,7 +2639,7 @@ void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
     if (this->moodTimer >= 781) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         if (this->moodTimer >= 1936) {
-            scale = SCALE_UNIT;
+            scale = sScaleUnit;
         } else if (this->moodTimer >= 1931) {
             scale = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
         } else if (this->moodTimer >= 1926) {
