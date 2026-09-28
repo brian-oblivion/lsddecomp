@@ -1993,7 +1993,7 @@ extern s32 sStyleStage;
 extern void RotateVramRectRight(DrawRect *rect, s32 count, DrawRect *scratch);
 extern DrawRect sStyleStripRectA;
 extern DrawRect gStyleStripScratchA;
-extern DrawRect gStyleStripRectB;
+extern DrawRect sStyleStripRectB;
 extern DrawRect gStyleStripScratchB;
 
 /* One step of RotateVramRectRight's one-column VRAM rotation: stage 2 on the
@@ -2008,7 +2008,7 @@ void StyleScrollVramStrips(void) {
         count = 1; /* MATCHING: a local set in each branch, not a literal argument */
     } else if ((u32)(sStyleStage - 3) < 3) {
         count = 1;
-        rect = &gStyleStripRectB;
+        rect = &sStyleStripRectB;
         scratch = &gStyleStripScratchB;
     } else {
         return;

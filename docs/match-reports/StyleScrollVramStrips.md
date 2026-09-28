@@ -28,8 +28,8 @@ Fresh ground, carved round 45, never attempted. No blockers.
 /* 46254 80055A54 0300422C */  sltiu $v0, $v0, 0x3
 /* 46258 80055A58 07004010 */  beqz  $v0, .L80055A78
 /* 4625C 80055A5C 01000534 */   ori  $a1, $zero, 0x1
-/* 46260 80055A60 0880043C */  lui   $a0, %hi(gStyleStripRectB)
-/* 46264 80055A64 5C748424 */  addiu $a0, $a0, %lo(gStyleStripRectB)
+/* 46260 80055A60 0880043C */  lui   $a0, %hi(sStyleStripRectB)
+/* 46264 80055A64 5C748424 */  addiu $a0, $a0, %lo(sStyleStripRectB)
 /* 46268 80055A68 0880063C */  lui   $a2, %hi(gStyleStripScratchB)
 /* 4626C 80055A6C 6874C624 */  addiu $a2, $a2, %lo(gStyleStripScratchB)
 .L80055A70:
@@ -54,7 +54,7 @@ extern s32 sStyleStage;
 extern void RotateVramRectRight(void *arg0, s32 arg1, void *arg2);
 extern s32 sStyleStripRectA[];
 extern s32 gStyleStripScratchA[];
-extern s32 gStyleStripRectB[];
+extern s32 sStyleStripRectB[];
 extern s32 gStyleStripScratchB[];
 
 void StyleScrollVramStrips(void) {
@@ -67,7 +67,7 @@ void StyleScrollVramStrips(void) {
         a1 = 1;
     } else if ((u32) (sStyleStage - 3) < 3) {
         a1 = 1;
-        a0 = gStyleStripRectB;
+        a0 = sStyleStripRectB;
         a2 = gStyleStripScratchB;
     } else {
         return;
@@ -121,6 +121,6 @@ every frame. MATCHED, 25/25, second build (one lever: hoist the shared `a1
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_80087444`/`D_80087450` | `sStyleStripRectA`/`gStyleStripScratchA` | A | DrawRect {0, 0x1F0, 248, 8} and {256, 0x1F0, 1, 8}: RotateVramRectRight's rect and scratch for stage 2. |
-| `D_8008745C`/`D_80087468` | `gStyleStripRectB`/`gStyleStripScratchB` | A | the same at y 0x1F8, for stages 3..5. |
+| `D_8008745C`/`D_80087468` | `sStyleStripRectB`/`gStyleStripScratchB` | A | the same at y 0x1F8, for stages 3..5. |
 
 Locals `rect`, `count`, `scratch`.
