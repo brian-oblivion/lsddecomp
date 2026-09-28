@@ -25,8 +25,7 @@
  * StageMap__SetChildParams (src/DayTaskStageMap.c), through LightRig's
  * getLight, with update = 1 and sources stepping 3 bytes (an r,g,b) and 6
  * bytes (an s16 vx,vy,vz) per light. That call site casts getLight's
- * BasicClass * to FlatLightObj * and its s32 sources to the slots' types
- * (track 4, round 89).
+ * BasicClass * to FlatLightObj * and its s32 sources to the slots' types.
  *
  * The object is 0x20 bytes (New_FlatLightObj's allocation).
  */

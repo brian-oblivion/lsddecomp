@@ -38,10 +38,10 @@
  *    IntermediateBase::state and notifyParents it; DayTask's
  *    onObjMNotify acts on those codes.
  * A day's play loop is the reading the evidence invites, but none of it
- * names the class, so the name stays round 15's.
+ * names the class.
  *
  * Overrides whose parameter list differs from the inherited slot keep the
- * slot's type (FINISHING-PLAN track 4 step 6):
+ * slot's type:
  *  - +0x044 init: ObjM__AttachTarget takes (args, DreamSys *);
  *    DayTask__StartObjM passes the DreamSys as the slot's s32 `mode`.
  *  - +0x04C onInit: ObjM__InitStyleAndWorld takes (gridSpan, style

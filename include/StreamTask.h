@@ -11,9 +11,7 @@
  * src/Task.c holds the whole class: allocator, ctor, every override,
  * the setters and the getter. The object is 0xDC bytes (New_StreamTask).
  *
- * The name is the table's stem with its `Obj` dropped (track 4 step 2);
- * include/GameApplication.h's view already called it StreamTask. What it does,
- * measured: it owns a MoviePlayer (`player`, New_MoviePlayer, gMoviePlayerMethods)
+ * What it does: it owns a MoviePlayer (`player`, New_MoviePlayer, gMoviePlayerMethods)
  * and runs one "ETC\*.STR" stream through it inside TaskCore's fade/state
  * machine. Every caller is GameApplicationFileResource's GameApplication (intro logo, weekly,
  * GraphRoom and cinematic streams): New_StreamTask(NULL, NULL, NULL, NULL),
@@ -59,13 +57,12 @@
  * The overrides of +0x04C/+0x080/+0x084 (and TaskCore's) take self alone;
  * the up-call to onInit casts the slot, as TaskCore.h's banner says.
  *
- * +0x044's contradiction, settled by track 4 step 6 (round 85's TodActor
- * +0x04C rule): StreamTask__Init takes (self, args, streamName, streamGroup,
+ * +0x044: StreamTask__Init takes (self, args, streamName, streamGroup,
  * autoPlay) where IntermediateBase's init takes (self, args, mode) and
  * returns s32. The table keeps the inherited slot type, and GameApplicationFileResource's
  * five callers, which forward the extra arguments, cast the slot to
  * StreamTaskInitFn (a pointer cast, no code). The override returns nothing
- * (no caller reads it), as the round-84 `configure` view had it.
+ * (no caller reads it).
  *
  * `streamName` is MoviePlayer__Play's name argument (`char *` there); it is
  * s32 here because four of the five callers pass a helper's s32 result

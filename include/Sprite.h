@@ -29,7 +29,7 @@
  *
  * Not settled here: the ctor passes reset FIVE arguments after self and
  * reset reads three, where SceneNode's reset takes none (VariantSprite's
- * ctor, round 87, is void: its +0x040 occupant sets no $v0). The slot keeps
+ * ctor is void: its +0x040 occupant sets no $v0). The slot keeps
  * SceneNode's type (it is that class's to change), so a C call through it
  * with arguments needs a cast until SceneNode's slot is retyped.
  *

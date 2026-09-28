@@ -66,3 +66,25 @@ field at +0x028 is FileResource's `inQueueDispatch` (u16), which
 CdDriver__RunRequestQueue sets around its dispatch back into a request method
 (CdDriver.c), and the ctor's store is `self->inQueueDispatch = 0`. No
 source change for this function in round 101 beyond the unit banner.
+
+## History (moved from include/CdDriver.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * queue, the file table and the module state its units share (track 4b,
+ * round 85).
+```
+
+```c
+ * freeGuard, pendingRequests, flags, inQueueDispatch -- are all FileResource's
+ * (pos and size, +0x018/+0x01C, were its pad18 until round 88), and the
+```
+
+```c
+/* The module state. Every global here was declared in two or more of the
+ * units above, with up to three different types; the types below are the
+ * ones their accessors need. A global only one unit touches stays a local
+ * extern in that unit (track 4b, round 85). */
+```
