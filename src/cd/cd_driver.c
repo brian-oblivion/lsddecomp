@@ -1,43 +1,21 @@
 /*
- * cd_driver.c -- the CD driver (class CdDriver, include/cd_driver.h). Five
- * parts, in ROM order:
+ * cd_driver.c -- the CD-ROM data-source driver, CdDriver (include/cd_driver.h,
+ * whose file documentation describes the driver mode, the service tick, the
+ * state machines and the blocking calls). Five parts, in address order:
  *   1. the lifecycle: the allocator, the constructor, the finalizer and the
  *      empty slot +0x040;
- *   2. the request methods (below);
- *   3. the module level: the three request methods that are not
- *      per-request, the queue's front end, the driver mode, the file table
- *      and the service tick;
+ *   2. the request methods open, close, seek, read and loadFile (slots
+ *      +0x044..+0x058, with the empty +0x050) and runRequestQueue (+0x068),
+ *      which feeds the queued requests back to them;
+ *   3. the module level: requestLoadFile, stopService and cancelRequests,
+ *      the queue's front end, the driver mode, the file table, the lock and
+ *      the service tick;
  *   4. the read state machines, the queue's nodes, the file-table lookups;
  *   5. the blocking file calls.
  *
- * Part 2: CdDriver's request methods, open, close, seek, read and loadFile
- * (slots +0x044..+0x058 of gCdDriverMethods, with the empty slot +0x050)
- * and runRequestQueue (+0x068), which feeds the queued requests back to
- * them.
- *
- * `self` is never a CdDriver of its own: SetActiveDataSource copies these
- * slots into every FileResource client's table, so `self` is the TimImage,
- * TodSet, ... that called its own `open`/`read`, and every field used here
- * is FileResource's.
- *
- * Every method but runRequestQueue has one shape, chosen by the driver mode
- * (SetCdDriverMode):
- *   - sCdAsyncEnabled and sCdSyncQueueMode both 0: forward to the blocking
- *     OpenCdFile / CloseCdFile / GetCdFileSize / ReadCdFile, or for loadFile
- *     to FileResource__LoadFile, and return.
- *   - otherwise, called from outside the queue (inQueueDispatch 0): append a
- *     CD_OP_* request for `self` with EnqueueCdRequest.
- *   - called back by runRequestQueue (inQueueDispatch 1), and the drive not
- *     busy: StartCdOperation, then either hand the work to the state machine
- *     through sCdSeekParam / sCdReadSectorCount / sCdReadBuffer and
- *     sCdTickStep (async mode), or do it on the spot as a CdControl(CdlSetloc)
- *     / CdSync / CdRead / CdReadSync spin and ResetCdStateMachine (queued
- *     synchronous mode).
- *
- * runRequestQueue looks only at the head node: a node not yet started is
- * dispatched to its owner's slot; a started one, once the drive is idle, is
- * reported to its owner as CD_FLAG_* bits in `flags` (then onRequestDone) and
- * freed, and the service stops when the queue empties.
+ * `self` in a method is never a CdDriver of its own but whichever
+ * FileResource client called its own slot, so every field used is
+ * FileResource's.
  */
 #include "common.h"
 #include <libcd.h>
@@ -255,10 +233,9 @@ s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
     return 0;
 }
 
-/* FileResource__LoadFile takes (self, name), and loadFile's direct path
- * hands it this method's own self and name by leaving them where they
- * arrived. MATCHING: called through a no-argument type, so no argument is
- * reloaded before the jal. */
+/* FileResource__LoadFile takes (self, name); loadFile's direct path hands
+ * it this method's own self and name by leaving them where they arrived. */
+/* MATCHING: called through a no-argument type, so no argument is reloaded before the call */
 typedef void (*LoadFileNoArgsFn)(void);
 
 void CdDriver__LoadFile(CdDriver *self, char *name) {
@@ -402,39 +379,10 @@ void CdDriver__RunRequestQueue(void) {
 /* ---- part 3: the module level ---- */
 
 /*
- * The CD driver's module level: the three request methods that are not
- * per-request (requestLoadFile, stopService, cancelRequests), the queue's
- * front end, the driver mode, the file table and the service tick. The
- * class, the queue's types and the shared module state are
- * include/cd_driver.h's; the constructor is in part 1, the other
- * request methods in part 2, the state machines and the queue's nodes in
- * part 4, the blocking file calls in part 5.
- *
- *   - The driver mode. SetCdDriverMode sets sCdAsyncEnabled (requests are
- *     queued and run in the background), sCdSyncQueueMode (queued, but each
- *     run as a blocking spin) and sCdUseVSyncCallback (ServiceCdDriver is
- *     installed with VSyncCallback; otherwise it becomes the DrawSystem
- *     singleton's callback). It refuses while sCdBusy. InitCdDrive puts the
- *     drive in double speed once; the Is/Get functions read the state
- *     machine's flags back.
- *   - The queue's front end. EnqueueCdRequest fills a node
- *     AllocCdRequestNode has linked, counts it in its owner's
- *     pendingRequests and calls StartCdService. CdDriver__CancelRequests
- *     frees every node an owner has queued, first stopping the drive
- *     (CdFlush, ResetCdStateMachine) if that owner's request is running.
- *   - The service tick. ServiceCdDriver steps the state machine sCdTickStep
- *     names and then runs the queue (runRequestQueue) while sCdQueueEnabled;
- *     StartCdService installs it and enables the queue, StopCdServiceIfIdle
- *     removes it once no state machine runs, DisableCdQueue only stops the
- *     queue. The tick does nothing while sCdLock is set (LockCd/UnlockCd)
- *     or while the BMemPMgr allocator is busy.
- *   - The file table. SetFileTable / SetFileTableCount install a
- *     CdFileEntry array; ResolveFileEntries fills each entry's disc position
- *     and size with CdSearchFile, CD_SEARCH_ATTEMPTS tries per name.
- *
- * The game reaches all of it through game_shell.c's
- * wrappers while the active data source is this class's id, DATASOURCE_CD
- * (0x13); the other source is the null driver, DATASOURCE_NULL (0x23).
+ * The module level: the three request methods that are not per-request, the
+ * queue's front end (EnqueueCdRequest), the driver mode, the file table, the
+ * lock and the service tick. The game reaches it through game_shell.c's
+ * data-source wrappers while the active data source is DATASOURCE_CD.
  */
 
 extern char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
@@ -722,36 +670,13 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
 /* ---- part 4: the state machines, the queue's nodes, the file table ---- */
 
 /*
- * The CD driver's read state machine, its request-queue nodes and its
- * file-table lookups (the class, the queue and the table are
- * include/cd_driver.h's).
- *
- * The state machine takes one step each time ServiceCdDriver
- * (part 3, a VSync callback) runs: it calls TickCdStateMachine or
- * TickCdLoadFileStateMachine as sCdTickStep says, after a CdDriver method
- * (part 2) has started an operation with StartCdOperation and set
- * sCdSeekParam, sCdReadSectorCount and sCdReadBuffer. sCdState walks
- * CD_STATE_SETLOC (CdControlF(CdlSetloc) to sCdSeekParam->pos),
- * CD_STATE_SETLOC_WAIT (poll CdSync), CD_STATE_READ (CdRead) and
- * CD_STATE_READ_WAIT (poll CdReadSync); SetCdState moves it and
- * ResetCdStateMachine ends the operation and marks the driver idle. A seek
- * that errors or stays unanswered for CD_WAIT_TIMEOUT polls, and a read that
- * errors, go back to CD_STATE_SETLOC.
- *
- * The two tick functions differ in three places. TickCdStateMachine, which
- * Open and Seek use (Read starts it at CD_STATE_READ), ends the operation
- * when the seek completes and CdFlushes after a read error;
- * TickCdLoadFileStateMachine, LoadFile's, goes on to read after the seek,
- * and when the read is done restores the sCdSeekParam LoadFile saved in
- * sCdSavedSeekParam.
- *
- * AllocCdRequestNode appends a zeroed node to sCdRequestQueue and
- * FreeCdRequestNode unlinks one; EnqueueCdRequest (part 3) fills
- * them and CdDriver__RunRequestQueue (part 2) consumes them from the
- * head. FindCdFileEntry and FindCdFileIndex look a name up in sFileTable by
- * substring, GetCdFileEntry indexes it. Every function but the three
- * state setters brackets its body with LockCd / UnlockCd, which makes
- * ServiceCdDriver skip its tick in between.
+ * The read state machines take one step each time ServiceCdDriver runs,
+ * after a request method has started an operation with StartCdOperation and
+ * set the seek target (sCdSeekParam), the sector count and the buffer.
+ * SetCdState moves sCdState; ResetCdStateMachine ends the operation. The
+ * queue's nodes are appended by AllocCdRequestNode and consumed from the
+ * front by CdDriver__RunRequestQueue. Every function but the three state
+ * setters brackets its body with LockCd / UnlockCd.
  */
 
 /* CdSync / CdReadSync mode: return the current status at once (0 waits).
@@ -1003,27 +928,13 @@ void SetCdState(s32 state) {
 /* ---- part 5: the blocking file calls ---- */
 
 /*
- * The CD driver's blocking file access, and a pair that turns a FileResource
- * into a CD driver.
+ * The blocking file access CdDriver's open, close, seek and read slots call
+ * outside the queue modes, and a pair that turns a FileResource into a CD
+ * driver object. Like the slots, these run on whichever FileResource object
+ * called them and use only its isOpen, pos and size.
  *
- * OpenCdFile, CloseCdFile, GetCdFileSize and ReadCdFile are what CdDriver's
- * open, close, seek and read slots (part 2) call when the driver is
- * not in async mode. Like those slots they run on whichever FileResource
- * object called them (cd_driver.h's banner) and use only its isOpen, pos and
- * size. OpenCdFile looks the name up with CdSearchFile under the path
- * BuildCdFilePath makes ("\\<data directory><name>;1") and records where
- * the file starts and how long it is; ReadCdFile seeks to that start and
- * reads whole sectors, starting over from the seek on a disk error. In this
- * mode a seek does not move: CdDriver__Seek returns GetCdFileSize and every
- * read begins at the start of the file.
- *
- * FileResource__InstallCdReadDriver runs FileResource's ctor, then gives the
- * object gCdDriverMethods and marks it closed; FileResource__DestroyCdReadDriver
- * runs FileResource's finalize. GetCdUseVSyncCallback is the CD half of
- * game_shell.c's GetActiveDataSourceUseVSyncCallback.
- *
- * Nothing in the executable calls the install/destroy pair or NoOp2, NoOp3
- * and NoOp4 (no jal, stored pointer or built address reaches them).
+ * Nothing in the game calls the install/destroy pair or NoOp2, NoOp3 and
+ * NoOp4, stores their address or builds it.
  */
 /* FileResource and its table come from include/file_resource.h, through data_source.h. */
 
@@ -1042,11 +953,7 @@ void FileResource__DestroyCdReadDriver(FileResource *self) {
 
 void NoOp2(void) {}
 
-/* Resolves `name` once and marks the object open; an open object is left
- * alone. After CD_SEARCH_ATTEMPTS failed lookups it prints the path and
- * returns with the object still closed.
- * MATCHING: the retry is a label and goto; a while or for loop hoists &path
- * out of it and rotates the saved registers. */
+/* MATCHING: the retry is a label and goto; a while or for loop hoists &path out of it */
 void OpenCdFile(CdDriver *self, char *name) {
     s32 retries;
     CdlFILE file;
@@ -1099,17 +1006,12 @@ s32 GetCdFileSize(CdDriver *self) {
 
 void NoOp3(void) {}
 
-/* Reads `size` bytes, rounded down to whole sectors, from the start of the
- * open file into `buf`, and returns 0. A closed object is sent to its own
- * close slot instead.
- * MATCHING: the seek retry and the CdSync wait are label and goto loops and
- * only the CdReadSync wait is a do-while; any other loop kind moves the
- * branch targets. */
+/* MATCHING: the seek retry and the CdSync wait are gotos, only the CdReadSync wait a do-while */
 s32 ReadCdFile(CdDriver *self, void *buf, s32 size) {
     s32 sectors;
     s32 status;
     char scratch[2048]; /* MATCHING: never used; it sizes the frame so syncResult sits where retail's does */
-    u_char syncResult[16]; /* CdSync writes 8 bytes; 16 is the size retail reserved */
+    u_char syncResult[16]; /* MATCHING: CdSync writes 8 bytes; 16 keeps the frame layout */
 
     if (self->isOpen != 0) {
     retry:

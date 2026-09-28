@@ -503,3 +503,21 @@ CdSync result buffer `buf` is `syncResult`).
 - Left: the `(u_char *)&self->pos` cast. `CdControl`'s parameter is Sony's
   `u_char *`, and `pos` is the project's `CdLoc16` (file_resource.h) rather
   than `CdlLOC`; the cast goes when track 6 gives FileResource Sony's type.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/cd/cd_driver.c`:
+
+The function comment read:
+
+> Reads `size` bytes, rounded down to whole sectors, from the start of the
+> open file into `buf`, and returns 0. A closed object is sent to its own
+> close slot instead.
+> MATCHING: the seek retry and the CdSync wait are label and goto loops and
+> only the CdReadSync wait is a do-while; any other loop kind moves the
+> branch targets.
+
+and `syncResult`'s: "CdSync writes 8 bytes; 16 is the size retail reserved".
+The description is now the prototype's `@brief` in include/cd_driver.h; the
+source keeps one `MATCHING:` line for the loop kinds and one for the 16-byte
+buffer.
