@@ -201,10 +201,10 @@ to apply by type scope:
 - IntermediateBase `+0x014 unk14` -> `lightRig`: its own comment says it is
   `initArgs->lightRig` or init's `New_LightRig()`; this function hangs the
   BgLayer and the slot widgets under it and attaches the view to it.
-  Accessors: Task.c, class_3bb8c_d.c, class_3bb8c_l.c, class_3bb8c_m.c.
+  Accessors: Task.c, class_3bb8c_c.c, class_3bb8c_l.c, class_3bb8c_m.c.
 - TaskCore `+0x02C unk2C` -> `packetCount` (tier B, TaskCore__Reset's
   report): handed to the viewport's `setUnk44`. Accessors: Task.c,
-  class_3bb8c_d.c (TitleMenu__Reset), class_3bb8c_t.c (GraphRoom__Reset).
+  class_3bb8c_c.c (TitleMenu__Reset), class_3bb8c_t.c (GraphRoom__Reset).
   Viewport's own `unk44`/`unk48` and `setUnk44`/`setUnk48` would follow as
   `packetCount`/`packetSize`.
 

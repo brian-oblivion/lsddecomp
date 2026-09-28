@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E34C` on 2026-09-24 (tools/rename.py). Address 0x8004e34c.
 
-Unit `class_3bb8c_d`. **REOPENED -- ASSIGNABLE** from round 42's `gp_rel`
+Unit `class_3bb8c_c`. **REOPENED -- ASSIGNABLE** from round 42's `gp_rel`
 resolution. The round-14 stub recorded 2 `gp_rel` hits and no derivation;
 this round wrote and matched the function from scratch.
 
@@ -80,7 +80,7 @@ SLPS_015.56`.
   object `class_3bb8c_e.c` calls `Node3bb8cE`.
 - New extern `sTaskObjFCount` (`s32`, the one-shot init counter).
 
-`src/class_3bb8c_d.c`: local (not shared-header) externs for
+`src/class_3bb8c_c.c`: local (not shared-header) externs for
 `TaskObjF__ClearLinks` (already matched elsewhere, under this unit's own `void *`
 view rather than `class_3bb8c_e`'s `Node3bb8cE *`) and for `InitCARD`/
 `StartCARD`/`_bu_init` (Sony's, linked from `lib/libcard`, declared the

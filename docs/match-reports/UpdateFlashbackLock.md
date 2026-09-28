@@ -11,7 +11,7 @@
 ## What it does
 
 Not a `NodeGuardedViewport`/`GridCell` method -- called directly (`jal`) from the
-still-uncarved `TitleMenu__RefreshMenu` in `asm/class_3bb8c_d.s`. Given a caller-side
+still-uncarved `TitleMenu__RefreshMenu` in `asm/class_3bb8c_c.s`. Given a caller-side
 context struct and a result struct, reaches through the context to an
 `Obj866E8` instance, checks one of its fields against a large constant
 (9999999) and a second field against zero, and writes a 0/1 flag into the
@@ -90,7 +90,7 @@ matches the project's existing `New_GameApplication`/`strcat`
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/class_3bb8c_d.c`'s 3-parameter declaration
+**Verdict: arity-ok idiom.** `src/class_3bb8c_c.c`'s 3-parameter declaration
 stays.
 
 **Callee evidence** (`0x8004D678`, and the matched definition in
@@ -125,7 +125,7 @@ a `too many arguments` error, and dropping the argument from the call site would
 delete `lw a2,164(s0)` and break `TitleMenu__RefreshMenu`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/class_3bb8c_d.c:219`. Oracle green.
+added to `src/class_3bb8c_c.c:219`. Oracle green.
 
 ## Naming
 

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004E0E4` on 2026-09-24 (tools/rename.py). Address 0x8004e0e4.
 
-Unit `class_3bb8c_d`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
+Unit `class_3bb8c_c`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 3 `gp_rel` hits
 and no derivation; this round wrote and matched the function from scratch.
 

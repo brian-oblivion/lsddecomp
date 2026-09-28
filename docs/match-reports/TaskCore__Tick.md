@@ -91,6 +91,6 @@ item list (`unk24[idx] == NULL`) and is this slot runs refreshViewValue,
 which calls viewCallback and sets state 7, the fade-out. So it is the slot
 whose confirm ends the menu; why a given menu picks it is data.
 `TaskCoreTarget::unk8` was renamed too (initialSlot) and reverted:
-TitleMenu__SetState in class_3bb8c_d reads it, so it is a proposal.
+TitleMenu__SetState in class_3bb8c_c reads it, so it is a proposal.
 
 Local `idx` -> `slot`. Byte-identical.

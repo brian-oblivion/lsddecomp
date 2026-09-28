@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004DE08` on 2026-09-24 (tools/rename.py). Address 0x8004de08.
 
-Unit `class_3bb8c_d`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
+Unit `class_3bb8c_c`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 1 `gp_rel` hit
 and no derivation; this round wrote and matched the function from scratch.
 
@@ -119,7 +119,7 @@ the whole image after any further edit there.)
   `slot60` (+0x060, `pad044` split), `slotE0` (+0x0E0, `pad0DC` split),
   `slot11C` (+0x11C, `pad0F4` split).
 
-`src/class_3bb8c_d.c`: local (not shared-header) 3-argument extern for
+`src/class_3bb8c_c.c`: local (not shared-header) 3-argument extern for
 `UpdateFlashbackLock`, matching this call site; `class_3bb8c_c.c`'s own
 2-argument declaration for the same real function is untouched.
 

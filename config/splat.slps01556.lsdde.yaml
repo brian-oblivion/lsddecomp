@@ -1433,7 +1433,6 @@ segments:
       # exactly.
       #
       # class_3bb8c_d: #0..#19, 0x3DF04..0x3EBF4.
-      - [0x3DF04, c, class_3bb8c_d]
       # class_3bb8c_e: #20..#38, 0x3EBF4..0x3F540.
       - [0x3EBF4, c, class_3bb8c_e]
       # class_3bb8c_f: #39..#58, 0x3F540..0x403E4.

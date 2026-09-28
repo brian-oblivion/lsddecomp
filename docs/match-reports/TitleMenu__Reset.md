@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D814` on 2026-09-24 (tools/rename.py). Address 0x8004d814.
 
-Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `class_3bb8c_c`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__Reset`: 33/33 words match.
 
 ## Source

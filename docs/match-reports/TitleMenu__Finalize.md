@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D704` on 2026-09-24 (tools/rename.py). Address 0x8004d704.
 
-Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `class_3bb8c_c`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__Finalize`: 33/33 words match.
 
 ## Source
@@ -24,7 +24,7 @@ void TitleMenu__Finalize(TitleMenu *self)
 
 ## Derivation
 
-This is `TitleMenu`'s own destructor (the first function of `class_3bb8c_d`,
+This is `TitleMenu`'s own destructor (the first function of `class_3bb8c_c`,
 immediately continuing `class_3bb8c_c`'s work on the same class). Structure:
 
 - `self->unkAC` and `self->iconHandle` are two owned sub-objects, each released
@@ -81,7 +81,7 @@ Renamed `func_8004D704` -> `TitleMenu__Finalize`. **Tier A**: matches the
 BasicClass-family destructor shape (release owned sub-objects, then
 forward to the base class's own dtor slot). Field `unkA8` renamed to
 `iconHandle` in the same round (compiler-ownership check: accessor set
-entirely inside `src/class_3bb8c_d.c`).
+entirely inside `src/class_3bb8c_c.c`).
 
 ## Proposed field names
 

@@ -154,7 +154,7 @@ separate job.
 Parameters `a1..a3` -> `base`, `clear`, `color96` (slot and prototype in
 TaskCore.h too). `unk93` is the colour TaskCore__OnDeinit (when unk34 is
 set) and TitleMenu__OnDeinit clear the screen to; its accessors are in
-Task and class_3bb8c_d, so the name (`clearColor`) is a proposal.
+Task and class_3bb8c_c, so the name (`clearColor`) is a proposal.
 `unk96` has no reader anywhere (Reset sets it to 128 grey from sTaskCoreDefaultColors);
 kept. Retyping all three to BgLayerRgb (delta's round-98 lead) would drop
 these casts but changes Task's accessors: proposed. The casts carry a

@@ -20,7 +20,7 @@ GenericCtorTable_3bb8c_d *GetTaskObjFMethods(void)
 
 This function was already forward-declared, opaquely, in
 `include/class_3bb8c.h` as `GenericCtorTable_3bb8c_d *GetTaskObjFMethods(void)`
-while deriving `class_3bb8c_d`'s own `New_TaskObjF` (a `New_X` allocator
+while deriving `class_3bb8c_c`'s own `New_TaskObjF` (a `New_X` allocator
 that calls `GetTaskObjFMethods()->ctor(...)`) last round -- that declaration
 predicted exactly this shape (a trivial vtable-getter, same pattern as
 `GetTitleMenuMethods`/`gTitleMenuMethods` and `Get_vtable_TaskCore`/`gTaskCoreMethods` elsewhere in
