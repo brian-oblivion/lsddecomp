@@ -146,3 +146,61 @@ rather than a name asserting one specific operation.
 
 See `TickCdLoadFileStateMachine`'s report for the paired evidence and the
 one call site that needs the other tick function.
+
+## Round 101 (track 7 polish): the goto dispatch is a switch
+
+The goto ladder above is GCC's own decision tree for a `switch`
+(`== 2`, `< 3`, `== 1`, `== 7`, `== 8`; and on CdSync's result `== 2`,
+`< 3`, `== 0`, `== 5`). Written as the switch it compiles from -- on
+gCdState's `CD_STATE_*`, and inside it on CdSync's `CdlComplete` /
+`CdlNoIntr` / `CdlDiskError` -- with a `newState` local and one
+`SetCdState(newState)` after the switch (the no-op paths `goto unlock`),
+the function is byte-exact. `v1 == state` was GCC substituting the known
+case value: the source says `case CdlComplete`, and cc1 still compares
+against the register holding `state`.
+
+One constraint, marked `/* MATCHING */` in the source: **`case
+CdlDiskError` must be written first** among the inner cases. Written last
+(case order Complete, NoIntr, DiskError) the build is 84/86: the `== 5`
+test flips from `bne ..., L_end` with the `newState = 1` body inline to
+`beq ..., L_set` with the store in the delay slot -- the same polarity flip
+round 45 hit in TickCdLoadFileStateMachine, which retail DOES encode that
+way, and which the natural case order reproduces there. Switch case bodies
+are emitted in source order, so the body order decides which of the two
+encodings the tree node gets. The read-wait case matches either as
+`if (result == -1) {...; break;} if (result == 0) Reset...; goto unlock;`
+or with the tests nested the other way.
+
+Other changes, zero bytes: `CdControlF(CdlSetloc, (u_char *)&gCdSeekParam->pos)`
+(was `CdControlF(2, (u8 *)gCdSeekParam + 0x14)`), `CdlModeSpeed` for
+CdRead's 0x80, `CD_SYNC_POLL` for CdSync/CdReadSync's mode 1,
+`CD_WAIT_TIMEOUT` as decimal 601, and the Cd* prototypes from Sony's
+`<libcd.h>` instead of local ones.
+
+## Naming (round 101: constants)
+
+- `CD_STATE_*` (CdDriver.h, round 100): the phases, from StartCdOperation's
+  callers and this function's dispatch.
+- `CdlSetloc`, `CdlModeSpeed`, `CdlComplete`, `CdlNoIntr`, `CdlDiskError`:
+  Sony's `<libcd.h>` values 0x02, 0x80, 2, 0, 5.
+- `CD_SYNC_POLL` (1, local): libcd's mode argument for CdSync/CdReadSync,
+  1 = return the status without waiting (the tick polls once per service
+  call; code_179d8_h.c's blocking read passes 0).
+- `CD_WAIT_TIMEOUT` (601, local): the count of CdlNoIntr polls before the
+  seek is issued again.
+
+## History (from code_179d8_r.c's comments, moved round 101)
+
+- The Cd* functions were declared locally as "Psy-Q CD-ROM library, linked
+  from lib/libcd/sys.o. Locally typed the same way code_179d8_h.c already
+  types this unit's own call sites" (`CdControlF(s32, void *)`,
+  `CdSync(s32, void *)`, `CdRead(s32, void *, s32)`,
+  `CdReadSync(s32, s32)`, `CdFlush(void)`).
+- `CD_CMD_SETLOC 2` was "Psy-Q's own command code": libcd.h's command list
+  was read as documenting names but not values, and 2 was confirmed the way
+  code_179d8_q.c's CD_CMD_SETMODE was, by the sibling's independently
+  derived 0x0E == CdlSetmode matching the Psy-Q CdlCommand enumeration, in
+  which CdlSetloc is the third member. It was spelled locally rather than by
+  including LIBCD.H because the unit's libcd declarations were deliberately
+  per-call-site. (`include/psyq/libcd.h` does define `CdlSetloc 0x02`.)
+- `CD_WAIT_TIMEOUT` was `0x259`, "~601 service-pump calls".
