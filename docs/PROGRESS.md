@@ -6,6 +6,87 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-28 — round 104: track 10 done, its four debt passes (premium head)
+
+Four Opus item runners, one per area: alpha `debt-app-cd`, bravo
+`debt-graphics`, charlie `debt-world`, delta `debt-ui-sound`. Each did its
+own area's findings and proposed the edits whose accessors sat in another
+area. When all four had merged, a fifth Opus runner (echo, a fresh worktree)
+applied those proposals across the tree. Track 10 is 8/8; track 11 opens,
+and its first item is `files-setup`, a premium setup item.
+
+- **alpha (12 commits):**
+  - `SlotEntry`/`SrcDesc` merged into `TaskCoreItemList`.
+  - `CdStreamFile` merged into Sony's `CdlFILE`; CdStream.h's claim that it
+    must avoid libcd.h was false.
+  - `withSound` is `s32` everywhere; `StreamTask::streamName` is
+    `const char *`.
+  - `APPLICATION_LOOP_REPEAT_MENU` / `onRepeatMenu`.
+  - The review's "part N off by one" was one line, not a pattern.
+- **bravo (29 commits):**
+  - Eight colour types, not six (TmdRenderer's `Rgb8`, `TimBlockSrcColor`),
+    merged into one `ColorRgb` in DrawSystem.h.
+  - The review's "signed" was wrong: u8 and s8 channels build identically.
+    What matches is the whole-struct copy (echo measured a per-byte copy
+    compiling differently).
+  - The four `func_`/`D_` names; `SceneNodeLinkEvent`;
+    `offsetof(PolyDrawCtx, sxy) - sizeof(DVECTOR)`.
+  - A source comment said rename.py cannot reach bss past the image end. It
+    can.
+- **charlie (34 commits):**
+  - DreamSys.h's `unk_0x*` fields named or turned into padding.
+  - Ten local duplicate types merged: `Ratio16`, `LongVec3`, `Entity`,
+    `BasicClass`, `MapChunk`, `StyleCueRecord`, and StageMap.h's `CellKey*`.
+  - One `CinematicCall`, defined in GameFiles.h.
+  - Both "goto ladders" the review flagged are plain C with no MATCHING
+    construct. EnableTeleportsForKind is a `switch`; TestForStageTransition
+    must stay `if`s, because a `switch` becomes a jump table.
+- **delta (19 commits):**
+  - SsScore.h 37/38 and SvmData.h 32/32 fields named from libsnd's own use.
+  - Sony's `Result` from bios.o's .bss (the head checked it in 3.5 bios.o).
+    `Alarm` stays three `D_` words: a struct view changes CD_readsync's
+    registers (514 bytes).
+  - The root counters take kernel.h's types, byte-identical.
+  - CD_cw's title now says 284/282 words.
+  - NoteOn's preserved NON_MATCHING body passed velocity where retail passes
+    the note. Fixed.
+- **echo (15 commits):** the proposals.
+  - The TaskCore field names.
+  - `ColorRgb` everywhere, aliases deleted.
+  - Pointer-typed `New_TimBlockSrc`/ModelData scans.
+  - Link-event names at all eight dispatchers (the proposals named three).
+  - One TOD format in Tod.h.
+  - `FilePathRecord` merged into `CdFileEntry`.
+  - `ScreenDims` absorbs `ViewportSize`.
+  - PlayCinematic passes `cc`, which retired the `idBuf` MATCHING construct
+    (declcheck DELIBERATE 11 to 10).
+  - Retyping IntermediateBase's `frameClock`/`lightRig` was measured and
+    dropped: byte-identical, but it adds casts. Those casts are to
+    `StageMap *`/`SceneNode *` and the `addChild` arguments.
+- **Head:**
+  - BasicClass's tail (FreeBasicClassList..GetBMemPMgrBusy) now ends
+    BMemPMgr.c instead of opening TmdRenderer.c: one yaml boundary,
+    0x8A88 to 0x8C64, byte-identical. tuboundary.py calls every edge there
+    possible.
+  - Declined alpha's CdStream `slot7C` to `setCallback`. The occupant is an
+    empty no-op, and a slot is named after what it dispatches to.
+
+**Merges.** bravo conflicted in three files and charlie in one. Each
+conflict was a rename against another runner's content edit: main's side
+was taken, then `replay.py HEAD^2..HEAD^1 HEAD^1..HEAD^2`. Once the merge
+is committed replay.py needs those explicit ranges. The four area runners
+reached one another's files only through the rename tools. Deferring every
+cross-area hand edit to a runner that starts after the merges kept these
+merges to four conflicted files; round 103's bravo merge alone conflicted
+in 25.
+
+End state: byte-identical, typeviews 0 new, check-nonmatching OK, declcheck
+0/0/0/0. `readability.py`: func_ 5 to 2, D_ 2 to 0, unk 61 to 28, slot 8 to
+5, rawoff 57 to 49, m2c 1 to 0, magic 883 to 824. Most of the 824 are
+Entity's cue frames and timings, which stay literal.
+
+---
+
 ## 2026-09-28 — round 103: track 10's three first items (premium head, plan revision 43)
 
 Three Opus item runners: alpha `prototypes`, bravo `conventions`, charlie

@@ -206,6 +206,15 @@ so merge by hand, one commit per type, the accessors from the compiler.
   282 words and length-exact, but its preserved body builds to 284: make
   the title say what the body builds to.
 
+### After round 104
+
+Round 104 did the four debt passes; each item's list above is done or
+measured wrong (the per-finding verdicts are in PROGRESS.md, round 104).
+Still open, none a track 10 item: what IsDaySpecial's `% 12` counts;
+whether TodActor's `TodSetBuffer` and GraphicsResources' `SubBlockTable` are
+one type; the write-only `unk` fields readability.py still lists (nothing
+reads them, so nothing names them).
+
 ## Track 12: what the documentation pass needs
 
 - About 1134 prototypes in include/, 240 with an adjacent comment; no header
