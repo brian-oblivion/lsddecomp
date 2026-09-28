@@ -743,7 +743,7 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 command) {
             !this->methods->tryInstantTeleportLink(this, pos) &&
             !this->methods->tryTunnelLink(this, pos)) {
             this->methods->saveLinkSnapshot(this);
-            MOVE_COMMAND_DISPATCH[command](this, delta, (void *)(this->staircaseMoveGate < 1));
+            sMoveCommandDispatch[command](this, delta, (void *)(this->staircaseMoveGate < 1));
             if (this->currentStage == 0 && this->coord2->coord.t[1] < -2000 &&
                 this->coord2->coord.t[0] >= -499) {
                 this->methods->onGridCellLinkCommand(this, this, 4);

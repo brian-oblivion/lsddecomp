@@ -82,7 +82,7 @@ Clears `moveCommandLatch`, then, if `moveCommand` is nonzero,
 swaps it for its pair: odd values +1, even values -1, i.e. 1<->2 and 3<->4. "Flip"
 rather than "advance" because the paired values are OPPOSITE directions on the same
 axis, which the two dispatch tables show directly:
-`MOVE_COMMAND_DISPATCH` is {null, SlotC4, SlotC4, Slot0, Slot0} and
+`sMoveCommandDispatch` is {null, SlotC4, SlotC4, Slot0, Slot0} and
 `sMoveCommandSigns` is {0, +1, -1, -1, +1}, so 1 and 2 are the two directions of
 one mover and 3 and 4 the two directions of the other.
 Tier B: the state change is exact; why a move command should alternate direction
