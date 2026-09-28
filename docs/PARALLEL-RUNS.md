@@ -351,6 +351,7 @@ git merge --no-ff runner/<name>; echo "merge exit=$?"
 git rev-parse -q --verify MERGE_HEAD >/dev/null && echo "MERGE IN PROGRESS"
 ./build-and-verify.sh; echo "build exit=$?"
 .venv/bin/python3 tools/typeviews.py --warnings   # 0 new, at EVERY merge (round 82: 27 slipped)
+make format; git status --porcelain              # empty: the rename tools and replay.py never format (round 102)
 ```
 
 A green build on top of `MERGE IN PROGRESS` means nothing (CLAUDE.md, fourth
@@ -359,7 +360,8 @@ conflicts on report files the head stubbed and a runner then wrote; take the
 runner's. Parallel `rename.py` runs conflict in the symbols file: resolve
 per ADDRESS against the merge base (`git show :1:<file>`), each side keeping
 the lines it changed; an address both sides changed is a real conflict
-(round 87, eleven merges, none). Then, for every function the runner attempted, confirm its report
+(round 87, eleven merges, none). Two runners appending to one report's end
+conflict there: keep both sections (round 102). Then, for every function the runner attempted, confirm its report
 no longer carries an `-- ASSIGNABLE` marker (`grep -l -- '-- ASSIGNABLE'
 docs/match-reports/<func>.md`); a spent marker left in place re-ranks the
 next round's queue on ground that is no longer fresh.
