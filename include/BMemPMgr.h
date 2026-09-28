@@ -88,14 +88,6 @@ extern void *BMemPMgrFree(); /* arity-ok: same as BMemPMgrAlloc (BMemPMgrFree.md
  * load one. */
 extern void SetupBMemPMgrFreeList(BMemPMgr *pool);
 
-/* The pool SetupBMemPMgrFreeList, BMemPMgrAlloc and BMemPMgrFree work on;
- * set by SetDefaultBMemPMgr (main.c, right after BMemPMgrInit). */
-extern BMemPMgr *sDefaultBMemPMgr;
-
-/* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
- * work and back to 0 after (setter and getter in TmdRenderer.c). Nothing in
- * either waits on it. */
-extern s32 sBMemPMgrBusy;
 extern void SetBMemPMgrBusy(s32 val);
 extern s32 GetBMemPMgrBusy(void);
 

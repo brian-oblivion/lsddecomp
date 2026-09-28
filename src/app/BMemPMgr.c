@@ -20,6 +20,10 @@
 #include "BMemPMgr.h"
 #include <malloc.h>
 
+/* The pool SetupBMemPMgrFreeList, BMemPMgrAlloc and BMemPMgrFree work on;
+ * set by SetDefaultBMemPMgr (main.c, right after BMemPMgrInit). */
+extern BMemPMgr *sDefaultBMemPMgr;
+
 /* Psy-Q printf, declared with the argument shape this call site passes:
  * it is variadic, and each unit that calls it declares its own. */
 extern void printf(const char *fmt, void *arg1, s32 arg2);

@@ -213,11 +213,6 @@ extern TaskObjFMethods *GetTaskObjFMethods(void); /* returns &gTaskObjFMethods *
  * EnableEvent, DisableEvent, TestEvent; Sony's libapi) are declared in the
  * units that call them. */
 
-/* Per TaskObjF::events slot: the event spec TaskObjF__OpenEvents passes to
- * OpenEvent, and the value WaitForReadyEvent returns for that slot.
- * Unsized: only the four slots are read. */
-extern s32 sCardEventSpecs[];
-
 /* A 6-byte memory-card device name, "bu00:" or "bu10:" (the BIOS names of
  * the two card slots). BuildMemcardPath copies one as a whole struct.
  * MATCHING: all-s8 members (alignment 1) make that copy retail's unaligned
@@ -225,9 +220,6 @@ extern s32 sCardEventSpecs[];
 typedef struct McDevicePath {
     s8 b0, b1, b2, b3, b4, b5;
 } McDevicePath;
-
-extern McDevicePath sMcDevicePath1; /* "bu10:" */
-extern McDevicePath sMcDevicePath0; /* "bu00:" */
 
 /* Game code (src/ui/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it
  * around its retry loop, and with (arg, 0) when the loop gives up. The BIOS

@@ -136,12 +136,6 @@ extern EntityMethods *GetEntityMethods(void); /* returns &gEntityMethods */
  * is the grid manager, StageMap (include/StageMap.h; DreamAux passes
  * sDreamAuxStageMap). Entity/_e/_g call its startScaleRamp (+0x138). */
 
-/* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
- * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what
- * Viewport gives its FadeBox (FadeBox.h). */
-extern s32 sEntityFadeBoxDefaultSize[2];
-extern s32 sEntityFadeBoxDefaultOffset[2];
-
 /* One row of the mood table (16 bytes): New_Entity's moodIndex selects it, and
  * every per-mood setting of an Entity is a column of it. Signed columns are
  * `s8` (`lb`); plain `char` would be unsigned here (-funsigned-char).
@@ -201,10 +195,6 @@ enum EntityDeactivateKind {
  * grid's cell size, STAGE_CELL_SIZE in StageMap.h, has the same value). */
 #define ENTITY_RANGE_SHIFT 11
 #define ENTITY_RANGE_UNIT (1 << ENTITY_RANGE_SHIFT)
-
-extern EntityMoodRow sEntityMoodTable[];
-extern s8 sEntityLinkStageTable[];  /* the linkStage column (Entity) */
-extern s8 sEntityEventVideoTable[]; /* the eventVideo column (Entity) */
 
 /* The class's own methods, in ROM order (Entity, then Entity). A caller
  * reaching the base ones goes through GetTodActorMethods() and upcasts. */

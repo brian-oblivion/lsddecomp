@@ -105,10 +105,6 @@ ResourceRequest *ResourceRequest__Set(ResourceRequest *req, void *buffer, char *
 extern FileResourceMethods gFileResourceMethods;
 extern FileResourceMethods *GetFileResourceMethods(void);
 
-/* The table getters of every class SetActiveDataSource rebinds, NULL-
- * terminated; it sits right after gFileResourceMethods's last slot. */
-extern void *(*sDataSourceClientGetters[])(void);
-
 void *FileResource__Release(FileResource *self);
 void FileResource__FileResource(FileResource *self);
 void FileResource__Finalize(FileResource *self);

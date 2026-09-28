@@ -55,6 +55,11 @@
 #include "GridCell.h"
 #include "GraphRoom.h"
 
+/* The row colours, two 3-byte RGBs in sdata, 4 bytes apart; only their
+ * addresses are taken (setColor). */
+extern struct SpriteRgb sItemListRowColor;
+extern struct SpriteRgb sItemListCursorColor;
+
 void ItemList__SetState(ItemList *self, s32 state) {
     /* MATCHING: the gotos keep retail's branch polarity and block order. */
     self->closeTicks = 0;

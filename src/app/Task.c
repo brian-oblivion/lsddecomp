@@ -33,6 +33,20 @@
 #include "LightRig.h"
 #include "FrameClock.h"
 
+/* {x 640, y 0, w 320, h 240}: the default movie frame. TaskCore__OnInit clears
+ * it to baseColor when the task has no sub handle. The same three words are
+ * StreamTask's default initData and its MoviePlayer's frame, through
+ * GetDefaultMovieFrame. */
+extern DrawRect sDefaultMovieFrame;
+
+/* Viewport's ctor data: sViewportFadeBoxSize is the (320, 240) it passes
+ * New_FadeBox; sFadeBoxAttachPos the (-100, -100) screen position the ctor
+ * and SetSubHandle attach the sub handle at; sDefaultViewTwist ({0, 1}) is
+ * Viewport__AttachViewChild's twist when its own is NULL. */
+extern u8 sViewportFadeBoxSize[];
+extern u8 sFadeBoxAttachPos[];
+extern Ratio16 sDefaultViewTwist;
+
 /* resetCounters' colours for setColors, three RGB triples back to back:
  * baseColor {0, 0, 0}, the clear colour {0, 0, 0}, the third {128, 128, 128}. */
 extern u8 sTaskCoreDefaultColors[3][3];

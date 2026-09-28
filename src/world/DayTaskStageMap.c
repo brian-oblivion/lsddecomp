@@ -54,6 +54,10 @@
 #include "FlatLightObj.h"
 #include "BMemPMgr.h"
 
+/* The rectangle StageMap__InitFootprintRect copies into rects[index] before
+ * setting its slotIndex: no slot (-1), the whole 20 x 20 cells from (0, 0). */
+extern CellRect sFullSlotRect;
+
 /* The default "enable every element" spec table SetTargetAndLoadChunks
  * passes to buildRateEntries: seven entries, every `flag` nonzero. */
 extern ChunkSlotSpec sDefaultTargetSpecs[7];

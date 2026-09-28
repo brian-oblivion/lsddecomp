@@ -129,11 +129,6 @@ struct ItemList {
 extern ItemListMethods gItemListMethods;
 extern ItemListMethods *GetItemListMethods(void); /* returns &gItemListMethods */
 
-/* The row colours, two 3-byte RGBs in sdata, 4 bytes apart; only their
- * addresses are taken (setColor). */
-extern struct SpriteRgb sItemListRowColor;
-extern struct SpriteRgb sItemListCursorColor;
-
 /* The overrides whose parameter lists differ from their slot's (see the
  * banner), as a caller that passes the extra arguments casts them: attachTarget
  * reaches its own addChild override with all four of its words once. */

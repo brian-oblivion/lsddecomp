@@ -25,6 +25,8 @@
 #include <libgs.h>
 #include "TmdModel.h"
 
+extern s32 sTmdModelBoundsCount; /* boxes in the bounds buffer: 1, set by the ctor */
+
 /* A counted box list of one: TmdModel__GetHull's local (its count is set
  * to 1, as the hull's is, and never read). */
 typedef struct BoxList {

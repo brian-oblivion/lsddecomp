@@ -24,12 +24,6 @@ typedef struct DreamAuxSlot {
     s32 pos[3];
 } DreamAuxSlot;
 
-extern DreamAuxSlot sDreamAuxSlots[1];
-
-/* sDreamAuxSlots one word in, so each element's `model` is that slot's
- * entity: ReleaseDreamAuxEntities walks it. */
-extern DreamAuxSlot sDreamAuxSlots2[1];
-
 /* One chunk trigger. `key` is the chunk's ChunkCoord (column, then row)
  * read as one s16. `dayParity` restricts the day: 0 any day, 1 odd days, 2
  * even days (CheckTriggerDayParity). `recordIndices` name up to three
@@ -39,14 +33,6 @@ typedef struct DreamAuxTriggerEntry {
     s8 dayParity;
     s8 recordIndices[3];
 } DreamAuxTriggerEntry;
-
-extern s8 sDreamAuxTriggerCounts[DREAM_AUX_STAGE_COUNT];
-extern DreamAuxTriggerEntry *sDreamAuxTriggerEntries[DREAM_AUX_STAGE_COUNT];
-
-/* The two ModelData files InitDreamAux can load. With one slot, only
- * SYMSPY.MOM is ever requested. */
-extern const char sMomPathSymSpy[];
-extern const char sMomPathSymDog[];
 
 /* TriggerRecord.condition: CheckDreamAuxTriggerCondition's tests, by id. A
  * negative condition tests -condition and passes only while the record has
@@ -80,9 +66,6 @@ typedef struct TriggerRecord {
     u8 moodIndex;
     s8 spawnIndices[4];
 } TriggerRecord;
-
-extern s8 sDreamAuxGroupCounts[DREAM_AUX_STAGE_COUNT];
-extern TriggerRecord *sDreamAuxGroupRecords[DREAM_AUX_STAGE_COUNT];
 
 extern bool CheckDreamAuxTriggerCondition(s32 day, TriggerRecord *record);
 /* `desc` is New_Entity's descriptor, forwarded untouched; the caller has

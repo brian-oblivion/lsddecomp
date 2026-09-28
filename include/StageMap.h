@@ -407,10 +407,6 @@ typedef void (*ChunkSlotFn)(StageMap *self, ChunkSlot *slot);
 extern StageMapMethods gStageMapMethods;
 extern StageMapMethods *GetStageMapMethods(void); /* returns &gStageMapMethods */
 
-/* The rectangle StageMap__InitFootprintRect copies into rects[index] before
- * setting its slotIndex: no slot (-1), the whole 20 x 20 cells from (0, 0). */
-extern CellRect sFullSlotRect;
-
 /* The class's own functions, in address order: the occupants of
  * gStageMapMethods and their non-slot helpers. */
 StageMap *New_StageMap(LongVec3 *origin, s32 autoLoad);

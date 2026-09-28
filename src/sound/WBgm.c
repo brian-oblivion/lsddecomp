@@ -14,6 +14,8 @@
 #include "DrawSystem.h"
 #include "WBgm.h"
 
+extern s32 sWBgmActive; /* 1 between WBgm__WBgm and WBgm__Finalize */
+
 extern void *BMemPMgrAlloc(s32 size);
 extern void printf(const char *fmt);
 extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */

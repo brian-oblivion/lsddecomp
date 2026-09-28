@@ -130,10 +130,6 @@ enum DreamSysMoveOverride {
    declared here, not defined. */
 extern s8 (*gpNavChallengesComplete)[NAV_CHALLENGE_COUNT];
 extern s32 *gpDinamicLinkPenalty;
-extern s32 sLinkSrcStage;
-extern s32 sLinkTriggerIndex;
-extern s32 sLinkDstStage;
-extern s32 sLinkSpawnIndex;
 
 /* A single {numerator, denominator} degree ratio. SceneNode__UpdateRotation
    (vtable slot +0x044, the inherited rotation setter) reads three of these
@@ -266,15 +262,6 @@ typedef struct DreamSysEntityMethods {
 typedef struct DreamSysEntityObj {
     DreamSysEntityMethods *methods;
 } DreamSysEntityObj;
-
-/* sProjectOffsetZ is the LAST word of a 3-word (LongVec3-shaped) scratch
-   vector whose first two words have no symbol of their own: they are the 8
-   zero bytes after sVoicePitchBySelect's 24, which voiceSelect (bounded to
-   [0, 0x18) by DreamSys__NotifyLinkAttempt) never reaches.
-   DreamSys__ProjectPointAtDistance writes `dist` into this word and passes
-   `&sProjectOffsetZ - 2` to SceneNode__LocalOffsetToWorldPos as its 3-word
-   `src` vector: the local offset (0, 0, dist). */
-extern s32 sProjectOffsetZ;
 
 /* Argument shape for InterpolateKeyframeValue: two "keyframe" points, each with a
    value (+0x4) and a position/time (+0x8); +0x0 is not read.

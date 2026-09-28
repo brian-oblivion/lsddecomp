@@ -56,6 +56,14 @@
 #include "ItemList.h"
 #include "BMemPMgr.h"
 
+/* Per TaskObjF::events slot: the event spec TaskObjF__OpenEvents passes to
+ * OpenEvent, and the value WaitForReadyEvent returns for that slot.
+ * Unsized: only the four slots are read. */
+extern s32 sCardEventSpecs[];
+
+extern McDevicePath sMcDevicePath1; /* "bu10:" */
+extern McDevicePath sMcDevicePath0; /* "bu00:" */
+
 /* TaskObjF__TaskObjF's construction count: InitCARD/StartCARD/_bu_init run
  * only on the first construction, when it was 0 before the increment. */
 extern s32 sTaskObjFCount;

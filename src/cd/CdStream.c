@@ -18,6 +18,8 @@
 #include "CdStream.h"
 #include "CdDriver.h" /* CD_SECTOR_SHIFT */
 
+extern CdStream *sActiveCdStream; /* the stream that owns the drive, or NULL */
+
 /* The ctor: a drive speed below this is double speed. */
 #define CDSTREAM_DOUBLE_SPEED_BELOW 4
 /* CD-ROM sectors read per second at double and at normal speed. */

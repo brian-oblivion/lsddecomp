@@ -42,6 +42,20 @@
 #include "VabStreamObj.h"
 #include "Viewport.h"
 
+extern s32 sLinkSrcStage;
+extern s32 sLinkTriggerIndex;
+extern s32 sLinkDstStage;
+extern s32 sLinkSpawnIndex;
+
+/* sProjectOffsetZ is the LAST word of a 3-word (LongVec3-shaped) scratch
+   vector whose first two words have no symbol of their own: they are the 8
+   zero bytes after sVoicePitchBySelect's 24, which voiceSelect (bounded to
+   [0, 0x18) by DreamSys__NotifyLinkAttempt) never reaches.
+   DreamSys__ProjectPointAtDistance writes `dist` into this word and passes
+   `&sProjectOffsetZ - 2` to SceneNode__LocalOffsetToWorldPos as its 3-word
+   `src` vector: the local offset (0, 0, dist). */
+extern s32 sProjectOffsetZ;
+
 /* Delta/threshold table pairs consumed by DreamSys__StepLookOffset (sLookOffsetSteps /
    sLookOffsetLimits, indexed by DreamSys::lookOffsetCommand) and DreamSys__StepLookYaw (sLookYawSteps /
    sLookYawLimits, indexed by DreamSys::lookYawCommand). Index 0 is unused/zero in both

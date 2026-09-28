@@ -101,7 +101,6 @@ struct CdStream {
 
 extern CdStreamMethods gCdStreamMethods;
 extern CdStreamMethods *GetCdStreamMethods(void); /* returns &gCdStreamMethods */
-extern CdStream *sActiveCdStream;                 /* the stream that owns the drive, or NULL */
 
 CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved);
 void CdStream__CdStream(CdStream *self, u32 cdSpeed, s32 fps, s32 reserved);

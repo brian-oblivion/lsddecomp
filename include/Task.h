@@ -42,27 +42,4 @@ extern s32 ResetGraph(s32 mode);
 /* Defined in Task.c: &sDefaultMovieFrame. */
 extern DrawRect *GetDefaultMovieFrame(void);
 
-/* {x 640, y 0, w 320, h 240}: the default movie frame. TaskCore__OnInit clears
- * it to baseColor when the task has no sub handle. The same three words are
- * StreamTask's default initData and its MoviePlayer's frame, through
- * GetDefaultMovieFrame. */
-extern DrawRect sDefaultMovieFrame;
-
-/* Viewport's ctor data: sViewportFadeBoxSize is the (320, 240) it passes
- * New_FadeBox; sFadeBoxAttachPos the (-100, -100) screen position the ctor
- * and SetSubHandle attach the sub handle at; sDefaultViewTwist ({0, 1}) is
- * Viewport__AttachViewChild's twist when its own is NULL. */
-extern u8 sViewportFadeBoxSize[];
-extern u8 sFadeBoxAttachPos[];
-extern Ratio16 sDefaultViewTwist;
-
-/* FadeBox's colour tables, eight RGB entries each, indexed at a 3-byte
- * stride by a channel mask: sFadeBoxMaskColors holds each mask's own
- * channels at 0xFF (0 and 7 white), sFadeBoxBlackColors is all black.
- * sBoxFillDefaultColor ({128, 128, 128}) is BoxFill__Reset's colour when it
- * is given none. */
-extern u8 sFadeBoxMaskColors[];
-extern u8 sFadeBoxBlackColors[];
-extern u8 sBoxFillDefaultColor[3];
-
 #endif

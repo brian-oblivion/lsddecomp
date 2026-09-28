@@ -79,8 +79,6 @@ struct WBgm {
 extern WBgmMethods gWBgmMethods;
 extern WBgmMethods *GetWBgmMethods(void); /* returns &gWBgmMethods */
 
-extern s32 sWBgmActive; /* 1 between WBgm__WBgm and WBgm__Finalize */
-
 /* The class's own methods and helpers, in address order. */
 WBgm *New_WBgm(char *vabPath, char *seqPath, s32 autoPlay); /* BMemPMgrAlloc(0x24), then ctor */
 void WBgm__WBgm(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay);

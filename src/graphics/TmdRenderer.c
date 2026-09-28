@@ -32,6 +32,11 @@
 #include "BMemPMgr.h"
 #include "gte.h"
 
+/* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
+ * work and back to 0 after (setter and getter in TmdRenderer.c). Nothing in
+ * either waits on it. */
+extern s32 sBMemPMgrBusy;
+
 void FreeBasicClassList(BasicClassListNode **head) {
     BasicClassListNode *node = *head;
 

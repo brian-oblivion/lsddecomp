@@ -35,6 +35,10 @@
 #include "ScreenSprite.h"
 #include "BMemPMgr.h"
 
+/* The cursor sprite's position at index 0, (-62, -12): loadCardResources
+ * attaches the cursor there, setCursorPos moves it to x + index * 7, y. */
+extern ScreenSpritePos sTextEntryCursorPos;
+
 /* ScreenWidgets.c's, which types both u8 *(u8 *dst, u8 *src); declared on
  * TextEntry's char buffers. Decode turns full-width SJIS into one byte a
  * character, Encode turns it back. */

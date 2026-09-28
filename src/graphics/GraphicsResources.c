@@ -60,6 +60,11 @@
 #include "CdStream.h"
 #include "MoviePlayer.h"
 
+extern MoviePlayer *sActiveMoviePlayer; /* the playing movie, or NULL (play sets it, pollActive clears it) */
+extern s32 sMdecInitialized;            /* set by the first ctor, which DecDCTReset(0)s the MDEC */
+extern s32 sMoviePollCounter;           /* pollActive's call count */
+extern u8 sMovieClearColor[4];          /* a zero word: play's clearImage color, black */
+
 #define CD_SECTOR_SIZE 2048 /* a CD-ROM data sector: TimBlockSrc's first read */
 #define FIX12_SHIFT 12      /* ONE == 1 << FIX12_SHIFT: 20.12 fixed point */
 

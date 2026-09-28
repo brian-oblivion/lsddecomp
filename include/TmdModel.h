@@ -112,8 +112,6 @@ struct TmdModel {
 extern TmdModelMethods gTmdModelMethods;
 extern TmdModelMethods *GetTmdModelMethods(void); /* returns &gTmdModelMethods */
 
-extern s32 sTmdModelBoundsCount; /* boxes in the bounds buffer: 1, set by the ctor */
-
 TmdModel *New_TmdModel(TmdObject *object);
 
 /* The occupants of its own table. */

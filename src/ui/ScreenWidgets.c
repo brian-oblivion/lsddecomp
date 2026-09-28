@@ -30,6 +30,15 @@
 #include "Task.h"
 #include "TextRow.h"
 
+/* FadeBox's colour tables, eight RGB entries each, indexed at a 3-byte
+ * stride by a channel mask: sFadeBoxMaskColors holds each mask's own
+ * channels at 0xFF (0 and 7 white), sFadeBoxBlackColors is all black.
+ * sBoxFillDefaultColor ({128, 128, 128}) is BoxFill__Reset's colour when it
+ * is given none. */
+extern u8 sFadeBoxMaskColors[];
+extern u8 sFadeBoxBlackColors[];
+extern u8 sBoxFillDefaultColor[3];
+
 FadeBox *New_FadeBox(void *size, s32 channels, s32 pri) {
     FadeBox *self;
 

@@ -47,6 +47,23 @@
 #include <strings.h>
 #include "GameApplicationFileResource.h"
 
+/* The CD driver's module state. */
+extern s32 sCdAsyncEnabled;
+extern s32 sCdSyncQueueMode; /* nonzero with sCdAsyncEnabled 0: requests queue, then run blocking */
+extern s32 sCdBusy;          /* 0/1 */
+extern CdFileEntry *sFileTable;        /* SetFileTable */
+extern s32 sFileTableCount;            /* SetFileTableCount */
+extern s32 sCdIdle;                    /* 0/1 */
+extern s32 sCdOperation;               /* StartCdOperation's op, GetCdOperation's result */
+extern s32 sCdState;                   /* the state machine's phase */
+extern CdFileEntry *sCdSeekParam;      /* the state machines seek to &sCdSeekParam->pos */
+extern s32 sCdReadSectorCount;         /* CdRead sector count */
+extern void *sCdReadBuffer;            /* CdRead target buffer */
+extern CdFileEntry *sCdSavedSeekParam; /* LoadFile's saved sCdSeekParam */
+extern CdRequestNode *sCdRequestQueue; /* list head */
+extern s32 sCdTickStep;                /* CD_TICK_* */
+extern s32 sCdUseVSyncCallback;
+
 /* `pos` (self->pos, CdFileEntry::pos) is Sony's CdlLOC; CdControl takes it
  * as the u_char * parameter bytes, hence those casts. */
 

@@ -38,6 +38,23 @@
 #include "DreamSys.h"
 #include "StageMap.h"
 
+extern DreamAuxSlot sDreamAuxSlots[1];
+
+/* sDreamAuxSlots one word in, so each element's `model` is that slot's
+ * entity: ReleaseDreamAuxEntities walks it. */
+extern DreamAuxSlot sDreamAuxSlots2[1];
+
+extern s8 sDreamAuxTriggerCounts[DREAM_AUX_STAGE_COUNT];
+extern DreamAuxTriggerEntry *sDreamAuxTriggerEntries[DREAM_AUX_STAGE_COUNT];
+
+/* The two ModelData files InitDreamAux can load. With one slot, only
+ * SYMSPY.MOM is ever requested. */
+extern const char sMomPathSymSpy[];
+extern const char sMomPathSymDog[];
+
+extern s8 sDreamAuxGroupCounts[DREAM_AUX_STAGE_COUNT];
+extern TriggerRecord *sDreamAuxGroupRecords[DREAM_AUX_STAGE_COUNT];
+
 extern s8 sSpecialColors[];
 
 const char sMomPathSymSpy[] = "ETC\\SYMSPY.MOM";

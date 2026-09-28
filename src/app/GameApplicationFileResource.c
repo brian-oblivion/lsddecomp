@@ -43,6 +43,10 @@
 #include "NullDriver.h"
 #include "CdDriver.h"
 
+/* The table getters of every class SetActiveDataSource rebinds, NULL-
+ * terminated; it sits right after gFileResourceMethods's last slot. */
+extern void *(*sDataSourceClientGetters[])(void);
+
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
 
 extern char *GetDefaultDataDirectory(void); /* GameFiles.c: "CDI\\" */

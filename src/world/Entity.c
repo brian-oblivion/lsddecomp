@@ -35,6 +35,16 @@
 #include "StageMap.h"
 #include "Viewport.h"
 
+/* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
+ * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what
+ * Viewport gives its FadeBox (FadeBox.h). */
+extern s32 sEntityFadeBoxDefaultSize[2];
+extern s32 sEntityFadeBoxDefaultOffset[2];
+
+extern EntityMoodRow sEntityMoodTable[];
+extern s8 sEntityLinkStageTable[];  /* the linkStage column (Entity) */
+extern s8 sEntityEventVideoTable[]; /* the eventVideo column (Entity) */
+
 /* The motion templates (.data, in address order):
  * the constant triples the MoodCue handlers in src/world/Entity.c pass to
  * updateRotation (+0x044) and updateScale (+0x048) -- three Ratio16s
