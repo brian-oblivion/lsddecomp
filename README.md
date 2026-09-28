@@ -114,58 +114,72 @@ job).
 
 ### The main subsystems
 
+`src/` is grouped by subsystem. Each file's banner says what it holds, and
+`python3 tools/srcpath.py` lists the directories and how many files each has.
+
+| directory | what it holds |
+| --- | --- |
+| `src/main.c` | the entry point: builds the pool, the application, the screen and the pad, and runs the main loop |
+| `src/app/` | the application shell and the object framework: the `BMemPMgr` pool allocator and `BasicClass`, `Application` and `GameApplication`, `FileResource`, the task classes (`TaskCore`, `IntermediateBase`, `StreamTask`) with `Viewport`, and `Pad` |
+| `src/cd/` | CD access and the game's files: `CdDriver`, `CdStream` streaming, `LbdFile` and the table of file names |
+| `src/graphics/` | the screen, the scene graph and rendering: `DrawSystem`, `SceneNode`, the sprites, the lights, `TmdModel` and the TMD renderer, the Viewport's draw pass, and the loaders that turn TIM, TMD and TOD files into graphics objects (with the tile-map layer and the FMV player) |
+| `src/world/` | the dream world and its actors: `DreamSys`, `DayTask` and `StageMap`, the stage grid, `DreamAux`'s triggers, `Actor`, `TodActor` and `Entity`, and `ObjM` with the style layer and `GraphRoom` |
+| `src/sound/` | the game's sound: `WBgm` background music and the VAB backend (`VabDriver`, `VabStreamObj`, sound cues), with the map chunks' `PlacementGrid` at the head of its file |
+| `src/ui/` | menus and 2D widgets: `TitleMenu` and the `TaskObjF` memory-card saves, `TextEntry` and `ItemList`, `FadeBox`, `BoxFill` and `TextRow` |
+| `src/psyq/` | Sony library modules not linked from `lib/`, carried in `src/` as C or `INCLUDE_ASM` instead (`libsnd_*`, `libcd_bios`, `libgs_*`, `libspu_s_ih`, `libcard_card`), each file named for its Sony module; `libsnd_vmanager.c` opens with one game function, `ServiceSoundCueSet` |
+
 Read each named class's header first; its banner points to the units.
 
 - **Boot and the main loop.** `src/main.c` sets up the `BMemPMgr` pool
-  allocator (`src/BMemPMgr.c`), the `DrawSystem` screen singleton and a
-  `Pad`, then runs the root object, `GameApplication` (`src/GameApplicationFileResource.c`, a
-  subclass of `Application`, `src/Application.c`). Its loop shows the intro logos, plays an opening
+  allocator (`src/app/BMemPMgr.c`), the `DrawSystem` screen singleton and a
+  `Pad`, then runs the root object, `GameApplication` (`src/app/GameApplicationFileResource.c`, a
+  subclass of `Application`, `src/app/Application.c`). Its loop shows the intro logos, plays an opening
   movie, runs the title menu, runs a day, and plays the ending movie when a
   year has gone by. The game's file paths (sound banks, each stage's
   textures, music and map chunks, the movies) are one table,
-  `src/GameFiles.c`.
+  `src/cd/GameFiles.c`.
 - **Scene objects.** `SceneNode` is the positioned 3D object, wrapping a
-  libgs `GsDOBJ2` and its coordinate system (`src/SceneNode.c`); `Actor`
-  adds movement (`src/ObjMStyleActor.c`). `LinkResource`, `TmdModel`, `ModelData` and `Tod`/`TodSet`
+  libgs `GsDOBJ2` and its coordinate system (`src/graphics/SceneNode.c`); `Actor`
+  adds movement (`src/world/ObjMStyleActor.c`). `LinkResource`, `TmdModel`, `ModelData` and `Tod`/`TodSet`
   load models and TOD animations. `Viewport` renders a scene through libgs;
-  `FrameClock` is the per-frame tick objects listen to; `Pad` (`src/Pad.c`)
-  turns the controller into button events; `DrawSystem` (`src/DrawSystem.c`)
+  `FrameClock` is the per-frame tick objects listen to; `Pad` (`src/app/Pad.c`)
+  turns the controller into button events; `DrawSystem` (`src/graphics/DrawSystem.c`)
   owns the screen and the VSync loop.
-- **The dream.** `DreamSys` (`src/DreamSys.c`) is the dream in progress: the
+- **The dream.** `DreamSys` (`src/world/DreamSys.c`) is the dream in progress: the
   dream clock, the player's movement, the mood record that picks the next
   day's dream, and the "link" teleport that ends one stage and starts
-  another. `Entity` (`src/Entity.c`, over `TodActor`, `src/TodActor.c`) is a TOD-animated
+  another. `Entity` (`src/world/Entity.c`, over `TodActor`, `src/world/TodActor.c`) is a TOD-animated
   actor driven by per-mood tables. `StageGrid` maps mood-graph values to
-  stage chunks (`src/StageGrid.c`); `DreamAux` (`src/DreamAux.c`) spawns the
+  stage chunks (`src/world/StageGrid.c`); `DreamAux` (`src/world/DreamAux.c`) spawns the
   dream's trigger entities;
   `StageMap` keeps the seven map chunks around its target loaded, each
   chunk's `PlacementGrid` linked into a lattice of `GridCell`s. `DayTask` runs one day around the
-  DreamSys's startDay/endDay (both classes in `src/DayTaskStageMap.c`) and
-  builds an `ObjM` per stage (`src/ObjMStyleActor.c`, with the style layer
+  DreamSys's startDay/endDay (both classes in `src/world/DayTaskStageMap.c`) and
+  builds an `ObjM` per stage (`src/world/ObjMStyleActor.c`, with the style layer
   and `StyleEffect`).
 - **Screens and menus.** `IntermediateBase` runs one attached job to a
-  result. `TaskCore` (`src/Task.c`, with `StreamTask`, `IntermediateBase` and
+  result. `TaskCore` (`src/app/Task.c`, with `StreamTask`, `IntermediateBase` and
   `Viewport`) is the base of the menu and screen
   tasks: `StreamTask` (plays one movie), `GraphRoom` (the mood graph) and
   `TitleMenu`, the START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE menu. The 2D pieces are `Sprite` and its subclasses (down to
-  `TextRow`), `BoxFill` and `FadeBox` (`src/ScreenWidgets.c`) and `TextEntry`
-  (`src/TextEntryItemList.c`).
+  `TextRow`), `BoxFill` and `FadeBox` (`src/ui/ScreenWidgets.c`) and `TextEntry`
+  (`src/ui/TextEntryItemList.c`).
 - **Memory-card saves.** `TitleMenu` owns a `TaskObjF`, the save/load
-  controller (both in `src/TitleMenuTaskObjF.c`): a state machine over the
+  controller (both in `src/ui/TitleMenuTaskObjF.c`): a state machine over the
   BIOS memory-card calls, which shows its choices in an `ItemList` scrolling
-  list (`src/TextEntryItemList.c` and `src/ObjMStyleActor.c`).
+  list (`src/ui/TextEntryItemList.c` and `src/world/ObjMStyleActor.c`).
 - **CD and data sources.** `FileResource` is the base of every class loaded
   from a file; its file interface is bound at run time to the active driver: `CdDriver`
-  (`src/CdDriver.c`: blocking file access, the CD request queue, its state
+  (`src/cd/CdDriver.c`: blocking file access, the CD request queue, its state
   machines and the file table)
-  or `VabDriver`. `TimImage` (`src/TimImage.c`), `TimArraySrc`, `TimBlockSrc`, `TileMap` and
+  or `VabDriver`. `TimImage` (`src/graphics/TimImage.c`), `TimArraySrc`, `TimBlockSrc`, `TileMap` and
   `TileAtlas` load and build textures.
-- **Movies.** `MoviePlayer` (`src/GraphicsResources.c`) decodes MDEC FMV from a
-  `CdStream` (`src/CdStream.c`, over libcd streaming).
+- **Movies.** `MoviePlayer` (`src/graphics/GraphicsResources.c`) decodes MDEC FMV from a
+  `CdStream` (`src/cd/CdStream.c`, over libcd streaming).
 - **Sound.** `VabStreamObj` loads VAB banks, `WBgm` plays background music
-  (`src/WBgm.c`), `src/PlacementGridVabSound.c` holds `VabDriver`, `VabStreamObj` and
+  (`src/sound/WBgm.c`), `src/sound/PlacementGridVabSound.c` holds `VabDriver`, `VabStreamObj` and
   the sound-cue set beside the map chunks' `PlacementGrid`, and
-  `src/libsnd_vmanager.c` is Sony's SPU voice manager written as C.
+  `src/psyq/libsnd_vmanager.c` is Sony's SPU voice manager written as C.
 
 ### From a function to its class and callers
 
@@ -184,7 +198,7 @@ with how it matched and the evidence for its name.
 
 | path | what |
 | --- | --- |
-| `src/` | the C units |
+| `src/` | the C units, one directory per subsystem (the table under "The main subsystems") |
 | `include/` | one header per class, subsystem headers, and the Psy-Q SDK headers in `include/psyq/` |
 | `config/` | splat segmentation, symbol names, the SDK object manifest |
 | `asm/` | disassembly generated by `make extract`. Never edited or committed. |
