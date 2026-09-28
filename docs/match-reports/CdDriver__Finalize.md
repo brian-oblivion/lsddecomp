@@ -4,7 +4,7 @@
 
 > Renamed from `func_80027274` on 2026-09-25 (tools/rename.py). Address 0x80027274.
 
-Unit `code_179d8_o`, round 26 (2026-09-09). A two-call vtable dispatcher on
+Unit `CdDriver`, round 26 (2026-09-09). A two-call vtable dispatcher on
 `self`, both calls through `self->methods` (the class table set up by
 `CdDriver__CdDriver`'s constructor).
 

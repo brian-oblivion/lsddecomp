@@ -4,7 +4,7 @@
 
 > Renamed from `new_class_6d4e8` on 2026-09-25 (tools/rename.py). Address 0x800271d8.
 
-Unit `code_179d8_o`, round 26 (2026-09-09). The unit's "new" function: allocate
+Unit `CdDriver`, round 26 (2026-09-09). The unit's "new" function: allocate
 an instance and dispatch to its constructor through the class's own method
 table.
 

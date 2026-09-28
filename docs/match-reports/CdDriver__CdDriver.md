@@ -4,7 +4,7 @@
 
 > Renamed from `func_80027228` on 2026-09-25 (tools/rename.py). Address 0x80027228.
 
-Unit `code_179d8_o`, round 26 (2026-09-09). This class's constructor --
+Unit `CdDriver`, round 26 (2026-09-09). This class's constructor --
 confirmed via `tools/classtable.py 0x8006D4E8 --vs 0x8006B58C` as the
 override of the base "BasicClass" hierarchy's constructor slot (`+0x008`);
 see `New_CdDriver.md` for the full table-comparison finding shared by

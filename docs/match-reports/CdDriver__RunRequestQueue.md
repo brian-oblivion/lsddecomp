@@ -228,7 +228,7 @@ For the head to apply by type scope (out of unit):
 
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
-| code_179d8_o | `Obj6D4E8` | `unk28` | `inQueueDispatch` | A | the constructor's clear of the same field this function raises around each dispatch (note that view types it `s16`, this unit `u16`) |
+| CdDriver | `Obj6D4E8` | `unk28` | `inQueueDispatch` | A | the constructor's clear of the same field this function raises around each dispatch (note that view types it `s16`, this unit `u16`) |
 | include/GameApplicationFileResource.h | `FileResource` | `unk28` | `inQueueDispatch` | B | the base ctor zeroes it; only this derived class reads it |
 | include/GameApplicationFileResource.h | `FileResource` | `unk22` | `pendingRequests` | B | the base ctor zeroes it; EnqueueCdRequest/this function count it |
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_800272C8` on 2026-09-25 (tools/rename.py). Address 0x800272c8.
 
-Unit `code_179d8_o`, round 26 (2026-09-09). A bare `jr $ra; nop` leaf --
+Unit `CdDriver`, round 26 (2026-09-09). A bare `jr $ra; nop` leaf --
 retail's own compiled body for this vtable slot is genuinely empty.
 
 ## What it is
