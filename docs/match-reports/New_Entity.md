@@ -105,3 +105,15 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
   - "This is the first 25 of a 142-function block split at Entity__UpdateTargetProximity; the rest (Entity_b through Entity_g, all sharing include/Entity.h) hold the mood-dispatch handler tables and the per-frame behaviour those handlers run."
   - "Entity's own vtable is gEntityMethods (asm/data/79528.data.s), reached via Get_vtable_Entity (Entity_b.c); `tools/classtable.py gEntityMethods` is the ground truth for which function occupies which slot, including the several self-referential slots this unit's own functions dispatch back into (activate/deactivate/getProximityRatio/startSoundCue/stopSoundCue)."
   - "The overrides of TodActor's slots are named for their slots (Entity__Finalize, Reset, AttachToParent, DetachFromParent, OnGridCellLinkCommand; track 4, round 88)."
+
+## History (moved from src/Entity.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> What decided its edges (python3 tools/tuboundary.py): DreamAux.c before it
+> and TodActor.c after it are other subjects, and both edges are "start
+> edge possible"; they stay. Inside, the file is seven old carve slices,
+> Entity and Entity_b to Entity_g, and every one of the six edges between
+> them is "start edge possible, soft-unlikely" on single-user data (each
+> quoting 0x80089eb0) and falls inside the one class, so all seven were
+> merged. No forced boundary lies in the file.

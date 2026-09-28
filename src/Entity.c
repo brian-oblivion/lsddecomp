@@ -1,14 +1,6 @@
 /* Entity -- the class whole (include/Entity.h): its methods, its table
  * getter Get_vtable_Entity, and the MoodCue handlers of its mood rows.
  *
- * What decided its edges (python3 tools/tuboundary.py): DreamAux.c before it
- * and TodActor.c after it are other subjects, and both edges are "start
- * edge possible"; they stay. Inside, the file is seven old carve slices,
- * Entity and Entity_b to Entity_g, and every one of the six edges between
- * them is "start edge possible, soft-unlikely" on single-user data (each
- * quoting 0x80089eb0) and falls inside the one class, so all seven were
- * merged. No forced boundary lies in the file.
- *
  * An Entity is a TodActor driven by one row of gEntityMoodTable, chosen by
  * New_Entity's moodIndex. The first section holds:
  *  - construction and teardown: New_Entity, Entity__Entity, Entity__Reset
