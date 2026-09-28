@@ -63,7 +63,7 @@ None beyond what's already documented -- straightforward wrapper.
 **`StyleEffect__ReleaseSprites` -- tier A.** Mechanics ARE the purpose: the
 whole body is `ReleaseBasicClassArray(this->links, 5)`, i.e. "release [all
 of] this object's links". `LinkOwnerObj` is this unit's own established
-local view of the class `class_3bb8c_s.c` independently calls `LinkNode`
+local view of the class `class_3bb8c_k.c` independently calls `LinkNode`
 (same object, same `arr84`/`links` array, per that unit's own header
 comment) -- kept distinct per the multiple-independent-local-views
 convention rather than importing that name here.
@@ -72,7 +72,7 @@ convention rather than importing that name here.
 
 Renamed from the `LinkOwnerObj__` family to `StyleEffect__` with the class's
 unification (`include/StyleEffect.h`). Evidence: the only caller is
-StyleEffect's own per-kind dispatch in `class_3bb8c_s.c`
+StyleEffect's own per-kind dispatch in `class_3bb8c_k.c`
 (`StyleEffect__InitByKind` kind 3, `StyleEffect__UpdateByKind` kind 3,
 `StyleEffect__ReleaseByKind` kinds 2/3), each passing its own `self`; the
 five-element array at +0x084 ("links") is `StyleEffect::sprites`, filled by

@@ -54,7 +54,7 @@ typedef struct StyleEffectMethods StyleEffectMethods;
 typedef struct StyleEffectParams StyleEffectParams;
 
 /* What each `kind` builds and does per frame (the switches in
- * class_3bb8c_s.c). */
+ * class_3bb8c_k.c). */
 typedef enum StyleEffectKind {
     STYLE_EFFECT_MODEL_ROW =
         0, /* model, plus two copies in a row (modelChildren) that spin and drift along z after 500 ticks */
@@ -110,7 +110,7 @@ extern StyleEffectMethods *GetStyleEffectMethods(void); /* class_3bb8c_o.c; retu
 
 /* The class's own methods, in address order (class_3bb8c_k, _s, then _o).
  * Four are declared WITHOUT a prototype on purpose: each is one-parameter,
- * but a caller in class_3bb8c_s.c passes a dead second argument that is
+ * but a caller in class_3bb8c_k.c passes a dead second argument that is
  * byte-load-bearing (the `arity-ok` notes there and in the reports). */
 StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *parent,
                              LongVec3 *pos); /* BMemPMgrAlloc(sizeof(StyleEffect)), then ctor */

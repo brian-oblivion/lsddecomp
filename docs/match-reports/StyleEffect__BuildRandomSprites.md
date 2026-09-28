@@ -4,7 +4,7 @@
 
 > Renamed from `func_80056BBC` on 2026-09-23 (tools/rename.py). Address 0x80056bbc.
 
-Unit `class_3bb8c_s`. Round 22. Runner delta reached 86/87 and filed this as a
+Unit `class_3bb8c_k`. Round 22. Runner delta reached 86/87 and filed this as a
 **stall of the documented "redundant move" class** -- "a genuine dead store in
 retail's own compiled output", one instruction the source cannot produce. The
 head re-read the residue and it is **not a dead store at all**. The function is
@@ -114,7 +114,7 @@ own entry point and would not have resolved for the next reader.
 
 ## Final body
 
-Lives in `src/class_3bb8c_s.c` in ROM order between `StyleEffect__ReleaseModelChildren` and
+Lives in `src/class_3bb8c_k.c` in ROM order between `StyleEffect__ReleaseModelChildren` and
 `StyleEffect__SpawnSprites`.
 
 ### Proposed learning
@@ -132,7 +132,7 @@ find and are themselves the evidence.
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/class_3bb8c_s.c`'s unprototyped declaration
+**Verdict: arity-ok idiom.** `src/class_3bb8c_k.c`'s unprototyped declaration
 stays.
 
 **Callee evidence** (`0x80056BBC`, and the matched definition *in this same
@@ -162,7 +162,7 @@ line 146 would make the `StyleEffect__BuildRandomSprites(self, 0)` call at line 
 `too many arguments` error against the definition 187 lines further down.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/class_3bb8c_s.c:146`. Oracle green.
+added to `src/class_3bb8c_k.c:146`. Oracle green.
 
 ## Naming
 
@@ -186,7 +186,7 @@ their ratio-triple values): `gSpriteShiftX` (was D_80087844, s32[6]),
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+class_3bb8c_k.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
 
 ## Naming (track 7, round 101)
 

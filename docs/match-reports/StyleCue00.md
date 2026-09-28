@@ -104,7 +104,7 @@ holds (and now names IsStyleVariantEven). The old one, verbatim:
  *    layer keeps at an offset from its target: this unit supplies its slot
  *    occupants (StyleEffect__StyleEffect/__Finalize/__SetParams/__Update)
  *    and the `New_StyleEffect` allocator; its per-kind work is in
- *    class_3bb8c_s.c and class_3bb8c_o.c.
+ *    class_3bb8c_k.c and class_3bb8c_o.c.
  *
  * Named round 73 (charlie); tiers and evidence in each function's match
  * report.

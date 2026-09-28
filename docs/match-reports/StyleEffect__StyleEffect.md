@@ -95,12 +95,12 @@ only creator is the style layer's effect-slot code (StyleFillEffectKind0..3
 into gStyleEffectSlots), whose vocabulary the name reuses. What an effect is
 in the game is not shown. The kinds became `enum StyleEffectKind` in
 include/StyleEffect.h (MODEL_ROW, MODEL, SPRITES, JITTER_SPRITES), from what
-each switch arm in class_3bb8c_s.c does; the switches still spell numbers.
+each switch arm in class_3bb8c_k.c does; the switches still spell numbers.
 
 The header banner was rewritten as documentation (what it is, who builds
 it, lifecycle by slot); `params.rotation`/`params.scale` went from `void *`
 to `Ratio16 *` (updateRotation/updateScale take Ratio16[3]), no accessor
-changed. class_3bb8c_s.c's banner lost its history lines (unified round 88,
+changed. class_3bb8c_k.c's banner lost its history lines (unified round 88,
 named round 70, last match round 75), all already in the per-function
 reports.
 

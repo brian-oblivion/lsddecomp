@@ -32,7 +32,7 @@ group; see `SceneNode__SetDisplay.md`).
 
 ## Naming
 
-Round 71 (alpha). `func_8001D374` -> `SceneNode__SetSemiTrans`, **tier A**. Table slot +0x064. Sets attribute bit 30, GsALON (semi-transparency on), to on != 0 and returns the old bit. class_3bb8c_s calls the slot setSemiTrans.
+Round 71 (alpha). `func_8001D374` -> `SceneNode__SetSemiTrans`, **tier A**. Table slot +0x064. Sets attribute bit 30, GsALON (semi-transparency on), to on != 0 and returns the old bit. class_3bb8c_k calls the slot setSemiTrans.
 
 Round 96 (alpha, track 6). The +0x064 slot is `setSemiTransOn`, not
 `setSemiTrans`: <libgpu.h> defines the function-like macro

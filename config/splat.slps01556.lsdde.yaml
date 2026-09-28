@@ -1711,7 +1711,6 @@ segments:
       # one `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, and
       # the single frameless function (func_80056794) opens on its own $a1,
       # not on $sp.
-      - [0x46D20, c, class_3bb8c_s]
       # class_3bb8c_o: functions 54..73 of that remainder, 0x475F0..0x47CC4
       # (20 functions).  Census 2026-09-04, three-grep screen per function:
       # 19/20 clean, the one blocked is func_80056F5C (gp_rel).  Owns NO

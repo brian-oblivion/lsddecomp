@@ -75,7 +75,7 @@ fully described in this report (stash `self`/two scalars into three
 globals, then loop twice through the still-unresolved `slot80` occupant
 and an unrenamed Psy-Q object, `TmdModel__SetFirstPrimClut`), but nothing establishes
 WHAT this accomplishes -- `arg0` is discarded by every known caller, and
-`class_3bb8c_s.c`'s own comment calls it merely "ctor-shaped" as a guess,
+`class_3bb8c_k.c`'s own comment calls it merely "ctor-shaped" as a guess,
 not a finding. Kept the tier-C `Class__func_xxxxx` form.
 
 ## Track 4 (2026-09-25, round 82, delta)
@@ -85,7 +85,7 @@ Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Act
 ## Track 4b (2026-09-25, round 85)
 
 `gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport` were `s32` in class_3bb8c_o.c and
-`D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_s.c. Both units now
+`D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_k.c. Both units now
 declare `Actor *`/`void *`/`void *`: this function stores its own `Actor *self` into the first, the two scalars go in through a `(void *)` cast. Byte-identical; no new `-Wall`
 warning.
 
@@ -108,4 +108,4 @@ are really `LinkResource *`, and the `setBackClip` calls through it are
 
 ## Track 7 (round 99, alpha)
 
-Parameters named (unused, tmd, tim, viewport), in the prototype in include/Actor.h too; the local `ret` is `TmdModel *model`, and the local prototype of TmdModel__SetFirstPrimClut takes its definition's (TmdModel *, s16 *xy). `python3 tools/rename.py D_8008AB94 gStyleEffectClutPos`, **tier A**: an s16[2] VRAM position, 0x01FF03F0 = (x 1008, y 511), which TmdModel__SetFirstPrimClut turns into a CLUT id (x / 16 + y * 64) for the first primitive of each model; this function is its only accessor. The comment on the three source globals, which said "track 4b, round 85", is covered by the Track 4b section above; it now says what they are. Still PROPOSED from track 6 (bravo): `tmd` and gStyleEffectTmd are a LinkResource (the +0x080 slot is LinkResource's getModel, returning a TmdModel), which would drop the Actor view and the cast; that changes class_3bb8c_s.c's declaration too.
+Parameters named (unused, tmd, tim, viewport), in the prototype in include/Actor.h too; the local `ret` is `TmdModel *model`, and the local prototype of TmdModel__SetFirstPrimClut takes its definition's (TmdModel *, s16 *xy). `python3 tools/rename.py D_8008AB94 gStyleEffectClutPos`, **tier A**: an s16[2] VRAM position, 0x01FF03F0 = (x 1008, y 511), which TmdModel__SetFirstPrimClut turns into a CLUT id (x / 16 + y * 64) for the first primitive of each model; this function is its only accessor. The comment on the three source globals, which said "track 4b, round 85", is covered by the Track 4b section above; it now says what they are. Still PROPOSED from track 6 (bravo): `tmd` and gStyleEffectTmd are a LinkResource (the +0x080 slot is LinkResource's getModel, returning a TmdModel), which would drop the Actor view and the cast; that changes class_3bb8c_k.c's declaration too.

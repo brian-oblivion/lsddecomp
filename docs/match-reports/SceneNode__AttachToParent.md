@@ -93,7 +93,7 @@ field for the cross-check with `SceneNode__DetachFromParent`).
 
 ## Naming
 
-Round 71 (alpha). `func_8001D0EC` -> `SceneNode__AttachToParent`, **tier A**. Table slot +0x04C. Only when not already attached: stores the parent in self->unkC, sets coord2->super to the parent's coordinate, calls parent->addChild(self) (BasicClass slot +0x010), copies the optional translation into coord2 (coord.t, +0x18..+0x20) or zeroes it, flg = 0. class_3bb8c_s independently calls this slot `attachToParent`.
+Round 71 (alpha). `func_8001D0EC` -> `SceneNode__AttachToParent`, **tier A**. Table slot +0x04C. Only when not already attached: stores the parent in self->unkC, sets coord2->super to the parent's coordinate, calls parent->addChild(self) (BasicClass slot +0x010), copies the optional translation into coord2 (coord.t, +0x18..+0x20) or zeroes it, flg = 0. class_3bb8c_k independently calls this slot `attachToParent`.
 
 ## Proposed field names
 

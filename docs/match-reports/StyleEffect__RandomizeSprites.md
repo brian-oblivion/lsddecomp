@@ -97,7 +97,7 @@ not established).
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/class_3bb8c_s.c`'s unprototyped declaration
+**Verdict: arity-ok idiom.** `src/class_3bb8c_k.c`'s unprototyped declaration
 stays.
 
 **Callee evidence** (`0x80056E44`, and the definition in
@@ -121,13 +121,13 @@ one-parameter prototype here would make every arm a `too many arguments`
 error, and dropping the argument would delete `move a1,s1`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/class_3bb8c_s.c:145`. Oracle green.
+added to `src/class_3bb8c_k.c:145`. Oracle green.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
 Renamed from the `LinkOwnerObj__` family to `StyleEffect__` with the class's
 unification (`include/StyleEffect.h`). Evidence: the only caller is
-StyleEffect's own per-kind dispatch in `class_3bb8c_s.c`
+StyleEffect's own per-kind dispatch in `class_3bb8c_k.c`
 (`StyleEffect__InitByKind` kind 3, `StyleEffect__UpdateByKind` kind 3,
 `StyleEffect__ReleaseByKind` kinds 2/3), each passing its own `self`; the
 five-element array at +0x084 ("links") is `StyleEffect::sprites`, filled by

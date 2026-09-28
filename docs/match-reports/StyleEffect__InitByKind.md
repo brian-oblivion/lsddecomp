@@ -4,7 +4,7 @@
 
 > Renamed from `func_80056520` on 2026-09-23 (tools/rename.py). Address 0x80056520.
 
-**Unit:** class_3bb8c_s · **Round:** 44 (2026-09-15)
+**Unit:** class_3bb8c_k · **Round:** 44 (2026-09-15)
 
 ## Provenance
 
@@ -56,7 +56,7 @@ void StyleEffect__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
 }
 ```
 
-Declarations added to `src/class_3bb8c_s.c` (kept regardless of any other
+Declarations added to `src/class_3bb8c_k.c` (kept regardless of any other
 function's match state):
 
 ```c
@@ -156,9 +156,9 @@ StyleEffect__UpdateByKind; only this unit references it).
 
 ### Field and slot names in this unit's local view (applied, round 70)
 
-`LinkNode` and `LinkNodeMethods` are defined only in `src/class_3bb8c_s.c`,
+`LinkNode` and `LinkNodeMethods` are defined only in `src/class_3bb8c_k.c`,
 so the compiler's accessor list after renaming the definition was entirely in
-this unit (every `has no member` error was in src/class_3bb8c_s.c, all fixed; build and `tools/check-nonmatching.sh`
+this unit (every `has no member` error was in src/class_3bb8c_k.c, all fixed; build and `tools/check-nonmatching.sh`
 green). `typedef struct LinkNode StyleEffect;` was added for the owner's
 method signatures; zero bytes changed.
 
@@ -205,13 +205,13 @@ For the HEAD, by type scope; none applied here (other units' views).
 ## Track 4b (2026-09-25, round 85)
 
 `gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport` were `s32` in class_3bb8c_o.c and
-`D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_s.c. Both units now
+`D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_k.c. Both units now
 declare `Actor *`/`void *`/`void *`: the local `D_8008ACA4Methods` view is gone and the +0x080 call reads `getSetUnk10Flag8`, the name `SetStyleEffectSources` calls the same slot by. Byte-identical; no new `-Wall`
 warning.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+class_3bb8c_k.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
 
 ## Track 6 (round 93, bravo)
 

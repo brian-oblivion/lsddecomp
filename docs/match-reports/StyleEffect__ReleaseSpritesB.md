@@ -37,7 +37,7 @@ None -- see `StyleEffect__ReleaseSprites`.
 **`StyleEffect__ReleaseSpritesB` -- tier A.** Byte-identical body to
 `StyleEffect__ReleaseSprites` (see that report), but a genuinely different
 ROM function, reached from a different dispatch state
-(`class_3bb8c_s.c:StyleEffect__ReleaseByKind`'s `case 3` vs. `ReleaseLinks`'s `case 2`).
+(`class_3bb8c_k.c:StyleEffect__ReleaseByKind`'s `case 3` vs. `ReleaseLinks`'s `case 2`).
 No evidence distinguishes what the two states mean, so the name only marks
 this as the second, otherwise-identical, release entry point (suffix `B`)
 rather than asserting a state-specific purpose that isn't established.
@@ -46,7 +46,7 @@ rather than asserting a state-specific purpose that isn't established.
 
 Renamed from the `LinkOwnerObj__` family to `StyleEffect__` with the class's
 unification (`include/StyleEffect.h`). Evidence: the only caller is
-StyleEffect's own per-kind dispatch in `class_3bb8c_s.c`
+StyleEffect's own per-kind dispatch in `class_3bb8c_k.c`
 (`StyleEffect__InitByKind` kind 3, `StyleEffect__UpdateByKind` kind 3,
 `StyleEffect__ReleaseByKind` kinds 2/3), each passing its own `self`; the
 five-element array at +0x084 ("links") is `StyleEffect::sprites`, filled by

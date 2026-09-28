@@ -49,7 +49,7 @@ None beyond what's already documented -- a plain forwarding wrapper.
 ## Naming
 
 **`StyleEffect__SpawnPlainSprites` -- tier C.** Class is known (`LinkOwnerObj`,
-confirmed by its caller's dispatch context in `class_3bb8c_s.c`), but the
+confirmed by its caller's dispatch context in `class_3bb8c_k.c`), but the
 function is a pure forward to `StyleEffect__SpawnSprites(this, 0, 0, 0)`, a function
 outside this unit's carved range with no prototype or report anywhere yet.
 Three literal zero arguments carry no evidence of what they mean, so
@@ -58,7 +58,7 @@ Kept the tier-C `Class__func_xxxxx` form per FINISHING-PLAN track 3.
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/class_3bb8c_s.c`'s unprototyped declaration
+**Verdict: arity-ok idiom.** `src/class_3bb8c_k.c`'s unprototyped declaration
 stays.
 
 **Callee evidence** (`0x80056E1C`, and the definition in
@@ -91,13 +91,13 @@ dispatch forwards `(self, 0)` uniformly; a one-parameter prototype would break
 every arm.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/class_3bb8c_s.c:144`. Oracle green.
+added to `src/class_3bb8c_k.c:144`. Oracle green.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
 Renamed from the `LinkOwnerObj__` family to `StyleEffect__` with the class's
 unification (`include/StyleEffect.h`). Evidence: the only caller is
-StyleEffect's own per-kind dispatch in `class_3bb8c_s.c`
+StyleEffect's own per-kind dispatch in `class_3bb8c_k.c`
 (`StyleEffect__InitByKind` kind 3, `StyleEffect__UpdateByKind` kind 3,
 `StyleEffect__ReleaseByKind` kinds 2/3), each passing its own `self`; the
 five-element array at +0x084 ("links") is `StyleEffect::sprites`, filled by

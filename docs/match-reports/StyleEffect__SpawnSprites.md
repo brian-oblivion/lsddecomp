@@ -4,7 +4,7 @@
 
 > Renamed from `func_80056D18` on 2026-09-23 (tools/rename.py). Address 0x80056d18.
 
-**Unit:** class_3bb8c_s · **Round:** 44 (2026-09-15)
+**Unit:** class_3bb8c_k · **Round:** 44 (2026-09-15)
 
 ## Provenance
 
@@ -129,7 +129,7 @@ the `(void *)` cast and the result is cast to this unit's `LinkNode *`
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+class_3bb8c_k.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
 
 ## Track 6 (round 93, bravo)
 

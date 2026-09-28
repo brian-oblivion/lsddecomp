@@ -5,7 +5,7 @@
  *
  *  - StyleEffect (include/StyleEffect.h): the per-kind pieces for its two
  *    sprite kinds that StyleEffect__UpdateByKind and ReleaseByKind
- *    (class_3bb8c_s.c) call. SpawnPlainSprites builds the five sprites,
+ *    (class_3bb8c_k.c) call. SpawnPlainSprites builds the five sprites,
  *    RandomizeSprites re-shapes four of them every frame, NoOpIgnoreArgs is
  *    the empty per-frame step, and ReleaseSprites / ReleaseSpritesB are two
  *    identical functions that release them. Behind them, by address, sit the
@@ -80,7 +80,7 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
     return &gStyleEffectMethods;
 }
 
-/* What StyleEffect's methods (class_3bb8c_s.c, which declares the same
+/* What StyleEffect's methods (class_3bb8c_k.c, which declares the same
  * globals) draw from: the scene's TMD resource, its TIM image and the
  * viewport. The TMD resource's getModel slot sits where Actor has
  * setBackClip, hence the Actor view. */

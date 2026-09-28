@@ -121,7 +121,7 @@ Renamed from `New_D800879C4` (tools/rename.py); the class is `VariantSprite`
 three arguments are forwarded unchanged to the ctor, whose parameters they
 name (see `VariantSprite__VariantSprite`'s report), and the result is the object.
 The body is unchanged but for the parameter names; the one caller outside
-this unit, `StyleEffect__SpawnSprites` (class_3bb8c_s.c), passes its `a2`
+this unit, `StyleEffect__SpawnSprites` (class_3bb8c_k.c), passes its `a2`
 as the variant without a cast and casts the result to its `LinkNode *`
 view, and its local `extern` of this function is gone. The "UNCARVED
 ground" section above is history: the getter and table are

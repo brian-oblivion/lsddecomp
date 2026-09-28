@@ -52,7 +52,7 @@ elsewhere before re-deriving it from scratch.
 
 ## Naming
 
-Round 71 (alpha). `func_8001D344` -> `SceneNode__SetDisplay`, **tier A**. Table slot +0x060. GetSetBitField(&attribute, 31, 1, on == 0): bit 31 of GsDOBJ2.attribute is GsDOFF (LIBGS.H), so on=0 hides the object; returns the previous display state (old DOFF == 0). DreamSys calls it with 0; class_3bb8c_s calls the slot setDisplay.
+Round 71 (alpha). `func_8001D344` -> `SceneNode__SetDisplay`, **tier A**. Table slot +0x060. GetSetBitField(&attribute, 31, 1, on == 0): bit 31 of GsDOBJ2.attribute is GsDOFF (LIBGS.H), so on=0 hides the object; returns the previous display state (old DOFF == 0). DreamSys calls it with 0; class_3bb8c_k calls the slot setDisplay.
 
 ## Proposed field names
 

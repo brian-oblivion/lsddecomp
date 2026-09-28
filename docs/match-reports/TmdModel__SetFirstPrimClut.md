@@ -63,7 +63,7 @@ deleted.
   `SetStyleEffectSources` (class_3bb8c_o.c), passes the value
   `gStyleEffectTmd`'s slot +0x080 returns for a model id; the same slot's
   result for the same `gStyleEffectModelIds[]` is what
-  `StyleEffect__InitByKind` (class_3bb8c_s.c) hands to
+  `StyleEffect__InitByKind` (class_3bb8c_k.c) hands to
   `SceneNode__LinkModel`, which reads it as a `TmdModel` (`->object`,
   `->data->objects`). TmdModel's +0x010 is `object`.
 - **`Inner_fa50` -> `TmdObject`** (`target` -> `prims`): TmdObject's +0x010

@@ -40,7 +40,7 @@ None -- a plain leaf, last of the twenty functions attempted this pass.
 
 `StyleEffect__UpdateByKind` was still `INCLUDE_ASM` when this report was written, so
 its real arity was unknown here. It has since matched (round 44,
-`class_3bb8c_s.c`) as genuinely 2-argument:
+`class_3bb8c_k.c`) as genuinely 2-argument:
 `void StyleEffect__UpdateByKind(LinkNode *self, void *arg1)`, and `arg1` is not
 dead -- it is dereferenced (`AddVec3(&local, (Vec3S *)arg1,
 &self->unk58);`) and forwarded live to three further callees in that
@@ -58,7 +58,7 @@ next touches this function or its caller.
 
 ## Naming
 
-**Tier A.** `+0x0EC`, the class's own per-frame slot per class_3bb8c_s.c's banner ("update slot (+0x0EC)"); the body ticks a counter and forwards to `StyleEffect__UpdateByKind` every call, which is what "Update" names.
+**Tier A.** `+0x0EC`, the class's own per-frame slot per class_3bb8c_k.c's banner ("update slot (+0x0EC)"); the body ticks a counter and forwards to `StyleEffect__UpdateByKind` every call, which is what "Update" names.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
