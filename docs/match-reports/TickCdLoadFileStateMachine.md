@@ -17,7 +17,7 @@ in every state except:
   directly rather than resetting.
 - **state 8, `CdReadSync` succeeds (`v1 == 0`)**: after
   `ResetCdStateMachine()`, this function additionally swaps two globals
-  (`gCdSeekParam = gCdSavedSeekParam; gCdSavedSeekParam = NULL;`) that `TickCdStateMachine`
+  (`gCdSeekParam = sCdSavedSeekParam; sCdSavedSeekParam = NULL;`) that `TickCdStateMachine`
   does not touch at all.
 
 ## Round 45's stall, and what closed it
@@ -139,8 +139,8 @@ L_state8:
     if (v1 != 0)
         goto L_end;
     ResetCdStateMachine();
-    tmp = gCdSavedSeekParam;
-    gCdSavedSeekParam = NULL;
+    tmp = sCdSavedSeekParam;
+    sCdSavedSeekParam = NULL;
     gCdSeekParam = tmp;
     goto L_end;
 
@@ -181,9 +181,9 @@ own comment, CdDriver.c) identifies via `tools/classtable.py` as the
 phase-2 "still busy" signal it proceeds straight into the read phase
 (`newstate = 7`) instead of resetting, because a LoadFile always intends a
 read to follow the seek; and on a successful read it restores
-`gCdSeekParam` from `gCdSavedSeekParam`, because `CdDriver__LoadFile` is the one
+`gCdSeekParam` from `sCdSavedSeekParam`, because `CdDriver__LoadFile` is the one
 call site that stashes the caller's previous `gCdSeekParam` there before
-overwriting it with the file it looked up (`gCdSavedSeekParam =
+overwriting it with the file it looked up (`sCdSavedSeekParam =
 gCdSeekParam; ... gCdSeekParam = rec;`). "LoadFile" names the operation this
 function is used for, established by the classtable evidence above, not a
 guess -- kept tier B because the report can name the caller and the effect
@@ -199,6 +199,6 @@ gCdState's `CD_STATE_*`, an inner switch on CdSync's `CdlComplete` /
 `SetCdState(newState)` after it. Byte-exact on the first build. Round 45's
 residue, the `== 5` test's polarity, is what the natural case order gives
 here; TickCdStateMachine needs `CdlDiskError` first to get the other
-encoding. The `tmp` temporary is gone: `gCdSeekParam = gCdSavedSeekParam;
-gCdSavedSeekParam = NULL;` compiles to the same load/store order.
+encoding. The `tmp` temporary is gone: `gCdSeekParam = sCdSavedSeekParam;
+sCdSavedSeekParam = NULL;` compiles to the same load/store order.
 Constants as TickCdStateMachine's report lists.

@@ -769,7 +769,7 @@ sCdRequestQueue = 0x8008A894;
 gCdSeekParam = 0x8008A87C;
 sCdReadSectorCount = 0x8008A880;
 sCdReadBuffer = 0x8008A884;
-gCdSavedSeekParam = 0x8008A888;
+sCdSavedSeekParam = 0x8008A888;
 gCdTickStep = 0x8008A898;
 gCdTimeoutCounter = 0x8008A8A0;
 // identified: fingerprint 1.00 (EXACT) vs libgpu/sys.o (discs 3.3,3.5,3.6),

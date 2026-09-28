@@ -16,7 +16,7 @@ the six assigned before `CdDriver__RunRequestQueue`.
  * that already matched against the earlier, narrower Obj80027480 still
  * match after this extension. */
 extern void FileResource__LoadFile(void);
-extern void *gCdSavedSeekParam;
+extern void *sCdSavedSeekParam;
 
 /* generic doubly-linked-list node, 0x24 bytes (src/cd/CdDriver.c's own
  * reading); only offset 0x0 is touched here -- declared LOCAL, per the
@@ -45,7 +45,7 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
     if (self->unk28 != 0) {
         if (sCdBusy == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
             StartCdOperation(4, 1);
-            gCdSavedSeekParam = gCdSeekParam;
+            sCdSavedSeekParam = gCdSeekParam;
             rec = FindCdFileEntry(arg1);
             gCdSeekParam = rec;
             if (rec == NULL) {

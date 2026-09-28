@@ -285,7 +285,7 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
     if (self->inQueueDispatch != 0) {
         if (sCdBusy == 0 && (self->buffer == NULL || self->freeGuard != 0)) {
             StartCdOperation(CD_OPERATION_LOAD_FILE, CD_STATE_SETLOC);
-            gCdSavedSeekParam = gCdSeekParam;
+            sCdSavedSeekParam = gCdSeekParam;
             entry = FindCdFileEntry(name);
             gCdSeekParam = entry;
             if (entry == NULL) {
@@ -528,8 +528,8 @@ void CdDriver__CancelRequests(CdDriver *self) {
         if (head->owner == self && head->active != 0 && sCdIdle == 0) {
             CdFlush();
             ResetCdStateMachine();
-            saved = gCdSavedSeekParam;
-            gCdSavedSeekParam = NULL;
+            saved = sCdSavedSeekParam;
+            sCdSavedSeekParam = NULL;
             gCdSeekParam = saved;
         }
 
@@ -779,7 +779,7 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
  * when the seek completes and CdFlushes after a read error;
  * TickCdLoadFileStateMachine, LoadFile's, goes on to read after the seek,
  * and when the read is done restores the gCdSeekParam LoadFile saved in
- * gCdSavedSeekParam.
+ * sCdSavedSeekParam.
  *
  * AllocCdRequestNode appends a zeroed node to sCdRequestQueue and
  * FreeCdRequestNode unlinks one; EnqueueCdRequest (part 3) fills
@@ -1009,8 +1009,8 @@ void TickCdLoadFileStateMachine(void) {
             }
             if (result == 0) {
                 ResetCdStateMachine();
-                gCdSeekParam = gCdSavedSeekParam;
-                gCdSavedSeekParam = NULL;
+                gCdSeekParam = sCdSavedSeekParam;
+                sCdSavedSeekParam = NULL;
             }
             goto unlock;
         default:
