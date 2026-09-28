@@ -648,3 +648,16 @@ extern void printf(const char *fmt); /* own local view: this call site passes on
 
 The `write` comment ("CD/streaming read-request submit") was wrong: this is
 the BIOS `write`, B(0x35), linked from libapi/a53 (config/psyq-objects.txt).
+
+## History (source comments moved in track 12, round 106)
+
+From `include/task_objf.h`:
+
+> IconPaletteHalf's comment: "MATCHING: all-s16 (alignment 2) makes the
+> whole-struct copy retail's unaligned lwl/lwr + swl/swr pairs."
+> 
+> IconFrame's comment: "MATCHING: a byte array (alignment 1) makes the
+> whole-struct copy retail's runtime-alignment-checked copy loop."
+> 
+> The prototype named the fourth parameter `a3` (`u8 a3`); track 12 renamed it
+> to the definition's `iconFrames` (names only, no bytes).

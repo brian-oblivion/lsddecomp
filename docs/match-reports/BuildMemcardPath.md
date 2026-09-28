@@ -146,3 +146,12 @@ The forward declaration's comment, replaced by one line:
  * return value lives in `$v0` either way, so the implicit-int reading
  * never produced different code, only a diagnostic. */
 ```
+
+## History (source comments moved in track 12, round 106)
+
+From `include/task_objf.h`:
+
+> McDevicePath's comment: "BuildMemcardPath copies one as a whole struct.
+> MATCHING: all-s8 members (alignment 1) make that copy retail's unaligned
+> lwl/lwr plus byte stores." The MATCHING line now sits at the copy in
+> title_menu.c.

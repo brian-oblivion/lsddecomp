@@ -243,3 +243,10 @@ The prototype in include/task_objf.h still says `char a3`: proposed to the
 head (the header is shared with echo this round, so edits there are
 additive only). The `(s32)` casts on StampSaveTitleFileLetter's arguments
 come from its `(s32, s32)` prototype in include/class_3bb8c.h: proposed.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/task_objf.h`:
+
+> The prototype named the fourth parameter `a3` (`char a3`); track 12 renamed
+> it to the definition's `iconFrames` (names only, no bytes).

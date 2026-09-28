@@ -53,3 +53,11 @@ sites are gone, and `slot80` is `playTone`. Zero bytes changed.
 Parameters `arg1`/`arg2`/`arg3` -> `inputSource`/`tickSource`/`target`:
 the first two are the Pad and the FrameClock addChild files into the
 fields of those names. Zero bytes changed.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/text_entry.h`:
+
+> The prototype and the +0x04C slot named the two child parameters `child1`
+> and `child2`; track 12 renamed them to the definition's `inputSource` and
+> `tickSource` (names only, no bytes).

@@ -181,3 +181,11 @@ verbatim:
 > `width`-digit decimal string into `self`, the output buffer (the
 > definition's `u8 *dst`; it was typed as a TextRow view until round 88).
 > This unit's own local view keeps it `void *`.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/title_menu.h`:
+
+> FullWidthChar's comment: "MATCHING: all-s8 (alignment 1), so a copy is
+> lwl/lwr words plus single bytes; alignment 2 would merge a two-byte tail
+> into a halfword." The MATCHING line now sits at the copies in title_menu.c.

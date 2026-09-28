@@ -65,3 +65,10 @@ Parameters `arg1`/`arg2` -> `list`/`result`; the cases are
 `ITEMLIST_RESULT_CHOSEN`/`_CANCELLED` (enum ItemListResult, added to
 include/item_list.h this round), the targets LOAD_WARNING and ABORTED.
 Image byte-identical.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/task_objf.h`:
+
+> The prototype and the +0x0B0 slot named the second parameter `sender`;
+> track 12 renamed it to the definition's `list` (names only, no bytes).

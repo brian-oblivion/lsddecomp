@@ -222,3 +222,11 @@ StampSaveTitleDay.md's track 6 section), unchanged in layout, with the
 `MATCHING:` line kept once there; title_menu.c's local definitions are
 deleted and it includes title_menu.h. title_menu's `Buf6_3bb8c_c` is
 retired for `FullWidthChars3`. Image byte-identical.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/title_menu.h`:
+
+> FullWidthChar's comment: "MATCHING: all-s8 (alignment 1), so a copy is
+> lwl/lwr words plus single bytes; alignment 2 would merge a two-byte tail
+> into a halfword." The MATCHING line now sits at the copies in title_menu.c.

@@ -126,3 +126,10 @@ Sony's TestEvent, and TaskObjF's `field14` became `events` in round 60.
  * view stays `void` -- per-call-site typing, the convention this block of
  * units already uses. */
 ```
+
+## History (source comments moved in track 12, round 106)
+
+From `include/task_objf.h`:
+
+> The prototype named the third parameter `flag`; track 12 renamed it to the
+> definition's `critical` (names only, no bytes).
