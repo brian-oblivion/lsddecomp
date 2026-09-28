@@ -66,7 +66,7 @@ void DreamSys__StepLookOffset(DreamSys *this)
 
 	idx = this->unk_0x88;
 	if (idx != 0) {
-		delta = LOOK_OFFSET_STEPS[idx];
+		delta = sLookOffsetSteps[idx];
 		threshold = LOOK_OFFSET_LIMITS[idx];
 		sum = delta + this->unk_0x8C;
 		if (sum >= 0) {
@@ -167,7 +167,7 @@ negation expression.
 Re-measuring produced `addiu at,at,0x7e40` against retail's
 `addiu at,at,0x7e50` -- the table base off by exactly 0x10 -- plus a
 101043-byte out-of-range diff. **That is NOT a symbol problem and NOT an
-independent residue.** `build/lsdde.map` confirms `LOOK_OFFSET_STEPS` linked at
+independent residue.** `build/lsdde.map` confirms `sLookOffsetSteps` linked at
 `0x80087e40`: the function is 4 words (0x10 bytes) short, so DreamSys.o's
 text is 0x10 small and every symbol after it, including all of `.data`,
 slides down by 0x10. The wrong-looking immediate IS the length bug, seen
@@ -364,7 +364,7 @@ void DreamSys__StepLookOffset(DreamSys *this)
 
 	idx = this->unk_0x88;
 	if (idx != 0) {
-		delta = LOOK_OFFSET_STEPS[idx];
+		delta = sLookOffsetSteps[idx];
 		threshold = LOOK_OFFSET_LIMITS[idx];
 		sum = delta + this->unk_0x8C;
 		if (sum >= 0) {
@@ -450,7 +450,7 @@ void DreamSys__StepLookOffset(DreamSys *this)
 
 	idx = this->unk_0x88;
 	if (idx != 0) {
-		delta = LOOK_OFFSET_STEPS[idx];
+		delta = sLookOffsetSteps[idx];
 		threshold = LOOK_OFFSET_LIMITS[idx];
 		sum = delta + this->unk_0x8C;
 		inRange = (sum < 0) ? (-sum < threshold) : (sum < threshold);
@@ -469,7 +469,7 @@ void DreamSys__StepLookOffset(DreamSys *this)
 ```
 
 Vtable slot `0x144`. Reads `this->unk_0x88` as an index into a
-delta/threshold table pair (`LOOK_OFFSET_STEPS`/`LOOK_OFFSET_LIMITS`); if the resulting sum
+delta/threshold table pair (`sLookOffsetSteps`/`LOOK_OFFSET_LIMITS`); if the resulting sum
 stays within the threshold, nudges `this->unk_0x5C->unk_0x24` and
 `this->unk_0x8C` by the delta and clears `unk_0x88`; otherwise (idx==0) it
 decays `unk_0x8C` towards zero by a fixed step of 600, applying the same
@@ -482,11 +482,11 @@ branch) is blocked.
 reshaping): the pinned `aspsx-version=2.34` cannot emit retail's addressing
 form for `globalArray[runtimeIndex]`
 
-Retail computes `LOOK_OFFSET_STEPS[idx]` as **five** instructions:
+Retail computes `sLookOffsetSteps[idx]` as **five** instructions:
 
 ```
-lui   $at, %hi(LOOK_OFFSET_STEPS)
-addiu $at, $at, %lo(LOOK_OFFSET_STEPS)   ; forms a COMPLETE pointer
+lui   $at, %hi(sLookOffsetSteps)
+addiu $at, $at, %lo(sLookOffsetSteps)   ; forms a COMPLETE pointer
 addu  $at, $at, $v1                ; THEN adds the (already ×4) index
 lw    $a2, 0x0($at)
 ```
@@ -495,18 +495,18 @@ Every C phrasing I tried compiles to the same **four**-instruction form
 instead (verified both in the full project build and in eight isolated
 `cpp|cc1|maspsx|as` reproducer runs against `/tmp/.../scratchpad/t1.c`
 through `t7.c` — plain array subscript, an explicit intermediate pointer
-local, an integer-cast-then-dereference, `LOOK_OFFSET_STEPS[]` with no declared
+local, an integer-cast-then-dereference, `sLookOffsetSteps[]` with no declared
 size, and an added-constant index):
 
 ```
-lui  $at, %hi(LOOK_OFFSET_STEPS)
+lui  $at, %hi(sLookOffsetSteps)
 addu $at, $at, $v1                 ; index added FIRST, no complete pointer yet
-lw   $a2, %lo(LOOK_OFFSET_STEPS)($at)     ; %lo folded straight into the load
+lw   $a2, %lo(sLookOffsetSteps)($at)     ; %lo folded straight into the load
 ```
 
 **Root cause, confirmed by reading `tools/maspsx/maspsx/__init__.py` directly
 (not inferred from behavior):** GCC 2.6.3's `cc1` never emits either of the
-above — it emits the abstract pseudo-op `lw $2,LOOK_OFFSET_STEPS($4)` (confirmed
+above — it emits the abstract pseudo-op `lw $2,sLookOffsetSteps($4)` (confirmed
 from `cc1`'s own raw output before `maspsx`/`as` see it). Expanding that
 pseudo-op into real MIPS instructions is `maspsx`'s job, at
 `__init__.py:972-998`, and the choice between the two forms above is
@@ -601,7 +601,7 @@ asm/`, so it will recur.
 Renamed from `func_80059814`.
 
 Steps `heightCurve->endValue` (the far keyframe's value) by the
-per-tick delta `LOOK_OFFSET_STEPS[lookOffsetCommand]` (+-600), refuses the step
+per-tick delta `sLookOffsetSteps[lookOffsetCommand]` (+-600), refuses the step
 once the accumulator `lookOffset` would pass `LOOK_OFFSET_LIMITS` (+-9000), and when
 no command is queued decays `lookOffset` back toward 0 by 600 a tick, applying that
 decay to the curve as well. Consumes the command (resets it to 0) either way.

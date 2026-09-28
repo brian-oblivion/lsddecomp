@@ -54,7 +54,7 @@
 #include "Viewport.h"
 
 /* With no look command pending, StepLookOffset springs the view height back
- * towards 0 by this much a tick (the size of one LOOK_OFFSET_STEPS step), and
+ * towards 0 by this much a tick (the size of one sLookOffsetSteps step), and
  * StepLookYaw turns back by this many degrees (one LOOK_YAW_STEPS step). */
 #define LOOK_OFFSET_RETURN_STEP 600
 #define LOOK_YAW_RETURN_STEP 45
@@ -541,7 +541,7 @@ void DreamSys__StepLookOffset(DreamSys *this) {
 
     idx = this->lookOffsetCommand;
     if (idx != 0) {
-        delta = LOOK_OFFSET_STEPS[idx];
+        delta = sLookOffsetSteps[idx];
         threshold = LOOK_OFFSET_LIMITS[idx];
         sum = delta + this->lookOffset;
         if (sum >= 0) {
