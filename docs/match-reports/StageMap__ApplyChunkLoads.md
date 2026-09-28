@@ -421,7 +421,7 @@ iterates `arr1[0..count)` (a 0xC-byte-strided array). Per entry:
    index/key).
 2. `self->methods->slot88(self, 6, e, i)` -- the SAME already-documented
    slot88 (dispatches to `StageMap__OnSlotEvent`, outside this unit) that
-   `StageMap__OnNotifyTag1` also calls, there with a literal `7` instead of `6`. No
+   `StageMap__OnDrawSystemEvent` also calls, there with a literal `7` instead of `6`. No
    header change needed for this slot, it already existed.
 3. If `arr1[i].ptr0 != 0`: conditionally call `slot108(self, e)` (new slot,
    guarded by `e->unk4->unk2C != 0`), copy `arr1[i].rate` into
@@ -480,7 +480,7 @@ void StageMap__ApplyChunkLoads(Obj866E8 *self, ChunkLoadEntry *arr1, s32 count) 
 }
 ```
 (Correction from an earlier draft of this report: step 2 dispatches
-`slot88`, an ALREADY-DOCUMENTED slot shared with `StageMap__OnNotifyTag1`
+`slot88`, an ALREADY-DOCUMENTED slot shared with `StageMap__OnDrawSystemEvent`
 -- StageMap__ApplyChunkLoads's own identity is `slotFC` at `+0xFC`, confirmed via
 `tools/classtable.py`, and is dispatched INTO from `StageMap__LoadChunksAround`
 elsewhere in this unit, not from within this function's own body. An

@@ -339,7 +339,7 @@ struct StageMapMethods {
     /* +0x0FC */ void (*applyChunkLoads)(StageMap *self, ChunkLoadEntry *entries,
                                          s32 count); /* StageMap__ApplyChunkLoads */
     /* +0x100 */ void (*onNotifyTag1)(StageMap *self, void *sender,
-                                      s32 mode); /* StageMap__OnNotifyTag1; OnNotify's class-1 sender case */
+                                      s32 mode); /* StageMap__OnDrawSystemEvent; OnNotify's class-1 sender case */
     /* +0x104 */ void (*populateSlotCells)(StageMap *self, ChunkSlot *slot); /* StageMap__PopulateSlotCells */
     /* +0x108 */ void (*clearSlotCells)(StageMap *self, ChunkSlot *slot); /* StageMap__ClearSlotCells */
     /* +0x10C */ Descriptor10 *(*getTargetDescriptor)(StageMap *self, Descriptor10Ext *out,
@@ -478,7 +478,7 @@ s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *entry, s32 d
                                     s32 key); /* 0 or 1; LoadChunksAround discards it */
 void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entries, s32 count);
 s32 StageMap__CountPendingLoads(StageMap *self);
-void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 mode);
+void StageMap__OnDrawSystemEvent(StageMap *self, void *sender, s32 mode);
 void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot);
 void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *slot);
 Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *out, void **outPos);

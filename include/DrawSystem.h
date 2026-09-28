@@ -34,7 +34,7 @@ typedef struct DrawSystemMethods DrawSystemMethods;
 #define DRAWSYSTEM_CLASS_ID 0x1
 
 /* The command runLoop passes its parents on every VSync pass
- * (notifyParents(self, 2)); StageMap__OnNotifyTag1 acts only on it. */
+ * (notifyParents(self, 2)); StageMap__OnDrawSystemEvent acts only on it. */
 #define DRAWSYSTEM_EVENT_VSYNC 2
 
 /* A {width, height} pair: the screen size initGraph hands to GsInitGraph

@@ -103,7 +103,7 @@ rules, this is left for the head to reconcile rather than edited directly
 (`unk4->unk30`) and an extra `unk4->unk2C != 0` gate, returns -1 (not 0)
 on a miss. Named the same way and for the same reason -- by the field it
 searches, since `unk30`/`unk2C` are cross-unit `ElemTarget` fields this
-unit does not own (also read by `StageMap__OnNotifyTag1`/`StageMap__ClearSlotCells` in
+unit does not own (also read by `StageMap__OnDrawSystemEvent`/`StageMap__ClearSlotCells` in
 DayTaskStageMap.c).
 
 ## Proposed field names
@@ -111,11 +111,11 @@ DayTaskStageMap.c).
 **Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that StageMap__ComputeFootprintDescriptor sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (DayTaskStageMap.c), where all readers are in one unit.
 
 `ElemTarget::unk30` and `ElemTarget::unk2C` (also read by DayTaskStageMap.c's
-`StageMap__OnNotifyTag1`/`StageMap__ClearSlotCells` -- cross-unit, not renamed here).
+`StageMap__OnDrawSystemEvent`/`StageMap__ClearSlotCells` -- cross-unit, not renamed here).
 Proposed: `unk30` -> `key` (same reasoning as `unk32` above -- compared
 for equality against this function's own `key` argument);
 `unk2C` -> `enabled` (gates this function's match with a nonzero test,
-and DayTaskStageMap.c's `StageMap__OnNotifyTag1` gates its own dispatch on the same
+and DayTaskStageMap.c's `StageMap__OnDrawSystemEvent` gates its own dispatch on the same
 field the same way -- a plain "is this target live" flag is the simplest
 reading that fits both call sites, though neither establishes it beyond
 "nonzero enables").

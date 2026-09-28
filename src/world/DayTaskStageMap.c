@@ -1162,7 +1162,7 @@ s32 StageMap__CountPendingLoads(StageMap *self) {
     return count;
 }
 
-void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 command) {
+void StageMap__OnDrawSystemEvent(StageMap *self, void *sender, s32 command) {
     s32 i;
     ChunkSlot *slot;
     s32 pending;

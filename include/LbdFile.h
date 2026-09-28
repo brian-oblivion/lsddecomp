@@ -51,7 +51,7 @@
 typedef struct LbdFile LbdFile;
 typedef struct LbdFileMethods LbdFileMethods;
 
-/* `headerReady` once StageMap__OnNotifyTag1 has linked the header's
+/* `headerReady` once StageMap__OnDrawSystemEvent has linked the header's
  * placements into the slot's cells (1 is "read, not yet consumed"). */
 #define LBDFILE_HEADER_CONSUMED 2
 
@@ -89,8 +89,8 @@ struct LbdFileMethods {
 
 struct LbdFile {
     FILERESOURCE_FIELDS(LbdFileMethods); /* buffer: the 0xB358 header block (LbdFileHeader); loadState: 0 idle, 9 header, 10 data block */
-    /* +0x02C */ s16 headerReady; /* 1 when the header is read; StageMap__OnNotifyTag1 sets 2 once consumed */
-    /* +0x02E */ s16 dataReady; /* 1 when the data block is read; cleared by StageMap__OnNotifyTag1 */
+    /* +0x02C */ s16 headerReady; /* 1 when the header is read; StageMap__OnDrawSystemEvent sets 2 once consumed */
+    /* +0x02E */ s16 dataReady; /* 1 when the data block is read; cleared by StageMap__OnDrawSystemEvent */
     /* +0x030 */ s16 chunkIndex; /* the loaded chunk's record index in its stage (ApplyRateEntries); -1 when none (ctor, ReleaseHeader) */
     /* +0x032 */ s16 elemKey; /* the owner's element key: StageMap's ctor (the index) and BuildRateEntries; zeroed by the ctor */
     /* +0x034 */ void *dataBuffer; /* the data block, BMemPMgrAlloc(dataSize); freed by ReleaseDataBlock */
