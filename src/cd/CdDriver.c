@@ -576,7 +576,7 @@ s32 GetCdOperation(void) {
 }
 
 s32 GetCdState(void) {
-    return gCdState;
+    return sCdState;
 }
 
 /* gCdSyncQueueMode is written only by SetCdDriverMode's second argument.
@@ -766,7 +766,7 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
  * (part 3, a VSync callback) runs: it calls TickCdStateMachine or
  * TickCdLoadFileStateMachine as gCdTickStep says, after a CdDriver method
  * (part 2) has started an operation with StartCdOperation and set
- * sCdSeekParam, sCdReadSectorCount and sCdReadBuffer. gCdState walks
+ * sCdSeekParam, sCdReadSectorCount and sCdReadBuffer. sCdState walks
  * CD_STATE_SETLOC (CdControlF(CdlSetloc) to sCdSeekParam->pos),
  * CD_STATE_SETLOC_WAIT (poll CdSync), CD_STATE_READ (CdRead) and
  * CD_STATE_READ_WAIT (poll CdReadSync); SetCdState moves it and
@@ -912,7 +912,7 @@ void TickCdStateMachine(void) {
     s32 newState;
 
     LockCd();
-    switch (gCdState) {
+    switch (sCdState) {
         case CD_STATE_SETLOC:
             if (CdControlF(CdlSetloc, (u_char *)&sCdSeekParam->pos) == 0) {
                 goto unlock;
@@ -969,7 +969,7 @@ void TickCdLoadFileStateMachine(void) {
     s32 newState;
 
     LockCd();
-    switch (gCdState) {
+    switch (sCdState) {
         case CD_STATE_SETLOC:
             if (CdControlF(CdlSetloc, (u_char *)&sCdSeekParam->pos) == 0) {
                 goto unlock;
@@ -1026,7 +1026,7 @@ unlock:
 void StartCdOperation(s32 op, s32 state) {
     sCdBusy = 1;
     sCdOperation = op;
-    gCdState = state;
+    sCdState = state;
     sCdIdle = 0;
     sCdRequestQueue->active = 1;
 }
@@ -1034,7 +1034,7 @@ void StartCdOperation(s32 op, s32 state) {
 /* No operation, no tick step: the driver is idle. */
 void ResetCdStateMachine(void) {
     sCdOperation = 0;
-    gCdState = CD_STATE_IDLE;
+    sCdState = CD_STATE_IDLE;
     gCdTickStep = CD_TICK_NONE;
     sCdIdle = 1;
     gCdTimeoutCounter = 0;
@@ -1042,7 +1042,7 @@ void ResetCdStateMachine(void) {
 }
 
 void SetCdState(s32 state) {
-    gCdState = state;
+    sCdState = state;
     gCdTimeoutCounter = 0;
 }
 

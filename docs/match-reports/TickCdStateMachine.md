@@ -6,7 +6,7 @@
 
 ## What it does
 
-One tick of a small CD-read state machine. `gCdState` holds the current
+One tick of a small CD-read state machine. `sCdState` holds the current
 phase (0 default, 1 = issue `CdControlF` seek, 2 = poll `CdSync`, 7 = issue
 `CdRead`, 8 = poll `CdReadSync`; anything else in `{3,4,5,6}` or `>8` is a
 no-op). `gCdTimeoutCounter` is a busy-wait timeout counter, reset by
@@ -29,7 +29,7 @@ void TickCdStateMachine(void)
     s32 newstate;
 
     LockCd();
-    state = gCdState;
+    state = sCdState;
 
     if (state == 2)
         goto L_state2;
@@ -152,7 +152,7 @@ one call site that needs the other tick function.
 The goto ladder above is GCC's own decision tree for a `switch`
 (`== 2`, `< 3`, `== 1`, `== 7`, `== 8`; and on CdSync's result `== 2`,
 `< 3`, `== 0`, `== 5`). Written as the switch it compiles from -- on
-gCdState's `CD_STATE_*`, and inside it on CdSync's `CdlComplete` /
+sCdState's `CD_STATE_*`, and inside it on CdSync's `CdlComplete` /
 `CdlNoIntr` / `CdlDiskError` -- with a `newState` local and one
 `SetCdState(newState)` after the switch (the no-op paths `goto unlock`),
 the function is byte-exact. `v1 == state` was GCC substituting the known

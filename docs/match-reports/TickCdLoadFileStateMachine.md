@@ -78,7 +78,7 @@ void TickCdLoadFileStateMachine(void)
     void *tmp;
 
     LockCd();
-    state = gCdState;
+    state = sCdState;
 
     if (state == 2)
         goto L_state2;
@@ -194,7 +194,7 @@ implement it).
 ## Round 101 (track 7 polish): the goto dispatch is a switch
 
 Rewritten the same way as TickCdStateMachine (see its report): a switch on
-gCdState's `CD_STATE_*`, an inner switch on CdSync's `CdlComplete` /
+sCdState's `CD_STATE_*`, an inner switch on CdSync's `CdlComplete` /
 `CdlNoIntr` / `CdlDiskError` in that natural order, `newState` and one
 `SetCdState(newState)` after it. Byte-exact on the first build. Round 45's
 residue, the `== 5` test's polarity, is what the natural case order gives

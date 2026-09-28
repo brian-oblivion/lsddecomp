@@ -7,16 +7,16 @@
 ## What this function does
 
 A plain `$gp`-relative getter, no arguments. Reads the scalar `s32` global
-`gCdState` (in `.sdata`, zero-initialized) and returns it.
+`sCdState` (in `.sdata`, zero-initialized) and returns it.
 
 ## The C
 
 ```c
-extern s32 gCdState;
+extern s32 sCdState;
 
 s32 GetCdState(void)
 {
-    return gCdState;
+    return sCdState;
 }
 ```
 
@@ -32,11 +32,11 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | was | now | tier |
 | --- | --- | --- |
 | `func_80027EEC` | `GetCdState` | A |
-| `D_8008A878` | `gCdState` | A |
+| `D_8008A878` | `sCdState` | A |
 
 **Evidence.** The global is the phase variable of the CD read state machine
 in `CdDriver`: `TickCdStateMachine` and `TickCdLoadFileStateMachine` both open with
-`state = gCdState` and then switch on it (1 -> issue `CdlSetloc` via
+`state = sCdState` and then switch on it (1 -> issue `CdlSetloc` via
 `CdControlF`, 2 -> poll `CdSync`, 7 -> issue `CdRead`, 8 -> poll
 `CdReadSync`), and `SetCdState` is a one-line "set the phase and reset the
 timeout" helper. `StartCdOperation` seeds it per operation; `ResetCdStateMachine`
