@@ -31,7 +31,7 @@ ground, no prior attempt. Byte-exact on build 4; whole-image SHA1 green.
   here as `*(u32 *)&self->loc[4]`, left untyped in the shared local view
   because the ten earlier methods pass `loc` as a `u8 *`. Unit-local
   externs: `CdSearchFile`, `strcpy`/`strcat` (Sony libc2, linked),
-  `GetDataDirectory` (GameApplicationFileResource.c), `sCdStreamAudioMixSet` (s32, sdata), `gCdStreamVersionSuffix`
+  `GetDataDirectory` (GameApplicationFileResource.c), `sCdStreamAudioMixSet` (s32, sdata), `sCdStreamVersionSuffix`
   (`char[]`, the rodata-style `";1"` in sdata, referenced as a symbol and
   never retyped). Added a prototype for `SetupCdStreamAudio`. Unit header comment
   updated: all 18 methods matched.
@@ -58,7 +58,7 @@ s32 CdStream__Open(CdStreamObj *self, char *name, s32 tries) {
         path[0] = '\\';
         strcpy(&path[1], GetDataDirectory());
         strcat(path, name);
-        strcat(path, gCdStreamVersionSuffix);
+        strcat(path, sCdStreamVersionSuffix);
         while (CdSearchFile(self->loc, path) == 0) {
             if (n >= 0 && --tries < 0) {
                 return 1;
@@ -92,7 +92,7 @@ Renamed from CdStreamObj__Open (tools/rename.py), the class rename only.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_8008A954` | `gCdStreamVersionSuffix` | A | sdata `.asciz ";1"`, strcat'd after the name to make the ISO9660 path CdSearchFile looks up; same role as `sCdFileVersionSuffix` (CdDriver.c), a separate copy |
+| `D_8008A954` | `sCdStreamVersionSuffix` | A | sdata `.asciz ";1"`, strcat'd after the name to make the ISO9660 path CdSearchFile looks up; same role as `sCdFileVersionSuffix` (CdDriver.c), a separate copy |
 | `D_8008A94C` | `sCdStreamAudioMixSet` | B | written only here, with SetupCdStreamAudio's return (always 1) after the SPU CD mix is set; read nowhere in the executable (only reference in asm/ is its sdata definition) |
 
 Constants: the path buffer is `CDSTREAM_PATH_SIZE` (32, unit-local; the CD

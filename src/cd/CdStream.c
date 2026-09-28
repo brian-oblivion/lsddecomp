@@ -48,7 +48,7 @@ extern char *strcat(char *dest, char *src);
 extern void *BMemPMgrAlloc(s32 size);
 
 extern s32 sCdStreamAudioMixSet;
-extern char gCdStreamVersionSuffix[]; /* ";1" */
+extern char sCdStreamVersionSuffix[]; /* ";1" */
 
 /* MATCHING: the ctor call and return sit inside `if (obj != NULL)`; an early
  * `return NULL` adds a jump. */
@@ -114,7 +114,7 @@ s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
         path[0] = '\\';
         strcpy(&path[1], GetDataDirectory());
         strcat(path, name);
-        strcat(path, gCdStreamVersionSuffix);
+        strcat(path, sCdStreamVersionSuffix);
         /* CdStreamFile is CdlFILE's layout (CdStream.h). */
         while (CdSearchFile((CdlFILE *)&self->file, path) == 0) {
             if (n >= 0 && --tries < 0) {
