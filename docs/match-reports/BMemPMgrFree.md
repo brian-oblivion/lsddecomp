@@ -389,7 +389,7 @@ green.
 99->107/107 permuter match) -- coalesces with the previous and following
 blocks and re-links the free list, the mirror of `BMemPMgrAlloc`. Called
 across the same wide set of units as `BMemPMgrAlloc` (`ScreenWidgets`,
-`code_55dd4`, `code_d294`, `TmdRenderer`, `main`, plus this unit's own
+`TodActor`, `code_d294`, `TmdRenderer`, `main`, plus this unit's own
 `RemoveBasicClassListNode`), confirming the general-purpose pool pairing.
 
 ## Polish (round 97, runner delta)

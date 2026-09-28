@@ -49,7 +49,7 @@ struct ResourceSource;
 #define TOD_PACKET_NIBBLE 0xF /* the type and flag fields' mask */
 
 /* The packet types ScanTodPackets tests. TOD_PACKET_MODEL_ID is spelled
- * exactly as src/code_55dd4.c's, which defines the other types. */
+ * exactly as src/TodActor.c's, which defines the other types. */
 #define TOD_PACKET_MODEL_ID 2       /* data: the TMD id the object is drawn with */
 #define TOD_PACKET_OBJECT_CONTROL 8 /* the flag says create or kill */
 #define TOD_OBJECT_CREATE 0         /* an object-control packet's flag: create */

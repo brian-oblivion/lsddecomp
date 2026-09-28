@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Decodes one packet word: `*out0 = v; *out1 = (v >> 16) & 0xF; *out2 = (v >> 20) & 0xF; *out3 = v >> 24; return acc + 1;` out2/out3 are the o32 5th/6th arguments (stack +0x10/+0x14), and self's a0 is reused for out2. Same signature as the `decodeTodPacket` slot in src/code_55dd4.c.
+Decodes one packet word: `*out0 = v; *out1 = (v >> 16) & 0xF; *out2 = (v >> 20) & 0xF; *out3 = v >> 24; return acc + 1;` out2/out3 are the o32 5th/6th arguments (stack +0x10/+0x14), and self's a0 is reused for out2. Same signature as the `decodeTodPacket` slot in src/TodActor.c.
 
 Table slot (`tools/classtable.py`): gTodMethods +0x080 and gTodSetMethods +0x080.
 

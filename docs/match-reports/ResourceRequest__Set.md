@@ -129,7 +129,7 @@ DayTask__DayTask, GameApplication__GameApplication). Its callers write only
 shrinking its pad to 4 bytes (so it is 0x0C, ResourceRequest's size) still
 builds byte-exact, so its size does not tell the two apart. Retiring it onto
 `ResourceRequest` is proposed, not applied, because its three units are
-outside this job's edit set. `TodActorDesc` (src/code_55dd4.c) now opens
+outside this job's edit set. `TodActorDesc` (src/TodActor.c) now opens
 with a `ResourceSource src` but is not a ResourceRequest: see
 TodActor__AcquireModelData.md.
 

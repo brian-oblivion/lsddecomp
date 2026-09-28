@@ -4,7 +4,7 @@
 
 > Renamed from `func_800660BC` on 2026-09-24 (tools/rename.py). Address 0x800660bc.
 
-**Unit:** code_55dd4 · **Size:** 32 words (0x80 bytes) · **Status:** MATCHED
+**Unit:** TodActor · **Size:** 32 words (0x80 bytes) · **Status:** MATCHED
 (32/32 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does
@@ -32,7 +32,7 @@ void TodActor__SelectTickCallback(TodActor *self, s32 value)
 ```
 
 `slot118`/`slot11C`/`slot120` are typed as plain `void *` in
-`src/code_55dd4.c`, not function pointers — this function only ever
+`src/TodActor.c`, not function pointers — this function only ever
 takes their *address* out of the vtable and stores it, it never `jalr`s
 through them, so there is no evidence here for their call signature (a
 future function that actually invokes `self->unk78` would be the place to

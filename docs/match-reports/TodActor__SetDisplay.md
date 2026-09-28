@@ -132,7 +132,7 @@ void TodActor__SetDisplay(TodActor *self, void *arg)
 ```
 
 This retypes `self->unk70` from the first pass's generic `void *` to
-`Unk70ElemObj **` (a new minimal type in `src/code_55dd4.c`, typed only
+`Unk70ElemObj **` (a new minimal type in `src/TodActor.c`, typed only
 at its `+0x060` slot, the only one this unit calls). The **entire loop body
 is byte-identical to retail** — confirmed across every attempt below, the
 diff never touched a single loop-body word. Only the five-word prologue
@@ -340,7 +340,7 @@ retail's `s2,s3,s0,ra,s1`), is unchanged. Confirmed the same result on
 signature) with an analogous probe -- see that function's own report.
 
 **This is a clean, cheap negative, and it did not cost a real build
-attempt** (never touched `src/code_55dd4.c` for this function this
+attempt** (never touched `src/TodActor.c` for this function this
 round; the probe lives entirely in scratch files under `cc1`). The
 round-19 lever explains FRAME SIZE (`current_function_outgoing_args_size`
 sees a wider call before DCE removes it); this function's residue is a
@@ -393,7 +393,7 @@ exactly one lever, the single top-of-function `__asm__("")` — no additive
 stacking to audit). None apply to this residue's shape. No new build attempt
 was spent chasing a lever that screening ruled out before touching `src/`.
 
-Remains a STALL at 30/33, `INCLUDE_ASM` restored, `src/code_55dd4.c`
+Remains a STALL at 30/33, `INCLUDE_ASM` restored, `src/TodActor.c`
 confirmed clean (`git status --porcelain` empty) before and after.
 
 ### Proposed learning
@@ -414,7 +414,7 @@ layout closure): grepped this function's own `.s` for a bare unconditional
 with real work in its delay slot.
 
 ```
-grep -nE '\*/\s+j\s' asm/nonmatchings/code_55dd4/TodActor__SetDisplay.s
+grep -nE '\*/\s+j\s' asm/nonmatchings/TodActor/TodActor__SetDisplay.s
 ```
 
 **No bare `j` mnemonic anywhere in this function's disassembly.** The only
@@ -488,7 +488,7 @@ reproduces exactly **30/33**, file range `0x5625C-0x562E0` (0x84 bytes = 33
 words, no drift) — matches this report's own figure and round 24/25's.
 `INCLUDE_ASM` restored, `git diff --stat` confirmed clean immediately after.
 
-Also added the preserved body to `src/code_55dd4.c` itself this round, wrapped
+Also added the preserved body to `src/TodActor.c` itself this round, wrapped
 in `#if 0`/`INCLUDE_ASM` per project convention — it had never been embedded
 there before (every other stall in this unit carries its best attempt inline;
 this one only lived in the report's markdown). No functional change; purely
@@ -498,7 +498,7 @@ retyping it.
 **Applied round 27's callee-saved-register discriminator** (address-taken-
 parameter lever's decision procedure: diff the compiled prologue's saved-
 register SET against retail's) as a **confirmation** check, not a new
-attempt — `grep -oE 'sw +\$(s[0-7]|fp|ra),' asm/nonmatchings/code_55dd4/TodActor__SetDisplay.s
+attempt — `grep -oE 'sw +\$(s[0-7]|fp|ra),' asm/nonmatchings/TodActor/TodActor__SetDisplay.s
 | sort -u` against the preserved body's own compiled output: **both save the
 identical set, `$ra,$s0,$s1,$s2,$s3`**. Per the discriminator's own rule
 ("SAME set -> genuine register identity, stop"), this independently confirms
@@ -551,7 +551,7 @@ This is now 17+ real attempts (15 manual/permuter-adjacent from rounds
 14/18/19 + 2 volatile variants this round) plus ~192,610 permuter
 iterations, all converging on the same three-register callee-save
 store-order permutation. Remains a STALL at 30/33, `INCLUDE_ASM` restored,
-`src/code_55dd4.c` confirmed clean before and after.
+`src/TodActor.c` confirmed clean before and after.
 
 ### Proposed learning
 
@@ -609,7 +609,7 @@ to 192,610 iterations without ever finding a single sub-base candidate
 functions' genuinely fresh ground and was judged the lowest-value use of
 this round's time. No new permuter run against this function this round.
 
-Remains a STALL at 30/33, `INCLUDE_ASM` restored, `src/code_55dd4.c`
+Remains a STALL at 30/33, `INCLUDE_ASM` restored, `src/TodActor.c`
 confirmed clean before and after.
 
 ### Proposed learning
@@ -634,9 +634,9 @@ candidate," not merely "was a search run."
 Track 1b mechanical promotion. The preserved 30/33 body above (this report's
 only `#if 0` block, hand-derived across 15+ manual attempts plus two
 permuter campaigns that never found a candidate below the base score) is
-placed in `src/code_55dd4.c` as `#ifdef NON_MATCHING ... #else INCLUDE_ASM
+placed in `src/TodActor.c` as `#ifdef NON_MATCHING ... #else INCLUDE_ASM
 ... #endif`. No declarations needed beyond what the unit already has
-(`Unk70ElemObj` comes from `src/code_55dd4.c`, already included).
+(`Unk70ElemObj` comes from `src/TodActor.c`, already included).
 `./build-and-verify.sh` stays green (no bytes changed; the verified build
 never takes the `NON_MATCHING` branch) and `tools/check-nonmatching.sh`
 compiles it clean.

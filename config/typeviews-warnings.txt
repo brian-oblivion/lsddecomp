@@ -49,7 +49,7 @@ code_179d8_q: warning: type mismatch with previous external decl
 code_179d8_q: warning: type mismatch with previous external decl
 code_179d8_q: warning: type mismatch with previous implicit declaration
 code_179d8_q: warning: type mismatch with previous implicit declaration
-code_55dd4: warning: unused variable `unused'
+TodActor: warning: unused variable `unused'
 code_d294_b: warning: unused variable `pad'
 code_d294_b: warning: unused variable `unused'
 libcd_bios: warning: passing arg 2 of `CD_cw' makes integer from pointer without a cast

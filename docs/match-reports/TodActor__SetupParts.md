@@ -4,7 +4,7 @@
 
 > Renamed from `func_80065DBC` on 2026-09-24 (tools/rename.py). Address 0x80065dbc.
 
-**Unit:** code_55dd4 · **Size:** 12 words (0x30 bytes) · **Status:** MATCHED
+**Unit:** TodActor · **Size:** 12 words (0x30 bytes) · **Status:** MATCHED
 (12/12 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does

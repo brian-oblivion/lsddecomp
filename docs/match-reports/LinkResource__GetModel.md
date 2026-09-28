@@ -48,7 +48,7 @@ s32 LinkResource__GetModel(Obj6F13C *self, s32 index) {
 2026-09-26, round 89 (delta): renamed from `LinkResource__GetEntry` with
 `tools/rename.py`. The word array at +0x2C is the one LinkResource__BuildModels
 fills with `New_TmdModel` results, so entry `index` is a TmdModel; the two
-callers that use the value confirm it: code_55dd4.c's TOD model-id packet
+callers that use the value confirm it: TodActor.c's TOD model-id packet
 passes it to `SceneNode__LinkModel` (whose `model` field holds a TmdModel,
 include/SceneNode.h), and class_3bb8c.c's StageMap__PopulateSlotCells
 reads its +0x010 (TmdModel's `object`) through PlacementGrid__ResolveEntry. The

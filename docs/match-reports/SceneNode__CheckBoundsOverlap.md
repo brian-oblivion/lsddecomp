@@ -324,7 +324,7 @@ per-function window finally aligned to the correct address (confirmed
 via `build/lsdde.map`, not just assumed), showing `self` deferred into
 the MIDDLE of the corner-loop setup instead of materializing into `$s0`
 in the prologue like retail -- the same "deferred parameter copy" shape
-this project's OTHER unit (`code_55dd4`) has repeatedly hit. `self` is
+this project's OTHER unit (`TodActor`) has repeatedly hit. `self` is
 not referenced in this function's source until `TmdModel__UpdateBoundsBuffer(self->unk20)`,
 deep in pass 2, so GCC defers it. A bare `__asm__("")` as the very first
 statement forced early materialization, matching retail's prologue

@@ -2,7 +2,7 @@
 
 > Renamed from `Class65650__TickCallbackB` on 2026-09-26 (tools/rename.py). Address 0x800661c4.
 
-Unit `code_55dd4`, 0x800661C4. The body is `jr $ra; nop`, which splat emits as C itself; no matching work was done. This report exists for the naming record.
+Unit `TodActor`, 0x800661C4. The body is `jr $ra; nop`, which splat emits as C itself; no matching work was done. This report exists for the naming record.
 
 ## Naming
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80065D64` on 2026-09-24 (tools/rename.py). Address 0x80065d64.
 
-**Unit:** code_55dd4 · **Size:** 22 words (0x58 bytes) · **Status:** MATCHED
+**Unit:** TodActor · **Size:** 22 words (0x58 bytes) · **Status:** MATCHED
 (22/22 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does
@@ -47,7 +47,7 @@ s32 TodActor__FindPartIndex(TodActor *self, s32 value)
 
 Confirms `self->unk74` is genuinely a `u8 *` (indexed with `lbu`), not the
 generic `void *` it was typed as after the first pass — updated in
-`src/code_55dd4.c`.
+`src/TodActor.c`.
 
 ## Two residues, two different fixes
 

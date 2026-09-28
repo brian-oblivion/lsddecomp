@@ -4,7 +4,7 @@
 
 > Renamed from `func_80065C5C` on 2026-09-24 (tools/rename.py). Address 0x80065c5c.
 
-**Unit:** code_55dd4 · **Size:** 36 words (0x90 bytes) · **Status:** MATCHED
+**Unit:** TodActor · **Size:** 36 words (0x90 bytes) · **Status:** MATCHED
 (36/36 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does
@@ -39,7 +39,7 @@ fail:
 }
 ```
 
-Adds `TodActorDesc` (`src/code_55dd4.c`) for the constructor's `arg1`,
+Adds `TodActorDesc` (`src/TodActor.c`) for the constructor's `arg1`,
 typed only at its `+0x00C` field (a `Unk5CObj *`, borrowed or freshly
 allocated), and retypes the `arg1` parameter all the way from
 `TodActor__TodActor` through `slot_setup5C`/`TodActor__SetupModelData` to here as

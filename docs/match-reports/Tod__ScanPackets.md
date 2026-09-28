@@ -49,4 +49,4 @@ Now `u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel)` (include/Tod.h): the two
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `sel` | `tmdId` | B | see ScanTodPackets |
-| `(u8 *)buffer + 8` | `TodFile` `frames` | A | Sony's TOD file header is 8 bytes (id, version, resolution, frame count); code_55dd4.c's TodHeader reads the same layout |
+| `(u8 *)buffer + 8` | `TodFile` `frames` | A | Sony's TOD file header is 8 bytes (id, version, resolution, frame count); TodActor.c's TodHeader reads the same layout |

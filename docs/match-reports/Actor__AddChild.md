@@ -6,7 +6,7 @@
 
 Unit: `class_3bb8c_k` (round 17). `BaseObjOMethods::slot10` -- the "link"
 half of a buddy-object pair, already named `slot10`
-(`code_55dd4.c`/`D800878D4Methods`) and `vtable_DreamSys::slot10`
+(`TodActor.c`/`D800878D4Methods`) and `vtable_DreamSys::slot10`
 (`DreamSys.h`) by two sibling units, both citing this exact function
 address. Chains to a fixed base handler, then classifies `arg` by its own
 vtable header word and records it into one of two companion-pointer
@@ -78,7 +78,7 @@ classifies `arg` by its own vtable header tag (`(header&0xFFF)==0x114` or
 `(header&0xF)==5`) and stores it into the matching one of two companion
 pointer fields (`companion1`/`companion2`) -- a "link" operation exactly
 as the existing term "companion-object pointer" (already used by
-`code_55dd4.c` for the identical field pattern at the same shared slot) is
+`TodActor.c` for the identical field pattern at the same shared slot) is
 already established for. `func_800570B4` is the "link" half of the
 `slot10`/`slot14` pair; `Actor__RemoveChild` (`slot14`) is the other
 half, right after it in ROM order.

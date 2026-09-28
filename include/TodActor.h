@@ -7,7 +7,7 @@
  * TodActor -- an Actor animated by a TOD: it owns one Actor "part" per
  * object of a TOD animation and plays the TOD's frames over them. Class id
  * 0x234, method table gTodActorMethods, getter GetTodActorMethods; methods
- * in src/code_55dd4.c. Its ctor chains to Actor's (include/Actor.h). One
+ * in src/TodActor.c. Its ctor chains to Actor's (include/Actor.h). One
  * class derives from it, Entity (0x1F234, include/Entity.h), and it is only
  * ever built as one: New_Entity (from DreamAux's SetDreamAuxWorld and
  * SpawnDreamAuxTriggerEntity) runs this ctor first; New_TodActor has no
@@ -67,7 +67,7 @@
 typedef struct TodActor TodActor;
 typedef struct TodActorMethods TodActorMethods;
 
-/* Tags completed in the unit that reads them (src/code_55dd4.c), so
+/* Tags completed in the unit that reads them (src/TodActor.c), so
  * that any header may repeat these declarations. */
 struct ModelData;    /* include/ModelData.h */
 struct TodActorDesc; /* the ctor's descriptor: +0x00C a ModelData to borrow */
@@ -149,7 +149,7 @@ extern TodActorMethods *GetTodActorMethods(void); /* returns &gTodActorMethods *
 typedef void (*TodActorAttachToParentFn)(TodActor *self, TodActor *peer, void *companion,
                                          void *parent, void *offset);
 
-/* The class's own methods, in ROM order (code_55dd4). A subclass reaches
+/* The class's own methods, in ROM order (TodActor). A subclass reaches
  * the base ones through GetTodActorMethods() and upcasts. */
 void *New_TodActor(void *desc, void *arg2);
 TodActor *TodActor__TodActor(TodActor *self, void *desc, void *arg2);

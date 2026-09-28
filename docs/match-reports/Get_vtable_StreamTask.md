@@ -10,7 +10,7 @@
 
 The class's own "GetMethods" accessor -- returns `&gStreamTaskMethods` and nothing
 else, the same shape as `Get_vtable_Entity` in `include/Entity.h` and
-`GetTodActorMethods` in `src/code_55dd4.c`. Called (still `INCLUDE_ASM`, not
+`GetTodActorMethods` in `src/TodActor.c`. Called (still `INCLUDE_ASM`, not
 this batch) by `New_StreamTask` (the allocator) and `StreamTask__StreamTask` (the
 constructor) to fetch the class's ctor at slot `+0x008` and to install the
 methods pointer at object offset 0, respectively.

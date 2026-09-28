@@ -44,7 +44,7 @@ Matched on the first attempt.
 ## Proposed learning
 
 None new — a clean instance of the vtable-dispatch-needs-no-forward-
-declaration pattern already documented for `code_55dd4`.
+declaration pattern already documented for `TodActor`.
 
 ## Naming
 
