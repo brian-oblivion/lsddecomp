@@ -883,12 +883,12 @@ s32 SpuVmPitchBend(s16 a0, s16 a1, s16 a2, u16 a3) {
 extern s32 _svm_envx_ptr;
 extern s32 _svm_envx_hist[];
 
-/* A u16 at a 0x34 stride: SpuVmFlush walks _svm_voice's +0x06 field
+/* A u16 at a 0x34 stride: SpuVmFlush walks _svm_voice's envx field
  * with a pointer of this type (store, then re-check the SAME field via
  * `lhu`). Kept as the walk's own element type so the pointer steps one
  * record at a time from &_svm_voice[0].envx. */
 typedef struct {
-    u16 unk0; /* +0x0 */
+    u16 envx; /* +0x0 */
     u8 pad2[0x34 - 0x2];
 } SvmVoiceEnvx;
 
@@ -913,16 +913,16 @@ void SpuVmFlush(void) {
     *slot = 0;
 
     if (count > 0) {
-        SvmVoiceEnvx *p98E = (SvmVoiceEnvx *)&_svm_voice[0].envx;
-        SpuVoiceRegs *pDad = _svm_sreg->voice;
+        SvmVoiceEnvx *envxSlot = (SvmVoiceEnvx *)&_svm_voice[0].envx;
+        SpuVoiceRegs *voiceRegs = _svm_sreg->voice;
 
         for (i = 0; i < count; i++) {
-            p98E->unk0 = pDad->envx;
-            if (p98E->unk0 == 0) {
+            envxSlot->envx = voiceRegs->envx;
+            if (envxSlot->envx == 0) {
                 *slot |= 1 << i;
             }
-            p98E++;
-            pDad++;
+            envxSlot++;
+            voiceRegs++;
         }
     }
 
@@ -960,12 +960,12 @@ void SpuVmFlush(void) {
     }
 
     {
-        SvmSreg *p7F0 = _svm_sreg_buf;
+        SvmSreg *shadow = _svm_sreg_buf;
 
         for (i = 0; i < 0x18; i++) {
             if (_svm_sreg_dirty[i] & SVM_SREG_DIRTY_VOL_L) {
-                _svm_sreg->voice[i].volL = p7F0->volL;
-                _svm_sreg->voice[i].volR = p7F0->volR;
+                _svm_sreg->voice[i].volL = shadow->volL;
+                _svm_sreg->voice[i].volR = shadow->volR;
             }
             if (_svm_sreg_dirty[i] & SVM_SREG_DIRTY_PITCH) {
                 _svm_sreg->voice[i].pitch = _svm_sreg_buf[i].pitch;
@@ -974,12 +974,12 @@ void SpuVmFlush(void) {
                 _svm_sreg->voice[i].addr = _svm_sreg_buf[i].addr;
             }
             if (_svm_sreg_dirty[i] & SVM_SREG_DIRTY_ADSR1) {
-                _svm_sreg->voice[i].adsr1 = p7F0->adsr1;
-                _svm_sreg->voice[i].adsr2 = p7F0->adsr2;
+                _svm_sreg->voice[i].adsr1 = shadow->adsr1;
+                _svm_sreg->voice[i].adsr2 = shadow->adsr2;
             }
 
             _svm_sreg_dirty[i] = 0;
-            p7F0++;
+            shadow++;
         }
     }
 
@@ -989,8 +989,8 @@ void SpuVmFlush(void) {
         u16 highMask = _svm_okof2;
         u16 lowActive = _svm_okon1;
         u16 highActive = _svm_okon2;
-        s16 v230 = _svm_orev1;
-        s16 v234 = _svm_orev2;
+        s16 lowReverb = _svm_orev1;
+        s16 highReverb = _svm_orev2;
 
         _svm_okof1 = 0;
         _svm_okof2 = 0;
@@ -1001,8 +1001,8 @@ void SpuVmFlush(void) {
         rec->keyOff[1] = highMask;
         rec->keyOn[0] = lowActive;
         rec->keyOn[1] = highActive;
-        rec->reverbOn[0] = v230;
-        rec->reverbOn[1] = v234;
+        rec->reverbOn[0] = lowReverb;
+        rec->reverbOn[1] = highReverb;
     }
 }
 #else
