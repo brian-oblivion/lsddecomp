@@ -103,7 +103,7 @@ TaskObjF's childA (+0x078) is now `struct TextEntry *` (it was the Class86E00Sub
 
 ## Track 4 (2026-09-26, round 89)
 
-Renamed from `TaskObjF__AttachChildA`. The child it makes is a TextEntry (New_TextEntry, include/TextEntry.h), kept in `textEntry` (+0x078, was `childA`), the slot TaskObjF__AddChild fills for a child of class id 0x10 (gTextEntryMethods). SetState(0x11) calls it through +0x09C.
+Renamed from `TaskObjF__AttachChildA`. The child it makes is a TextEntry (New_TextEntry, include/text_entry.h), kept in `textEntry` (+0x078, was `childA`), the slot TaskObjF__AddChild fills for a child of class id 0x10 (gTextEntryMethods). SetState(0x11) calls it through +0x09C.
 
 ## Track 7 (2026-09-27, round 95)
 

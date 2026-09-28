@@ -81,11 +81,11 @@ or what the two codes represent in the game.
 
 ## Track 4 (2026-09-26, round 89)
 
-Renamed from `TaskObjF__OnCommand`. Slot +0x0A4, which TaskObjF__OnNotify calls for a sender of class id 0x10, i.e. the TextEntry, whose setState(4) notifies its parents with closeState 2 (the edit was written back) or 3 (include/TextEntry.h). 2 detaches it and calls beginSave (+0x078) again with the edited title; 3 detaches it and sets state 0x17.
+Renamed from `TaskObjF__OnCommand`. Slot +0x0A4, which TaskObjF__OnNotify calls for a sender of class id 0x10, i.e. the TextEntry, whose setState(4) notifies its parents with closeState 2 (the edit was written back) or 3 (include/text_entry.h). 2 detaches it and calls beginSave (+0x078) again with the edited title; 3 detaches it and sets state 0x17.
 
 ## Track 7 (2026-09-27, round 95)
 
 Parameters `arg1`/`arg2` -> `sender`/`result`; the cases are
 `TEXTENTRY_RESULT_ACCEPTED`/`_CANCELLED` (enum TextEntryResult, added to
-include/TextEntry.h this round: command 25 writes `editBuf` back and closes
+include/text_entry.h this round: command 25 writes `editBuf` back and closes
 with 2, command 23 closes with 3), the target ABORTED. Image byte-identical.

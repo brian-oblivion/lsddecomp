@@ -1065,7 +1065,7 @@
         "gTextEntryMethods": {
           "class": "TextEntry",
           "date": "2026-09-26",
-          "header": "include/TextEntry.h"
+          "header": "include/text_entry.h"
         },
         "gTextRowMethods": {
           "class": "TextRow",

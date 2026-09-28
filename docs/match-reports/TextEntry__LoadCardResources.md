@@ -159,7 +159,7 @@ three-value swap was resolved by touching only the non-persistent one.
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 ## Track 4 (2026-09-26, round 88)
 
@@ -173,7 +173,7 @@ TimImage__Upload) through `TimImageUploadFn`, +0x004 the inherited
 
 `ChildObj86ED0`/`ChildMethods86ED0` (include/class_3bb8c.h) are deleted: the
 object behind them is the `New_TextRow` result, so TextEntry::textRow
-(+0x044, include/TextEntry.h) is `struct TextRow *`. The slots map onto
+(+0x044, include/text_entry.h) is `struct TextRow *`. The slots map onto
 TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
 (position cast to `LongVec3 *`, as ScreenSprite's banner describes), +0x0B8
 `setColor` (`sTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `ColorRgb *`),
@@ -208,6 +208,6 @@ ScreenSpritePos.
 ## Round 98: sTextEntryCursorPos unified (track 4b)
 
 The local `extern ScreenSpritePos sTextEntryCursorPos` moved to
-include/TextEntry.h, the only declaration; input_dialogs's `s32` view and its
+include/text_entry.h, the only declaration; input_dialogs's `s32` view and its
 `D_8008AAE0` (the y) now read `sTextEntryCursorPos.x`/`.y`, byte-exact. The
 proposal above is applied.

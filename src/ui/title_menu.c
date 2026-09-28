@@ -52,7 +52,7 @@
 #include "pad.h"
 #include "frame_clock.h"
 #include "screen_sprite.h"
-#include "TextEntry.h"
+#include "text_entry.h"
 #include "item_list.h"
 #include "bmem_pmgr.h"
 #include "full_width_sjis.h"

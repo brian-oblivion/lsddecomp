@@ -1,5 +1,5 @@
-#ifndef TEXTENTRY_H
-#define TEXTENTRY_H
+#ifndef TEXT_ENTRY_H
+#define TEXT_ENTRY_H
 
 #include "basic_class.h"
 #include "char_sprite.h"

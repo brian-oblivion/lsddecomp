@@ -93,14 +93,14 @@ verdict was set aside.
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 Renamed from Obj86ED0__DispatchIndexValue: moves cursorSprite with its setPosition slot (ScreenSprite +0x0BC) to x = pos * 7 + sTextEntryCursorPos, y = D_8008AAE0 (the stack block is a ScreenSpritePos), stores cursorIndex, and calls notifyTarget(0) when `notify`. Occupant of slot +0x0A4, called by MoveCursorRight/Left and ResetAllChars. Tier A (the body is the name).
 
 ## Round 98: sTextEntryCursorPos unified (track 4b)
 
 `sTextEntryCursorPos` (0x8008AADC) now has one declaration, `extern
-ScreenSpritePos sTextEntryCursorPos;` in include/TextEntry.h; this unit's
+ScreenSpritePos sTextEntryCursorPos;` in include/text_entry.h; this unit's
 `extern s32 sTextEntryCursorPos` and `extern s32 D_8008AAE0` are gone. The
 body reads `local.y = sTextEntryCursorPos.y; local.x = pos * 7 +
 sTextEntryCursorPos.x;`. `D_8008AAE0` was that position's y (-12, the word at

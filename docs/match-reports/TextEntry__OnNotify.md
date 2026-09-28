@@ -65,14 +65,14 @@ its own disassembly, not by analogy); this one was not.
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 Renamed from Obj86ED0__Notify for its slot, BasicClass's onNotify (+0x038). It calls the base onNotify, then handleCommand (sender low nibble 2) or tickState (5) with (sender, event); the bytes pass $a1/$a2 to both, which is why the tickState slot keeps those parameters though its occupant reads only self.
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
 TextEntry +0x034/+0x038 `childType2`/`childType5` -> `inputSource`/
-`tickSource` (include/TextEntry.h; accessed only in input_dialogs, so
+`tickSource` (include/text_entry.h; accessed only in input_dialogs, so
 renamed in the definition). They are the children of class 2 and 5, which
 are Pad and FrameClock (`typeviews.py --tree`), and ItemList and TaskObjF
 already call the same pair `inputSource`/`tickSource`. The kind test reads

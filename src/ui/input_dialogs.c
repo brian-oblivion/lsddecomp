@@ -3,7 +3,7 @@
  * first half of ItemList (its allocator to detachTarget). ItemList's list
  * methods and its getter follow in dream_scene.c.
  *
- * A TextEntry (include/TextEntry.h) edits a caller-owned string on screen.
+ * A TextEntry (include/text_entry.h) edits a caller-owned string on screen.
  * setText keeps the caller's buffer and copies it into its own `editBuf`
  * (decoding full-width SJIS in TEXTENTRY_MODE_FULLWIDTH). loadCardResources
  * makes the panel (CARD\COMINPUT.TIM), the text row and the '_' cursor
@@ -24,7 +24,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <strings.h>
-#include "TextEntry.h"
+#include "text_entry.h"
 #include "char_sprite.h"
 #include "TextRow.h"
 #include "tim_image.h"
@@ -462,7 +462,7 @@ void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify) {
     }
 }
 
-/* TextEntry's own table getter (include/TextEntry.h), defined here in ROM
+/* TextEntry's own table getter (include/text_entry.h), defined here in ROM
  * order; not ItemList's. */
 TextEntryMethods *GetTextEntryMethods(void) {
     return &gTextEntryMethods;

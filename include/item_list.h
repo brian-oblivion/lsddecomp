@@ -34,7 +34,7 @@
  * save files already on the memory card, so in the game this is the
  * load-file picker (include/task_objf.h, beginLoad). It is TextEntry's
  * sibling, driven the same way: slots +0x044..+0x060 and fields
- * +0x02C..+0x03C line up one for one (include/TextEntry.h).
+ * +0x02C..+0x03C line up one for one (include/text_entry.h).
  *
  * +0x058 tickClosing: the slot passes (sender, event) because onNotify's
  * bytes set $a1/$a2 for it; its occupant reads only self (TextEntry's
