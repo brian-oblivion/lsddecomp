@@ -501,3 +501,21 @@ The file's banner carried its object identification and edge evidence:
 > object libsnd/sstable follows it; inside, both edges are "boundary
 > possible". No merge is possible: the neighbouring C unit is on the other
 > side of the sstable object.
+
+## History (moved from src/psyq/libsnd_ssinit.c, round 103)
+
+The function comment above _SsInit before it was cut to one MATCHING line:
+
+> /*
+>  * Sound-system init.  Reached only through SsInit (arg0 = 0) and
+>  * SsInitHot (arg0 = 1) below.
+>  *
+>  * DO NOT "TIDY" THE LOOP VARIABLES -- the pairing is byte-load-bearing.
+>  * Retail reuses exactly two counter pseudos across all three loops and SWAPS their outer/inner roles in the last one: `i` is the outer
+>  * counter of loops 1-2 and the INNER counter of loop 3, `j` the inner counter
+>  * of loop 1 and the OUTER counter of loop 3.  Writing loop 3 as
+>  * `for (i ...) for (j ...)` costs 35 words to register renames; splitting
+>  * them into per-loop names costs the function's size outright.  Likewise the
+>  * `i = 0;` before each loop is a statement in its own right, not a `for`
+>  * init clause: retail zeroes the counter BEFORE loading the source base.
+>  */

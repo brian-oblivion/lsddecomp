@@ -956,10 +956,8 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
 }
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 49/91 words, length exact. Residue: register identity
- * (the three hoisted pointers p620/p6A0/p8D8 land in different
- * callee-saved registers than retail's $s3/$s1/$s0) (docs/match-reports/
- * CD_datasync.md). */
+/* NON_MATCHING: length exact, 91 words; register identity on the three
+ * hoisted table pointers (docs/match-reports/CD_datasync.md). */
 s32 CD_datasync(s32 arg0) {
     s32 now;
     s32 ok;

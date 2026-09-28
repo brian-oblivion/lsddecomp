@@ -658,3 +658,12 @@ The comment above this function's NON_MATCHING body in src/libcd_bios.c read:
 > CD_datasync.md). Structure is hand-derived; the diagnostic call's
 > `ok =` sink is a permuter find (round 36), reviewed as a semantically
 > inert dead-store reuse and oracle-confirmed.
+
+## History (moved from src/psyq/libcd_bios.c, round 103)
+
+The NON_MATCHING line above the preserved body read:
+
+> NON_MATCHING: 49/91 words, length exact. Residue: register identity
+> (the three hoisted pointers p620/p6A0/p8D8 land in different
+> callee-saved registers than retail's $s3/$s1/$s0) (docs/match-reports/
+> CD_datasync.md).
