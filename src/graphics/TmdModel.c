@@ -7,7 +7,7 @@
  * each packet through Sony's own <libgs.h> layouts: GPU_COM_* mode codes,
  * TMD_P_* structs, GsTMDFlagGRD), compute an axis-aligned bounding box or
  * its eight corners (TmdModel__ComputeBounds, TmdModel__GetHull, and the
- * shared buffer of gTmdModelBoundsCount boxes, TmdModel__UpdateBoundsBuffer /
+ * shared buffer of sTmdModelBoundsCount boxes, TmdModel__UpdateBoundsBuffer /
  * TmdModel__GetBoundsBuffer / TmdModel__GetBoundsCount), and ray-cast a
  * segment against every face (TmdModel__RaycastFaces) for SceneNode's own
  * collision helpers in SceneNode.c.
@@ -108,11 +108,11 @@ TmdModelMethods *GetTmdModelMethods(void) {
 }
 
 void TmdModel__InitBoundsCount(TmdModel *self) {
-    gTmdModelBoundsCount = 1;
+    sTmdModelBoundsCount = 1;
 }
 
 s32 TmdModel__GetBoundsCount(TmdModel *self) {
-    return gTmdModelBoundsCount;
+    return sTmdModelBoundsCount;
 }
 
 void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box) {

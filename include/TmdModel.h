@@ -19,7 +19,7 @@
  * Besides its table the class has non-virtual methods SceneNode's collision
  * code calls directly: a bounding box over the object's vertices
  * (ComputeBounds, GetHull), a shared bounds buffer holding
- * gTmdModelBoundsCount boxes (always 1, set by the ctor), and a segment cast
+ * sTmdModelBoundsCount boxes (always 1, set by the ctor), and a segment cast
  * against every face (RaycastFaces, walking primitives with NextPrimitive).
  *
  * The object is 0x24 bytes (New_TmdModel's allocation). Slots +0x040..+0x04C
@@ -112,7 +112,7 @@ struct TmdModel {
 extern TmdModelMethods gTmdModelMethods;
 extern TmdModelMethods *GetTmdModelMethods(void); /* returns &gTmdModelMethods */
 
-extern s32 gTmdModelBoundsCount; /* boxes in the bounds buffer: 1, set by the ctor */
+extern s32 sTmdModelBoundsCount; /* boxes in the bounds buffer: 1, set by the ctor */
 
 TmdModel *New_TmdModel(TmdObject *object);
 
