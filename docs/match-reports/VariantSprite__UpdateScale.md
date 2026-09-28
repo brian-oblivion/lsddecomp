@@ -170,6 +170,9 @@ class's track 7 pass (see `VariantSprite__SetVariantClut`'s report).
 | name | tier | evidence |
 | --- | --- | --- |
 | Sprite fields `accumScaleX` / `accumScaleY` (were `unk5C` / `unk60`, `+0x05C` / `+0x060`) | B | Mechanics only: while `unk58` is non-zero this method multiplies each by its axis's 20.12 ratio (`(ratio * v) >> 12`) and stores it back, in place of writing `sprite.scalex/scaley`, so the ratios accumulate into them. Renaming them in `SPRITE_FIELDS` (include/Sprite.h) broke only this unit in the default build and under `-DNON_MATCHING`, so this is their whole accessor set: nothing else reads or writes them, `Viewport__DrawNode` included. What the accumulated value is for is not established (nothing found sets `unk58` non-zero), hence B. |
+| param `ratios`: `s16 *` -> `Ratio16 *` | A | The body reads `[0]/[1]` and `[2]/[3]` as num/den, two SceneNode.h `Ratio16`s (x, y), the type `Sprite__UpdateRotation` and `BgLayer__UpdateScale` already take; round 93's proposal. A type change, so the oracle decided: byte-identical. The prototype in include/VariantSprite.h changed with it; nothing calls it directly (only `gVariantSpriteMethods`' slot). |
+| locals `xWhole`/`xRem`/`xFrac`/`xRatio`, `y...` (were `q1`/`r1`/`q2`/`ratio1`, `q3`/`r3`/`q4`/`ratio2`) | A | The split division: whole part `num / den`, remainder, the remainder's 12 fractional bits, and their 20.12 sum. |
+| locals `xScale` / `yScale` (were `short1` / `short2`) | A | The 16-bit truncations stored into `sprite.scalex` / `.scaley`. |
 
 `unk58` itself is also written by `Sprite__Reset` (src/Sprite.c, outside
 this job), so its name is proposed, not applied: see "Proposed field

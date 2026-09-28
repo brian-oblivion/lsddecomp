@@ -46,28 +46,28 @@ void VariantSprite__SetVariantClut(VariantSprite *self, s32 variant) {
  * Unlike the base method, `set` is never read: every path assigns. Read as
  * a raw `s16 *` per the RatioToFixed12 precedent for this shape.
  */
-void VariantSprite__UpdateScale(VariantSprite *self, s32 set, s16 *ratios) {
-    s32 q1, r1, q2, ratio1;
-    s32 q3, r3, q4, ratio2;
-    s16 short1, short2;
+void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
+    s32 xWhole, xRem, xFrac, xRatio;
+    s32 yWhole, yRem, yFrac, yRatio;
+    s16 xScale, yScale;
 
-    q1 = ratios[0] / ratios[1];
-    r1 = ratios[0] % ratios[1];
-    q2 = (r1 << 12) / ratios[1];
-    ratio1 = (q1 << 12) + q2;
-    short1 = (s16)ratio1;
+    xWhole = ratios[0].num / ratios[0].den;
+    xRem = ratios[0].num % ratios[0].den;
+    xFrac = (xRem << 12) / ratios[0].den;
+    xRatio = (xWhole << 12) + xFrac;
+    xScale = (s16)xRatio;
 
-    q3 = ratios[2] / ratios[3];
-    r3 = ratios[2] % ratios[3];
-    q4 = (r3 << 12) / ratios[3];
-    ratio2 = (q3 << 12) + q4;
-    short2 = (s16)ratio2;
+    yWhole = ratios[1].num / ratios[1].den;
+    yRem = ratios[1].num % ratios[1].den;
+    yFrac = (yRem << 12) / ratios[1].den;
+    yRatio = (yWhole << 12) + yFrac;
+    yScale = (s16)yRatio;
 
     if (self->unk58 != 0) {
-        self->accumScaleX = ((s16)ratio1 * self->accumScaleX) >> 12;
-        self->accumScaleY = ((s16)ratio2 * self->accumScaleY) >> 12;
+        self->accumScaleX = ((s16)xRatio * self->accumScaleX) >> 12;
+        self->accumScaleY = ((s16)yRatio * self->accumScaleY) >> 12;
     } else {
-        self->sprite.scalex = short1;
-        self->sprite.scaley = short2;
+        self->sprite.scalex = xScale;
+        self->sprite.scaley = yScale;
     }
 }

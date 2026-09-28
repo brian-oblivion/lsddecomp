@@ -92,7 +92,7 @@ extern VariantSpriteMethods *GetVariantSpriteMethods(void); /* returns &gVariant
 VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture);
 void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetArg, void *texture);
 void VariantSprite__SetVariantClut(VariantSprite *self, s32 variant);
-void VariantSprite__UpdateScale(VariantSprite *self, s32 set, s16 *ratios);
+void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios);
 void VariantSprite__Update(VariantSprite *self, void *sender, s32 event);
 void VariantSprite__NoOpSlotBC(void);
 void VariantSprite__NoOpSlotC0(void);
