@@ -89,7 +89,7 @@ Tier B: the state change is exact; why a move command should alternate direction
 while a yaw command is active (this is only reached from
 `DreamSys__StepLookYaw`'s two active paths) is not established.
 
-## Comment moved from src/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/DreamSys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

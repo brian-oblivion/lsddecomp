@@ -153,7 +153,7 @@ queue).
 
 - **Tier B.** Near-identical body to DreamSys__CheckStaircaseHeading, differing only in which per-stage heading table it indexes (TUNNEL_ENTER_HEADINGS/TUNNEL_EXIT_HEADINGS here); called from DreamSys__TryTunnelLink.
 
-## Comment moved from src/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/DreamSys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

@@ -52,7 +52,7 @@ quotient to be SECONDS, `dreamTimer` must advance at 15 Hz. Measured, it does
 not follow from anything available:
 
 - `dreamTimer` is incremented by exactly 1 per call of `DreamSys__TimerTick`
-  (src/DreamSys.c, gated on `arg2 == 2`), and `TimerTick` is a vtable slot
+  (src/world/DreamSys.c, gated on `arg2 == 2`), and `TimerTick` is a vtable slot
   (`include/DreamSys.h`, `void *TimerTick;`) with no caller anywhere in `src/`
   that would fix its rate.
 - `dreamTimeLimit`, the value `dreamTimer` is compared against, is written

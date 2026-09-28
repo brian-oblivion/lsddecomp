@@ -77,7 +77,7 @@ try the other form before reaching for anything else. (Measured here: 19/20 vs
 **`GetMoodFromStageChunk`, tier A.** Inherited from lsddecomp, confirmed: the
 body is exactly "given a stage and a chunk, return that chunk's mood point",
 which is what the name says, and the one call site outside this unit,
-`src/DreamSys.c:1460` inside `DreamSys__LogChunkMood` (`mood =
+`src/world/DreamSys.c:1460` inside `DreamSys__LogChunkMood` (`mood =
 GetMoodFromStageChunk(this->currentStage, (StageChunk *)currentPos);`, whose
 result is immediately logged via `LogMood`), passes the player's current
 stage and position and reads back a mood value, agreeing with the name.

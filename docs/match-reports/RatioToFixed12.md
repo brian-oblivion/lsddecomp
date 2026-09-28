@@ -62,7 +62,7 @@ shows the same two-`div`-block disassembly pattern.
   (`SceneNode__GetRotationDegrees`, `SceneNode__FaceTarget`) writes a
   degrees value and a constant 1, which is consistent with both readings and
   is why the weaker one survived. Renaming the type and its two fields is
-  left to track 4: `Ratio16` is also used by `src/DreamSys.c` and
+  left to track 4: `Ratio16` is also used by `src/world/DreamSys.c` and
   named in `include/Task.h`, outside this runner's unit.
 - Signature kept as `void *pair`, as the shared header already declares it.
 

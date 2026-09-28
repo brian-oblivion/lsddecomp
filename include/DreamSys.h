@@ -6,7 +6,7 @@
  * gDreamSysMethods, getter Get_vtable_DreamSys): an Actor subclass
  * (include/Actor.h); no class derives from it. The ctor calls Actor's first
  * (DreamSys__DreamSys: GetActorMethods()->ctor), so the id parent is the
- * ctor-chain parent. Every method is in src/DreamSys.c. One instance, made
+ * ctor-chain parent. Every method is in src/world/DreamSys.c. One instance, made
  * by GameApplication__GameApplication (src/app/GameApplicationFileResource.c, New_DreamSys) and kept in
  * GameApplication::dreamSys; the same object is GraphRoom::dreamSys, the
  * `target` ObjMStyleActor hands SetDreamAuxWorld (DreamAux's
@@ -907,7 +907,7 @@ extern s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2);
 /* Called by DreamSys__TryStaircaseLink (round 2026-09-06) as (&this->linkCoordinates,
    currentPos, this->currentStage) -- same forwarding shape as
    Test4TunnelLinks/TestForStaticLink above. Defined later in this unit's own
-   ROM order (`src/DreamSys.c`); this is a forward declaration for that
+   ROM order (`src/world/DreamSys.c`); this is a forward declaration for that
    earlier call site, not a cross-unit prototype. */
 extern s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2);
 
@@ -1072,7 +1072,7 @@ void DreamSys__ResetFlashbackList(DreamSys *this);
 DreamSysMethods *Get_vtable_DreamSys(void);
 
 /* @brief Allocates and constructs a DreamSys instance.
- * Still INCLUDE_ASM in src/DreamSys.c; declared here so other units'
+ * Still INCLUDE_ASM in src/world/DreamSys.c; declared here so other units'
  * matched C (e.g. GameApplication__GameApplication in src/app/GameApplicationFileResource.c) can call it -- see
  * "Calling into a function that is still INCLUDE_ASM in another unit is
  * fine" in docs/DECOMPILATION_LEARNINGS.md. */

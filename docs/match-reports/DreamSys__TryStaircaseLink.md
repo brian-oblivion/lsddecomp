@@ -269,7 +269,7 @@ All in `include/DreamSys.h`:
 - **`extern s32 (*STAIRCASE_TICK_FNS[4])(DreamSys *this)`** -- a table of the four
   already-matched `s32 (DreamSys *this)` functions `DreamSys__TickStaircaseCase0`/
   `DreamSys__TickStaircaseCase1`/`DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase3`, confirmed by their own
-  existing definitions in `src/DreamSys.c`.
+  existing definitions in `src/world/DreamSys.c`.
 - **`extern s32 Test4StaircaseNodes(...)`** and **`extern s32
   DreamSys__CheckStaircaseHeading(...)`** forward/call-site prototypes added near the
   existing `DreamSys__CheckTunnelHeading` one (same 3-arg shape; `DreamSys__CheckStaircaseHeading` is
@@ -542,7 +542,7 @@ expression."
 
 - **Tier B.** STALL (still INCLUDE_ASM). Wraps Test4StaircaseNodes and DreamSys__CheckStaircaseHeading, and on success wires up the DreamSys__TickStaircaseCase0..3 dispatch via GetLastSpawnExtra, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink.
 
-## Comment moved from src/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/DreamSys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

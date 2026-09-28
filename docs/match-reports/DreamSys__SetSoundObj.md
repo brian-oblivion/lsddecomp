@@ -64,7 +64,7 @@ identification comes from other units.
 `D_8008xxxx` globals in this unit, and every one of them came back
 compiler-confirmed unit-local: the renames went into the struct DEFINITIONS in
 `include/DreamSys.h` and the only accessors the compiler then listed were in
-`src/DreamSys.c` (FINISHING-PLAN track 3 step 3). So there is nothing here for
+`src/world/DreamSys.c` (FINISHING-PLAN track 3 step 3). So there is nothing here for
 the head to apply by type scope at merge time.
 
 Worth recording because it falsifies a plausible assumption rather than

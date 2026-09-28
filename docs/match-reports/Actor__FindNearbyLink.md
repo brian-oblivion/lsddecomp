@@ -108,7 +108,7 @@ is not established, which keeps this tier B rather than A.
 ## Proposed field names
 
 `DreamSys::unk_0x28` and `DreamSys::unk_0x4C` are accessed from OTHER
-units too (`src/DreamSys.c`, per `grep -rn -- '->unk_0x28\b\|->unk_0x4C\b'
+units too (`src/world/DreamSys.c`, per `grep -rn -- '->unk_0x28\b\|->unk_0x4C\b'
 src/`), so per FINISHING-PLAN.md track 3 step 3 they are proposed here,
 not renamed, and posted to the broadcast for the head to apply by type
 scope at merge.
@@ -124,7 +124,7 @@ scope at merge.
   B). Evidence: this function calls `unk_0x4C->methods->queryLinkAtPos`
   to look up a link at a position; `include/DreamSys.h`'s own existing
   comments show it used the same way by `DreamSys__WallLink`,
-  `DreamSys__TryInstantTeleportLink` and `DreamSys__DetachFromParent` in `src/DreamSys.c` -- every access
+  `DreamSys__TryInstantTeleportLink` and `DreamSys__DetachFromParent` in `src/world/DreamSys.c` -- every access
   across every unit is link-related.
 
 ## Verify

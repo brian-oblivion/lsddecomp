@@ -52,7 +52,7 @@ Deliberately NOT called `TickFall` or `TickRise`: this unit never establishes wh
 way +Y points, so the name says "drift" and the comment says "+512 on the Y
 axis".
 
-## Comment moved from src/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/DreamSys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

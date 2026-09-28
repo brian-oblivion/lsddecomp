@@ -93,7 +93,7 @@ which case 0. `DreamSys__TryStageTimerLink` stores the result in
 `ROTATION_YAW_180`, and the same encoding as every `CARDINAL_ANGLES` entry. Tier B:
 no carved code reads `stageLinkAngle` back, so the consumer is unobserved.
 
-## Comment moved from src/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/DreamSys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

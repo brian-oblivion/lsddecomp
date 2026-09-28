@@ -110,11 +110,11 @@ the call site deletes the `move a3,zero` and breaks both matches. The callee
 ignores the value; the caller still has to place it.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/DreamSys.c:364` and `src/DreamAux.c:443`. Oracle green.
+added to `src/world/DreamSys.c:364` and `src/DreamAux.c:443`. Oracle green.
 
 ## Track 4 (2026-09-25, round 81, charlie)
 
-The two 4-argument `arity-ok` externs (`src/DreamSys.c`, `src/DreamAux.c`)
+The two 4-argument `arity-ok` externs (`src/world/DreamSys.c`, `src/DreamAux.c`)
 are gone. SceneNode's one header, `include/SceneNode.h`, declares the
 method, and a 3-parameter prototype there would make both callers a compile
 error. Both callers set `$a3 = 0` (0x80059460, 0x8005CF7C), so the

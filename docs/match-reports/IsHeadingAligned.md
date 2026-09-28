@@ -95,7 +95,7 @@ instruction over the precedent.
 
 - **Tier A.** Pure leaf: normalizes a heading delta to [-180,180) and tests it against a fixed window. Mechanics are the whole story; free function shared by DreamSys__CheckTunnelHeading and DreamSys__CheckStaircaseHeading.
 
-## Comment moved from src/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/DreamSys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

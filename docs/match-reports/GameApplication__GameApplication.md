@@ -128,7 +128,7 @@ another caller is found that writes them.
   previously-documented end (`0x21c`) with 3 padding words and a new named
   slot at `+0x228` (`func_228`), discovered purely from this call site —
   nothing in `DreamSys`'s own unit references it yet. Added the
-  `New_DreamSys` prototype (still `INCLUDE_ASM` in `src/DreamSys.c`; this
+  `New_DreamSys` prototype (still `INCLUDE_ASM` in `src/world/DreamSys.c`; this
   is a same-shape cross-unit call as documented in
   `docs/DECOMPILATION_LEARNINGS.md`).
 

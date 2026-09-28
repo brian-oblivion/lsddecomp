@@ -14,7 +14,7 @@ boolean as a differently-shaped 2-instruction sequence later).
 
 **One inherited-body drift caught in passing**: the report's own "Best-reached
 C" section (below) shows a named `s32 bit = count & 1;` local, but the body
-actually preserved in `src/DreamSys.c` had that inlined away
+actually preserved in `src/world/DreamSys.c` had that inlined away
 (`doCallback = ((count & 1) == 0);`, no `bit` local at all) — a genuine
 divergence between the report's prose and what was actually banked. Rebuilt
 BOTH forms fresh to check which was really best: the `bit`-local form scores
@@ -160,7 +160,7 @@ function itself did not close:
   counter described above, bounded to `[0,4)` while `unk_0xA0` is nonzero.
 - `vtable_DreamSys::DreamSys__StartVoice` (was `unknown_functions_0x168[1]`) — named
   from `tools/classtable.py gDreamSysMethods` (`+0x168`); the symbol already
-  existed as an `INCLUDE_ASM` entry in `src/DreamSys.c`, just not yet wired
+  existed as an `INCLUDE_ASM` entry in `src/world/DreamSys.c`, just not yet wired
   into the vtable struct.
 - `DreamSys::unk_0x678` is exactly `DreamSys::screenShakeOn` — confirmed by
   offset arithmetic (`unknown_values_0x604[116]` runs `0x604`-`0x677`,
@@ -365,7 +365,7 @@ changes.
 
 ## Round: found a THIRD, previously undocumented residue -- a real 2-word drift (runner delta, round 19)
 
-Rebuilt this report's exact preserved 45/79 body into `src/DreamSys.c`
+Rebuilt this report's exact preserved 45/79 body into `src/world/DreamSys.c`
 directly (not just re-read) to verify the "clean (drift-free) build" claim,
 per this round's "verify claims, do not inherit them" brief. **The claim is
 wrong.** `funcdiff.py` prints the usual outside-range drift warning
@@ -672,7 +672,7 @@ lever for this residue either, despite superficially matching the
 
 **Both reshapes reverted; `INCLUDE_ASM` restored with round 20's own
 80/79-word body preserved as the best-reached (see `#if 0` block in
-`src/DreamSys.c`, positioned in ROM order).** No further attempts made
+`src/world/DreamSys.c`, positioned in ROM order).** No further attempts made
 this round; two independent, previously-unexplored axes (the block-order
 lever, and a scheduling barrier at the exact diverging instruction) both
 failed to close the last word, which is a stronger signal that this
