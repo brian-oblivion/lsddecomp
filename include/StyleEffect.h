@@ -54,7 +54,7 @@ typedef struct StyleEffectMethods StyleEffectMethods;
 typedef struct StyleEffectParams StyleEffectParams;
 
 /* What each `kind` builds and does per frame (the switches in
- * class_3bb8c_s.c; they still spell the values as numbers). */
+ * class_3bb8c_s.c). */
 typedef enum StyleEffectKind {
     STYLE_EFFECT_MODEL_ROW =
         0, /* model, plus two copies in a row (modelChildren) that spin and drift along z after 500 ticks */

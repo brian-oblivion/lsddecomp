@@ -78,20 +78,20 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
     AttachWithRotScale((Actor *)self, parent, &placed, self->params.rotation, self->params.scale);
 
     kind = self->pendingExtra;
-    if (kind < 2) {
+    if (kind <= STYLE_EFFECT_MODEL) {
         s32 model = gStyleEffectTmd->methods->setBackClip(gStyleEffectTmd, gStyleEffectModelIds[kind]);
         SceneNode__LinkModel((SceneNode *)self, (void *)model);
         kind = self->pendingExtra;
     }
 
     switch (kind) {
-        case 0:
+        case STYLE_EFFECT_MODEL_ROW:
             StyleEffect__PlaceModelChildren(self, 0);
             break;
-        case 2:
+        case STYLE_EFFECT_SPRITES:
             StyleEffect__BuildRandomSprites(self, 0);
             break;
-        case 3:
+        case STYLE_EFFECT_JITTER_SPRITES:
             StyleEffect__SpawnPlainSprites(self, 0);
             break;
         default:
@@ -112,13 +112,13 @@ void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
     self->methods->setTranslation(self, &placed);
 
     switch (self->pendingExtra) {
-        case 0:
+        case STYLE_EFFECT_MODEL_ROW:
             StyleEffect__DriftModelChildren(self, pos);
             break;
-        case 2:
+        case STYLE_EFFECT_SPRITES:
             NoOpIgnoreArgs(self, pos);
             break;
-        case 3:
+        case STYLE_EFFECT_JITTER_SPRITES:
             StyleEffect__RandomizeSprites(self, pos);
             break;
         default:
@@ -131,13 +131,13 @@ void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
  * identical class_3bb8c_o.c functions). */
 void StyleEffect__ReleaseByKind(StyleEffect *self) {
     switch (self->pendingExtra) {
-        case 0:
+        case STYLE_EFFECT_MODEL_ROW:
             StyleEffect__ReleaseModelChildren(self);
             break;
-        case 2:
+        case STYLE_EFFECT_SPRITES:
             StyleEffect__ReleaseSprites(self);
             break;
-        case 3:
+        case STYLE_EFFECT_JITTER_SPRITES:
             StyleEffect__ReleaseSpritesB(self);
             break;
         default:
@@ -179,7 +179,7 @@ void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
     }
     childPos = gModelChildOffsetInit;
     slot = self->modelChildren;
-    for (i = 0; i < 2; i++, slot++) {
+    for (i = 0; i < ARRAY_COUNT(self->modelChildren); i++, slot++) {
         if (layout < 3) {
             childPos.x += self->params.scale[0].num * gModelChildSpacing[layout];
         } else {
@@ -207,6 +207,12 @@ extern LongVec3 gModelChildDriftInit;
  * updateRotation(.., 0, ..) adds to self and to each model child. */
 extern Ratio16 gSpinRotStep[3];
 
+/* Ticks (StyleEffect::tick) before the model children start to drift. */
+#define MODEL_CHILD_DRIFT_DELAY 500
+/* The z distance a child drifts before it snaps back: the reset period is
+ * this over the child's per-tick step, gModelChildDriftZ[tableIndex]. */
+#define MODEL_CHILD_DRIFT_RANGE 24500
+
 /* After 500 frames (tick >= 0x1F5), for kinds with model children and a
  * nonzero gModelChildDriftZ step: spin self and both children, move the
  * children along z, and every 24500 / step frames snap them back to their
@@ -226,13 +232,13 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
 
     tableIndex = self->params.tableIndex;
     if (self->params.modelChildLayout != 0 && gModelChildDriftZ[tableIndex] != 0 &&
-        (u32)self->tick >= 0x1F5) {
+        (u32)self->tick > MODEL_CHILD_DRIFT_DELAY) {
         slot = self->modelChildren;
         self->methods->updateRotation(self, 0, gSpinRotStep);
         i = 0;
         stepZ = &gModelChildDriftZ[tableIndex];
         extraZ = 0;
-        for (; i < 2; i++) {
+        for (; i < ARRAY_COUNT(self->modelChildren); i++) {
             LongVec3 delta = gModelChildDriftInit;
             delta.z += extraZ + *stepZ;
             (*slot)->methods->addTranslation(*slot, &delta);
@@ -241,7 +247,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
             slot++;
         }
 
-        period = 24500 / gModelChildDriftZ[tableIndex];
+        period = MODEL_CHILD_DRIFT_RANGE / gModelChildDriftZ[tableIndex];
         tick = self->tick;
         if (period >= 0) {
             if ((u32)tick % (u32)period == 0) {
@@ -260,7 +266,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
 /* Release the two model children, if this layout made any. */
 void StyleEffect__ReleaseModelChildren(StyleEffect *self) {
     if (self->params.modelChildLayout != 0) {
-        ReleaseBasicClassArray((void **)self->modelChildren, 2);
+        ReleaseBasicClassArray((void **)self->modelChildren, ARRAY_COUNT(self->modelChildren));
     }
 }
 
@@ -308,7 +314,7 @@ void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale)
     VariantSprite *sprite;
     s32 i;
 
-    for (i = 0; i < 5; i++, slot++) {
+    for (i = 0; i < ARRAY_COUNT(((StyleEffect *)self)->sprites); i++, slot++) {
         sprite = New_VariantSprite(variant, 0, gStyleEffectTim);
         *slot = sprite;
         sprite->methods->attachToParent(sprite, self, 0);
