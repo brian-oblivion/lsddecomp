@@ -707,7 +707,7 @@ extern s32 gObjMProjectionBias;
 
 /* The StageMap's accepted tags (setAcceptedTags): the class ids of DreamSys
  * (0x1F34) and Entity (0x1F234), 0-terminated. */
-extern s32 gObjMAcceptedClassIds[];
+extern s32 sObjMAcceptedClassIds[];
 
 void ObjM__SetupSceneStyle(ObjM *self) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
@@ -736,7 +736,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     rig->methods->setConfig(rig, GetStageGridDimensions(self->stage));
     ((DreamSysAttachToParentFn)self->dreamSys->methods->attachToParent)(self->dreamSys, rig);
     rig->methods->setGridSpan(rig, self->gridSpan);
-    rig->methods->setAcceptedTags(rig, gObjMAcceptedClassIds);
+    rig->methods->setAcceptedTags(rig, sObjMAcceptedClassIds);
 }
 
 void ObjM__ExitSceneStyle(ObjM *self) {

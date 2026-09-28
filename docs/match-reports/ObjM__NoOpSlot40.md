@@ -49,7 +49,7 @@ commit), all read only by this unit:
 
 | old | new | holds |
 | --- | --- | --- |
-| `D_8008710C` | `gObjMAcceptedClassIds` | {0x1F34 DreamSys, 0x1F234 Entity, 0}: setAcceptedTags' 0-terminated class-id list |
+| `D_8008710C` | `sObjMAcceptedClassIds` | {0x1F34 DreamSys, 0x1F234 Entity, 0}: setAcceptedTags' 0-terminated class-id list |
 | `D_80087118` | `gStagePendingExtras` | 14 words, one DreamSys setPendingExtra value per stage (0x80, 0x400, 0x80, 0x100, ...) |
 | `D_80087150` | `gStage0Bounds` | CellBounds {0, 0, 8, 9}: setBounds on stage 0 only |
 | `D_8008715C` | `gObjMViewPoint` | LongVec3 {0, -1200, 0}: attachViewChild's `vp` |

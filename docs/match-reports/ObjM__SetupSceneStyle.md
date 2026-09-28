@@ -25,7 +25,7 @@ struct UnkCObj_3bb8c_l {
 extern void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 extern void *GetStageGridDimensions(s32 index);
 extern s32 gObjMProjectionBias;
-extern s32 gObjMAcceptedClassIds;
+extern s32 sObjMAcceptedClassIds;
 
 void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
@@ -52,7 +52,7 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     unk14->methods->slotE0(unk14, GetStageGridDimensions((s32)self->unk38));
     self->unk3C->methods->slot4C(self->unk3C, unk14);
     unk14->methods->slotDC(unk14, self->unk48);
-    unk14->methods->slotCC(unk14, &gObjMAcceptedClassIds);
+    unk14->methods->slotCC(unk14, &sObjMAcceptedClassIds);
 }
 ```
 
@@ -183,7 +183,7 @@ Comment history moved from the unit's externs:
 
 SetDreamAuxWorld's local prototype takes its parameter names from what the
 definition does with them (stage, grid, world, sound, clock).
-`gObjMViewPoint`, `gObjMViewRefPoint` and `gObjMAcceptedClassIds` are typed
+`gObjMViewPoint`, `gObjMViewRefPoint` and `sObjMAcceptedClassIds` are typed
 (LongVec3, s32[]), dropping their casts. `/* GsFOG */` on EnterStyleSession's
 setLightMode(vp, 1): SceneNode__SetLightMode writes a 3-bit field at bit 3
 of the GsDOBJ2 attribute, where 1 is libgs's GsFOG (1<<3).
