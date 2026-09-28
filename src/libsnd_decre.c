@@ -13,10 +13,6 @@
  * 3.5 and 3.6. None is retail's build: its text is 0x474 (3.0), 0x4B0
  * (3.3) and 0x2AC (3.5, 3.6) bytes against retail's 0x328, so it cannot be
  * linked.
- *
- * What decided its edges (python3 tools/tuboundary.py --unit): the placed
- * object libsnd/tempo precedes it ("start edge possible") and the placed
- * object libsnd/replay follows it, so there is nothing to merge with.
  */
 
 #include "common.h"

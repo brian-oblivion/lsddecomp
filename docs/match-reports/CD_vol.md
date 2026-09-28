@@ -46,3 +46,14 @@ shared header.
 
 None beyond what's already documented (address-drift bites unit-local extern
 declarations too, not just struct edits -- see CD_initintr's report).
+
+## History (moved from src/libcd_bios.c, comments pass)
+
+The module declarations above CD_vol carried:
+
+> Still INCLUDE_ASM in THIS unit (not yet converted) -- INCLUDE_ASM leaves no
+> C-level prototype of its own, so callers within this file need one.
+
+The module declarations above CD_vol carried:
+
+> Still INCLUDE_ASM elsewhere -- not this unit's to carve.

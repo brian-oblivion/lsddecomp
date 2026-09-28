@@ -67,3 +67,19 @@ self->list = NULL;` -- i.e. the caller, not this function, clears the head
 pointer. The name says "free the list", and the "does not clear `*head`"
 caveat stays in the declaration comment in `include/code_8220.h` because
 it is the one thing the name cannot carry.
+
+## History (moved from src/TmdRenderer.c, comments pass)
+
+The file's banner carried its edge evidence and the reason it is parked:
+
+> What decided its edges (python3 tools/tuboundary.py --unit): the binary
+> forces no edge anywhere from BMemPMgr.c through this file ("boundary
+> possible" throughout). The soft signal calls every edge inside the
+> renderer "boundary unlikely (single-user data)", the old carve edge
+> between StoreSxyPolyG4 and StoreSxyPolyFT4 included (gTexturedFaceColor
+> and sDivClipWidth are read on both sides), so the two carve slices were
+> merged into this file. PARKED: the content says the original file
+> boundary is between GetBMemPMgrBusy and SortTmdObject (the one edge the
+> soft signal does not flag), which would put the BasicClass tail above
+> with BMemPMgr.c; moving it is a split, which no tool does, so it stays
+> here.

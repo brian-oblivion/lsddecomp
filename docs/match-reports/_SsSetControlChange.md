@@ -512,3 +512,30 @@ with `offsetof(SsScore, unk2C/unk17)`: rewriting it as `rec->unk2C[o]` /
 `rec->unk17[o]` changed the allocation of the whole function (image red),
 while the same rewrite in cases 7 and 11 was byte-exact. Marked MATCHING in
 the source.
+
+## History (moved from src/libsnd_seqread.c, comments pass)
+
+The function comment's paragraph on its two load-bearing choices opened:
+
+> Two choices below are byte-load-bearing (round 69): SpuVmSetVol's first
+
+The forward declarations above _SsSetControlChange carried:
+
+> Forward declarations for sibling functions defined later in THIS unit's
+> ROM-address order. ContDataEntry's signature is this call site's own
+> reading; the rest are already established (matched, or from their own
+> STALL comments) elsewhere in this file.
+
+The declarations above _SsSetControlChange carried:
+
+> Cross-unit calls, local guesses per this project's convention (a prototype
+> for a function another unit defines stays in this .c). SpuVmDamperOn and
+> SsUtSetReverbDepth are Psy-Q libsnd (`vm_don`, `ut_rev`), linked from the
+> SDK objects since round 34 -- never write C for them.  So is
+> `SpuVmSetProgVol` (`libsnd/vm_prog`, 3.6), which was libsnd_vmanager.c's
+> matched func_800307F0 until the same round; SpuVmSetVol is still
+> INCLUDE_ASM
+> there, so its signature below is this call site's own reading -- a 5th
+> argument (the one spilling to the stack at 0x10($sp)) alongside the usual
+> "packed (slot<<8)|channel" first argument this file's siblings already
+> use.

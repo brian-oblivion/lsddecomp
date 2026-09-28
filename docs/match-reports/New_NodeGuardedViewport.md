@@ -98,3 +98,22 @@ status line "All 20 definitions here are matched, 0 INCLUDE_ASM", which
 `BMemPMgrAlloc(0xDC)` is `BMemPMgrAlloc(sizeof(NodeGuardedViewport))`:
 the struct ends at +0x0DC (`pad0BC[0x0DC - 0x0BC]`), and the image is
 byte-identical.
+
+## History (moved from src/TitleMenuTaskObjF.c, comments pass)
+
+The file's banner carried its edge evidence and the reason it is parked:
+
+> What decided its edges (python3 tools/tuboundary.py): it was five carve
+> slices (class_3bb8c_c, _d, _e, _f, _g), merged because a class straddled
+> each edge: TitleMenu the first ("start edge possible, soft-unlikely"),
+> TaskObjF the other three ("start edge possible", then "soft-unlikely"
+> twice). The file's end is real: the placed Sony object libapi/a51
+> follows, and it meets the forced boundary tuboundary notes there (jump
+> tables 0x80011594 / 0x80011628).
+>
+> PARKED: the start, after DayTaskStageMap.c, is "start edge possible" and
+> no class straddles it, but content says the file boundary lies one step
+> later, between GridCell and TitleMenu: DayTask's ctor makes the
+> NodeGuardedViewport and StageMap is GridCell's only maker. A split is a
+> new carve, not a merge or rename, so the carve edge stays and the file
+> is named for the two classes that make up the rest of it.

@@ -51,3 +51,13 @@ rewrote the banner to say only what the file holds:
   `INCLUDE_ASM` left.
 - The class has been declared once, in include/CdStream.h, since track 4
   (round 87).
+
+## History (moved from src/CdStream.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> the stream down from any state.
+>
+> The file's edges are Sony objects on both sides (libpress/vlc2 before,
+> libcd/c_002 after); tools/tuboundary.py finds no rodata anchor and no
+> forced boundary inside, so content decided it: one class, one file.

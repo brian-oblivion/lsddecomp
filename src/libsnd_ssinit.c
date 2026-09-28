@@ -9,22 +9,9 @@
  * (SpuVmInit), clears the mark-callback table and resets libsnd's globals. SsInit and
  * SsInitHot are its two one-line entry points, _SsInit(0) and _SsInit(1).
  *
- * Which object (nm over sdk/work/<disc>/elf/libsnd): on the 3.0 and 3.3
- * discs one ssinit.o holds, in this order, _SsInit, SsInit, SsInitHot,
- * SsSetTableSize, SsSetTickMode, _SsStart, SsStart, SsStart2, SsEnd,
- * SsQuit, _SsTrapIntrVSync and _SsSeqCalledTbyT_1per2 -- retail's order
- * exactly. 3.5 and 3.6 split it into ssinit.o, ssinit_c.o, ssinit_h.o,
- * sstable.o, sstick.o, ssend.o and ssquit.o, and their _SsInit (58 words)
- * and SsInit (12 words) are not retail's (83 and 8 words). Retail links
- * SsSetTableSize from the 3.5 sstable.o in the middle of the module, so
- * libsnd/ssinit is two files here: this one, and the libsnd/ssinit half of
- * src/libsnd_ssinit_libapi_counter.c after the sstable object.
- *
- * What decided its edges (python3 tools/tuboundary.py --unit): the placed
- * object libsnd/vm_vsu precedes it ("start edge possible") and the placed
- * object libsnd/sstable follows it; inside, both edges are "boundary
- * possible". No merge is possible: the neighbouring C unit is on the other
- * side of the sstable object.
+ * The rest of libsnd/ssinit is the first half of
+ * libsnd_ssinit_libapi_counter.c: retail links Sony's sstable object
+ * (SsSetTableSize) between the two.
  *
  * Data: _snd_openflag and _snd_ev_flag are pinned by name in
  * config/psyq-objects.ld. D_8006DC5C/D_8006DC6C are read only by _SsInit,

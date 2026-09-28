@@ -11,9 +11,6 @@
  * 3.3, renamed _SsSndCrescendo on 3.5 and 3.6. None is retail's build: its
  * text is 0x474 (3.0), 0x57C (3.3) and 0x2DC (3.5, 3.6) bytes against
  * retail's 0x3C0, so it cannot be linked.
- *
- * The unit's edges are Sony objects on both sides: libsnd/vm_doff before it,
- * libsnd/stop after it.
  */
 #include "common.h"
 #include "SsScore.h"

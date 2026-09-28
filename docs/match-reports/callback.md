@@ -744,3 +744,11 @@ bare-array form) rather than the original body's implicit-truncation
 decay, since the promoted body is read, not scored.
 
 NON_MATCHING body promoted, round 68.
+
+## History (moved from src/libcd_bios.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libcd_bios.c read:
+
+> NON_MATCHING: 30/56 words, length 1 short. Residue: instruction-selection
+> (retail computes &D_8006D8D8 unfolded inside the loop; this folds it)
+> (docs/match-reports/callback.md). Hand-derived.

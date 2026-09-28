@@ -10,16 +10,6 @@
  *   4. the read state machines, the queue's nodes, the file-table lookups;
  *   5. the blocking file calls.
  *
- * What decided its edges (tools/tuboundary.py, round 101). The rodata makes
- * parts 3, 4 and 5 one file with part 2: each was a carve unit whose start
- * edge is IMPOSSIBLE, because part 2's jump tables (0x80010810,
- * 0x80010828) lie after the strings of parts 3 and 5 (0x800107D8,
- * 0x800107F4). The edge between parts 1 and 2 is "boundary possible", and
- * the one forced boundary near it (tables 0x80010354 / 0x80010810) is
- * already met by the Sony objects before part 1, so content (one class)
- * joins them. The file starts after libc2/strcat and ends where
- * libcd_bios, Sony's libcd, begins.
- *
  * Part 2: CdDriver's request methods, open, close, seek, read and loadFile
  * (slots +0x044..+0x058 of gCdDriverMethods, with the empty slot +0x050)
  * and runRequestQueue (+0x068), which feeds the queued requests back to

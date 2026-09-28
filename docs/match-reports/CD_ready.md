@@ -314,3 +314,17 @@ similar ("something about `D_8006D8D8` accesses"), and the lever that
 helped one function did nothing for the other. Reverted immediately;
 `src/libcd_bios.c` confirmed back to its committed state
 (`build-and-verify.sh` clean, `git status` empty) before moving on.
+
+## History (moved from src/libcd_bios.c, comments pass)
+
+The comment above CD_ready's preserved `#if 0` body read:
+
+> Round 37 (echo): re-splice of the round-35 rebuild, verbatim, to confirm
+> the recorded 178/180 score before a permuter search -- per CLAUDE.md's
+> "build the inherited body before you trust its score" discipline. See
+> docs/match-reports/CD_ready.md for the full derivation; this is a
+> STALL (2 words short, both instances of a redundant `andi` mask after an
+> already-zero-extending `lbu` that GCC's instruction selection elides by
+> choosing the load's destination register directly). Restored to
+> INCLUDE_ASM per project rule -- no score short of byte-exact stays in
+> src/.

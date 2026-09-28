@@ -869,3 +869,18 @@ because splat names only addresses some asm references. Byte-identical.
 ## Track 6 (round 96, charlie)
 
 Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. The preserved body's `Rec16DAD4C` (0x10-byte records over `_svm_sreg`) is `SpuVoiceRegs`, one element of `SpuRegs.voice[24]` (the SPU register block at 0x1F801C00; `ObjDAD4` renamed `SpuRegs`). The activity walk reads `envx` (+0xC, the current envelope level); the dirty copy-out writes `voice[i].volL/volR/pitch/addr/adsr1/adsr2`; the tail's byte-offset stores are `keyOff[0..1]` (+0x18C, from _svm_okof1/64), `keyOn[0..1]` (+0x188, from _svm_okon1/22C) and `reverbOn[0..1]` (+0x198, from _svm_orev1/234). `SpuSetNoiseVoice` now comes from `<libspu.h>`. `Rec34HalfU2` (the 0x34-stride walk over `_svm_voice[].unk06`) is kept: it is the walk's own element type.
+
+## History (moved from src/libsnd_vmanager.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libsnd_vmanager.c read:
+
+> NON_MATCHING: 236/241 words, 5 words short. Residue: retail's
+> unconditional `move a2,v0`/`li t0,1`/`move a3,a0` do-while-style setup
+> before the count>0 loop, which this C's `for` does not reproduce (a
+> literal do-while conversion was tried and regressed hard, 236/241,
+> 93/241 raw match -> 233/241, 16/241 -- reverted), plus cosmetic
+> s0/s1 register-color swaps in phases 2-6. Round 48's frame-padding
+> lever and an `s32 count` fix (drop a spurious andi mask) already
+> applied; a permuter search (round 37) plateaued at 1578/2276 with no
+> candidate reaching zero (docs/match-reports/SpuVmFlush.md).
+> Hand-derived.

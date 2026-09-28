@@ -905,3 +905,15 @@ The unit banner was rewritten as documentation. Its previous text and the shared
  * "move the shared prelude up, do not duplicate" fix round 37 already
  * used here; declaration order carries no code. */
 ```
+
+## History (moved from src/libsnd_vmanager.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libsnd_vmanager.c read:
+
+> NON_MATCHING: 231/231 words, length exact, 223/231 raw, funcdiff
+> insertions 1 / deletions 1 (round 73). This is libsnd's SetAutoVol
+> (sdkname shape 0.99). Residue: in the pan split's `else` arm retail
+> copies the volume into $a1 first and multiplies THAT register (no
+> andi); this body multiplies the volume register directly and masks
+> val1 -- same residue as SetAutoPan below
+> (docs/match-reports/SetAutoVol.md).

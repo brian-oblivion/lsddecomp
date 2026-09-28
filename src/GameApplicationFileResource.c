@@ -3,16 +3,6 @@
  * the game's Application, and FileResource, the base of everything loaded
  * from a file, with the active-data-source layer and the data directory.
  *
- * Edges: libapi/a21 before and Sony's libc2/strcat after are placed objects.
- * tuboundary.py is silent inside ("boundary possible" at every gap, "start
- * edge possible" at the old code_1677c|code_171e0 carve edge), so content
- * decided, and it rules out that edge: the code after it opened with
- * GetGameApplicationMethods, and in every file of this game that defines a
- * Get<Class>Methods getter the getter closes its own class's methods. The
- * carve edge cut GameApplication off its getter, so the two units were
- * merged (round 101). Whether FileResource began a file of its own right
- * after the getter the binary cannot say, and no tool splits a unit.
- *
  * GameApplication (include/GameApplication.h, which documents the class):
  * its allocator and ctor, the RNG seed and initSystems overrides, then the
  * hooks Application__RunMainLoop calls, each with the helpers it uses:

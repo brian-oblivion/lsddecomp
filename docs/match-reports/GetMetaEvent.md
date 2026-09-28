@@ -670,3 +670,50 @@ channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
 `build/nonmatching/src/code_179d8_k.c.o` before/after).
+
+## History (moved from src/libsnd_seqread.c, comments pass)
+
+A comment inside the NON_MATCHING body, on the `volatile s32 *pbpm`, read:
+
+> Narrowed volatile lever (round 26 head ruling): only the
+> WORD-sized field needs to be volatile to defeat GCC's
+> div/mod fusion -- there is no load-width to get wrong for
+> a full-word read, so retail's plain `lh` for unk4A is
+> unaffected. See docs/match-reports/GetMetaEvent.md.
+
+The comment above this function's NON_MATCHING body in src/libsnd_seqread.c read:
+
+> NON_MATCHING: 211/213 words, length 2 SHORT. Residue: register-identity
+> re-read of rec->unk4A (retail's second divu re-reads it fresh via a
+> plain `lh`; this body keeps the first read's value live in a register)
+> (docs/match-reports/GetMetaEvent.md). Hand-derived -- reaches 211/213
+> via a narrowed `volatile` qualifier on the word-sized field only
+> (round 26 head ruling, ordinary C semantics defeating div/mod fusion,
+> not a banned register pin); round 35's permuter search (15862+
+> iterations) found no zero and never beat the base score, residue
+> marked permuter-exhausted.
+
+The function comment above GetMetaEvent carried this stall paragraph between its summary and its per-type notes:
+
+> STALL -- see docs/match-reports/GetMetaEvent.md. 2 words SHORT
+> (211/213, compiled length measured off build/src/libsnd_seqread.c.o since
+> funcdiff's word-match number is not trustworthy once length drifts).
+> First real diff at word 56 (`tools/funcdiff.py GetMetaEvent`), a
+> register-identity symptom: retail re-reads `rec->unk4A` fresh (a plain
+> `lh`) before EACH of the Set-Tempo rate recompute's two divisions; this
+> body keeps the first read's value live in a register instead. The
+> round-26 head's narrowed-`volatile` lever (only the WORD-sized
+> `rec->unk8C` field marked `volatile`, not the sub-word `unk4A`) closed
+> 18 of the 20 words this stalled at previously by defeating GCC's
+> div/mod fusion without retail's plain `lh` turning into `lhu`+widen.
+> The one remaining word resisted six further reshapes (see report) --
+> every one of them either had no effect or regressed.
+
+The declarations above GetMetaEvent carried:
+
+> Cross-unit calls, local guesses per project convention. SpuVmSeqKeyOff is
+> matched in libsnd_vmanager.c and already has this exact "(slot<<8)|channel"
+> single-argument reading in both libsnd_cres.c and libsnd_decre.c;
+> _SsSndNextSep is Sony's `libsnd/next`, linked from the SDK object since
+> round 34; this signature is the one libsnd_cres.c's matched C used
+> before the conversion.

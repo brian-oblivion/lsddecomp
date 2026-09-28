@@ -584,3 +584,15 @@ ReadDeltaValue's result; SeqPlay counts it down); `unk4C` read as a "note"
 at the SpuVm* call sites -- it is the VAB id (`SsUtGetProgAtr(vabId, prog,
 ...)`, and CC0 bank select stores it); the 0x2C byte read as "vol" -- it is
 the channel's program (SetProgramChange stores it).
+
+## History (moved from src/libsnd_seqread.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libsnd_seqread.c read:
+
+> NON_MATCHING: 62/70 words, length exact. Residue: register-identity
+> rename ($t0<->$a2 for the a0 copy kept live across the two calls,
+> $a3/$s1<->$t0 for the masked-a3 copy), not a logic or CFG difference
+> (docs/match-reports/NoteOn.md). Permuter candidate, semantics
+> reviewed round 66; its winning mutation (`return;` as
+> `do { return; } while (0);`) is in the report, not here: this body is
+> for the reader and the verified build never compiles it.

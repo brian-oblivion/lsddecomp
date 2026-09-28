@@ -739,3 +739,20 @@ Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`
 - `Tbl32E978` -> `VagAtr` (`_svm_tn`): `unk0`..`unk7` are prior, mode, vol, pan, center, shift, min, max; `unk16` is `vag`.
 - **Body correction.** The preserved body's note-range scan compared the note with `bendCurveUp`/`bendCurveDown`, i.e. +0xC/+0xD. Retail reads +0x6/+0x7 (`lbu $v0, 0x6($a0)` at 0x8002FC68 and `lbu $v0, 0x7($a0)` at 0x8002FC84), which are `VagAtr.min`/`max`; the scan now reads `entry->min`/`entry->max`. Measured by building the body live (`#if 1`, then reverted): 414 built words against retail's 387 both before and after the correction (the map puts SpuVmKeyOff at 0x8003013C either way), so the length residue is not this. The 402 figure in the NON_MATCHING header predates this measurement.
 - `Entry90902E8M` (`_ss_score`'s 0xAC-byte record) -> `include/SsScore.h`'s `SsScore`, which gains `unk12` (+0x12, the event's MIDI channel) and `unk4E[0x10]` (+0x4E, per-channel volume: controller 7 stores it and reset-all-controllers resets it to 0x7F in libsnd_seqread). The speed read becomes `s6->unk4E[s6->unk12]`.
+
+## History (moved from src/libsnd_vmanager.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libsnd_vmanager.c read:
+
+> NON_MATCHING: 414 built words vs 387 (measured round 96; an earlier
+> score read 402). Residue as recorded then: two independent
+> pieces -- an early-materialization scheduling point (~2-3 words) and a
+> mid-loop addressing-cost difference for D_8008EA26 and neighbors
+> (~10-12 words); round 48's frame-padding lever realigned the frame
+> byte-exactly without closing either. A permuter search (round 37)
+> plateaued at 12471/15053 across 51,596 iterations with no candidate
+> reaching zero (docs/match-reports/SpuVmKeyOn.md). Hand-derived; two
+> stale-symbol fixes applied per tools/stalesyms.py (round 37): the
+> renamed-to-SpuVmVSetUp call (was func_80032148) and D_8008EA0D, which
+> has no linker symbol of its own and is read through the already-linked
+> D_8008EA24 base pointer instead.

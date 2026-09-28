@@ -17,11 +17,6 @@
  *   StopTod, and ApplyTodFrame / ApplyTodPacket, which write a frame's
  *   packets into the parts.
  * - PlayTone, on the sound bank the ctor was given; LinkPeer / UnlinkPeer.
- *
- * What decided its edges (python3 tools/tuboundary.py): the edge before it,
- * after Entity__MoodCue129, is "start edge possible" and kept on content:
- * Entity (Entity.c) is TodActor's subclass, a different class, and this
- * file is TodActor whole, New_TodActor to GetTodActorMethods.
  */
 #include "common.h"
 #include <libgte.h>

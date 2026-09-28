@@ -133,3 +133,12 @@ channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
 `build/nonmatching/src/code_179d8_k.c.o` before/after).
+
+## History (moved from src/libsnd_seqread.c, comments pass)
+
+ContResetAll is live C and the image is byte-exact; the stale STALL comment above it read:
+
+> STALL -- see docs/match-reports/ContResetAll.md. length exact 51/51,
+> 49/51 raw word-match, residue is the project's settled commutative-
+> operand-order canonicalization class (2 words). Near-miss body preserved
+> in the report; #if 0 body kept here too so it travels with this .c.

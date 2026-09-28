@@ -74,3 +74,22 @@ The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Day
 
 Parameter `arg3` -> `syncDriver` (tier B), forwarded to the ctor: see
 DayTask__DayTask.md. The allocation is `sizeof(DayTask)` (0x50).
+
+## History (moved from src/DayTaskStageMap.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> What decided its edges (python3 tools/tuboundary.py): the start is
+> "start edge possible" after StageGrid.c, which follows the placed Sony
+> object libc2/rand; the binary is silent there and content keeps the two
+> apart (StageGrid's free lookups, then DayTask). The forced boundary noted
+> on DayTask's early gaps is the jump-table pair 0x80011290 / 0x8001140c,
+> whose interval runs from Sprite.c to DayTask__OnObjMNotify across placed
+> Sony objects, so it forces nothing here. Inside, it was four carve
+> slices (class_39e08, class_3ac78, class_3bb8c, class_3bb8c_b), merged
+> because a class straddled each edge: TimedTask the first (PlaySound and
+> the getter opened class_3ac78, "start edge possible"), StageMap the other
+> two ("start edge possible, soft-unlikely" at both). The end is "start edge
+> possible" before TitleMenuTaskObjF.c and nothing straddles it; see that
+> file's banner for why NodeGuardedViewport and GridCell, which content
+> would put here, sit there.

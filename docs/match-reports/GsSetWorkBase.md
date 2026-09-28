@@ -70,3 +70,11 @@ Posted to the broadcast for parallel naming.
 - Round 90 (track 8): `tools/unitfile.py rename code_2cc8c_e1 libgs_gs_124`.
   `tuboundary.py --unit code_2cc8c_e1`: "(after sony:libgs/gs_123): start edge
   possible"; both neighbours are placed objects, so no merge was possible.
+
+## History (moved from src/libgs_gs_124.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> Edges: both are placed Sony objects (libgs/gs_123 before, libgs/gs_111
+> after), so this file cannot merge with a neighbour; its extent is the
+> gs_124 slot of the archive's link order.

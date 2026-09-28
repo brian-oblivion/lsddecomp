@@ -139,3 +139,12 @@ Facts the header banner carried as derivation, kept here:
   at +0x020, which bounds it.
 - ScreenDims and InitSystems's drawSystem argument became DrawSystem's in
   round 87 (include/DrawSystem.h).
+
+## History (moved from src/Application.c)
+
+The file's banner carried its edge evidence:
+
+> Its edges are Sony's objects on both sides (libsnd/sspause before,
+> libgs/gs_104 after), so the file is the whole region; tools/tuboundary.py
+> (round 101) finds no rodata inside it that joins or splits anything, and
+> its seven functions are one class's.

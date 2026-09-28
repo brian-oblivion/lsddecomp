@@ -1029,3 +1029,28 @@ channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
 `build/nonmatching/src/code_179d8_k.c.o` before/after).
+
+## History (moved from src/libsnd_seqread.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libsnd_seqread.c read:
+
+> NON_MATCHING: 380/376 words, 4 LONG; 95/376 raw, frame exact (-0x108).
+> Residue: retail keeps the two dead `unused` values in a callee-saved
+> register ($s5, set and never read) where this body needs `volatile` stack
+> slots, and with $s5 free this build hoists the loop-invariant `a2 & 0x7F`
+> out of the first loop, which renumbers $s3-$s5 through the loops
+> (docs/match-reports/ContDataEntry.md). Hand-derived. Written for the
+> reader: the byte-shaped body's `dead[16]` frame pad and `volatile` on the
+> two `unused` locals are omitted here and kept in the report.
+
+The forward declaration of Snd_setVabAttr above ContDataEntry carried:
+
+> Snd_setVabAttr is defined later in this unit; its own definition fixes
+> this signature (round 49).
+
+The comment on DataEntryLocals, ContDataEntry's frame view, read:
+
+> SsUtGetProgAtr's fill at function entry. From +0x10 the SAME memory is
+> both the VagAtr buffer the unk29==2 loops hand to SsUtGet/SetVagAtr
+> (retail addresses it at sp+0x58 = list+0x10) and, with the 18 bytes
+> after it, the two by-value arguments of Snd_setVabAttr (round 69).

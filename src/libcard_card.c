@@ -10,10 +10,6 @@
  * its word 5 is an `addiu $a1,$zero,0x3F`, the form Sony's libcard
  * assembler emitted, which the pinned pipeline cannot produce (it emits
  * `ori`). The evidence is in docs/match-reports/_card_clear.md.
- *
- * Edges: both are placed Sony objects (libcard/c171 _card_info before,
- * libcard/a78 _card_write after), so this file cannot merge with a
- * neighbour.
  */
 
 #include "common.h"

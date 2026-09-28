@@ -293,3 +293,13 @@ channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
 `build/nonmatching/src/code_179d8_k.c.o` before/after).
+
+## History (moved from src/libsnd_seqread.c, comments pass)
+
+SetPitchBend is live C and the image is byte-exact; the stale STALL comment above its `#if 1` read:
+
+> STALL -- see docs/match-reports/SetPitchBend.md. length exact 44/44,
+> 36/44 raw word-match, first real diff at word 23: an independent value
+> (rec->unk4C) the compiler schedules earlier than retail does, not a
+> logic or CFG difference -- no if/else arm ordering applies here (see
+> report for the round-25 head lever's explicit negative answer).

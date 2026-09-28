@@ -261,3 +261,13 @@ channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
 `build/nonmatching/src/code_179d8_k.c.o` before/after).
+
+## History (moved from src/libsnd_seqread.c, comments pass)
+
+ContNrpn2 is live C and the image is byte-exact; the stale STALL comment above its `#if 1` read:
+
+> STALL -- see docs/match-reports/ContNrpn2.md. Compiled length EXACT
+> (82/82), 77/82 raw word-match, first real diff at word 40: a single
+> independent instruction (`sltiu`) the compiler hoists into a branch
+> delay slot one branch earlier than retail places it -- a pure
+> instruction-scheduling residue, not a logic or CFG difference.

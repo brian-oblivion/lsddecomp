@@ -10,10 +10,6 @@
  * time. `state` (enum CdStreamState) runs open -> SEEKING -> startRead ->
  * READING -> stop -> STOPPED -> restart -> IDLE and seeks again; close tears
  * the stream down from any state.
- *
- * The file's edges are Sony objects on both sides (libpress/vlc2 before,
- * libcd/c_002 after); tools/tuboundary.py finds no rodata anchor and no
- * forced boundary inside, so content decided it: one class, one file.
  */
 #include "common.h"
 #include <libcd.h>

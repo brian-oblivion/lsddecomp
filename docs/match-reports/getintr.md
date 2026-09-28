@@ -421,3 +421,31 @@ before the merge (unit names in them are the carve names).
  * kept local per the project's multiple-independent-local-views convention
  * -- see code_179d8_b.c's header comment for why no shared header. */
 ```
+
+## History (moved from src/libcd_bios.c, comments pass)
+
+The prototype of getintr, in the declarations above CD_vol, carried:
+
+> libcd_bios.c, MATCHED round 70
+>                                                                    (libcd getintr by its strings)
+
+The comment on copy8, getintr's inline helper, read:
+
+> 8-byte response copy with a null guard on dst (2.6.3 does not fold
+> `&array != NULL`).  It must be an INLINE FUNCTION, not a macro: as a
+> do{}while(0) macro every site swapped the dst and counter registers
+> (round 70); the inline's parameter pseudos give retail's allocation.
+
+The file's banner carried its edge evidence:
+
+> What decided its edges (python3 tools/tuboundary.py):
+>   - start: the object in front, libcd/sys, ends here ("start edge
+>     possible"), and getintr is bios.c's first function;
+>   - CD_sync and CD_vol, once the first functions of their own carve units,
+>     are proven to be the SAME file as what precedes them by the rodata
+>     ("start edge IMPOSSIBLE", strings 0x800109F8 > 0x80010984 and
+>     0x80010A38 > 0x80010984), so the three carve slices are merged here;
+>   - end: the placed object libcd/iso9660 follows cb_read.
+>
+> The history of the three carve slices this file was merged from is in
+> docs/match-reports/getintr.md, "File history".

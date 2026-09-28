@@ -33,18 +33,8 @@
  * TimBlockHeaderBytes), ModelDataHeader and SubBlockTable, the layouts of
  * TimBlockSrc's, ModelData's and TodSet's / TriggerWorld's buffers.
  *
- * What decided its edges (python3 tools/tuboundary.py): the placed object
- * libgs/gs_107 precedes it ("start edge possible") and Sony's libpress
- * (psyq_36654, from DecDCTReset) follows it ("start edge possible"), so
- * there is nothing to merge with. Inside, all 96 edges are "boundary
- * possible". The "forced boundary lies in this stretch" note on each of
- * them is the jump-table pair 0x80011290 / 0x8001140c, whose interval runs
- * from Sprite to DayTaskStageMap across many placed Sony objects, so it
- * says nothing about this file. PARKED: the content would split it (eleven
- * classes; BgLayer and MoviePlayer are not FileResources, and BgLayer sits
- * between Tod and ModelData), but a split is a new carve, not a merge or
- * rename, so the file keeps its carve edges and is named for what its
- * classes do together: graphics data loaded from files, and what draws it.
+ * The file holds more than one subject (BgLayer and MoviePlayer are not
+ * FileResources); where the original files inside it began is not known.
  */
 #include "common.h"
 #include <libgte.h>

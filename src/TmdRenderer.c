@@ -21,17 +21,8 @@
  * records, and the ndiv override setter. All GTE work goes through
  * include/gte.h's gte_* macros (Sony's names; never <inline.h>).
  *
- * What decided its edges (python3 tools/tuboundary.py --unit): the binary
- * forces no edge anywhere from BMemPMgr.c through this file ("boundary
- * possible" throughout). The soft signal calls every edge inside the
- * renderer "boundary unlikely (single-user data)", the old carve edge
- * between StoreSxyPolyG4 and StoreSxyPolyFT4 included (gTexturedFaceColor
- * and sDivClipWidth are read on both sides), so the two carve slices were
- * merged into this file. PARKED: the content says the original file
- * boundary is between GetBMemPMgrBusy and SortTmdObject (the one edge the
- * soft signal does not flag), which would put the BasicClass tail above
- * with BMemPMgr.c; moving it is a split, which no tool does, so it stays
- * here.
+ * The BasicClass part, which ends at GetBMemPMgrBusy, belongs with
+ * BMemPMgr.c; the renderer begins at SortTmdObject.
  */
 
 #include "common.h"

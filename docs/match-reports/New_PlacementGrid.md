@@ -206,3 +206,21 @@ function comments it shortened:
  * keeps `placement` in $a3 across the call (the round-76 match). The
  * occupant reads only (self, index); a function-pointer cast, no code. */
 ```
+
+## History (moved from src/PlacementGridVabSound.c, comments pass)
+
+The file's banner carried its edge evidence and the reason it is parked:
+
+> What decided its edges (python3 tools/tuboundary.py): the placed object
+> libc2/strncmp precedes it ("start edge possible"), and every edge inside
+> and at its end is "boundary possible", so the binary neither proves nor
+> forbids a file boundary anywhere here. Content decided: VabDriver's
+> methods straddled the old carve edge between code_179d8_d and
+> code_179d8_e (seven empty slots before it, the rest and the getter
+> after), which was a twenty-function carve window, so the two were merged.
+> The next file, libsnd_vmanager.c, opens on ServiceSoundCueSet, the third
+> SoundCueSet function, which belongs with Init/Flush below; it stays there
+> because Sony's voice manager starts one function later and no tool
+> splits a unit. PARKED: the content says a file boundary between
+> PlacementGrid (or ReturnZero) and VabDriver, and a split is a new carve,
+> so the file keeps both and is named for both.

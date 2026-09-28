@@ -312,3 +312,16 @@ The MOM paths:
  * format (per lsddecomp naming elsewhere in the project). Defined in
  * DreamAux.c, right before InitDreamAux which is their only reader. */
 ```
+
+## History (moved from src/DreamAux.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> What decided its edges (python3 tools/tuboundary.py): both are kept. The
+> one before it, after DreamSys.c, lies in a forced stretch ("a forced
+> boundary lies in this stretch: tables 0x80011848 / 0x8001188c", the jump
+> tables of DreamSys__InstanceEffectsOnJournal and
+> CheckDreamAuxTriggerCondition), and content puts the boundary there. The
+> one after it, before New_Entity, is "start edge possible" and content
+> decided: the DreamAux free functions end with PlaceDreamAuxEntityByPlayer
+> and a class, Entity, begins.

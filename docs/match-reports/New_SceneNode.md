@@ -77,3 +77,15 @@ Step 5 (comments): the unit banner was rewritten as documentation (lifecycle, ch
  * GsDOBJ2.attribute. Part 2 is SceneNode.c, part 3 code_d294_c.c.
  */
 ```
+
+## History (moved from src/SceneNode.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> Edges. The file starts after Sony's libgte/divgt4a and ends before the
+> head of the old psyq_GsLinkObject4 (0xF770). It was carved as three
+> slices (code_d294, _b, _c) and merged in round 101: tuboundary.py finds
+> no rodata crossing and no forced boundary anywhere in the stretch, calls
+> the first slice edge "boundary unlikely (single-user data)" and the
+> second "boundary possible", and the content is one class throughout, so
+> content decided the merge.

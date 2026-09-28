@@ -696,3 +696,31 @@ back before that function can build again.
    check for a forward declaration of it elsewhere in the same `.c`
    (`grep -n 'extern.*<func>' src/<unit>.c`) before assuming a clean
    build means no such declaration exists to conflict with.
+
+## History (moved from src/libsnd_seqread.c, comments pass)
+
+The function comment's second line read:
+
+> per-parameter handler, reached only from ContDataEntry (still a stall;
+> see its own report) via a double jump-table dispatch this unit owns
+
+The declarations above Snd_setVabAttr carried:
+
+> Both linked from Sony's `libsnd/adsr.o` (round 34) -- see
+> func_80035F3C.md / func_80035F98.md for the derivation of this shape,
+> fixed as those units' independent local views:
+
+Snd_setVabAttr is live C and the image is byte-exact; the stale STALL comment above its declarations read:
+
+> STALL (round 39, up from round 35's 163/179): 171/179 words match, zero
+> out-of-range drift, length EXACT (179/179 words). A permuter-found
+> simplification of case 12 (drop the named `s32 t = arg6 - 0x40;` local
+> entirely and recompute `arg6 - 0x40` inline at its one real use) closed
+> 8 of the 16 words round 35 left open -- see docs/match-reports/Snd_setVabAttr.md's
+> round 39 update. Every remaining diff (8 words) is the SAME register-
+> identity swap round 35 already found (this build keeps `channel` in $s2
+> and the cached `arg5` in $s3; retail has them the other way around) --
+> CLAUDE.md's register-identity STALL class, not a banned-fix target. Both
+> directions of "hoist through a fresh local" (channel, round 35; arg5,
+> round 39) are confirmed inert against it. See the match report for the
+> full derivation and the preserved near-miss body.

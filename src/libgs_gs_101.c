@@ -5,15 +5,9 @@
  * object in this image, so the function is matched as C; it counts as
  * library, not game code.
  *
- * What decided its edges (python3 tools/tuboundary.py): the placed object
- * libgs/gs_133 precedes it ("start edge possible"), and the placed object
- * libgs/gs_123 follows it. One function between two objects, so nothing to
- * merge with.
- *
  * Deliberately includes only common.h: its one caller, Viewport__Update,
  * declares it locally from LIBGS.H, and no shared header carries a Sony
- * prototype. The carve history is in docs/match-reports/GsSetNearClip.md,
- * "File history".
+ * prototype.
  */
 #include "common.h"
 

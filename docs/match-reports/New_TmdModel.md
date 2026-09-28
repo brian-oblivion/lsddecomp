@@ -87,3 +87,17 @@ re-sent track 7 pass, from the banner as it stood at `b7c5a68e^`).
   the unit's local TmdModel view was deleted for `include/TmdModel.h`.
 - **Jump table.** `TmdModel__NextPrimitive` owns `jtbl_80010354` (its
   mode `switch`).
+
+## History (moved from src/TmdModel.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> File edges: this is one whole original file. It lies between two placed
+> Sony objects, libgte/ratan before and libgs/gs_105 after, so both edges
+> are measured file edges; tools/tuboundary.py finds no rodata crossing and
+> no forced boundary inside it (the forced interval that starts at
+> TmdModel__NextPrimitive's jtbl_80010354 is closed by the gs_105 edge).
+> Content settles the rest: every function is TmdModel's or serves it.
+>
+> Tiers and match evidence for every function are in each function's own
+> docs/match-reports/ file; the unit's own history is in New_TmdModel's.

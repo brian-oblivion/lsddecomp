@@ -566,3 +566,13 @@ The NON_MATCHING body now reads `_svm_voice[a0].unk0E/unk16/unk12/unk14/unk0C`; 
 ## Track 6 (round 96, charlie)
 
 Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `Tbl32E978` was a local view of libsnd's `_svm_tn` (0x8008E978, pinned) and is `<libsnd.h>`'s `VagAtr`: `bendCurveUp` (+0xC) is `pbmin`, used when the bend is below 0x40, and `bendCurveDown` (+0xD) is `pbmax`, used above it. The preserved body now reads `D_8008E978[...].pbmax`/`.pbmin`. `D_8008EA18` is `_svm_cur + 0xC`, the current tone number.
+
+## History (moved from src/libsnd_vmanager.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libsnd_vmanager.c read:
+
+> NON_MATCHING: 77/138 words, length exact. Residue: register-class
+> renumbering plus one deferred `& 0xFFFF` mask on the second
+> note2pitch2 argument -- a banned-to-fix register-identity case, per
+> a permuter search that plateaued at 485/770 with no candidate reaching
+> zero (docs/match-reports/SpuVmPBVoice.md). Hand-derived.

@@ -589,3 +589,19 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 
 Return type is now Sony's `short` (`<libsnd.h>`: `short SsUtKeyOffV(short
 voice)`), byte-identical.
+
+## History (moved from src/libsnd_vm_vol_ut_key_ut_keyv.c, comments pass)
+
+The comment above SsUtKeyOffV read:
+
+> The "release channel" twin of SsUtKeyOff's else-branch above: same
+> _snd_ev_flag lock, same (mask0, mask1) split of a 0..0x17 channel across two
+> 16-bit mask words, same three per-channel field clears, same mask update.
+> MATCHED round 62 by writing it in exactly that sibling's idiom -- direct
+> global expressions with NO cached locals. Four earlier rounds carried four
+> cached locals here (old60/old64/e228/e22c) and filed the result as an
+> unreachable register-identity stall; the caching was the whole residue.
+> The only structural difference from the sibling is that the lock is
+> released BEFORE the mask block rather than after it (retail's
+> `sw zero, _snd_ev_flag` sits at 0x80031950, between the _svm_okon1 load and
+> the first `or`). See docs/match-reports/SsUtKeyOffV.md.

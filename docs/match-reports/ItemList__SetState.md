@@ -120,3 +120,28 @@ left for a pass that owns both units.
 ## Round 99 (delta, track 7)
 
 `state < 2` / `< 4` / `== 4` are `ITEMLIST_RESULT_CHOSEN`, `ITEMLIST_STATE_REPORT` (new in include/ItemList.h, value 4: the state that passes `result` to notifyParents; TickClosing enters it, as TextEntry's `TEXTENTRY_STATE_REPORT`). The gotos carry a `MATCHING:` line (see Notes).
+
+## History (moved from src/ObjMStyleActor.c, comments pass)
+
+The file's banner carried its edge evidence and the reason it is parked:
+
+> What decided its edges (python3 tools/tuboundary.py). The start edge is
+> kept because the binary forces a boundary in its stretch: the jump tables
+> of TextEntry__HandleCommand (0x80011628, TextEntryItemList.c) and
+> ItemList__HandleInputCode (0x800116f4, here) differ in parity ("a forced
+> boundary lies in this stretch: tables 0x80011628 / 0x800116f4"). The end
+> edge, before New_DreamSys, is kept for the same reason: ObjM__OnDreamSysNotify
+> (0x8001174c) and DreamSys__OnPadEvent (0x80011788) were in different files,
+> and this edge is the only gap left between them outside DreamSys's own
+> class. Inside, the file is ten old carve slices, class_3bb8c_k to _t, and
+> each of the nine edges between them cut a class: ObjM at k|l and l|m, the
+> style layer at m|n and n|r, StyleEffect at r|s and s|o, Actor at o|p and
+> VariantSprite at p|q and q|t. tuboundary calls each "start edge
+> possible", six of them soft-unlikely on single-user data (l|m, m|n, s|o,
+> o|p, p|q, q|t); content decided, so all ten were merged.
+> PARKED: the soft signal and the content agree that the game's files ended
+> after each Get<Class>Methods getter (GetItemListMethods, GetObjMMethods,
+> GetStyleEffectMethods or SetStyleEffectSources, GetActorMethods,
+> GetVariantSpriteMethods): those gaps are "boundary possible" between
+> "unlikely" ones. Those are content splits, a new carve each, so the file
+> keeps them all and is named for its main subjects.

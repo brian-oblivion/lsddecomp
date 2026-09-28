@@ -841,3 +841,10 @@ what the code is.
 ```c
  * SvmVoice: libsnd/vmanager.o bss +0x000, 24 voices x 0x10, 0x8008D7F0;
 ```
+
+## History (moved from src/libsnd_vmanager.c, comments pass)
+
+The declaration of _svm_sreg above SpuVmInit carried:
+
+> Declared without volatile, the spelling this unit's matched bodies were
+> derived against.

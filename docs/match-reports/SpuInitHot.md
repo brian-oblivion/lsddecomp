@@ -116,3 +116,14 @@ verbatim, as it stood before the rename.
  * nothing in this unit is game code.
  */
 ```
+
+## History (moved from src/libspu_s_ih.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> What decided its edges (python3 tools/tuboundary.py): the placed object
+> libsnd/stop precedes it ("start edge possible"), and the placed object
+> libspu/s_sm (SpuSetMute) follows it. One function between two objects,
+> so nothing to merge with.
+>
+> The carve history is in docs/match-reports/SpuInitHot.md, "File history".

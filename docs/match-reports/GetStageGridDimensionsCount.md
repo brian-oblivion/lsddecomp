@@ -58,3 +58,16 @@ It was true when written: all five functions (`GetStageGridDimensionsCount`,
 `GetStageGridDimensionsTable`, `GetStageGridDimensions`,
 `GetStageChunkFromMood`, `GetMoodFromStageChunk`) are matched, each with its
 own report.
+
+## History (moved from src/StageGrid.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> What decided its edges (python3 tools/tuboundary.py): the placed Sony
+> object libc2/rand precedes it ("start edge possible"), and the edge to
+> DayTaskStageMap.c is "start edge possible" too, with no soft signal and
+> no class across it, so the binary is silent and content keeps the stage
+> grid's lookups apart from DayTask. The forced boundary the tool notes on
+> every gap here is the jump-table pair 0x80011290 / 0x8001140c, whose
+> interval runs from Sprite.c across placed Sony objects, so it forces
+> nothing inside.

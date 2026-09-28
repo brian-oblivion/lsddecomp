@@ -148,3 +148,14 @@ channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
 `build/nonmatching/src/code_179d8_k.c.o` before/after).
+
+## History (moved from src/libsnd_seqread.c, comments pass)
+
+The comment above ReadDeltaValue read:
+
+> MATCHED -- see docs/match-reports/ReadDeltaValue.md. The `goto combine`
+> is load-bearing: retail keeps the "single-byte" and "loop-exit" `val`
+> writes as textually distinct arms reaching one merge point, and this
+> exact shape (jump-arm written explicitly, fallthrough-arm last in
+> source order) is what makes GCC 2.6.3 choose retail's own register for
+> both. See the round-25 head broadcast on if/else arm ordering.

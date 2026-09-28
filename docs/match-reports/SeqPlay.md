@@ -587,3 +587,46 @@ channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
 `build/nonmatching/src/code_179d8_k.c.o` before/after).
+
+## History (moved from src/libsnd_seqread.c, comments pass)
+
+The comment above SeqPlay read:
+
+> Catch-up scheduler tick.  When the re-armed counter is still reloading
+> its threshold (remain == 0) it copies the threshold rec->unk70 into the
+> counter.  The third parameter is unused; retail reuses its dead register
+> ($a2) to hold rec->unk70 for that store (round 69,
+> docs/match-reports/SeqPlay.md).
+
+The forward declaration of GetSeqData above SeqPlay carried:
+
+> Forward declaration for a sibling function defined later in THIS unit
+> (GetSeqData, still INCLUDE_ASM) -- called from SeqPlay's
+> catch-up loop below with the same (channel, slot) pair as every other
+> helper in this file; its own return/side effects are not yet
+> characterised since it has not been matched.
+
+The module declarations at the top of the file carried, on SpuVmKeyOn:
+
+> SpuVmKeyOn (round 76, was StartNote): Sony libsnd/vmanager INTERNAL,
+> no public LIBSND.H prototype (unlike SsUtKeyOn) -- kept byte-exact.
+
+The module declarations at the top of the file opened with:
+
+> Cross-unit calls, typed per-call-site from the registers loaded before
+> each `jal` -- none of these callees have an established prototype from
+> their own unit's side yet except where noted, so these are local
+> guesses, not authoritative.  Per this project's convention, a prototype
+> for a function ANOTHER unit defines stays in this .c, not in a shared
+> header.
+
+The file's banner carried its edge evidence:
+
+> Edges: this file is the whole module and nothing else. Its 18 functions
+> are seqread.o's 18, in seqread.o's order; their offsets equal the 3.3
+> build's through _SsSetControlChange and sit 0x7C below them after it
+> (3.0's and 3.5's differ from GetSeqData on), and the file is 0x1E04 bytes,
+> 3.3's 0x1E80 less those 0x7C. Before it: libsnd_play.c (libsnd/play.o),
+> where tuboundary.py reads "start edge possible" -- the rodata is silent,
+> and the edge is kept because play and seqread are separate objects in
+> every libsnd build. After it: libsnd/adsr, a placed Sony object.

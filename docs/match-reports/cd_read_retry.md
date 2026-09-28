@@ -1457,3 +1457,18 @@ whose string literals sit in that module's `$Id:` rodata block, is that
 module's code. Before revisiting any stall in a `code_179d8_*` unit, look at
 its neighbours in `config/psyq-objects.ld` and grep its `D_` strings'
 rodata block for a `$Id:` line.
+
+## History (moved from src/libcd_bios.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libcd_bios.c read:
+
+> NON_MATCHING: 215/223 words, length exact. Residue: two small isolated
+> clusters -- a loop-setup scheduling swap at 0x8002AABC (p2 computed from
+> $a0 before vs. after the move into $s5) and a register-identity swap in
+> the final D_8006D8F4=-1 block at 0x8002ADAC -- neither reachable by any
+> reorder or spelling variant tried (docs/match-reports/cd_read_retry.md).
+> Hand-derived structure (rounds 17-39); the n/saved throwaway-sink reuse
+> a few lines below is a permuter find (round 41) reviewed here and
+> confirmed sound (both are freshly written on every path before their
+> next read) against a rejected sibling candidate that hoisted a value
+> across a loop boundary unsoundly.

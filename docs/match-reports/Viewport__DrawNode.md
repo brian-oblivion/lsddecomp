@@ -204,3 +204,14 @@ them are "Levers" above):
 ```
 
 The extern's comment was `/* code_d294_c.c (include/SceneNode.h) */`, and `scr`'s was `/* never used; reserves retail's 8 unused frame bytes */`.
+
+## History (moved from src/ViewportDraw.c, comments pass)
+
+The file's banner carried its edge evidence and the reason for its name:
+
+> Edges: the file is exactly this one function, between two linked Sony
+> objects (_obj/malloc before it, libapi/c159 after it), so the binary puts
+> both edges there and there is no neighbouring game unit to merge with. The
+> rest of the Viewport class is in other files, well away from this one.
+> This file is named for what it holds, the Viewport's scene-graph draw, and
+> leaves the Viewport stem to the class header, include/Viewport.h.

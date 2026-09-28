@@ -29,3 +29,10 @@ allocator, methods and the three data tables followed the class name.
 The same tool run rewrote `Class879C4` tokens inside this report's older
 history prose (the known renametype behaviour pending an operator
 decision); those lines were left as the tool wrote them.
+
+## History (moved from src/ObjMStyleActor.c, comments pass)
+
+The comment above VariantSprite__Update said of the four empty leaves, `jr $ra; nop`:
+
+> VariantSprite's (include/VariantSprite.h) four empty leaves, `jr $ra; nop`
+> (splat matched them itself), and its table getter.

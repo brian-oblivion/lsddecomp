@@ -13,45 +13,30 @@
  * 3.5 it is the last function of vmanager.o. 3.6's text is 0x138 bytes
  * against retail's 0x20C, so it cannot be linked.
  *
- * What decided its edges (python3 tools/tuboundary.py --unit): the unit
- * before it, libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c, ends on
- * ut_autop's SsUtAutoPan ("start edge possible"; a Sony module edge by
- * content, so not merged), and the placed object libsnd/vm_vsu follows it.
- *
  * This file's declarations stay local, except Sony's _svm_voice, whose one
  * type is include/SvmData.h.
  */
 #include "common.h"
 #include "SvmData.h"
 
-/* libsnd_vmanager.c's own comment on this exact symbol: "written as a side
- * effect, then re-read from the global (not a cached register) a few
- * instructions later... Genuinely needs volatile: without it, this
- * compiler proves... the re-read is redundant and elides it entirely."
- * Independently re-confirmed here: the same store-then-reload shape shows
- * up in this function's own disassembly. */
+/* Written as a side effect, then re-read from the global a few
+ * instructions later: it needs volatile, or cc1 proves the re-read
+ * redundant and drops it. */
 extern volatile u16 D_8008EA26;
 
 /* "Loop bound / threshold" -- libsnd_vmanager.c's own comment on this symbol. */
 extern u8 spuVmMaxVoice;
 
 /*
- * This function's OWN reading of _svm_sreg: a POINTER VARIABLE (loaded with
- * `lw`, not an array base) into the PS1 SPU voice register block -- the value
- * is 0x1F801C00, established when libsnd_vmanager was named as the 24-voice
- * sound driver.  Indexed as HALFWORDS: `_svm_sreg[woff + N]` with
- * `s16 woff = i * 8`, i.e. 8 halfwords (0x10 bytes) per voice, which is the
- * SPU's own per-voice register stride.  libsnd_vmanager.c reads the SAME symbol
- * as a fixed-offset object pointer (its own SpuRegs, offsets 0x194/0x196) --
- * a different, valid reading per the project's convention.
+ * _svm_sreg as this function reads it: a pointer variable (loaded with `lw`,
+ * not an array base) to the SPU voice register block at 0x1F801C00, indexed
+ * as halfwords, `_svm_sreg[woff + N]` with `s16 woff = i * 8`: 8 halfwords
+ * (0x10 bytes) per voice, the SPU's own per-voice stride. libsnd_vmanager.c
+ * reads the same symbol as a pointer to its SpuRegs.
  *
- * ROUND 66: the POINTEE MUST BE `volatile`.  These are hardware registers, and
- * the qualifier is load-bearing for the MATCH, not just for correctness: cc1
- * 2.6.3 orders volatile accesses against other volatile accesses only, so
- * without it cc1 hoists the `D_8008EA26` volatile store/reload pair across
- * these six stores.  Worth 54/131 -> 98/131.  Round 31's `Rec16DAD4` struct
- * spelling (stride 0x10, fields f0..fA) is RETRACTED: it compiles the index as
- * a plain late `sll 4` instead of retail's split `sll 19` / `sra 15`.
+ * MATCHING: the pointee is volatile. cc1 orders volatile accesses only
+ * against other volatile accesses, so without it the D_8008EA26 store/reload
+ * pair is hoisted across these six stores.
  */
 extern volatile u16 *_svm_sreg;
 
@@ -64,17 +49,12 @@ extern u16 _svm_okof2;
 extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 
-/* STALL -- see docs/match-reports/SsUtAllKeyOff.md.  Round 66 revisit:
- * best-derived body now compiles to EXACT LENGTH (was 9 words SHORT);
- * raw word-match 103/131 (was 42/131); first real diff at vram 0x80032064
- * (file 0x22864) -- `sllv a3,t2,a0` vs `sllv a2,t2,a0`, a register-identity
- * residue on bitLo/bitHi.  Preserved here for the next attempt.  Note the
- * four load-bearing spellings: _svm_sreg's POINTEE is volatile (it holds
- * 0x1F801C00, the SPU voice registers) which is what pins cc1's scheduler;
- * `s16 woff = i * 8` (SIGNED) is what fuses into retail's sll19/sra15 split
- * shift; the loop is a `for`, not a guard plus `for(;;)`; and the tail does
- * three stores off the reloaded index, not one.
- */
+/* SsUtAllKeyOff's near-miss body, kept for reading: length exact, with a
+ * register-identity residue on bitLo/bitHi
+ * (docs/match-reports/SsUtAllKeyOff.md). Its load-bearing spellings:
+ * _svm_sreg's pointee is volatile; `s16 woff = i * 8` is signed, which gives
+ * the sll 19 / sra 15 pair; the loop is a `for`, not a guard plus
+ * `for(;;)`; and the tail does three stores off the reloaded index. */
 #if 0
 void SsUtAllKeyOff(void)
 {

@@ -10,15 +10,6 @@
  * functions as library by address, and they keep Sony's names and
  * <libsnd.h>'s prototypes.
  *
- * What decided its edges (python3 tools/tuboundary.py): the placed object
- * libsnd/vm_prog precedes it ("start edge possible") and the placed object
- * libsnd/ut_pb follows it ("start edge possible"), so there is nothing to
- * merge with. Inside, every edge is "boundary possible": the binary neither
- * proves nor forbids a file boundary. PARKED: the content says three files
- * (after SpuVmSetVol and after SsUtKeyOff, the 3.6 module edges), but that
- * split is a new carve, not a merge or rename, so the file keeps its carve
- * edges and is named for all three modules.
- *
  *   SpuVmSetVol  rescales every voice one sequence plays on a given VAB and
  *                program: voice level x the VAB's, the program's and the
  *                tone's volumes x the sequence's L/R volume (SsScore),
@@ -63,9 +54,8 @@ extern u16 *_svm_sreg;
 #define SPU_NOISE_ON_LO (0x194 / 2)
 #define SPU_NOISE_ON_HI (0x196 / 2)
 
-/* Reentrancy lock, same identifier/type as the sibling reading in
- * Sony's `SsSeqCalledTbyT` (`libsnd/sscall`, linked since round 34; it was
- * libsnd_decre.c's matched func_80033738) -- "if already busy, return/skip;
+/* Reentrancy lock, the same identifier and type as Sony's
+ * `SsSeqCalledTbyT` (`libsnd/sscall`) reads: "if already busy, return/skip;
  * set; ...; clear before returning" guarding a per-channel operation. */
 extern s32 _snd_ev_flag;
 
@@ -133,11 +123,9 @@ extern VabHdr *_svm_vh;
 extern s16 _svm_stereo_mono;
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 315/324 words, 9 words short; raw word-match 10/324,
- * insertions 76 / deletions 76 (re-measured round 70, unchanged since
- * round 62). Residue: one GCC CSE decision on the
- * `_svm_tn[_svm_voice[i].unk14]` address plus two loop-invariant
- * hoists (docs/match-reports/SpuVmSetVol.md). Hand-derived. */
+/* NON_MATCHING: 315/324 words, 9 words short. Residue: one GCC CSE
+ * decision on the `_svm_tn[_svm_voice[i].unk14]` address plus two
+ * loop-invariant hoists (docs/match-reports/SpuVmSetVol.md). */
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     SsScore *e;
     u8 i;
@@ -234,11 +222,9 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
 INCLUDE_ASM("asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv", SpuVmSetVol);
 #endif
 #ifdef NON_MATCHING
-/* NON_MATCHING: 252/252 words, length exact; raw word-match 65/252,
- * insertions 11 / deletions 11 (re-measured round 70). Residue: the
- * busy-lock guard's branch polarity, with the rest not re-characterised
- * since `--nop-at-expansion` closed the old length gap
- * (docs/match-reports/SsUtKeyOn.md). Hand-derived. */
+/* NON_MATCHING: 252/252 words, length exact. Residue: the busy-lock
+ * guard's branch polarity, and more not yet characterised
+ * (docs/match-reports/SsUtKeyOn.md). */
 s16 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
     ProgAtr *slot;
     VagAtr *rec;
@@ -381,11 +367,9 @@ fail_nolock:
 }
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 248/253 words, 5 words short (re-measured round 70).
- * Residue: the busy-lock guard's branch polarity and a second guard
- * flip; the 5-word gap is not re-characterised since
- * `--nop-at-expansion` closed 11 of the old 16
- * (docs/match-reports/SsUtKeyOnV.md). Hand-derived. */
+/* NON_MATCHING: 248/253 words, 5 words short. Residue: the busy-lock
+ * guard's branch polarity and a second guard flip
+ * (docs/match-reports/SsUtKeyOnV.md). */
 s16 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
     VagAtr *rec;
     u16 note;
@@ -476,14 +460,9 @@ INCLUDE_ASM("asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv", SsUtKeyOnV);
 /* The "release channel" twin of SsUtKeyOff's else-branch above: same
  * _snd_ev_flag lock, same (mask0, mask1) split of a 0..0x17 channel across two
  * 16-bit mask words, same three per-channel field clears, same mask update.
- * MATCHED round 62 by writing it in exactly that sibling's idiom -- direct
- * global expressions with NO cached locals. Four earlier rounds carried four
- * cached locals here (old60/old64/e228/e22c) and filed the result as an
- * unreachable register-identity stall; the caching was the whole residue.
- * The only structural difference from the sibling is that the lock is
- * released BEFORE the mask block rather than after it (retail's
- * `sw zero, _snd_ev_flag` sits at 0x80031950, between the _svm_okon1 load and
- * the first `or`). See docs/match-reports/SsUtKeyOffV.md. */
+ * MATCHING: written in that sibling's idiom, direct global expressions with
+ * no cached locals. Unlike the sibling it releases the lock before the mask
+ * block rather than after it. */
 s16 SsUtKeyOffV(s16 idx) {
     u16 chan;
     u32 mask0;
