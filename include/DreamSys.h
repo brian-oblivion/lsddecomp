@@ -333,7 +333,7 @@ typedef struct DreamSysEntityObj {
 } DreamSysEntityObj;
 
 /* DreamSys__TickDrift's per-tick addTranslation (+0x0BC) step. */
-extern LongVec3 DRIFT_STEP;
+extern LongVec3 sDriftStep;
 
 /* gProjectOffsetZ is the LAST word of an unnamed 3-word (LongVec3-shaped)
    global scratch vector; the other two words are NOT independently named

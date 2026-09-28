@@ -765,7 +765,7 @@ void DreamSys__ApplyPendingTurn(DreamSys *this) {
 
 void DreamSys__TickDrift(DreamSys *this) {
     if (this->driftActive != 0) {
-        this->methods->addTranslation(this, &DRIFT_STEP);
+        this->methods->addTranslation(this, &sDriftStep);
         this->viewport->refView.vr.y -= 600;
     }
     if (this->cueServiceActive != 0)
