@@ -39,7 +39,6 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <strings.h>
-#include "class_3bb8c.h"
 #include "TextEntry.h"
 #include "CharSprite.h"
 #include "TextRow.h"

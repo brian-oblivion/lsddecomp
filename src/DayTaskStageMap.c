@@ -65,7 +65,6 @@
 #include "GridCell.h"
 #include "FlatLightObj.h"
 #include "BMemPMgr.h"
-#include "class_3bb8c.h"
 
 /* The viewpoint and view-reference points DayTask__OnInit hands the
  * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000). */

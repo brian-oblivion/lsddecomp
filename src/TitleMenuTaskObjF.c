@@ -46,7 +46,6 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <strings.h>
-#include "class_3bb8c.h"
 #include "DreamSys.h"
 #include "SceneNode.h"
 #include "Actor.h"
@@ -229,7 +228,7 @@ void StampSaveTitleDay(s32 day) {
  * and the memory-card methods that drive `saveCtrl`, a TaskObjF, for SAVE
  * and LOAD. The header's banner describes the class.
  *
- * The data they share is in include/class_3bb8c.h: gSaveTitle, the
+ * The data they share is in include/TitleMenu.h: gSaveTitle, the
  * full-width save title the TextRow shows and the card save carries;
  * sSaveFileName; the card's name prefix and suffix table; and the colour
  * cycle's channel and frame counters.
