@@ -41,7 +41,7 @@ through to a shared tail: `unk_0xA0 = 1`, `unk_0x914++`, `return 0`.
 s32 DreamSys__TickStaircaseCase2(DreamSys *this)
 {
 	if (this->unk_0x914 == 0) {
-		DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_2, &this->unk_0x91C);
+		DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset2, &this->unk_0x91C);
 	}
 	if (this->unk_0xAC != 4) {
 		if (this->unk_0x914 < 0x65) {
@@ -83,7 +83,7 @@ All of this came in with the salvaged tree and is part of the match:
   as `DreamSys__ApplyRelativeOffset`'s `b` argument. Also carved out of that same 0x10-byte
   raw block, which is why the block's remainder is now
   `unknown_values_0x918[4]` plus `unknown_values_0x922[2]`.
-- **`STAIRCASE_OFFSET_2` (`struct RelativePos`)** — a constant, `DreamSys__ApplyRelativeOffset`'s `a`
+- **`sStaircaseOffset2` (`struct RelativePos`)** — a constant, `DreamSys__ApplyRelativeOffset`'s `a`
   argument.
 - **`sRotationYawPlus45` (`u8[]`)** — address-of only, never dereferenced here;
   forwarded as vtable slot `+0x044`'s (`SceneNode__UpdateRotation`) second argument. Same
@@ -109,4 +109,4 @@ error away from losing all of it.** See PARALLEL-RUNS §4b/§4c.
 
 ## Naming
 
-- **Tier B.** Table index 2 of the same sStaircaseTickFns family, against STAIRCASE_OFFSET_2; same evidence and caveat.
+- **Tier B.** Table index 2 of the same sStaircaseTickFns family, against sStaircaseOffset2; same evidence and caveat.

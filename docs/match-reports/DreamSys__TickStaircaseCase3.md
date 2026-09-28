@@ -61,7 +61,7 @@ additional coaxing.
 ## New knowledge
 
 - **`STAIRCASE_OFFSET_3`** (`struct RelativePos`), a third constant in the same table
-  as `DreamSys__TickStaircaseCase2`'s `STAIRCASE_OFFSET_2` and `DreamSys__TickStaircaseCase0`'s `sStaircaseOffset0`,
+  as `DreamSys__TickStaircaseCase2`'s `sStaircaseOffset2` and `DreamSys__TickStaircaseCase0`'s `sStaircaseOffset0`,
   passed as `DreamSys__ApplyRelativeOffset`'s `a` argument.
 - **`sRotationYawMinus45`**, another opaque forwarded-pointer constant for
   `vt->SceneNode__UpdateRotation`'s `arg2`, same shape as the already-known

@@ -366,20 +366,20 @@ extern s32 gProjectOffsetZ;
 
 /* A `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a` argument
    by DreamSys__TickStaircaseCase2 (round 2026-09-02). */
-extern struct RelativePos STAIRCASE_OFFSET_2;
+extern struct RelativePos sStaircaseOffset2;
 
 /* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
-   argument by DreamSys__TickStaircaseCase0 -- same call shape as STAIRCASE_OFFSET_2 above, just a
+   argument by DreamSys__TickStaircaseCase0 -- same call shape as sStaircaseOffset2 above, just a
    different constant (round 2026-09-02). */
 extern struct RelativePos sStaircaseOffset0;
 
 /* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
-   argument by DreamSys__TickStaircaseCase1 -- same call shape as sStaircaseOffset0/STAIRCASE_OFFSET_2
+   argument by DreamSys__TickStaircaseCase1 -- same call shape as sStaircaseOffset0/sStaircaseOffset2
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos sStaircaseOffset1;
 
 /* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
-   argument by DreamSys__TickStaircaseCase3 -- same call shape as STAIRCASE_OFFSET_2/sStaircaseOffset0
+   argument by DreamSys__TickStaircaseCase3 -- same call shape as sStaircaseOffset2/sStaircaseOffset0
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos STAIRCASE_OFFSET_3;
 

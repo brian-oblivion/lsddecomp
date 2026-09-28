@@ -62,7 +62,7 @@ if (this->unk_0x914 < 0x85) {
 This produced a function **2 words too long**, which (as `build exit=`
 correctly reported: the whole-image `make check` failed, not just this
 function) shifted every later linked address, including two unrelated,
-already-established data symbols (`sStaircaseOffset0`, `STAIRCASE_OFFSET_2`) that this same
+already-established data symbols (`sStaircaseOffset0`, `sStaircaseOffset2`) that this same
 function references — their `%lo` immediates read as wrong by exactly the
 same +8-byte delta as the size overshoot. This looked at first like a broken
 symbol/linker resolution (worth flagging: do not chase a linker mystery
@@ -95,7 +95,7 @@ This matched first try after the rewrite (62/62).
 
 - **`sStaircaseOffset0` (`struct RelativePos`)**, passed as `DreamSys__ApplyRelativeOffset`'s `a`
   argument by this function — same call shape as `DreamSys__TickStaircaseCase2`'s
-  `STAIRCASE_OFFSET_2`, just a different constant 0x10 bytes earlier in the same
+  `sStaircaseOffset2`, just a different constant 0x10 bytes earlier in the same
   table.
 - **Confirms and sharpens the branch-polarity lesson from
   `DreamSys__TimerTick`'s report this round**: it is not just "an `if`/`else`
@@ -110,7 +110,7 @@ This matched first try after the rewrite (62/62).
   a branch of an `if`/`else`.
 - **A whole-image size regression can manifest as an apparently-unrelated
   symbol-resolution mystery.** Two long-established data symbols
-  (`sStaircaseOffset0`/`STAIRCASE_OFFSET_2`, both already used correctly by the
+  (`sStaircaseOffset0`/`sStaircaseOffset2`, both already used correctly by the
   already-matched `DreamSys__TickStaircaseCase2`) appeared to resolve to addresses 8 bytes
   higher than their names once this function was 2 words too long — not a
   linker bug, just "the three ways a score lies" #3 (address drift) wearing
