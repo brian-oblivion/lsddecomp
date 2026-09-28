@@ -47,7 +47,7 @@
 #include "Actor.h"
 #include "LightRig.h"
 #include "TimedTask.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 #include "PlacementGrid.h"
 #include "LbdFile.h"
 #include "GridCell.h"

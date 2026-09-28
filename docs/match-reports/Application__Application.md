@@ -138,7 +138,7 @@ Facts the header banner carried as derivation, kept here:
 - Object size 0x20: no allocator, but GameApplication's ctor stores its argument
   at +0x020, which bounds it.
 - ScreenDims and InitSystems's drawSystem argument became DrawSystem's in
-  round 87 (include/DrawSystem.h).
+  round 87 (include/draw_system.h).
 
 ## History (moved from src/Application.c)
 

@@ -56,7 +56,7 @@
 #include "TileAtlas.h"
 #include "TmdModel.h"
 #include "LinkResource.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 #include "cd_stream.h"
 #include "MoviePlayer.h"
 #include "bmem_pmgr.h"

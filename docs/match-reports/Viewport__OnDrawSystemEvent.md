@@ -44,4 +44,4 @@ Renamed from `Unk18Obj__OnNotifyTag1`. Slot +0x098 `onNotifyTag1`, onNotify's Dr
 
 ## Track 7 (round 95, alpha, polish pass)
 
-Event 2 is the DrawSystem's per-VSync event, `DRAWSYSTEM_EVENT_VSYNC` on `main` since this round (include/DrawSystem.h); this branch predates it, so the literal is left and the swap is proposed to the head.
+Event 2 is the DrawSystem's per-VSync event, `DRAWSYSTEM_EVENT_VSYNC` on `main` since this round (include/draw_system.h); this branch predates it, so the literal is left and the swap is proposed to the head.

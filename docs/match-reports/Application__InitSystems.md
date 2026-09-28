@@ -73,7 +73,7 @@ typed it `s32`, and its one caller ignores $v0. Bytes unchanged.
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (gDrawSystemMethods unified). Byte-identical.
+The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/draw_system.h` (gDrawSystemMethods unified). Byte-identical.
 
 ## Track 7 (round 101, charlie)
 

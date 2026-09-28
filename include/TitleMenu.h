@@ -2,7 +2,7 @@
 #define TITLEMENU_H
 
 #include "TaskCore.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 
 /*
  * TitleMenu -- the menu over ETC\TITLE.TIM that the game returns to between

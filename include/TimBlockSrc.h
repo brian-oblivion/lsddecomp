@@ -2,7 +2,7 @@
 #define TIMBLOCKSRC_H
 
 #include "FileResource.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 
 /*
  * TimBlockSrc -- a FileResource data source (class id 0xF03, method table

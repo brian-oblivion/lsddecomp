@@ -159,7 +159,7 @@ Zero bytes changed.
 
 The unit-local view `UnkCObj_3bb8c_l` / `UnkCObjMethods_3bb8c_l` was deleted:
 it was the DrawSystem (IntermediateBaseInitArgs::drawSystem) seen through
-+0x07C, which include/DrawSystem.h has as `getDims(self, DrawRect *out)`
++0x07C, which include/draw_system.h has as `getDims(self, DrawRect *out)`
 returning `ScreenDims *`. The body now reads
 `drawSystem->methods->getDims(drawSystem, NULL)->w`, byte-identical. Its
 comment, moved here:
@@ -190,6 +190,6 @@ of the GsDOBJ2 attribute, where 1 is libgs's GsFOG (1<<3).
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
+The six per-class aliases of `ColorRgb` (include/draw_system.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
 
-Viewport's `ViewportSize` merged into DrawSystem.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.
+Viewport's `ViewportSize` merged into draw_system.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.

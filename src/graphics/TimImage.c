@@ -8,7 +8,7 @@
  * (TimImage__Upload, +0x078) and usually FileResource__FreeBuffer (+0x05C).
  * TimImage__GetTimInfo describes the file with Sony's GsGetTimInfo; Upload
  * sends its pixel block and, when the TIM carries one, its CLUT to the draw
- * singleton (include/DrawSystem.h) through the loadImage slot. The slots at
+ * singleton (include/draw_system.h) through the loadImage slot. The slots at
  * +0x07C..+0x094 are empty, and +0x098 only sets flag, which no code reads.
  *
  * RotateVramRectRight is not a TimImage method (no method table lists it): it
@@ -20,7 +20,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "FileResource.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 #include "TimImage.h"
 #include "bmem_pmgr.h"
 #include "GameApplicationFileResource.h"

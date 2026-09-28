@@ -122,7 +122,7 @@ The player is a MoviePlayer (`include/MoviePlayer.h`); Task.h's StreamTaskUnkB4O
 
 ## Track 6 (2026-09-27, round 99, runner bravo)
 
-`StreamTaskInitData` was a local spelling of DrawSystem.h's `DrawRect` (the same three words, and `sDefaultMovieFrame`, the fallback, was already `extern DrawRect` in both units that name it); it is deleted. `initData` (+0x0A8), the fifth parameter and `GetDefaultMovieFrame()` are `DrawRect`, so the allocation is `New_MoviePlayer(GetDefaultMovieFrame(), 0, 0)` with no cast. The struct copy is unchanged (both types are 12 bytes, 4-aligned). Byte-identical; `typeviews.py --warnings` 0 new. The getter and the data were renamed this round from `GetDefaultStreamTaskInitData`/`gDefaultStreamTaskInitData` (see GetDefaultMovieFrame.md).
+`StreamTaskInitData` was a local spelling of draw_system.h's `DrawRect` (the same three words, and `sDefaultMovieFrame`, the fallback, was already `extern DrawRect` in both units that name it); it is deleted. `initData` (+0x0A8), the fifth parameter and `GetDefaultMovieFrame()` are `DrawRect`, so the allocation is `New_MoviePlayer(GetDefaultMovieFrame(), 0, 0)` with no cast. The struct copy is unchanged (both types are 12 bytes, 4-aligned). Byte-identical; `typeviews.py --warnings` 0 new. The getter and the data were renamed this round from `GetDefaultStreamTaskInitData`/`gDefaultStreamTaskInitData` (see GetDefaultMovieFrame.md).
 
 ## History (moved from include/StreamTask.h, round 102)
 

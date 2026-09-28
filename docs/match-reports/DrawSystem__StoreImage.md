@@ -2,7 +2,7 @@
 
 > Renamed from `func_800209A0` on 2026-09-25 (tools/rename.py). Address 0x800209a0.
 
-Round 82, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha. Unit `src/graphics/draw_system.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x05C (`tools/classtable.py gDrawSystemMethods`), the
   sibling of DrawSystem__LoadImage (+0x058).
@@ -33,7 +33,7 @@ void DrawSystem__StoreImage(Class6C070 *self, u_long *pixels, Class6C070Rect *sr
 ```
 
 The declarations it needs are the unit-local `Class6C070`, `RECT` and
-`Class6C070Rect` view at the top of `src/graphics/DrawSystem.c` (reproduced in full in
+`Class6C070Rect` view at the top of `src/graphics/draw_system.c` (reproduced in full in
 `docs/match-reports/DrawSystem__LoadImage.md`), plus `DrawSync` and `ConvertRect`.
 
 ## Naming
@@ -45,4 +45,4 @@ mechanic alone rather than cross-unit agreement.
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
+The class is unified: its one definition is `include/draw_system.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.

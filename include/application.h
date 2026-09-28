@@ -2,7 +2,7 @@
 #define APPLICATION_H
 
 #include "basic_class.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 #include "IntermediateBase.h"
 
 /*
@@ -38,7 +38,7 @@ typedef struct Application Application;
 typedef struct ApplicationMethods ApplicationMethods;
 struct Pad; /* initSystems's pad: main()'s New_Pad(0, 0) */
 
-/* ScreenDims and DrawSystem are include/DrawSystem.h's. */
+/* ScreenDims and DrawSystem are include/draw_system.h's. */
 
 /* clang-format off */
 #define APPLICATION_SLOTS(Self, CtorParams)                                                         \

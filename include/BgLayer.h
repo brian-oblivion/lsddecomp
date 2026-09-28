@@ -40,7 +40,7 @@
  *
  * FIELDS: the GsBG, +0x044..+0x067; the object is 0x68 bytes (New_BgLayer).
  * `bgAttribute` because SceneNode's +0x010 (GsDOBJ2.attribute) already has
- * the name. r, g, b are one ColorRgb (include/DrawSystem.h): retail copies
+ * the name. r, g, b are one ColorRgb (include/draw_system.h): retail copies
  * them lb/lb/lb, sb/sb/sb (BgLayer__SetColor, BgLayer__Reset), a whole-struct
  * copy.
  *

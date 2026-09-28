@@ -75,7 +75,7 @@ Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, i
 
 ## Track 6 (2026-09-27, round 99, runner bravo)
 
-The fifth parameter is a `DrawRect *` (DrawSystem.h); `StreamTaskInitData`, its local spelling, is deleted (StreamTask__StreamTask.md). Byte-identical.
+The fifth parameter is a `DrawRect *` (draw_system.h); `StreamTaskInitData`, its local spelling, is deleted (StreamTask__StreamTask.md). Byte-identical.
 
 ## History (moved from src/Task.c, comments pass)
 

@@ -20,7 +20,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "DrawSystem.h"
+#include "draw_system.h"
 #include "gte.h"
 #include "TmdRenderer.h"
 

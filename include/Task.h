@@ -11,7 +11,7 @@
 #include "StreamTask.h"
 #include "Viewport.h"
 #include "MoviePlayer.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 #include "TextRow.h"
 
 /*

@@ -11,7 +11,7 @@
 #include "common.h"
 #include <libsnd.h>
 #include "basic_class.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 #include "WBgm.h"
 #include "bmem_pmgr.h"
 #include <stdio.h>

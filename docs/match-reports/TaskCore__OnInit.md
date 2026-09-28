@@ -168,7 +168,7 @@ bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj casts are g
 
 - `TaskTextObj`/`TaskTextMethods`, this unit's local view of
   `initArgs->drawSystem`, is retired: its only slot, `+0x078 slot78`, is
-  `DrawSystem::clearImage(self, color, rect)` (include/DrawSystem.h), which
+  `DrawSystem::clearImage(self, color, rect)` (include/draw_system.h), which
   TitleMenu__OnDeinit already calls through `DrawSystem *`. The calls now cast
   to `DrawSystem *`; byte-identical. The two clears are therefore: the
   default movie frame (`&sDefaultMovieFrame`, a DrawRect
@@ -217,4 +217,4 @@ to apply by type scope:
 
 TaskCore fields renamed (include/TaskCore.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.
 
-The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
+The six per-class aliases of `ColorRgb` (include/draw_system.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

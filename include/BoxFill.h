@@ -96,7 +96,7 @@ struct BoxFillPos {
     s32 y; /* +0x004 */
 };
 
-/* The box's colour, GsBOXF r, g, b, is a ColorRgb (include/DrawSystem.h):
+/* The box's colour, GsBOXF r, g, b, is a ColorRgb (include/draw_system.h):
  * what setColor copies into `color` (or adds to it when overwrite is 0), and
  * the ctor's (and Reset's) colour argument. A whole-struct copy is three
  * lb/sb pairs (BoxFill__ApplyColor, GraphRoom__BuildGraphPoints). The field

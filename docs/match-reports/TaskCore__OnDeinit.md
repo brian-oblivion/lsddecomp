@@ -119,7 +119,7 @@ bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj cast is gon
 
 - The `+0x078` call is `DrawSystem::clearImage(drawSystem, unk93, NULL)`,
   the whole screen cleared to `unk93` while `unk34` is set; the local
-  `TaskTextObj` view is retired for include/DrawSystem.h's type
+  `TaskTextObj` view is retired for include/draw_system.h's type
   (TaskCore__OnInit's report). Byte-identical.
 - `unk34` and `unk93` are also accessed by TitleMenuTaskObjF.c (TitleMenu__Reset,
   TitleMenu__OnDeinit) and Task.c, so they are proposed, not renamed:

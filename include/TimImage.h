@@ -20,7 +20,7 @@
  * describes the TIM in `buffer` (past its id word) into a GsIMAGE with
  * Sony's GsGetTimInfo; TimImage__Upload, at +0x078, describes it into `tim`
  * and uploads the pixel block and, when pmode bit 3 says there is one, the
- * CLUT through the draw singleton's loadImage (include/DrawSystem.h).
+ * CLUT through the draw singleton's loadImage (include/draw_system.h).
  *
  * How it is used, at every New_TimImage call site: New_TimImage(path) with
  * a ".TIM" path (the ctor requests the file), then +0x078 (upload), then
@@ -94,7 +94,7 @@ typedef struct DrawPoint {
 
 /* Rotates the VRAM rectangle `area` one column to the right, count times,
  * through the one-column scratch area at `scratch`. Not a TimImage method. */
-struct DrawRect; /* include/DrawSystem.h */
+struct DrawRect; /* include/draw_system.h */
 void RotateVramRectRight(struct DrawRect *area, s32 count, DrawPoint *scratch);
 
 #endif

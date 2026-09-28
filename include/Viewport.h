@@ -3,7 +3,7 @@
 
 #include "basic_class.h"
 #include "scene_node.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 
 /*
  * Viewport -- the object that renders a scene (class id 0x7, method table
@@ -30,7 +30,7 @@
  *
  * Children are cached by their class-id nibble (AddChild/RemoveChild): 1 is
  * the DrawSystem (gDrawSystemMethods, id 0x1), 4 a SceneNode, the node the view is
- * attached to. Each is typed by its class (include/DrawSystem.h,
+ * attached to. Each is typed by its class (include/draw_system.h,
  * include/scene_node.h).
  *
  * The ctor chains to BasicClass's first (GetBasicClassMethods()->ctor),

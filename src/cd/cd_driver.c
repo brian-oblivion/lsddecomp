@@ -43,7 +43,7 @@
 #include <libcd.h>
 #include "cd_driver.h"
 #include <libetc.h>
-#include "DrawSystem.h"
+#include "draw_system.h"
 #include <strings.h>
 #include "GameApplicationFileResource.h"
 #include "bmem_pmgr.h"

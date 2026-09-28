@@ -2,7 +2,7 @@
 #define STREAMTASK_H
 
 #include "TaskCore.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 
 /*
  * StreamTask -- class id 0x1130, method table gStreamTaskMethods, a TaskCore
@@ -86,7 +86,7 @@ enum StreamTaskState { STREAMTASK_STATE_SKIPPED = 18 };
  * movie time, as TaskCore's bound is seconds; no caller's value shows it. */
 #define STREAMTASK_FRAMES_PER_SECOND 15
 
-/* `initData` is a DrawRect (include/DrawSystem.h): the ctor's optional fifth
+/* `initData` is a DrawRect (include/draw_system.h): the ctor's optional fifth
  * (stack) argument, else GetDefaultMovieFrame()'s &sDefaultMovieFrame,
  * {x 640, y 0, w 320, h 240}, the rect the ctor also hands New_MoviePlayer
  * as the player's frame and TaskCore__OnInit clears. Copied whole (retail

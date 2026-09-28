@@ -3,7 +3,7 @@
 
 #include "basic_class.h"
 #include "cd_stream.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 
 /*
  * MoviePlayer -- CD-streamed, MDEC-decoded FMV playback (class id 0x70,

@@ -84,7 +84,7 @@ First build. DrawSystem is reached through a per-function methods view (the type
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (gDrawSystemMethods unified). Byte-identical.
+The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/draw_system.h` (gDrawSystemMethods unified). Byte-identical.
 
 ## Track 4 (2026-09-26, round 89)
 

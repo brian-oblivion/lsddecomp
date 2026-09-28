@@ -9,7 +9,7 @@ nm on the SDK objects). It is the starting list for phase 3's items
 Line numbers are as of commit b23bdf545 and drift; search for the name.
 
 **Verdict.** The function bodies are in good shape: one-line `MATCHING:`
-notes, Sony types under Sony's names, few raw casts. DrawSystem.c,
+notes, Sony types under Sony's names, few raw casts. draw_system.c,
 FlatLightObj.c, TimImage.c, Pad.c, cd_stream.c, application.c, StageGrid.c,
 TodActor.c, DayTaskStageMap.c, WBgm.c and ScreenWidgets.c's FadeBox code
 are close to release quality. The debt is in declarations, a few

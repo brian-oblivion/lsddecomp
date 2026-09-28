@@ -44,7 +44,7 @@ void LightRig__SetAmbientColor(LightRig *self, ColorRgb *rgb, s32 swap) {
 
 ## Types (track 10 debt pass, round 104, bravo)
 
-`ambient` and `rgb` are the one colour type `ColorRgb` (include/DrawSystem.h),
+`ambient` and `rgb` are the one colour type `ColorRgb` (include/draw_system.h),
 which the six per-class 3-byte colour types were merged into. Its channels
 are `u8`: the whole image builds byte-identical with u8 and with s8 members,
 so the signedness was never what the lb/sb copies needed (a whole-struct

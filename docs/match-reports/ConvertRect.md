@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020970` on 2026-09-25 (tools/rename.py). Address 0x80020970.
 
-Round 81, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
+Round 81, runner alpha. Unit `src/graphics/draw_system.c`. Fresh ground, no prior attempt.
 
 - **Where:** helper (not a table slot) (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** copies x/y/w from +0/+2/+4 and h from +8 of a source record into a RECT (lhu/sh pairs from plain s16 member copies).
@@ -21,7 +21,7 @@ void ConvertRect(RECT *dst, Class6C070Rect *src) {
 }
 ```
 
-The declarations it needs (unit-local view in `src/graphics/DrawSystem.c`; the class
+The declarations it needs (unit-local view in `src/graphics/draw_system.c`; the class
 structs start with `BASICCLASS_SLOTS`/`BASICCLASS_FIELDS` from
 `include/basic_class.h`, and the SDK externs are local copies of the
 LIBGPU.H/LIBGS.H prototypes):
@@ -52,4 +52,4 @@ ARE the purpose. Not a method (no table slot); the source struct's unknown
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
+The class is unified: its one definition is `include/draw_system.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.

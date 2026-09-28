@@ -20,12 +20,12 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Proposed names for symbols defined outside this unit
 
 Not renamed here -- both are defined in a unit this round did not touch, and
-one of them (`DrawSystem.c`) has a live matching runner this round
+one of them (`draw_system.c`) has a live matching runner this round
 (`GetDrawSystem`, per the round-82 broadcast: alpha finished it just before
 this pass started). Recorded as proposals for the head to apply with
 `tools/rename.py` once safe.
 
-- `GetDrawSystem` (defined `src/graphics/DrawSystem.c`, returns `Class6C070 *`): called
+- `GetDrawSystem` (defined `src/graphics/draw_system.c`, returns `Class6C070 *`): called
   here only as `addChild`/`removeChild`'s argument, registering `WBgm` as a
   child of that singleton for lifecycle notification -- the same pattern
   `DayTaskStageMap.c` and `TimImage.c` use it for. No WBgm-specific evidence for
@@ -148,7 +148,7 @@ extern u8 sSsSizeTableBuf[];
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
+The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/draw_system.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 

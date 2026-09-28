@@ -169,7 +169,7 @@ and 0x8008665C.
 - Locals `obj`/`ret` -> `drawSystem`/`fadeBox`: the init args' `drawSystem`
   and Viewport's `getFadeBox` result.
 - SubObjE's +0x07C `slot7C` -> `getDims`: the object is the init args'
-  `drawSystem`, and DrawSystem.h's +0x07C is `getDims` (DrawSystem__GetDims).
+  `drawSystem`, and draw_system.h's +0x07C is `getDims` (DrawSystem__GetDims).
 - `setUnk44(vp, 1200)`: decimal; Viewport.h says unk44 x unk48 is each
   buffer's packet area (default 2000) without settling which is the count, so
   the value keeps no name.
@@ -183,4 +183,4 @@ takes (both `{s32, s32}`). Byte-identical (`./build-and-verify.sh` OK).
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-Viewport's `ViewportSize` merged into DrawSystem.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.
+Viewport's `ViewportSize` merged into draw_system.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.

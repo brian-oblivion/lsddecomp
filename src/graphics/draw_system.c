@@ -1,5 +1,5 @@
 /*
- * DrawSystem: the game's screen and graphics singleton (include/DrawSystem.h).
+ * DrawSystem: the game's screen and graphics singleton (include/draw_system.h).
  * This file holds all of its methods, the table getter, and the
  * GetDrawSystem/SetDrawSystem accessors for the one instance.
  *
@@ -16,7 +16,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <libetc.h>
-#include "DrawSystem.h"
+#include "draw_system.h"
 #include "bmem_pmgr.h"
 
 extern DrawSystem *sDrawSystem; /* sdata: the singleton GetDrawSystem returns */

@@ -148,7 +148,7 @@ Read each named class's header first; its banner points to the units.
   `Viewport` (`src/app/Task.c`, its draw pass in `src/graphics/ViewportDraw.c`)
   renders a scene through libgs;
   `FrameClock` (`src/graphics/Sprite.c`) is the per-frame tick objects listen to; `Pad` (`src/app/Pad.c`)
-  turns the controller into button events; `DrawSystem` (`src/graphics/DrawSystem.c`)
+  turns the controller into button events; `DrawSystem` (`src/graphics/draw_system.c`)
   owns the screen and the VSync loop.
 - **The dream.** `DreamSys` (`src/world/DreamSys.c`) is the dream in progress: the
   dream clock, the player's movement, the mood record that picks the next

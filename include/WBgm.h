@@ -2,7 +2,7 @@
 #define WBGM_H
 
 #include "basic_class.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 #include "VabStreamObj.h"
 #include "RequestedFile.h"
 
@@ -21,7 +21,7 @@
  * played at once if `autoPlay`. Until then `openState` is WBGM_OPEN_WAITING
  * and the DrawSystem retries: the ctor adds the DrawSystem as a child, so
  * the DrawSystem's per-VSync notifyParents(self, DRAWSYSTEM_EVENT_VSYNC)
- * (include/DrawSystem.h) reaches onNotify, which forwards a DrawSystem
+ * (include/draw_system.h) reaches onNotify, which forwards a DrawSystem
  * sender (DRAWSYSTEM_CLASS_ID) to +0x040 update, which retries on that
  * event.
  *

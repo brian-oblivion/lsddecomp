@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020AF4` on 2026-09-25 (tools/rename.py). Address 0x80020af4.
 
-Round 81, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
+Round 81, runner alpha. Unit `src/graphics/draw_system.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x06C (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** ignores self; on the singleton GetDrawSystem() increments +0x24, and once it reaches +0x20 and +0xC is clear, sets +0xC = 1 and resets +0x24.
@@ -24,7 +24,7 @@ void DrawSystem__CountFrames(Class6C070 *self) {
 }
 ```
 
-The declarations it needs (unit-local view in `src/graphics/DrawSystem.c`; the class
+The declarations it needs (unit-local view in `src/graphics/draw_system.c`; the class
 structs start with `BASICCLASS_SLOTS`/`BASICCLASS_FIELDS` from
 `include/basic_class.h`, and the SDK externs are local copies of the
 LIBGPU.H/LIBGS.H prototypes):
@@ -62,12 +62,12 @@ through `->methods->` from within this unit; what calls it, and what the
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
+The class is unified: its one definition is `include/draw_system.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
 
 ## Track 7 (2026-09-28, round 101, alpha)
 
 Field `unkC` -> `countReached` (tier B, definition-only rename in
-`include/DrawSystem.h`; the compiler's error list named this function's two
+`include/draw_system.h`; the compiler's error list named this function's two
 accesses and nothing else, and `tools/check-nonmatching.sh` found no
 NON_MATCHING accessor). Evidence: this body sets it to 1, and restarts
 `frameCount`, once `frameCount >= vsyncCount` while it is still 0. No C

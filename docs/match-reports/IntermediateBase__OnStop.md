@@ -82,12 +82,12 @@ The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/c
 ## Track 7 (round 98, echo)
 
 initArgs->drawSystem is the DrawSystem, so the call is its +0x04C
-`stop` (DrawSystem__Stop, include/DrawSystem.h), not the unit-local
+`stop` (DrawSystem__Stop, include/draw_system.h), not the unit-local
 `slot4C`. Local `obj0` -> `drawSystem`. Byte-identical.
 
 The unit-local view these calls went through was removed; it read, verbatim
 (the only history in it is the "not established" claim, which Pad.h and
-DrawSystem.h have since settled):
+draw_system.h have since settled):
 
 ```c
 /* One local reading of the objects IntermediateBase calls outside

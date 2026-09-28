@@ -2,7 +2,7 @@
 #define FLATLIGHTOBJ_H
 
 #include "basic_class.h"
-#include "DrawSystem.h"
+#include "draw_system.h"
 
 /*
  * FlatLightObj -- one Psy-Q flat light, class id 0x6, method table
@@ -16,7 +16,7 @@
  * +0x010, and setColor/setDirection update the GsF_LIGHT and hand it by
  * address to GsSetFlatLight(lightId, &light). FlatLightParams is GsF_LIGHT's
  * layout (`int vx,vy,vz; unsigned char r,g,b;`, same offsets) with r,g,b
- * grouped as a ColorRgb (include/DrawSystem.h), which setColor's whole-struct
+ * grouped as a ColorRgb (include/draw_system.h), which setColor's whole-struct
  * copy needs;
  * src/graphics/FlatLightObj.c takes GsSetFlatLight from <libgs.h> and casts to GsF_LIGHT *.
  *

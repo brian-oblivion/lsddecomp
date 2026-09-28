@@ -2,7 +2,7 @@
 
 > Renamed from `new_class_6c078` on 2026-09-25 (tools/rename.py). Address 0x800206e0.
 
-Round 81, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
+Round 81, runner alpha. Unit `src/graphics/draw_system.c`. Fresh ground, no prior attempt.
 
 - **Where:** allocator (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** allocates 0x34 bytes with BMemPMgrAlloc and runs the ctor through the class table (GetDrawSystemMethods()->ctor); the broadcast alloc-then-ctor shape `if (p != NULL) { ctor; return p; } return NULL;`.
@@ -24,7 +24,7 @@ Class6C070 *New_DrawSystem(void) {
 }
 ```
 
-The declarations it needs (unit-local view in `src/graphics/DrawSystem.c`; the class
+The declarations it needs (unit-local view in `src/graphics/draw_system.c`; the class
 structs start with `BASICCLASS_SLOTS`/`BASICCLASS_FIELDS` from
 `include/basic_class.h`, and the SDK externs are local copies of the
 LIBGPU.H/LIBGS.H prototypes):
@@ -75,14 +75,14 @@ struct Class6C070Methods {
 ## Naming
 
 `New_DrawSystem`, tier A. The class is named `DrawSystem` this round (see
-`src/graphics/DrawSystem.c`'s header comment for the cross-unit evidence); the
+`src/graphics/draw_system.c`'s header comment for the cross-unit evidence); the
 `New_<Class>` allocator shape (alloc + call the ctor slot) is a pure
 mechanic, so once the class has a name the allocator's name follows by the
 project's own convention (`basic_class.h`; matches `New_WBgm`, round 81).
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
+The class is unified: its one definition is `include/draw_system.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
 
 ## History: the `src/code_10ee0.c` unit banner (moved here in round 101, track 7)
 

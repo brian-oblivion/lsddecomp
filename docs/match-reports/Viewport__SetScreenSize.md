@@ -63,4 +63,4 @@ Renamed from `Unk18Obj__SetUnk34`. Renamed for the field it stores: +0x034 is `s
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-Viewport's `ViewportSize` merged into DrawSystem.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.
+Viewport's `ViewportSize` merged into draw_system.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.

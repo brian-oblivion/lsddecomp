@@ -1,5 +1,5 @@
-#ifndef DRAWSYSTEM_H
-#define DRAWSYSTEM_H
+#ifndef DRAW_SYSTEM_H
+#define DRAW_SYSTEM_H
 
 #include "basic_class.h"
 
@@ -7,7 +7,7 @@
  * DrawSystem -- the game's screen/graphics singleton, class id 0x1, method
  * table gDrawSystemMethods, a direct BasicClass subclass (`tools/classtable.py
  * gDrawSystemMethods --vs gBasicClassMethods`: overrides only the ctor, adds seventeen
- * slots). Methods in src/graphics/DrawSystem.c; no class derives from it.
+ * slots). Methods in src/graphics/draw_system.c; no class derives from it.
  *
  * main() builds the one instance (New_DrawSystem) and hands it to
  * Application__InitSystems (Application), which stores it as the singleton
