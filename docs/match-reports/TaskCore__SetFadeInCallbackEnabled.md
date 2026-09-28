@@ -1,4 +1,6 @@
-# TaskCore__SetFadeCallbackEnabled — MATCH (14/14 words)
+# TaskCore__SetFadeInCallbackEnabled — MATCH (14/14 words)
+
+> Renamed from `TaskCore__SetFadeCallbackEnabled` on 2026-09-28 (tools/rename.py). Address 0x8003caf8.
 
 > Renamed from `Obj86B60__SetFadeCallbackEnabled` on 2026-09-25 (tools/rename.py). Address 0x8003caf8.
 
@@ -9,7 +11,7 @@
 ## What it does
 
 ```c
-void TaskCore__SetFadeCallbackEnabled(Obj86B60 *self, s32 a1)
+void TaskCore__SetFadeInCallbackEnabled(Obj86B60 *self, s32 a1)
 {
     Obj86B60Methods *methods;
 

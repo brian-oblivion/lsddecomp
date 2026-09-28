@@ -150,7 +150,7 @@ struct TaskCoreTarget {
     /* +0x090 */ void (*tick)(Self *self);                       /* TaskCore__ConfirmSlot: setState(0xB) */ \
     /* +0x094 */ void (*refreshViewValue)(Self *self);           /* TaskCore__Exit */  \
     /* +0x098 */ void (*setCallback)(Self *self, void (*callback)(void *ctx), void *ctx); /* TaskCore__SetCallback */ \
-    /* +0x09C */ void (*setFadeCallbackEnabled)(Self *self, s32 enable);    /* TaskCore__SetFadeCallbackEnabled */ \
+    /* +0x09C */ void (*setFadeCallbackEnabled)(Self *self, s32 enable);    /* TaskCore__SetFadeInCallbackEnabled */ \
     /* +0x0A0 */ void (*setFadeOutCallbackEnabled)(Self *self, s32 enable); /* TaskCore__SetFadeOutCallbackEnabled */ \
     /* +0x0A4 */ void (*setColors)(Self *self, u8 *base, u8 *clear, u8 *color96); /* TaskCore__SetColors */ \
     /* +0x0A8 */ void (*setFadeRate)(Self *self, s32 rate);      /* TaskCore__SetFadeRate */       \
@@ -255,7 +255,7 @@ void TaskCore__OnPadNext(TaskCore *self);
 void TaskCore__ConfirmSlot(TaskCore *self);
 void TaskCore__Exit(TaskCore *self);
 void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx);
-void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable);
+void TaskCore__SetFadeInCallbackEnabled(TaskCore *self, s32 enable);
 void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable);
 void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *clear, u8 *color96);
 void TaskCore__SetFadeRate(TaskCore *self, s32 rate);

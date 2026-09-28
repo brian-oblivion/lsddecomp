@@ -80,7 +80,7 @@ BASE SHAPE, not more search on this one, was needed.
 ## What it does
 
 The `self->unk8C` counterpart to `TaskCore__TickFadeInCallback`'s `self->unk88` (both set
-by `TaskCore__SetFadeOutCallbackEnabled`/`TaskCore__SetFadeCallbackEnabled` respectively). UNLIKE `TaskCore__TickFadeInCallback`,
+by `TaskCore__SetFadeOutCallbackEnabled`/`TaskCore__SetFadeInCallbackEnabled` respectively). UNLIKE `TaskCore__TickFadeInCallback`,
 this function's control flow has a genuine extra early-exit: if the
 callback returns 0, retail branches DIRECTLY to the shared epilogue,
 skipping the `slot60` call entirely, rather than reaching the same skip via

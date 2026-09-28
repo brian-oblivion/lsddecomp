@@ -527,7 +527,7 @@ void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ct
     self->viewCallbackCtx = ctx;
 }
 
-void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable) {
+void TaskCore__SetFadeInCallbackEnabled(TaskCore *self, s32 enable) {
     TaskCoreMethods *methods;
 
     methods = self->methods; /* MATCHING: loaded before the switch, on every path */

@@ -78,7 +78,7 @@ parameter either way) so the earlier match stays intact.
 **Residue 2: `self->methods` must be cached into a local BEFORE the
 `GetIntermediateBaseMethods()` call, or every `self->methods->slotNN` after it reloads
 from memory instead of reusing retail's single early `lw $s3,0($s2)`.**
-Same lesson as `TaskCore__SetFadeCallbackEnabled`'s report, but here the stakes are an entire
+Same lesson as `TaskCore__SetFadeInCallbackEnabled`'s report, but here the stakes are an entire
 missing callee-saved register (`s3`) and hence a wrong stack-frame size
 (`-0x20` instead of `-0x28`) rather than one extra word -- GCC cannot
 prove `self->methods` is unchanged across an opaque call, so without an
@@ -125,7 +125,7 @@ Two generalizable levers, both already present in the codebase but easy to
 under-apply on a function this size:
 1. **A shared "cache the vtable pointer" local is not optional once ANY
    call happens between two `self->methods->slotNN` uses** -- it is not
-   just a word-count nicety (as it looked in `TaskCore__SetFadeCallbackEnabled`, a 14-insn
+   just a word-count nicety (as it looked in `TaskCore__SetFadeInCallbackEnabled`, a 14-insn
    function) but can cost an entire callee-saved register and a wrong
    frame size on a larger function, which then reads as "everything after
    word 6 differs" rather than a narrow diff. Screen for this FIRST on any

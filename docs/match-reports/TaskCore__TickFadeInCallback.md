@@ -26,7 +26,7 @@ s32 TaskCore__TickFadeInCallback(Obj86B60 *self)
 }
 ```
 
-The consumer of `self->unk88` (set by `TaskCore__SetFadeCallbackEnabled`). Exactly the
+The consumer of `self->unk88` (set by `TaskCore__SetFadeInCallbackEnabled`). Exactly the
 "default value, then conditionally overwritten" idiom already documented
 in DECOMPILATION_LEARNINGS.md: the `beqz`'s delay slot sets `result = 1`
 UNCONDITIONALLY, then the taken call overwrites it. This IS this class's

@@ -8,7 +8,7 @@
 
 ## What it does
 
-Structurally identical to `TaskCore__SetFadeCallbackEnabled` (see that report for the residue
+Structurally identical to `TaskCore__SetFadeInCallbackEnabled` (see that report for the residue
 and its fix, applied directly here on the first attempt):
 
 ```c
@@ -35,7 +35,7 @@ to this class's own vtable slot `+0xC4` (external `TaskCore__TickFadeOut`).
 
 - `Obj86B60::unk8C` (`s32 (*)(Obj86B60*)`, +0x08C) -- OBSERVED here.
 - `Obj86B60Methods::slotC4` (+0x0C4, external `TaskCore__TickFadeOut`) -- read as
-  DATA here, same idiom as `TaskCore__SetFadeCallbackEnabled`'s `slotB0`.
+  DATA here, same idiom as `TaskCore__SetFadeInCallbackEnabled`'s `slotB0`.
 
 ## Provenance
 
@@ -44,7 +44,7 @@ round 2026-09-02, runner echo, unit Task. 1 attempt.
 ## Naming (round 78, delta)
 
 **Tier C.** `func_8003CB30` -> `Obj86B60__func_8003CB30`. Same
-enable/disable-toggle SHAPE as `TaskCore__SetFadeCallbackEnabled` immediately
+enable/disable-toggle SHAPE as `TaskCore__SetFadeInCallbackEnabled` immediately
 above (`self->unk8C = NULL` or `= methods->slotC4`), but `slotC4`'s occupant
 (`TaskCore__TickFadeOut`) is EXTERNAL -- not in this unit, its body has not been
 read here -- so unlike `unk88`/`TickColorFade` there is no basis to call this
