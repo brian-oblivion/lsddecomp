@@ -381,10 +381,10 @@ struct DreamSys {
     ACTOR_FIELDS(DreamSysMethods);
     /* +0x058 onward: DreamSys's own */
     /* Set by DreamSys__SetSoundObj(this, value): a VabStreamObj, cast to
-	   one where it is called through (include/VabStreamObj.h). */
+           one where it is called through (include/VabStreamObj.h). */
     s32 soundObj;
     /* The camera: set by DreamSys__SetViewport (and the ctor's arg3); see
-	   `struct Viewport` above for the refView fields this class moves. */
+           `struct Viewport` above for the refView fields this class moves. */
     struct Viewport *viewport;
     /* Set by the ctor to its `arg1`: the LinkResource its model 0 came
        from. Not read elsewhere. */
@@ -399,18 +399,18 @@ struct DreamSys {
     s32 moveOverride;
 
     /* Gate flag: DreamSys__BlockMovement sets it to 1; DreamSys__GetLinkCommandFlag reads it back;
-	   DreamSys__UpdateTickState skips its whole body while this is nonzero. */
+           DreamSys__UpdateTickState skips its whole body while this is nonzero. */
     s32 movementBlocked;
     /* Cleared to 0, then set to (tick % tickPeriod == 0) by
-	   DreamSys__UpdateTickState. */
+           DreamSys__UpdateTickState. */
     s32 linkCommandFlag;
     /* Cleared to 0 by DreamSys__func_59598; no other observed use. */
     s32 unk_0x78;
     /* Cleared to 0 by DreamSys__func_59590; no other observed use. */
     s32 unk_0x7C;
     /* Set by DreamSys__SelectCallback80(this, arg1): NULL when arg1==0, otherwise one of
-	   three vtable-slot function pointers selected by arg1 (1/2/3). Called
-	   with (this) by DreamSys__RunTickCallbacks, if non-NULL. */
+           three vtable-slot function pointers selected by arg1 (1/2/3). Called
+           with (this) by DreamSys__RunTickCallbacks, if non-NULL. */
     void (*lookCallback)(struct DreamSys *this);
     /* Set unconditionally to arg1 by DreamSys__SelectCallback80(this, arg1);
        no other observed use. */
@@ -454,9 +454,9 @@ struct DreamSys {
     /* "Previous"/paired value; see moveMode. */
     s32 previousMoveMode;
     /* Attempt/beat counter incremented (and bounded to [0,4)) by
-	   DreamSys__AdvanceMoveCycle on every call while moveCommand is nonzero; reset to 0 once
-	   moveCommand goes back to 0. Compared against 3 there to pick a +-50
-	   nudge applied to viewport->refView's vp.y and vr.y, and against 4 (together with
+           DreamSys__AdvanceMoveCycle on every call while moveCommand is nonzero; reset to 0 once
+           moveCommand goes back to 0. Compared against 3 there to pick a +-50
+           nudge applied to viewport->refView's vp.y and vr.y, and against 4 (together with
        moveMode) to force moveCommand back to 0. */
     s32 moveCycleTick;
     /* Derived from `linkTarget->flags36` masked to 0x7F, or forced to
@@ -561,7 +561,7 @@ struct DreamSys {
        by 1 at that function's normal exit. */
     s32 staircaseFrame;
     /* See PlayerSpawnGridPos's own comment -- the `chunk`+`tile` half of a
-	   PlayerSpawnPoint whole-struct-copied here by DreamSys__TryStaircaseLink. */
+           PlayerSpawnPoint whole-struct-copied here by DreamSys__TryStaircaseLink. */
     PlayerSpawnGridPos staircaseGridPos;
     /* A `struct RelativePos`, address-taken and passed to DreamSys__ApplyRelativeOffset as
        its `b` argument (DreamSys__TickStaircaseCase2). */

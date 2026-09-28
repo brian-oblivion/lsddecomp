@@ -119,7 +119,61 @@ TRACK9_ITEMS = {
     "docs-budget": "every doc within its word budget",
     "nonmatching-clean": "tools/check-nonmatching.sh green",
 }
-CHECK_ITEMS = {"5": TRACK5_ITEMS, "6": TRACK6_SETUP, "7": TRACK7_SETUP, "9": TRACK9_ITEMS}
+# Phase 3 (plan revision 41, 2026-09-28): the tree is ready to publish.
+# Each track is an ordered checklist; an item is (done-when, model, after).
+# model: "opus"/"sonnet" is a runner job, "premium" a head setup item, None
+# an operator decision the head records. An item is ready once every item in
+# `after` is ticked; a track opens when the one before it is done.
+_DEBT = ("second pass on readability.py debt in {}: unk/slot/rawoff/m2c/func_/D_ named where the "
+         "accessors show what they are, literals named only when they mean more than their value")
+_DOCS = "every header {} documented per track 12 (apidoc.py clean for them), no process text"
+_SRC = "{}: .c comments per track 12, long banners split into class and function docs, no process text"
+PHASE3 = {
+    "10": ("declarations and conventions", {
+        "prototypes": ("every function and global declared once, in the defining file's header or Sony's "
+                       "(add include/psyq/libapi.h from the SDK disc for the BIOS and card calls), with the "
+                       "definition's types; no unit re-declares a header's name", "opus", ()),
+        "conventions": ("Get<Class>Methods not Get_vtable_, self not this, guards <NAME>_H, no s-prefixed "
+                        "extern in a header, the review's misleading names and typos renamed", "opus", ()),
+        "sony-code": ("src/psyq/ on Sony's names (libcd's CD_* globals, _SpuInit, _ss_MarkCallback) and "
+                      "Sony's headers; its #if 0/#if 1 blocks in the NON_MATCHING form or gone", "opus", ()),
+        "tabs": ("no tab in src/ or include/ outside .inc files, and `make format` fails on one",
+                 "sonnet", ()),
+        "debt-app-cd": (_DEBT.format("src/app and src/cd"), "opus", ("prototypes", "conventions")),
+        "debt-graphics": (_DEBT.format("src/graphics"), "opus", ("prototypes", "conventions")),
+        "debt-world": (_DEBT.format("src/world"), "opus", ("prototypes", "conventions")),
+        "debt-ui-sound": (_DEBT.format("src/ui and src/sound"), "opus", ("prototypes", "conventions")),
+    }),
+    "11": ("file names", {
+        "files-setup": ("unitfile.py renames a type-named file's stem (paths only, no token rewrite) and a "
+                        "header with no unit; proven byte-identical on one of each", "premium", ()),
+        "file-names": ("every game file in src/ and include/ snake_case and named for what it holds, no "
+                       "concatenated names; README's code map follows", "opus", ("files-setup",)),
+    }),
+    "12": ("documented API", {
+        "apidoc-setup": ("tools/apidoc.py (per header: undocumented prototypes, missing @param, process-text "
+                         "hits in include/ and src/ comments) and a Doxyfile", "premium", ()),
+        "api-a-e": (_DOCS.format("A to E"), "opus", ("apidoc-setup",)),
+        "api-f-o": (_DOCS.format("F to O"), "opus", ("apidoc-setup",)),
+        "api-p-s": (_DOCS.format("P to S"), "opus", ("apidoc-setup",)),
+        "api-t-z": (_DOCS.format("T to Z, and common.h, types.h, gte.h"), "opus", ("apidoc-setup",)),
+        "src-app-cd": (_SRC.format("src/app and src/cd"), "opus", ("apidoc-setup",)),
+        "src-graphics": (_SRC.format("src/graphics"), "opus", ("apidoc-setup",)),
+        "src-world": (_SRC.format("src/world"), "opus", ("apidoc-setup",)),
+        "src-ui-sound-psyq": (_SRC.format("src/ui, src/sound, src/psyq and src/main.c"), "opus", ("apidoc-setup",)),
+    }),
+    "13": ("publish", {
+        "readme": ("README: what the code is, the layout, how to build, verify and change it while "
+                   "keeping it matching", "opus", ()),
+        "lint": ("one disc-free lint (make format check, apidoc.py, readability.py) runnable as CI",
+                 "opus", ()),
+        "licence": ("the operator's licence decision, recorded in PROGRESS.md", None, ()),
+        "process-docs": ("the operator's decision on docs/, CLAUDE.md and one-off tools, applied", None,
+                         ("readme",)),
+    }),
+}
+PHASE3_ITEMS = {k: {i: v[0] for i, v in items.items()} for k, (_, items) in PHASE3.items()}
+CHECK_ITEMS = {"5": TRACK5_ITEMS, "6": TRACK6_SETUP, "7": TRACK7_SETUP, "9": TRACK9_ITEMS, **PHASE3_ITEMS}
 TABLE_NAME = re.compile(r"^g[A-Z]\w*Methods$")
 
 DEFAULT_STATE = {
@@ -136,6 +190,7 @@ DEFAULT_STATE = {
         "7": {"status": "auto", "reason": "", "checklist": {}, "units_done": {}},
         "8": {"status": "auto", "reason": "", "parked": {}},
         "9": {"status": "auto", "reason": "", "checklist": {}},
+        **{k: {"status": "auto", "reason": "", "checklist": {}} for k in PHASE3},
     },
 }
 
@@ -144,6 +199,23 @@ DEFAULT_STATE = {
 FUNC_PH = re.compile(r"^(?:\w+__)?func_(?:800)?[0-9A-Fa-f]{5}$")
 DEF_RE = progress.DEF_RE
 NOT_DEF = {"if", "while", "for", "switch", "do", "return", "sizeof"}
+
+
+def phase3_status(tr, prev):
+    """Each phase-3 track opens when the one before it is done and, once an
+    item is ticked, stays open beside a reopened earlier track (as track 9)."""
+    out = {}
+    for k, (title, items) in PHASE3.items():
+        tk = tr[k]["checklist"]
+        if tr[k]["status"] != "auto":
+            s = tr[k]["status"]
+        elif prev != "done" and not any(tk.values()):
+            s = f"waiting (opens when track {int(k) - 1} is done)"
+        else:
+            s = "done" if all(tk.get(i) for i in items) else "open"
+        out[k] = {"status": s, "title": title, "checklist": {i: bool(tk.get(i)) for i in items}}
+        prev = s
+    return out
 
 
 def load_state():
@@ -862,6 +934,7 @@ def collect_phase2(st, info, t5_status, classes, units_meta):
               "orphan_headers": orphans8},
         "9": {"status": s9, "checklist": {k: bool(ticked9.get(k)) for k in TRACK9_ITEMS},
               "history": rd["totals"]["history"] + rd["totals"]["header_history"]},
+        **phase3_status(tr, s9),
         "_class_jobs": class_jobs, "_homes": homes, "_types": types, "_todo7": todo7,
         "_after": {n: fs for n, fs in t6.get("after", {}).items() if n in flagged},
         "_units": {n: us for n, us in t6.get("units", {}).items() if n in flagged},
@@ -1341,7 +1414,20 @@ def jobs(d, n):
         # globals is a mechanical rename list: Sonnet (revision 39)
         q9 = [("9", f"{k}: {TRACK9_ITEMS[k]}", "sonnet" if k == "globals" else "opus")
               for k, done in t["9"]["checklist"].items() if not done]
-    queues = [q_fresh, q_naming, q_stall, q_sdk, q_revisit, q_promote, q_types, q_close, q6, q7, q8, q9]
+    q3 = []
+    for k, (_, items) in PHASE3.items():
+        if t[k]["status"] != "open":
+            continue
+        ck = t[k]["checklist"]
+        for i, (desc, model, after) in items.items():
+            if ck[i] or not all(ck[x] for x in after) or model is None:
+                continue
+            if model == "premium":
+                q3.append((k, f"HEAD (premium) setup {i}: {desc} (FINISHING-PLAN track {k})",
+                           MODELS["head_when_new_procedure"]))
+            else:
+                q3.append((k, f"{i}: {desc}", model))
+    queues = [q_fresh, q_naming, q_stall, q_sdk, q_revisit, q_promote, q_types, q_close, q6, q7, q8, q9, q3]
     order = []
     while any(queues):
         for q in queues:
@@ -1486,7 +1572,14 @@ def print_status(d, n, st):
     c9 = t9["checklist"]
     print(f"  9      {t9['status'].split(' (')[0]:<10} close-out: {sum(c9.values())}/{len(c9)} items ticked; "
           f"{t9['history']} history mention(s) left in comments")
-    for k in ("6", "7", "8", "9"):
+    print("  -- phase 3: the tree is ready to publish (revision 41)")
+    for k in PHASE3:
+        ck = t[k]["checklist"]
+        left = [i for i, v in ck.items() if not v]
+        ops = [i for i in left if PHASE3[k][1][i][1] is None]
+        print(f"  {k:<6} {t[k]['status'].split(' (')[0]:<10} {t[k]['title']}: {sum(ck.values())}/{len(ck)} "
+              f"items ticked" + (f"; operator decision: {', '.join(ops)}" if ops else ""))
+    for k in ("6", "7", "8", "9", *PHASE3):
         if t[k]["status"].startswith("waiting"):
             print(f"         track {k}: {t[k]['status']}")
     print()

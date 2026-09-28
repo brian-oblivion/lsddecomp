@@ -6,6 +6,56 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-28 — premium session: plan revision 41, phase 3 (the tree is ready to publish)
+
+Operator: every track is done, but measured debt has no track, the file
+names should be snake_case, the headers should be documented API
+(Doxygen), and the long process comments should go. A six-area read-only
+review of the finished tree came first, one reviewer per area:
+`docs/research/release-review-2026-09-28.md`, grouped by the item that
+fixes each finding.
+
+- **What the review found.** Bodies are in good shape. The debt is in
+  declarations: BMemPMgrFree has two return types, SoundCueSet and GameFiles
+  have three prototypes each, and about 18 BIOS and card calls have no
+  declaration at all because include/psyq has no libapi.h. There are
+  convention splits (13 `Get_vtable_X` against 46 `GetXMethods`, `this` in
+  DreamSys.c and Entity.c) and names the code has outgrown (FileResource's
+  `setFlag` is every subclass's on-loaded hook, MoviePlayer's `Stop`
+  rewinds). Sony's names are recoverable for 12 libcd globals (366
+  references), `_SpuInit` and `_ss_MarkCallback`. The headers read as
+  analysis, not API: 1134 prototypes, 240 with an adjacent comment, no
+  `/**` anywhere.
+- **Measured before ruling.** Of the 884 `magic` hits, 588 are in Entity.c,
+  and they are mood-cue script data (frame numbers, tick intervals, VAB
+  programs). Naming those would read worse than the literals. So magic is
+  not a target, and track 10 states the rule instead. There are no game
+  source names in the executable (only Sony's `sys.c`, `bios.c`,
+  `intr.c`), so nothing ties the tree to CamelCase. The tabs are 10 lines in
+  DreamSys.h's comments, which clang-format cannot reach
+  (`ReflowComments: Never`, and `UseTab: Never` was already set). They are
+  expanded, and `make format` now fails on a tab; item `tabs` is ticked.
+  Comment words: headers 3.1 per code word, game .c files 0.6.
+- **Phase 3, four checklist tracks** in plan.py's `PHASE3`, each item one
+  runner job on §4.7's prompt (now generic, "item runner"):
+  - 10: declarations and conventions (`prototypes`, `conventions`,
+    `sony-code`, `tabs`, then four per-area debt passes);
+  - 11: file names (a premium `files-setup`, because unitfile.py cannot yet
+    change a type-named file's stem or rename a header with no unit; then
+    `file-names`);
+  - 12: documented API (a premium `apidoc-setup` for tools/apidoc.py and a
+    Doxyfile; then four header and four .c-comment items);
+  - 13: publish (`readme`, a disc-free `lint`, and two operator decisions:
+    `licence` and `process-docs`).
+
+  Tracks run in order, because file renames and documentation churn every
+  line the earlier tracks touch.
+- **Tracks 6 to 9 and prompts 4.8 to 4.10 archived** verbatim
+  (`docs/archive/FINISHING-PLAN-tracks-6-9-2026-09-28.md`, 2428 words). The
+  plan is at 3.4k of 5.6k words with phase 3 in it.
+
+---
+
 ## 2026-09-28 — round 102: track 9 done, every track done (premium head, plan revision 40)
 
 Premium head (Opus 5.5), cap 5: six jobs, five Opus and one Sonnet, none

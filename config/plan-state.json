@@ -345,6 +345,28 @@
       ],
       "status": "open"
     },
+    "10": {
+      "checklist": {
+        "tabs": true
+      },
+      "reason": "",
+      "status": "auto"
+    },
+    "11": {
+      "checklist": {},
+      "reason": "",
+      "status": "auto"
+    },
+    "12": {
+      "checklist": {},
+      "reason": "",
+      "status": "auto"
+    },
+    "13": {
+      "checklist": {},
+      "reason": "",
+      "status": "auto"
+    },
     "1b": {
       "reason": "",
       "rounds": [

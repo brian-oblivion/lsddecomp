@@ -180,6 +180,9 @@ clean:
 
 format:
 	clang-format -i $$(find src include -name '*.c' -o -name '*.h' | grep -v -e include/psyq -e include/include_asm.h)
+	@# clang-format never touches comment text (ReflowComments: Never), so a tab there survives it
+	@! grep -nP '\t' $$(find src include -name '*.c' -o -name '*.h' | grep -v -e include/psyq -e include/include_asm.h) \
+		|| { echo "format: tab characters above (clang-format cannot fix tabs inside comments)"; exit 1; }
 
 expected: check
 	rm -rf expected/build && mkdir -p expected && cp -r $(BUILD_DIR) expected/
