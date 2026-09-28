@@ -417,3 +417,12 @@ what the code is.
  * class_3bb8c.h -- the data and shared helper declarations of the units
  * carved from the old class_3bb8c segment. The classes those units hold
 ```
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+        /* MATCHING: `end` from `cells` before `cursor = cells`, or the load
+         * of slot->cells no longer goes through $v0. */
+```

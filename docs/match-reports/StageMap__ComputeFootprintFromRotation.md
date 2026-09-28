@@ -833,3 +833,22 @@ retail's compare).
 ## Round 97 (alpha): Sony's SVECTOR
 
 GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/scene_node.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+/* The flat grid's window, from the target's cell and its y rotation: a
+ * window aheadCells deep along whichever of x and z the target faces
+ * (within 45 degrees), starting at the target's cell and running the way it
+ * faces, and acrossCells wide, centred on the target and shifted by the
+ * off-axis part of a gridSpan-long facing vector, in cells, kept inside half
+ * the grid. The window goes to BuildFootprintRects as footprintCol/Row and
+ * footprintWidth/Height. MATCHING: the (u16) casts are retail's lhu. */
+```
+
+```c
+    /* Facing +-x, then facing +-z. MATCHING: the second test is retail's; the
+     * two cover every angle. */
+```

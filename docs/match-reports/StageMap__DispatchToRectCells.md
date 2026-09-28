@@ -451,3 +451,17 @@ an operator decision; not hand-reverted).
 Moved here from the `.c` comment: "Notify every cell of every rectangle, and every object chained behind each cell. Matched round 71: the ORDER of the comma-separated increments is load-bearing in both loops (`entry++, i++` and `cell++, col++`); the reverse order was the whole 95/117 residue." The comment keeps the description and a `MATCHING:` line. Locals `entry` -> `rect`, `obj` -> `chained`; `20` is `STAGE_CHUNK_CELLS`.
 
 Measured this round: writing the `*(u16 *)&self->curCell = *(u16 *)&self->targetCell` copy as two byte stores (`curCell.b0 = targetCell.base.b0; curCell.b1 = ...b1`) breaks the image, so the halfword copy carries a `MATCHING:` line.
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+/* Notify every cell of every rectangle, and every object chained behind
+ * each cell, with the cell's key in curCell while it is notified.
+ * MATCHING: the comma increments go `rect++, i++` and `cell++, col++`. */
+```
+
+```c
+                    /* MATCHING: b0/b1 as one halfword; two byte copies are two lb/sb */
+```

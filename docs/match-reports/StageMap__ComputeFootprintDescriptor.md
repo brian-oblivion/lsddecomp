@@ -642,3 +642,22 @@ The comment that stood above the function in `src/world/dream_day.c`, moved here
  *      placement schedules its `sw` too early; only trailing it after the
  *      h8 store reproduces retail's order. */
 ```
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+/* The descriptor of world position `pos`: the slot holding it, that slot's
+ * chunk index and column/row, the chunk's centre, the position relative to
+ * it, and the cell column/row and the offset from the cell's centre. Returns
+ * 0, or 1 when no slot holds the position.
+ * MATCHING: cellCol/cellRow re-read the stored bytes, the half cell sits
+ * inside the subtracted group, and `out->slot` is stored last. */
+
+include/stage_map.h, on SplitLongVec3: "computeFootprintDescriptor's world position: each word is read whole (the
+cell) and, later, as its low halfword (the offset), which is why each is a union: retail reloads at the narrower
+width."
+
+include/stage_map.h, on SplitCoord2: "MATCHING: the unions; retail reloads tx/tz at the narrower width." 
+```

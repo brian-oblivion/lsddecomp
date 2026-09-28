@@ -257,3 +257,21 @@ commented at the site. Re-measured by deleting it alone: the image went red
 after `sw v0,0x1c(s1)` to directly after the `getProximityRatio` call's delay
 slot, above `sw v0,0x10(s1)`. Same registers, instruction order only -- the
 same finding as row 9b above.
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+    /* The do/while(0) wrapper is a no-op scoping device, load-bearing for
+     * register allocation only -- see the match report. Without it GCC
+     * swaps which callee-saved register holds `self` vs `out` for the
+     * whole function. */
+    do {
+```
+
+```c
+            /* Keeps the `li` of v1 = 110 below the out->slots[0].program store; without it
+             * GCC schedules it above the out->attenuation store, right after the call. */
+            __asm__("");
+```

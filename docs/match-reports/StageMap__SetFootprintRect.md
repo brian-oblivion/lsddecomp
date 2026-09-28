@@ -764,3 +764,15 @@ an operator decision; not hand-reverted).
 ## Track 7 (2026-09-27, round 98, charlie)
 
 Moved here from the `.c` comment: "Clamp a span x span footprint centred on desc's cell to the 20 x 20 grid: a cell on the low edge (0) loses one row/column, one on the high edge (0x13) loses one too. The edge tests read a COPY of each byte taken before the decrement, and the height companion is `span` itself. Matched round 71." The comment keeps the description and a `MATCHING:` line for the two load-bearing shapes; `0x13` is `STAGE_CHUNK_CELLS - 1`. Zero bytes.
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+/* Clamp a span x span footprint centred on desc's cell to the chunk's
+ * STAGE_CHUNK_CELLS x STAGE_CHUNK_CELLS lattice: a cell on the low edge (0)
+ * or the high edge loses one row/column there.
+ * MATCHING: the edge tests read copies taken before the decrement, and the
+ * height is `span` itself. */
+```

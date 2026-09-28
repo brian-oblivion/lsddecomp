@@ -1,34 +1,11 @@
 /*
- * dream_day.c -- the dream day's task and the stage map it builds: DayTask,
- * RegisterRecordTableFiles, TimedTask (DayTask's parent, and ObjM's) and
- * StageMap, in that ROM order.
- *
- * DayTask (include/day_task.h), New_DayTask through GetDayTaskMethods: the
- * task GameApplication__RunDayTask runs for one dream day. Its ctor loads
- * the day's shared resources (ETC\ETC.TIM, ETC\DREAMER.TMD, the week's
- * BGM) and fills the init args' viewport (a NodeGuardedViewport), frame
- * clock and light rig (a StageMap); on each DrawSystem VSync
- * DayTask__AdvancePhase starts the day or replaces the running ObjM, and
- * DayTask__OnObjMNotify turns ObjM's states into the next phase or the
- * task's result.
- *
- * RegisterRecordTableFiles: registers sRecordTable's file entries with the
- * CD driver in at most two batches (DayTask's ctor, and the loader-task
- * callback in game_shell.c).
- *
- * TimedTask (include/timed_task.h), New_TimedTask through
- * GetTimedTaskMethods: an IntermediateBase with a frame timeout, a sound
- * object and a result.
- *
- * StageMap (include/stage_map.h, whose banner describes the class),
- * New_StageMap through GetStageMapMethods: the loaded part of a stage's
- * map, seven chunk slots each laid out as a lattice of GridCells. Its
- * methods fall in three runs, each introduced below: life and the command
- * path; placing, loading and querying the slots; the drawn window and the
- * scale ramp. Its data tables and SplitCoord2 are in include/stage_map.h.
- *
- * NodeGuardedViewport and GridCell, which DayTask and StageMap use, are
- * defined in title_menu.c.
+ * dream_day.c -- the dream day's task and the stage map it builds, in
+ * address order: DayTask (include/day_task.h), RegisterRecordTableFiles
+ * (include/dream_day.h), TimedTask, DayTask's and ObjM's parent
+ * (include/timed_task.h), and StageMap (include/stage_map.h). Each class's
+ * header says what it is and how it lives; StageMap's methods fall in three
+ * runs, each introduced below. NodeGuardedViewport and GridCell, which
+ * DayTask and StageMap use, are defined in src/ui/title_menu.c.
  */
 #include "common.h"
 #include <libgte.h>
@@ -61,32 +38,34 @@
  * setting its slotIndex: no slot (-1), the whole 20 x 20 cells from (0, 0). */
 extern CellRect sFullSlotRect;
 
-/* The default "enable every element" spec table SetTargetAndLoadChunks
- * passes to buildRateEntries: seven entries, every `flag` nonzero. */
+/* The spec table SetTargetAndLoadChunks passes to loadChunksAround: seven
+ * entries, every `load` nonzero, so every slot is (re)loaded. */
 extern ChunkSlotSpec sDefaultTargetSpecs[7];
 
-/* Indexed by ChunkSlotSpec::key in StageMap__LoadChunksAround: the world
- * offset of that neighbour's cellParent from the centre position. Unsized:
- * `key` is the caller's byte. */
+/* Indexed by neighbour key (ChunkSlotSpec::neighbour) in
+ * StageMap__LoadChunksAround: the world offset of that neighbour's
+ * cellParent from the centre position. Unsized: the key is the caller's
+ * byte. */
 extern LongVec3 sNeighbourOffsets[];
 
-/* `key`-indexed bitmask table (`1 << key`) StageMap__ComputeChunkLoadEntry
- * tests against ComputeNeighbourMask's result. */
+/* CHUNK_NEIGHBOUR_BIT(key) for each neighbour key: what
+ * StageMap__ComputeChunkLoadEntry tests against ComputeNeighbourMask's
+ * result. */
 extern const s32 sNeighbourBits[7];
 
-/* `key`-indexed chunk-index steps to the seven chunks around a centre chunk
- * (ChunkNeighbourDelta, include/stage_map.h). */
+/* The chunk-index steps to the seven chunks around a centre chunk, by
+ * neighbour key (ChunkNeighbourDelta, include/stage_map.h). */
 extern const ChunkNeighbourDelta sChunkNeighbourDeltas[7];
 
-/* LbdFile::ownerKey-indexed remap, read signed by
- * StageMap__UpdateFootprintTracking (01 02 03 00 04 05 06 00). The byte
- * (0..6) is UpdateFootprintTracking's return value and the index into
- * sFootprintResultPtrTable. */
+/* Indexed by the neighbour key (LbdFile::elemKey) of the slot holding the
+ * target, read signed by StageMap__UpdateFootprintTracking (01 02 03 00 04
+ * 05 06 00). The byte (0..6) is UpdateFootprintTracking's return value and
+ * the index into sFootprintResultPtrTable. */
 extern const s8 sFootprintResultRemap[8];
 
 /* 7 pointers, the first NULL, the rest to 4-word tables of ChunkSlotSpecs
  * (seven 2-byte entries, padded): UpdateFootprintTracking passes the
- * selected one to buildRateEntries as its spec table, as
+ * selected one to loadChunksAround as its spec table, as
  * SetTargetAndLoadChunks passes sDefaultTargetSpecs. */
 extern ChunkSlotSpec *sFootprintResultPtrTable[7];
 
@@ -112,9 +91,7 @@ DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32
 
 void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys,
                       s32 syncDriver) {
-    /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
-     * frame by 8. */
-    ResourceRequest req;
+    ResourceRequest req; /* MATCHING: mode is never set; a bare ResourceSource shrinks the frame */
     char *vabPath;
 
     GetTimedTaskMethods()->ctor((TimedTask *)self, GetSoundEffectDir(0), 0);
@@ -218,9 +195,6 @@ void DayTask__OnDeinit(DayTask *self) {
     vp->methods->detachViewChild(vp);
 }
 
-/* onDrawSystemEvent: on each DrawSystem VSync, starts the day's first ObjM
- * (READY) or replaces the ObjM a link state ended (REPLACE_OBJM). A day
- * startDay refuses ends at once. */
 void DayTask__AdvancePhase(DayTask *self, BasicClass *sender, s32 event) {
     s32 result;
 
@@ -305,10 +279,6 @@ DayTaskMethods *GetDayTaskMethods(void) {
 extern s32 sRecordRegisterCalls;
 extern s32 sRecordFirstBatchCount;
 
-/* Registers sRecordTable's records with the CD driver, retrying until it
- * accepts them. The first call registers the whole table when `all` is set,
- * else its first half; the second call registers the rest; any later call
- * registers nothing. */
 s32 RegisterRecordTableFiles(s32 all) {
     s32 count;
     CdFileEntry *table;
@@ -407,28 +377,17 @@ void TimedTask__SetTimeout(TimedTask *self, s32 timeout) {
 }
 
 /*
- * TimedTask's last two functions, then the front third of StageMap's
- * methods.
- *
- * This third holds the object's life and its command path: the allocator
- * and ctor (seven slots, each an LbdFile, a placement list, a cellParent
- * GridCell attached at `origin` and STAGE_SLOT_CELLS cells STAGE_CELL_SIZE
- * apart, row stride STAGE_CHUNK_CELLS), Finalize, OnNotify, Reset,
- * OnSlotEvent, the per-tick update (UpdateIfEnabled: footprint tracking,
- * then the scale ramp), UnloadAllSlots, the setters ObjM configures it
- * through (SetChildParams, SetCallback, SetAcceptedTags, SetGridSpan,
- * SetConfig), and the path a command takes to the cells:
- * DispatchLinkCommand passes on an Actor sender's, ForwardAcceptedCommand
- * filters the sender against acceptedTags, ApplyToSenderFootprint turns
- * the sender's position into a 3 x 3 cell footprint (SetFootprintFromCell
- * or SetFootprintRect), and DispatchToRectCells hands the command to every
- * cell in it and every cell chained behind each (NotifyGridCell).
- * StageMap__NoOpSlotD8 is the empty +0x0D8 slot; nothing calls it.
+ * StageMap's first run of methods: its life (allocator, ctor, Finalize,
+ * OnNotify, Reset, OnSlotEvent, the per-tick UpdateIfEnabled,
+ * UnloadAllSlots), the setters ObjM configures it through, and the path a
+ * command takes to the cells: DispatchLinkCommand, ForwardAcceptedCommand
+ * (the acceptedTags filter), ApplyToSenderFootprint (a 3 x 3 cell
+ * footprint around the sender) and DispatchToRectCells. TimedTask's last two
+ * functions come first.
  */
 
-/* TimedTask::sound is BasicClass * (it may be the ctor's own argument); when
- * it is a New_VabStreamObj object, +0x080 is VabStreamObj__PlayTone. Plays
- * `tone` at full volume (127) throughout. */
+/* `sound` may be the ctor's own argument; as a VabStreamObj, its +0x080 is
+ * VabStreamObj__PlayTone. */
 void TimedTask__PlaySound(TimedTask *self, s32 tone) {
     VabStreamObj *sound = (VabStreamObj *)self->sound;
 
@@ -506,8 +465,7 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
         pos.y = 0;
         pos.z = STAGE_CELL_SIZE / 2;
 
-        /* MATCHING: `end` from `cells` before `cursor = cells`, or the load
-         * of slot->cells no longer goes through $v0. */
+        /* MATCHING: `end` from `cells` before `cursor = cells`, or slot->cells loads differently */
         cells = slot->cells;
         end = cells + STAGE_SLOT_CELLS;
         cursor = cells;
@@ -584,7 +542,6 @@ void StageMap__Finalize(StageMap *self) {
     GetLightRigMethods()->finalize((LightRig *)self);
 }
 
-/* A sender of DrawSystem's class (id nibble 0x1) goes on to onDrawSystemEvent. */
 void StageMap__OnNotify(StageMap *self, BasicClass *sender, s32 command) {
     GetSceneNodeMethods()->onNotify((SceneNode *)self, sender, command);
 
@@ -606,13 +563,10 @@ void StageMap__Reset(StageMap *self) {
     self->unk1D8 = -1;
 }
 
-/* Records the slot and passes a slot event on to the parents; a
- * STAGEMAP_EVENT_SLOT_RELEASE also releases the slot's heldObj. */
 void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *slot) {
     GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, command);
 
-    /* MATCHING: two literal if+goto tests; an if/else-if chain inverts the
-     * branches. */
+    /* MATCHING: two if+goto tests; an if/else-if chain inverts the branches */
     if (command == STAGEMAP_EVENT_SLOT_RELEASE)
         goto release;
     if (command == STAGEMAP_EVENT_SLOT_DATA_READY)
@@ -642,8 +596,6 @@ void StageMap__DispatchLinkCommand(StageMap *self, BasicClass *sender, s32 comma
     }
 }
 
-/* Cancel every slot's load, clear and release what it holds, then zero
- * the load counters and end the scale ramp. */
 void StageMap__UnloadAllSlots(StageMap *self) {
     s32 i;
     ChunkSlot *slot;
@@ -693,7 +645,7 @@ void StageMap__SetAcceptedTags(StageMap *self, s32 *tags) {
 
 void StageMap__ForwardAcceptedCommand(StageMap *self, void *sender, s32 command) {
     s32 *tag;
-    u8 unused[24]; /* MATCHING: retail's frame is 24 bytes larger than the locals need */
+    u8 unused[24]; /* MATCHING: the frame is 24 bytes larger than the locals need */
 
     switch (command) {
         case SCENENODE_EVENT_HULL_FIRST:
@@ -738,7 +690,7 @@ void StageMap__ApplyToSenderFootprint(StageMap *self, SceneNode *sender, s32 com
     }
 
     savedRectCount = self->rectCount;
-    savedRects = self->rects;
+    savedRects = self->rects; /* MATCHING: a whole-struct copy; an indexed loop is not a block move */
 
     if (self->config->isVertical == 0) {
         StageMap__SetFootprintFromCell(self, &desc, 3);
@@ -763,11 +715,8 @@ void StageMap__SetFootprintFromCell(StageMap *self, Descriptor10Ext *desc, s32 s
     StageMap__BuildFootprintRects(self);
 }
 
-/* Clamp a span x span footprint centred on desc's cell to the chunk's
- * STAGE_CHUNK_CELLS x STAGE_CHUNK_CELLS lattice: a cell on the low edge (0)
- * or the high edge loses one row/column there.
- * MATCHING: the edge tests read copies taken before the decrement, and the
- * height is `span` itself. */
+/* A cell on the low edge (0) or the high edge loses one row/column there. */
+/* MATCHING: the edge tests read copies taken before the decrement; the height is `span` */
 void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span) {
     s32 col;
     s32 row;
@@ -807,9 +756,7 @@ void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span)
     self->rects.e[0].height = span;
 }
 
-/* Notify every cell of every rectangle, and every object chained behind
- * each cell, with the cell's key in curCell while it is notified.
- * MATCHING: the comma increments go `rect++, i++` and `cell++, col++`. */
+/* MATCHING: the comma increments go `rect++, i++` and `cell++, col++` */
 void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 command) {
     s32 i;
     s32 row;
@@ -826,7 +773,7 @@ void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 comman
             cell = (slot->cells + rect->col) + rect->row * STAGE_CHUNK_CELLS;
             for (row = 0; row < rect->height; row++) {
                 for (col = 0; col < rect->width; cell++, col++) {
-                    /* MATCHING: b0/b1 as one halfword; two byte copies are two lb/sb */
+                    /* MATCHING: b0/b1 copied as one halfword, not as two bytes */
                     *(u16 *)&self->curCell = *(u16 *)&self->targetCell;
                     self->curCell.b2 = rect->col + col;
                     self->curCell.b3 = rect->row + row;
@@ -841,8 +788,6 @@ void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 comman
     }
 }
 
-/* Hands the command to a cell flagged GRIDCELL_FLAG_TAKES_COMMANDS. sender
- * and command arrive as DispatchToRectCells' own. */
 void NotifyGridCell(GridCell *cell, SceneNode *sender, s32 command) {
     if (cell != NULL && (cell->flags36 & GRIDCELL_FLAG_TAKES_COMMANDS)) {
         cell->methods->onNotify(cell, sender, command);
@@ -867,29 +812,16 @@ void StageMap__SetConfig(StageMap *self, StageGridDimensions *config) {
 }
 
 /*
- * The middle of StageMap's methods: placing a cell descriptor in the world,
- * loading the seven chunk slots around a centre chunk, linking a loaded
- * chunk into its slot's cells, and the queries that turn a position back
- * into a slot and cell.
- *
- *  - SetTargetAndLoadChunks, ComputeCellOffsets, ComputeCellWorldOffsets:
- *    a cell descriptor to a world position and the chunk it lies in.
- *  - Enable/Disable, UpdateFootprintTracking: the per-tick tracking of the
- *    target.
- *  - LoadChunksAround, ComputeNeighbourMask, ComputeChunkLoadEntry,
- *    ApplyChunkLoads, CountPendingLoads: moving the slots around a centre
- *    chunk and starting (or cancelling) each slot's LbdFile load.
- *  - OnDrawSystemEvent: on the DrawSystem's per-VSync notification, finishing
- *    the loads that have completed.
- *  - PopulateSlotCells / ClearSlotCells: linking a loaded chunk's
- *    placements and models into its slot's cells, and clearing them.
- *  - GetTargetDescriptor, ComputeFootprintDescriptor, SplitChunkIndex,
- *    GetLastEventSlotChunk, FindSlotByNeighbour, FindSlotForPosition:
- *    queries. A slot's position is its cellParent's GsCOORDINATE2, read
- *    through SplitCoord2 (include/stage_map.h).
- *
- * Positions are in world units: a cell is STAGE_CELL_SIZE square, a chunk
- * STAGE_CHUNK_SIZE (include/stage_map.h).
+ * StageMap's second run of methods: placing a cell descriptor in the world
+ * (SetTargetAndLoadChunks, ComputeCellOffsets, ComputeCellWorldOffsets),
+ * the per-tick tracking (Enable, Disable, UpdateFootprintTracking), loading
+ * the seven slots around a centre chunk (LoadChunksAround through
+ * CountPendingLoads), finishing the loads on each VSync
+ * (OnDrawSystemEvent), linking a loaded chunk into its slot's cells
+ * (PopulateSlotCells, ClearSlotCells), and the queries that turn a position
+ * back into a slot and cell (GetTargetDescriptor through
+ * FindSlotForPosition). A slot's position is its cellParent's
+ * GsCOORDINATE2, read through SplitCoord2.
  */
 
 /* The height of one layer of a vertical grid: FindSlotForPosition gives
@@ -901,7 +833,7 @@ s32 StageMap__SetTargetAndLoadChunks(StageMap *self, void *outPos, SceneNode *ta
     s32 chunkIndex;
 
     self->target = target;
-    self->targetCell.base = *cell;
+    self->targetCell.base = *cell; /* MATCHING: Descriptor10 is all s8/s16, so this copies as unaligned words */
     chunkIndex = ComputeCellWorldOffsets(outPos, chunkCentre, self->config, &self->origin, cell);
     return self->methods->loadChunksAround(self, chunkIndex, (LongVec3 *)chunkCentre, sDefaultTargetSpecs);
 }
@@ -912,11 +844,6 @@ s32 StageMap__ComputeCellOffsets(StageMap *self, void *outPos, void *cell) {
     return ComputeCellWorldOffsets(outPos, chunkCentre, self->config, &self->origin, cell);
 }
 
-/* A cell descriptor to world positions: writes the chunk's centre to
- * chunkPos and the cell point (cell column/row plus the offset inside the
- * cell, measured from the cell's centre) to outPos, and returns the chunk's
- * index (0 in a vertical grid). The grid is centred on `origin`; odd rows sit
- * half a chunk to -x. */
 s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dims, LongVec3 *origin,
                             Descriptor10 *cell) {
     s32 row;
@@ -942,7 +869,7 @@ s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dim
         chunkPos[0] = x - STAGE_CHUNK_SIZE / 2;
     }
     chunkPos[1] = origin->y;
-    halfCell = STAGE_CELL_SIZE / 2; /* MATCHING: a local, set here, places retail's constant load */
+    halfCell = STAGE_CELL_SIZE / 2; /* MATCHING: a local, set here, places the constant's load */
     chunkPos[2] = z + row * STAGE_CHUNK_SIZE;
     outPos[0] = (cell->b2 << STAGE_CELL_SHIFT) + chunkPos[0] + (cell->h4 + halfCell);
     outPos[1] = cell->h6 + chunkPos[1];
@@ -961,11 +888,6 @@ void StageMap__Disable(StageMap *self) {
     self->enabled = 0;
 }
 
-/* The per-tick tracking: re-reads the target's descriptor; in a flat grid,
- * reloads the slots the target's slot selects (sFootprintResultRemap) around
- * its chunk; moves the drawn window; notifies the parents when the chunk
- * changed. Returns the selected spec's index (0 for the centre slot, which
- * changes nothing). */
 s32 StageMap__UpdateFootprintTracking(StageMap *self) {
     Descriptor10Ext desc;
     ChunkSlot *slot;
@@ -998,10 +920,6 @@ s32 StageMap__UpdateFootprintTracking(StageMap *self) {
     return specIndex;
 }
 
-/* Moves each slot `specs` marks for loading to the centre position plus
- * its neighbour key's offset (a vertical grid: to its layer), builds a
- * ChunkLoadEntry for it, gives every slot its new key, then starts the
- * loads (applyChunkLoads). */
 void StageMap__LoadChunksAround(StageMap *self, s32 centreChunk, LongVec3 *centrePos,
                                 ChunkSlotSpec *specs) {
     s32 columns;
@@ -1094,10 +1012,7 @@ s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 chunk, s32 oddRow) {
     }
 }
 
-/* Fills `out` for the slot taking neighbour key `neighbour` of centreChunk:
- * the neighbour's chunk index and the chunk's file record from the
- * callback, or a NULL file when that neighbour lies off the grid. Returns 1
- * for a file, 0 for none. MATCHING: one `step` local carries every addend. */
+/* MATCHING: one `step` local carries every addend */
 s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 columns, s32 oddRow,
                                     s32 centreChunk, s32 onGridMask, s32 neighbour) {
     s32 bit = sNeighbourBits[neighbour];
@@ -1143,11 +1058,7 @@ storeKey:
     return result;
 }
 
-/* Starts each entry's load in the slot holding its neighbour key (after
- * clearing the cells of a chunk already linked there), or cancels the slot's
- * load for a NULL file; then counts the slots left pending.
- * MATCHING: `tail` is taken from `entry` inside the loop and `entry` itself
- * advances; a copy of the parameter swaps two saved registers. */
+/* MATCHING: `tail` from `entry` inside the loop, `entry` itself advancing; a copy swaps two registers */
 void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entry, s32 count) {
     s32 i;
     ChunkSlot *slot;
@@ -1226,17 +1137,7 @@ void StageMap__OnDrawSystemEvent(StageMap *self, void *sender, s32 command) {
     }
 }
 
-/* Links a loaded chunk into its slot: points the slot's PlacementGrid at the
- * header's placement records, replaces its LinkResource with one over the
- * header's model block, then resolves record after record until the grid
- * returns 0. A record with no model (-1) hides its lattice cell; one with a
- * model links it into the next lattice cell (a chained record: the next
- * overflow cell), sets the cell's position, y rotation and flags, and hides
- * it until the drawn window shows it. While a record has `next` set, the
- * cell's nextInCell is the overflow cell the following record takes.
- * MATCHING: `header` and `header2` are two locals (one changes the
- * allocation), and the cells are walked by byte offset (an index changes the
- * code). */
+/* MATCHING: `header` and `header2` are two locals; the cells are walked by byte offset */
 void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     LbdFileHeader *header;
     LbdFileHeader *header2;
@@ -1257,9 +1158,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     s32 cellOff;
     s32 overflowOff;
     CellPlacement rec;
-    /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
-     * frame by 8. */
-    ResourceRequest req;
+    ResourceRequest req; /* MATCHING: mode is never set; a bare ResourceSource shrinks the frame */
 
     loader = slot->loader;
     grid = slot->placements;
@@ -1365,12 +1264,8 @@ Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *des
     return &self->targetCell.base;
 }
 
-/* The descriptor of world position `pos`: the slot holding it, that slot's
- * chunk index and column/row, the chunk's centre, the position relative to
- * it, and the cell column/row and the offset from the cell's centre. Returns
- * 0, or 1 when no slot holds the position.
- * MATCHING: cellCol/cellRow re-read the stored bytes, the half cell sits
- * inside the subtracted group, and `out->slot` is stored last. */
+/* MATCHING: cellCol/cellRow re-read the stored bytes; the half cell sits inside the subtracted group */
+/* MATCHING: `out->slot` is stored last; SplitLongVec3's unions reread x/z at the narrower width */
 s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, SplitLongVec3 *pos) {
     ChunkSlot *slot;
     SplitCoord2 *chunkOrigin;
@@ -1443,9 +1338,7 @@ ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 neighbour) {
     }
 }
 
-/* The slot whose chunk holds `pos` in x and z (in a vertical grid, also
- * the layer holding y), or NULL.
- * MATCHING: `edge` is assigned inside each upper-bound test. */
+/* MATCHING: `edge` is assigned inside each upper-bound test */
 ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos) {
     s32 i;
     s32 span;
@@ -1478,29 +1371,15 @@ ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos) {
 }
 
 /*
- * StageMap's drawn window and scale ramp: the last of the class's methods.
- *
- *  - FindSlotIndexByNeighbour, FindSlotIndexByChunk: which of the seven
- *    slots holds a neighbour key, or a loaded chunk.
- *  - The footprint, the window of cells that is drawn. Once every chunk is
- *    loaded, RefreshFootprint hides the cells of the current `rects`, and
- *    every cell chained behind them, rebuilds `rects` and shows the cells of
- *    the new ones (SetFootprintVisible: GsDOFF in each cell's `attribute`).
- *    `rects` is up to four CellRects, one per slot the window overlaps. In
- *    a flat grid the window lies ahead of the target along the axis nearest
- *    its facing and is shifted sideways toward where it looks
- *    (ComputeFootprintFromRotation); BuildFootprintRects and
- *    SplitFootprintRect clip it at the chunk's right and bottom edges into
- *    the neighbouring slots. In a vertical grid it is whole chunks: the
- *    target's, the previous one, and the next one when the target's cell
- *    lies outside `bounds` (SetFootprintFromQuery, InitFootprintRect,
- *    IsPointOutOfBounds; SetBounds).
- *  - The scale ramp: StartScaleRamp picks a step and a tick count,
- *    StepScaleRamp adds the step to every cell's scale once a tick, and
- *    EndScaleRamp sets every cell back to 1/1 (AddScaleStepToCell and
- *    ResetCellScale, run on every cell of every slot by ForEachSlot and
- *    ForEachSlotCell).
- *  - GetUnk1CC, and GetStageMapMethods.
+ * StageMap's last run of methods: the drawn window and the scale ramp.
+ * FindSlotIndexByNeighbour and FindSlotIndexByChunk name a slot by key or
+ * chunk. RefreshFootprint moves the window of cells that is drawn: in a flat
+ * grid ahead of the target along its facing (ComputeFootprintFromRotation,
+ * split per slot by BuildFootprintRects and SplitFootprintRect), in a
+ * vertical grid whole chunks (SetFootprintFromQuery, IsPointOutOfBounds,
+ * InitFootprintRect), shown and hidden by SetFootprintVisible. The scale
+ * ramp (StartScaleRamp, StepScaleRamp, EndScaleRamp) walks every cell with
+ * ForEachSlot and ForEachSlotCell.
  */
 
 /* The four scale steps (Ratio16[3], x/y/z) StartScaleRamp picks for
@@ -1514,8 +1393,6 @@ extern Ratio16 sScaleStepDownFast[3];
 /* 1/1, 1/1, 1/1: the scale ResetCellScale sets on every cell. */
 extern Ratio16 sScaleOne[3];
 
-/* The index of the slot whose chunk is at neighbour key `key`; 0 when
- * none is. */
 s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key) {
     s32 index;
     s32 i;
@@ -1532,8 +1409,6 @@ s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key) {
     return index;
 }
 
-/* The index of the slot holding chunk chunkIndex with its header read; -1
- * when none does. */
 s32 StageMap__FindSlotIndexByChunk(StageMap *self, s32 chunkIndex) {
     s32 i;
     ChunkSlot *slot;
@@ -1563,13 +1438,7 @@ void StageMap__RefreshFootprint(StageMap *self) {
     StageMap__SetFootprintVisible(self, 1);
 }
 
-/* The flat grid's window, from the target's cell and its y rotation: a
- * window aheadCells deep along whichever of x and z the target faces
- * (within 45 degrees), starting at the target's cell and running the way it
- * faces, and acrossCells wide, centred on the target and shifted by the
- * off-axis part of a gridSpan-long facing vector, in cells, kept inside half
- * the grid. The window goes to BuildFootprintRects as footprintCol/Row and
- * footprintWidth/Height. MATCHING: the (u16) casts are retail's lhu. */
+/* MATCHING: the (u16) casts make the halfword loads unsigned */
 void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32 aheadCells) {
     GsCOORD2PARAM *param;
     Descriptor10Ext desc;
@@ -1601,8 +1470,8 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32
     RotMatrix(rot, &mat);
     ApplyMatrixLV(&mat, (VECTOR *)mat.t, (VECTOR *)mat.t);
 
-    /* Facing +-x, then facing +-z. MATCHING: the second test is retail's; the
-     * two cover every angle. */
+    /* Facing +-x, then facing +-z; the two tests cover every angle. */
+    /* MATCHING: the else-if keeps its test, though every angle the first rejects passes it */
     if ((u16)(angle - ANGLE_DEG(45)) < ANGLE_DEG(90) || (u16)(angle - ANGLE_DEG(225)) < ANGLE_DEG(90)) {
         lateral = mat.t[2];
         self->footprintWidth = aheadCells;
@@ -1639,14 +1508,7 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32
     StageMap__BuildFootprintRects(self);
 }
 
-/* Splits the window (footprintCol/Row, footprintWidth/Height) into
- * `rects`: a window that starts left of the centre chunk or above it starts
- * in that neighbour's slot, with its column and row moved into that chunk
- * (rows above are staggered by half a chunk); a part past the right edge
- * goes to the slot of key + 1, and SplitFootprintRect splits off the part
- * past the bottom edge. MATCHING: one `rect` pointer reused for the second
- * rectangle, `over` its own local, and `count += 1` in each arm and again at
- * the join. */
+/* MATCHING: one `rect` reused for the second rectangle, `over` its own local, `count += 1` thrice */
 void StageMap__BuildFootprintRects(StageMap *self) {
     s32 wrappedCol;
     s32 col;
@@ -1727,8 +1589,7 @@ s32 StageMap__SplitFootprintRect(StageMap *self, CellRect *rect, s32 count, s32 
             belowKey = key + 2;
             rect->slotIndex = self->methods->findSlotIndexByNeighbour(self, belowKey);
             rect->col = col + STAGE_CHUNK_HALF_CELLS;
-            /* MATCHING: stored in both arms (cross-jumping merges them, and
-             * the join keeps the col reload below after it). */
+            /* MATCHING: stored in both arms; merged, they move the col reload below */
             rect->height = span;
         } else {
             belowKey = key + 3;
@@ -1742,8 +1603,7 @@ s32 StageMap__SplitFootprintRect(StageMap *self, CellRect *rect, s32 count, s32 
         if (span > STAGE_CHUNK_CELLS) {
             /* ...and past the right edge too. */
             count = count + 1;
-            /* MATCHING: two statements; one expression shares span - 20
-             * with the store below. */
+            /* MATCHING: two statements; one expression shares span - 20 with the store below */
             widthLeft = width + STAGE_CHUNK_CELLS;
             widthLeft = widthLeft - span;
             rect->width = widthLeft;
@@ -1780,9 +1640,7 @@ void StageMap__SetFootprintFromQuery(StageMap *self) {
     }
 }
 
-/* 1 when there are no bounds or the point (cell column, row) lies outside
- * them, else 0. MATCHING: the in-range test returns 0 and `return 1`
- * follows it; the other order allocates differently. */
+/* MATCHING: the in-range test returns 0 and `return 1` follows; the other order differs */
 s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     if (bounds != NULL && point[0] >= bounds->minCol && bounds->maxCol >= point[0] &&
         point[1] >= bounds->minRow && bounds->maxRow >= point[1]) {
@@ -1791,8 +1649,6 @@ s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     return 1;
 }
 
-/* rects[index] becomes the whole of the slot holding chunkIndex; returns the
- * next index. */
 s32 StageMap__InitFootprintRect(StageMap *self, s32 unused, s32 index, s32 chunkIndex) {
     CellRect *rect;
 
@@ -1849,11 +1705,7 @@ void StageMap__SetBounds(StageMap *self, CellBounds *bounds) {
     self->bounds = bounds;
 }
 
-/* Picks the scale step by the sign of `rate` and by `fast`, and runs the
- * ramp for |rate| times the step's y denominator ticks (scaleStep[1].den).
- * MATCHING: the goto ladder (retail stores scaleStep on the fast positive
- * path and once for the other three), `scale` loaded once before the sign
- * test, and `val` set in an if/else; `~rate + 1` is retail's negation. */
+/* MATCHING: the goto ladder, `scale` read before the sign test, `val` in an if/else, `~rate + 1` */
 void StageMap__StartScaleRamp(StageMap *self, s32 rate, s32 fast) {
     Ratio16 *table;
     s32 val;

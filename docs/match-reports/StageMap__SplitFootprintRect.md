@@ -997,3 +997,17 @@ are `MATCHING:` lines.
 
 `21`/`20` -> `> STAGE_CHUNK_CELLS`/`STAGE_CHUNK_CELLS`, `10` ->
 `STAGE_CHUNK_HALF_CELLS`.
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+            /* MATCHING: stored in both arms (cross-jumping merges them, and
+             * the join keeps the col reload below after it). */
+```
+
+```c
+            /* MATCHING: two statements; one expression shares span - 20
+             * with the store below. */
+```

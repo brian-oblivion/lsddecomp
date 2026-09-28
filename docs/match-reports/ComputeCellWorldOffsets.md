@@ -409,3 +409,11 @@ The comment that stood above the function in `src/world/dream_day.c`, moved here
  * directly and never touched this constant; the permuter found a
  * completely different axis. See docs/match-reports/ComputeCellWorldOffsets.md. */
 ```
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+    halfCell = STAGE_CELL_SIZE / 2; /* MATCHING: a local, set here, places retail's constant load */
+```

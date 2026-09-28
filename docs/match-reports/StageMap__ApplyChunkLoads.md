@@ -670,3 +670,15 @@ The comment that stood above the function in `src/world/dream_day.c`, moved here
  * advanced directly; the old `ep = arr1` copy is what swapped s3/s4.
  * See docs/match-reports/StageMap__ApplyChunkLoads.md. */
 ```
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+/* Starts each entry's load in the slot holding its neighbour key (after
+ * clearing the cells of a chunk already linked there), or cancels the slot's
+ * load for a NULL file; then counts the slots left pending.
+ * MATCHING: `tail` is taken from `entry` inside the loop and `entry` itself
+ * advances; a copy of the parameter swaps two saved registers. */
+```

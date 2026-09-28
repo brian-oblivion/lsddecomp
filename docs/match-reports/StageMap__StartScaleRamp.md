@@ -597,3 +597,15 @@ load-bearing shapes.
   `sScaleStepDownFast` (-1/4); x and z 0/1 in each. Unit-static data: this
   unit alone reads them, so their externs moved from include/class_3bb8c.h
   into dream_day.c.
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+/* Picks the scale step by the sign of `rate` and by `fast`, and runs the
+ * ramp for |rate| times the step's y denominator ticks (scaleStep[1].den).
+ * MATCHING: the goto ladder (retail stores scaleStep on the fast positive
+ * path and once for the other three), `scale` loaded once before the sign
+ * test, and `val` set in an if/else; `~rate + 1` is retail's negation. */
+```
