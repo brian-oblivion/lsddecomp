@@ -77,3 +77,7 @@ whose `parent` is `self`, and SceneNode__DetachAttachedChildren calls their
 detachFromParent, so they are SceneNodes. `cursor` is the BasicClass child
 list cursor. DetachAttachedChildren's `s32 cont` became that cursor, which
 it only tests for NULL. Byte-identical.
+
+## Round 101 (delta): track 7
+
+Step 3 (locals and parameters): `entry` -> `child`, `tag` -> `classId`. Byte-identical.

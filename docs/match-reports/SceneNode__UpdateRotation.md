@@ -126,3 +126,5 @@ GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/Sc
 ## Round 101 (delta): track 7
 
 Step 2: the three raw offsets `(u8 *)data + 4` / `+ 8` read the table as what it is, Ratio16[3] (include/SceneNode.h), through a local `Ratio16 *ratios = data`: `&ratios[0]`, `&ratios[1]`, `&ratios[2]`. The parameter stays `void *` because the prototype and the slot type in include/SceneNode.h say so (not this unit's to change; proposed). Byte-identical.
+
+Step 3 (locals and parameters): `flag` -> `set`, `data` -> `table` (the prototype's names), `vals` -> `angles`, `dst` -> `param` (GsCOORD2PARAM), `field` -> `next` (the carried pointer the loop advances ahead of `cur`). Byte-identical.

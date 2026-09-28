@@ -59,3 +59,7 @@ Round 71 (alpha). `func_8001D344` -> `SceneNode__SetDisplay`, **tier A**. Table 
 For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
 
 - `SceneNodeObj.unk10` -> `attribute` (tier A): GsDOBJ2.attribute. SceneNode__LinkModel passes `&self->unk10` to GsLinkObject4 as the GsDOBJ2, and the five setters here write it at GsDOFF/GsALON/GsA*/GsLOFF/light-mode bit positions. Accessors: code_d294, code_d294_b, code_d294_c.
+
+## Round 101 (delta): track 7
+
+Step 3 (locals and parameters): `a1` -> `on` (written inverted into GsDOFF, so nonzero means displayed). Byte-identical.

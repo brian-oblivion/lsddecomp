@@ -44,15 +44,15 @@ SceneNode *New_SceneNode(void) {
 }
 
 void *SceneNode__SceneNode(SceneNode *self) {
-    void *blockB;
+    GsCOORD2PARAM *param;
 
     self->coord2 = BMemPMgrAlloc(0x50);
     if (self->coord2 == NULL) {
         return NULL;
     }
-    blockB = BMemPMgrAlloc(0x28);
-    self->coord2->param = blockB;
-    if (blockB == NULL) {
+    param = BMemPMgrAlloc(0x28);
+    self->coord2->param = param;
+    if (param == NULL) {
         BMemPMgrFree(self->coord2);
         return NULL;
     }
@@ -67,13 +67,13 @@ void *SceneNode__SceneNode(SceneNode *self) {
 }
 
 void SceneNode__Finalize(SceneNode *self) {
-    GsCOORDINATE2 *sub;
+    GsCOORDINATE2 *coord2;
 
     self->methods->detachFromParent(self);
     self->methods->detachAttachedChildren(self);
     self->methods->slot5C(self, 0);
-    sub = self->coord2;
-    BMemPMgrFree(sub->param);
+    coord2 = self->coord2;
+    BMemPMgrFree(coord2->param);
     BMemPMgrFree(self->coord2);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
@@ -120,75 +120,75 @@ void SceneNode__Reset(SceneNode *self) {
     self->coord2->flg = 1;
 }
 
-void SceneNode__UpdateRotation(SceneNode *self, s32 flag, void *data) {
-    Ratio16 *ratios = data;
-    s32 vals[3];
-    GsCOORD2PARAM *dst;
-    s16 *field;
+void SceneNode__UpdateRotation(SceneNode *self, s32 set, void *table) {
+    Ratio16 *ratios = table;
+    s32 angles[3];
+    GsCOORD2PARAM *param;
+    s16 *next;
 
-    vals[0] = RatioToFixed12(&ratios[0]);
-    vals[1] = RatioToFixed12(&ratios[1]);
-    vals[2] = RatioToFixed12(&ratios[2]);
-    vals[0] /= 360;
-    vals[1] /= 360;
-    vals[2] /= 360;
-    dst = self->coord2->param;
-    field = &dst->rotate.vx;
-    if (flag) {
-        dst->rotate.vx = vals[0];
-        dst->rotate.vy = vals[1];
-        dst->rotate.vz = vals[2];
+    angles[0] = RatioToFixed12(&ratios[0]);
+    angles[1] = RatioToFixed12(&ratios[1]);
+    angles[2] = RatioToFixed12(&ratios[2]);
+    angles[0] /= 360;
+    angles[1] /= 360;
+    angles[2] /= 360;
+    param = self->coord2->param;
+    next = &param->rotate.vx;
+    if (set) {
+        param->rotate.vx = angles[0];
+        param->rotate.vy = angles[1];
+        param->rotate.vz = angles[2];
     } else {
         s32 i;
         s16 *cur;
 
         for (i = 0; i < 3; i++) {
-            cur = field;
-            field++;
-            *cur = (*cur + vals[i]) % 4096;
+            cur = next;
+            next++;
+            *cur = (*cur + angles[i]) % 4096;
         }
     }
     self->coord2->flg = 0;
 }
 
-void SceneNode__UpdateScale(SceneNode *self, s32 flag, void *data) {
-    Ratio16 *ratios = data;
-    s32 r0, r1, r2;
-    GsCOORD2PARAM *dst;
+void SceneNode__UpdateScale(SceneNode *self, s32 set, void *table) {
+    Ratio16 *ratios = table;
+    s32 sx, sy, sz;
+    GsCOORD2PARAM *param;
 
-    r0 = RatioToFixed12(&ratios[0]);
-    r1 = RatioToFixed12(&ratios[1]);
-    r2 = RatioToFixed12(&ratios[2]);
-    dst = self->coord2->param;
-    if (flag) {
-        dst->scale.vx = (s16)r0;
-        dst->scale.vy = (s16)r1;
-        dst->scale.vz = (s16)r2;
+    sx = RatioToFixed12(&ratios[0]);
+    sy = RatioToFixed12(&ratios[1]);
+    sz = RatioToFixed12(&ratios[2]);
+    param = self->coord2->param;
+    if (set) {
+        param->scale.vx = (s16)sx;
+        param->scale.vy = (s16)sy;
+        param->scale.vz = (s16)sz;
     } else {
-        dst->scale.vx += (s16)r0;
-        dst->scale.vy += (s16)r1;
-        dst->scale.vz += (s16)r2;
+        param->scale.vx += (s16)sx;
+        param->scale.vy += (s16)sy;
+        param->scale.vz += (s16)sz;
     }
     self->coord2->flg = 0;
 }
 
-SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *obj, LongVec3 *vec) {
-    GsCOORDINATE2 *sub;
+SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *parent, LongVec3 *offset) {
+    GsCOORDINATE2 *coord2;
 
     if (self->parent == NULL) {
-        self->parent = obj;
-        sub = self->coord2;
-        sub->super = obj->coord2;
-        obj->methods->addChild(obj, (BasicClass *)self);
-        sub = self->coord2;
-        if (vec != NULL) {
-            sub->coord.t[0] = vec->x;
-            sub->coord.t[1] = vec->y;
-            sub->coord.t[2] = vec->z;
+        self->parent = parent;
+        coord2 = self->coord2;
+        coord2->super = parent->coord2;
+        parent->methods->addChild(parent, (BasicClass *)self);
+        coord2 = self->coord2;
+        if (offset != NULL) {
+            coord2->coord.t[0] = offset->x;
+            coord2->coord.t[1] = offset->y;
+            coord2->coord.t[2] = offset->z;
         } else {
-            sub->coord.t[0] = 0;
-            sub->coord.t[1] = 0;
-            sub->coord.t[2] = 0;
+            coord2->coord.t[0] = 0;
+            coord2->coord.t[1] = 0;
+            coord2->coord.t[2] = 0;
         }
         self->coord2->flg = 0;
     }
@@ -196,11 +196,11 @@ SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *obj, LongVec3 *
 }
 
 SceneNode *SceneNode__DetachFromParent(SceneNode *self) {
-    SceneNode *owner;
+    SceneNode *parent;
 
-    owner = self->parent;
-    if (owner != NULL) {
-        owner->methods->removeChild(owner, (BasicClass *)self);
+    parent = self->parent;
+    if (parent != NULL) {
+        parent->methods->removeChild(parent, (BasicClass *)self);
         self->coord2->super = 0;
         self->parent = NULL;
     }
@@ -208,55 +208,55 @@ SceneNode *SceneNode__DetachFromParent(SceneNode *self) {
 }
 
 void SceneNode__DetachAttachedChildren(SceneNode *self) {
-    SceneNode *entry = NULL;
+    SceneNode *child = NULL;
     BasicClassListNode *cursor;
 
     do {
-        self->methods->getNextAttachedChild(self, &entry, &cursor);
-        if (entry != NULL) {
-            entry->methods->detachFromParent(entry);
+        self->methods->getNextAttachedChild(self, &child, &cursor);
+        if (child != NULL) {
+            child->methods->detachFromParent(child);
         }
     } while (cursor);
 }
 
-void SceneNode__GetNextAttachedChild(SceneNode *self, SceneNode **entry, BasicClassListNode **cursor) {
-    s32 tag;
+void SceneNode__GetNextAttachedChild(SceneNode *self, SceneNode **child, BasicClassListNode **cursor) {
+    s32 classId;
 
-    tag = TAG_SCENENODE;
+    classId = TAG_SCENENODE;
     do {
-        if (*entry == NULL) {
+        if (*child == NULL) {
             *cursor = self->children;
         }
-        GetNextBasicClass((BasicClass **)entry, cursor);
-        if (*entry != NULL) {
-            if ((((*entry)->methods->header) & CLASS_TAG_MASK) == tag) {
-                if ((*entry)->parent == self) {
+        GetNextBasicClass((BasicClass **)child, cursor);
+        if (*child != NULL) {
+            if ((((*child)->methods->header) & CLASS_TAG_MASK) == classId) {
+                if ((*child)->parent == self) {
                     return;
                 }
             }
         }
     } while (*cursor != NULL);
-    *entry = NULL;
+    *child = NULL;
 }
 
 void SceneNode__NoOpSlot5C(void) {}
 
-s32 SceneNode__SetDisplay(SceneNode *self, s32 a1) {
-    return GetSetBitField(&self->attribute, ATTR_DOFF_SHIFT, 1, a1 == 0) == 0;
+s32 SceneNode__SetDisplay(SceneNode *self, s32 on) {
+    return GetSetBitField(&self->attribute, ATTR_DOFF_SHIFT, 1, on == 0) == 0;
 }
 
-u32 SceneNode__SetSemiTrans(SceneNode *self, s32 a1) {
-    return GetSetBitField(&self->attribute, ATTR_ALON_SHIFT, 1, a1 != 0);
+u32 SceneNode__SetSemiTrans(SceneNode *self, s32 on) {
+    return GetSetBitField(&self->attribute, ATTR_ALON_SHIFT, 1, on != 0);
 }
 
-u32 SceneNode__SetSemiTransRate(SceneNode *self, u32 a1) {
-    return GetSetBitField(&self->attribute, ATTR_ABR_SHIFT, 2, a1);
+u32 SceneNode__SetSemiTransRate(SceneNode *self, u32 rate) {
+    return GetSetBitField(&self->attribute, ATTR_ABR_SHIFT, 2, rate);
 }
 
-u32 SceneNode__SetLighting(SceneNode *self, s32 a1) {
-    return GetSetBitField(&self->attribute, ATTR_LOFF_SHIFT, 1, a1 == 0);
+u32 SceneNode__SetLighting(SceneNode *self, s32 on) {
+    return GetSetBitField(&self->attribute, ATTR_LOFF_SHIFT, 1, on == 0);
 }
 
-u32 SceneNode__SetLightMode(SceneNode *self, u32 a1) {
-    return GetSetBitField(&self->attribute, ATTR_LIGHTMODE_SHIFT, 3, a1);
+u32 SceneNode__SetLightMode(SceneNode *self, u32 mode) {
+    return GetSetBitField(&self->attribute, ATTR_LIGHTMODE_SHIFT, 3, mode);
 }

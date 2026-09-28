@@ -51,3 +51,7 @@ shape on whatever `self->unkC` points to.
 ## Naming
 
 Round 71 (alpha). `func_8001D1A4` -> `SceneNode__DetachFromParent`, **tier A**. Table slot +0x050. If attached: parent->removeChild(self) (BasicClass slot +0x014), coord2->super = 0, self->unkC = NULL. Exact inverse of SceneNode__AttachToParent. Finalize calls it first.
+
+## Round 101 (delta): track 7
+
+Step 3 (locals and parameters): `owner` -> `parent`. Byte-identical.
