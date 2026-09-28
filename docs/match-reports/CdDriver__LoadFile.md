@@ -53,11 +53,11 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
             }
             {
                 sectorCount = rec->unk18 >> 11;
-                gCdReadSectorCount = sectorCount;
+                sCdReadSectorCount = sectorCount;
                 if ((rec->unk18 & 0x7FF) != 0) {
-                    gCdReadSectorCount = sectorCount + 1;
+                    sCdReadSectorCount = sectorCount + 1;
                 }
-                pos = gCdReadSectorCount << 11;
+                pos = sCdReadSectorCount << 11;
                 if (self->unk10 == NULL) {
                     ret = BMemPMgrAlloc(pos);
                     if (ret == NULL) {
@@ -80,7 +80,7 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
                             v1 = CdSync(0, 0);
                         } while (v1 == 0);
                     } while (v1 == 5);
-                    CdRead(gCdReadSectorCount, self->unk10, 0x80);
+                    CdRead(sCdReadSectorCount, self->unk10, 0x80);
                     do {
                         v1 = CdReadSync(0, 0);
                     } while (v1 > 0);

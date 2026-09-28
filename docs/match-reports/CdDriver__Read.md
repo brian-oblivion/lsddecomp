@@ -9,7 +9,7 @@
 ## Source
 
 ```c
-extern s32 gCdReadSectorCount; /* CdRead sector count */
+extern s32 sCdReadSectorCount; /* CdRead sector count */
 extern void *sCdReadBuffer; /* CdRead target buffer */
 extern s32 gCdTickStep;
 
@@ -30,7 +30,7 @@ s32 CdDriver__Read(Obj80027480 *self, void *buf, u32 size) {
         if (sCdBusy == 0 && self->unk0C != 0) {
             StartCdOperation(3, 7);
             if (sCdAsyncEnabled != 0) {
-                gCdReadSectorCount = size >> 11;
+                sCdReadSectorCount = size >> 11;
                 sCdReadBuffer = buf;
                 gCdTickStep = 1;
             } else {
@@ -66,7 +66,7 @@ the unit, ahead of `CdDriver__Close`.)
 2. **`size >> 11` must be an UNSIGNED shift.** Retail's `srl` (logical) vs an
    initial `s32 size` parameter, which produces `sra` (arithmetic) for a
    right-shift of a negative-capable type. Declaring the parameter `u32 size`
-   fixed all three `>>11` sites at once (`gCdReadSectorCount` store, the two `CdRead`
+   fixed all three `>>11` sites at once (`sCdReadSectorCount` store, the two `CdRead`
    calls).
 3. **The real find: GCC 2.6.3's loop-invariant code motion hoists a
    loop-carried literal comparison (`v1 == -1`) out of a `do { ... } while
@@ -124,7 +124,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 **Evidence.** `(self, buf, size)`. Sync mode forwards to `ReadCdFile`;
 otherwise it enqueues op 5 with `buf`/`size`, or inside a queue dispatch on
 an open file reads `size >> 11` sectors into `buf` (CdRead + CdReadSync
-retry loop, or hands `gCdReadSectorCount`/`sCdReadBuffer` to the state
+retry loop, or hands `sCdReadSectorCount`/`sCdReadBuffer` to the state
 machine). `FileResource__LoadFile` calls this slot with the buffer it just
 allocated and its size, between the rewind and the close.
 
