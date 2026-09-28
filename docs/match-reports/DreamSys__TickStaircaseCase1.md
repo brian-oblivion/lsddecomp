@@ -103,4 +103,4 @@ matched code for a template.
 
 ## Naming
 
-- **Tier B.** Table index 1 of the same STAIRCASE_TICK_FNS family as DreamSys__TickStaircaseCase0, against STAIRCASE_OFFSET_1; same evidence and same caveat.
+- **Tier B.** Table index 1 of the same sStaircaseTickFns family as DreamSys__TickStaircaseCase0, against STAIRCASE_OFFSET_1; same evidence and same caveat.

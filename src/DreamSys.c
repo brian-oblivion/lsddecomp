@@ -1080,7 +1080,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos) {
                 this->staircaseActive = 1;
                 this->staircaseMoveGate = 1;
                 this->staircaseFrame = 0;
-                this->staircaseTickFn = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
+                this->staircaseTickFn = sStaircaseTickFns[GetLastSpawnExtra()];
                 this->methods->updateRotation(this, 1, (void *)this->enterRotation);
                 this->staircaseTickFn(this);
             }

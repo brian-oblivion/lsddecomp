@@ -85,4 +85,4 @@ guard clauses into one physical block when retail does so.
 
 ## Naming
 
-- **Tier B.** Table index 3 of the same STAIRCASE_TICK_FNS family, against STAIRCASE_OFFSET_3; same evidence and caveat.
+- **Tier B.** Table index 3 of the same sStaircaseTickFns family, against STAIRCASE_OFFSET_3; same evidence and caveat.

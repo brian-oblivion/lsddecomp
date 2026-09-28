@@ -109,4 +109,4 @@ error away from losing all of it.** See PARALLEL-RUNS §4b/§4c.
 
 ## Naming
 
-- **Tier B.** Table index 2 of the same STAIRCASE_TICK_FNS family, against STAIRCASE_OFFSET_2; same evidence and caveat.
+- **Tier B.** Table index 2 of the same sStaircaseTickFns family, against STAIRCASE_OFFSET_2; same evidence and caveat.

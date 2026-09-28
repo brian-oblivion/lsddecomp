@@ -73,7 +73,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 				this->staircaseActive = 1;
 				this->staircaseMoveGate = 1;
 				this->staircaseFrame = 0;
-				this->staircaseTickFn = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
+				this->staircaseTickFn = sStaircaseTickFns[GetLastSpawnExtra()];
 				this->vt->SceneNode__UpdateRotation(this, 1, (void *)this->enterRotation);
 				this->staircaseTickFn(this);
 			}
@@ -232,7 +232,7 @@ staircase:
 	this->unk_0x908 = 1;
 	this->unk_0x90C = 1;
 	this->unk_0x914 = 0;
-	this->unk_0x910 = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
+	this->unk_0x910 = sStaircaseTickFns[GetLastSpawnExtra()];
 	this->vt->SceneNode__UpdateRotation(this, 1, (void *)this->unk_0x884);
 	this->unk_0x910(this);
 	return false;
@@ -266,7 +266,7 @@ All in `include/DreamSys.h`:
   same idiom as the existing `unk_0x91C` (`struct RelativePos`) next to it,
   which already covers `currentPos->position`. No other reader of this
   field existed before this round.
-- **`extern s32 (*STAIRCASE_TICK_FNS[4])(DreamSys *this)`** -- a table of the four
+- **`extern s32 (*sStaircaseTickFns[4])(DreamSys *this)`** -- a table of the four
   already-matched `s32 (DreamSys *this)` functions `DreamSys__TickStaircaseCase0`/
   `DreamSys__TickStaircaseCase1`/`DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase3`, confirmed by their own
   existing definitions in `src/DreamSys.c`.

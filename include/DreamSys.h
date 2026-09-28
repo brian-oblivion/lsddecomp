@@ -617,7 +617,7 @@ struct DreamSys {
     u32 staircaseMoveGate;
     /* Function pointer, called as `staircaseTickFn(this)` and its `s32` result
 	   used as a truth value (DreamSys__TryStaircaseLink, round 2026-09-06); set from
-	   `STAIRCASE_TICK_FNS[GetLastSpawnExtra()]` (both MATCHED) or NULLed --
+	   `sStaircaseTickFns[GetLastSpawnExtra()]` (both MATCHED) or NULLed --
 	   0 is a valid state, tested with a plain `!= 0`/`== 0` before ever
 	   being called through. */
     s32 (*staircaseTickFn)(struct DreamSys *this);
@@ -667,12 +667,12 @@ extern void (*sMoveCommandDispatch[5])(DreamSys *this, s32 val, void *extra);
    DreamSys__TickStaircaseCase1, DreamSys__TickStaircaseCase2, DreamSys__TickStaircaseCase3, all already matched with
    exactly that signature), indexed by GetLastSpawnExtra()'s return value and
    stashed into DreamSys::staircaseTickFn by DreamSys__TryStaircaseLink (round 2026-09-06). */
-extern s32 (*STAIRCASE_TICK_FNS[4])(DreamSys *this);
+extern s32 (*sStaircaseTickFns[4])(DreamSys *this);
 
 /* Called by DreamSys__TryStaircaseLink with NO explicit argument setup (the disassembly's
    call site leaves `$a0` holding an unrelated leftover value from the
    preceding statement, same "empty delay slot, no a0-a3 setup" shape as
-   GetStageLinkAngle above); return value used as STAIRCASE_TICK_FNS's index. MATCHED
+   GetStageLinkAngle above); return value used as sStaircaseTickFns's index. MATCHED
    round 43 (2026-09-15) -- both the gp-relative and addiu_at blockers it was
    filed under are resolved (see docs/research/gp-relative-blocker.md and
    docs/research/addiu-at-blocker.md), and the one-line body
