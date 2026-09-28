@@ -32,7 +32,7 @@ jal   GetSetBitField
 sltiu $v0, $v0, 0x1       # result = (raw == 0)
 ```
 
-Note: `include/class_3ac78.h` documents an UNRELATED cross-unit call that
+Note: `include/class_39e08.h` documents an UNRELATED cross-unit call that
 also names this symbol `SceneNode__SetBackClip` but through a different table
 (`TimedTask::unk34`) with a 4-argument `(self, arg1, arg2, arg3)` shape at
 its own local slot `+0x080`. That's the same "same code address, different
@@ -52,7 +52,7 @@ None new -- extends the family census.
 (tier A: pure bitfield accessor, shift 8 width 1, double-inverted
 boolean -- same shape as the renamed `SceneNode__SetUseZ`).
 Held back because this symbol is name-checked (in comments, not calls)
-from `src/class_3bb8c_o.c:186` and `include/class_3ac78.h:173` -- two
+from `src/class_3bb8c_o.c:186` and `include/class_39e08.h:173` -- two
 different units' own vtable-slot census comments, both discussing a
 coincidental address match in an unrelated table (`gStyleEffectMethods`'s own
 slot80, a different class entirely). Renaming would edit those files

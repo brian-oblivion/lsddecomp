@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004AA10` on 2026-09-22 (tools/rename.py). Address 0x8004aa10.
 
-**Unit:** `class_3ac78` · **Size:** 23 words · **Status:** MATCHED, 23/23 exact.
+**Unit:** `class_39e08` · **Size:** 23 words · **Status:** MATCHED, 23/23 exact.
 
 Previously filed as blocked by `gp_rel` (round 42 reopen note); that blocker
 was RESOLVED in round 42 by `maspsx --gp-symbols`, pinned in the Makefile.
@@ -43,7 +43,7 @@ void StageMap__Reset(StageMap *self)
   with no other reference anywhere in the image (checked with
   `grep -rl gDefaultGridSpan asm/`). It sits in an unnamed top-level `sdata`
   segment, not owned by any carved unit, so it is declared `extern s32`
-  directly in `src/class_3ac78.c` -- same pattern already used for
+  directly in `src/class_39e08.c` -- same pattern already used for
   `gDefaultOrigin` in this same file. `%gp_rel(gDefaultGridSpan)($gp)` loads its
   *value*, not its address, so the call argument is a plain `s32`, not a
   pointer.
@@ -51,7 +51,7 @@ void StageMap__Reset(StageMap *self)
   instruction order, and slot `+0x0DC` had no prior occupant or
   declaration -- added to `StageMapMethods` as `slotDC(StageMap*, s32)`,
   splitting the padding that used to run `0xD4..0xF4` at `0xDC`.
-  `include/class_3ac78.h` updated (was already shared only within this
+  `include/class_39e08.h` updated (was already shared only within this
   runner's assignment this round; no cross-runner contention).
 - Offsets `0x1CC`/`0x1D0`/`0x1D4`/`0x1D8` were inside the `StageMap`
   struct's `pad1C4[0x1E0-0x1C4]` catch-all padding; split into four new

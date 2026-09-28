@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004B32C` on 2026-09-22 (tools/rename.py). Address 0x8004b32c.
 
-**Unit:** class_3ac78 · **Size:** 6 words · **Status:** MATCHED (6/6 words)
+**Unit:** class_39e08 · **Size:** 6 words · **Status:** MATCHED (6/6 words)
 
 ## What it does
 

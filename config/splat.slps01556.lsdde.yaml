@@ -1376,7 +1376,6 @@ segments:
       # Gate 2).
       - [0x39cb4, c, StageGrid]
       - [0x39e08, c, class_39e08]
-      - [0x3ac78, c, class_3ac78]
       # class_3bb8c is 365 functions -- the largest uncarved block in the
       # game, and the one holding all 13 PSX BIOS trampolines (`jr $t2`,
       # not expressible in C). Carved in slices from the front, like Entity.

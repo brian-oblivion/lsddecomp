@@ -38,7 +38,7 @@ What the two orders do to the asm:
   of `addiu s1, s1, 1` and fills its own load delay; with `col++` first
   the load follows the increment and costs a `nop`.
 
-The matched C is the live definition in `src/class_3ac78.c`.
+The matched C is the live definition in `src/class_39e08.c`.
 
 ### Proposed learning
 
@@ -113,10 +113,10 @@ void StageMap__DispatchToRectCells(StageMap *self, UnkListObj_3ac78 *arg1, s32 a
 }
 ```
 
-## New/corrected header content (`include/class_3ac78.h`)
+## New/corrected header content (`include/class_39e08.h`)
 
 This unit has no additive-only constraint (nobody else holds
-`class_3ac78.h`), so these are real corrections, not just additions.
+`class_39e08.h`), so these are real corrections, not just additions.
 Every one was independently reverified after the change: `build exit=0`
 and `StageMap__ApplyToSenderFootprint`/`NotifyGridCell` (the two ALREADY-MATCHED functions
 whose bytes depend on these types) stayed at their full-match scores
@@ -265,7 +265,7 @@ regressions:**
 > loop, register lands in the wrong callee-saved slot" residue, since it
 > is cheap and, here, closed 48 of the function's 70 remaining words in
 > one attempt. The load-delay-slot-fill class itself remains open; this
-> function is the second STALL this round in `class_3ac78`/`class_3bb8c_c`
+> function is the second STALL this round in `class_39e08`/`class_3bb8c_c`
 > where a source-level restructuring provably could not reach a
 > retail-chosen instruction SCHEDULE, even though the SHAPE (branches,
 > registers) was already fully correct -- worth a permuter pass (see
@@ -313,7 +313,7 @@ Per the coordinator's cross-unit transferability question (does the lever
 that closed 5/7 residue words on `libsnd_ssinit`'s `GetRCnt` --
 splitting a combined `base = tableBase; entry = &base[idx];` into two
 independently-live locals instead of one combined expression -- transfer
-to `class_3ac78`), tested it against this function's own base+index
+to `class_39e08`), tested it against this function's own base+index
 pointer computation, the closest analogue in this unit:
 
 ```c
@@ -390,14 +390,14 @@ into each freshly built cell's `+0x010`, which is `EntryChildObj::unk10`
 exactly (`StageMap__ClearSlotCells` sets the same bit, matched `StageMap__SetFootprintVisible` clears
 it), and `flags36`/`nextInCell` line up with `EntryChildObj::unk36`/`unk38`.
 Unifying the two views is track-4 work, so the declared type is unchanged and
-a note sits on the field in `include/class_3ac78.h`. Posted to the broadcast.
+a note sits on the field in `include/class_39e08.h`. Posted to the broadcast.
 
 ### Field names in the preserved bodies above
 
 Round 67 renamed this unit's struct fields. The preserved bodies in THIS
 report are left in their original spelling -- preserved code is a record of
 what was tried, not doctrine -- but they will not compile as written against
-the current `include/class_3ac78.h`. The mapping, for whoever rebuilds one:
+the current `include/class_39e08.h`. The mapping, for whoever rebuilds one:
 
 | old | current |
 | --- | --- |
@@ -414,7 +414,7 @@ the current `include/class_3ac78.h`. The mapping, for whoever rebuilds one:
 | `HistoryEntry_3ac78` / `HistoryBlock_3ac78` | `GridRect_3ac78` / `GridRectList_3ac78` |
 | `->methods->unk04(...)` | `->methods->release(...)` |
 
-The `#if 0` copy that lives in `src/class_3ac78.c` WAS updated to the current
+The `#if 0` copy that lives in `src/class_39e08.c` WAS updated to the current
 names in the same round, so that one still compiles; only identifiers changed
 and the recorded score is unaffected.
 

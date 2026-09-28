@@ -139,7 +139,7 @@ apply by type scope.
 - `LbdFile.ownerKey` (+0x032) -> `elemKey`. StageMap's ctor writes the
   element's index, BuildRateEntries copies each element's `key` in, and
   FindElemByUnk32 / UpdateFootprintTracking / class_3bb8c_p read it back to
-  find an element. Accessors: class_3ac78.c, class_3bb8c.c, class_3bb8c_b.c,
+  find an element. Accessors: class_39e08.c, class_3bb8c.c, class_3bb8c_b.c,
   class_3bb8c_p.c (none in GameFiles.c; the ctor zeroes it).
 - `LbdFileHeader.gridOffset` / `gridSize` (+0x04 / +0x08) ->
   `placementsOffset` / `placementsSize`. StageMap__PopulateSlotCells

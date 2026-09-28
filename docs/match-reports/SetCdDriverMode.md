@@ -92,7 +92,7 @@ drift) and corrected on the second:
    near-miss diff showed `a0`/`a1` register roles and the materialized
    `&ServiceCdDriver` address swapped between them, which was the tell.
 
-`GetDrawSystem` is declared exactly as `class_3ac78.c` already declares it
+`GetDrawSystem` is declared exactly as `class_39e08.c` already declares it
 (`extern s32 GetDrawSystem(void);`, cast to a pointer type at the call
 site) — reused convention, not a new one. `ServiceCdDriver` (this unit,
 matched earlier this round) needed only a forward `extern s32

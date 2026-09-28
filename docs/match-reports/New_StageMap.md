@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004A4C8` on 2026-09-22 (tools/rename.py). Address 0x8004a4c8.
 
-**Unit:** class_3ac78 · **Size:** 27 words · **Status:** MATCHED (27/27 words)
+**Unit:** class_39e08 · **Size:** 27 words · **Status:** MATCHED (27/27 words)
 
 This is the **canonical account of how the `New_X` epilogue-merge residue
 class was closed.** Four other reports point here:
@@ -72,7 +72,7 @@ Five instances closed in one pass, all byte-exact:
 
 | function | unit | words |
 | --- | --- | --- |
-| `New_StageMap` | class_3ac78 | 27/27 |
+| `New_StageMap` | class_39e08 | 27/27 |
 | `New_TimedTask` | class_39e08 | 27/27 |
 | `New_DayTask` | class_39e08 | 31/31 |
 | `New_StreamTask` | Task | 36/36 |

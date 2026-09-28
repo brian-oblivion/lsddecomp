@@ -22,7 +22,7 @@ TmdModel: warning: `p' might be used uninitialized in this function
 TmdModel: warning: `size' might be used uninitialized in this function
 TmdModel: warning: unused variable `unused'
 ViewportDraw: warning: unused variable `scr'
-class_3ac78: warning: unused variable `unused'
+class_39e08: warning: unused variable `unused'
 class_3bb8c: warning: control reaches end of non-void function
 class_3bb8c_b: warning: `junk' might be used uninitialized in this function
 class_3bb8c_b: warning: `lateral' might be used uninitialized in this function

@@ -812,7 +812,7 @@ unique extension beyond FileResource's base layout, confirmed by
 grid-cell-shaped index (cached byte offset, or fresh `index*12+8` lookup),
 and when present computes position-like fields on a 0x800/0x400 lattice
 with row stride 20 before forwarding to `ctx->unk2C->methods->slot80`.
-That lattice/stride matches `class_3ac78.c`'s own header comment for
+That lattice/stride matches `class_39e08.c`'s own header comment for
 `StageMap`'s 20-column grid verbatim ("seeds every cell with a world
 position on a 0x800 lattice") -- a real lead for a future round, not
 claimed as proof here, since nothing in this unit confirms `ctx`/`self`

@@ -9,7 +9,7 @@
 ## What it does
 
 `New_NodeGuardedViewport`: the allocator for `NodeGuardedViewport`. Standard
-allocate-null-check-ctor shape, identical to class_3ac78.c's
+allocate-null-check-ctor shape, identical to class_39e08.c's
 `New_StageMap`/class_39e08.c's several `New_X` functions -- allocate a
 fixed-size block (`0xDC` bytes here), and on success run the class's ctor
 (`NodeGuardedViewport__NodeGuardedViewport`, fetched through `GetNodeGuardedViewportMethods()->ctor`) and return the

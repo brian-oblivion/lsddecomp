@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004ADD8` on 2026-09-22 (tools/rename.py). Address 0x8004add8.
 
-**Unit:** class_3ac78 · **Size:** 51 instructions · **Result:** 51/51 words
+**Unit:** class_39e08 · **Size:** 51 instructions · **Result:** 51/51 words
 
 ## What it does
 
@@ -119,7 +119,7 @@ quirk rather than something specific to those two functions' unit.
 
 ## Provenance
 
-round 2026-09-02, runner ALPHA, unit class_3ac78. First attempt 39/51
+round 2026-09-02, runner ALPHA, unit class_39e08. First attempt 39/51
 (pure frame-size gap, logic already exact); second attempt (padding local)
 closed it, 51/51. Follow-up (same day, head-requested): `switch` rewrite
 of the gate, one attempt, also 51/51 — adopted as final.

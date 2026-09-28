@@ -7,7 +7,7 @@
 Round 82, runner alpha (second re-staffed slot of the round). Unit `src/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table (`tools/classtable.py`).
-- **What:** Returns the gLightRigMethods method table (`class_3ac78.c` declares it `BaseCtorTable_3ac78 *`).
+- **What:** Returns the gLightRigMethods method table (`class_39e08.c` declares it `BaseCtorTable_3ac78 *`).
 - **Result:** byte-exact; 4/4 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** local views and `extern s32 D_XXXXXXXX[];` table declarations live in the unit; no shared header was touched.
 

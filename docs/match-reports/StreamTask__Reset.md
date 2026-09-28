@@ -55,7 +55,7 @@ None new beyond `StreamTask__SetKeepActive`'s.
 **StreamTask__Reset** -- tier A. Occupies `gStreamTaskMethods` slot
 `+0x040`, the SAME numbered slot independently named `Reset` in two other,
 unrelated classes in this codebase (`StageMap__Reset`,
-`include/class_3ac78.h`; `SceneNode__Reset`, `include/SceneNode.h`) --
+`include/class_39e08.h`; `SceneNode__Reset`, `include/SceneNode.h`) --
 both also called from their own class's ctor chain, both also just a run of
 fixed-literal field stores, exactly this function's own shape.
 

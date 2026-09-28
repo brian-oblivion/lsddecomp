@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004A534` on 2026-09-22 (tools/rename.py). Address 0x8004a534.
 
-Unit `class_3ac78`, 177-line body, `StageMapMethods::ctor` (the occupant
+Unit `class_39e08`, 177-line body, `StageMapMethods::ctor` (the occupant
 of the ctor slot, dispatched by `New_StageMap`'s `New_StageMap`
 allocator). 8 distinct callee-saved registers (`$s0`-`$s7`, fully
 saturated) -- flagged by the head as being in the band that was 0
@@ -125,7 +125,7 @@ more dispatches on `self->methods` (`slot10` with a fresh `GetDrawSystem()`
 value, then `slot40`, already known gp_rel-blocked as a CALLEE -- irrelevant
 here since this function only DISPATCHES to it, never inlines its body).
 
-## New struct ground opened (all additive; class_3ac78.h is unique to this unit)
+## New struct ground opened (all additive; class_39e08.h is unique to this unit)
 
 - `StageMapMethods::slot10` (+0x010, replacing a 4-byte pad) -- the ctor's
   own dispatch, `(self, s32 arg1)`.
@@ -217,7 +217,7 @@ Round 67 (track 3, naming pass).
 | `D_8008682C` | `gDefaultOrigin` | A | Its only use is this ctor's fallback when `arg1 == NULL`: `self->origin = gDefaultOrigin`. `asm/data/76DC8.data.s` shows the three words are all zero, so it is literally the default origin. |
 
 Field names this function established (all unit-local -- the compiler listed
-no accessor outside `src/class_3ac78.c`):
+no accessor outside `src/class_39e08.c`):
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |

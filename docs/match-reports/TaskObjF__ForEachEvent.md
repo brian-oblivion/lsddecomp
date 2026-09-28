@@ -27,7 +27,7 @@ this codebase. Established from first principles across this whole batch:
 
 `include/class_3bb8c.h` gets a new, purely additive section
 (`TaskObjF`/`TaskObjFMethods`) for this — a second independent local view
-in the same file as `Obj866E8`, same policy as `class_3ac78.h`'s
+in the same file as `Obj866E8`, same policy as `class_39e08.h`'s
 `StageMapMethods` vs. this file's own `Obj866E8Methods`.
 
 ## What TaskObjF__ForEachEvent does

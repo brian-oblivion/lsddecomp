@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004ADC4` on 2026-09-22 (tools/rename.py). Address 0x8004adc4.
 
-**Unit:** class_3ac78 · **Size:** 3 words · **Status:** MATCHED (3/3 words)
+**Unit:** class_39e08 · **Size:** 3 words · **Status:** MATCHED (3/3 words)
 
 ## What it does
 
@@ -20,7 +20,7 @@ jr $ra
 ```
 
 A two-field setter, both `s32` (plain `sw`, no shift/sign-extend). Field
-offsets and the `StageMap` type come from `include/class_3ac78.h`
+offsets and the `StageMap` type come from `include/class_39e08.h`
 (established this round; see `TimedTask__PlaySound.md` for how the class was
 identified via `tools/classtable.py gStageMapMethods`).
 

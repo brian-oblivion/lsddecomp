@@ -1,6 +1,6 @@
 /*
  * class_3bb8c_b -- StageMap's drawn window and scale ramp: the last of the
- * class's methods (include/StageMap.h; the others are in class_3ac78.c and
+ * class's methods (include/StageMap.h; the others are in class_39e08.c and
  * class_3bb8c.c).
  *
  *  - FindSlotIndexByNeighbour, FindSlotIndexByChunk: which of the seven

@@ -578,7 +578,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004C1C0` | `StageMap__ComputeFootprintDescriptor` | B | Occupant of `gStageMapMethods` +0x110 (`slot110`). `class_3ac78`'s own `StageMap__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `StageMap__SetFootprintFromCell`/`StageMap__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `SplitLongVec3` world position via `StageMap__FindSlotForPosition` and an `SplitCoord2` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |
+| `func_8004C1C0` | `StageMap__ComputeFootprintDescriptor` | B | Occupant of `gStageMapMethods` +0x110 (`slot110`). `class_39e08`'s own `StageMap__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `StageMap__SetFootprintFromCell`/`StageMap__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `SplitLongVec3` world position via `StageMap__FindSlotForPosition` and an `SplitCoord2` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |
 
 ## Track 6 (2026-09-26, round 93, alpha)
 

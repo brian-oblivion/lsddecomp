@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004AFE0` on 2026-09-22 (tools/rename.py). Address 0x8004afe0.
 
-**Unit:** class_3ac78 · **Size:** 20 instructions · **Result:** 20/20 words
+**Unit:** class_39e08 · **Size:** 20 instructions · **Result:** 20/20 words
 
 ## What it does
 
@@ -16,7 +16,7 @@ with a plain (non-virtual) tail call to `StageMap__BuildFootprintRects(self)`.
 `arg1`'s buffer is populated elsewhere (out of this round's scope, by a
 call through `StageMapMethods` slot `+0x110`, itself not decompiled) so
 only the two bytes this function actually reads are typed — added as
-`UnkArgObj_3ac78` in `include/class_3ac78.h`, following the
+`UnkArgObj_3ac78` in `include/class_39e08.h`, following the
 `Unk*Obj_<unit>` naming convention already used in `GameApplicationFileResource.h`.
 
 ## Final source
@@ -76,7 +76,7 @@ placement reachable from C.
 
 ## Provenance
 
-round 2026-09-02, runner ALPHA, unit class_3ac78.
+round 2026-09-02, runner ALPHA, unit class_39e08.
 
 ## Naming
 

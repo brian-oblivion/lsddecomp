@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004A4B8` on 2026-09-22 (tools/rename.py). Address 0x8004a4b8.
 
-**Unit:** class_3ac78 · **Size:** 4 words · **Status:** MATCHED (4/4 words)
+**Unit:** class_39e08 · **Size:** 4 words · **Status:** MATCHED (4/4 words)
 
 ## What it does
 
@@ -26,7 +26,7 @@ another reason; either way it isn't the gp-relative blocker since there's no
 `lui`+`lw` pair reading through `$gp`, just address materialization).
 `gTimedTaskMethods` resolved as a 28-slot method table via `tools/classtable.py
 gTimedTaskMethods`; declared `extern TimedTaskMethods gTimedTaskMethods;` in
-`include/class_3ac78.h` (the table's own data bytes remain unmatched/raw —
+`include/class_39e08.h` (the table's own data bytes remain unmatched/raw —
 this function only takes its address).
 
 ## Proposed learning

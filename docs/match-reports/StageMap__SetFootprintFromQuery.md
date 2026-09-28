@@ -100,7 +100,7 @@ real value, at that argument position.
 dispatch: fills a query buffer via `slot10C`, seeds `self->gridSlots[0]`
 via `StageMap__InitFootprintRect`, then conditionally adds up to two
 more slots gated by a bounding-box test (`IsPointOutOfBounds`) and a
-range check. Named to parallel class_3ac78's
+range check. Named to parallel class_39e08's
 `StageMap__SetFootprintFromCell`/`StageMap__SetFootprintRect` pair for
 the same subsystem, which the query-buffer + bounding-box shape here most
 resembles.

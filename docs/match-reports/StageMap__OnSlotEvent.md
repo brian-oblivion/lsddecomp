@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004AA6C` on 2026-09-22 (tools/rename.py). Address 0x8004aa6c.
 
-**Unit:** class_3ac78 · **Size:** 46 instructions · **Result:** 46/46 words
+**Unit:** class_39e08 · **Size:** 46 instructions · **Result:** 46/46 words
 
 ## What it does
 
@@ -86,7 +86,7 @@ just for forward dispatch instead of a shared tail.
 
 ## Provenance
 
-round 2026-09-02, runner ALPHA, unit class_3ac78. First attempt 33/46 (two
+round 2026-09-02, runner ALPHA, unit class_39e08. First attempt 33/46 (two
 distinct residues); second attempt closed both together, 46/46.
 
 ## Naming

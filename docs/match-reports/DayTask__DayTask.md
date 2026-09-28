@@ -170,7 +170,7 @@ needed anywhere in this 107-word function.
   earlier this round) already established as a uniform `SubObjG` family via
   `->methods->slot4`. These are almost certainly six DIFFERENT real
   classes under the hood (`New_StageMap` is independently and fully typed
-  in `class_3ac78.h` as returning `StageMap *`, a much richer type with
+  in `class_39e08.h` as returning `StageMap *`, a much richer type with
   its own documented `ctor`/`slot38`/`slot40`/`slot80`/`slotD0`) — `SubObjG`
   is this unit's own minimal, deliberately-unified LOCAL view (only the
   slots this unit's own functions actually reach: `slot4`, and now

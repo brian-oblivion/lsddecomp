@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004AB24` on 2026-09-22 (tools/rename.py). Address 0x8004ab24.
 
-**Unit:** class_3ac78 · **Size:** 25 instructions · **Result:** 25/25 words
+**Unit:** class_39e08 · **Size:** 25 instructions · **Result:** 25/25 words
 
 ## What it does
 
@@ -29,7 +29,7 @@ void StageMap__UpdateIfEnabled(StageMap *self)
 ```
 
 `self->unk70` (a plain `s32`, offset 0x6C..0x74 previously undifferentiated
-padding) is new struct knowledge, added to `include/class_3ac78.h`.
+padding) is new struct knowledge, added to `include/class_39e08.h`.
 
 ## Residue
 
@@ -44,7 +44,7 @@ this without any special handling.
 
 ## Provenance
 
-round 2026-09-02, runner ALPHA, unit class_3ac78.
+round 2026-09-02, runner ALPHA, unit class_39e08.
 
 ## Naming
 

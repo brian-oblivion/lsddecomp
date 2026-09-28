@@ -57,7 +57,7 @@ each arm by the compiler rather than needing to be written twice by hand.
   of the already-matched `class_39e08.c` function of the same name, which
   there returns its own unit's local view `SubObjG *`. Per this project's
   established multiple-independent-local-views convention (see
-  `class_3ac78`/`class_3bb8c` in DECOMPILATION_LEARNINGS), this unit keeps
+  `class_39e08`/`class_3bb8c` in DECOMPILATION_LEARNINGS), this unit keeps
   its own view rather than including `class_39e08.h`.
 
 ## The one residue, and how it closed

@@ -3,7 +3,7 @@
  * banner describes the class): placing a cell descriptor in the world,
  * loading the seven chunk slots around a centre chunk, linking a loaded
  * chunk into its slot's cells, and the queries that turn a position back
- * into a slot and cell. class_3ac78.c holds the methods before these and
+ * into a slot and cell. class_39e08.c holds the methods before these and
  * class_3bb8c_b.c those after; the class's data tables are declared in
  * include/class_3bb8c.h.
  *

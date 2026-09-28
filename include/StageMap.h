@@ -9,7 +9,7 @@
  * around a tracked target, each laid out as a lattice of GridCells. Class
  * id 0x114, method table gStageMapMethods; LightRig's subclass (its ctor
  * and finalize chain to LightRig's first; getLight and setAmbientColor are
- * inherited unchanged), no class below it. Methods in src/class_3ac78.c
+ * inherited unchanged), no class below it. Methods in src/class_39e08.c
  * (New_StageMap .. SetConfig), src/class_3bb8c.c (SetTargetAndLoadChunks
  * .. FindSlotForPosition) and src/class_3bb8c_b.c
  * (FindSlotIndexByNeighbour .. GetStageMapMethods).
