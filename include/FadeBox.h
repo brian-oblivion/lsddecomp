@@ -13,7 +13,7 @@
  *
  * A channel mask (4 = r, 2 = g, 1 = b; 0 means all, stored as 0xF) picks
  * the colour: it indexes gFadeBoxMaskColors, eight 3-byte RGB entries whose bytes
- * are the mask's channels at 0xFF (0 and 7 are white); gFadeBoxBlackColors's are
+ * are the mask's channels at 0xFF (0 and 7 are white); sFadeBoxBlackColors's are
  * black.
  *
  * One fade:

@@ -58,11 +58,11 @@ extern Ratio16 sDefaultViewTwist;
 
 /* FadeBox's colour tables, eight RGB entries each, indexed at a 3-byte
  * stride by a channel mask: gFadeBoxMaskColors holds each mask's own
- * channels at 0xFF (0 and 7 white), gFadeBoxBlackColors is all black.
+ * channels at 0xFF (0 and 7 white), sFadeBoxBlackColors is all black.
  * sBoxFillDefaultColor ({128, 128, 128}) is BoxFill__Reset's colour when it
  * is given none. */
 extern u8 gFadeBoxMaskColors[];
-extern u8 gFadeBoxBlackColors[];
+extern u8 sFadeBoxBlackColors[];
 extern u8 sBoxFillDefaultColor[3];
 
 #endif

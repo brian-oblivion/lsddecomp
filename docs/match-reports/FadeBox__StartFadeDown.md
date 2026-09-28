@@ -258,7 +258,7 @@ on `state == 0` (idle), looks up an index via `configure`, dispatches the
 `slotB8` color-set slot with `&gFadeBoxMaskColors[idx * 3]` (an INDEXED table
 entry), sets `state = 1`, and negates `step`. Named opposite
 `FadeBox__StartFadeUp` (`startFadeDefault`, `state = 2`, the FIXED
-`gFadeBoxBlackColors` table) -- the two are a matched pair distinguished by which
+`sFadeBoxBlackColors` table) -- the two are a matched pair distinguished by which
 color source they select. "Fade" is inferred from `step` accumulating into
 color-channel bytes over time in `FadeBox__Update`; "index" from this
 function's own `idx`-based table lookup versus its sibling's fixed one.

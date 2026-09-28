@@ -4,7 +4,7 @@
  *
  * FadeBox (include/FadeBox.h), New_FadeBox to GetFadeBoxMethods: a BoxFill
  * whose colour steps once per FrameClock tick away from a channel mask's
- * colour (gFadeBoxMaskColors) or up from black (gFadeBoxBlackColors), with
+ * colour (gFadeBoxMaskColors) or up from black (sFadeBoxBlackColors), with
  * semi-transparency on, and notifies its parents when the ramp runs out.
  * Viewport's fadeBox and Entity's are the two users.
  *
@@ -49,7 +49,7 @@ void FadeBox__FadeBox(FadeBox *self, void *size, s32 channels, s32 pri) {
     if (channels != 0) {
         color = &gFadeBoxMaskColors[channels * 3];
     } else {
-        color = gFadeBoxBlackColors;
+        color = sFadeBoxBlackColors;
     }
     base->ctor((BoxFill *)self, size, color, pri);
     self->methods = GetFadeBoxMethods();
@@ -119,7 +119,7 @@ void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 m
     if (self->altMode != 0) {
         self->ticksLeft--;
     } else {
-        self->methods->setColor(self, 1, &gFadeBoxBlackColors[channels * 3]);
+        self->methods->setColor(self, 1, &sFadeBoxBlackColors[channels * 3]);
     }
     self->state = FADEBOX_STATE_FADING_UP;
 }
@@ -180,7 +180,7 @@ void FadeBox__Stop(FadeBox *self, BasicClass *source) {
         event = FADEBOX_EVENT_FADE_UP_DONE;
         if (self->altMode != 0) {
             if (self->channels == FADEBOX_CHANNELS_ALL) {
-                methods->setColor(self, 1, gFadeBoxBlackColors);
+                methods->setColor(self, 1, sFadeBoxBlackColors);
             }
             methods->setSemiTransOn(self, 0);
         }
@@ -195,7 +195,7 @@ void FadeBox__Stop(FadeBox *self, BasicClass *source) {
 
 void *FadeBox__GetColor(FadeBox *self) {
     if (self->channels == FADEBOX_CHANNELS_ALL) {
-        return gFadeBoxBlackColors;
+        return sFadeBoxBlackColors;
     }
     return &gFadeBoxMaskColors[self->channels * 3];
 }
