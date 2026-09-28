@@ -52,7 +52,7 @@ void TileMap__Load(Obj6F498 *self) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); +0x042 is `loaded`. The no-argument call through FileResource's `void *slot78` is spelled `((TileMapBuildMapFn)self->methods->slot78)()` (a typedef with an empty parameter list, no code). Byte-identical.
+Class unified in `include/tile_map.h`. `self` is `TileMap *` (was `Obj6F498`); +0x042 is `loaded`. The no-argument call through FileResource's `void *slot78` is spelled `((TileMapBuildMapFn)self->methods->slot78)()` (a typedef with an empty parameter list, no code). Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

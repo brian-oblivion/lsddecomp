@@ -1080,7 +1080,7 @@
         "gTileMapMethods": {
           "class": "TileMap",
           "date": "2026-09-26",
-          "header": "include/TileMap.h"
+          "header": "include/tile_map.h"
         },
         "gTimArraySrcMethods": {
           "class": "TimArraySrc",

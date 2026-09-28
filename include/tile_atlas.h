@@ -9,7 +9,7 @@
 /*
  * TileAtlas -- a FileResource data source (class id 0x303, method table
  * gTileAtlasMethods) that builds, instead of loading, an array of 300 libgs
- * GsCELLs: the cell atlas a TileMap's GsMAP indexes (include/TileMap.h).
+ * GsCELLs: the cell atlas a TileMap's GsMAP indexes (include/tile_map.h).
  * Methods in src/graphics/graphics_resources.c. No classes derive from it (`typeviews.py
  * --tree`), so there are no FIELDS/SLOTS macros.
  *

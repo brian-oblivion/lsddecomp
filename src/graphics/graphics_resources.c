@@ -52,7 +52,7 @@
 #include "tim_image.h"
 #include "TimArraySrc.h"
 #include "bg_layer.h"
-#include "TileMap.h"
+#include "tile_map.h"
 #include "tile_atlas.h"
 #include "tmd_model.h"
 #include "link_resource.h"

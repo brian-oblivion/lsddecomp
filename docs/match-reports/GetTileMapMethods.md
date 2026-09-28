@@ -36,4 +36,4 @@ void *GetTileMapMethods(void) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. Returns `TileMapMethods *` and `&gTileMapMethods` (was `void *` over `extern s32 gTileMapMethods[]`). Byte-identical.
+Class unified in `include/tile_map.h`. Returns `TileMapMethods *` and `&gTileMapMethods` (was `void *` over `extern s32 gTileMapMethods[]`). Byte-identical.

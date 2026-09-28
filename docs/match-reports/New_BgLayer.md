@@ -48,7 +48,7 @@ void *New_BgLayer(s32 arg0, s32 arg1) {
 
 Class unified in `include/bg_layer.h`. Returns `BgLayer *` and takes `(struct Map44294 *src, s32 mode)` (was `void *` / `s32, s32`); the ctor is called through the typed `GetBgLayerMethods()->ctor` (was the unit-local unprototyped `UnprototypedCtorTable` view). The slot keeps SceneNode's `void *` return; the value is ignored, as before. The local views of it in include/task.h are gone. Byte-identical.
 
-Later the same round (alpha, second class): TileMap unified too (`include/TileMap.h`, same round): `src` is `TileMap *` (was `struct Map44294 *`). Byte-identical.
+Later the same round (alpha, second class): TileMap unified too (`include/tile_map.h`, same round): `src` is `TileMap *` (was `struct Map44294 *`). Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

@@ -48,9 +48,9 @@ void *New_TileMap(s32 arg0, s32 arg1) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. Returns `TileMap *` (was `void *`); the second parameter is `FileResource *atlas` (was `s32 arg1`: a TileAtlas, gTileAtlasMethods, typed by its nearest unified ancestor); the ctor is reached through `GetTileMapMethods()->ctor` (was the unit-local `UnprototypedCtorTable` cast). The prototype `extern StreamTaskUnkB4Obj *New_TileMap(...)` in include/task.h is gone. Byte-identical.
+Class unified in `include/tile_map.h`. Returns `TileMap *` (was `void *`); the second parameter is `FileResource *atlas` (was `s32 arg1`: a TileAtlas, gTileAtlasMethods, typed by its nearest unified ancestor); the ctor is reached through `GetTileMapMethods()->ctor` (was the unit-local `UnprototypedCtorTable` cast). The prototype `extern StreamTaskUnkB4Obj *New_TileMap(...)` in include/task.h is gone. Byte-identical.
 
-Later the same round (alpha, third class): TileAtlas unified; the `atlas` parameter is `TileAtlas *` (was `FileResource *`), in the prototype in include/TileMap.h (`struct TileAtlas *`, by tag) and in the ctor slot's parameter list. Byte-identical.
+Later the same round (alpha, third class): TileAtlas unified; the `atlas` parameter is `TileAtlas *` (was `FileResource *`), in the prototype in include/tile_map.h (`struct TileAtlas *`, by tag) and in the ctor slot's parameter list. Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

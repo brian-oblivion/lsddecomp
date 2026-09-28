@@ -43,4 +43,4 @@ void TileMap__Finalize(DataSrc33808 *self) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. `self` is `TileMap *` (was the generic `DataSrc33808`); the freed field is `map.index` (was `unk38`, s32), the GsMAP index table BuildMap allocates. Byte-identical.
+Class unified in `include/tile_map.h`. `self` is `TileMap *` (was the generic `DataSrc33808`); the freed field is `map.index` (was `unk38`, s32), the GsMAP index table BuildMap allocates. Byte-identical.

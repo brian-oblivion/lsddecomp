@@ -59,7 +59,7 @@ First build; the gTileAtlasMethods ctor (TileAtlas__TileAtlas) shape with one mo
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); the third parameter is `FileResource *atlas` (was `s32 arg2`); +0x03C `atlas` (was unk3C), +0x040 `defaultGrid` (was unk40: set here only when arg1 == 0, and BuildMap lays out the default grid only when it is set), +0x042 `loaded` (was unk42: cleared here, set by TileMap__Load after BuildMap). setFlag is called with `self` uncast. Byte-identical.
+Class unified in `include/tile_map.h`. `self` is `TileMap *` (was `Obj6F498`); the third parameter is `FileResource *atlas` (was `s32 arg2`); +0x03C `atlas` (was unk3C), +0x040 `defaultGrid` (was unk40: set here only when arg1 == 0, and BuildMap lays out the default grid only when it is set), +0x042 `loaded` (was unk42: cleared here, set by TileMap__Load after BuildMap). setFlag is called with `self` uncast. Byte-identical.
 
 Later the same round (alpha, third class): TileAtlas unified; the `atlas` parameter and TileMap::atlas are `TileAtlas *` (were `FileResource *`). Byte-identical.
 
@@ -75,4 +75,4 @@ MATCHING line on `s32 unused[8]`: it gives retail's 0x40-byte frame, which holds
 
 ## Round 95 (alpha, track 6: Sony headers)
 
-include/TileMap.h's banner no longer carries the name's history: the class was named TileMap in round 83 (from TileMap__BuildMap's GsMAP), unified in round 88. The header's local GsMAP is gone; the type is <libgs.h>'s (field-for-field the same: cellw, cellh, ncellw, ncellh, base, index), so both includers take Sony's headers first. Byte-identical.
+include/tile_map.h's banner no longer carries the name's history: the class was named TileMap in round 83 (from TileMap__BuildMap's GsMAP), unified in round 88. The header's local GsMAP is gone; the type is <libgs.h>'s (field-for-field the same: cellw, cellh, ncellw, ncellh, base, index), so both includers take Sony's headers first. Byte-identical.

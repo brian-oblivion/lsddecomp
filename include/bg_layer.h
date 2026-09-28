@@ -44,7 +44,7 @@
  * them lb/lb/lb, sb/sb/sb (BgLayer__SetColor, BgLayer__Reset), a whole-struct
  * copy.
  *
- * The map source is a TileMap (gTileMapMethods, include/TileMap.h),
+ * The map source is a TileMap (gTileMapMethods, include/tile_map.h),
  * whose GsMAP starts at +0x02C. Only its tag is named here, as
  * include/TriggerWorld.h does for its descriptor.
  */

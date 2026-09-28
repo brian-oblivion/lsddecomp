@@ -1,5 +1,5 @@
-#ifndef TILEMAP_H
-#define TILEMAP_H
+#ifndef TILE_MAP_H
+#define TILE_MAP_H
 
 #include "file_resource.h"
 #include <libgte.h>

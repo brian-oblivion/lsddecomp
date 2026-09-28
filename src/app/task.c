@@ -25,7 +25,7 @@
 #include "bmem_pmgr.h"
 #include "VabStreamObj.h"
 #include "bg_layer.h"
-#include "TileMap.h"
+#include "tile_map.h"
 #include "tile_atlas.h"
 #include "pad.h"
 #include "tim_image.h"

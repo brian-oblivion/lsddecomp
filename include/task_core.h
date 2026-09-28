@@ -65,7 +65,7 @@
  * (include/Viewport.h); its callers cast to that type. bgLayer is a
  * `struct BgLayer *` (include/bg_layer.h), by tag, so a unit that calls it
  * includes bg_layer.h. tileMap likewise is a `struct TileMap *`
- * (include/TileMap.h), and tileAtlas a `struct TileAtlas *`
+ * (include/tile_map.h), and tileAtlas a `struct TileAtlas *`
  * (include/tile_atlas.h).
  */
 
@@ -211,7 +211,7 @@ struct TaskCoreTarget {
     /* +0x070 */ const char *subHandlePath; /* setSubHandle's path; nonzero: the handle is owned */ \
     /* +0x074 */ BasicClass *subHandle; /* New_TimImage(subHandlePath), or the caller's; NULL: onInit also passes baseColor with sDefaultMovieFrame */ \
     /* +0x078 */ struct BgLayer *bgLayer; /* New_BgLayer(tileMap, 1); include/bg_layer.h (tag only here) */ \
-    /* +0x07C */ struct TileMap *tileMap; /* New_TileMap(0, tileAtlas); include/TileMap.h (tag only here) */ \
+    /* +0x07C */ struct TileMap *tileMap; /* New_TileMap(0, tileAtlas); include/tile_map.h (tag only here) */ \
     /* +0x080 */ struct TileAtlas *tileAtlas; /* New_TileAtlas(0); include/tile_atlas.h (tag only here) */ \
     /* +0x084 */ s32 fadeRate;          /* setFadeRate; reset: 9 */                                \
     /* +0x088 */ s32 (*fadeInCallback)(TaskCore *self);  /* setFadeInCallbackEnabled: NULL or tickFadeIn; nonzero: onInit sets baseColor */ \
