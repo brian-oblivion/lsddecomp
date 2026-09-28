@@ -25,15 +25,6 @@
  * which keeps it with the chunk. When the parity rules the day out, on a
  * stage other than 0 and an even day, one time in 12 the resident entity is
  * moved next to the player instead (PlaceDreamAuxEntityByPlayer).
- *
- * What decided its edges (python3 tools/tuboundary.py): both are kept. The
- * one before it, after DreamSys.c, lies in a forced stretch ("a forced
- * boundary lies in this stretch: tables 0x80011848 / 0x8001188c", the jump
- * tables of DreamSys__InstanceEffectsOnJournal and
- * CheckDreamAuxTriggerCondition), and content puts the boundary there. The
- * one after it, before New_Entity, is "start edge possible" and content
- * decided: the DreamAux free functions end with PlaceDreamAuxEntityByPlayer
- * and a class, Entity, begins.
  */
 #include "common.h"
 #include <libgte.h>
