@@ -155,7 +155,7 @@ void NullDriver__NoOpSlot50(void) {}
  * active data source and played through libsnd), and the SoundCueSet
  * start/flush pair.
  *
- * NullDriver (include/NullDriver.h, class id 0x23 = DATASOURCE_SPU) is the
+ * NullDriver (include/NullDriver.h, class id 0x23 = DATASOURCE_NULL) is the
  * data source GameApplicationFileResource.c selects when it is not reading the CD; the CD
  * driver (include/CdDriver.h, 0x13) is the other. Its Read, LoadFile,
  * RunRequestQueue, RequestLoadFile, StopService and CancelRequests slots do

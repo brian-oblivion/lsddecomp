@@ -367,14 +367,14 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
  * game loads from a file: a BasicClass subclass owning one file buffer
  * (FileResource__LoadFile reads a whole named file into it, FreeBuffer
  * releases it) and declaring the file-I/O interface that the CD driver
- * (gCdDriverMethods, include/CdDriver.h) and the SPU/VAB driver
+ * (gCdDriverMethods, include/CdDriver.h) and the null driver
  * (gNullDriverMethods, include/NullDriver.h) implement.
  *
  * gActiveDataSource selects one of those two drivers. SetActiveDataSource
  * installs one and copies its interface slots into FileResource's table and
  * into every client table. The Lock/Unlock, IsBusy/Idle, Get.../Set...
  * functions after it forward to the CD driver when it is active, and
- * otherwise do nothing, return a fixed value or call the SPU/VAB driver.
+ * otherwise do nothing, return a fixed value or call the null driver.
  * RegisterFileTableEntries appends CdFileEntry records to the CD driver's
  * file table and resolves them.
  *
@@ -388,9 +388,9 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
 
 /* gActiveDataSource's two observed values are the header words of the two
  * sibling classes it selects between: gCdDriverMethods (the CD-ROM read driver,
- * CdDriver.c) and gNullDriverMethods (NullDriver, the SPU/VAB driver, include/NullDriver.h). */
+ * CdDriver.c) and gNullDriverMethods (NullDriver, the null driver, include/NullDriver.h). */
 #define DATASOURCE_CD 0x13
-#define DATASOURCE_SPU 0x23
+#define DATASOURCE_NULL 0x23
 
 void *FileResource__Release(FileResource *this) {
     this->freeGuard = 0;
@@ -471,7 +471,7 @@ FileResourceMethods *GetFileResourceMethods(void) {
 extern s32 gActiveDataSource;
 
 void *GetActiveDataSourceMethods(void) {
-    if (gActiveDataSource == DATASOURCE_SPU) {
+    if (gActiveDataSource == DATASOURCE_NULL) {
         return GetNullDriverMethods();
     } else {
         return GetCdDriverMethods();
@@ -586,7 +586,7 @@ s32 GetActiveDataSourceState(void) {
 
 typedef s32 (*DataSourceSetDriverModeFn)(s32, s32, s32);
 /* SetNullDriverMode takes two arguments and SetCdDriverMode three. Both are
- * called through the three-argument type, and the VAB driver ignores the
+ * called through the three-argument type, and the null driver ignores the
  * third. Assigning SetNullDriverMode to `fn` warns about incompatible pointer
  * types, and that is harmless. */
 extern s32 SetNullDriverMode(s32 async, s32 mode2);

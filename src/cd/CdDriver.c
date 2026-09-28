@@ -446,7 +446,7 @@ void CdDriver__RunRequestQueue(void) {
  *
  * The game reaches all of it through GameApplicationFileResource.c's
  * wrappers while the active data source is this class's id, DATASOURCE_CD
- * (0x13); the other source is the SPU/VAB driver, DATASOURCE_SPU (0x23).
+ * (0x13); the other source is the null driver, DATASOURCE_NULL (0x23).
  */
 
 /* This unit's own functions, called before their definitions. */
