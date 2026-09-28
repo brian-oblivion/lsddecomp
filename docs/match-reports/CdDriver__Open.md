@@ -6,7 +6,7 @@
 
 108/108 words, byte-exact, file 0x17AD0-0x17C80. Cold ground. First function
 in ROM order in this unit, so the shared `Obj80027480` local struct and
-`sCdAsyncEnabled`/`gCdSyncQueueMode`/`gCdBusy`/`LockCd`/`StartCdOperation`/
+`sCdAsyncEnabled`/`gCdSyncQueueMode`/`sCdBusy`/`LockCd`/`StartCdOperation`/
 `ResetCdStateMachine`/`EnqueueCdRequest`/`UnlockCd` externs were moved ahead of
 it (they were previously declared between it and `CdDriver__Close`).
 
@@ -57,7 +57,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (gCdBusy == 0 && self->unk0C == 0) {
+        if (sCdBusy == 0 && self->unk0C == 0) {
             StartCdOperation(1, 1);
             if (sCdAsyncEnabled != 0) {
                 rec = FindCdFileEntry(suffix);

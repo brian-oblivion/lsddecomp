@@ -43,7 +43,7 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (gCdBusy == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
+        if (sCdBusy == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
             StartCdOperation(4, 1);
             gCdSavedSeekParam = gCdSeekParam;
             rec = FindCdFileEntry(arg1);
@@ -117,7 +117,7 @@ not necessarily the order that matters most:
 
 1. **The nested-if/else-if-vs-nested-if polarity lever, a FOURTH instance in
    this unit**, on the outermost `self->unk28` split: `if (self->unk28 != 0)
-   { if (gCdBusy==0 && ...) {...} } else { EnqueueCdRequest(...); }`, not
+   { if (sCdBusy==0 && ...) {...} } else { EnqueueCdRequest(...); }`, not
    the flattened else-if form.
 
 2. **The SAME polarity lever again, a fifth instance, on `self->unk10 ==

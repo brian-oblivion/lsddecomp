@@ -27,7 +27,7 @@ s32 CdDriver__Read(Obj80027480 *self, void *buf, u32 size) {
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (gCdBusy == 0 && self->unk0C != 0) {
+        if (sCdBusy == 0 && self->unk0C != 0) {
             StartCdOperation(3, 7);
             if (sCdAsyncEnabled != 0) {
                 gCdReadSectorCount = size >> 11;
@@ -53,14 +53,14 @@ s32 CdDriver__Read(Obj80027480 *self, void *buf, u32 size) {
 }
 ```
 
-(`Obj80027480`, `sCdAsyncEnabled`, `gCdSyncQueueMode`, `gCdBusy`, `LockCd`,
+(`Obj80027480`, `sCdAsyncEnabled`, `gCdSyncQueueMode`, `sCdBusy`, `LockCd`,
 `StartCdOperation`, `EnqueueCdRequest`, `UnlockCd` are all declared earlier in
 the unit, ahead of `CdDriver__Close`.)
 
 ## What it took, in order
 
 1. **The nested-if-vs-if/else-if polarity lever from `CdDriver__Close` applied
-   again unchanged**: `if (self->unk28 != 0) { if (gCdBusy==0 && ...) {...}
+   again unchanged**: `if (self->unk28 != 0) { if (sCdBusy==0 && ...) {...}
    } else { EnqueueCdRequest(...); }`, not the flattened else-if form. Same
    reasoning as that report.
 2. **`size >> 11` must be an UNSIGNED shift.** Retail's `srl` (logical) vs an

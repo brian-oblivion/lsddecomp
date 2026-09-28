@@ -28,7 +28,7 @@ s32 CdDriver__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (gCdBusy == 0 && self->unk0C != 0) {
+        if (sCdBusy == 0 && self->unk0C != 0) {
             StartCdOperation(2, 1);
             s0tmp = arg1 >> 11;
             if ((arg1 & 0x7FF) != 0) {

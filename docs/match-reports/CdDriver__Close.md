@@ -23,7 +23,7 @@ typedef struct Obj80027480 {
 
 extern s32 sCdAsyncEnabled;
 extern s32 gCdSyncQueueMode;
-extern s32 gCdBusy;
+extern s32 sCdBusy;
 
 extern void CloseCdFile(Obj80027480 *self);
 extern void LockCd(void);
@@ -40,7 +40,7 @@ void CdDriver__Close(Obj80027480 *self) {
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (gCdBusy == 0) {
+        if (sCdBusy == 0) {
             StartCdOperation(0, 0);
             self->unk0C = 0;
             ResetCdStateMachine();
@@ -59,14 +59,14 @@ matched immediately (retail compiles a plain short-circuit `&&` as two
 separate `bnez`-to-same-target branches, which is exactly this shape).
 
 The one miss: I first wrote the second half as
-`if (self->unk28 == 0) { EnqueueCdRequest(...); } else if (gCdBusy == 0) { ...
+`if (self->unk28 == 0) { EnqueueCdRequest(...); } else if (sCdBusy == 0) { ...
 }` -- logically identical to the nested form, but GCC 2.6.3 lays out the
 `then`-arm of an `if` as the fall-through immediately after the test, so this
 inverted the *physical order* of the two blocks relative to retail (retail's
-`beqz` falls through to the `gCdBusy` check block, with the
+`beqz` falls through to the `sCdBusy` check block, with the
 `EnqueueCdRequest` call living at the branch TARGET, further down). `m2ctx.py
 --run`'s seed already had the correct nested shape
-(`if (self->unk28 != 0) { if (gCdBusy == 0) {...} } else { EnqueueCdRequest(...); }`)
+(`if (self->unk28 != 0) { if (sCdBusy == 0) {...} } else { EnqueueCdRequest(...); }`)
 -- switching to it matched on the very next build with zero other changes.
 This is the same family as round 46's "put the longer continuation in the
 `if` body" lever, but on the OTHER axis: here it was about which of two

@@ -7,17 +7,17 @@
 ## What this function does
 
 A plain `$gp`-relative getter, no arguments. Reads the scalar `s32` global
-`gCdBusy` (in `.sdata`, confirmed a single `.word` in
+`sCdBusy` (in `.sdata`, confirmed a single `.word` in
 `asm/data/7B048.sdata.s`) and returns it.
 
 ## The C
 
 ```c
-extern s32 gCdBusy;
+extern s32 sCdBusy;
 
 s32 IsCdBusy(void)
 {
-    return gCdBusy;
+    return sCdBusy;
 }
 ```
 
@@ -37,12 +37,12 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | was | now | tier |
 | --- | --- | --- |
 | `func_80027EC8` | `IsCdBusy` | A |
-| `D_8008A864` | `gCdBusy` | A |
+| `D_8008A864` | `sCdBusy` | A |
 
 **Evidence.** The global is set to 1 by `StartCdOperation` (CdDriver), which
 every method of this class calls to BEGIN an operation, and back to 0 by
 `ResetCdStateMachine`, the state-machine reset. Every reader is a refusal guard:
-`CdDriver` tests `gCdBusy == 0` before starting any transfer, and
+`CdDriver` tests `sCdBusy == 0` before starting any transfer, and
 `SetCdDriverMode` in this unit returns 0 (rejected) while it is non-zero.
 `GameApplicationFileResource.c`'s wrapper `IsActiveDataSourceBusy` returns 0 -- not busy -- when no CD
 source is selected. Getter of a flag whose writers define it: tier A by the

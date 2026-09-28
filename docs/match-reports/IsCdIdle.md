@@ -35,10 +35,10 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `func_80027ED4` | `IsCdIdle` | B |
 | `D_8008A870` | `gCdIdle` | B |
 
-**Evidence.** Written in exactly the same two places as `gCdBusy` and always
-to the opposite value: `StartCdOperation` (operation start) sets `gCdBusy = 1`
+**Evidence.** Written in exactly the same two places as `sCdBusy` and always
+to the opposite value: `StartCdOperation` (operation start) sets `sCdBusy = 1`
 and `gCdIdle = 0`, `ResetCdStateMachine` (state-machine reset) sets `gCdIdle = 1`
-and `gCdBusy = 0`. Its initial value in `.sdata` is 1. `GameApplicationFileResource.c`'s
+and `sCdBusy = 0`. Its initial value in `.sdata` is 1. `GameApplicationFileResource.c`'s
 wrapper returns 1 when no CD source is selected, matching "idle". The one
 reader that is not a getter is `CdDriver__CancelRequests`, which only
 aborts a transfer in flight when `gCdIdle == 0`.
@@ -47,5 +47,5 @@ aborts a transfer in flight when `gCdIdle == 0`.
 why the driver carries two globals that are exact complements. One of them
 presumably means something narrower than the other, and nothing in the three
 carved units distinguishes them. A reader should know that `gCdIdle` is
-`!gCdBusy` in every write the corpus contains, which is why this is written
+`!sCdBusy` in every write the corpus contains, which is why this is written
 down rather than smoothed over.

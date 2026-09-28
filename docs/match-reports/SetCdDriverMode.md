@@ -17,7 +17,7 @@ carries the evidence for each one.
 ```c
 extern s32 GetDrawSystem(void); /* returns gDrawSystem, a singleton object */
 extern s32 ServiceCdDriver(void);
-extern s32 gCdBusy;
+extern s32 sCdBusy;
 extern s32 sCdAsyncEnabled;
 extern s32 gCdSyncQueueMode;
 extern s32 gCdUseVSyncCallback;
@@ -42,7 +42,7 @@ s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
 {
     ObjF18 *obj;
 
-    if (gCdBusy == 0) {
+    if (sCdBusy == 0) {
         if (useVSyncCallback == 0) {
             obj = (ObjF18 *)GetDrawSystem();
 
@@ -75,13 +75,13 @@ drift) and corrected on the second:
 
 1. **The whole-body guard is `if (cond == 0) { body; return 1; } return 0;`,
    not `if (cond != 0) { return 0; } body; return 1;`.** Retail's
-   `gCdBusy != 0` check branches DIRECTLY to the shared `move v0,zero`
+   `sCdBusy != 0` check branches DIRECTLY to the shared `move v0,zero`
    tail already sitting at the very end of the function (right after the
    `return 1` tail), rather than to a duplicate `v0=0`/jump pair inlined at
    the top. Writing the guard as an early `if (cond) return 0;` makes GCC
    duplicate that tail at the entry instead of reusing the one at the end,
    adding two words and shifting everything after. Wrapping the entire rest
-   of the function in `if (gCdBusy == 0) { ...; return 1; }` followed by
+   of the function in `if (sCdBusy == 0) { ...; return 1; }` followed by
    a single trailing `return 0;` reproduces retail's single physical copy.
 2. **The virtual dispatch takes an explicit `self` argument, not just the
    callback.** `obj->methods->setCallback(callback)` (`slot84` when this was written) compiles the callback into
@@ -122,7 +122,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `func_80027F18` | `SetCdDriverMode` | B |
 | `D_8008A8A4` | `gCdUseVSyncCallback` | A |
 
-**Evidence for the function.** It refuses (returns 0) while `gCdBusy`, and
+**Evidence for the function.** It refuses (returns 0) while `sCdBusy`, and
 otherwise stores its three arguments into `gCdUseVSyncCallback`,
 `sCdAsyncEnabled` and `gCdSyncQueueMode` and returns 1 -- the write half of the
 pair `GetCdDriverMode` reads back. `GameApplicationFileResource.c`'s `SetActiveDataSourceDriverMode` calls it

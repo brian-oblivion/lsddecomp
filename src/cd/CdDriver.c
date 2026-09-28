@@ -116,7 +116,7 @@ void CdDriver__Open(CdDriver *self, char *name, s32 param0, s32 param1) {
     }
     LockCd();
     if (self->inQueueDispatch != 0) {
-        if (gCdBusy == 0 && self->isOpen == 0) {
+        if (sCdBusy == 0 && self->isOpen == 0) {
             StartCdOperation(CD_OPERATION_OPEN, CD_STATE_SETLOC);
             if (sCdAsyncEnabled != 0) {
                 entry = FindCdFileEntry(name);
@@ -159,7 +159,7 @@ void CdDriver__Close(CdDriver *self) {
     }
     LockCd();
     if (self->inQueueDispatch != 0) {
-        if (gCdBusy == 0) {
+        if (sCdBusy == 0) {
             StartCdOperation(CD_OPERATION_CLOSE, CD_STATE_IDLE);
             self->isOpen = 0;
             ResetCdStateMachine();
@@ -183,7 +183,7 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
     }
     LockCd();
     if (self->inQueueDispatch != 0) {
-        if (gCdBusy == 0 && self->isOpen != 0) {
+        if (sCdBusy == 0 && self->isOpen != 0) {
             StartCdOperation(CD_OPERATION_SEEK, CD_STATE_SETLOC);
             sectors = offset >> CD_SECTOR_SHIFT;
             if ((offset & (CD_SECTOR_SIZE - 1)) != 0) {
@@ -234,7 +234,7 @@ s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
     }
     LockCd();
     if (self->inQueueDispatch != 0) {
-        if (gCdBusy == 0 && self->isOpen != 0) {
+        if (sCdBusy == 0 && self->isOpen != 0) {
             StartCdOperation(CD_OPERATION_READ, CD_STATE_READ);
             if (sCdAsyncEnabled != 0) {
                 gCdReadSectorCount = size >> CD_SECTOR_SHIFT;
@@ -283,7 +283,7 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
     }
     LockCd();
     if (self->inQueueDispatch != 0) {
-        if (gCdBusy == 0 && (self->buffer == NULL || self->freeGuard != 0)) {
+        if (sCdBusy == 0 && (self->buffer == NULL || self->freeGuard != 0)) {
             StartCdOperation(CD_OPERATION_LOAD_FILE, CD_STATE_SETLOC);
             gCdSavedSeekParam = gCdSeekParam;
             entry = FindCdFileEntry(name);
@@ -426,7 +426,7 @@ void CdDriver__RunRequestQueue(void) {
  *     queued and run in the background), gCdSyncQueueMode (queued, but each
  *     run as a blocking spin) and gCdUseVSyncCallback (ServiceCdDriver is
  *     installed with VSyncCallback; otherwise it becomes the DrawSystem
- *     singleton's callback). It refuses while gCdBusy. InitCdDrive puts the
+ *     singleton's callback). It refuses while sCdBusy. InitCdDrive puts the
  *     drive in double speed once; the Is/Get functions read the state
  *     machine's flags back.
  *   - The queue's front end. EnqueueCdRequest fills a node
@@ -564,7 +564,7 @@ void InitCdDrive(void) {
 }
 
 s32 IsCdBusy(void) {
-    return gCdBusy;
+    return sCdBusy;
 }
 
 s32 IsCdIdle(void) {
@@ -594,7 +594,7 @@ s32 GetCdDriverMode(s32 *outSyncQueueMode) {
 s32 SetCdDriverMode(s32 async, s32 syncQueueMode, s32 useVSyncCallback) {
     DrawSystem *drawSystem;
 
-    if (gCdBusy == 0) {
+    if (sCdBusy == 0) {
         if (useVSyncCallback == 0) {
             drawSystem = GetDrawSystem();
 
@@ -1024,7 +1024,7 @@ unlock:
 /* op is a CD_OPERATION_* and state the first CD_STATE_*; the operation is the
  * queue's head request, which is marked active. */
 void StartCdOperation(s32 op, s32 state) {
-    gCdBusy = 1;
+    sCdBusy = 1;
     gCdOperation = op;
     gCdState = state;
     gCdIdle = 0;
@@ -1038,7 +1038,7 @@ void ResetCdStateMachine(void) {
     gCdTickStep = CD_TICK_NONE;
     gCdIdle = 1;
     gCdTimeoutCounter = 0;
-    gCdBusy = 0;
+    sCdBusy = 0;
 }
 
 void SetCdState(s32 state) {

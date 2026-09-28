@@ -599,7 +599,7 @@ void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     if (sActiveDataSource == DATASOURCE_CD) {
         fn = SetCdDriverMode;
     }
-    /* Retry until the driver accepts: SetCdDriverMode refuses while gCdBusy. */
+    /* Retry until the driver accepts: SetCdDriverMode refuses while sCdBusy. */
     do {
     } while (fn(async, mode2, useVSyncCallback) == 0);
 }
