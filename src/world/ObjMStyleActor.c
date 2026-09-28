@@ -1809,7 +1809,7 @@ extern u8 *gStyleCueRecordLists[];
 extern u8 gStyleCueRecordCounts[];
 extern s32 sStyleCueDistanceTable[];
 
-/* The cell-key halves: a record's four cell bytes and gStyleCueOffsets' s16
+/* The cell-key halves: a record's four cell bytes and sStyleCueOffsets' s16
  * x/y/z, copied whole into a 10-byte cell key (StageMap's Descriptor10
  * shape) for computeCellOffsets. */
 typedef struct Pos4 Pos4;
@@ -1826,7 +1826,7 @@ struct TabEntry {
     s16 tail;
 };
 
-extern TabEntry gStyleCueOffsets[];
+extern TabEntry sStyleCueOffsets[];
 
 typedef struct EntrySlot EntrySlot;
 
@@ -1868,7 +1868,7 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
         gStyleCueRecordIndex++;
         if (entry->cue > 0) {
             buf.pos = entry->pos;
-            buf.tab = gStyleCueOffsets[entry->offsetIndex];
+            buf.tab = sStyleCueOffsets[entry->offsetIndex];
             grid = (StageMap *)gStyleGrid;
             grid->methods->computeCellOffsets(grid, pos, &buf);
             dx = pos->x - target->x;
