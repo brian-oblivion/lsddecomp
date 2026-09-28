@@ -110,7 +110,7 @@ struct TmdModel {
 };
 
 extern TmdModelMethods gTmdModelMethods;
-extern TmdModelMethods *Get_vtable_TmdModel(void); /* returns &gTmdModelMethods */
+extern TmdModelMethods *GetTmdModelMethods(void); /* returns &gTmdModelMethods */
 
 extern s32 gTmdModelBoundsCount; /* boxes in the bounds buffer: 1, set by the ctor */
 

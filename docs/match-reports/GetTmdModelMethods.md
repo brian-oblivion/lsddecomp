@@ -1,4 +1,6 @@
-# Get_vtable_TmdModel -- MATCHED (4/4 words), round 82
+# GetTmdModelMethods -- MATCHED (4/4 words), round 82
+
+> Renamed from `Get_vtable_TmdModel` on 2026-09-28 (tools/rename.py). Address 0x8001f384.
 
 > Renamed from `func_8001F384` on 2026-09-25 (tools/rename.py). Address 0x8001f384.
 
@@ -13,14 +15,14 @@ Round 82, runner charlie (matching slot). Unit `src/graphics/TmdModel.c`. Fresh 
 ## Source
 
 ```c
-void *Get_vtable_TmdModel(void) {
+void *GetTmdModelMethods(void) {
     return gTmdModelMethods;
 }
 ```
 
 ## Naming
 
-`Get_vtable_TmdModel` -- tier B. Convention: `Get_vtable_<Class>` (matches
+`GetTmdModelMethods` -- tier B. Convention: `Get_vtable_<Class>` (matches
 `GetBasicClassMethods`, `GetCdStreamMethods`, `GetDrawSystemMethods`).
 Class name `TmdModel`: gTmdModelMethods is class tag 9, the object
 `SceneNode__LinkModel` (src/graphics/SceneNode.c) links as `self->model` -- that

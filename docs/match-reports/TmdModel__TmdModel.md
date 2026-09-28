@@ -16,7 +16,7 @@ void TmdModel__InitBoundsCount(TmdModel *self);
 
 void TmdModel__TmdModel(TmdModel *self, void *arg) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_TmdModel();
+    self->methods = GetTmdModelMethods();
     self->object = arg;
     self->data = (ModelData_fa50 *)((u8 *)arg - 0xC);
     TmdModel__InitBoundsCount(self);

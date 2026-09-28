@@ -75,7 +75,7 @@ TmdModel *New_TmdModel(TmdObject *object) {
     TmdModel *p = BMemPMgrAlloc(sizeof(TmdModel));
 
     if (p != NULL) {
-        Get_vtable_TmdModel()->ctor(p, object);
+        GetTmdModelMethods()->ctor(p, object);
         return p;
     }
     return NULL;
@@ -83,7 +83,7 @@ TmdModel *New_TmdModel(TmdObject *object) {
 
 void TmdModel__TmdModel(TmdModel *self, TmdObject *object) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_TmdModel();
+    self->methods = GetTmdModelMethods();
     self->object = object;
     self->data = (TmdFile *)((u8 *)object - offsetof(TmdFile, objects));
     TmdModel__InitBoundsCount(self);
@@ -103,7 +103,7 @@ TmdObject *TmdModel__GetObject(TmdModel *self, s32 i) {
 
 void TmdModel__func_8001F37C(void) {}
 
-TmdModelMethods *Get_vtable_TmdModel(void) {
+TmdModelMethods *GetTmdModelMethods(void) {
     return &gTmdModelMethods;
 }
 
