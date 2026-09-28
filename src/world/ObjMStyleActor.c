@@ -1727,7 +1727,7 @@ extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
 extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
-extern s32 gStyleSpawnModelLayout;
+extern s32 sStyleSpawnModelLayout;
 
 /* Randomises the spawn parameters: offset y (offsetY, or a random choice
  * when 0), x and z offsets of 0..22 steps of 2048 either side, a rotation
@@ -1748,11 +1748,11 @@ void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
         gStyleSpawnOffsetZ = -gStyleSpawnOffsetZ;
     }
     gStyleSpawnRotation = gStyleSpawnRotations[(u32)rand() % 7];
-    gStyleSpawnModelLayout = rand() % 5;
+    sStyleSpawnModelLayout = rand() % 5;
 }
 
 extern s32 gStyleSpawnYChoice1;
-extern s32 gStyleSpawnModelLayout;
+extern s32 sStyleSpawnModelLayout;
 
 /* The every-seventh-day setup: fixed offset y, x of 0..19 steps of 2048, z
  * by day % 3 (40960, -40960, 2048), then the same rotation and layout
@@ -1775,7 +1775,7 @@ void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
         gStyleSpawnOffsetZ = 2048;
     }
     gStyleSpawnRotation = gStyleSpawnRotations[(u32)rand() % 7];
-    gStyleSpawnModelLayout = rand() % 5;
+    sStyleSpawnModelLayout = rand() % 5;
 }
 
 extern s32 sStyleSceneRefs;

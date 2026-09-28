@@ -47,7 +47,7 @@ gStyleSpawnOffsetX = (r % 20) << 11;
 r = rand();
 gStyleSpawnRotation = gStyleSpawnRotations + ((u32) r % 7) * 12;
 r = rand();
-gStyleSpawnModelLayout = r % 5;
+sStyleSpawnModelLayout = r % 5;
 ```
 
 `r` is one pseudo whose live range spans the calls, so cc1 2.6.3 cannot
@@ -81,7 +81,7 @@ extern s32 sStyleDay;
 extern s32 gStyleSpawnOffsetZ;
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
-extern s32 gStyleSpawnModelLayout;
+extern s32 sStyleSpawnModelLayout;
 
 void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1) {
     s32 mod3;
@@ -97,7 +97,7 @@ void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1) {
         gStyleSpawnOffsetZ = 0x800;
     }
     gStyleSpawnRotation = gStyleSpawnRotations + ((u32) rand() % 7) * 12;
-    gStyleSpawnModelLayout = rand() % 5;
+    sStyleSpawnModelLayout = rand() % 5;
 }
 ```
 
