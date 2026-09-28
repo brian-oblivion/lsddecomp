@@ -57,6 +57,10 @@
  * The object is 0x108 bytes (New_Entity); TodActor's fields end at +0x098.
  */
 
+/* gEntityMethods' class id (TodActor's 0xF234 with a 1 above it):
+ * `(header & 0xFFFFF) == ENTITY_CLASS_ID` is its is-kind-of test. */
+#define ENTITY_CLASS_ID 0x1F234
+
 typedef struct Entity Entity;
 typedef struct EntityMethods EntityMethods;
 typedef struct EntityMoodRow EntityMoodRow;

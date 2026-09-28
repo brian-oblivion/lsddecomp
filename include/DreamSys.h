@@ -231,22 +231,6 @@ struct LinkResource;
 /* DreamSys's base class is Actor (include/Actor.h): DreamSys's own methods
    reach the base implementations through GetActorMethods() and upcast. */
 
-/* DreamSys__InstanceEffectsOnJournal's view of the Entity (include/Entity.h,
-   class 0x1F234) that sent it an instance effect: the four Entity slots it
-   calls, named as Entity.h names them. A local view because a unit including
-   both this header and Entity.h sees conflicting SoundCueSet prototypes. */
-typedef struct DreamSysEntityMethods {
-    u8 pad00[0x14C];
-    MoodGraphPoint *(*getMoodEffect)(void *self); /* Entity +0x14C */
-    s32 (*getUnlockEffect)(void *self);           /* Entity +0x150 */
-    s32 (*getLinkStage)(void *self);              /* Entity +0x154 */
-    s32 (*getEventVideo)(void *self);             /* Entity +0x158 */
-} DreamSysEntityMethods;
-
-typedef struct DreamSysEntityObj {
-    DreamSysEntityMethods *methods;
-} DreamSysEntityObj;
-
 /* The object. Actor's fields (include/Actor.h) run to +0x058; DreamSys's
  * own start there. New_DreamSys allocates 0x928 bytes. */
 struct DreamSys {

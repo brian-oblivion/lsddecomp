@@ -36,6 +36,7 @@
 #include <memory.h>
 #include <rand.h>
 #include "DreamSys.h"
+#include "Entity.h"
 #include "LinkResource.h"
 #include "StageMap.h"
 #include "LbdFile.h"
@@ -399,7 +400,7 @@ void DreamSys__DispatchChunkChange(DreamSys *self, void *sender, s32 event) {
 
 void DreamSys__DispatchInstanceEffect(DreamSys *self, void *sender, s32 effect) {
     GetActorMethods()->onActorLinkCommand((Actor *)self, sender, effect);
-    if ((((BasicClass *)sender)->methods->header & 0xFFFFF) == 0x1F234) {
+    if ((((BasicClass *)sender)->methods->header & 0xFFFFF) == ENTITY_CLASS_ID) {
         self->methods->instanceEffectsOnJournal(self, sender, effect);
     }
 }
@@ -1328,7 +1329,7 @@ s32 DreamSys__GetCurrentStage(DreamSys *self) {
 void DreamSys__ProcessChunkChange(DreamSys *self, void *entity, s32 effect) {
     PlayerSpawnPoint *pos;
 
-    if (effect == 5) {
+    if (effect == STAGEMAP_EVENT_CHUNK_CHANGED) {
         pos =
             (PlayerSpawnPoint *)((StageMap *)entity)->methods->getTargetDescriptor((StageMap *)entity, 0, 0);
         self->methods->logChunkMood(self, pos);
@@ -1354,34 +1355,33 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *self, void *entity, s32 effect
         case 7:
         case 8:
             break;
-        case 9:
+        case ENTITY_EFFECT_LOG_MOOD:
             if (self->isFlashbackSession != 0) {
                 return;
             }
             self->methods->logInstanceMood(
-                self, ((DreamSysEntityObj *)entity)->methods->getMoodEffect(entity));
-            self->instanceFlashbackUnlockScore +=
-                ((DreamSysEntityObj *)entity)->methods->getUnlockEffect(entity);
+                self, (MoodGraphPoint *)((Entity *)entity)->methods->getMoodEffect(entity));
+            self->instanceFlashbackUnlockScore += ((Entity *)entity)->methods->getUnlockEffect(entity);
             self->methods->flashbackSaving(self, 0, 16);
             break;
-        case 10: {
+        case ENTITY_EFFECT_LINK_STAGE: {
             s32 previousStage = self->currentStage;
-            self->currentStage = -((DreamSysEntityObj *)entity)->methods->getLinkStage(entity);
+            self->currentStage = -((Entity *)entity)->methods->getLinkStage(entity);
             self->methods->dynamicLink(self);
             if (self->currentStage < 0) {
                 self->currentStage = previousStage;
             }
             break;
         }
-        case 11:
+        case ENTITY_EFFECT_EVENT_VIDEO:
             if (self->isFlashbackSession != 0) {
                 return;
             }
             self->nextCinematic.bank = -1;
             self->tick = self->dreamTimeLimit;
-            self->nextCinematic.entry = ((DreamSysEntityObj *)entity)->methods->getEventVideo(entity);
+            self->nextCinematic.entry = ((Entity *)entity)->methods->getEventVideo(entity);
             break;
-        case 12:
+        case ENTITY_EFFECT_END_DREAM:
             if (self->isFlashbackSession != 0) {
                 return;
             }
