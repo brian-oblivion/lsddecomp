@@ -7,7 +7,7 @@
  * TimArraySrc -- a FileResource data source (class id 0xC03, method table
  * gTimArraySrcMethods) whose buffer holds one block of TIM images -- a count, then
  * that many byte offsets from the block's start -- and which turns it into
- * an array of TimImage objects (include/TimImage.h). Methods in
+ * an array of TimImage objects (include/tim_image.h). Methods in
  * src/graphics/graphics_resources.c. No classes derive from it (`typeviews.py --tree`), so
  * there are no FIELDS/SLOTS macros.
  *

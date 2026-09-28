@@ -49,7 +49,7 @@ extern void GsSwapDispBuff(void);
 ## Naming
 
 `GetDrawSystem`, tier A. The singleton getter for `sDrawSystem`; three other
-units (`TimImage.c`, `cd_driver.c`, `WBgm.c`) independently
+units (`tim_image.c`, `cd_driver.c`, `WBgm.c`) independently
 called this function's return "the draw singleton" in their own comments
 before this rename -- convergent naming from callers that never saw each
 other's code.

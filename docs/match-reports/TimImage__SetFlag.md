@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003B5E4` on 2026-09-25 (tools/rename.py). Address 0x8003b5e4.
 
-Round 81, runner echo. Unit `src/graphics/TimImage.c` (carved from `psyq_2bb9c` in
+Round 81, runner echo. Unit `src/graphics/tim_image.c` (carved from `psyq_2bb9c` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** TimImage's table (`gTimImageMethods`) slot +0x098 (resolved with `tools/classtable.py D_8006E558`).
@@ -26,7 +26,7 @@ void TimImage__SetFlag(TimImage *self) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/graphics/TimImage.c`:
+The unit-local view it needs, from the top of `src/graphics/tim_image.c`:
 
 ```c
 #include "FileResource.h"
@@ -58,16 +58,16 @@ Renamed `TimImage__func_8003B5E4` -> `TimImage__SetFlag` with `tools/rename.py`
 `self->flag48 = 1` (`ori $v0,$zero,1; jr $ra; sw $v0,0x48($a0)`), named as
 `FrameClock__Stop` is for the same shape. The field +0x048 is renamed
 `unk48` -> `flag48` and the table slot +0x098 `slot98` -> `setFlag48` in
-`include/TimImage.h`; the compiler's accessor set for both was this unit only
+`include/tim_image.h`; the compiler's accessor set for both was this unit only
 (the ctor, which clears it, and this setter). No reader of TimImage +0x048 is
-found in `src/` (the eleven TimImage.h includers and graphics_resources.c's
+found in `src/` (the eleven tim_image.h includers and graphics_resources.c's
 TimArraySrc, which builds TimImages), and no C calls +0x098, so what the flag
 gates is not established: the field name says only that it is a flag.
 
 ## Naming (track 10 debt pass, round 104, bravo)
 
 `TimImage__SetFlag48` -> `TimImage__SetFlag` (`tools/rename.py`), and by hand
-in `include/TimImage.h` the field `flag48` -> `flag` and the slot
+in `include/tim_image.h` the field `flag48` -> `flag` and the slot
 `setFlag48` -> `setFlag`: the offset in the name said nothing the offset
 comment does not. The accessor set is unchanged, this unit only (the ctor
 clears it, this setter sets it), and still nothing reads it. The body is now

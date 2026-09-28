@@ -308,7 +308,7 @@ cross-unit sibling with the same call skeleton first.
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`); this unit's local `extern
+TimImage is unified (`include/tim_image.h`); this unit's local `extern
 ItemListHandle_3bb8c_j *New_TimImage(char *)` is deleted. `handle1`/
 `handle2` are `TimImage *`: +0x078 through `TimImageUploadFn` (occupant
 TimImage__Upload), `slot4` -> the inherited `release`; `handle2` is cast to

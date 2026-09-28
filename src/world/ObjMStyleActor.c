@@ -31,7 +31,7 @@
 #include "DayTaskStageMap.h"
 #include "TimedTask.h"
 #include "TextRow.h"
-#include "TimImage.h"
+#include "tim_image.h"
 #include "ItemList.h"
 #include "ObjM.h"
 #include "VabStreamObj.h"

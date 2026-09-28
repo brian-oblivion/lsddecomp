@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003B624` on 2026-09-26 (tools/rename.py). Address 0x8003b624.
 
-Round 81, runner echo. Unit `src/graphics/TimImage.c`. Fresh ground, no prior attempt.
+Round 81, runner echo. Unit `src/graphics/tim_image.c`. Fresh ground, no prior attempt.
 Byte-exact on the first build.
 
 - **Where:** after the table getter GetTimImageMethods; it is not a slot of
@@ -74,7 +74,7 @@ void RotateVramRectRight(DrawRect *r, s32 count, DrawPoint *p) {
   unestablished, per that unit's own header comment, so tier B rather than
   A. Same rename.py-bug block as `func_8003B39C` (now `New_TimImage`) had; that bug is fixed (FINISHING-PLAN revision 19).
 - **`draw->methods->moveImage`** (this unit's own local field, not a
-  cross-unit rename -- `Class6C070Methods` here is `TimImage.c`'s private
+  cross-unit rename -- `Class6C070Methods` here is `tim_image.c`'s private
   partial view of the singleton `draw_system.c` owns): tier A. The wrapped
   slot's signature, `void (*)(Class6C070 *self, DrawRect *rect, s32 x, s32
   y)`, matches LIBGPU.H's `extern int MoveImage(RECT *rect, int x, int y)`

@@ -32,7 +32,7 @@
 #include "LightRig.h"
 #include "flat_light_obj.h"
 #include "RequestedFile.h"
-#include "TimImage.h"
+#include "tim_image.h"
 #include "FrameClock.h"
 #include "bmem_pmgr.h"
 #include <strings.h>

@@ -16,7 +16,7 @@
  * ObjMStyleActor/q/t).
  *
  * The texture is bound by reset (+0x040), which the ctor calls with its own
- * arguments: `texture` is a TimImage (include/TimImage.h: its GsIMAGE is at +0x02C,
+ * arguments: `texture` is a TimImage (include/tim_image.h: its GsIMAGE is at +0x02C,
  * which reset keeps in `image`), `rect` the texture cell, and InitGsSprite
  * fills the GsSPRITE from the two: tpage from GetTPage(pmode & 3, abr, px,
  * py), clut from the image, w/h and u/v from the cell, rgb 0x80, the pivot

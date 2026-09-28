@@ -104,7 +104,7 @@ Renamed `func_8004DF64` -> `TitleMenu__BeginCardAccess`. **Tier B**: Lazy-inits 
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`); this unit's local `extern
+TimImage is unified (`include/tim_image.h`); this unit's local `extern
 GenericReleaseObj_3bb8c_d *New_TimImage(const char *)` is deleted. The call
 casts its argument to `char *` and its result to
 `GenericReleaseObj_3bb8c_d *`, the type TitleMenu's own view gives

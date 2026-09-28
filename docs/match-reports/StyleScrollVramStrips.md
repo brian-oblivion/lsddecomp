@@ -116,7 +116,7 @@ every frame. MATCHED, 25/25, second build (one lever: hoist the shared `a1
 
 ### Naming
 
-**Renamed from `DrawStyleTables`, tier B.** The callee, RotateVramRectRight (TimImage.c), does three DrawSystem moveImage calls per step: the rect's rightmost column to the scratch point, the rest one pixel right, the scratch column back to the rect's left edge -- a one-column rotation of a VRAM rectangle. This function does one step per tick on stage 2 (rect 0,496 248x8 via scratch 256,496) and stages 3 to 5 (rect 0,504 via 256,504). Drawing is not what it does; the "12-byte tuple" reading is `DrawRect`. What the strips hold is not established.
+**Renamed from `DrawStyleTables`, tier B.** The callee, RotateVramRectRight (tim_image.c), does three DrawSystem moveImage calls per step: the rect's rightmost column to the scratch point, the rest one pixel right, the scratch column back to the rect's left edge -- a one-column rotation of a VRAM rectangle. This function does one step per tick on stage 2 (rect 0,496 248x8 via scratch 256,496) and stages 3 to 5 (rect 0,504 via 256,504). Drawing is not what it does; the "12-byte tuple" reading is `DrawRect`. What the strips hold is not established.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |

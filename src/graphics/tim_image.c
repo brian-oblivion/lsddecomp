@@ -1,6 +1,6 @@
 /*
  * TimImage: the game's TIM-image loader, a FileResource data source (class id
- * 0x103, table gTimImageMethods, include/TimImage.h), plus one free VRAM
+ * 0x103, table gTimImageMethods, include/tim_image.h), plus one free VRAM
  * helper.
  *
  * Every caller builds a ".TIM" path and hands it to New_TimImage (the ctor
@@ -21,7 +21,7 @@
 #include <libgs.h>
 #include "FileResource.h"
 #include "draw_system.h"
-#include "TimImage.h"
+#include "tim_image.h"
 #include "bmem_pmgr.h"
 #include "GameApplicationFileResource.h"
 

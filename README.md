@@ -180,7 +180,7 @@ Read each named class's header first; its banner points to the units.
   from a file; its file interface is bound at run time to the active driver: `CdDriver`
   (`src/cd/cd_driver.c`: blocking file access, the CD request queue, its state
   machines and the file table)
-  or `VabDriver`. `TimImage` (`src/graphics/TimImage.c`), `TimArraySrc`, `TimBlockSrc`, `TileMap` and
+  or `VabDriver`. `TimImage` (`src/graphics/tim_image.c`), `TimArraySrc`, `TimBlockSrc`, `TileMap` and
   `TileAtlas` load and build textures.
 - **Movies.** `MoviePlayer` (`src/graphics/graphics_resources.c`) decodes MDEC FMV from a
   `CdStream` (`src/cd/cd_stream.c`, over libcd streaming).

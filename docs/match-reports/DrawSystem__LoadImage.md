@@ -70,7 +70,7 @@ struct Class6C070 {
 
 `DrawSystem__LoadImage`, tier A. Wraps LIBGPU.H's `LoadImage`; confirmed by
 CONVERGENT naming from two other units that never saw each other's code --
-`TimImage.c` and `cd_driver.c` each carry their own independent local
+`tim_image.c` and `cd_driver.c` each carry their own independent local
 view of this class's method table and both independently named this exact
 slot (+0x058) `loadImage`.
 

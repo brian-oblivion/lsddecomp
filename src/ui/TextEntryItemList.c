@@ -27,7 +27,7 @@
 #include "TextEntry.h"
 #include "CharSprite.h"
 #include "TextRow.h"
-#include "TimImage.h"
+#include "tim_image.h"
 #include "VabStreamObj.h"
 #include "pad.h"
 #include "FrameClock.h"

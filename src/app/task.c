@@ -28,7 +28,7 @@
 #include "TileMap.h"
 #include "TileAtlas.h"
 #include "pad.h"
-#include "TimImage.h"
+#include "tim_image.h"
 #include "Viewport.h"
 #include "LightRig.h"
 #include "FrameClock.h"

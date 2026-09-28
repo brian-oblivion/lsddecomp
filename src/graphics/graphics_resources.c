@@ -49,7 +49,7 @@
 #include "Tod.h"
 #include "TodSet.h"
 #include "TriggerWorld.h"
-#include "TimImage.h"
+#include "tim_image.h"
 #include "TimArraySrc.h"
 #include "BgLayer.h"
 #include "TileMap.h"

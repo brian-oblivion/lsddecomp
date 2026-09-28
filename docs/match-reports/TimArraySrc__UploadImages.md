@@ -48,7 +48,7 @@ First build. Pointer walk with the increment after the call (the addiu lands in 
 
 The array at +0x30 holds TimImages (TimArraySrc__BuildImages fills it with
 New_TimImage(NULL)), so `objs` is `TimImage **` and the +0x078 call goes
-through `TimImageUploadFn` (include/TimImage.h: FileResource's `void *slot78`,
+through `TimImageUploadFn` (include/tim_image.h: FileResource's `void *slot78`,
 whose occupant here is TimImage__Upload) instead of an unprototyped cast of
 DataSrc33808's slot. Image byte-identical.
 
@@ -58,7 +58,7 @@ Renamed from `TimArraySrc__NotifyImages`. The slot it forwards is +0x078 of
 every object in `images` (+0x030), and every such object is a TimImage:
 TimArraySrc__BuildImages fills the array with `New_TimImage(NULL)` and
 nothing else writes it. TimImage's +0x078 occupant is TimImage__Upload
-(include/TimImage.h), so the body uploads every image of the block; its one
+(include/tim_image.h), so the body uploads every image of the block; its one
 reach is TimBlockSrc__AdvanceLoadState, which calls this slot right after
 setFlag (BuildImages) on each new TimArraySrc. The call goes through
 TimImageUploadFn (no code). Class header: include/TimArraySrc.h.

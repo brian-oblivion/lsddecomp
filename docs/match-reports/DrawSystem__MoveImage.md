@@ -66,7 +66,7 @@ struct Class6C070 {
 `DrawSystem__MoveImage`, tier A. Wraps LIBGPU.H's `MoveImage`; confirmed by
 convergent naming -- `cd_driver.c`'s own independent local view of this
 class's method table names this exact slot (+0x064) `moveImage`, and
-`TimImage.c`'s `RotateVramRectRight` calls it through a local `moveImage`
+`tim_image.c`'s `RotateVramRectRight` calls it through a local `moveImage`
 function-pointer variable read from the same slot.
 
 ## Track 4 (2026-09-26, round 87, bravo)

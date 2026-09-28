@@ -96,7 +96,7 @@ Renamed from Obj86B60__SetSubHandle (tools/rename.py): the class prefix. Occupan
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`) and `include/task.h`'s
+TimImage is unified (`include/tim_image.h`) and `include/task.h`'s
 `Unk74Obj`/`Unk74ObjMethods` view of it is deleted, together with that
 header's local `extern` of New_TimImage. The handle is cast to
 `TimImage *` (TaskCore.h still types the field `BasicClass *`); its slots are

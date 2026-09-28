@@ -259,7 +259,7 @@ session matched within 1-2.
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`); `include/DayTaskStageMap.h`'s local
+TimImage is unified (`include/tim_image.h`); `include/DayTaskStageMap.h`'s local
 `extern SubObjG *New_TimImage(const char *)` is deleted. `unk44` is a
 TimImage but keeps Obj865C8's own `SubObjG *` type (Obj865C8's view is that
 class's job): the result is cast to `SubObjG *`, and the two calls cast

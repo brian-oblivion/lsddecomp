@@ -105,11 +105,11 @@ First build. The GsIMAGE local (0x1C bytes) is what gives retail's 0x50 frame. L
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`). This function's local views of
+TimImage is unified (`include/tim_image.h`). This function's local views of
 it -- `Tim43CB8`, `TimMethods43CB8` and `Image43CB8` (GsIMAGE) -- and its
 local `extern` of New_TimImage are deleted; `objs` is `TimImage **`,
 `info` a `GsIMAGE`, and `Obj43CB8::images` is `TimImage **`. `clutBase`
-(+0x04C) is the name TimImage.h took from this view. Image byte-identical.
+(+0x04C) is the name tim_image.h took from this view. Image byte-identical.
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)

@@ -1,5 +1,5 @@
-#ifndef TIMIMAGE_H
-#define TIMIMAGE_H
+#ifndef TIM_IMAGE_H
+#define TIM_IMAGE_H
 
 #include "FileResource.h"
 #include <libgte.h>
@@ -9,7 +9,7 @@
 /*
  * TimImage -- a FileResource data source (class id 0x103, method table
  * gTimImageMethods) whose buffer holds one TIM image. Methods in
- * src/graphics/TimImage.c. No classes derive from it (`typeviews.py --tree`), so
+ * src/graphics/tim_image.c. No classes derive from it (`typeviews.py --tree`), so
  * there are no FIELDS/SLOTS macros.
  *
  * The ctor chain agrees with the id: TimImage__TimImage's first call is

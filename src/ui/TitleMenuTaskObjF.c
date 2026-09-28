@@ -44,7 +44,7 @@
 #include "TitleMenu.h"
 #include "VabStreamObj.h"
 #include "TextRow.h"
-#include "TimImage.h"
+#include "tim_image.h"
 #include "TaskObjF.h"
 #include <kernel.h>
 #include <sys/file.h>

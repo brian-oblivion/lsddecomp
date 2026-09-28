@@ -186,7 +186,7 @@ Renamed from Obj86B60__SetTarget (tools/rename.py): the class prefix. Occupant o
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`) and `include/task.h`'s
+TimImage is unified (`include/tim_image.h`) and `include/task.h`'s
 `Unk74Obj`/`Unk74ObjMethods` view of it is deleted, together with that
 header's local `extern` of New_TimImage. The handle is cast to
 `TimImage *` (TaskCore.h still types the field `BasicClass *`); its slots are
@@ -197,7 +197,7 @@ New_TimImage. Image byte-identical.
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
-D_8008A8E8 -> sListViewSize (tier A: the two words are {320, 240}, New_BoxFill's size argument for listView), D_8008A8F0 -> sListViewColor (tier A: bytes 20 20 40, New_BoxFill's colour, now declared a BoxFillRgb and passed as &sListViewColor). Both via rename.py, both declared in this unit now (they were in task.h, used nowhere else). `size = count * 4` is `count * sizeof(void *)`. Locals: a1 -> target, list -> names, arr -> widget, handle -> texture, extra -> itemList. The two `(char *)path` casts stay: New_TimImage takes `char *` (proposal: `const char *`, TimImage.h).
+D_8008A8E8 -> sListViewSize (tier A: the two words are {320, 240}, New_BoxFill's size argument for listView), D_8008A8F0 -> sListViewColor (tier A: bytes 20 20 40, New_BoxFill's colour, now declared a BoxFillRgb and passed as &sListViewColor). Both via rename.py, both declared in this unit now (they were in task.h, used nowhere else). `size = count * 4` is `count * sizeof(void *)`. Locals: a1 -> target, list -> names, arr -> widget, handle -> texture, extra -> itemList. The two `(char *)path` casts stay: New_TimImage takes `char *` (proposal: `const char *`, tim_image.h).
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
