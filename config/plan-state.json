@@ -387,6 +387,18 @@
         "files-setup": true
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-28",
+          "matches": 1,
+          "model": "opus",
+          "note": "Track 11 done. Premium head wrote files-setup (unitfile.py paths-only rename for type-named files, header, check; replay.py replays both; proven on Entity and BasicClass.h). One Opus runner (alpha) did file-names: 75 unitfile.py runs, 94 files, 0 not snake_case, byte-identical; concatenated units renamed for their subsystem (game_shell, data_source, title_menu, input_dialogs, dream_day, dream_scene, vab_sound).",
+          "round": 105,
+          "runners": 1
+        }
+      ],
       "status": "auto"
     },
     "12": {
