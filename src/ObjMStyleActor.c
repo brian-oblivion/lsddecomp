@@ -21,26 +21,8 @@
  *  - VariantSprite (include/VariantSprite.h), whole;
  *  - GraphRoom (include/GraphRoom.h), whole, the mood graph screen.
  *
- * What decided its edges (python3 tools/tuboundary.py). The start edge is
- * kept because the binary forces a boundary in its stretch: the jump tables
- * of TextEntry__HandleCommand (0x80011628, TextEntryItemList.c) and
- * ItemList__HandleInputCode (0x800116f4, here) differ in parity ("a forced
- * boundary lies in this stretch: tables 0x80011628 / 0x800116f4"). The end
- * edge, before New_DreamSys, is kept for the same reason: ObjM__OnDreamSysNotify
- * (0x8001174c) and DreamSys__OnPadEvent (0x80011788) were in different files,
- * and this edge is the only gap left between them outside DreamSys's own
- * class. Inside, the file is ten old carve slices, class_3bb8c_k to _t, and
- * each of the nine edges between them cut a class: ObjM at k|l and l|m, the
- * style layer at m|n and n|r, StyleEffect at r|s and s|o, Actor at o|p and
- * VariantSprite at p|q and q|t. tuboundary calls each "start edge
- * possible", six of them soft-unlikely on single-user data (l|m, m|n, s|o,
- * o|p, p|q, q|t); content decided, so all ten were merged.
- * PARKED: the soft signal and the content agree that the game's files ended
- * after each Get<Class>Methods getter (GetItemListMethods, GetObjMMethods,
- * GetStyleEffectMethods or SetStyleEffectSources, GetActorMethods,
- * GetVariantSpriteMethods): those gaps are "boundary possible" between
- * "unlikely" ones. Those are content splits, a new carve each, so the file
- * keeps them all and is named for its main subjects.
+ * The game's own files most likely ended after each class's table getter;
+ * this file keeps the classes together.
  */
 #include "common.h"
 #include <libgte.h>
@@ -460,9 +442,6 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
  *    EnterState4/5/6 set IntermediateBase::state and start a fade up
  *    (ObjM__StartFadeUp, next section).
  * NoOpSlot40 and NoOpSlot7C are empty.
- *
- * include/class_3bb8c.h is shared with the other files of the old class_3bb8c segment;
- * edits to it are additive.
  */
 
 void ObjM__NoOpSlot40(void) {}
@@ -3371,11 +3350,10 @@ extern void *BMemPMgrAlloc(s32 size);
 /* Screen pixels per step of a mood axis (PopulateGraphPoints). */
 #define GRAPH_PIXELS_PER_MOOD 10
 
-/* VariantSprite's (include/VariantSprite.h) four empty leaves, `jr $ra; nop`
- * (splat matched them itself), and its table getter. VariantSprite__Update is
- * the +0x098 update override of Sprite__Update, typed as that slot; the
- * other three occupy the class's own slots +0x0BC/+0x0C0/+0x0C4, which
- * nothing calls. */
+/* VariantSprite's (include/VariantSprite.h) four empty leaves and its table
+ * getter. VariantSprite__Update is the +0x098 update override of
+ * Sprite__Update, typed as that slot; the other three occupy the class's own
+ * slots +0x0BC/+0x0C0/+0x0C4, which nothing calls. */
 void VariantSprite__Update(VariantSprite *self, void *sender, s32 event) {}
 
 void VariantSprite__NoOpSlotBC(void) {}

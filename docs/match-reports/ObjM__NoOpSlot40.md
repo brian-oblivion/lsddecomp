@@ -60,3 +60,10 @@ Tier A for all six: each name says what the data is and where it goes,
 read from the bytes and the one site that uses it. `gStagePendingExtras`
 names the slot it feeds, not what pendingExtra means in the game (Actor.h:
 NotifyMove adds it to |lastOffsetValue|).
+
+## History (moved from src/ObjMStyleActor.c, comments pass)
+
+The ObjM section banner (resetCounters to enterState6, just above this function) carried a note on its shared header:
+
+> include/class_3bb8c.h is shared with the other files of the old class_3bb8c segment;
+> edits to it are additive.
