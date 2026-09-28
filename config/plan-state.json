@@ -347,6 +347,7 @@
     },
     "10": {
       "checklist": {
+        "sony-code": true,
         "tabs": true
       },
       "reason": "",
@@ -363,6 +364,11 @@
       "status": "auto"
     },
     "13": {
+      "checklist": {},
+      "reason": "",
+      "status": "auto"
+    },
+    "14": {
       "checklist": {},
       "reason": "",
       "status": "auto"
