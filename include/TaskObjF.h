@@ -227,7 +227,7 @@ typedef struct McDevicePath {
 } McDevicePath;
 
 extern McDevicePath gMcDevicePath1; /* "bu10:" */
-extern McDevicePath gMcDevicePath0; /* "bu00:" */
+extern McDevicePath sMcDevicePath0; /* "bu00:" */
 
 /* Game code (src/ui/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it
  * around its retry loop, and with (arg, 0) when the loop gives up. The BIOS

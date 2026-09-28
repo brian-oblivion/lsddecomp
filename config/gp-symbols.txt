@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gMcDevicePath0
 gMcDevicePath1
 gMdecInitialized
 gMovieClearColor
@@ -187,6 +186,7 @@ sLinkSrcStage
 sLinkTriggerIndex
 sListViewColor
 sListViewSize
+sMcDevicePath0
 sMcTempFileSuffix
 sMoodCue74ClearColor
 sMoodCue78TransitionDone
