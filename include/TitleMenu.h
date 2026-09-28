@@ -32,7 +32,7 @@
  *  - 1 FLASHBACK: result 0 and a flashback session opened; 4 GRAPH: result 2.
  *    Both then end the menu through exit.
  *  - 2 SAVE runs saveToCard, 3 LOAD loadFromCard.
- *  - 5 SHAKE is the one entry with an item list (the target's unk24[5]).
+ *  - 5 SHAKE is the one entry with an item list (the target's slotLists[5]).
  *  - FLASHBACK starts locked (hiddenSlots[1] = 1); refreshMenu clears
  *    the lock through UpdateFlashbackLock when the save block allows it.
  * setState(TASKCORE_STATE_ACTIVE), the menu becoming active, runs refreshMenu: the save title's
