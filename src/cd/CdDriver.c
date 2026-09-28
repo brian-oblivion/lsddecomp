@@ -439,7 +439,7 @@ void CdDriver__RunRequestQueue(void) {
 
 extern char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
 
-/* Part 2's module state; parts 2 and 4 see it only through the
+/* Part 3's module state; parts 2 and 4 see it only through the
  * functions below. */
 extern s32 sCdDriveInited;       /* InitCdDrive has set the drive's mode */
 extern s32 sCdLock;              /* LockCd / UnlockCd */
