@@ -70,21 +70,21 @@ extern s32 gStyleEffectModelIds[];
  * plain sprites (StyleEffect__SpawnPlainSprites is StyleEffect__SpawnSprites(self,
  * 0, 0, NULL)). */
 void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos) {
-    LongVec3 local;
-    s32 state;
+    LongVec3 placed;
+    s32 kind;
 
     gStyleEffectBaseViewY = ((Viewport *)gStyleEffectViewport)->refView.vp.y;
-    AddVec3(&local, pos, &self->params.offset);
-    AttachWithRotScale((Actor *)self, parent, &local, self->params.rotation, self->params.scale);
+    AddVec3(&placed, pos, &self->params.offset);
+    AttachWithRotScale((Actor *)self, parent, &placed, self->params.rotation, self->params.scale);
 
-    state = self->pendingExtra;
-    if (state < 2) {
-        s32 ret = gStyleEffectTmd->methods->setBackClip(gStyleEffectTmd, gStyleEffectModelIds[state]);
-        SceneNode__LinkModel((SceneNode *)self, (void *)ret);
-        state = self->pendingExtra;
+    kind = self->pendingExtra;
+    if (kind < 2) {
+        s32 model = gStyleEffectTmd->methods->setBackClip(gStyleEffectTmd, gStyleEffectModelIds[kind]);
+        SceneNode__LinkModel((SceneNode *)self, (void *)model);
+        kind = self->pendingExtra;
     }
 
-    switch (state) {
+    switch (kind) {
         case 0:
             StyleEffect__PlaceModelChildren(self, 0);
             break;
@@ -105,11 +105,11 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
  * word has moved since StyleEffect__InitByKind snapshotted it, then run the
  * per-kind update. */
 void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
-    LongVec3 local;
+    LongVec3 placed;
 
-    AddVec3(&local, pos, &self->params.offset);
-    local.y += ((Viewport *)gStyleEffectViewport)->refView.vp.y - gStyleEffectBaseViewY;
-    self->methods->setTranslation(self, &local);
+    AddVec3(&placed, pos, &self->params.offset);
+    placed.y += ((Viewport *)gStyleEffectViewport)->refView.vp.y - gStyleEffectBaseViewY;
+    self->methods->setTranslation(self, &placed);
 
     switch (self->pendingExtra) {
         case 0:
@@ -169,30 +169,30 @@ extern LongVec3 gModelChildOffsetInit;
 extern s32 gModelChildSpacing[];
 
 void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
-    LongVec3 accum;
-    Actor **p;
+    LongVec3 childPos;
+    Actor **slot;
     s32 i;
-    s32 count = self->params.modelChildLayout;
+    s32 layout = self->params.modelChildLayout;
 
-    if (count == 0) {
+    if (layout == 0) {
         return;
     }
-    accum = gModelChildOffsetInit;
-    p = self->modelChildren;
-    for (i = 0; i < 2; i++, p++) {
-        if (count < 3) {
-            accum.x += self->params.scale[0].num * gModelChildSpacing[count];
+    childPos = gModelChildOffsetInit;
+    slot = self->modelChildren;
+    for (i = 0; i < 2; i++, slot++) {
+        if (layout < 3) {
+            childPos.x += self->params.scale[0].num * gModelChildSpacing[layout];
         } else {
-            accum.y += gModelChildSpacing[count];
+            childPos.y += gModelChildSpacing[layout];
         }
         if (reuse) {
-            Actor *child = *p;
-            child->methods->setTranslation(child, &accum);
+            Actor *child = *slot;
+            child->methods->setTranslation(child, &childPos);
         } else {
             Actor *child = New_Actor();
-            *p = child;
+            *slot = child;
             SceneNode__LinkModel((SceneNode *)child, self->model);
-            AttachWithRotScale(*p, self, &accum, self->params.rotation, self->params.scale);
+            AttachWithRotScale(*slot, self, &childPos, self->params.rotation, self->params.scale);
         }
     }
 }
@@ -216,39 +216,40 @@ extern Ratio16 gSpinRotStep[3];
  * and the loop's pointer is taken again after the call -- CSE turns that
  * second &gModelChildDriftZ[idx] into retail's `move s4,s1`. */
 void StyleEffect__DriftModelChildren(StyleEffect *self) {
-    s32 idx;
-    s32 accumOffset;
-    s32 divq;
-    s32 modend;
-    Actor **p;
+    s32 tableIndex;
+    s32 extraZ;
+    s32 period;
+    s32 tick;
+    Actor **slot;
     s32 i;
     s32 *stepZ;
 
-    idx = self->params.tableIndex;
-    if (self->params.modelChildLayout != 0 && gModelChildDriftZ[idx] != 0 && (u32)self->tick >= 0x1F5) {
-        p = self->modelChildren;
+    tableIndex = self->params.tableIndex;
+    if (self->params.modelChildLayout != 0 && gModelChildDriftZ[tableIndex] != 0 &&
+        (u32)self->tick >= 0x1F5) {
+        slot = self->modelChildren;
         self->methods->updateRotation(self, 0, gSpinRotStep);
         i = 0;
-        stepZ = &gModelChildDriftZ[idx];
-        accumOffset = 0;
+        stepZ = &gModelChildDriftZ[tableIndex];
+        extraZ = 0;
         for (; i < 2; i++) {
-            LongVec3 local = gModelChildDriftInit;
-            local.z += accumOffset + *stepZ;
-            (*p)->methods->addTranslation(*p, &local);
-            accumOffset += 3;
-            (*p)->methods->updateRotation(*p, 0, gSpinRotStep);
-            p++;
+            LongVec3 delta = gModelChildDriftInit;
+            delta.z += extraZ + *stepZ;
+            (*slot)->methods->addTranslation(*slot, &delta);
+            extraZ += 3;
+            (*slot)->methods->updateRotation(*slot, 0, gSpinRotStep);
+            slot++;
         }
 
-        divq = 24500 / gModelChildDriftZ[idx];
-        modend = self->tick;
-        if (divq >= 0) {
-            if ((u32)modend % (u32)divq == 0) {
+        period = 24500 / gModelChildDriftZ[tableIndex];
+        tick = self->tick;
+        if (period >= 0) {
+            if ((u32)tick % (u32)period == 0) {
                 StyleEffect__PlaceModelChildren(self, 1);
             }
         } else {
-            u32 adivq = ~divq + 1;
-            if ((u32)modend % adivq == 0) {
+            u32 absPeriod = ~period + 1;
+            if ((u32)tick % absPeriod == 0) {
                 StyleEffect__PlaceModelChildren(self, 1);
             }
         }
@@ -269,29 +270,29 @@ void StyleEffect__ReleaseModelChildren(StyleEffect *self) {
  * semi-transparent (rate 0) and rescaled, and sprites[2] is hidden. */
 void StyleEffect__BuildRandomSprites(StyleEffect *self) {
     s32 parity = rand() % 2;
-    void *tblOrNull = parity ? NULL : gSpriteScaleHalf;
-    VariantSprite *child;
-    SpriteRgb *arg;
+    void *scale = parity ? NULL : gSpriteScaleHalf;
+    VariantSprite *sprite;
+    SpriteRgb *color;
 
-    StyleEffect__SpawnSprites(self, 0, 0, tblOrNull);
+    StyleEffect__SpawnSprites(self, 0, 0, scale);
 
     if (self->params.tableIndex >= 2) {
-        VariantSpriteMethods *m;
+        VariantSpriteMethods *methods;
 
-        child = self->sprites[1];
+        sprite = self->sprites[1];
         gSpriteShiftScratch.x = gSpriteShiftX[self->params.tableIndex];
-        /* Called directly, not through the child's table: the child is a
-         * sprite (VariantSprite, a Sprite), not an Actor, and the function only
-         * touches the SceneNode coord2 both share. */
-        Actor__AddTranslation((Actor *)child, &gSpriteShiftScratch);
-        m = child->methods;
-        arg = (self->params.altColor != NULL) ? self->params.altColor : self->params.color;
-        m->setColor(child, arg);
+        /* Called directly, not through the sprite's table: a VariantSprite
+         * is a Sprite, not an Actor, and the function only touches the
+         * SceneNode coord2 both share. */
+        Actor__AddTranslation((Actor *)sprite, &gSpriteShiftScratch);
+        methods = sprite->methods;
+        color = (self->params.altColor != NULL) ? self->params.altColor : self->params.color;
+        methods->setColor(sprite, color);
     } else {
-        child = self->sprites[1];
-        child->methods->setSemiTransOn(child, 1);
-        child->methods->setSemiTransRate(child, 0);
-        child->methods->updateScale(child, 1, (parity != 0) ? gSpriteScaleLarge : gSpriteScaleSmall);
+        sprite = self->sprites[1];
+        sprite->methods->setSemiTransOn(sprite, 1);
+        sprite->methods->setSemiTransRate(sprite, 0);
+        sprite->methods->updateScale(sprite, 1, (parity != 0) ? gSpriteScaleLarge : gSpriteScaleSmall);
     }
 
     self->sprites[2]->methods->setDisplay(self->sprites[2], 0);
@@ -303,17 +304,17 @@ void StyleEffect__BuildRandomSprites(StyleEffect *self) {
  * the prototype class_3bb8c_o.c calls through, and a typed local alias of
  * it costs a callee-saved register (see this function's report). */
 void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale) {
-    VariantSprite **p = ((StyleEffect *)self)->sprites;
-    VariantSprite *node;
+    VariantSprite **slot = ((StyleEffect *)self)->sprites;
+    VariantSprite *sprite;
     s32 i;
 
-    for (i = 0; i < 5; i++, p++) {
-        node = New_VariantSprite(variant, 0, gStyleEffectTim);
-        *p = node;
-        node->methods->attachToParent(node, self, 0);
-        (*p)->methods->setColor(*p, ((StyleEffect *)self)->params.color);
+    for (i = 0; i < 5; i++, slot++) {
+        sprite = New_VariantSprite(variant, 0, gStyleEffectTim);
+        *slot = sprite;
+        sprite->methods->attachToParent(sprite, self, 0);
+        (*slot)->methods->setColor(*slot, ((StyleEffect *)self)->params.color);
         if (scale != 0) {
-            (*p)->methods->updateScale(*p, 1, scale);
+            (*slot)->methods->updateScale(*slot, 1, scale);
         }
     }
 }
