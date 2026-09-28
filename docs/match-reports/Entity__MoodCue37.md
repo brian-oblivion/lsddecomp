@@ -61,7 +61,7 @@ tie-breaker, not reading a fact off retail. That is what the rule is for and
 the original call was reasonable; this note records that the tie-breaker has
 since been overruled by an actual measurement.
 
-The measurement is `Entity__MoodCue115` (Entity_d), a two-round stall that closes
+The measurement is `Entity__MoodCue115` (Entity), a two-round stall that closes
 198/198 the moment `slotCC` is `void`: retail tail-merges its `slotCC` call
 with sibling `slotC4`/`slot134` calls that are `void`, and GCC 2.6.3 cannot
 cross-jump a `(set (reg v0) (call ...))` against a bare `(call ...)`, so the

@@ -102,7 +102,7 @@ struct Entity {
 };
 
 /* playTod (+0x12C) is TodActor's slot and returns the flag its occupant
- * sets, but Entity's callers call it as void: Entity__MoodCue39/57 (Entity_d)
+ * sets, but Entity's callers call it as void: Entity__MoodCue39/57 (Entity)
  * and Entity__MoodCue86 (Entity_f) cross-jump a playTod call with a void
  * sibling (stopTod), which GCC 2.6.3 does only when both are void (the
  * moveLocalZ case in the banner); through the s32 slot they grow 3 words
@@ -243,10 +243,10 @@ s32 Entity__IsTargetInRange(Entity *self, s32 range);
 s32 Entity__UpdateSoundCueStop(Entity *self);
 
 /* MoodCue handlers called from another Entity unit. */
-void Entity__MoodCue51(Entity *self, SoundCueSet *out); /* Entity_d; called by Entity__MoodCue113 (Entity_g) */
+void Entity__MoodCue51(Entity *self, SoundCueSet *out); /* Entity; called by Entity__MoodCue113 (Entity_g) */
 void Entity__MoodCue71(Entity *self, SoundCueSet *out); /* Entity_e; called by Entity__MoodCue108 (Entity_g) */
 void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 windowStart,
-                                            s32 deactivateTimer, s32 zStep); /* Entity_g; called by Entity_d */
+                                            s32 deactivateTimer, s32 zStep); /* Entity_g; called by Entity */
 
 /* The motion templates (.data, 0x80089C58..0x80089E97, in address order):
  * the constant triples the MoodCue handlers in Entity..Entity_g pass to
@@ -255,7 +255,7 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 
  * addTranslation (+0x0BC), three s32 deltas. Named by value. The slots take
  * the table untyped, so the element type is the reader's (SceneNode__Update-
  * Rotation/UpdateScale), not the callers'. TRANSLATE_Y_MINUS64's label also
- * holds a second triple, (0, -0x20, 0); SCALE_X3's z den is Entity_d.c's
+ * holds a second triple, (0, -0x20, 0); SCALE_X3's z den is Entity.c's
  * sScaleTemplateZDenom. */
 extern Ratio16 ROTATION_XPLUS_EIGHTH[];
 extern Ratio16 ROTATION_YAW_PLUS9[];

@@ -28,7 +28,7 @@ path falls through to the identical check after the loop. Writing this as
 nested-inside-else would have made the `unkFC==0` path skip the `>=0x19`
 check, which is wrong. Same "independent top-level `if` after a reload,
 not an `else` branch" idiom already established in this project for
-functions with a similar shared-tail shape (see e.g. Entity_d's
+functions with a similar shared-tail shape (see e.g. Entity's
 `Entity__MoodCue58` report).
 
 The `slot134` loop is byte-identical in shape to `Entity__MoodCue92`'s own

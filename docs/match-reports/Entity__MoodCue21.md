@@ -46,7 +46,7 @@ Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 21
 (read by every one of Entity/c/d/e/f/g, `grep -rn -- '->unk80\b'
 src/Entity_*.c`), so proposed rather than applied. This function's own body
 adds a third independent use to the ones already on file (`Entity__MoodCue09`/
-`Entity__MoodCue11`'s halving, Entity_d/_f/_g's `moodTimer == unk80` /
+`Entity__MoodCue11`'s halving, Entity/_f/_g's `moodTimer == unk80` /
 `moodTimer < unk80 * K` threshold comparisons): `rem = out->unk4 % (unk80 /
 2)`, a periodic-action modulus derived from the same field. Every known
 reader across all six sibling units treats it as either (a) a threshold

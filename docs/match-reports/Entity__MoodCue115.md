@@ -2,7 +2,7 @@
 
 > Renamed from `func_80061778` on 2026-09-24 (tools/rename.py). Address 0x80061778.
 
-**Unit:** Entity_d · **Size:** 198 words · **Status:** MATCHED (round 68) — 198/198, whole-image oracle green
+**Unit:** Entity · **Size:** 198 words · **Status:** MATCHED (round 68) — 198/198, whole-image oracle green
 
 REVISITED, round 68: MATCHED 198/198 on the first build after retyping
 `EntityMethods::slotCC` from `s32` back to `void`; names/types used — the
@@ -129,7 +129,7 @@ from every path) is a `slot144(this, target) < 0x200` check driving
 
 ## Final body
 
-As committed in `src/Entity_d.c` — the inherited near-miss body unchanged
+As committed in `src/Entity.c` — the inherited near-miss body unchanged
 apart from the renames. The fix was entirely in the header.
 
 ```c
@@ -261,7 +261,7 @@ emitted.
 
 ## HEAD FINDING, round 13: the reversed `SceneNode__FaceTarget` arguments are a DIRECTION FLAG
 
-Runner echo (`Entity__MoodCue115`, `Entity_d`) and runner bravo (`Entity__MoodCue81`,
+Runner echo (`Entity__MoodCue115`, `Entity`) and runner bravo (`Entity__MoodCue81`,
 `Entity_e`) each independently flagged a `SceneNode__FaceTarget` call site
 whose first two arguments are swapped relative to every other known site. Both
 verified it against raw disassembly. The head then surveyed **every** call site
@@ -354,7 +354,7 @@ lever stays cleanly scoped.
 directly from `disk/SLPS_015.56`. Row 115 is NOT contiguous with this
 unit's other rows (39-52, 55-58) or with Entity_e's own rows (59-92ish),
 confirming the row index tracks moodIndex assignment rather than code
-address -- flagged in `src/Entity_d.c`'s unit header comment so the next
+address -- flagged in `src/Entity.c`'s unit header comment so the next
 reader doesn't assume a typo. Mechanics established (mood-tick sound-cue-set
 callback); which dream object owns the row is not.
 

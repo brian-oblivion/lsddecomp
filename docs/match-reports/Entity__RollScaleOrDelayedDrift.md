@@ -4,7 +4,7 @@
 
 > Renamed from `func_80060710` on 2026-09-24 (tools/rename.py). Address 0x80060710.
 
-Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch helper called
+Unit: `Entity` (fresh carve, round 2026-09-03). Mood-dispatch helper called
 by `Entity__MoodCue43`, but itself takes only `Entity *this` -- no `out`
 parameter, despite the family convention. Signature: `void
 Entity__RollScaleOrDelayedDrift(Entity *this)`.
@@ -116,7 +116,7 @@ the game (which dream objects use rows 43/44) is not established, hence B.
 The literals are decimal (10, 201); the `state` value 10 is this helper's
 own phase, shared with nothing.
 
-## Entity_d banner before round 93 (moved here, not deleted)
+## Entity banner before round 93 (moved here, not deleted)
 
 The unit banner was rewritten as documentation in round 93. Its history and
 derivation, verbatim:

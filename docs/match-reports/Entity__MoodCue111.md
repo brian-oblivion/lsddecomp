@@ -193,7 +193,7 @@ branch points and this round's remaining queue size.
 
 None beyond what the control-flow trace above already confirms
 (`unk44`, `unkFC`, `slot130`, `slot12C`, `slotCC`, and `Entity__StepYawInWindowsThenDeactivate`'s
-own 5-argument signature, cross-checked against `Entity_d.c`'s existing
+own 5-argument signature, cross-checked against `Entity.c`'s existing
 extern for the same function).
 
 ### Proposed learning
@@ -587,7 +587,7 @@ screen 4's warning that a title is only as good as the last rebuild.
 Why `MoodCue111`: the function's address sits in `gEntityMoodHandlerTable`
 row 111 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
 confirmed by reading `disk/SLPS_015.56` directly rather than trusting
-address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+address proximity (Entity/Entity_e, rounds 76-77, measured that row
 order does not track code address). Tier B: the row-to-function mapping is
 a compiler fact, not a guess, but which dream state or object each row
 represents is not established -- the row number is kept decimal, matching

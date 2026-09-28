@@ -1773,7 +1773,6 @@ segments:
       # Still zero `jlabel` and zero `jr $t2` in the whole remainder, so
       # no rodata slot to attach and no hasm/.word disposition. Blocker
       # census over the slice: zero gp_rel, zero addiu-$at.
-      - [0x5077C, c, Entity_d]
       # Entity_e: third 20-function slice of the remainder,
       # 0x52290..0x53CA8. 0x53CA8 (func_800634A8) is a real boundary --
       # func_80063144 closes `addiu $sp, $sp, 0x28; jr $ra; nop` and

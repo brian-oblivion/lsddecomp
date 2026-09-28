@@ -56,7 +56,7 @@ build. Adds `ROTATION_YAW_MINUS_HALF` to this unit's local externs.
 Why `MoodCue103`: the function's address sits in `gEntityMoodHandlerTable`
 row 103 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
 confirmed by reading `disk/SLPS_015.56` directly rather than trusting
-address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+address proximity (Entity/Entity_e, rounds 76-77, measured that row
 order does not track code address). Tier B: the row-to-function mapping is
 a compiler fact, not a guess, but which dream state or object each row
 represents is not established -- the row number is kept decimal, matching

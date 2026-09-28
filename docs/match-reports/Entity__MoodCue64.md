@@ -36,14 +36,14 @@ pipeline): compiling `int mod300(int x){return x%300;}` through
 `tools/gcc263/cc1` at `-mips1 -mcpu=3000 -O2` reproduces this exact
 instruction sequence (magic, shift, and the `sll 2/addu/sll 4/subu/sll 2`
 reconstruction) byte-for-byte. This is the same idiom as
-`Entity__MoodCue66` below (`% 30`) and `Entity__MoodCue40` in `Entity_d.c` (`% 7`)
+`Entity__MoodCue66` below (`% 30`) and `Entity__MoodCue40` in `Entity.c` (`% 7`)
 -- worth having a reproducer command on hand rather than re-deriving the
 magic-number-to-divisor mapping by arithmetic each time, which is
 error-prone (a first pass on this function mis-guessed divisor 150 instead
 of 300 from the magic constant alone).
 
 `this->methods->slot148` and `slotC4` are both already-typed vtable slots
-from `Entity_d`'s work; no new struct knowledge here.
+from `Entity`'s work; no new struct knowledge here.
 
 ### Proposed learning
 
@@ -57,7 +57,7 @@ by hand.
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 64 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 64 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity.
 
 Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`, `voice0Pitch`.
 

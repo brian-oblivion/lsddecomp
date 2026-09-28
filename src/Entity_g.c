@@ -1,5 +1,5 @@
 /* Entity_g: nineteen of Entity's MoodCue handlers and a per-tick helper
- * one of them shares with Entity_d.
+ * one of them shares with Entity.
  *
  * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
  * NN (include/Entity.h): rows 98, 102 to 106, 108 to 111, 113, 114, 117,
@@ -15,7 +15,7 @@
  *
  * Entity__StepYawInWindowsThenDeactivate is not a row: it is a shared
  * per-tick helper called directly by two different row handlers,
- * Entity__MoodCue111 (this unit, twice) and Entity__MoodCue40 (Entity_d.c,
+ * Entity__MoodCue111 (this unit, twice) and Entity__MoodCue40 (Entity.c,
  * its only caller from outside this unit).
  *
  * The literals are left unnamed where they are one handler's tuning: tick

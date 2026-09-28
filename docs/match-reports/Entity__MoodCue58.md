@@ -2,7 +2,7 @@
 
 > Renamed from `func_80061400` on 2026-09-24 (tools/rename.py). Address 0x80061400.
 
-**Unit:** Entity_d · **Size:** 222 words · **Status:** MATCHED (222/222 words)
+**Unit:** Entity · **Size:** 222 words · **Status:** MATCHED (222/222 words)
 
 ## What it does
 
@@ -117,7 +117,7 @@ which instruction-scheduling window the receiver's load competes in.
   caller, alongside the callers already on record. No type or name changed
   on any of them.
 
-`extern u8 ROTATION_ZMINUS90[];` added to `src/Entity_d.c` (file-local, same
+`extern u8 ROTATION_ZMINUS90[];` added to `src/Entity.c` (file-local, same
 convention as this unit's other raw data-table externs).
 
 ## Proposed learning

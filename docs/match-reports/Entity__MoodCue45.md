@@ -2,7 +2,7 @@
 
 > Renamed from `func_800607F8` on 2026-09-24 (tools/rename.py). Address 0x800607F8.
 
-Unit: `Entity_d`. Genuinely empty function -- `jr $ra; nop`, no other
+Unit: `Entity`. Genuinely empty function -- `jr $ra; nop`, no other
 instructions. Never had an `INCLUDE_ASM`/`asm/nonmatchings` entry: splat
 generated the matched body itself the moment the unit was carved, the same
 "some bodies are just `jr $ra; nop`" case CLAUDE.md's progress-reading
