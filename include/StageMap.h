@@ -106,7 +106,7 @@ typedef struct ChunkSlot ChunkSlot;
  * ComputeFootprintDescriptor shifts a position's offset from its slot's
  * origin right by STAGE_CELL_SHIFT for the cell column/row. A chunk is
  * STAGE_CHUNK_CELLS cells square (the ctor's 20 x 20 lattice, 0x800 apart),
- * so STAGE_CHUNK_SIZE (0xA000, also gDefaultGridSpan) wide; odd rows sit
+ * so STAGE_CHUNK_SIZE (0xA000, also sDefaultGridSpan) wide; odd rows sit
  * STAGE_CHUNK_SIZE / 2 to -x (ComputeCellWorldOffsets). */
 #define STAGE_CELL_SHIFT 11
 #define STAGE_CELL_SIZE (1 << STAGE_CELL_SHIFT)
@@ -369,7 +369,7 @@ struct StageMap {
     /* +0x068 */ StageGridDimensions *config; /* setConfig (ObjM: GetStageGridDimensions(stage)); NULL after Reset */
     /* +0x06C */ SceneNode *target; /* setTargetAndLoadChunks (DreamSys__SpawnAtLink passes the DreamSys); its coord2 is the tracked position */
     /* +0x070 */ s32 enabled;       /* enable/disable; gates UpdateIfEnabled */
-    /* +0x074 */ s32 gridSpan;      /* setGridSpan: gDefaultGridSpan = 0xA000 */
+    /* +0x074 */ s32 gridSpan;      /* setGridSpan: sDefaultGridSpan = 0xA000 */
     /* +0x078 */ s16 gridHalfCells; /* gridSpan >> 12 = 10 */
     /* +0x07A */ s16 gridCells;     /* gridSpan >> 11 = 20, the row stride */
     /* +0x07C */ s16 footprintCol; /* BuildFootprintRects' input: a signed column, clamped into [0,20) */

@@ -251,7 +251,7 @@ Naming, all zero bytes:
 - local `ret1` split into `record` (PickStageBgm / PickStageTexture results)
   and `day` (getCurrentDayAndYear); the split compiled identically.
 - `0x10` -> 16, `0xA000` -> `DEFAULT_GRID_SPAN` (40960, unit-local; the value
-  of gDefaultGridSpan, what StageMap starts with; StageMap::gridHalfCells is
+  of sDefaultGridSpan, what StageMap starts with; StageMap::gridHalfCells is
   gridSpan >> 12 = 10).
 - `arg3` / `unk4C` kept: stored, never read, and IntermediateBase__Init
   passes 0, so nothing names it.

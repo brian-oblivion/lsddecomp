@@ -497,7 +497,7 @@ extern LongVec3 gObjMViewRefPoint;
 extern s32 gStagePendingExtras[];
 extern CellBounds gStage0Bounds;
 
-/* onInit's gridSpan when it is passed 0: gDefaultGridSpan's value, the one
+/* onInit's gridSpan when it is passed 0: sDefaultGridSpan's value, the one
  * the StageMap starts with (10 half-cells: StageMap::gridHalfCells is
  * gridSpan >> 12). */
 #define DEFAULT_GRID_SPAN 40960

@@ -594,13 +594,13 @@ void StageMap__OnNotify(StageMap *self, BasicClass *sender, s32 command) {
     }
 }
 
-extern s32 gDefaultGridSpan;
+extern s32 sDefaultGridSpan;
 
 void StageMap__Reset(StageMap *self) {
     self->config = NULL;
     self->acceptedTags = NULL;
     self->rectCount = 0;
-    self->methods->setGridSpan(self, gDefaultGridSpan);
+    self->methods->setGridSpan(self, sDefaultGridSpan);
     self->unk1CC = -1;
     self->unk1D0 = -1;
     self->unk1D4 = -1;
