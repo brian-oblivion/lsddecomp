@@ -2,7 +2,7 @@
 
 > Renamed from `func_800641C0` on 2026-09-25 (tools/rename.py). Address 0x800641c0.
 
-**Unit:** Entity_f · **Size:** 53 words · **Status:** MATCHED (53/53 words)
+**Unit:** Entity · **Size:** 53 words · **Status:** MATCHED (53/53 words)
 
 ## What it does
 
@@ -47,7 +47,7 @@ Entity is a TodActor subclass: `Entity__Entity` runs
 keeps TodActor's TOD slots at +0x128..+0x138. `code_55dd4.h` names both the
 slots and the fields they write; the Entity offsets are the same.
 
-| field / slot | proposed | tier | evidence | accessor outside Entity_f |
+| field / slot | proposed | tier | evidence | accessor outside Entity |
 | --- | --- | --- | --- | --- |
 | `EntityMethods::slot128` | `setTod` | A | gEntityMethods +0x128 = `TodActor__SetTod` (writes todIndex +0x7C, todFrameCount +0x80, todFramePtr +0x88, todFrame +0x84 = 0) | Entity_g (first compiler failure, `Entity_g.c:184`) |
 | `EntityMethods::slot12C` | `playTod` | A | +0x12C = `TodActor__PlayTod` (todPlaying = 1) | Entity_g (first compiler failure, `Entity_g.c:239`) |
@@ -68,8 +68,8 @@ Unk94Methods `slot44`/`slot100`/`slot130`/`slot200` (on `this->target`) and
 Unk100Methods `slotD4`/`slotD8` are not named: the target's and `unk100`'s
 classes are not established.
 
-The accessor column is the first unit outside Entity_f that failed to compile
-with the definition renamed and Entity_f's own accessors fixed (make stops
+The accessor column is the first unit outside Entity that failed to compile
+with the definition renamed and Entity's own accessors fixed (make stops
 at the first failing unit, so it is a witness, not the full list); the head's
 type-scope apply lists the rest.
 

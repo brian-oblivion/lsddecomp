@@ -12,7 +12,7 @@ grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity
 
 No hits. Consistent with the coordinator's measured all-clear for this unit
 (all three blocker screens return zero across all 37 functions of the
-original `Entity_f`/`Entity_g` segment).
+original `Entity`/`Entity_g` segment).
 
 ## What it does
 

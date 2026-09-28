@@ -103,7 +103,7 @@ struct Entity {
 
 /* playTod (+0x12C) is TodActor's slot and returns the flag its occupant
  * sets, but Entity's callers call it as void: Entity__MoodCue39/57 (Entity)
- * and Entity__MoodCue86 (Entity_f) cross-jump a playTod call with a void
+ * and Entity__MoodCue86 (Entity) cross-jump a playTod call with a void
  * sibling (stopTod), which GCC 2.6.3 does only when both are void (the
  * moveLocalZ case in the banner); through the s32 slot they grow 3 words
  * each. Every Entity call site casts the slot to this typedef, which emits

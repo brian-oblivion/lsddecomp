@@ -2,7 +2,7 @@
 
 > Renamed from `func_80063CAC` on 2026-09-25 (tools/rename.py). Address 0x80063cac.
 
-**Unit:** Entity_f · **Size:** 7 words · **Status:** MATCHED (7/7 words)
+**Unit:** Entity · **Size:** 7 words · **Status:** MATCHED (7/7 words)
 
 ## What it does
 

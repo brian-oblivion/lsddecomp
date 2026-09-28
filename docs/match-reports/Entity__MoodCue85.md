@@ -2,7 +2,7 @@
 
 > Renamed from `func_80063874` on 2026-09-25 (tools/rename.py). Address 0x80063874.
 
-**Unit:** Entity_f · **Size:** 211 words · **Status:** MATCHED (211/211 words)
+**Unit:** Entity · **Size:** 211 words · **Status:** MATCHED (211/211 words)
 
 ## What it does
 
@@ -114,7 +114,7 @@ existing names' reading, not re-derived here.
 
 ## Proposed field names
 
-| field | proposed | tier | evidence | accessor outside Entity_f |
+| field | proposed | tier | evidence | accessor outside Entity |
 | --- | --- | --- | --- | --- |
 | `Entity::unk50` (+0x50) | `companion2` | B | Entity is a TodActor subclass (`Entity__Entity` calls `GetTodActorMethods()->ctor`; gEntityMethods keeps TodActor's slots), and `code_55dd4.h` names TodActor's +0x50 `companion2` (the tag-5 BaseObjO companion). Here and in `Entity__MoodCue57` it is only passed opaquely as `unk100->slotD4/slotD8`'s arg1, so nothing in this unit contradicts or confirms it beyond the offset. | Entity_g (first compiler failure, `Entity_g.c:78`; make stops there, so a witness, not the full list) |
 

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80063784` on 2026-09-25 (tools/rename.py). Address 0x80063784.
 
-**Unit:** Entity_f · **Size:** 60 words · **Status:** MATCHED (60/60 words)
+**Unit:** Entity · **Size:** 60 words · **Status:** MATCHED (60/60 words)
 
 ## What it does
 

@@ -1803,7 +1803,6 @@ segments:
       # needed 5+ and both functions at 8+ stalled.
       #
       # Entity_f: first 17, 0x53CA8..0x54E18.
-      - [0x53CA8, c, Entity_f]
       # Entity_g: remaining 20, 0x54E18..0x55DD4.
       - [0x54E18, c, Entity_g]
       - [0x55DD4, c, code_55dd4]

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80063ED4` on 2026-09-25 (tools/rename.py). Address 0x80063ed4.
 
-**Unit:** Entity_f · **Size:** 105 words · **Status:** MATCHED (105/105 words)
+**Unit:** Entity · **Size:** 105 words · **Status:** MATCHED (105/105 words)
 
 ## What it does
 
@@ -77,7 +77,7 @@ What it does, in the unit's current field names: Tick 0: gets/creates `unk100`, 
 scale) is left unnamed, as Entity_g's header comment already decided for the
 same symbol: no precedent for naming a non-uniform, non-unit-fraction scale.
 
-### Fields renamed (round 79, applied, compiler-listed accessors all in Entity_f)
+### Fields renamed (round 79, applied, compiler-listed accessors all in Entity)
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |

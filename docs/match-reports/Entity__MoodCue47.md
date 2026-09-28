@@ -89,7 +89,7 @@ track code address once row 115 is reached). Mechanics established
 Not proposing `unk80`/`unk84`: both are read here as `moodTimer`-scaling
 constants (a divisor/multiplier derived from the mood row) but the existing
 header comment already flags `unk84` as carrying a SECOND, unrelated
-loop-counter meaning in `Entity_f.c` (`Entity__MoodCue91`/`Entity__MoodCue92`), so a
+loop-counter meaning in `Entity.c` (`Entity__MoodCue91`/`Entity__MoodCue92`), so a
 single name would misdescribe one of the two uses -- exactly the ambiguity
 CLAUDE.md's field-ownership rule exists to keep out of a shared header.
 

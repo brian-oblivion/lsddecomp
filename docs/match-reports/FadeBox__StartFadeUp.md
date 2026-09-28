@@ -369,7 +369,7 @@ black in the retail bytes); the mechanics are the fade direction. Unless
 takes one tick off `ticksLeft`. It is the counterpart of
 `FadeBox__StartFadeDown` (state 2 against that one's 1; `Stop`
 notifies its parents with event 6 against 5). Caller: Entity__MoodCue85
-(Entity_f) passes (companion2, 0, 0). Tier B.
+(Entity) passes (companion2, 0, 0). Tier B.
 
 ## Track 6 (2026-09-26, round 93, charlie)
 
