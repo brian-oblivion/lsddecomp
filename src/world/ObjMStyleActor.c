@@ -1637,7 +1637,7 @@ extern s32 sStyleSpawnColors[];
 extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 sStyleSpawnOffsetY;
-extern s32 gStyleSpawnOffsetZ;
+extern s32 sStyleSpawnOffsetZ;
 extern u8 sStyleKind3Colors[][3];
 
 /* MATCHING: the rotation store goes through a one-field struct, so the
@@ -1657,10 +1657,10 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     if (sStyleDecorVariant != 0 && sStyleDecorColors == sStyleDecorColorsB) {
         sStyleSpawnOffsetX = -45056;
         sStyleSpawnOffsetY = -8192;
-        gStyleSpawnOffsetZ = 0;
+        sStyleSpawnOffsetZ = 0;
         sStyleSpawnColors[0] = (s32)sStyleKind3Colors[1];
     } else {
-        offsetZ = &gStyleSpawnOffsetZ;
+        offsetZ = &sStyleSpawnOffsetZ;
         if (*offsetZ > 0) {
             *offsetZ = -*offsetZ;
         }
@@ -1724,7 +1724,7 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
 }
 
 extern s32 sStyleSpawnOffsetY;
-extern s32 gStyleSpawnOffsetZ;
+extern s32 sStyleSpawnOffsetZ;
 extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 sStyleSpawnModelLayout;
@@ -1743,9 +1743,9 @@ void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
     if (rand() & 1) {
         sStyleSpawnOffsetX = -sStyleSpawnOffsetX;
     }
-    gStyleSpawnOffsetZ = (rand() % 23) << 11;
+    sStyleSpawnOffsetZ = (rand() % 23) << 11;
     if (rand() & 1) {
-        gStyleSpawnOffsetZ = -gStyleSpawnOffsetZ;
+        sStyleSpawnOffsetZ = -sStyleSpawnOffsetZ;
     }
     gStyleSpawnRotation = gStyleSpawnRotations[(u32)rand() % 7];
     sStyleSpawnModelLayout = rand() % 5;
@@ -1768,11 +1768,11 @@ void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     sStyleSpawnOffsetY = gStyleSpawnYChoice1;
     sStyleSpawnOffsetX = (rand() % 20) << 11;
     dayMod3 = sStyleDay % 3;
-    gStyleSpawnOffsetZ = 40960;
+    sStyleSpawnOffsetZ = 40960;
     if (dayMod3 == 1) {
-        gStyleSpawnOffsetZ = -40960;
+        sStyleSpawnOffsetZ = -40960;
     } else if (dayMod3 == 2) {
-        gStyleSpawnOffsetZ = 2048;
+        sStyleSpawnOffsetZ = 2048;
     }
     gStyleSpawnRotation = gStyleSpawnRotations[(u32)rand() % 7];
     sStyleSpawnModelLayout = rand() % 5;

@@ -163,7 +163,7 @@ the retype, so the retype cost it nothing.
 extern s32 gStyleSpawnYChoices[];
 extern s32 sStyleSpawnOffsetX;
 extern s32 sStyleSpawnOffsetY;
-extern s32 gStyleSpawnOffsetZ;
+extern s32 sStyleSpawnOffsetZ;
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 sStyleSpawnModelLayout;
@@ -177,9 +177,9 @@ void SetupStyleSpawnParamsRandom(void *arg0, void *arg1) {
     if (rand() & 1) {
         sStyleSpawnOffsetX = -sStyleSpawnOffsetX;
     }
-    gStyleSpawnOffsetZ = (rand() % 23) << 11;
+    sStyleSpawnOffsetZ = (rand() % 23) << 11;
     if (rand() & 1) {
-        gStyleSpawnOffsetZ = -gStyleSpawnOffsetZ;
+        sStyleSpawnOffsetZ = -sStyleSpawnOffsetZ;
     }
     gStyleSpawnRotation = gStyleSpawnRotations + ((u32) rand() % 7) * 12;
     sStyleSpawnModelLayout = rand() % 5;
@@ -211,9 +211,9 @@ source shape, spelled as a cast.
 ### The interesting asymmetry from round 48, now explained
 
 Round 48 flagged, unexplained, that the textually identical
-write/conditional-negate pattern on `gStyleSpawnOffsetZ` did **not** get an address
+write/conditional-negate pattern on `sStyleSpawnOffsetZ` did **not** get an address
 cached in either build, and guessed at register-pressure/CSE-table state.
-The real reason is that `gStyleSpawnOffsetZ` was declared `extern s32 gStyleSpawnOffsetZ;`
+The real reason is that `sStyleSpawnOffsetZ` was declared `extern s32 sStyleSpawnOffsetZ;`
 and assigned by name all along, one statement below the `u8[]`-plus-cast
 spelling. The two globals differed only in their declarations, and that
 difference was the whole residue. The discriminator was sitting in the same
@@ -254,7 +254,7 @@ practice. Confirmed here whole-image green with an already-matched sibling
   by that pair. When ins/del is entirely prologue/epilogue, the residue is
   ONE structural cause, not a diffuse allocation difference.
 - **Look for a sibling global in the SAME function that already gets retail's
-  shape.** Here `gStyleSpawnOffsetZ`, one statement later, was already correct; the
+  shape.** Here `sStyleSpawnOffsetZ`, one statement later, was already correct; the
   only difference between the two was the declaration. Round 63's "check
   whether a sibling loop in the SAME function already uses the correct idiom"
   applies to declarations too.
