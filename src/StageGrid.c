@@ -2,7 +2,7 @@
  * between a mood-graph value and the grid cell (stage + chunk) that owns it.
  *
  * Each of the game's stages divides into a `columns` x `rows` grid of chunks
- * (StageGridDimensions, one entry per stage in STAGE_GRID_DIMENSIONS), and
+ * (StageGridDimensions, one entry per stage in sStageGridDimensions), and
  * every chunk owns one MoodGraphPoint in a row-major per-stage table
  * (STAGE_CHUNK_MOODS -- 14 pointers to the per-stage STGnn_CHUNK_MOODS
  * arrays). GetMoodFromStageChunk and GetStageChunkFromMood convert between a
@@ -31,7 +31,7 @@ StageGridDimensions *GetStageGridDimensionsTable(s32 *count) {
     if (count != NULL) {
         *count = STAGE_GRID_DIMENSIONS_COUNT;
     }
-    return STAGE_GRID_DIMENSIONS;
+    return sStageGridDimensions;
 }
 
 StageGridDimensions *GetStageGridDimensions(s32 index) {
@@ -48,8 +48,8 @@ s32 GetStageChunkFromMood(StageChunk *ret, MoodGraphPoint *mood) {
 
     for (stage = 0; stage < STAGE_GRID_DIMENSIONS_COUNT; stage++) {
         p = STAGE_CHUNK_MOODS[stage];
-        rows = STAGE_GRID_DIMENSIONS[stage].rows;
-        columns = STAGE_GRID_DIMENSIONS[stage].columns;
+        rows = sStageGridDimensions[stage].rows;
+        columns = sStageGridDimensions[stage].columns;
         for (row = 0; row < rows; row++) {
             for (col = 0; col < columns; col++) {
                 if (mood->value == p->value) {
@@ -65,5 +65,5 @@ s32 GetStageChunkFromMood(StageChunk *ret, MoodGraphPoint *mood) {
 }
 
 MoodGraphPoint *GetMoodFromStageChunk(s32 stage, StageChunk *chunk) {
-    return STAGE_CHUNK_MOODS[stage] + chunk->row * STAGE_GRID_DIMENSIONS[stage].columns + chunk->column;
+    return STAGE_CHUNK_MOODS[stage] + chunk->row * sStageGridDimensions[stage].columns + chunk->column;
 }

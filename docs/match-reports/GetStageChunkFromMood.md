@@ -20,8 +20,8 @@ s32 GetStageChunkFromMood(StageChunk *ret, MoodGraphPoint *mood) {
 
     for (stage = 0; stage < STAGE_GRID_DIMENSIONS_COUNT; stage++) {
         p = STAGE_CHUNK_MOODS[stage];
-        rows = STAGE_GRID_DIMENSIONS[stage].rows;
-        columns = STAGE_GRID_DIMENSIONS[stage].columns;
+        rows = sStageGridDimensions[stage].rows;
+        columns = sStageGridDimensions[stage].columns;
         for (row = 0; row < rows; row++) {
             for (col = 0; col < columns; col++) {
                 if (mood->value == p->value) {

@@ -14,8 +14,8 @@ beqz  $a0, .L800494C8
  ori  $v0, $zero, 0xE
 sw    $v0, 0x0($a0)
 .L800494C8:
-lui   $v0, %hi(STAGE_GRID_DIMENSIONS)
-addiu $v0, $v0, %lo(STAGE_GRID_DIMENSIONS)
+lui   $v0, %hi(sStageGridDimensions)
+addiu $v0, $v0, %lo(sStageGridDimensions)
 jr    $ra
  nop
 ```
@@ -34,11 +34,11 @@ StageGridDimensions *GetStageGridDimensionsTable(s32 *count) {
     if (count != NULL) {
         *count = STAGE_GRID_DIMENSIONS_COUNT;
     }
-    return STAGE_GRID_DIMENSIONS;
+    return sStageGridDimensions;
 }
 ```
 
-Returning the bare array name (not `&STAGE_GRID_DIMENSIONS`, not a cast) is what
+Returning the bare array name (not `&sStageGridDimensions`, not a cast) is what
 produces the plain `lui`/`addiu` pair.
 
 ## Naming
