@@ -107,3 +107,10 @@ The banner's last sentence read:
 
 >  prototype. The carve history is in docs/match-reports/GsSetNearClip.md,
 > "File history".
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libgs_gs_101.c`:
+
+> On GsCLIP3near: "libgs's bss global, pinned in config/psyq-objects.ld;
+> <libgs.h> does not declare it."

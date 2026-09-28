@@ -1,40 +1,32 @@
 /*
- * libsnd_ut_ako -- Sony's libsnd/ut_ako module, carried as disassembly
- * because no SDK disc carries the build retail linked.
- *
- * SsUtAllKeyOff resets every voice the voice manager owns (spuVmMaxVoice of
- * them): its _svm_voice record (include/svm_data.h), its SPU voice
- * registers (_svm_sreg points at them, 0x1F801C00, eight halfwords per
- * voice), and its bit in the key-off masks. It keeps Sony's name and
+ * libsnd_ut_ako -- Sony's libsnd/ut_ako module, carried as disassembly:
+ * SsUtAllKeyOff, which resets every voice the voice manager owns
+ * (spuVmMaxVoice of them): its _svm_voice record (svm_data.h), its SPU
+ * voice registers (_svm_sreg points at them, 0x1F801C00, eight halfwords
+ * per voice), and its bit in the key-off masks. It keeps Sony's name and
  * <libsnd.h>'s prototype.
  *
- * Which object (nm over sdk/work/<disc>/elf/libsnd): ut_ako.o on the 3.6
- * disc, with this one function as its only text symbol; on 3.0, 3.3 and
- * 3.5 it is the last function of vmanager.o. 3.6's text is 0x138 bytes
- * against retail's 0x20C, so it cannot be linked.
+ * ut_ako.o on the 3.6 disc holds this one function; on 3.0, 3.3 and 3.5 it
+ * is the last function of vmanager.o. 3.6's object differs in length from
+ * the game's, so it cannot be linked in its place.
  *
- * Its declarations are include/libsnd_internal.h's, except _svm_sreg,
- * which it reads through its own spelling.
+ * Its declarations are libsnd_internal.h's, except _svm_sreg, which it
+ * reads through its own spelling.
  */
 #include "common.h"
 #include "libsnd_internal.h"
 
 /*
- * _svm_sreg as this function reads it: a pointer variable (loaded with `lw`,
- * not an array base) to the SPU voice register block at 0x1F801C00, indexed
- * as halfwords, `_svm_sreg[woff + N]` with `s16 woff = i * 8`: 8 halfwords
- * (0x10 bytes) per voice, the SPU's own per-voice stride. libsnd_vmanager.c
- * reads the same symbol as a pointer to its SpuRegs.
- *
- * MATCHING: the pointee is volatile. cc1 orders volatile accesses only
- * against other volatile accesses, so without it the D_8008EA26 store/reload
- * pair is hoisted across these six stores.
+ * _svm_sreg as this function reads it: a pointer to the SPU voice register
+ * block at 0x1F801C00, indexed as halfwords, `_svm_sreg[woff + N]` with
+ * `s16 woff = i * 8`: 8 halfwords (0x10 bytes) per voice, the SPU's own
+ * per-voice stride. libsnd_vmanager.c reads the same symbol as a pointer to
+ * its SpuRegs.
  */
+/* MATCHING: volatile pointee: without it the voice store and reload are hoisted across the six stores. */
 extern volatile u16 *_svm_sreg;
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: length exact, 131 words; a register-identity residue on
- * bitLo/bitHi (docs/match-reports/SsUtAllKeyOff.md). */
 void SsUtAllKeyOff(s16 mode) {
     s16 i;
     s16 woff;

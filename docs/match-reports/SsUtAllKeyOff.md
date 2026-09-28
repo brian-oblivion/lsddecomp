@@ -482,3 +482,22 @@ The file's banner carried its edge evidence:
 > before it, libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c, ends on
 > ut_autop's SsUtAutoPan ("start edge possible"; a Sony module edge by
 > content, so not merged), and the placed object libsnd/vm_vsu follows it.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_ut_ako.c`:
+
+> The file banner's evidence: "Which object (nm over sdk/work/<disc>/elf/libsnd):
+> ut_ako.o on the 3.6 disc, with this one function as its only text symbol; on
+> 3.0, 3.3 and 3.5 it is the last function of vmanager.o. 3.6's text is 0x138
+> bytes against retail's 0x20C, so it cannot be linked." It opened "carried as
+> disassembly because no SDK disc carries the build retail linked."
+>
+> On the _svm_sreg declaration: "a pointer variable (loaded with `lw`, not an
+> array base)", and "MATCHING: the pointee is volatile. cc1 orders volatile
+> accesses only against other volatile accesses, so without it the D_8008EA26
+> store/reload pair is hoisted across these six stores." Now one line.
+>
+> The NON_MATCHING body's score comment: "NON_MATCHING: length exact, 131
+> words; a register-identity residue on bitLo/bitHi
+> (docs/match-reports/SsUtAllKeyOff.md)."

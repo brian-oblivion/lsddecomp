@@ -1,15 +1,9 @@
 /*
- * libcard_card -- Sony's libcard module `card`: _card_clear, carried as
- * assembly.
- *
- * _card_clear is memory-card library code: it calls only libcard's _new_card
- * and _card_write. The 3.3 disc's libcard/card holds it at the same length
- * and shape, but retail's copy was assembled differently, so the object
- * never places and the function cannot be linked like its neighbours; the
- * file is named for that object. It stays INCLUDE_ASM for good:
- * its word 5 is an `addiu $a1,$zero,0x3F`, the form Sony's libcard
- * assembler emitted, which the pinned pipeline cannot produce (it emits
- * `ori`). The evidence is in docs/match-reports/_card_clear.md.
+ * libcard_card -- Sony's libcard module `card`: _card_clear, which clears a
+ * memory card through libcard's _new_card and _card_write. The 3.3 disc's
+ * libcard/card holds it at the same length and shape but not in the same
+ * bytes, so the object cannot be linked in its place; the file is named
+ * for that object. The function stays disassembly.
  */
 
 #include "common.h"

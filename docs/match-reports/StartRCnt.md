@@ -85,3 +85,16 @@ subsystem relies on it is not).
 ## Identification (round 69, head)
 
 Sony's `StartRCnt`, `libapi/counter`: the five functions at 0x80032B18 are that module's exports in its own order (SetRCnt, GetRCnt, StartRCnt, StopRCnt, ResetRCnt), with the first three offsets exact against the 3.5/3.6 `counter.o` and the last two 4 and 8 bytes later (a library build the discs do not carry, so no object can be linked); `KERNEL.H` prototypes agree on arity. Two evidence kinds per FINISHING-PLAN track 2. Delta had named it `SetIrqMask` (mechanically right: it ORs the counter's bit into I_MASK); renamed at merge.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_ssinit_libapi_counter.c`:
+
+> The comment above IrqRegs (shared with StopRCnt):
+>
+> "Shadow of the PSX interrupt controller pair at 0x1F801070/0x1F801074
+> (I_STAT/I_MASK). D_8006DCAC is a pointer to this pair, not the pair
+> itself -- same "pointer-to-hardware-block" idiom as D_8006DCB0 above.
+> D_8006DCB4 holds the per-index IRQ mask bit (root counters 0/1/2 use
+> indices 0-2 -> Tmr0/Tmr1/Tmr2 IRQ bits 0x10/0x20/0x40; index 3 is the
+> 0x1 VBLANK bit)."

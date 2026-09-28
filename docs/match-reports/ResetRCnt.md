@@ -376,3 +376,22 @@ directly from this report's own heading.
 ## Identification (round 69, head)
 
 Sony's `ResetRCnt`, `libapi/counter`: the five functions at 0x80032B18 are that module's exports in its own order (SetRCnt, GetRCnt, StartRCnt, StopRCnt, ResetRCnt), with the first three offsets exact against the 3.5/3.6 `counter.o` and the last two 4 and 8 bytes later (a library build the discs do not carry, so no object can be linked); `KERNEL.H` prototypes agree on arity. Two evidence kinds per FINISHING-PLAN track 2. 
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_ssinit_libapi_counter.c`:
+
+> The comment above RCntEntry (shared by SetRCnt, GetRCnt and ResetRCnt; its
+> MATCHING note is ResetRCnt's):
+>
+> "Shadow copy of the three PSX root-counter register blocks (COUNT/MODE/
+> TARGET, each a hardware halfword, 0x10 apart -- matches the real
+> 0x1F801100/0x1F801110/0x1F801120 hardware spacing). D_8006DCB0 is a
+> pointer to this table, not the table itself.
+>
+> The three hardware fields are `volatile` because they are memory-mapped
+> registers. MATCHING: without it GCC reorders the table load against the
+> index arithmetic and hoists stores into unconditional-jump delay slots
+> retail leaves as `nop` (docs/match-reports/ResetRCnt.md)."
+>
+> The MATCHING note is now one line above the typedef.
