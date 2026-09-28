@@ -64,7 +64,7 @@ is not the gp-relative blocker, it is a residue class of its own. Restored to
 Two independent passes over unrelated tables, then a load of the "DreamAux"
 audio-stream-request object:
 
-1. For `i` in `0..13`: `gDreamAuxGroupRecords[i]` is a pointer to an array of
+1. For `i` in `0..13`: `sDreamAuxGroupRecords[i]` is a pointer to an array of
    `sDreamAuxGroupCounts[i]` (signed count) 8-byte records; clear byte 0 (offset `0x0`,
    named `flag`) of each.
 2. Build a request (`ResourceRequest__Set`, already matched elsewhere in
@@ -98,7 +98,7 @@ void InitDreamAux(void)
 
     for (i = 0; i < 14; i++) {
         for (j = 0; j < sDreamAuxGroupCounts[i]; j++) {
-            gDreamAuxGroupRecords[i][j].flag = 0;
+            sDreamAuxGroupRecords[i][j].flag = 0;
         }
     }
 
@@ -112,7 +112,7 @@ void InitDreamAux(void)
 ```
 
 Needs (from `include/DreamAux.h`, added this round):
-`DreamAuxLoadReq`, `DreamAuxGroupRecord`, `sDreamAuxGroupCounts`, `gDreamAuxGroupRecords`,
+`DreamAuxLoadReq`, `DreamAuxGroupRecord`, `sDreamAuxGroupCounts`, `sDreamAuxGroupRecords`,
 `DreamAuxSlot`, `gDreamAuxSlots`, `ResourceRequest__Set`, `New_ModelData`.
 
 ## The residue, precisely
@@ -146,7 +146,7 @@ which shows the first ~46 instructions matching before this one diverges).
 
 1. Manually hoisted `s8 *counts` / `DreamAuxGroupRecord **groups` pointers
    incremented by hand in loop 1, instead of indexing `sDreamAuxGroupCounts[i]` /
-   `gDreamAuxGroupRecords[i][j]` directly -- **worse** (5/56). Switching to direct
+   `sDreamAuxGroupRecords[i][j]` directly -- **worse** (5/56). Switching to direct
    array indexing and letting GCC do its own induction-variable strength
    reduction (per the head's "let GCC hoist its own invariants" broadcast)
    got loop 1 to match byte-for-byte; this part of the lever generalizes.
@@ -300,7 +300,7 @@ The group-record view (deleted; TriggerRecord):
 
 ```c
 /* A tiny fixed-size record family read by InitDreamAux: 14 (0xE) parallel
- * groups, sDreamAuxGroupCounts[i] a signed count and gDreamAuxGroupRecords[i] a pointer to an
+ * groups, sDreamAuxGroupCounts[i] a signed count and sDreamAuxGroupRecords[i] a pointer to an
  * array of count 8-byte records whose first byte InitDreamAux clears. The
  * record's remaining 7 bytes are not accessed here. */
 ```

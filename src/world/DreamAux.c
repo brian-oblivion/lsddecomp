@@ -48,9 +48,9 @@ void InitDreamAux(void) {
     u32 i;
     s32 record;
 
-    for (i = 0; i < ARRAY_COUNT(gDreamAuxGroupRecords); i++) {
+    for (i = 0; i < ARRAY_COUNT(sDreamAuxGroupRecords); i++) {
         for (record = 0; record < sDreamAuxGroupCounts[i]; record++) {
-            gDreamAuxGroupRecords[i][record].triggered = 0;
+            sDreamAuxGroupRecords[i][record].triggered = 0;
         }
     }
 
@@ -230,7 +230,7 @@ TriggerWorld *FireDreamAuxTriggerEntries(s32 day, DreamAuxTriggerEntry *trigger,
     world = New_TriggerWorld(&req.src);
 
     if (world != NULL) {
-        TriggerRecord *records = gDreamAuxGroupRecords[gDreamAuxStage];
+        TriggerRecord *records = sDreamAuxGroupRecords[gDreamAuxStage];
         s8 *next = trigger->recordIndices;
         s8 *end = trigger->recordIndices + ARRAY_COUNT(trigger->recordIndices);
 

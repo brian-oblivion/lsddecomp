@@ -47,7 +47,7 @@ s32 LookupDreamAuxTrigger(s16 *a0)
 
 `gDreamAuxTriggerCounts`/`gDreamAuxTriggerEntries` is a second "count + pointer-to-array" parallel
 family in this unit, structurally identical to the already-documented
-`sDreamAuxGroupCounts`/`gDreamAuxGroupRecords` (`InitDreamAux`) but a different stride (6 bytes,
+`sDreamAuxGroupCounts`/`sDreamAuxGroupRecords` (`InitDreamAux`) but a different stride (6 bytes,
 not 8) and a different index space (`gDreamAuxStage`, not a loop counter). The
 record type is named `DreamAuxTriggerEntry` since `LookupDreamAuxTrigger`'s only
 consumer of the match, `RemapTriggerForDreamColor`, is itself part of this unit's

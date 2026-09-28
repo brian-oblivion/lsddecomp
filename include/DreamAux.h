@@ -67,7 +67,7 @@ enum TriggerCondition {
     TRIGGER_COND_ODD_DAY = 21
 };
 
-/* One spawn record of a stage's table (gDreamAuxGroupRecords[stage], 8-byte
+/* One spawn record of a stage's table (sDreamAuxGroupRecords[stage], 8-byte
  * stride). `triggered` latches once `condition` has passed; InitDreamAux
  * clears every latch. `modelIndex` picks the ModelData of the chunk's
  * TriggerWorld, and each of `spawnIndices` (-1 ends the list) one
@@ -82,7 +82,7 @@ typedef struct TriggerRecord {
 } TriggerRecord;
 
 extern s8 sDreamAuxGroupCounts[DREAM_AUX_STAGE_COUNT];
-extern TriggerRecord *gDreamAuxGroupRecords[DREAM_AUX_STAGE_COUNT];
+extern TriggerRecord *sDreamAuxGroupRecords[DREAM_AUX_STAGE_COUNT];
 
 extern bool CheckDreamAuxTriggerCondition(s32 day, TriggerRecord *record);
 /* `desc` is New_Entity's descriptor, forwarded untouched; the caller has
