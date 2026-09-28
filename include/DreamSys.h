@@ -10,7 +10,7 @@
  * by GameApplication__GameApplication (src/app/GameApplicationFileResource.c, New_DreamSys) and kept in
  * GameApplication::dreamSys; the same object is GraphRoom::dreamSys, the
  * `target` ObjMStyleActor hands SetDreamAuxWorld (DreamAux's
- * gDreamAuxWorld), and the `peer` every Entity links to.
+ * sDreamAuxWorld), and the `peer` every Entity links to.
  *
  * It owns the dream clock (SceneNode's `tick`, advanced by
  * DreamSys__TimerTick, the update (+0x098) override, against

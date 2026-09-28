@@ -47,7 +47,7 @@ function's own report) is kept as a plain `s32` and cast to `s8 *` only at
 the point `CheckTriggerDayParity` needs it (that function's own signature takes a
 raw `s8 *`, per its existing match report) -- there is no evidence either
 way that this is a distinct pointer type worth naming, so it stays untyped
-like `gDreamAuxWorld` elsewhere in this unit.
+like `sDreamAuxWorld` elsewhere in this unit.
 
 `FireDreamAuxTriggerEntries` is forward-declared here with a placeholder `(s32, s32,
 s32)` signature to be filled in when that function (also queued this round)

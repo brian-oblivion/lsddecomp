@@ -121,7 +121,7 @@ error. Both callers set `$a3 = 0` (0x80059460, 0x8005CF7C), so the
 definition now takes that word as an unused 4th parameter, `s32 unused`. The
 body never reads `$a3`, and the whole image is byte-identical with the
 parameter added. The callers upcast (`(SceneNode *)this`,
-`(SceneNode *)gDreamAuxWorld`).
+`(SceneNode *)sDreamAuxWorld`).
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 

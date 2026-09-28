@@ -23,7 +23,7 @@ The initializer for this unit's five `%gp_rel` globals plus a one-shot
 extern void *New_Entity(void *arg0, void *arg1, void *arg2);
 extern s32 sDreamAuxStage;
 extern s32 sDreamAuxStageMap;
-extern s32 gDreamAuxWorld;
+extern s32 sDreamAuxWorld;
 extern s32 sDreamAuxSound;
 extern s32 sDreamAuxFrameClock;
 
@@ -36,7 +36,7 @@ void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
 
     sDreamAuxStage = a0;
     sDreamAuxStageMap = a1;
-    gDreamAuxWorld = a2;
+    sDreamAuxWorld = a2;
     sDreamAuxSound = a3;
     sDreamAuxFrameClock = a4;
 
@@ -107,11 +107,11 @@ Two independent instances now confirm it in this unit alone
 ## Naming
 
 **SetDreamAuxWorld** — tier B. Installs its five parameters into the unit's
-shared context globals (`sDreamAuxStage`, `gDreamAuxWorld` and three still-
+shared context globals (`sDreamAuxStage`, `sDreamAuxWorld` and three still-
 unnamed siblings), spawns one entity into `sDreamAuxSlots[0].entity` via
 `New_Entity`, then calls `SetTeleportsEnabled`. Called from
 `ObjM__SetupSceneStyle` (`ObjMStyleActor.c`), itself a per-object/per-level setup
-routine. "World" reflects `gDreamAuxWorld`'s own established role (cast
+routine. "World" reflects `sDreamAuxWorld`'s own established role (cast
 `TriggerWorld*`, dispatched through vtable slots 0x80/0x22 elsewhere in the
 unit) -- but this function's OWN purpose (why these five values, together,
 constitute entering a "world") is inferred from usage, not proven, hence B.
@@ -125,7 +125,7 @@ Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 ## Track 4 (2026-09-26, round 88)
 
 The third parameter is retyped `s32 a2` -> `DreamSys *world`, and the global
-it is stored in, gDreamAuxWorld, `s32` -> `DreamSys *` (DreamAux.c). Its
+it is stored in, sDreamAuxWorld, `s32` -> `DreamSys *` (DreamAux.c). Its
 only caller, ObjM__SetupSceneStyle (ObjMStyleActor), passes its DreamSys
 `target`; DreamAux calls +0x200 of its table (getDreamColor) and passes
 it as Entity's peer. Byte-identical.
@@ -147,5 +147,5 @@ The extern comments, as they stood:
 
 ```c
 extern StageMap *D_8008ABFC; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
-extern DreamSys *gDreamAuxWorld; /* the player DreamSys: ObjMStyleActor passes its `target` */
+extern DreamSys *sDreamAuxWorld; /* the player DreamSys: ObjMStyleActor passes its `target` */
 ```

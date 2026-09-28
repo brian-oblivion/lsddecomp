@@ -174,7 +174,7 @@ call and can go the same way.
 Comment history moved from the unit's externs:
 
 > DreamAux.c's (MATCHED round 43); no header declares it. `world` is the
-> DreamSys it installs as gDreamAuxWorld (track 4, round 88).
+> DreamSys it installs as sDreamAuxWorld (track 4, round 88).
 
 > GetStageGridDimensions comes from include/StageGrid.h, through DreamSys.h.
 

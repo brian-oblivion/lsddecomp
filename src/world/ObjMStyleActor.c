@@ -695,7 +695,7 @@ void ObjM__TogglePause(ObjM *self) {
 void ObjM__NoOpSlot7C(void) {}
 
 /* src/world/DreamAux.c's; no header declares it. It keeps the stage, the
- * StageMap, the DreamSys (gDreamAuxWorld), the sound and the FrameClock for
+ * StageMap, the DreamSys (sDreamAuxWorld), the sound and the FrameClock for
  * the dream's aux entities. */
 struct FrameClock;
 extern void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world,

@@ -24,7 +24,7 @@
  * start/stop pair and updateTargetProximity, then TodActor's update.
  *
  * The peer is the player. attachToParent's (self, peer, companion, parent,
- * offset) is TodActor's; DreamAux passes gDreamAuxWorld as the peer, and
+ * offset) is TodActor's; DreamAux passes sDreamAuxWorld as the peer, and
  * the slots Entity calls on `peer` (+0x100, +0x120, +0x1A0, +0x200, +0x21C)
  * lie past the end of TodActor's table: their occupants in
  * gDreamSysMethods are DreamSys__GetLinkCommandFlag,

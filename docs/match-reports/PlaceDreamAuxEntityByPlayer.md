@@ -30,9 +30,9 @@ void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *a0)
         s32 localPos[3];
 
         ((DreamAuxObjFn14)a0->entity->vtable[0x14])(a0->entity);
-        SceneNode__LocalOffsetToWorldPos((void *)gDreamAuxWorld, localPos, a0->pos, 0);
-        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, gDreamAuxWorld, sDreamAuxFrameClock, (void *)sDreamAuxStageMap, localPos);
-        SceneNode__FaceTarget(a0->entity, (void *)gDreamAuxWorld, 1, 0, 0);
+        SceneNode__LocalOffsetToWorldPos((void *)sDreamAuxWorld, localPos, a0->pos, 0);
+        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, sDreamAuxWorld, sDreamAuxFrameClock, (void *)sDreamAuxStageMap, localPos);
+        SceneNode__FaceTarget(a0->entity, (void *)sDreamAuxWorld, 1, 0, 0);
     }
 }
 ```

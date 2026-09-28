@@ -82,7 +82,7 @@ void ReleaseDreamAuxModels(void) {
  * companion. */
 extern s32 sDreamAuxStage;
 extern StageMap *sDreamAuxStageMap;
-extern DreamSys *gDreamAuxWorld;
+extern DreamSys *sDreamAuxWorld;
 extern struct VabStreamObj *sDreamAuxSound;
 extern struct FrameClock *sDreamAuxFrameClock;
 
@@ -95,7 +95,7 @@ void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct Vab
 
     sDreamAuxStage = stage;
     sDreamAuxStageMap = stageMap;
-    gDreamAuxWorld = world;
+    sDreamAuxWorld = world;
     sDreamAuxSound = sound;
     sDreamAuxFrameClock = frameClock;
 
@@ -196,7 +196,7 @@ DreamAuxTriggerEntry *RemapTriggerForDreamColor(DreamAuxTriggerEntry *trigger, s
     s32 stage = sDreamAuxStage;
 
     if (stage == 4 && index == 16) {
-        DreamSys *player = gDreamAuxWorld;
+        DreamSys *player = sDreamAuxWorld;
         s32 color = player->methods->getDreamColor(player);
 
         if (color == DREAM_COLOR_RED) {
@@ -372,7 +372,7 @@ success:
 /* Whether the player's dream colour is sSpecialColors' entry for trigger
  * condition `condition` (10..17). */
 bool IsCurrentDreamColor(s32 condition) {
-    DreamSys *player = gDreamAuxWorld;
+    DreamSys *player = sDreamAuxWorld;
     s32 color = sSpecialColors[condition - TRIGGER_COND_DREAM_COLOR_FIRST];
     s32 current = player->methods->getDreamColor(player);
 
@@ -448,7 +448,7 @@ bool SpawnDreamAuxTriggerEntity(s32 moodIndex, void *desc, DreamAuxTriggerEntry 
         sDreamAuxStageMap->methods->computeCellOffsets(sDreamAuxStageMap, worldPos, &cellDesc);
         entity->methods->updateRotation(entity, 1, sDreamAuxSpawnRotations[spawn->rotationIndex]);
         ((TodActorAttachToParentFn)entity->methods->attachToParent)(
-            (TodActor *)entity, (TodActor *)gDreamAuxWorld, sDreamAuxFrameClock,
+            (TodActor *)entity, (TodActor *)sDreamAuxWorld, sDreamAuxFrameClock,
             (void *)sDreamAuxStageMap, worldPos);
         return false;
     }
@@ -462,10 +462,10 @@ void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *slot) {
         s32 worldPos[3];
 
         slot->entity->methods->detachFromParent(slot->entity);
-        SceneNode__LocalOffsetToWorldPos((SceneNode *)gDreamAuxWorld, worldPos, slot->pos, 0);
+        SceneNode__LocalOffsetToWorldPos((SceneNode *)sDreamAuxWorld, worldPos, slot->pos, 0);
         ((TodActorAttachToParentFn)slot->entity->methods->attachToParent)(
-            (TodActor *)slot->entity, (TodActor *)gDreamAuxWorld, sDreamAuxFrameClock,
+            (TodActor *)slot->entity, (TodActor *)sDreamAuxWorld, sDreamAuxFrameClock,
             (void *)sDreamAuxStageMap, worldPos);
-        SceneNode__FaceTarget((SceneNode *)slot->entity, (SceneNode *)gDreamAuxWorld, 1, 0, NULL);
+        SceneNode__FaceTarget((SceneNode *)slot->entity, (SceneNode *)sDreamAuxWorld, 1, 0, NULL);
     }
 }

@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gDreamAuxWorld
 gEntityFadeBoxDefaultOffset
 gEntityFadeBoxDefaultSize
 gFadeBoxAttachPos
@@ -182,6 +181,7 @@ sDreamAuxFrameClock
 sDreamAuxSound
 sDreamAuxStage
 sDreamAuxStageMap
+sDreamAuxWorld
 sItemListCardPathPrefix
 sItemListTimExt
 sLinkAngle180

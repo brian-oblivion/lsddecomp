@@ -271,7 +271,7 @@ The header banner:
  * in DreamSys.c). InitDreamAux/TickDreamAuxSlots/TickDreamAuxSlots2 are the
  * construct/tick/destruct hooks a caller in DayTaskStageMap.c and
  * ObjMStyleActor.c drives this subsystem through. `sDreamAuxStage`,
- * `gDreamAuxWorld` and three sibling globals SetDreamAuxWorld installs are
+ * `sDreamAuxWorld` and three sibling globals SetDreamAuxWorld installs are
  * the shared context every other function in the unit reads.
  */
 ```
@@ -289,7 +289,7 @@ The slot and its object view (DreamAuxObj / DreamAuxTickFn, deleted):
  * result back into the same slot); an Entity at +0x4 (include/Entity.h)
  * that SetDreamAuxWorld makes with New_Entity and DespawnDreamAuxEntity
  * detaches and re-attaches (detachFromParent, attachToParent with the
- * player gDreamAuxWorld as the peer);
+ * player sDreamAuxWorld as the peer);
  * and a 3-word position vector at +0x8 that DespawnDreamAuxEntity passes as
  * `SceneNode__LocalOffsetToWorldPos`'s `src` (that function's own signature, `SceneNode.h`,
  * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
