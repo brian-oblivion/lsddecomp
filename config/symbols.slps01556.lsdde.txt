@@ -606,7 +606,7 @@ gStg11PermalinkTriggers = 0x80088700;
 gStg12PermalinkTriggers = 0x80088708;
 sStagePermalinkTriggers = 0x80088710;
 sStagePermalinkTriggersCount = 0x80088748;
-SPECIAL_DAYS = 0x80088CCC;
+sSpecialDays = 0x80088CCC;
 SPECIAL_COLORS = 0x80088D20;
 // identified: libc2/rand.o .sbss (its weak `n`, the rand seed), pinned by
 // psyq-objects.ld. Was FirecatFG's Small__rand (round 89).

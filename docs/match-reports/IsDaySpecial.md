@@ -35,7 +35,7 @@ MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day)
 	s32 i;
 
 	for (i = 0; (u32)i < 42; i++) {
-		if (day == SPECIAL_DAYS[i]) {
+		if (day == sSpecialDays[i]) {
 			cinematic->entry = rand() % 6;
 			cinematic->bank = i % 12;
 			return &SPECIAL_DAY_MOOD;
@@ -49,7 +49,7 @@ Compiled standalone through the pinned pipeline with **only
 `--aspsx-version` varied**, this produces **52 instructions that match
 retail's 52 one-for-one, register for register**, from the `addiu $sp` to the
 trailing `nop` — the only textual differences being unresolved relocations
-(`lui $v1, 0x0` for `%hi(SPECIAL_DAYS)`) and branch targets printed as local
+(`lui $v1, 0x0` for `%hi(sSpecialDays)`) and branch targets printed as local
 offsets, both expected in a relocatable object.
 
 At the project's pin it is 2 instructions longer, and that is the whole stall.
@@ -122,14 +122,14 @@ ever resolved, paste it in and it should match with no reshaping.
 
 ## Derivation that is solid (do not re-derive)
 
-- Loop scans `SPECIAL_DAYS[0..41]` (42 = `0x2A`) for an `s16` equal to `day`.
+- Loop scans `sSpecialDays[0..41]` (42 = `0x2A`) for an `s16` equal to `day`.
 - Both divisors confirmed **arithmetically**, not guessed: magic constant
   `0x2AAAAAAB` = 715827883; `715827883 * 6 = 2^32 + 2`, so the first division
   is by 6 (`sll 1 / addu / sll 1` = `q*6`). The second has an extra
   `sra $a0, $a0, 1` folded in before the sign fix and reconstructs as
   `sll 1 / addu / sll 2` = `q*12`. The extra `sra` on the second division only
   is the tell that distinguishes 6/12 from 3/6.
-- `day == SPECIAL_DAYS[i]` and not the reverse — operand order drives the
+- `day == sSpecialDays[i]` and not the reverse — operand order drives the
   `bne`.
 - Plain array indexing, not a pointer walk. Retail's `$v1` pointer walk and
   its `$s0` index are one C variable each doing separate jobs; splitting them

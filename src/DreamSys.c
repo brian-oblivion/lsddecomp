@@ -1827,7 +1827,7 @@ MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day) {
     s32 i;
 
     for (i = 0; (u32)i < 42; i++) {
-        if (day == SPECIAL_DAYS[i]) {
+        if (day == sSpecialDays[i]) {
             cinematic->entry = rand() % 6;
             cinematic->bank = i % 12;
             return &SPECIAL_DAY_MOOD;

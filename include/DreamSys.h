@@ -851,7 +851,7 @@ extern StageSpawn *sStagePermalinkSpawns[];
 extern StaticLinkTrigger *sStagePermalinkTriggers[];
 extern s8 sStagePermalinkTriggersCount[];
 
-extern s16 SPECIAL_DAYS[];
+extern s16 sSpecialDays[];
 
 /* The fixed "special day" mood, returned by IsDaySpecial on a match
    (round 2026-09-02); only ever address-taken there, never dereferenced by
