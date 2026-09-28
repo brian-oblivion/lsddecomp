@@ -6,6 +6,78 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-28 — round 106: tracks 12 and 13's code items done (premium head, plan revision 45)
+
+The premium head did track 12's setup item `apidoc-setup` itself, revised
+the plan (revision 45), then ran eleven Opus item runners, five at a time,
+refilling each slot as a branch merged. Track 12 is 10/10; track 13 is 2/4,
+and its two left are operator decisions (licence, process-docs).
+
+- **apidoc-setup (head):**
+  - `tools/apidoc.py` parses every game header from ONE stub unit through
+    the pinned cpp and pycparser (0.4 s; track 10 made the declarations
+    unique, so they coexist), then checks the raw text Doxygen reads:
+    `@file`; a `/** @brief */` per prototype with `@param` per named
+    parameter (unnamed and stale ones too) and `@return`; type, global and
+    field docs, members a `*_FIELDS`/`*_SLOTS` macro expands counted at the
+    macro; plain `/* @brief */` tags Doxygen skips; process text in every
+    comment of include/ and src/; `.c` banners over 20 lines.
+  - `Doxyfile` (MACRO_EXPANSION for the class macros). Doxygen is not
+    installed here; nothing was rendered.
+- **Revision 45: the items are apidoc's areas.** The plan's letter ranges
+  (headers) and directories (`.c`) crossed: moving a header's matching note
+  into its `.c`, or a `.c` banner into its header, left the item. Each item
+  is now a set of `.c` files plus the headers they define (by definition
+  count; `apidoc.py --areas`), nine of them, sized to equal debt. They were
+  disjoint by construction and no merge conflicted.
+- **Nine area runners** (alpha app, bravo cd-sound then dream-scene,
+  charlie graphics-core then dream-sys, delta graphics-res then dream-day,
+  echo ui then psyq-shared): the tree went from 3343 apidoc hits to 0,
+  every commit byte-identical, typeviews 0 new, declcheck clean. Process
+  text moved verbatim to match reports under a history heading, and to
+  nine new `docs/research/` notes (gte.h's to
+  `gte-macros.md`; gte.h keeps HARD RULE 6's exception as macro
+  documentation, so CLAUDE.md's pointer still holds).
+  - Corrections found by reading bodies: a wrong `$a1` claim in
+    bmem_pmgr.h, TitleMenu's override count (12, not 14), dream_sys.h's
+    `enterRotation` and spawn-copy notes, lbd_file.h's stale names (bravo
+    named one wrongly; delta corrected it from `elemKey`'s writers and the
+    head fixed it on main), `types.h`'s `int8_t` now `signed char` (unused).
+  - The review's "unit-private" headers were measured, not trusted:
+    data_source.h, dream_day.h and dream_aux.h are each included by three
+    or more units, so none was folded.
+- **The tool was wrong four times, each found by a runner and fixed on
+  main:** it always exited 1 (printing `tot[k]` filled the defaultdict:
+  charlie, bravo, delta); "the head" is English; a macro line's trailing
+  comment read as a field; a MATCHING note inside a longer comment, "saved
+  register" and a `byte match` boundary (bravo). The head also made a
+  MATCHING note over two lines a hit (the plan says one line) and fixed the
+  four it found on merged areas.
+- **Two head catches at merge:** declcheck TYPE went 0 to 4 after bravo's
+  dream-scene merge: style_effect.h's four unprototyped helpers had been
+  DELIBERATE only because of the MATCHING notes the item moved to the
+  `.c`; they now carry `arity-ok`. And `make extract` rewrites
+  `include/include_asm.h` (splat's `generate_asm_macros_files`), deleting
+  echo's docs on the next extract (alpha found it); the file is back to
+  splat's output and apidoc/Doxyfile treat it as generated.
+- **Head measurement slip:** the first check of charlie's tree ran main's
+  apidoc.py from charlie's directory; REPO resolves from the script, so it
+  measured main. Every later branch was measured by importing main's tool
+  with `apidoc.REPO`/`declcheck.REPO` set to the worktree.
+- **Track 13:** alpha rewrote README.md for a stranger (code map fixed
+  against the tree, "changing code and keeping it matching", no counts, no
+  licence); bravo wrote `tools/lint.sh` (format check over `make format`'s
+  own file list, apidoc, readability's finished counters, declcheck,
+  snake_case), measured passing in a copy with no disc, sdk, lib, asm or
+  build, and made to fail once per check.
+- **Left, not acted on:** `DreamSys__GetPreviousDayMood` may read index -1
+  on day 0 of a later year (retail behaviour, documented only);
+  `MoodGraphPoint` still in common.h; SceneNode slot/occupant type
+  disagreements; `TimedTask__NoOpSlot58` is the onPadEvent slot (a rename
+  candidate); libsnd_internal.h's parameter names differ from the Sony
+  `.c` definitions' `a0..`; comments inside macro bodies are `/* */` in
+  some headers and `/**< */` in others (Doxygen strips both).
+
 ## 2026-09-28 — round 105: track 11 done, file names (premium head, plan revision 44)
 
 The premium head did the setup item `files-setup` itself. Then one Opus item
