@@ -1637,7 +1637,7 @@ s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading) {
 
 /* Compared against the leading 4 bytes (chunk+tile) of `currentPos` as a
    raw word; only ever compared here, never dereferenced field-by-field. */
-extern s32 STAGE5_TRIGGER_GRIDPOS;
+extern s32 sStage5TriggerGridPos;
 
 s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer) {
     s32 result;
@@ -1659,7 +1659,7 @@ shared:
 case5:
     if (currentPos->position.y < -4095)
         goto merge;
-    if (*(s32 *)currentPos == STAGE5_TRIGGER_GRIDPOS)
+    if (*(s32 *)currentPos == sStage5TriggerGridPos)
         goto merge;
     return -1;
 

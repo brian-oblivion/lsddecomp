@@ -60,7 +60,7 @@ once total length matches.
 ## Final body: same goto structure, blocks reordered to retail's physical layout (46/46)
 
 ```c
-extern s32 STAGE5_TRIGGER_GRIDPOS;
+extern s32 sStage5TriggerGridPos;
 
 s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer)
 {
@@ -83,7 +83,7 @@ shared:
 case5:
 	if (currentPos->position.y < -0xFFF)
 		goto merge;
-	if (*(s32 *)currentPos == STAGE5_TRIGGER_GRIDPOS)
+	if (*(s32 *)currentPos == sStage5TriggerGridPos)
 		goto merge;
 	return -1;
 
