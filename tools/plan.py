@@ -1312,6 +1312,10 @@ def jobs(d, n):
         for r in p2["_regions"]:
             if r["state"] != "ready":
                 continue
+            # A region that would take the batch past the limit starts its
+            # own job (round 101: one unit was glued to a 22-unit region).
+            if batch and sum(len(x["units"]) for x in batch) + len(r["units"]) > REGION_UNITS:
+                flush()
             batch.append(r)
             if sum(len(x["units"]) for x in batch) >= REGION_UNITS:
                 flush()
