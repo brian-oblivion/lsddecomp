@@ -215,11 +215,11 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 which does open/size/alloc/rewind/read/close through the slots above). Sync
 mode calls that base method, then ORs `CD_FLAG_LOAD_FILE_DONE` (0x200) and
 calls `setFlag`. Otherwise it enqueues op 7 (`CD_OP_LOAD_FILE`, the name
-code_179d8_q already gives it), or inside a queue dispatch: looks the file
+code_179d8_s already gives it), or inside a queue dispatch: looks the file
 up by name, rounds its size up to whole sectors, allocates `self->buffer`
 with `BMemPMgrAlloc` if it has none (calling `close` if that fails), and
 seeks + reads the whole file into it, recording the rounded size in
-`self->bufferSize`. `CdDriver__RequestLoadFile` (code_179d8_q) dispatches
+`self->bufferSize`. `CdDriver__RequestLoadFile` (code_179d8_s) dispatches
 this slot as `loadFile`, so the slot name and the function name agree.
 
 **Class prefix.** `Class6D4E8` is the placeholder token for the method

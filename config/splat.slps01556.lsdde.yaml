@@ -681,7 +681,6 @@ segments:
       # Expect this slice to span more than one class; identify each with
       # `tools/classtable.py` rather than assuming the unit has one.
       - [0x17AD0, c, code_179d8_s]
-      - [0x18480, c, code_179d8_q]
       - [0x18B2C, c, code_179d8_r]
       # code_179d8_h: functions 43..59 of the original monolith's head,
       # 0x19098..0x194E0 (17 functions).  Carved MID-round 17 to re-staff a

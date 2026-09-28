@@ -533,7 +533,7 @@ takes a `CdlFILE *`. The type was deleted and the unit now includes
 `<libcd.h>`; the accessors `statBuf.pos`/`statBuf.size` keep their names as
 Sony's own fields. `CdDriver::pos` is still the project's `CdLoc16`
 (include/FileResource.h), so the copy is spelled `*(CdLoc16 *)&statBuf.pos`,
-the round 96 precedent in `src/code_179d8_q.c`'s `ResolveFileEntries`.
+the round 96 precedent in `src/code_179d8_s.c`'s `ResolveFileEntries`.
 Byte-exact; whole-image SHA1 green.
 
 ## Source comment history (round 99, echo, track 7)

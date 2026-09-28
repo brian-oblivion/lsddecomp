@@ -106,7 +106,7 @@ lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
-`FileResource` is shared with `code_179d8_h.c`/`code_179d8_q.c`
+`FileResource` is shared with `code_179d8_h.c`/`code_179d8_s.c`
 (see `FileResource__LoadFile.md`); every field this constructor zeroes is
 therefore checked, and only `flags` (this round's own rename, zero
 cross-unit hits) renamed outright. The rest:
@@ -161,7 +161,7 @@ zeroed and otherwise untouched" from scratch.
   `include/FileResource.h` (measured with `MAKEFLAGS=-k`) makes exactly four
   units fail with `conflicting types`, each re-declaring Cd* functions its
   own way: code_179d8_h (CdSearchFile, CdControl, CdSync, CdRead,
-  CdReadSync), code_179d8_q (CdControlB, CdSearchFile), code_179d8_r
+  CdReadSync), code_179d8_s (CdControlB, CdSearchFile), code_179d8_r
   (CdControlF, CdRead, CdReadSync, CdSync), code_179d8_s (CdControl,
   CdIntToPos, CdPosToInt, CdRead, CdReadSync, CdSearchFile, CdSync). Those
   are those units' polish passes (`sonyheaders.py`). Once they take Sony's

@@ -15,14 +15,14 @@
  * Nothing calls New_CdDriver: the driver's slots are copied into its
  * clients' tables by SetActiveDataSource (CdDriver.h), so the class's
  * request methods run on other objects. The rest of the class is in
- * code_179d8_s.c (the request methods) and code_179d8_q.c.
+ * code_179d8_s.c (the request methods) and code_179d8_s.c.
  */
 #include "common.h"
 #include "CdDriver.h"
 
 /* The game's pool allocator, src/BMemPMgr.c. */
 extern void *BMemPMgrAlloc(s32 size);
-/* Defined in code_179d8_q.c. */
+/* Defined in code_179d8_s.c. */
 extern void InitCdDrive(void);
 
 CdDriver *New_CdDriver(void) {

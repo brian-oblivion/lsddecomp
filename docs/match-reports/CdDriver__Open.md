@@ -217,9 +217,9 @@ oracles green after.
 | --- | --- | --- | --- | --- |
 | `Obj80027480` | -- | `Class6D4E8` | A | the object whose methods are `gCdDriverMethods`'s slots |
 | `Methods80027480` | -- | `Class6D4E8Methods` | A | `gCdDriverMethods` itself |
-| `Pos18` | -- | `CdLoc16` | A | code_179d8_q's name for the same 2-aligned CdlLOC shape |
-| `Rec80028448` | -- | `CdFileEntry` | A | code_179d8_q's name for the 0x1C-byte file-table record |
-| `StatBuf80027` | -- | `CdFileInfo` | A | code_179d8_q's name for CdSearchFile's CdlFILE output |
+| `Pos18` | -- | `CdLoc16` | A | code_179d8_s's name for the same 2-aligned CdlLOC shape |
+| `Rec80028448` | -- | `CdFileEntry` | A | code_179d8_s's name for the 0x1C-byte file-table record |
+| `StatBuf80027` | -- | `CdFileInfo` | A | code_179d8_s's name for CdSearchFile's CdlFILE output |
 | `Node8008A894` | -- | `CdRequestNode` | A | code_179d8_r's name for the queue node |
 | `Class6D4E8` | `unk0C` | `isOpen` | A | set 1 by Open, 0 by Close; Seek/Read require it; code_179d8_h's name |
 | `Class6D4E8` | `unk10` | `buffer` | A | LoadFile's BMemPMgrAlloc result / read target; FileResource's name |
@@ -227,28 +227,28 @@ oracles green after.
 | `Class6D4E8` | `unk18` | `pos` | A | the file's disc position, CdlSetloc target; code_179d8_h's name |
 | `Class6D4E8` | `unk1C` | `size` | A | the file's byte size from the entry / CdSearchFile; code_179d8_h's name |
 | `Class6D4E8` | `unk20` | `freeGuard` | B | FileResource's name; here only: nonzero lets LoadFile reuse an existing buffer |
-| `Class6D4E8` | `unk22` | `pendingRequests` | A | code_179d8_q's name; RunRequestQueue decrements it per completion |
-| `Class6D4E8` | `unk24` | `flags` | A | code_179d8_q's name; only ORed with CD_FLAG_* bits |
+| `Class6D4E8` | `unk22` | `pendingRequests` | A | code_179d8_s's name; RunRequestQueue decrements it per completion |
+| `Class6D4E8` | `unk24` | `flags` | A | code_179d8_s's name; only ORed with CD_FLAG_* bits |
 | `Class6D4E8` | `unk28` | `inQueueDispatch` | A | written only by the ctor (0) and RunRequestQueue (1 around the dispatch call, 0 after); every method starts its operation when set, enqueues when clear |
 | `Class6D4E8Methods` | `slot44` | `open` | A | resolves to `CdDriver__Open` |
 | `Class6D4E8Methods` | `onError` | `close` | A | resolves to `CdDriver__Close` (see that report) |
 | `Class6D4E8Methods` | `slot4C` | `seek` | B | resolves to `CdDriver__Seek` |
 | `Class6D4E8Methods` | `slot54` | `read` | A | resolves to `CdDriver__Read` |
-| `Class6D4E8Methods` | `slot58` | `loadFile` | A | resolves to `CdDriver__LoadFile`; code_179d8_q's name |
+| `Class6D4E8Methods` | `slot58` | `loadFile` | A | resolves to `CdDriver__LoadFile`; code_179d8_s's name |
 | `Class6D4E8Methods` | `slot64` | `setFlag` | A | resolves to `FileResource__SetFlag` |
 | `Class6D4E8Methods` | `slot70` | `stopCdService` | A | resolves to `CdDriver__StopService` |
-| `CdFileEntry` | `pad0`/`unk14`/`unk18` | `name`/`pos`/`size` | A | code_179d8_q's CdFileEntry |
-| `CdFileInfo` | `unk0`/`unk4` | `pos`/`size` | A | code_179d8_q's CdFileInfo |
+| `CdFileEntry` | `pad0`/`unk14`/`unk18` | `name`/`pos`/`size` | A | code_179d8_s's CdFileEntry |
+| `CdFileInfo` | `unk0`/`unk4` | `pos`/`size` | A | code_179d8_s's CdFileInfo |
 | `CdRequestNode` | `unk0`,`unk8`,`unkC`,`unk10`,`unk14`,`unk18` | `active`,`op`,`owner`,`fileIndex`,`param0`,`param1` | A (params B) | EnqueueCdRequest's writes and StartCdOperation's `active = 1`, per their reports' proposals |
 
 `CdRequestNode::unk4` keeps its placeholder: it is zeroed at allocation and
 its one reader here ORs flags bit 0, but no writer of a nonzero value is
-identified (code_179d8_q's `UnkC80::unk04` store goes through an
+identified (code_179d8_s's `UnkC80::unk04` store goes through an
 uninitialised pointer).
 
 Globals: `D_8006D574` -> `gCdSeekLoc` (A: 8 bytes of .data written only by
 `CdDriver__Seek`'s `CdIntToPos` and used as its CdlSetloc target).
-`gCdSyncQueueMode` keeps its placeholder for code_179d8_q's stated reason: every
+`gCdSyncQueueMode` keeps its placeholder for code_179d8_s's stated reason: every
 read here is the `gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0` sync-mode test and
 nothing names the second mode.
 

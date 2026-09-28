@@ -107,7 +107,7 @@ lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
-Same cross-unit exposure (`code_179d8_h.c`/`code_179d8_q.c` include
+Same cross-unit exposure (`code_179d8_h.c`/`code_179d8_s.c` include
 `FileResource`), so PROPOSED, not renamed. None of `unk40`/`unk44`/
 `unk48`/`unk4C`/`unk50`/`unk54`/`unk58`/`unk68`/`unk6C`/`unk70`/`unk74` has
 any evidence beyond "copied together, in this order, with a real 0xC-byte

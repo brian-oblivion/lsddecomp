@@ -4,7 +4,7 @@
 
 > Renamed from `func_80027E68` on 2026-09-17 (tools/rename.py). Address 0x80027e68.
 
-**Unit:** code_179d8_q (fresh carve) · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
+**Unit:** code_179d8_s (fresh carve) · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
 ## Class identity
 
@@ -56,7 +56,7 @@ the array (which decays to its address) reproduces that exactly.
 
 ## Provenance
 
-round 45 (2026-09-15), runner echo, unit code_179d8_q (fresh carve).
+round 45 (2026-09-15), runner echo, unit code_179d8_s (fresh carve).
 
 ## Naming
 
@@ -105,9 +105,9 @@ Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, i
 
 ## Round 96 (track 6, echo): unit comment moved here
 
-Moved from code_179d8_q.c, as history: CdDriver, its table and its methods are
+Moved from code_179d8_s.c, as history: CdDriver, its table and its methods are
 include/CdDriver.h's since track 4, round 88; the per-call-site views
-code_179d8_q declared (Obj6D4E8_C80, Obj6D4E8_D70, Obj6D4E8_282AC, and the
+code_179d8_s declared (Obj6D4E8_C80, Obj6D4E8_D70, Obj6D4E8_282AC, and the
 table views Methods6D4E8_C80 / Methods6D4E8_80EC) were that one class. Round
 96 removed the unit's last two local views: CdRequest_282AC (the writing-side
 view of CdRequestNode) and UnkC80 (CdDriver__RequestLoadFile's report).

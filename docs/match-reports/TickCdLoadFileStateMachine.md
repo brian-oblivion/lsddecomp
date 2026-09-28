@@ -174,7 +174,7 @@ arm and both compiled to the same (wrong) encoding; hoisting it above the
 `ServiceCdDriver` when `gCdTickStep == 2`. Grepping every `gCdTickStep = 2`
 assignment in code_179d8_s.c finds exactly one: `CdDriver__LoadFile`, which
 `docs/match-reports` for the class's method table (`GetCdDriverMethods`'s
-own comment, code_179d8_q.c) identifies via `tools/classtable.py` as the
+own comment, code_179d8_s.c) identifies via `tools/classtable.py` as the
 `loadFile` slot (+0x58) of class `D_6D4E8` -- i.e. the
 `CdDriver__RequestLoadFile` worker. The two mechanical differences from
 `TickCdStateMachine` both make sense for that one operation: on the

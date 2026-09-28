@@ -9,7 +9,7 @@
  * include/CdDriver.h's).
  *
  * The state machine takes one step each time ServiceCdDriver
- * (code_179d8_q.c, a VSync callback) runs: it calls TickCdStateMachine or
+ * (code_179d8_s.c, a VSync callback) runs: it calls TickCdStateMachine or
  * TickCdLoadFileStateMachine as gCdTickStep says, after a CdDriver method
  * (code_179d8_s.c) has started an operation with StartCdOperation and set
  * gCdSeekParam, gCdReadSectorCount and gCdReadBuffer. gCdState walks
@@ -28,7 +28,7 @@
  * gCdSavedSeekParam.
  *
  * AllocCdRequestNode appends a zeroed node to gCdRequestQueue and
- * FreeCdRequestNode unlinks one; EnqueueCdRequest (code_179d8_q.c) fills
+ * FreeCdRequestNode unlinks one; EnqueueCdRequest (code_179d8_s.c) fills
  * them and CdDriver__RunRequestQueue (code_179d8_s.c) consumes them from the
  * head. FindCdFileEntry and FindCdFileIndex look a name up in gFileTable by
  * substring, GetCdFileEntry indexes it. Every function but the three
@@ -36,7 +36,7 @@
  * ServiceCdDriver skip its tick in between.
  */
 
-/* Defined in code_179d8_q.c. */
+/* Defined in code_179d8_s.c. */
 extern void LockCd(void);
 extern void UnlockCd(void);
 

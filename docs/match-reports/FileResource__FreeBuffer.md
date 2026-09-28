@@ -104,7 +104,7 @@ The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
 Same cross-unit exposure as `FileResource__LoadFile.md` (`FileResource`
-is shared with `code_179d8_h.c`/`code_179d8_q.c`), so PROPOSED, not renamed:
+is shared with `code_179d8_h.c`/`code_179d8_s.c`), so PROPOSED, not renamed:
 
 | field | proposed name | tier | evidence |
 | --- | --- | --- | --- |

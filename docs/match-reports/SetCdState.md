@@ -29,5 +29,5 @@ Closed on the first attempt.
 **Tier A.** Sets `gCdState` to a new phase and clears `gCdTimeoutCounter` --
 the shared "advance to phase N" primitive both tick functions route every
 transition through (`goto L_set; ... SetCdState(newstate);`). Named to
-parallel `GetCdState` (code_179d8_q.c's already-established accessor for
+parallel `GetCdState` (code_179d8_s.c's already-established accessor for
 the same global).

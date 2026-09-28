@@ -4,7 +4,7 @@
 
 > Renamed from `func_80027D70` on 2026-09-17 (tools/rename.py). Address 0x80027d70.
 
-Round 45, runner echo (second sitting), `src/code_179d8_q.c`. This class's
+Round 45, runner echo (second sitting), `src/code_179d8_s.c`. This class's
 own method-table slot **+0x074** (see the class-map comment above
 `GetCdDriverMethods` in the `.c`).
 

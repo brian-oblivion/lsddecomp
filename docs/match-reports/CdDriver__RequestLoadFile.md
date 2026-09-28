@@ -4,7 +4,7 @@
 
 > Renamed from `func_80027C80` on 2026-09-17 (tools/rename.py). Address 0x80027c80.
 
-Round 45, runner echo (third sitting), `src/code_179d8_q.c`. This class's own
+Round 45, runner echo (third sitting), `src/code_179d8_s.c`. This class's own
 slot +0x06C of `gCdDriverMethods`.
 
 ## Result
@@ -262,7 +262,7 @@ EnqueueCdRequest's `fileIndex`). `self->flags |= 4` is
 `CD_FLAG_NONE_PENDING` (FileResource.h): the synchronous load is done and
 `pendingRequests` is 0, the same condition RunRequestQueue sets it on.
 
-**The build warnings.** code_179d8_q.c's compile printed 13 warnings
+**The build warnings.** code_179d8_s.c's compile printed 13 warnings
 (`implicit declaration of function 'LockCd'`, `type mismatch with previous
 external decl`, `'LockCd' was previously implicitly declared to return
 'int'`, the same for `UnlockCd`). This function was the first to call

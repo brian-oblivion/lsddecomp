@@ -60,7 +60,7 @@ The section above types `slot74` as `void (*)(void)` because its `jalr` has
 a nop delay slot. That reading is wrong about the callee: at that `jalr`,
 `$a0` still holds this function's own `self` (the prologue's `move s0,a0`
 copies it and leaves `$a0` intact), and `CdDriver__CancelRequests`
-(code_179d8_q.c) reads `self` from `$a0`. So the call does pass `self`.
+(code_179d8_s.c) reads `self` from `$a0`. So the call does pass `self`.
 Retyped to `void (*cancelRequests)(void *self)` and called as
 `self->methods->cancelRequests(self)`: **byte-identical** (build exit 0,
 SHA1 OK, check-nonmatching green). `FileResource__Finalize` in GameApplicationFileResource.c

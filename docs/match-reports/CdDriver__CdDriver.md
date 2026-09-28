@@ -48,10 +48,10 @@ Round 79 (delta).
   project's constructor shape exactly: parent ctor first
   (`GetFileResourceMethods()->ctor(self)`), then install its own table
   (`self->methods = GetCdDriverMethods()`), then its own fields
-  (`unk28 = 0`), then `InitCdDrive()` (code_179d8_q: one-shot
+  (`unk28 = 0`), then `InitCdDrive()` (code_179d8_s: one-shot
   `CdSetDebug(0)` + set double-speed mode). `New_CdDriver` dispatches it.
 - The two externs' notes that `GetCdDriverMethods` and `InitCdDrive` are
-  "still INCLUDE_ASM" were stale (both are matched C in code_179d8_q.c) and
+  "still INCLUDE_ASM" were stale (both are matched C in code_179d8_s.c) and
   are corrected in the unit.
 - `unk28` (+0x28, s16) is kept: cleared here and by FileResource's own ctor,
   read nowhere in this unit, so nothing establishes a meaning.

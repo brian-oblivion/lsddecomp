@@ -2,7 +2,7 @@
 
 > Renamed from `func_800282AC` on 2026-09-17 (tools/rename.py). Address 0x800282ac.
 
-Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
+Round 45, runner echo (second sitting), `src/code_179d8_s.c`.
 
 ## Result
 

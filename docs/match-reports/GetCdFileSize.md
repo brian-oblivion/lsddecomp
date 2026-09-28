@@ -51,7 +51,7 @@ buffer (re)alloc"), and `self->size` falls inside that struct's
 Extending the shared header would require splitting that padding without
 shifting anything after it, which is mechanically safe -- but
 `GameApplicationFileResource.h` is OUT OF UNIT (shared with `GameApplicationFileResource.c` and
-`code_179d8_q.c`, neither this unit) and the rule is explicit that nothing
+`code_179d8_s.c`, neither this unit) and the rule is explicit that nothing
 outside the assigned unit + its reports gets edited. Kept as this unit's own
 narrower local reading instead, per the project's multiple-independent-
 local-views convention. Worth flagging for the head: if this coincidence

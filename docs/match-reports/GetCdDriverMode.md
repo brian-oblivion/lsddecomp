@@ -2,7 +2,7 @@
 
 > Renamed from `func_80027EF8` on 2026-09-17 (tools/rename.py). Address 0x80027ef8.
 
-Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
+Round 45, runner echo (second sitting), `src/code_179d8_s.c`.
 
 ## Result
 
@@ -78,7 +78,7 @@ the `.c` now carries this paragraph as a comment instead.
 
 **Callee evidence** (`0x80027EF8`): the very first instruction is `beqz a0,...`
 — `$a0` is read before it is written, so the definition in
-`src/code_179d8_q.c` (`s32 GetCdDriverMode(s32 *outMode2)`) is right: one real
+`src/code_179d8_s.c` (`s32 GetCdDriverMode(s32 *outMode2)`) is right: one real
 argument, an optional out-pointer that is written only when non-NULL.
 
 **Why the `(void)` extern is right anyway.** Its only carved caller,

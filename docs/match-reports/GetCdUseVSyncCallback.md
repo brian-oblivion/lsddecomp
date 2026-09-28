@@ -88,6 +88,6 @@ body is `return gCdUseVSyncCallback;` -- and per CLAUDE.md/FINISHING-PLAN.md
 track 3, "a pure leaf whose mechanics ARE its purpose (a getter, a clamp, a
 list push) is tier A by definition." `gCdUseVSyncCallback` itself was
 already properly named (not a placeholder) before this round, by
-`src/code_179d8_q.c`'s own header comment ("the driver mode:
+`src/code_179d8_s.c`'s own header comment ("the driver mode:
 gCdAsyncEnabled and gCdUseVSyncCallback, set through SetCdDriverMode"); no
 further rename needed there.

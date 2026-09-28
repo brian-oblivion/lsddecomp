@@ -2,7 +2,7 @@
 
 > Renamed from `func_800280D0` on 2026-09-17 (tools/rename.py). Address 0x800280d0.
 
-**Unit:** code_179d8_q (fresh carve) · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
+**Unit:** code_179d8_s (fresh carve) · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
 ## What this function does
 
@@ -29,7 +29,7 @@ void LockCd(void)
 
 ## Provenance
 
-round 45 (2026-09-15), runner echo, unit code_179d8_q (fresh carve). See
+round 45 (2026-09-15), runner echo, unit code_179d8_s (fresh carve). See
 IsCdBusy.md for the sibling-accessor context; see UnlockCd.md for
 its pair.
 

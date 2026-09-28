@@ -66,7 +66,7 @@ is easy to misread as conditional).
 ### Proposed learning
 
 `LockCd`/`UnlockCd` (defined in the sibling unit
-`code_179d8_q.c`, runner echo) are a plain lock/unlock pair over a global
+`code_179d8_s.c`, runner echo) are a plain lock/unlock pair over a global
 flag `sCdLock`. Every function in this slice's small CD-state-machine
 and list-management group brackets its body with them; declare them
 locally as `extern void LockCd(void); extern void
@@ -78,7 +78,7 @@ UnlockCd(void);` rather than sharing a header with the adjacent unit.
 appends it to the tail of `gCdRequestQueue`, clearing `active` (offset 0x00)
 and `unk4` (offset 0x04). Named for exactly this mechanics -- a pure
 alloc+link leaf, tier A by the "mechanics ARE its purpose" rule. Corroborated
-independently by code_179d8_q.c's own comment on this function (written
+independently by code_179d8_s.c's own comment on this function (written
 before this rename, referring to it by address): "func_8002832C allocates
 one and links it onto D_8008A894" / "func_8002832C clears it [active] at
 allocation".

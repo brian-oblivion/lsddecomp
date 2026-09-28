@@ -2,7 +2,7 @@
 
 > Renamed from `func_80027FFC` on 2026-09-17 (tools/rename.py). Address 0x80027ffc.
 
-Round 45, runner echo (third sitting), `src/code_179d8_q.c`. Last remaining
+Round 45, runner echo (third sitting), `src/code_179d8_s.c`. Last remaining
 function in this unit.
 
 ## Result

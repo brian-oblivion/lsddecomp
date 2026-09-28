@@ -15,7 +15,7 @@
  *   src/code_179d8_s.c  Open, Close, Seek, NoOpSlot50, Read, LoadFile,
  *                       RunRequestQueue: each enqueues a CD_OP_* request, or
  *                       starts it when RunRequestQueue dispatches it back
- *   src/code_179d8_q.c  RequestLoadFile, StopService, CancelRequests, the
+ *   src/code_179d8_s.c  RequestLoadFile, StopService, CancelRequests, the
  *                       getter; the queue front end (EnqueueCdRequest), the
  *                       file table's setters, ResolveFileEntries, the lock
  *                       and the VSync service tick (ServiceCdDriver)
