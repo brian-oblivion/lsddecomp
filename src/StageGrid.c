@@ -1,19 +1,19 @@
-/* StageGrid: the world map's per-stage grid layout, and the two-way lookup
- * between a mood-graph value and the grid cell (stage + chunk) that owns it.
+/* StageGrid: each stage's grid of map chunks, and the two-way lookup between
+ * a mood-graph value and the grid cell (stage + chunk) that owns it.
  *
- * Each of the game's stages divides into a `columns` x `rows` grid of chunks
- * (StageGridDimensions, one entry per stage in sStageGridDimensions), and
- * every chunk owns one MoodGraphPoint in a row-major per-stage table
- * (sStageChunkMoods -- 14 pointers to the per-stage STGnn_CHUNK_MOODS
- * arrays). GetMoodFromStageChunk and GetStageChunkFromMood convert between a
- * mood value and its owning (stage, chunk); DreamSys (src/DreamSys.c) is the
- * only caller of either, using them to read the mood at the player's current
- * grid position and to place a mood value back onto the grid.
- * GetStageGridDimensions(Table/Count) are plain accessors over the
- * dimensions table itself.
- *
- * Every function in this unit is matched byte-exact; see
- * docs/match-reports/ for each function's derivation.
+ * Each of the STAGE_COUNT stages divides into a `columns` x `rows` grid of
+ * chunks (StageGridDimensions, one entry per stage in sStageGridDimensions),
+ * and every chunk owns one MoodGraphPoint in a row-major per-stage table
+ * (sStageChunkMoods: one pointer per stage, to sStage00ChunkMoods ..
+ * sStage13ChunkMoods). GetMoodFromStageChunk and GetStageChunkFromMood
+ * convert between a chunk and its mood value; DreamSys (src/DreamSys.c) is
+ * the only caller of either, reading the mood of the player's current chunk
+ * (DreamSys__LogChunkMood) and finding the stage and chunk that own a given
+ * mood value to choose a spawn point (GenerateInitialSpawn).
+ * GetStageGridDimensionsCount, GetStageGridDimensionsTable and
+ * GetStageGridDimensions are plain accessors over the dimensions table;
+ * GetStageMapChunkRecordXY (src/GameFiles.c) turns a chunk's (x, y) into the
+ * index of its map-chunk file with the same row-major `columns` stride.
  */
 #include "common.h"
 #include "StageGrid.h"
@@ -40,11 +40,14 @@ StageGridDimensions *GetStageGridDimensions(s32 stage) {
     return GetStageGridDimensionsTable(NULL) + stage;
 }
 
+/* Searches every stage's chunks in row-major order for the first whose mood
+ * equals *mood. Returns -1, leaving *chunk unwritten, when none does. */
 s32 GetStageChunkFromMood(StageChunk *chunk, MoodGraphPoint *mood) {
-    u32 stage;
+    u32 stage; /* MATCHING: a signed counter compiles slti, not sltiu */
     s32 row;
     s32 column;
     MoodGraphPoint *chunkMood;
+    /* MATCHING: s32, not the fields' s16, which re-sign-extends per use */
     s32 rows;
     s32 columns;
 
@@ -67,5 +70,7 @@ s32 GetStageChunkFromMood(StageChunk *chunk, MoodGraphPoint *mood) {
 }
 
 MoodGraphPoint *GetMoodFromStageChunk(s32 stage, StageChunk *chunk) {
+    /* MATCHING: pointer additions, not &moods[row * columns + column], which
+     * scales the summed index once (one word short) */
     return sStageChunkMoods[stage] + chunk->row * sStageGridDimensions[stage].columns + chunk->column;
 }
