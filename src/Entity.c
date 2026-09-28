@@ -2374,7 +2374,7 @@ void Entity__MoodCue85(Entity *this, SoundCueSet *out) {
         }
     } else if (this->state == 12) {
         if (this->moodTimer < 10) {
-            this->methods->updateRotation(this, 0, ROTATION_ZMINUS9);
+            this->methods->updateRotation(this, 0, sRotationZMinus9);
         } else {
             SetCueTones18_3_3(out);
             this->methods->stopSoundCue(this);

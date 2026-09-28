@@ -2426,7 +2426,7 @@ Entity__MoodCue96 = 0x800644E8; // type:func
 SetCueTones7_7_7 = 0x80063C84; // type:func
 SetCueTones18_3_3 = 0x80063CAC; // type:func
 sRotationZPlus1 = 0x80089CD0;
-ROTATION_ZMINUS9 = 0x80089CDC;
+sRotationZMinus9 = 0x80089CDC;
 TRANSLATE_Y_MINUS256 = 0x80089D90;
 // identified: libsnd/vmanager KeyOnCheck (disc 3.3), internal (not in
 // LIBSND.H). Fingerprint EXACT masked 1.00 but TINY (2 words, `jr ra; nop`);
