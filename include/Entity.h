@@ -259,7 +259,7 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 
 extern Ratio16 ROTATION_XPLUS_EIGHTH[];
 extern Ratio16 sRotationYawPlus9[];
 extern Ratio16 sRotationYawMinus9[];
-extern Ratio16 ROTATION_YAW_PLUS180[];
+extern Ratio16 sRotationYawPlus180[];
 extern Ratio16 sRotationYawPlus90[];
 extern Ratio16 sRotationYawMinus90[];
 extern Ratio16 sRotationYawPlus2[];

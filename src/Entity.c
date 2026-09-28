@@ -1208,11 +1208,11 @@ void Entity__MoodCue40(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 200) {
         table = sRotationYawMinus90;
     } else if (this->moodTimer == 400) {
-        table = ROTATION_YAW_PLUS180;
+        table = sRotationYawPlus180;
     } else if (this->moodTimer == 600) {
         table = sRotationYawPlus90;
     } else if (this->moodTimer == 800) {
-        table = ROTATION_YAW_PLUS180;
+        table = sRotationYawPlus180;
         this->moodTimer = -1;
     }
     if (table != NULL) {
@@ -1480,7 +1480,7 @@ void Entity__MoodCue51(Entity *this, SoundCueSet *out) {
         table = sRotationYawPlus90;
     } else if (this->moodTimer == 220) {
         if (rand() & 1) {
-            table = ROTATION_YAW_PLUS180;
+            table = sRotationYawPlus180;
         }
     }
     if (table != NULL) {
@@ -1493,7 +1493,7 @@ void Entity__MoodCue52(Entity *this, SoundCueSet *out) {
     out->attenuation = this->methods->getProximityRatio(this);
     if (this->moodTimer < 188) {
         if (this->moodTimer == 84) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS180);
+            this->methods->updateRotation(this, 0, sRotationYawPlus180);
         }
         if (out->tick % 20 == 0) {
             out->slots[0].program = 9;
@@ -1908,7 +1908,7 @@ void Entity__MoodCue70(Entity *this, SoundCueSet *out) {
         }
     }
     if (this->moodTimer == 300) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS180);
+        this->methods->updateRotation(this, 0, sRotationYawPlus180);
     }
     if (this->moodTimer < 600) {
         this->methods->moveLocalZ(this, this->state == 0 ? -256 : 256, 0);
@@ -2367,7 +2367,7 @@ void Entity__MoodCue85(Entity *this, SoundCueSet *out) {
             ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 0, ROTATION_ZPLUS1);
         } else {
             SetCueTones18_3_3(out);
-            ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, ROTATION_YAW_PLUS180);
+            ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, sRotationYawPlus180);
             this->methods->notifyParents(this, (rand() % 5 != 0) ? ENTITY_EFFECT_LINK_STAGE
                                                                  : ENTITY_EFFECT_END_DREAM);
             this->state = 14;
@@ -2545,7 +2545,7 @@ void Entity__MoodCue94(Entity *this, SoundCueSet *out) {
             }
         }
         if (rand() % 3 == 0) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS180);
+            this->methods->updateRotation(this, 0, sRotationYawPlus180);
         }
     }
     if (this->todIndex != 0) {

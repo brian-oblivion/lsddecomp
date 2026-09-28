@@ -62,7 +62,7 @@ void Entity__MoodCue44(Entity *this, EntityMoodHandlerArg *out) {
   exactly (see that report) -- two independent instances now, worth
   treating as a general rule for this codebase.
 - `slotC4`/`slot44`/`slotC8`/`slot148` were all already correctly typed;
-  no header change needed. The only new extern was `ROTATION_YAW_PLUS180`-style
+  no header change needed. The only new extern was `sRotationYawPlus180`-style
   data-table symbols already declared for sibling functions in this unit
   (`sRotationYawPlus9`/`sRotationYawMinus9`, both reused here, no new declarations).
 - All three branches funnel into a SHARED `jalr v0` at one physical
