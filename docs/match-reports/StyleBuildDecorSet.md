@@ -18,11 +18,11 @@ variables:
 | build | change | score |
 | --- | --- | --- |
 | 1 | preserved body | 17/86, 1 short, ins 4 / del 4 |
-| 2 | `for (i = 1; i < 0x12; i++)`, `gStyleDecorSlots[0] = New(...)` before the loop, `gStyleDecorSlots[i] = obj` and `gStyleDecorSlots[0]` as the dispatch argument inside it; no `arr`/`wp`, no `__asm__("")` | **77/86, length EXACT**, ins 1 / del 1 |
+| 2 | `for (i = 1; i < 0x12; i++)`, `sStyleDecorSlots[0] = New(...)` before the loop, `sStyleDecorSlots[i] = obj` and `sStyleDecorSlots[0]` as the dispatch argument inside it; no `arr`/`wp`, no `__asm__("")` | **77/86, length EXACT**, ins 1 / del 1 |
 | 3 | + drop the `s1` counter: `(void *) (sStyleDecorColors + i * 3)` | **86/86**, `OK: build matches retail` |
 
 - **Build 2 produces retail's `move s3,v1`.** The pre-loop store's address
-  is one pseudo (`$v1`); loop.c's invariant `&gStyleDecorSlots` for the
+  is one pseudo (`$v1`); loop.c's invariant `&sStyleDecorSlots` for the
   loop's `slots[i]`/`slots[0]` is another (`$s3`) initialised from it, and
   the strength-reduced giv for `&slots[i]` starts at `$s3 + 4` -- exactly the
   `addiu s0,s3,4` round 61 took for a hand-written `wp = arr + 1`. The
@@ -54,18 +54,18 @@ void StyleBuildDecorSet(void) {
         paramA.y += 0x1E;
     }
     paramB = *(PairXY *) &sStyleDecorSizeW;
-    gStyleDecorSlots[0] = New_BoxFill(&paramB, (void *) sStyleDecorColors, 0x1FFF);
+    sStyleDecorSlots[0] = New_BoxFill(&paramB, (void *) sStyleDecorColors, 0x1FFF);
     for (i = 1; i < 0x12; i++) {
         obj = New_BoxFill(&paramB, (void *) (sStyleDecorColors + i * 3), 0x1FFF);
-        gStyleDecorSlots[i] = obj;
-        ((ObjSlot4C *) obj)->methods->slot4C(obj, gStyleDecorSlots[0], &paramA);
+        sStyleDecorSlots[i] = obj;
+        ((ObjSlot4C *) obj)->methods->slot4C(obj, sStyleDecorSlots[0], &paramA);
         paramA.y += 3;
         paramB.y -= 7;
     }
 
     self2 = *(ObjSlotAC **) (gStyleSceneRefs + 0xC);
     result = self2->methods->slotAC(self2);
-    ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
+    ((ObjSlot4C *) sStyleDecorSlots[0])->methods->slot4C(sStyleDecorSlots[0], result, &paramA);
 }
 ```
 
@@ -154,7 +154,7 @@ read straight off the raw `.s`:
 | # | correction | evidence in retail |
 | --- | --- | --- |
 | 1 | the pair copies are struct assignments (above) | the two reloads |
-| 2 | the trailing double dispatch reads the GLOBAL `gStyleDecorSlots[0]` twice, not the cached `arr[0]` | `lui v1/lw %lo(gStyleDecorSlots)` at 45160 **and again** `lui a0/lw %lo` at 45170, where the loop body uses `lw a1,0(s3)` |
+| 2 | the trailing double dispatch reads the GLOBAL `sStyleDecorSlots[0]` twice, not the cached `arr[0]` | `lui v1/lw %lo(sStyleDecorSlots)` at 45160 **and again** `lui a0/lw %lo` at 45170, where the loop body uses `lw a1,0(s3)` |
 | 3 | the array is walked with a separate pointer starting at `arr + 1`, not indexed by the loop counter | `addiu s0,s3,4` before the loop; `sw a0,0(s0); addiu s0,s0,4` inside |
 | 4 | `arr` is assigned AFTER the first call, not before | `lui v1/addiu v1` sit at 450c4, past the `jal` at 450bc |
 
@@ -188,10 +188,10 @@ register, same value, branch targets agreeing"), and it is the whole of the
 byte-identical output, i.e. the residue is invariant to all of them rather
 than merely unimproved:
 
-- `arr = gStyleDecorSlots; wp = arr + 1;`
-- `wp = gStyleDecorSlots; arr = wp; wp = arr + 1;`
-- an extra `void **base;` temp: `base = gStyleDecorSlots; arr = base;`
-- `wp = gStyleDecorSlots + 1;` (derive the walker from the global, not from `arr`)
+- `arr = sStyleDecorSlots; wp = arr + 1;`
+- `wp = sStyleDecorSlots; arr = wp; wp = arr + 1;`
+- an extra `void **base;` temp: `base = sStyleDecorSlots; arr = base;`
+- `wp = sStyleDecorSlots + 1;` (derive the walker from the global, not from `arr`)
 - `wp[0] = obj; wp = wp + 1;` instead of `*wp = obj; wp++;`
 - `obj` typed `ObjSlot4C *` instead of `void *`, dropping the cast at the
   dispatch
@@ -222,7 +222,7 @@ side effect of the image moving. The honest figures are the two in the title:
 
 Needs, already present earlier in the unit in strict ROM order:
 `extern s32 gStyleDecorVariant, sStyleDecorPosX, sStyleDecorPosY, sStyleDecorSizeW, sStyleDecorSizeH,
-gStyleSceneRefs, sStyleDecorColors;`, `extern void *gStyleDecorSlots[];`,
+gStyleSceneRefs, sStyleDecorColors;`, `extern void *sStyleDecorSlots[];`,
 `extern void *New_BoxFill(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
 the function in the unit.
@@ -257,7 +257,7 @@ void StyleBuildDecorSet(void) {
     s1 = 3;
     obj = New_BoxFill(&paramB, (void *) sStyleDecorColors, 0x1FFF);
     __asm__("");
-    arr = gStyleDecorSlots;
+    arr = sStyleDecorSlots;
     wp = arr + 1;
     *arr = obj;
     do {
@@ -273,7 +273,7 @@ void StyleBuildDecorSet(void) {
 
     self2 = *(ObjSlotAC **) (gStyleSceneRefs + 0xC);
     result = self2->methods->slotAC(self2);
-    ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
+    ((ObjSlot4C *) sStyleDecorSlots[0])->methods->slot4C(sStyleDecorSlots[0], result, &paramA);
 }
 ```
 
@@ -314,7 +314,7 @@ stopped on it. The discriminator here costs one build.
 
 Guarded by `gStyleDecorVariant` (set only for `gStyleVariant == 0` by
 `PickStyleFallbackConfig`). Allocates 18 `New_BoxFill` instances into
-`gStyleDecorSlots`, walking two position pairs (`paramA`/`paramB`) that step
+`sStyleDecorSlots`, walking two position pairs (`paramA`/`paramB`) that step
 by a fixed per-iteration delta. Released by `StyleReleaseDecorSet`,
 per-frame-updated by `StyleUpdateDecorSet` (sibling report; same guard, same
 array). "DecorSet" names the mechanics (a released/updated SET of objects
@@ -324,7 +324,7 @@ STALL, 1 word short; naming is unaffected by match state per track 3.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-gStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` view's +0x04C is attachToParent, cast to BoxFillAttachToParentFn with the PairXY position cast to BoxFillPos *. Zero bytes.
+sStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` view's +0x04C is attachToParent, cast to BoxFillAttachToParentFn with the PairXY position cast to BoxFillPos *. Zero bytes.
 
 ## Round 93 polish (delta, track 7)
 
@@ -358,7 +358,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
 ```
 
 ```c
-/* Allocates the 18 decor objects into gStyleDecorSlots, each attached
+/* Allocates the 18 decor objects into sStyleDecorSlots, each attached
  * (attachToParent, +0x04C) to slot 0, then attaches slot 0 to the target object's slotAC
  * result.  MATCHED round 76 (charlie): an indexed for loop -- loop.c's
  * strength reduction produces both the slot walker and the colour-table

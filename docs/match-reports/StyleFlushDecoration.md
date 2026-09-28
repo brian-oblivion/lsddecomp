@@ -101,7 +101,7 @@ sStyleDecorObj is a BoxFill (include/BoxFill.h); the deleted `ObjAB54` view's +0
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 
 ```c
-/* sStyleDecorObj and gStyleDecorSlots[] hold BoxFill objects
+/* sStyleDecorObj and sStyleDecorSlots[] hold BoxFill objects
  * (include/BoxFill.h, New_BoxFill), in globals typed `s32`/`void *[]`
  * (track 4b's to retype). */
 ```

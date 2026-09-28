@@ -1232,7 +1232,7 @@ void ApplyStyleDecorationIfSet(void) {
  * What TickStyle keeps, each built on the first tick:
  *  - the decoration box, sStyleDecorObj, when the config has a colour for
  *    it (ApplyStyleDecorationIfSet builds it, StyleFlushDecoration releases it);
- *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (gStyleDecorSlots)
+ *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (sStyleDecorSlots)
  *    coloured from sStyleDecorColors and attached under the viewport's fade
  *    box; every tick StyleUpdateDecorSet shifts their colours, their
  *    position and the viewport's clear colour by the view point's y offset
@@ -1348,7 +1348,7 @@ extern s32 sStyleDecorPosX;
 extern s32 sStyleDecorPosY;
 extern s32 sStyleDecorSizeW;
 extern s32 sStyleDecorSizeH;
-extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
+extern BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
 extern s32 gStyleSceneRefs; /* a StyleSceneRefs * */
 
 /* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs.
@@ -1380,20 +1380,20 @@ void StyleBuildDecorSet(void) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
     size = *(PairXY *)&sStyleDecorSizeW;
-    gStyleDecorSlots[0] = New_BoxFill(&size, (void *)sStyleDecorColors, STYLE_DECOR_PRI);
+    sStyleDecorSlots[0] = New_BoxFill(&size, (void *)sStyleDecorColors, STYLE_DECOR_PRI);
     for (i = 1; i < STYLE_DECOR_BANDS; i++) {
         band = New_BoxFill(&size, (void *)(sStyleDecorColors + i * 3), STYLE_DECOR_PRI);
-        gStyleDecorSlots[i] = band;
+        sStyleDecorSlots[i] = band;
         ((BoxFillAttachToParentFn)band->methods->attachToParent)(
-            band, (SceneNode *)gStyleDecorSlots[0], (BoxFillPos *)&pos);
+            band, (SceneNode *)sStyleDecorSlots[0], (BoxFillPos *)&pos);
         pos.y += 3;
         size.y -= 7;
     }
 
     viewport = ((StyleSceneRefs *)gStyleSceneRefs)->viewport;
     parent = viewport->methods->getFadeBox(viewport);
-    ((BoxFillAttachToParentFn)gStyleDecorSlots[0]->methods->attachToParent)(
-        gStyleDecorSlots[0], parent, (BoxFillPos *)&pos);
+    ((BoxFillAttachToParentFn)sStyleDecorSlots[0]->methods->attachToParent)(
+        sStyleDecorSlots[0], parent, (BoxFillPos *)&pos);
 }
 
 void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta);
@@ -1427,7 +1427,7 @@ void StyleUpdateDecorSet(void) {
     if (gStyleDecorVariant == 2) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
-    slot = gStyleDecorSlots;
+    slot = sStyleDecorSlots;
     colorOfs = 0;
     pos.y += fade * 3;
     do {
@@ -1454,12 +1454,12 @@ void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 gStyleDecorVariant;
-extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
+extern BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
 
 /* Releases the bands, if StyleBuildDecorSet made them. */
 void StyleReleaseDecorSet(void) {
     if (gStyleDecorVariant != 0) {
-        ReleaseBasicClassArray((void **)gStyleDecorSlots, ARRAY_COUNT(gStyleDecorSlots));
+        ReleaseBasicClassArray((void **)sStyleDecorSlots, ARRAY_COUNT(sStyleDecorSlots));
         gStyleDecorVariant = 0;
     }
 }

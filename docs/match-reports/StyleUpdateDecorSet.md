@@ -88,7 +88,7 @@ void StyleUpdateDecorSet(void) {
     if (gStyleDecorVariant == 2) {
         pos.y += 0x1E;
     }
-    wp = gStyleDecorSlots;
+    wp = sStyleDecorSlots;
     srcOfs = 0;
     pos.y += shift * 3;
     do {
@@ -134,7 +134,7 @@ made this cheap.
 **`StyleUpdateDecorSet`, tier B.**
 
 Sibling of `StyleBuildDecorSet` (same `gStyleDecorVariant` guard, same
-`gStyleDecorSlots` array, same `paramA`/`paramB`-shaped position pair).
+`sStyleDecorSlots` array, same `paramA`/`paramB`-shaped position pair).
 Computes a time-based `shift` from an `ObjAC7CSub` object's `field18`/
 `field24` delta, then per-element recolors (`AdjustRgbByDelta`) and
 repositions (`slotB8`/`slotBC`) all 18 objects every frame. MATCHED,

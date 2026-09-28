@@ -290,7 +290,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * self-dispatch on their OWN symbol); they are free functions dispatching
  * into THREE separate object families through local method-table views: a
  * decoration object (`sStyleDecorObj`, `New_BoxFill`-allocated), an
- * 18-slot "decor set" array (`gStyleDecorSlots`, same allocator) and an
+ * 18-slot "decor set" array (`sStyleDecorSlots`, same allocator) and an
  * StyleEffect "effect slots" array (`gStyleEffectSlots`, include/
  * StyleEffect.h, `New_StyleEffect`-allocated, kind-tagged 0..3 by
  * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot

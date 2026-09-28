@@ -25,7 +25,7 @@ jr $ra
 Same family as `StyleReleaseDecorSet` (also calls `ReleaseBasicClassArray`), but gated by
 `gStyleVariant >= 0` rather than a nonzero flag, with no flag-clear afterward
 and a variable count (`gStyleEffectSlotCount`) instead of a literal. `gStyleEffectSlots` is
-the same kind of far `.bss` symbol as `gStyleDecorSlots` (no dlabel in any
+the same kind of far `.bss` symbol as `sStyleDecorSlots` (no dlabel in any
 `asm/data/*.s`, resolved via `config/undefined_syms_auto.slps01556.lsdde.txt`
 and confirmed in `build/lsdde.map`).
 
