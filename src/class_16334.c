@@ -107,7 +107,7 @@ void Pad__LoadButtonTable(void) {
     s32 i;
 
     dst = sButtonMasks;
-    local = D_80010764;
+    local = sDefaultButtonMasks;
     i = 0;
     src = local.w;
     for (; i < 16; i++) {

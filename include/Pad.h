@@ -31,7 +31,7 @@
 #define PAD_CLASS_ID 0x2
 
 /* sButtonMasks' indices. Pad__LoadButtonTable fills it from one fixed
- * table (D_80010764), whose words are libetc's masks in this order. */
+ * table (sDefaultButtonMasks), whose words are libetc's masks in this order. */
 enum PadButton {
     PAD_BUTTON_LUP = 0,     /* PADLup */
     PAD_BUTTON_LDOWN = 1,   /* PADLdown */

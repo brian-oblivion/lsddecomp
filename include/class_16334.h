@@ -22,6 +22,6 @@ typedef struct {
     u32 w[16];
 } Block64;
 
-extern Block64 D_80010764; /* Psy-Q's own default button-mask table (psyq_15d04 rodata) */
+extern Block64 sDefaultButtonMasks; /* Psy-Q's own default button-mask table (psyq_15d04 rodata) */
 
 #endif

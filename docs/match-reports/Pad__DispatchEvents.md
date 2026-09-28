@@ -29,7 +29,7 @@ the field names:
    highest-numbered button is handled first.
 
 `sButtonMasks` is confirmed here as a 16-entry mask table indexed `0..15` — the
-runtime copy that `Pad__LoadButtonTable` fills from Psy-Q's `D_80010764`.
+runtime copy that `Pad__LoadButtonTable` fills from Psy-Q's `sDefaultButtonMasks`.
 
 ## Derivation
 
