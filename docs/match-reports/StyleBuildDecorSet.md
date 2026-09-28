@@ -135,7 +135,7 @@ reloads, load-delay `nop` and all:
 
 ```
 45070  lw    v0,%gp_rel(sStyleDecorPosX)     45078  sw  v0,0x10(sp)
-45074  lw    v1,%gp_rel(gStyleDecorPosY)     4507c  sw  v1,0x14(sp)
+45074  lw    v1,%gp_rel(sStyleDecorPosY)     4507c  sw  v1,0x14(sp)
 45080  lw    v1,%gp_rel(gStyleDecorVariant)   <-- reload 2
 45084  li    v0,0x2
 45088  bne   v1,v0,450a0
@@ -221,7 +221,7 @@ side effect of the image moving. The honest figures are the two in the title:
 ## Preserved near-miss body (1 word short, `#if 0` in `src/world/ObjMStyleActor.c`)
 
 Needs, already present earlier in the unit in strict ROM order:
-`extern s32 gStyleDecorVariant, sStyleDecorPosX, gStyleDecorPosY, gStyleDecorSizeW, gStyleDecorSizeH,
+`extern s32 gStyleDecorVariant, sStyleDecorPosX, sStyleDecorPosY, gStyleDecorSizeW, gStyleDecorSizeH,
 gStyleSceneRefs, sStyleDecorColors;`, `extern void *gStyleDecorSlots[];`,
 `extern void *New_BoxFill(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
@@ -346,7 +346,7 @@ Local views replaced by the real classes: the `+0x0AC` slot on `gStyleSceneRefs`
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 
 ```c
-/* Local view: sStyleDecorPosX/gStyleDecorPosY and gStyleDecorSizeW/gStyleDecorSizeH are two
+/* Local view: sStyleDecorPosX/sStyleDecorPosY and gStyleDecorSizeW/gStyleDecorSizeH are two
  * adjacent 8-byte pairs, and this unit copies each into a local pair as a
  * WHOLE-STRUCT assignment rather than field by field.  That is not a style
  * choice -- it is load-bearing.  A BLKmode set makes gcc 2.6.3's cse.c call

@@ -13,7 +13,7 @@ One construct, carried over from `StyleBuildDecorSet` earlier in this same sessi
 assignment, not field by field.**
 
 ```c
-pos = *(PairXY *) &sStyleDecorPosX;      /* NOT pos.x = sStyleDecorPosX; pos.y = gStyleDecorPosY; */
+pos = *(PairXY *) &sStyleDecorPosX;      /* NOT pos.x = sStyleDecorPosX; pos.y = sStyleDecorPosY; */
 ```
 
 A struct assignment is a BLKmode `set`, and gcc 2.6.3's `cse.c` answers a
