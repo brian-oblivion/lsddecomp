@@ -34,7 +34,7 @@
 #include "tim_image.h"
 #include "item_list.h"
 #include "objm.h"
-#include "VabStreamObj.h"
+#include "vab_stream_obj.h"
 #include "pad.h"
 #include "fade_box.h"
 #include "dream_sys.h"

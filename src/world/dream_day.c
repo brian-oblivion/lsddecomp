@@ -35,7 +35,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "dream_day.h"
-#include "VabStreamObj.h"
+#include "vab_stream_obj.h"
 #include "node_guarded_viewport.h"
 #include "stage_map.h"
 #include "wbgm.h"

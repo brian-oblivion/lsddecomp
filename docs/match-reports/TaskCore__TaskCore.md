@@ -152,7 +152,7 @@ Renamed from TaskCoreObj__TaskCoreObj (tools/rename.py). Occupant of +0x008 (`ct
 
 `include/task.h`'s local `extern StreamTaskUnkB4Obj
 *New_VabStreamObj(char *)` is deleted. `src/app/task.c` includes
-`include/VabStreamObj.h` instead. The existing `(BasicClass *)` cast into
+`include/vab_stream_obj.h` instead. The existing `(BasicClass *)` cast into
 `TaskCore::sound` is unchanged, and the whole image stays byte-identical.
 
 ## Track 4 (2026-09-26, round 88, alpha)

@@ -82,7 +82,7 @@ table family may read them.
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
 `src/world/dream_day.c`'s `SoundObj_3ac78`/`SoundObjMethods_3ac78` view is
-deleted. `sound` is cast to `VabStreamObj *` (`include/VabStreamObj.h`) and
+deleted. `sound` is cast to `VabStreamObj *` (`include/vab_stream_obj.h`) and
 calls `playTone`, the same slot at the same type. The whole image stays
 byte-identical. `TimedTask::sound` stays `BasicClass *`.
 

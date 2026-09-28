@@ -213,7 +213,7 @@ typedef struct {
    setClearColor (+0x064). */
 struct Viewport;
 
-/* DreamSys::soundObj is a VabStreamObj (include/VabStreamObj.h; tag only
+/* DreamSys::soundObj is a VabStreamObj (include/vab_stream_obj.h; tag only
    here, dream_sys.c includes the header). StartVoice / ExecuteLink call playTone (+0x080; the voice
    it returns goes to voiceIndex), StopVoice calls stopVoice (+0x084), and
    StartVoice calls setPitchOffset (+0x09C). */

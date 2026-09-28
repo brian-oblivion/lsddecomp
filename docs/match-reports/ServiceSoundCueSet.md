@@ -550,7 +550,7 @@ not because another unit's file needs editing.
 ## Track 4 (2026-09-26, round 87)
 
 The unit-local `VabStreamObj`/`VabStreamObjMethods` view is gone. The
-function now includes `include/VabStreamObj.h`, and the whole image stays
+function now includes `include/vab_stream_obj.h`, and the whole image stays
 byte-identical. Its three calls use the header's own slot names, which the
 local view already had: `playTone` (+0x080), `stopVoice` (+0x084) and
 `setPitchOffset` (+0x09C). The header names playTone's arguments
@@ -615,7 +615,7 @@ dispatches are `tools/classtable.py gVabStreamObjMethods`'
 `VabStreamObj__PlayTone`/`StopVoice`/`SetPitchOffset`, and the slot `index`,
 `tag`, `owner` and `slots` usage (the `>= 0`-gated stop-voice call, the
 `> 0` tag guard, callback's first argument) matches. VabStreamObj comes from
-include/VabStreamObj.h since round 87 (track 4). The parameters and locals
+include/vab_stream_obj.h since round 87 (track 4). The parameters and locals
 were renamed with the fields (a0/a1 to sound/set, note/rem1/rem2 to
 toneIndex/vol/endVol).
 
@@ -627,7 +627,7 @@ volumes are the new `SOUND_CUE_DEFAULT_VOL` (127, libsnd's full volume) and
 it keys the tone at `vol` and hands `endVol` to `SsUtAutoVol` as the ramp's
 end. The loop bound is `ARRAY_COUNT(set->slots)`, the tone index `program *
 VAB_TONES_PER_PROG`, defined token-identically to `vab_sound.c`'s (the
-move of both `VAB_*` defines into `VabStreamObj.h` is proposed to the head).
+move of both `VAB_*` defines into `vab_stream_obj.h` is proposed to the head).
 `e` is `slot`. Byte-identical.
 
 ## History (moved from src/libsnd_vmanager.c, comments pass)

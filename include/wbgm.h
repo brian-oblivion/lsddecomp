@@ -3,7 +3,7 @@
 
 #include "basic_class.h"
 #include "draw_system.h"
-#include "VabStreamObj.h"
+#include "vab_stream_obj.h"
 #include "requested_file.h"
 
 /*

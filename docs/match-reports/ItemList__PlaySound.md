@@ -43,7 +43,7 @@ Slot +0x060 (`tools/classtable.py gItemListMethods`). If `target` (+0x03C) is se
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/dream_scene.c`).
 
-Round 99 (delta, track 7): `ItemList__ForwardToTarget` -> `ItemList__PlaySound`, **tier A**, and the slot `forwardToTarget` -> `playSound`, the parameter `code` -> `tone`. The body IS its purpose: it plays tone `tone` on the VabStreamObj `target` through `playTone(index, vol, endVol)`, whose index is program << 4 | tone (include/VabStreamObj.h). TextEntry, ItemList's sibling, holds the same body at the same slot +0x060 as `TextEntry__PlaySound(self, tone)` with the same volumes (96, 96), so the two now share one name. The callers pass `1 << 4` (VAB program 1, tone 0) before closing and 0 on every cursor move and redraw.
+Round 99 (delta, track 7): `ItemList__ForwardToTarget` -> `ItemList__PlaySound`, **tier A**, and the slot `forwardToTarget` -> `playSound`, the parameter `code` -> `tone`. The body IS its purpose: it plays tone `tone` on the VabStreamObj `target` through `playTone(index, vol, endVol)`, whose index is program << 4 | tone (include/vab_stream_obj.h). TextEntry, ItemList's sibling, holds the same body at the same slot +0x060 as `TextEntry__PlaySound(self, tone)` with the same volumes (96, 96), so the two now share one name. The callers pass `1 << 4` (VAB program 1, tone 0) before closing and 0 on every cursor move and redraw.
 
 ## Round 94 (track 6, charlie): the target is a VabStreamObj
 
@@ -51,7 +51,7 @@ Round 99 (delta, track 7): `ItemList__ForwardToTarget` -> `ItemList__PlaySound`,
 Both attachTarget callers (TaskObjF, src/ui/title_menu.c) pass TaskObjF's
 `sound`, already typed `struct VabStreamObj *`, and the one slot the view
 named, +0x080, is VabStreamObj's `playTone(self, index, vol, endVol)`
-(include/VabStreamObj.h): the `(code, 0x60, 0x60)` call plays tone `code`
+(include/vab_stream_obj.h): the `(code, 0x60, 0x60)` call plays tone `code`
 at volume 0x60. TextEntry::target and ItemList::target (+0x03C) and both
 attachTarget prototypes are `struct VabStreamObj *`, the casts at the call
 sites are gone, and `slot80` is `playTone`. Zero bytes changed.

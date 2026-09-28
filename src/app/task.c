@@ -23,7 +23,7 @@
 #include <libgs.h>
 #include "task.h"
 #include "bmem_pmgr.h"
-#include "VabStreamObj.h"
+#include "vab_stream_obj.h"
 #include "bg_layer.h"
 #include "tile_map.h"
 #include "tile_atlas.h"

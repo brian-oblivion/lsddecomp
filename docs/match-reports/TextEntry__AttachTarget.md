@@ -43,7 +43,7 @@ Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gT
 Both attachTarget callers (TaskObjF, src/ui/title_menu.c) pass TaskObjF's
 `sound`, already typed `struct VabStreamObj *`, and the one slot the view
 named, +0x080, is VabStreamObj's `playTone(self, index, vol, endVol)`
-(include/VabStreamObj.h): the `(code, 0x60, 0x60)` call plays tone `code`
+(include/vab_stream_obj.h): the `(code, 0x60, 0x60)` call plays tone `code`
 at volume 0x60. TextEntry::target and ItemList::target (+0x03C) and both
 attachTarget prototypes are `struct VabStreamObj *`, the casts at the call
 sites are gone, and `slot80` is `playTone`. Zero bytes changed.

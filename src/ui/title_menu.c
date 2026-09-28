@@ -42,7 +42,7 @@
 #include "node_guarded_viewport.h"
 #include "grid_cell.h"
 #include "title_menu.h"
-#include "VabStreamObj.h"
+#include "vab_stream_obj.h"
 #include "text_row.h"
 #include "tim_image.h"
 #include "task_objf.h"

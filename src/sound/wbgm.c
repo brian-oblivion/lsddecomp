@@ -15,7 +15,7 @@
 #include "wbgm.h"
 #include "bmem_pmgr.h"
 #include <stdio.h>
-#include "VabStreamObj.h"
+#include "vab_stream_obj.h"
 
 extern s32 sWBgmActive; /* 1 between WBgm__WBgm and WBgm__Finalize */
 

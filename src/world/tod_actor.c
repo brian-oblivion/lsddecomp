@@ -26,7 +26,7 @@
 #include "model_data.h"
 #include "tod.h"
 #include "link_resource.h"
-#include "VabStreamObj.h"
+#include "vab_stream_obj.h"
 #include "frame_clock.h"
 #include "bmem_pmgr.h"
 
@@ -36,7 +36,7 @@
  * format (file, frame and packet headers, packet types and flags, the
  * rotation unit) and a TodSet's table of Tods, plus the unit's own tuning
  * values. The class itself -- object, table, getter, method prototypes -- is
- * include/tod_actor.h's; the sound bank is include/VabStreamObj.h's and a
+ * include/tod_actor.h's; the sound bank is include/vab_stream_obj.h's and a
  * part's coordinate parameters are Sony's GsCOORD2PARAM.
  */
 

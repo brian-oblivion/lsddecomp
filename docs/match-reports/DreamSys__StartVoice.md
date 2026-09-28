@@ -590,7 +590,7 @@ Tier B: the two extra layered voices played when `voiceSelect == 0xB`, and what 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
 `include/dream_sys.h`'s `DreamSysUnk58`/`DreamSysUnk58Vtable` view is deleted.
-`DreamSys::soundObj` is cast to `VabStreamObj *` (`include/VabStreamObj.h`),
+`DreamSys::soundObj` is cast to `VabStreamObj *` (`include/vab_stream_obj.h`),
 and the slots are called by the class's names: `slot0x80` -> `playTone`
 (`VabStreamObj__PlayTone`: index = program << 4 | tone, then vol and
 endVol; it returns the voice), `slot0x84` -> `stopVoice`, and `slot0x9C` ->

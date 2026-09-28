@@ -139,7 +139,7 @@ mechanics ARE the purpose here.
 
 Sony's `ProgAtr` replaces the local `ProgAtrView`; `SsUtGetVabHdr` and
 `SsUtGetVagAtr` now carry `<libsnd.h>`'s prototypes, so the call sites cast
-VabStreamObj.h's reduced views: `(VabHdr *)&self->vabHdr`, `(VagAtr *)pool`.
+vab_stream_obj.h's reduced views: `(VabHdr *)&self->vabHdr`, `(VagAtr *)pool`.
 The two allocations are spelled `vs * sizeof(VabStreamVagAtr)` and
 `ts * sizeof(VabStreamVagAtr *)` (were `<< 5`, `<< 2`), and the master
 volume `VAB_MASTER_VOLUME` (120, was `0x78`). Byte-exact.

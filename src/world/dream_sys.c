@@ -42,7 +42,7 @@
 #include "link_resource.h"
 #include "stage_map.h"
 #include "lbd_file.h"
-#include "VabStreamObj.h"
+#include "vab_stream_obj.h"
 #include "Viewport.h"
 #include "bmem_pmgr.h"
 

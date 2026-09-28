@@ -125,7 +125,7 @@ interface slots into every table `sDataSourceClientGetters` lists
 
 ## Round 98 (charlie, track 7)
 
-The states are `enum VabStreamLoadState` (include/VabStreamObj.h:
+The states are `enum VabStreamLoadState` (include/vab_stream_obj.h:
 `VABSTREAM_LOAD_IDLE` 0, `_HEADER` 1, `_BODY` 6) and the flag is
 `CD_FLAG_LOAD_FILE_DONE` (0x200, the bit cd_driver.c's CD driver sets
 when a load finishes); the path buffer is `VAB_PATH_SIZE` (32). Byte-exact.

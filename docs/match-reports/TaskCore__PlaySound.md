@@ -53,7 +53,7 @@ Renamed from Obj86B60__ForwardToChild (tools/rename.py). Occupant of +0x070 (`pl
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
 `include/task.h`'s `Unk48Obj`/`Unk48ObjMethods` view is deleted.
-`sound` is now cast to `VabStreamObj *` (`include/VabStreamObj.h`), and the
+`sound` is now cast to `VabStreamObj *` (`include/vab_stream_obj.h`), and the
 call is `playTone`. The view had typed the slot `void`, but the occupant
 `VabStreamObj__PlayTone` returns the voice. The whole image stays
 byte-identical with the s32 slot, because the call is this void function's

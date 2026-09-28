@@ -5,7 +5,7 @@
  * SoundCueSet -- a three-voice sound cue that an owner object drives once
  * per tick through a callback. Not a class: no method table, and the three
  * functions that operate on it are free functions taking the sound object
- * (a VabStreamObj, include/VabStreamObj.h) first.
+ * (a VabStreamObj, include/vab_stream_obj.h) first.
  *
  *  - InitSoundCueSet (vab_sound.c) starts the cue, unless one is already
  *    running (tag != 0): it stores the owner's tag, owner and callback,
@@ -76,7 +76,7 @@ struct SoundCueSet {
     /* +0x18 */ SoundCueSlot slots[3];
 }; /* 0x54 bytes */
 
-struct VabStreamObj; /* include/VabStreamObj.h */
+struct VabStreamObj; /* include/vab_stream_obj.h */
 
 /* The three functions on a cue, all in src/sound/vab_sound.c;
  * `sound` is the VabStreamObj whose voices the cue plays. */

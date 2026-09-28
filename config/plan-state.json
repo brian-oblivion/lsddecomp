@@ -1135,7 +1135,7 @@
         "gVabStreamObjMethods": {
           "class": "VabStreamObj",
           "date": "2026-09-26",
-          "header": "include/VabStreamObj.h"
+          "header": "include/vab_stream_obj.h"
         },
         "gVariantSpriteMethods": {
           "class": "VariantSprite",

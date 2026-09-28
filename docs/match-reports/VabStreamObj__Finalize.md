@@ -88,7 +88,7 @@ driver's finalize, as `FileResource__Finalize` does. "Close" also named a
 different slot: FileResource's +0x048 is `close`. Track 4 step 6 names an
 override for its slot.
 
-Return type (same day, when the unit's view became `include/VabStreamObj.h`).
+Return type (same day, when the unit's view became `include/vab_stream_obj.h`).
 The function is now `void`, like the finalize slot it fills, and the chained
 `GetActiveDataSourceMethods()->slot0C(self)` is a statement rather than a
 `return`. The whole image stays byte-identical. The one caller is

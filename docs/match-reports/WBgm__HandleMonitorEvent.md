@@ -129,7 +129,7 @@ extern u8 sSsSizeTableBuf[];
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
 The unit-local view `SeqVab` and its `extern SeqVab *New_VabStreamObj(s32)`
-are gone. `WBgm::vab` is now `VabStreamObj *` (`include/VabStreamObj.h`),
+are gone. `WBgm::vab` is now `VabStreamObj *` (`include/vab_stream_obj.h`),
 and the whole image stays byte-identical. SeqVab's `ready` (+0x058) is
 VabStreamObj's `attrsReady`, which OnBodyReady sets once the VAB body has
 transferred. `vabId` (+0x054) is the same field under the same name. The

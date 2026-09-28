@@ -65,7 +65,7 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 
 Renamed `TodActor__func_800661D4` -> `TodActor__PlayTone` (`tools/rename.py`),
 slot `+0x124` `slot124` -> `playTone`, and `UnkArg2Obj`/`UnkArg2Methods`
-deleted for `VabStreamObj` (include/VabStreamObj.h). **Tier A** (a pure
+deleted for `VabStreamObj` (include/vab_stream_obj.h). **Tier A** (a pure
 forward): the object at `arg2` is a VabStreamObj -- its `+0x080` is
 `VabStreamObj__PlayTone(self, index, vol, endVol)`, and Entity passes the same
 field to InitSoundCueSet/ServiceSoundCueSet/FlushSoundCueSet as their sound

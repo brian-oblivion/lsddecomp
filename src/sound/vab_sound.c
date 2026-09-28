@@ -23,7 +23,7 @@
 #include "link_resource.h"
 #include "stage_map.h"
 #include <libsnd.h>
-#include "VabStreamObj.h"
+#include "vab_stream_obj.h"
 #include "sound_cue_set.h"
 #include "bmem_pmgr.h"
 #include <strings.h>
@@ -159,7 +159,7 @@ void NullDriver__NoOpSlot50(void) {}
  * GetCdUseVSyncCallback: they keep the two mode words and report no VSync
  * callback.
  *
- * VabStreamObj (include/VabStreamObj.h, 0xA03) is a FileResource subclass
+ * VabStreamObj (include/vab_stream_obj.h, 0xA03) is a FileResource subclass
  * whose ctor and finalize chain to the active driver's. The header's banner
  * describes the load sequence and the slots. The first bank constructed
  * initialises libsnd (SsInit, the score size table, a 60 Hz tick); the first

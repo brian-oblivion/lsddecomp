@@ -153,7 +153,7 @@ unit level, not guessed here.
 ## Track 4 (2026-09-26, round 87)
 
 The unit's local `VabStreamObj`/`VabStreamObjMethods` views are replaced by
-`include/VabStreamObj.h`, and the whole image stays byte-identical. The
+`include/vab_stream_obj.h`, and the whole image stays byte-identical. The
 slots this ctor calls now carry their inherited FileResource names:
 `slot9C` -> `setPitchOffset`, `slot6C` -> `requestLoadFile`, and
 `self->loadState` -> `self->unk2A`, which is FileResource's field.

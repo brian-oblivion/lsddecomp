@@ -56,7 +56,7 @@
  * detachFromParent undoes all three.
  *
  * Sound. `sound`, the ctor's second argument, is a VabStreamObj (include/
- * VabStreamObj.h; dream_aux passes the same bank to every Entity). playTone
+ * vab_stream_obj.h; dream_aux passes the same bank to every Entity). playTone
  * (+0x124) plays one of its tones at volume 0x6E; Entity drives its
  * SoundCueSet on it.
  *
@@ -71,7 +71,7 @@ typedef struct TodActorMethods TodActorMethods;
  * that any header may repeat these declarations. */
 struct ModelData;    /* include/model_data.h */
 struct TodActorDesc; /* the ctor's descriptor: +0x00C a ModelData to borrow */
-struct VabStreamObj; /* include/VabStreamObj.h: the sound bank the ctor's second argument names */
+struct VabStreamObj; /* include/vab_stream_obj.h: the sound bank the ctor's second argument names */
 
 /* Occupants in gTodActorMethods named at each slot; `tools/classtable.py
  * gEntityMethods --vs gTodActorMethods` lists Entity's overrides. The

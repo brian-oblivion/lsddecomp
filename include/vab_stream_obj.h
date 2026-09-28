@@ -1,5 +1,5 @@
-#ifndef VABSTREAMOBJ_H
-#define VABSTREAMOBJ_H
+#ifndef VAB_STREAM_OBJ_H
+#define VAB_STREAM_OBJ_H
 
 #include "file_resource.h"
 

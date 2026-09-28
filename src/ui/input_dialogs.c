@@ -28,7 +28,7 @@
 #include "char_sprite.h"
 #include "text_row.h"
 #include "tim_image.h"
-#include "VabStreamObj.h"
+#include "vab_stream_obj.h"
 #include "pad.h"
 #include "frame_clock.h"
 #include "item_list.h"

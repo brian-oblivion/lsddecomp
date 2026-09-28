@@ -228,4 +228,4 @@ calls go through `dreamSys` directly: `struct DreamSys *` and `DreamSys *`
 are one type, and the image is byte-identical. The null `sound` argument,
 the `saveCtrl` clear and getCurrentDayAndYear's `outYear` are `NULL`;
 setPitchOffset(-1) is commented (octave -1: pitchOffset = -1 * 12 - 24 =
--36 semitones, VabStreamObj.h).
+-36 semitones, vab_stream_obj.h).
