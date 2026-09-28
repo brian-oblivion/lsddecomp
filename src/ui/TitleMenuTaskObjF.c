@@ -438,8 +438,8 @@ void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
  * of each cycle and the moving channel after.
  * MATCHING: `channels` is taken before the first call (it lives in $s1)
  * and `rgb = *color` is one struct copy. */
-void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
-    SpriteRgb rgb;
+void TitleMenu__CycleSaveTitleColor(TitleMenu *self, ColorRgb *color) {
+    ColorRgb rgb;
     u8 *channels;
 
     channels = (u8 *)&rgb;

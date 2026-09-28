@@ -74,7 +74,7 @@ rather than API.
   `SubObjE` (DayTaskStageMap.h:18) is a DrawSystem view; `SlotEntry`/`SrcDesc`
   (Task.c:658, 670) are one record; `CdStreamFile` (CdStream.h:44) is
   `CdlFILE`; a signed 3-byte colour is defined six times (`BgLayerRgb`,
-  `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `SpriteRgb`, `ViewportRgb`):
+  `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `ColorRgb`, `ViewportRgb`):
   one type. `FIX12_SHIFT` and `CD_SECTOR_SIZE` redefined at
   GraphicsResources.c:63-64. `ABS_fa50` (TmdModel.c:53) open-coded twice more.
 - **Headers not self-contained:** six M-Z headers use `GsCOORDINATE2`,
@@ -186,7 +186,7 @@ so merge by hand, one commit per type, the accessors from the compiler.
   `void *` in its functions and `s32` in its slots; `SetTickCallbacks`'
   header prototype still names its parameters `arg1`/`arg2`.
 - **graphics:** the six signed 3-byte colour types (`BgLayerRgb`,
-  `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `SpriteRgb`,
+  `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `ColorRgb`,
   `ViewportRgb`) into one, in a graphics header (BoxFill.h is ui's, and
   this item may edit it for that).
 - **world:** `RotationRatio(s)` (DreamSys.h) into `Ratio16`; `SubObjE`

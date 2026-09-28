@@ -61,8 +61,8 @@
 
 /* The row colours, two 3-byte RGBs in sdata, 4 bytes apart; only their
  * addresses are taken (setColor). */
-extern struct SpriteRgb sItemListRowColor;
-extern struct SpriteRgb sItemListCursorColor;
+extern struct ColorRgb sItemListRowColor;
+extern struct ColorRgb sItemListCursorColor;
 
 void ItemList__SetState(ItemList *self, s32 state) {
     /* MATCHING: the gotos keep retail's branch polarity and block order. */
@@ -925,7 +925,7 @@ typedef struct ChunkCoord {
  * text, the TextRow's position (attachToParent) and its colour (setColor). */
 extern char sPauseText[];             /* "Pause" */
 extern ScreenSpritePos sPauseTextPos; /* (-20, -50) */
-extern SpriteRgb sPauseTextColor;     /* red: (255, 0, 0) */
+extern ColorRgb sPauseTextColor;     /* red: (255, 0, 0) */
 
 void ObjM__EnterLinkFlashback(ObjM *self) {
     DreamColors color;
@@ -2548,7 +2548,7 @@ void StyleEffect__BuildRandomSprites(StyleEffect *self) {
     s32 parity = rand() % 2;
     void *scale = parity ? NULL : sSpriteScaleHalf;
     VariantSprite *sprite;
-    SpriteRgb *color;
+    ColorRgb *color;
 
     StyleEffect__SpawnSprites(self, 0, 0, scale);
 

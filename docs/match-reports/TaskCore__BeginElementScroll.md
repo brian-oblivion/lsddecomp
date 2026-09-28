@@ -100,4 +100,4 @@ Renamed from Obj86B60__BeginElementScroll (tools/rename.py): the class prefix. O
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
-`(u8 *)target->unk24[idx] + 8` is `&((SlotEntry *)...)->cursorColor` (SlotEntry +0x008, a SpriteRgb; TitleMenu's is (128, 128, 0)). setState(14) -> TASKCORE_STATE_SCROLL_OPENED.
+`(u8 *)target->unk24[idx] + 8` is `&((SlotEntry *)...)->cursorColor` (SlotEntry +0x008, a ColorRgb; TitleMenu's is (128, 128, 0)). setState(14) -> TASKCORE_STATE_SCROLL_OPENED.

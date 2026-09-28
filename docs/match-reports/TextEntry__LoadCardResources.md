@@ -176,7 +176,7 @@ object behind them is the `New_TextRow` result, so TextEntry::textRow
 (+0x044, include/TextEntry.h) is `struct TextRow *`. The slots map onto
 TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
 (position cast to `LongVec3 *`, as ScreenSprite's banner describes), +0x0B8
-`setColor` (`sTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
+`setColor` (`sTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `ColorRgb *`),
 +0x0C4 `setCell`, called through `TextRowSetCellAtFn` because
 TextRow__SetCellAt takes the index too. Zero bytes changed.
 
@@ -193,7 +193,7 @@ says what they are):
 | D_8008AAD4 | sTextEntryTextPos | the text row's attachToParent position: (-62, -15) |
 | D_8008AADC | sTextEntryCursorPos | the cursor's attachToParent position (-62, -12); SetCursorPos (TextEntryItemList) reads its x |
 
-The externs are typed `SpriteRect`, `SpriteRgb` and `ScreenSpritePos`
+The externs are typed `SpriteRect`, `ColorRgb` and `ScreenSpritePos`
 (TaskObjF's sCardIconRect/sCardIconPos are the precedent), so two casts
 are gone; the three positions still go through the LongVec3 slot with a
 cast. Locals `handle1`/`handle2` -> `panelTim`/`fontTim`, parameter

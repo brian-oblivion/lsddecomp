@@ -278,7 +278,7 @@ void Sprite__Update(Sprite *self, void *sender, s32 event) {}
 
 /* Slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gVariantSpriteMethods (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
-void Sprite__SetColor(Sprite *self, SpriteRgb *rgb) {
+void Sprite__SetColor(Sprite *self, ColorRgb *rgb) {
     self->sprite.rgb = *rgb;
 }
 

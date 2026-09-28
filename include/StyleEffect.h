@@ -73,8 +73,8 @@ struct StyleEffectParams {
     /* +0x010 */ Ratio16 *scale; /* Ratio16[3], their updateScale; scale[0].num also scales the model-child spacing (PlaceModelChildren) */
     /* +0x014 */ s32 modelChildLayout; /* 0 = no modelChildren, else an index 1..4 into sModelChildSpacing: 1-2 along x, 3-4 along y */
     /* +0x018 */ s32 tableIndex;   /* index into sModelChildDriftZ and sSpriteShiftX */
-    /* +0x01C */ SpriteRgb *color; /* every sprite's setColor (SpawnSprites) */
-    /* +0x020 */ SpriteRgb *altColor; /* sprites[1]'s colour instead, when non-NULL (BuildRandomSprites) */
+    /* +0x01C */ ColorRgb *color; /* every sprite's setColor (SpawnSprites) */
+    /* +0x020 */ ColorRgb *altColor; /* sprites[1]'s colour instead, when non-NULL (BuildRandomSprites) */
 };
 
 /* Actor's slots, then this class's own: none. The overrides of inherited

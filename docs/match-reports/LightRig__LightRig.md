@@ -9,7 +9,7 @@ Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/Sprite.c`. Fre
 - **Where:** gLightRigMethods slot +0x008 (ctor) (`tools/classtable.py`).
 - **What:** SceneNode ctor via `GetSceneNodeMethods()`, installs `GetLightRigMethods()`'s table, creates `New_FlatLightObj(0..2)` into +0x044..+0x04C and adds each as a child (slot +0x010), then calls reset (+0x040).
 - **Result:** byte-exact; 43/43 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK).
-- **Types:** new unit-local view `D_8006EFACObj` (SCENENODE_FIELDS/SLOTS + `lights[3]` +0x044, `SpriteRgb ambient` +0x050, slot +0x0B8 `getChild`); `New_FlatLightObj` and `GsSetAmbient` declared locally. No shared header touched.
+- **Types:** new unit-local view `D_8006EFACObj` (SCENENODE_FIELDS/SLOTS + `lights[3]` +0x044, `ColorRgb ambient` +0x050, slot +0x0B8 `getChild`); `New_FlatLightObj` and `GsSetAmbient` declared locally. No shared header touched.
 
 ## Lever
 

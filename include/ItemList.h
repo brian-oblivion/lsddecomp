@@ -52,7 +52,7 @@ struct SceneNode;
 struct ScreenSprite;
 struct TextRow;
 struct TimImage;
-struct SpriteRgb;
+struct ColorRgb;
 struct VabStreamObj;
 
 typedef struct ItemList ItemList;

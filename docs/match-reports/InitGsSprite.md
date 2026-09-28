@@ -9,7 +9,7 @@ Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/Sprite.c`. Fre
 
 ## Lever
 
-Two levers, three builds. (1) Retail loads `pmode` once, into `$a0`, and keeps the masked value there for GetTPage; writing `image->pmode & 3` twice reloads it after the stores (the stores through `sprite` may alias `image`), 1 word long. A local `s32 mode = image->pmode & 3;` fixes it. (2) Retail's grey is `li v0,0x80`; `SpriteRgb` is all-s8 (Sprite.h, kept for Sprite__SetColor's lb/sb copy), so a constant 0x80 stored to it folds to `li v0,-0x80`, and the chained `r = g = b = 0x80` does the same. An `s32 grey = 0x80;` local stored three times (b, g, r, matching retail's store order) keeps the full-width constant.
+Two levers, three builds. (1) Retail loads `pmode` once, into `$a0`, and keeps the masked value there for GetTPage; writing `image->pmode & 3` twice reloads it after the stores (the stores through `sprite` may alias `image`), 1 word long. A local `s32 mode = image->pmode & 3;` fixes it. (2) Retail's grey is `li v0,0x80`; `ColorRgb` is all-s8 (Sprite.h, kept for Sprite__SetColor's lb/sb copy), so a constant 0x80 stored to it folds to `li v0,-0x80`, and the chained `r = g = b = 0x80` does the same. An `s32 grey = 0x80;` local stored three times (b, g, r, matching retail's store order) keeps the full-width constant.
 
 ## Source
 
@@ -57,7 +57,7 @@ Round 96 (alpha, track 6). The parameter is Sony's `GsIMAGE *tim` in the
 prototype (include/Sprite.h) and the definition; the `GsIMAGE *tim =
 (GsIMAGE *)image` local is gone and the body reads `tim->` directly.
 Byte-identical. `sprite` stays the local SpriteGs rather than Sony's
-GsSPRITE: Sprite__SetColor's whole-struct copy needs `rgb` as one SpriteRgb,
+GsSPRITE: Sprite__SetColor's whole-struct copy needs `rgb` as one ColorRgb,
 and GetSetBitField takes `attribute` as u32 * (Sony's is unsigned long), so
 Sony's type would add four casts to save two (Viewport__DrawNode).
 

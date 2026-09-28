@@ -678,7 +678,7 @@ typedef struct {
 typedef struct SlotEntry {
     u8 pad000[0x004];
     s32 savedCursor;       /* +0x004 the committed item cursor */
-    SpriteRgb cursorColor; /* +0x008 the colour of the item under the cursor while scrolling */
+    ColorRgb cursorColor; /* +0x008 the colour of the item under the cursor while scrolling */
     u8 pad00B[0x010 - 0x00B];
     /* +0x010 where the cursor's row is drawn; the list starts savedCursor rows
      * above. MATCHING: a struct, so the copy is lw/lw, sw/sw, then a reload of
@@ -920,9 +920,9 @@ void TaskCore__SetActiveSlot(TaskCore *self, s32 slot, void *withSound) {
     prevWidget = ((TextRow **)self->slotElements)[prev];
     nextWidget = ((TextRow **)self->slotElements)[slot];
     if (prev >= 0) {
-        prevWidget->methods->setColor(prevWidget, (SpriteRgb *)self->target->unselectedColor);
+        prevWidget->methods->setColor(prevWidget, (ColorRgb *)self->target->unselectedColor);
     }
-    nextWidget->methods->setColor(nextWidget, (SpriteRgb *)self->target->selectedColor);
+    nextWidget->methods->setColor(nextWidget, (ColorRgb *)self->target->selectedColor);
     self->activeSlot = slot;
     if (withSound != NULL) {
         self->methods->playSound(self, TASKCORE_TONE_CURSOR);
@@ -1033,7 +1033,7 @@ void TaskCore__BroadcastToSlotElements(TaskCore *self, void *color) {
 void TaskCore__BeginElementScroll(TaskCore *self) {
     s32 slot;
     TextRow *item;
-    SpriteRgb *cursorColor;
+    ColorRgb *cursorColor;
 
     if (self->inputMode != TASKCORE_INPUT_CHOOSING_SLOT) {
         return;
@@ -1076,7 +1076,7 @@ void TaskCore__CommitElementScroll(TaskCore *self) {
         TextRow *row = ((TextRow **)self->itemLists[slot])[cursor];
 
         row->methods->setDisplay(row, 1);
-        row->methods->setColor(row, (SpriteRgb *)self->target->unselectedColor);
+        row->methods->setColor(row, (ColorRgb *)self->target->unselectedColor);
     }
 
     ((SlotEntry *)self->target->unk24[slot])->savedCursor = cursor;
@@ -1103,7 +1103,7 @@ void TaskCore__CancelElementScroll(TaskCore *self) {
     self->methods->refreshSlotView(self, self->lightRig, 0);
     items = (TextRow **)self->itemLists[slot];
     prevItem = items[cursor];
-    prevItem->methods->setColor(prevItem, (SpriteRgb *)self->target->unselectedColor);
+    prevItem->methods->setColor(prevItem, (ColorRgb *)self->target->unselectedColor);
     saved = ((SlotEntry *)self->target->unk24[slot])->savedCursor;
     self->itemCursors[slot] = saved;
     savedItem = items[saved];
@@ -1140,14 +1140,14 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
     TextRow **items;
     TextRow *prevItem;
     TextRow *nextItem;
-    SpriteRgb *cursorColor;
+    ColorRgb *cursorColor;
 
     slot = self->activeSlot;
     prev = self->itemCursors[slot];
     items = (TextRow **)self->itemLists[slot];
     prevItem = items[prev];
     nextItem = items[cursor];
-    prevItem->methods->setColor(prevItem, (SpriteRgb *)self->target->unselectedColor);
+    prevItem->methods->setColor(prevItem, (ColorRgb *)self->target->unselectedColor);
     cursorColor = &((SlotEntry *)self->target->unk24[slot])->cursorColor;
     nextItem->methods->setColor(nextItem, cursorColor);
     self->itemCursors[slot] = cursor;

@@ -45,7 +45,7 @@ typedef struct LightRigRgb LightRigRgb;
 /* A 3-byte colour. All-s8 members give it alignment 1, which is what makes
  * LightRig__SetAmbientColor's whole-struct copies compile to lb,lb,lb then
  * sb,sb,sb (DECOMPILATION_LEARNINGS, the 3-byte all-s8 struct idiom). The
- * same shape as Sprite.h's SpriteRgb and FlatLightObj's FlatLightColor. */
+ * same shape as Sprite.h's ColorRgb and FlatLightObj's FlatLightColor. */
 struct LightRigRgb {
     s8 r, g, b;
 };
