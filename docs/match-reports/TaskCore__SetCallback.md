@@ -18,7 +18,7 @@ void TaskCore__SetCallback(Obj86B60 *self, void (*a1)(void *ctx), void *a2)
 
 A pure setter, establishing `Obj86B60::unk9C`/`unkA0` as an
 (unconditional) callback/context pair -- confirmed against
-`TaskCore__RefreshViewValue`'s use of both (see that report).
+`TaskCore__Exit`'s use of both (see that report).
 
 ## Provenance
 
@@ -29,14 +29,14 @@ round 2026-09-02, runner echo, unit Task. 1 attempt.
 **Tier A** (pure setter). `func_8003CAEC` -> `Obj86B60__SetCallback`. Body:
 `self->unk9C = a1; self->unkA0 = a2;` -- stores a callback pointer and its
 context argument verbatim, no other logic. Corroborated by
-`TaskCore__RefreshViewValue`, the sole invoker of this pair
+`TaskCore__Exit`, the sole invoker of this pair
 (`self->unk9C(self->unkA0)`).
 
 ## Proposed field names (round 78, delta -- NOT applied, cross-unit)
 
 `Obj86B60::unk9C` (`void (*)(void *ctx)`, +0x09C) -> `viewCallback`;
 `Obj86B60::unkA0` (`void *`, +0x0A0) -> `viewCallbackCtx`. Tier B (mechanics:
-a callback+context pair invoked by `TaskCore__RefreshViewValue`, hence
+a callback+context pair invoked by `TaskCore__Exit`, hence
 "view"; not a guess about what the callback itself does). Grep shows
 `unk9C`/`unkA0` textual hits in ObjMStyleActor.c/class_3bb8c_q.c/Task.c/
 libsnd_decre.c (unrelated structs sharing the name), so proposal only.

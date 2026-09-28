@@ -515,7 +515,7 @@ void TaskCore__ConfirmSlot(TaskCore *self) {
     }
 }
 
-void TaskCore__RefreshViewValue(TaskCore *self) {
+void TaskCore__Exit(TaskCore *self) {
     if (self->viewCallback != NULL) {
         self->viewCallback(self->viewCallbackCtx);
     }

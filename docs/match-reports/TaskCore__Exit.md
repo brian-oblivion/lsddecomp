@@ -1,4 +1,6 @@
-# TaskCore__RefreshViewValue — MATCH (22/22 words)
+# TaskCore__Exit — MATCH (22/22 words)
+
+> Renamed from `TaskCore__RefreshViewValue` on 2026-09-28 (tools/rename.py). Address 0x8003ca94.
 
 > Renamed from `Obj86B60__RefreshViewValue` on 2026-09-25 (tools/rename.py). Address 0x8003ca94.
 
@@ -9,7 +11,7 @@
 ## What it does
 
 ```c
-void TaskCore__RefreshViewValue(Obj86B60 *self)
+void TaskCore__Exit(Obj86B60 *self)
 {
     if (self->unk9C != NULL) {
         self->unk9C(self->unkA0);
