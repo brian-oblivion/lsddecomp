@@ -141,7 +141,7 @@ def sony_names(rows):
     """name -> {(sony target, disc, object, function, ratio)}."""
     want = {f for _, _, fs in rows for f in fs}
     ours = {}
-    for o in sorted((ROOT / "build/src").glob("*.c.o")):
+    for o in sorted((ROOT / "build/src").rglob("*.c.o")):
         ours.update({k: v for k, v in disasm(o).items() if k in want})
     sony = {}
     for o in sorted((ROOT / "sdk/work").glob("*/elf/*/*.o")):

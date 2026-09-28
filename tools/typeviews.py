@@ -49,6 +49,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import srcpath
+
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src"
 CPP = ROOT / "tools/gcc263/cpp"
@@ -296,7 +298,7 @@ STAB_RE = re.compile(r'^\s*\.stabs\s+"((?:[^"\\]|\\.)*)",(\d+),')
 
 
 def unit_stabs(unit):
-    src = SRC / f"{unit}.c"
+    src = srcpath.unit_src(unit)
     cpp = subprocess.run([str(CPP)] + makefile_flags("CPP_FLAGS") + [str(src)],
                          capture_output=True, text=True, cwd=ROOT)
     cc = subprocess.run([str(CC1), "-mips1", "-quiet", "-funsigned-char", "-G0",
@@ -345,7 +347,7 @@ def unit_warnings(unit):
     stabs; a slot or prototype that disagrees with a call site's argument is
     an `incompatible pointer type` / `makes integer from pointer` warning, so
     'no new warnings' is the parameter half of the layout check."""
-    src = SRC / f"{unit}.c"
+    src = srcpath.unit_src(unit)
     cpp = subprocess.run([str(CPP)] + makefile_flags("CPP_FLAGS") + [str(src)],
                          capture_output=True, text=True, cwd=ROOT)
     cc = subprocess.run([str(CC1)] + makefile_flags("CC_FLAGS") + ["-o", "/dev/null"],
@@ -385,7 +387,7 @@ def upcast(getter, base, files, objargs=("addChild", "removeChild", "addParentRe
 
 
 def units():
-    return sorted(p.stem for p in SRC.glob("*.c"))
+    return srcpath.units()
 
 
 def collect(only=None):
@@ -486,17 +488,17 @@ def census(views, funcs):
     object view and one table view, both defined in include/<Class>.h."""
     tabs, byid, parent, syms = class_tree()
     ext = {}
-    for f in list(SRC.glob("*.c")) + list((ROOT / "include").glob("*.h")):
+    for f in srcpath.src_files() + list((ROOT / "include").glob("*.h")):
         for m in re.finditer(r"^\s*extern\s+(?:const\s+)?(\w+)\s+(\w+)\s*;", f.read_text(errors="replace"), re.M):
             ext.setdefault(m.group(2), set()).add((m.group(1), str(f.relative_to(ROOT))))
     # table getters: a C function whose body is `return &TABLE;` (or `return TABLE;`)
     getters, gdecl = {}, {}
-    for f in SRC.glob("*.c"):
+    for f in srcpath.src_files():
         t = f.read_text(errors="replace")
         for m in re.finditer(r"^[\w *]*?\b(\w+)\s*\(\s*(?:void)?\s*\)\s*\{\s*return\s+&?\s*(\w+)\s*;\s*\}", t, re.M):
             getters.setdefault(m.group(2), set()).add(m.group(1))
     allg = {g for gs in getters.values() for g in gs}
-    for f in list(SRC.glob("*.c")) + list((ROOT / "include").glob("*.h")):
+    for f in srcpath.src_files() + list((ROOT / "include").glob("*.h")):
         t = re.sub(r"/\*.*?\*/", "", f.read_text(errors="replace"), flags=re.S)
         for m in re.finditer(r"^\s*(?:extern\s+)?(?:const\s+)?(\w+)\s*\*\s*(\w+)\s*\([^)]*\)\s*[;{]", t, re.M):
             if m.group(2) in allg:
@@ -607,7 +609,7 @@ def shared_globals(sony=False):
     this listed were libsnd's and libcd's, the plan's "largest case" among
     them, `_svm_voice` from libsnd/vmanager.o)."""
     ext = {}
-    for f in list(SRC.glob("*.c")) + list((ROOT / "include").glob("*.h")):
+    for f in srcpath.src_files() + list((ROOT / "include").glob("*.h")):
         t = re.sub(r"/\*.*?\*/", "", f.read_text(errors="replace"), flags=re.S)
         for m in re.finditer(r"^\s*extern\s+(?:const\s+)?((?:struct\s+)?\w+)\s*(\**)\s*(\w+)\s*(\[[^\]]*\])?\s*;", t, re.M):
             ty = m.group(1) + m.group(2) + ("[]" if m.group(4) else "")
@@ -625,7 +627,7 @@ def global_accessors(names):
     acc = {n: set() for n in names}
     if not objdump.exists():
         return acc
-    for o in sorted((ROOT / "build/src").glob("*.c.o")):
+    for o in sorted((ROOT / "build/src").rglob("*.c.o")):
         out = subprocess.run([str(objdump), "-dr", str(o)], capture_output=True, text=True).stdout
         fn = None
         for line in out.splitlines():

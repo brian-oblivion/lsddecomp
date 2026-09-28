@@ -34,6 +34,13 @@ fi
 units=("$@")
 if [ ${#units[@]} -eq 0 ]; then
     mapfile -t units < <(find src -name '*.c' | sed 's#^src/##; s#\.c$##' | sort)
+else
+    # A unit NAME is flat (tools/srcpath.py); its file may sit in a subdirectory.
+    for i in "${!units[@]}"; do
+        p=$(find src -name "${units[$i]##*/}.c" | head -1)
+        [ -n "$p" ] || { echo "FATAL: no unit ${units[$i]} under src/" >&2; exit 1; }
+        p=${p#src/}; units[$i]=${p%.c}
+    done
 fi
 
 targets=()
@@ -67,8 +74,8 @@ done
 
 # grep exits 1 on zero matches, which under pipefail would end the script
 # silently right here; `|| true` keeps "no bodies yet" an ordinary answer.
-count=$( { grep -l '^#ifdef NON_MATCHING' src/*.c || true; } | wc -l)
-bodies=$( { grep -c '^#ifdef NON_MATCHING' src/*.c || true; } | awk -F: '{s+=$2} END{print s+0}')
+count=$( { grep -rl --include='*.c' '^#ifdef NON_MATCHING' src || true; } | wc -l)
+bodies=$( { grep -rc --include='*.c' '^#ifdef NON_MATCHING' src || true; } | awk -F: '{s+=$2} END{print s+0}')
 if [ "$bad" -ne 0 ]; then
     echo "FAIL: $bodies NON_MATCHING body(ies) in $count unit(s) compile, but some cannot link."
     exit 1

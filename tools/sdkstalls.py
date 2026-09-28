@@ -58,7 +58,7 @@ def live_functions():
     """
     insn = re.compile(r"\s*/\* [0-9A-F]+ ([0-9A-F]{8}) [0-9A-F]{8} \*/")
     out = []
-    for c in sorted(glob.glob(str(ROOT / "src/*.c"))):
+    for c in sorted(glob.glob(str(ROOT / "src/**/*.c"), recursive=True)):
         unit = pathlib.Path(c).stem
         src = pathlib.Path(c).read_text()
         for fn in re.findall(r'^INCLUDE_ASM\("[^"]*",\s*(\w+)\)', src, re.M):

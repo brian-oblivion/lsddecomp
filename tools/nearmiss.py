@@ -46,6 +46,8 @@ import re
 import subprocess
 import sys
 
+import srcpath
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 INCLUDE_ASM_RE = re.compile(r'^INCLUDE_ASM\("[^"]*",\s*(\w+)\)', re.M)
@@ -282,14 +284,13 @@ def main():
 
     os.chdir(ROOT)
     rows = []
-    src = sorted(f for f in os.listdir("src") if f.endswith(".c"))
-    for cfile in src:
-        unit = cfile[:-2]
+    for cpath in srcpath.src_files():
+        unit = cpath.stem
         if unit.startswith("psyq_"):
             continue
         if args.unit and unit != args.unit:
             continue
-        body = open(os.path.join("src", cfile), encoding="utf-8",
+        body = open(cpath, encoding="utf-8",
                     errors="replace").read()
         for func in INCLUDE_ASM_RE.findall(body):
             spath = os.path.join("asm", "nonmatchings", unit, f"{func}.s")
