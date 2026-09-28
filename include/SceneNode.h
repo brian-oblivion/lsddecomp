@@ -34,9 +34,9 @@
  *
  * Messages: onNotify dispatches on the SENDER's class id nibble: a Pad (2)
  * to onPadEvent, a FrameClock (5) to update, another SceneNode (4) to
- * dispatchLinkCommand, which on event 2 or 3 runs tryAttachNearby (a
- * bounds test of the sender's hull against this node) and on event 4
- * records the sender as `linkTarget`. notifyWithHull is the sending side:
+ * dispatchLinkCommand, which on a hull event runs tryAttachNearby (a
+ * bounds test of the sender's hull against this node) and on
+ * SCENENODE_EVENT_LINKED records the sender as `linkTarget`. notifyWithHull is the sending side:
  * it transforms the model's hull into world space and notifies the parents.
  *
  * Methods: src/graphics/SceneNode.c. Subclasses:
@@ -57,6 +57,18 @@ typedef struct SceneNodeMethods SceneNodeMethods;
 /* SceneNode's class id (gSceneNodeMethods word +0x000). A single nibble, so
  * `(header & CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID` tests for it or a subclass. */
 #define SCENENODE_CLASS_ID 0x4
+
+/* The link test's events, between two SceneNodes (SceneNode__NotifyWithHull
+ * sends, SceneNode__DispatchLinkCommand receives). A node notifies its
+ * parents with its hull in notifyVerts on an event in HULL_FIRST..HULL_LAST,
+ * which SceneNode treats alike; a receiver whose model the hull touches
+ * answers the sender with LINKED. Actor adds its move events after these
+ * (include/Actor.h). */
+enum SceneNodeLinkEvent {
+    SCENENODE_EVENT_HULL_FIRST = 2,
+    SCENENODE_EVENT_HULL_LAST = 3,
+    SCENENODE_EVENT_LINKED = 4
+};
 
 /* Three 32-bit components (Sony's "long vector" without VECTOR's pad word;
  * arrays of it have a 0xC stride): positions, offsets and translations. */
@@ -124,7 +136,7 @@ struct Ratio16 {
     /* +0x01C */ s32 id; /* GsDOBJ2.id; no accessor */ \
     /* +0x020 */ void *model; /* the TmdModel child LinkModel linked; NULL when none */ \
     /* +0x024 */ s32 tick; /* zeroed by Reset; gStyleEffectMethods's update increments it */ \
-    /* +0x028 */ SceneNode *linkTarget; /* dispatchLinkCommand's event-4 sender; TryAttachNearby's hit */ \
+    /* +0x028 */ SceneNode *linkTarget; /* dispatchLinkCommand's SCENENODE_EVENT_LINKED sender; TryAttachNearby's hit */ \
     /* +0x02C */ s32 hitMask; /* RaycastHullAgainstFaces: one bit per model bounds box (own) or hull box (the other's) */ \
     /* +0x030 */ TmdHull *notifyVerts; /* TransformAndNotifyParents's hull, set only while the parents are notified */ \
     /* +0x034 */ u16 unk34; /* zeroed by GridCell's ctor */ \
