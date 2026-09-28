@@ -151,8 +151,8 @@ typedef struct CdRequestNode {
 
 /* The module state: the globals two or more of the units above share. A
  * global only one unit touches is a local extern in that unit. */
-extern s32 gCdAsyncEnabled;
-extern s32 gCdSyncQueueMode; /* nonzero with gCdAsyncEnabled 0: requests queue, then run blocking */
+extern s32 sCdAsyncEnabled;
+extern s32 gCdSyncQueueMode; /* nonzero with sCdAsyncEnabled 0: requests queue, then run blocking */
 extern s32 gCdBusy;          /* 0/1 */
 extern CdFileEntry *gFileTable;        /* SetFileTable */
 extern s32 gFileTableCount;            /* SetFileTableCount */

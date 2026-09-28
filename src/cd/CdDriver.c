@@ -22,7 +22,7 @@
  *
  * Every method but runRequestQueue has one shape, chosen by the driver mode
  * (SetCdDriverMode):
- *   - gCdAsyncEnabled and gCdSyncQueueMode both 0: forward to the blocking
+ *   - sCdAsyncEnabled and gCdSyncQueueMode both 0: forward to the blocking
  *     OpenCdFile / CloseCdFile / GetCdFileSize / ReadCdFile, or for loadFile
  *     to FileResource__LoadFile, and return.
  *   - otherwise, called from outside the queue (inQueueDispatch 0): append a
@@ -110,7 +110,7 @@ void CdDriver__Open(CdDriver *self, char *name, s32 param0, s32 param1) {
     s32 size; /* MATCHING: not shared with status: one local adds a move in the CdSync loop */
     s32 status;
 
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         OpenCdFile(self, name);
         return;
     }
@@ -118,7 +118,7 @@ void CdDriver__Open(CdDriver *self, char *name, s32 param0, s32 param1) {
     if (self->inQueueDispatch != 0) {
         if (gCdBusy == 0 && self->isOpen == 0) {
             StartCdOperation(CD_OPERATION_OPEN, CD_STATE_SETLOC);
-            if (gCdAsyncEnabled != 0) {
+            if (sCdAsyncEnabled != 0) {
                 entry = FindCdFileEntry(name);
                 gCdSeekParam = entry;
                 if (entry == NULL) {
@@ -153,7 +153,7 @@ void CdDriver__Open(CdDriver *self, char *name, s32 param0, s32 param1) {
 }
 
 void CdDriver__Close(CdDriver *self) {
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         CloseCdFile(self);
         return;
     }
@@ -178,7 +178,7 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
     s32 status;
     u32 sectors;
 
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         return GetCdFileSize(self);
     }
     LockCd();
@@ -191,7 +191,7 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
             }
             CdIntToPos(CdPosToInt(&self->pos) + sectors, &gCdSeekLoc);
             if (mode == 0) {
-                if (gCdAsyncEnabled != 0) {
+                if (sCdAsyncEnabled != 0) {
                     /* the state machine seeks to &gCdSeekParam->pos: aim it
                      * at a pretend entry whose pos is gCdSeekLoc */
                     gCdSeekParam = (CdFileEntry *)((u8 *)&gCdSeekLoc - offsetof(CdFileEntry, pos));
@@ -228,7 +228,7 @@ extern s32 ReadCdFile(CdDriver *self, void *buf, s32 size);
 s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
     s32 status;
 
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         ReadCdFile(self, buf, size);
         return 0;
     }
@@ -236,7 +236,7 @@ s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
     if (self->inQueueDispatch != 0) {
         if (gCdBusy == 0 && self->isOpen != 0) {
             StartCdOperation(CD_OPERATION_READ, CD_STATE_READ);
-            if (gCdAsyncEnabled != 0) {
+            if (sCdAsyncEnabled != 0) {
                 gCdReadSectorCount = size >> CD_SECTOR_SHIFT;
                 gCdReadBuffer = buf;
                 gCdTickStep = CD_TICK_STATE_MACHINE;
@@ -275,7 +275,7 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
     void *buffer;
     s32 status;
 
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         ((LoadFileNoArgsFn)FileResource__LoadFile)();
         self->flags |= CD_FLAG_LOAD_FILE_DONE;
         self->methods->onRequestDone(self);
@@ -309,7 +309,7 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
             } else {
                 gCdReadBuffer = self->buffer;
             }
-            if (gCdAsyncEnabled != 0) {
+            if (sCdAsyncEnabled != 0) {
                 self->bufferSize = readSize;
                 gCdTickStep = CD_TICK_LOAD_FILE;
             } else {
@@ -422,7 +422,7 @@ void CdDriver__RunRequestQueue(void) {
  * request methods in part 2, the state machines and the queue's nodes in
  * part 4, the blocking file calls in part 5.
  *
- *   - The driver mode. SetCdDriverMode sets gCdAsyncEnabled (requests are
+ *   - The driver mode. SetCdDriverMode sets sCdAsyncEnabled (requests are
  *     queued and run in the background), gCdSyncQueueMode (queued, but each
  *     run as a blocking spin) and gCdUseVSyncCallback (ServiceCdDriver is
  *     installed with VSyncCallback; otherwise it becomes the DrawSystem
@@ -489,7 +489,7 @@ void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
     LockCd();
 
     if (name != NULL) {
-        if (gCdAsyncEnabled != 0) {
+        if (sCdAsyncEnabled != 0) {
             /* MATCHING: retail's bug, a store through the caller's $s2 */
             unassigned[1] = 1;
             fileIndex = FindCdFileIndex(name);
@@ -580,7 +580,7 @@ s32 GetCdState(void) {
 }
 
 /* gCdSyncQueueMode is written only by SetCdDriverMode's second argument.
- * With it set and gCdAsyncEnabled clear, the request methods
+ * With it set and sCdAsyncEnabled clear, the request methods
  * (part 2) still queue each request but run it as a blocking spin
  * when runRequestQueue dispatches it; with both clear they skip the queue. */
 
@@ -588,7 +588,7 @@ s32 GetCdDriverMode(s32 *outSyncQueueMode) {
     if (outSyncQueueMode != NULL) {
         *outSyncQueueMode = gCdSyncQueueMode;
     }
-    return gCdAsyncEnabled;
+    return sCdAsyncEnabled;
 }
 
 s32 SetCdDriverMode(s32 async, s32 syncQueueMode, s32 useVSyncCallback) {
@@ -598,7 +598,7 @@ s32 SetCdDriverMode(s32 async, s32 syncQueueMode, s32 useVSyncCallback) {
         if (useVSyncCallback == 0) {
             drawSystem = GetDrawSystem();
 
-            if (gCdAsyncEnabled == 0) {
+            if (sCdAsyncEnabled == 0) {
                 if (async != 0) {
                     drawSystem->methods->setCallback(drawSystem, (void (*)(void))ServiceCdDriver);
                 }
@@ -610,7 +610,7 @@ s32 SetCdDriverMode(s32 async, s32 syncQueueMode, s32 useVSyncCallback) {
         }
 
         gCdUseVSyncCallback = useVSyncCallback;
-        gCdAsyncEnabled = async;
+        sCdAsyncEnabled = async;
         gCdSyncQueueMode = syncQueueMode;
 
         return 1;

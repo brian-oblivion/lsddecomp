@@ -21,7 +21,7 @@ typedef struct Obj80027480 {
     u16 unk28;
 } Obj80027480;
 
-extern s32 gCdAsyncEnabled;
+extern s32 sCdAsyncEnabled;
 extern s32 gCdSyncQueueMode;
 extern s32 gCdBusy;
 
@@ -34,7 +34,7 @@ extern void EnqueueCdRequest(Obj80027480 *arg0, s32 arg1, s32 arg2, s32 arg3,
 extern void UnlockCd(void);
 
 void CdDriver__Close(Obj80027480 *self) {
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         CloseCdFile(self);
         return;
     }

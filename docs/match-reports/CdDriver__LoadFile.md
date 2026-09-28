@@ -35,7 +35,7 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
     void *ret;
     s32 v1;
 
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         FileResource__LoadFile();
         self->unk24 |= 0x200;
         self->methods->slot64(self);
@@ -69,7 +69,7 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
                 } else {
                     gCdReadBuffer = self->unk10;
                 }
-                if (gCdAsyncEnabled != 0) {
+                if (sCdAsyncEnabled != 0) {
                     self->unk14 = pos;
                     gCdTickStep = 2;
                 } else {

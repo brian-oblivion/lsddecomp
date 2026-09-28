@@ -27,7 +27,7 @@ round 45 (2026-09-15), runner echo, unit CdDriver (fresh carve). One of
 a run of identically-shaped `$gp_rel` accessors in this unit
 (IsCdBusy/ED4/EE0/EEC are getters, SetFileTable/FE4 are setters,
 GetFileTableCount is a paired getter, LockCd/E0 are a 1/0 setter pair) --
-see the sibling reports for the same globals block, `gCdAsyncEnabled`..
+see the sibling reports for the same globals block, `sCdAsyncEnabled`..
 `sCdQueueEnabled`.
 
 ## Naming

@@ -18,7 +18,7 @@ carries the evidence for each one.
 extern s32 GetDrawSystem(void); /* returns gDrawSystem, a singleton object */
 extern s32 ServiceCdDriver(void);
 extern s32 gCdBusy;
-extern s32 gCdAsyncEnabled;
+extern s32 sCdAsyncEnabled;
 extern s32 gCdSyncQueueMode;
 extern s32 gCdUseVSyncCallback;
 
@@ -46,7 +46,7 @@ s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
         if (useVSyncCallback == 0) {
             obj = (ObjF18 *)GetDrawSystem();
 
-            if (gCdAsyncEnabled == 0) {
+            if (sCdAsyncEnabled == 0) {
                 if (async != 0) {
                     obj->methods->setCallback(obj, (void *)ServiceCdDriver);
                 }
@@ -58,7 +58,7 @@ s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
         }
 
         gCdUseVSyncCallback = useVSyncCallback;
-        gCdAsyncEnabled = async;
+        sCdAsyncEnabled = async;
         gCdSyncQueueMode = mode2;
 
         return 1;
@@ -124,7 +124,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 
 **Evidence for the function.** It refuses (returns 0) while `gCdBusy`, and
 otherwise stores its three arguments into `gCdUseVSyncCallback`,
-`gCdAsyncEnabled` and `gCdSyncQueueMode` and returns 1 -- the write half of the
+`sCdAsyncEnabled` and `gCdSyncQueueMode` and returns 1 -- the write half of the
 pair `GetCdDriverMode` reads back. `GameApplicationFileResource.c`'s `SetActiveDataSourceDriverMode` calls it
 in a `do {} while (fn(...) == 0)` loop, i.e. "retry until the driver accepts
 the new mode", which is what the refusal-while-busy return value is for.

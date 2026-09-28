@@ -89,5 +89,5 @@ track 3, "a pure leaf whose mechanics ARE its purpose (a getter, a clamp, a
 list push) is tier A by definition." `gCdUseVSyncCallback` itself was
 already properly named (not a placeholder) before this round, by
 `src/cd/CdDriver.c`'s own header comment ("the driver mode:
-gCdAsyncEnabled and gCdUseVSyncCallback, set through SetCdDriverMode"); no
+sCdAsyncEnabled and gCdUseVSyncCallback, set through SetCdDriverMode"); no
 further rename needed there.

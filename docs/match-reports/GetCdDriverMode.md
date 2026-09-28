@@ -10,23 +10,23 @@ Byte-exact on the first attempt.
 
 ```c
 extern s32 gCdSyncQueueMode;
-extern s32 gCdAsyncEnabled;
+extern s32 sCdAsyncEnabled;
 
 s32 GetCdDriverMode(s32 *a0)
 {
     if (a0 != NULL) {
         *a0 = gCdSyncQueueMode;
     }
-    return gCdAsyncEnabled;
+    return sCdAsyncEnabled;
 }
 ```
 
 ## Derivation
 
 Straight read of the disassembly: `beqz $a0, .L80027F0C` guards a store of
-`gCdSyncQueueMode` (gp_rel) into `*a0`; fallthrough loads `gCdAsyncEnabled` (gp_rel) into
+`gCdSyncQueueMode` (gp_rel) into `*a0`; fallthrough loads `sCdAsyncEnabled` (gp_rel) into
 `$v0` and returns it unconditionally. Both globals are in the same
-`gCdAsyncEnabled..sCdQueueEnabled` sdata block this unit's other getter/setters touch
+`sCdAsyncEnabled..sCdQueueEnabled` sdata block this unit's other getter/setters touch
 (see `GetCdDriverMethods`'s header comment in the `.c` for the class map). No
 class/struct involvement — plain scalar globals, plain optional-out-param
 shape.
@@ -44,18 +44,18 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | was | now | tier |
 | --- | --- | --- |
 | `func_80027EF8` | `GetCdDriverMode` | B |
-| `D_8008A85C` | `gCdAsyncEnabled` | A |
+| `D_8008A85C` | `sCdAsyncEnabled` | A |
 | `gCdSyncQueueMode` | *(kept -- see below)* | C |
 
 **Evidence for the function.** It is the read half of `SetCdDriverMode`:
-it returns `gCdAsyncEnabled` and, through an optional out-parameter, the
+it returns `sCdAsyncEnabled` and, through an optional out-parameter, the
 second value that function stored. `GameApplicationFileResource.c`'s `GetActiveDataSourceDriverMode` routes to
 it for the CD source and to `GetNullDriverMode` for the sound source -- and that
 function is the same shape over that source's own two globals, which
 independently confirms "read back the two mode values" rather than anything
 specific to the CD. Tier B: the pairing is certain, the second value is not.
 
-**Evidence for `gCdAsyncEnabled`.** Every reader branches the same way: when
+**Evidence for `sCdAsyncEnabled`.** Every reader branches the same way: when
 it is non-zero, the class's methods in `CdDriver` set up the state machine
 (or `EnqueueCdRequest` a node) and return immediately; when it is zero they
 run a blocking `do { v = CdSync(0,0); } while (v == 0);` spin to completion.
@@ -67,7 +67,7 @@ flag switches on; tier A.
 **`gCdSyncQueueMode` keeps its placeholder, on purpose.** Its only writer stores
 `SetCdDriverMode`'s second argument verbatim, and its only readers are this
 getter and five guards in `CdDriver` of the form
-`gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0` -- i.e. "neither mode is on, take
+`sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0` -- i.e. "neither mode is on, take
 the plain synchronous path". That tells you the two are alternative modes and
 nothing at all about what the second one is. Naming it would be invention;
 the `.c` now carries this paragraph as a comment instead.

@@ -6,7 +6,7 @@
 
 108/108 words, byte-exact, file 0x17AD0-0x17C80. Cold ground. First function
 in ROM order in this unit, so the shared `Obj80027480` local struct and
-`gCdAsyncEnabled`/`gCdSyncQueueMode`/`gCdBusy`/`LockCd`/`StartCdOperation`/
+`sCdAsyncEnabled`/`gCdSyncQueueMode`/`gCdBusy`/`LockCd`/`StartCdOperation`/
 `ResetCdStateMachine`/`EnqueueCdRequest`/`UnlockCd` externs were moved ahead of
 it (they were previously declared between it and `CdDriver__Close`).
 
@@ -51,7 +51,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     s32 temp;
     s32 v0;
 
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         OpenCdFile(self, suffix);
         return;
     }
@@ -59,7 +59,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     if (self->unk28 != 0) {
         if (gCdBusy == 0 && self->unk0C == 0) {
             StartCdOperation(1, 1);
-            if (gCdAsyncEnabled != 0) {
+            if (sCdAsyncEnabled != 0) {
                 rec = FindCdFileEntry(suffix);
                 gCdSeekParam = rec;
                 if (rec == NULL) {
@@ -249,7 +249,7 @@ uninitialised pointer).
 Globals: `D_8006D574` -> `gCdSeekLoc` (A: 8 bytes of .data written only by
 `CdDriver__Seek`'s `CdIntToPos` and used as its CdlSetloc target).
 `gCdSyncQueueMode` keeps its placeholder for CdDriver's stated reason: every
-read here is the `gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0` sync-mode test and
+read here is the `sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0` sync-mode test and
 nothing names the second mode.
 
 
@@ -259,8 +259,8 @@ Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, i
 
 The paragraph above predates this rename (the tool rewrote the name in it).
 What the five methods' bodies show, read together: the mode word only ever
-matters when `gCdAsyncEnabled` is 0. Both 0: each method forwards straight
-to CdDriver's blocking call and never touches the queue. `gCdAsyncEnabled`
+matters when `sCdAsyncEnabled` is 0. Both 0: each method forwards straight
+to CdDriver's blocking call and never touches the queue. `sCdAsyncEnabled`
 0 and this word nonzero: the call is enqueued like an async one, and when
 `CdDriver__RunRequestQueue` dispatches it back the method runs it as a
 blocking CdControl/CdSync/CdRead spin on the spot. So the word selects

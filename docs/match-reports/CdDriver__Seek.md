@@ -23,7 +23,7 @@ s32 CdDriver__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
     s32 v0;
     u32 s0tmp;
 
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         return GetCdFileSize(self);
     }
     LockCd();
@@ -37,7 +37,7 @@ s32 CdDriver__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
             v0 = CdPosToInt(self->unk18);
             CdIntToPos(v0 + s0tmp, gCdSeekLoc);
             if (arg2 == 0) {
-                if (gCdAsyncEnabled != 0) {
+                if (sCdAsyncEnabled != 0) {
                     gCdSeekParam = gCdSeekLoc - 0x14;
                     gCdTickStep = 1;
                 } else {
@@ -72,7 +72,7 @@ below.
 
 ## What it took, in order
 
-1. **`if (arg2 != 0) { ...; return X; } if (gCdAsyncEnabled...) {...} else {...}`
+1. **`if (arg2 != 0) { ...; return X; } if (sCdAsyncEnabled...) {...} else {...}`
    vs `if (arg2 == 0) {...} else { ...; return X; }`** -- the same
    nested-if/else-if-vs-nested-if POLARITY lever as `CdDriver__Close` and
    `CdDriver__Read`, on a THIRD shape this time (an early-return `if` next to
