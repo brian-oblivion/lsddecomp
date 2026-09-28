@@ -1573,7 +1573,7 @@ void StyleTeardown(void) {
     }
 }
 
-extern Ratio16 gStyleSpawnScales[][3];
+extern Ratio16 sStyleSpawnScales[][3];
 extern s32 gStyleSpawnYChoices[];
 extern Ratio16 *sStyleSpawnScale;
 extern s32 gStyleSpawnTableIndex;
@@ -1593,7 +1593,7 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
     void (*setup)(LongVec3 *, s32);
 
     gStyleSpawnTableIndex = rand() % 7;
-    sStyleSpawnScale = gStyleSpawnScales[(u32)rand() % 5];
+    sStyleSpawnScale = sStyleSpawnScales[(u32)rand() % 5];
     offsetY = (u32)rand() % 5;
     if (offsetY != 0) {
         offsetY = gStyleSpawnYChoices[offsetY];

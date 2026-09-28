@@ -124,7 +124,7 @@ the output array walked and returned one slot advanced (the same
 ## What the function does (recovered from the raw disassembly)
 
 ```c
-extern u8 gStyleSpawnScales[];
+extern u8 sStyleSpawnScales[];
 extern s32 gStyleSpawnYChoices[];
 extern u8 *sStyleSpawnScale;
 extern s32 gStyleSpawnTableIndex;
@@ -142,7 +142,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
 
     arr = (void **) arg0;
     gStyleSpawnTableIndex = rand() % 7;
-    sStyleSpawnScale = (u8 *) gStyleSpawnScales + ((u32) rand() % 5) * 12;
+    sStyleSpawnScale = (u8 *) sStyleSpawnScales + ((u32) rand() % 5) * 12;
     t3 = (u32) rand() % 5;
     if (t3 != 0) {
         t3 = gStyleSpawnYChoices[t3];
@@ -253,7 +253,7 @@ iteration via a `sStyleDay % 7` test. STALL, 93/99, whole-function
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_8008E0A4`..`D_8008E0C0` | `sStyleSpawnOffsetX`, `...OffsetY`, `...OffsetZ`, `sStyleSpawnRotation`, `sStyleSpawnScale`, `sStyleSpawnModelLayout`, `gStyleSpawnTableIndex`, `sStyleSpawnColors` | A | the 0x24-byte block passed to New_StyleEffect as its `StyleEffectParams` (include/StyleEffect.h, which names each member: offset x/y/z, rotation, scale, modelChildLayout, tableIndex, color/altColor). Kept as separate symbols: SetupStyleSpawnParamsRandom's match depends on the scalar declarations. |
-| `D_800871C8` | `gStyleSpawnScales` | A | 5 Ratio16 triples, one picked by `rand() % 5` into the params' scale. |
+| `D_800871C8` | `sStyleSpawnScales` | A | 5 Ratio16 triples, one picked by `rand() % 5` into the params' scale. |
 | `D_80087328` | `gStyleSpawnYChoices` | A | 4 words {-0x1800, -0x2800, -0x3800, -0x5000}: the offset-y values SetupStyleSpawnParamsRandom picks from. |
 
 Note: the offset-y pick is `rand() % 5`, and 0 means "let SetupStyleSpawnParamsRandom choose"; index 4 reads one word past the 4-entry table (0x80087338, the next symbol, D_80087338: 0x0A0A0200). That is retail's behaviour, reproduced as written.
