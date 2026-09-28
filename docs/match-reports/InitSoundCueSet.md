@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002CC34` on 2026-09-18 (tools/rename.py). Address 0x8002cc34.
 
-Unit: `PlacementGridVabSound`. Runner: echo, round 17.
+Unit: `vab_sound`. Runner: echo, round 17.
 
 ## Result
 
@@ -88,7 +88,7 @@ at all: an EARLY-RETURN guard's delay slot and a LATE, seemingly-dead
 constant load right before the final store are the two-sided signature of
 an `s32` function with `return 0;` / `return 1;` on its two paths, not two
 independent scheduling artifacts. Confirmed here as a second, independent
-instance of the class `PlacementGridVabSound.c`'s `Table6D940::slot0C`/`slot64`
+instance of the class `vab_sound.c`'s `Table6D940::slot0C`/`slot64`
 comment already names generically ("a `void` wrapper around an `s32` tail
 call is byte-identical") -- this one has no tail call at all, so the trap
 generalises past that specific phrasing.
@@ -118,7 +118,7 @@ a name beyond "some default/config word").
 ## Track 6 (2026-09-26, round 92, alpha): one SoundCueSet
 
 `include/SoundCueSet.h` now holds the one definition of `SoundCueSet` and
-`SoundCueSlot`. It replaced three views: PlacementGridVabSound.c's (named
+`SoundCueSlot`. It replaced three views: vab_sound.c's (named
 `tag`/`owner`/`callback`/`slots[].index` only), libsnd_vmanager.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
 include/entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the

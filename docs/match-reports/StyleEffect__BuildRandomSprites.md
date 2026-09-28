@@ -70,7 +70,7 @@ src/ui/screen_widgets.c:445   methods->slot64(self, 0);
 src/world/dream_scene.c:207  unk18->methods->slot64(unk18, unk50->unkC);
 ```
 
-(`PlacementGridVabSound.c`'s `s32 (*slot64)(void *)` is a different class's table and
+(`vab_sound.c`'s `s32 (*slot64)(void *)` is a different class's table and
 not evidence either way.) Six matched call sites in four units agree on the
 arity; this unit's one-argument view was the outlier, and the project's
 multiple-independent-local-views convention is exactly what makes checking the

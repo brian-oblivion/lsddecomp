@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C3F0` on 2026-09-26 (tools/rename.py). Address 0x8002c3f0.
 
-**Unit:** PlacementGridVabSound · **Size:** 1 instruction (`jr $ra; nop`, 0x8 bytes) ·
+**Unit:** vab_sound · **Size:** 1 instruction (`jr $ra; nop`, 0x8 bytes) ·
 **Status: MATCHED**, whole-image SHA1 green. Splat matched this itself
 (empty body); no derivation was spent, and it never had a report until
 this naming pass touched it.
@@ -22,9 +22,9 @@ void NullDriver__Close(void)
 ## Naming (round 77, charlie -- track 3, no rename)
 
 `tools/classtable.py 0x8006D9BC` confirms this is the `+0x048` slot of
-`gNullDriverMethods` (29-slot FileResource-derived table, `PlacementGridVabSound.c`,
-the SPU/VAB driver base class) -- physically carved into PlacementGridVabSound.c by
-ROM address, semantically owned by that other unit. `PlacementGridVabSound.c`'s own
+`gNullDriverMethods` (29-slot FileResource-derived table, `vab_sound.c`,
+the SPU/VAB driver base class) -- physically carved into vab_sound.c by
+ROM address, semantically owned by that other unit. `vab_sound.c`'s own
 `NullDriverMethods` struct comment leaves this slot and its siblings
 (`NullDriver__NoOpSlot40`/`NullDriver__Open`/`NullDriver__Seek`/`NullDriver__NoOpSlot50`) entirely opaque (`u8 pad000[0x054]`
 covers +0x000..+0x054 with no per-slot field). Kept `func_`, not renamed.

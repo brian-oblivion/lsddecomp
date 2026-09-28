@@ -722,7 +722,7 @@ code_179d8_j_c.c took <libsnd.h> and its banner was rewritten as documentation. 
  * round 21 and was removed rather than left to be believed.)  See CLAUDE.md's note on this.
  * ------------------------------------------------------------------------ */
 /* SpuVmKeyOn (round 76, was StartNote) is Sony libsnd/vmanager INTERNAL --
- * unlike SsUtKeyOn (PlacementGridVabSound.c), it has no public prototype in
+ * unlike SsUtKeyOn (vab_sound.c), it has no public prototype in
  * LIBSND.H (grep confirms no `Vm`-prefixed extern anywhere in that
  * header), so this stays the byte-exact local-guess signature rather
  * than a header copy. */

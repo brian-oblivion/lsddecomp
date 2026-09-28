@@ -14,7 +14,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 ## Naming
 
-`GetSsSizeTableBuf`, tier B. returns `&sSsSizeTableBuf`; its only caller (`VabStreamObj__VabStreamObj`, PlacementGridVabSound.c) passes it straight to Sony's `SsSetTableSize`. The buffer's role in libsnd's own bookkeeping is established; why this WBgm-owning file holds it (rather than the VAB-streaming unit that consumes it) is not.
+`GetSsSizeTableBuf`, tier B. returns `&sSsSizeTableBuf`; its only caller (`VabStreamObj__VabStreamObj`, vab_sound.c) passes it straight to Sony's `SsSetTableSize`. The buffer's role in libsnd's own bookkeeping is established; why this WBgm-owning file holds it (rather than the VAB-streaming unit that consumes it) is not.
 
 ## Source
 

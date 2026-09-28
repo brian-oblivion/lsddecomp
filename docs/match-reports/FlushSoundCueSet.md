@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002CC84` on 2026-09-18 (tools/rename.py). Address 0x8002cc84.
 
-Unit: `PlacementGridVabSound`. Runner: echo, round 17.
+Unit: `vab_sound`. Runner: echo, round 17.
 
 ## Result
 
@@ -90,7 +90,7 @@ sit) isn't established from this unit alone.
 ## Track 6 (2026-09-26, round 92, alpha): one SoundCueSet
 
 `include/SoundCueSet.h` now holds the one definition of `SoundCueSet` and
-`SoundCueSlot`. It replaced three views: PlacementGridVabSound.c's (named
+`SoundCueSlot`. It replaced three views: vab_sound.c's (named
 `tag`/`owner`/`callback`/`slots[].index` only), libsnd_vmanager.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
 include/entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the

@@ -35,7 +35,7 @@
  * ObjM__TeardownPauseOverlay; include/ObjM.h).
  *
  * sWBgmActive is 1 from the ctor to finalize; IsWBgmActive returns it, and
- * VabStreamObj__Finalize (src/sound/PlacementGridVabSound.c) shuts libsnd down (SsEnd,
+ * VabStreamObj__Finalize (src/sound/vab_sound.c) shuts libsnd down (SsEnd,
  * SsQuit) only when the last VAB closes AND no WBgm is active.
  */
 

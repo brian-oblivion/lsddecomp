@@ -6,7 +6,7 @@
 
 > Renamed from `func_8002C238` on 2026-09-24 (tools/rename.py). Address 0x8002c238.
 
-**Unit:** PlacementGridVabSound · **Size:** 16 instructions (0x40 bytes) ·
+**Unit:** vab_sound · **Size:** 16 instructions (0x40 bytes) ·
 **Status: MATCHED 16/16**, whole-image SHA1 green.
 
 ## Role

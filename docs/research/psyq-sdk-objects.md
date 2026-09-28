@@ -109,7 +109,7 @@ helpers and 16-byte `libapi`/`libcard` BIOS stubs:
 
 | where | what |
 | --- | --- |
-| game_shell, PlacementGridVabSound/_h | `strcat`, `strcpy`, `strstr`, `strcmp`, `strncmp` |
+| game_shell, vab_sound/_h | `strcat`, `strcpy`, `strstr`, `strcmp`, `strncmp` |
 | code_179d8, _c, _f, _i, _j | 19 `libsnd` objects (`sscall`, `stop`, `adsr`, `sstable`, …) |
 | screen_widgets | `libgs/gs_133`, `gs_111`, `gs_113`, `gs_108`, `libgte/fgo_00`, `fog_01` |
 | class_3bb8c_h, _h_b, _h_c | 13 BIOS trampolines: `libapi/a5x`, `libcard/a7x`, `c17x`, `c112` |
@@ -359,7 +359,7 @@ lines). `sys` has a 5-byte `.rdata` ("none", 0x1040) and a 0x80-byte `.data`
 `.rdata` with a 3-byte `pad`. `libcd_bios` is left with ONE function.
 
 **`libcd/iso9660` + `libc2/strcmp` + `libc2/strncmp`** (0x1BE40..0x1C92C,
-crossing `libcd_bios` / `PlacementGridVabSound`): nine functions, three stalls
+crossing `libcd_bios` / `vab_sound`): nine functions, three stalls
 (`CdSearchFile`, `CD_newmedia`, `CD_cachefile`, ~1300 lines). `.rdata` 0x1EA
 at 0x12EC with a 2-byte pad before `libsnd_ssinit_libapi_counter`'s jump table; `.data`
 8 bytes at 0x5E138 (a byte search finds the same two DMA register addresses

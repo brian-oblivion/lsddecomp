@@ -16,8 +16,8 @@
  * `jr $ra; nop`, `return 0` or a bare 0x40-byte frame (Open, NoOpSlot40),
  * so with the VAB source active the file-I/O interface does nothing; the
  * VAB streaming itself is VabStreamObj's (gVabStreamObjMethods, 0xA03,
- * src/sound/PlacementGridVabSound.c), a separate FileResource subclass. Methods in
- * src/sound/PlacementGridVabSound.c (ctor through NoOpSlot50) and src/sound/PlacementGridVabSound.c
+ * src/sound/vab_sound.c), a separate FileResource subclass. Methods in
+ * src/sound/vab_sound.c (ctor through NoOpSlot50) and src/sound/vab_sound.c
  * (Read onward, and the getter). Each is named for its slot
  * (`classtable.py gNullDriverMethods --vs gFileResourceMethods`); the slot names are
  * FileResource's.

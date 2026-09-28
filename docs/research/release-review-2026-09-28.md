@@ -44,7 +44,7 @@ rather than API.
   `char *(char *, char *)` at input_dialogs.c:41, 511;
   `FormatFullWidthNumber` re-declared at title_menu.c:193. One header.
 - **Others without a header or disagreeing:** `BuildFileName`
-  (input_dialogs.c:155, 629; PlacementGridVabSound.c:185, with `const`);
+  (input_dialogs.c:155, 629; vab_sound.c:185, with `const`);
   `GetSsSizeTableBuf` (`void *` vs `char *`); `GetSsTicksPerSecond` (wbgm.c:21
   only); `LockCd`/`UnlockCd` declared `s32` at game_shell.c:535,
   defined `void`; `SetActiveDataSourceDriverMode` `s32` in dream_day.h:57

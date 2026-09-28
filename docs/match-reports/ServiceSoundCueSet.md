@@ -489,7 +489,7 @@ by-hand structural one.
 `this->cueServiceActive != 0` (`if (this->cueServiceActive != 0)
 func_8002CD08(...)`), and `DreamSys__StopDrift` calls the sibling
 `FlushSoundCueSet` (a DIFFERENT, already-matched function in
-`PlacementGridVabSound.c`) to tear the same cue set down. A field literally named
+`vab_sound.c`) to tear the same cue set down. A field literally named
 `cueServiceActive` gating the call is about as direct as tier-A evidence
 gets: this is the "service" (per-tick) half of the cue-set's start/stop
 pair, `FlushSoundCueSet` the "flush"/stop half. `include/dream_sys.h` and
@@ -499,7 +499,7 @@ was the SAME function as `FlushSoundCueSet` -- it is not (confirmed: they
 are two distinct symbols at two distinct addresses, 0x8002CD08 vs
 0x8002CC84, with opposite roles). `rename.py` rewrote every such comment.
 
-Object/field identity (`self`/`set`): confirmed against `PlacementGridVabSound.c`'s
+Object/field identity (`self`/`set`): confirmed against `vab_sound.c`'s
 own `VabStreamObj`/`SoundCueSet`/`SoundCueSlot` and `gVabStreamObjMethods`
 (`tools/classtable.py gVabStreamObjMethods`) -- see the struct comment in
 `src/psyq/libsnd_vmanager.c` above the type definitions, and `FlushSoundCueSet.md`/
@@ -508,15 +508,15 @@ unless noted:
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `Obj179D8CD08` / `Obj179D8CD08Methods` | `VabStreamObj` / `VabStreamObjMethods` | A | same object `PlacementGridVabSound.c` already names; slot offsets match exactly |
+| `Obj179D8CD08` / `Obj179D8CD08Methods` | `VabStreamObj` / `VabStreamObjMethods` | A | same object `vab_sound.c` already names; slot offsets match exactly |
 | `slot80` | `playTone` | A | offset +0x80 == `gVabStreamObjMethods`'s `VabStreamObj__PlayTone` |
 | `slot84` | `stopVoice` | A | offset +0x84 == `VabStreamObj__StopVoice`; same `(self, index)` call shape as `FlushSoundCueSet`'s own call through the identical slot |
 | `slot9C` | `setPitchOffset` | A | offset +0x9C == `VabStreamObj__SetPitchOffset` |
-| `Entry179D8CD08` | `SoundCueSlot` | A | same 0x14-byte-stride struct `PlacementGridVabSound.c` declares |
-| `result` | `index` | A | matches `SoundCueSlot.index` (`PlacementGridVabSound.c`): -1 sentinel, `>= 0` forwarded to `stopVoice` -- identical pattern to `FlushSoundCueSet`'s `if (slot->index >= 0) slot->index = self->methods->slot84(self, slot->index);` |
+| `Entry179D8CD08` | `SoundCueSlot` | A | same 0x14-byte-stride struct `vab_sound.c` declares |
+| `result` | `index` | A | matches `SoundCueSlot.index` (`vab_sound.c`): -1 sentinel, `>= 0` forwarded to `stopVoice` -- identical pattern to `FlushSoundCueSet`'s `if (slot->index >= 0) slot->index = self->methods->slot84(self, slot->index);` |
 | `word0` | `note` | A | `note = e->note * 16` packs directly into `playTone`'s `index` argument (hi/lo split, see `VabStreamObj__PlayTone.md`) |
 | `word1` | `pitchOffset` | A | passed unchanged to `setPitchOffset` |
-| `S179D8CD08` | `SoundCueSet` | A | same object `PlacementGridVabSound.c` names |
+| `S179D8CD08` | `SoundCueSet` | A | same object `vab_sound.c` names |
 | `unk0` | `tag` | A | matches `SoundCueSet.tag`; `> 0` guard here parallels that unit's `!= 0` guard |
 | `unk8` | `owner` | A | matches `SoundCueSet.owner`; passed as `callback`'s first argument unchanged |
 | `entries` | `slots` | A | matches `SoundCueSet.slots` |
@@ -531,13 +531,13 @@ unless noted:
   confirmed against a real Sony signature. Proposed: `volume` / `pan`,
   tier B if adopted.
 - `SoundCueSet.unk4` -- incremented once per `ServiceSoundCueSet` call;
-  `PlacementGridVabSound.c`'s own view of the same struct never reads it. Proposed:
+  `vab_sound.c`'s own view of the same struct never reads it. Proposed:
   `tickCount`, tier B (mechanics-only, purpose in the game not established).
 - `SoundCueSet.unk10` -- zeroed before the callback runs; the callback may
   set it negative to skip processing this tick's slots entirely. No further
   evidence of what a non-negative value beyond 0 means. Proposed:
   `serviceGate` or similar, tier C -- too thin to commit to this pass.
-- `SoundCueSet.unk14` -- matches `PlacementGridVabSound.c`'s own `unk14` (set to the
+- `SoundCueSet.unk14` -- matches `vab_sound.c`'s own `unk14` (set to the
   constant 10 by `InitSoundCueSet`); used here as a divisor
   (`e->word2 - (e->word2/unk14)*unk10`). Purpose beyond "some kind of
   scaling period" not established in either unit.
@@ -563,7 +563,7 @@ setPitchOffset's argument is an octave: `pitchOffset = octave * 12 - 24`.
 ## Track 6 (2026-09-26, round 92, alpha): one SoundCueSet
 
 `include/SoundCueSet.h` now holds the one definition of `SoundCueSet` and
-`SoundCueSlot`. It replaced three views: PlacementGridVabSound.c's (named
+`SoundCueSlot`. It replaced three views: vab_sound.c's (named
 `tag`/`owner`/`callback`/`slots[].index` only), libsnd_vmanager.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
 include/entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
@@ -609,7 +609,7 @@ with their own type for the sound object (TodActor's `arg2` is a
 would warn in each.
 
 The comment that stood above libsnd_vmanager.c's local view, moved here:
-round 75 (naming) confirmed `self`/`set` are the objects PlacementGridVabSound.c names
+round 75 (naming) confirmed `self`/`set` are the objects vab_sound.c names
 `VabStreamObj`/`SoundCueSet`: the +0x80/+0x84/+0x9C slots this function
 dispatches are `tools/classtable.py gVabStreamObjMethods`'
 `VabStreamObj__PlayTone`/`StopVoice`/`SetPitchOffset`, and the slot `index`,
@@ -626,7 +626,7 @@ volumes are the new `SOUND_CUE_DEFAULT_VOL` (127, libsnd's full volume) and
 `SOUND_CUE_DEFAULT_END_VOL` (64), whose meaning is `VabStreamObj__PlayTone`'s:
 it keys the tone at `vol` and hands `endVol` to `SsUtAutoVol` as the ramp's
 end. The loop bound is `ARRAY_COUNT(set->slots)`, the tone index `program *
-VAB_TONES_PER_PROG`, defined token-identically to `PlacementGridVabSound.c`'s (the
+VAB_TONES_PER_PROG`, defined token-identically to `vab_sound.c`'s (the
 move of both `VAB_*` defines into `VabStreamObj.h` is proposed to the head).
 `e` is `slot`. Byte-identical.
 

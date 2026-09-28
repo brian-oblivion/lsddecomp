@@ -7,11 +7,11 @@
  * functions that operate on it are free functions taking the sound object
  * (a VabStreamObj, include/VabStreamObj.h) first.
  *
- *  - InitSoundCueSet (PlacementGridVabSound.c) starts the cue, unless one is already
+ *  - InitSoundCueSet (vab_sound.c) starts the cue, unless one is already
  *    running (tag != 0): it stores the owner's tag, owner and callback,
  *    frees every slot's voice (-1), zeroes the tick and sets
  *    attenuationSteps to 10. Returns 1 when it started the cue.
- *  - ServiceSoundCueSet (PlacementGridVabSound.c), once per tick while tag > 0:
+ *  - ServiceSoundCueSet (vab_sound.c), once per tick while tag > 0:
  *    resets every slot's request (program -1, octave 0, vol 0x7F,
  *    endVol 0x40) and attenuation, calls callback(owner, set), and then,
  *    unless the callback left attenuation negative, keys the requests: for
@@ -20,7 +20,7 @@
  *    each volume reduced by (vol / attenuationSteps) * attenuation, keeping
  *    the returned voice; program -2 stops the slot's voice instead. Last it
  *    advances tick.
- *  - FlushSoundCueSet (PlacementGridVabSound.c) stops every slot's voice and clears
+ *  - FlushSoundCueSet (vab_sound.c) stops every slot's voice and clears
  *    tag, so the set may be started again.
  *
  * The callback therefore writes a slot's program (and optionally octave
@@ -78,7 +78,7 @@ struct SoundCueSet {
 
 struct VabStreamObj; /* include/VabStreamObj.h */
 
-/* The three functions on a cue, all in src/sound/PlacementGridVabSound.c;
+/* The three functions on a cue, all in src/sound/vab_sound.c;
  * `sound` is the VabStreamObj whose voices the cue plays. */
 extern s32 InitSoundCueSet(struct VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
                            SoundCueCallbackFn callback);

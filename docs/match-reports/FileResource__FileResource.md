@@ -174,8 +174,8 @@ zeroed and otherwise untouched" from scratch.
 
 | member | proposed | tier | evidence | accessors |
 | --- | --- | --- | --- | --- |
-| slot `+0x078` `slot78` | `processBuffer` | B | every subclass occupant consumes the loaded buffer (list above); callers invoke it right after `New_<Sub>` and before `freeBuffer` | title_menu/i/j.c, dream_day.c, task.c, PlacementGridVabSound.c |
-| field `+0x02A` `unk2A` | `loadState` | B | the base ctor zeroes it; LbdFile steps it 0 -> 9 (header) -> 0 / 0 -> 10 (data block) -> 0 and VabStreamObj 1 (VH) -> 6 (VB); both advance it from slot +0x064 on a flags completion bit | game_files.c, PlacementGridVabSound.c |
+| slot `+0x078` `slot78` | `processBuffer` | B | every subclass occupant consumes the loaded buffer (list above); callers invoke it right after `New_<Sub>` and before `freeBuffer` | title_menu/i/j.c, dream_day.c, task.c, vab_sound.c |
+| field `+0x02A` `unk2A` | `loadState` | B | the base ctor zeroes it; LbdFile steps it 0 -> 9 (header) -> 0 / 0 -> 10 (data block) -> 0 and VabStreamObj 1 (VH) -> 6 (VB); both advance it from slot +0x064 on a flags completion bit | game_files.c, vab_sound.c |
 
 The table in the section above lists `unk22`/`unk28`/`unk2A` as write-only:
 that was true of this unit only. `unk22` and `unk28` have since been named

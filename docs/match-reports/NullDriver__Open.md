@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C3E0` on 2026-09-26 (tools/rename.py). Address 0x8002c3e0.
 
-**Unit:** PlacementGridVabSound · **Size:** 4 instructions (0x10 bytes) ·
+**Unit:** vab_sound · **Size:** 4 instructions (0x10 bytes) ·
 **Status: MATCHED 4/4**, whole-image SHA1 green. Identical shape to
 `NullDriver__NoOpSlot40` immediately preceding it (this unit, matched the same
 round) -- same 0x40-byte reserved-and-unused stack frame.
@@ -19,7 +19,7 @@ void NullDriver__Open(void)
 ## Naming (round 77, charlie -- track 3, no rename)
 
 Same finding as `NullDriver__NoOpSlot40`'s report: `+0x044` slot of
-`gNullDriverMethods` (PlacementGridVabSound.c), left opaque even at that unit's own
+`gNullDriverMethods` (vab_sound.c), left opaque even at that unit's own
 struct-comment level. Kept `func_`, not renamed.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `func_8002C3E0` -> `NullDriver__Open`

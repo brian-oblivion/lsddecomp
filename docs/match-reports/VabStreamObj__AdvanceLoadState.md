@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C6FC` on 2026-09-18 (tools/rename.py). Address 0x8002c6fc.
 
-Unit `PlacementGridVabSound`. Previously filed as a `gp_rel` stall (round 17, never
+Unit `vab_sound`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`
 resolved that blocker project-wide. Confirmed against `gVabStreamObjMethods`'s own
 rodata as that table's `+0x64` slot -- the class's own per-frame poll/update

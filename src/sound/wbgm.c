@@ -5,7 +5,7 @@
  * WBgm__HandleMonitorEvent (it SsSeqOpens the SEQ once both files have
  * loaded) after update; then the table getter; IsWBgmActive, which
  * VabStreamObj__Finalize checks before it shuts libsnd down; and
- * GetSsSizeTableBuf, the buffer PlacementGridVabSound.c passes to
+ * GetSsSizeTableBuf, the buffer vab_sound.c passes to
  * SsSetTableSize.
  */
 #include "common.h"

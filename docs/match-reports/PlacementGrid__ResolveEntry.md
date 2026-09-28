@@ -6,7 +6,7 @@
 
 REVISITED, round 76: MATCHED 76/76 byte-exact (from 54/76) by the argument-count lever -- slot80 takes four arguments; names/types used (the unit's own Ctx278/Obj278/Entry278, slot80 retyped)
 
-**Unit:** PlacementGridVabSound · **Size:** 76 instructions (0x130 bytes) ·
+**Unit:** vab_sound · **Size:** 76 instructions (0x130 bytes) ·
 **Status: MATCHED**, round 76 (runner bravo). `./build-and-verify.sh`
 green (SHA1 OK), `tools/check-nonmatching.sh` green. The round-73
 `#ifdef NON_MATCHING` block is gone: the live C replaces it.
@@ -110,7 +110,7 @@ s32 PlacementGrid__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 }
 ```
 
-`Ctx278SubMethods` is local to `src/sound/PlacementGridVabSound.c` (no other unit or
+`Ctx278SubMethods` is local to `src/sound/vab_sound.c` (no other unit or
 header names it), so the retype touches no other caller. Which class
 `ctx->unk2C` is, and so which function slot 0x80 resolves to, was not
 established; the four-argument signature is measured from this call
@@ -250,7 +250,7 @@ process:
 #endif
 ```
 
-**The struct definitions above ARE kept live in `src/sound/PlacementGridVabSound.c`**
+**The struct definitions above ARE kept live in `src/sound/vab_sound.c`**
 (not only in this report) -- they compile cleanly as unused types with
 the function itself restored to `INCLUDE_ASM`, per this project's
 established precedent (see e.g. `ChunkLoadEntry`/`ChunkLoadEntryTail` in
@@ -322,7 +322,7 @@ unit (pure scheduling, not register identity) but was not chased further
 > (`libc2/strcmp.o`, `libc2/strncmp.o`), reclassified as linked SDK objects
 > in round 34. They were never game stalls, so **no source shape ever
 > reached those bytes** and there is no residue class to be "the same as".
-> `src/sound/PlacementGridVabSound.c`'s own header comment records the reclassification.
+> `src/sound/vab_sound.c`'s own header comment records the reclassification.
 > The scheduling observation about THIS function's `sw $ra` stands on its
 > own measurement; only the appeal to those two as precedent is void.
 given the larger, register-identity residue makes the function
@@ -433,7 +433,7 @@ change kept in `src/`.**
 ## Round 31 update (runner echo) — reconfirmed, no new attempt
 
 Lowest-priority item in this round's assignment. Rebuilt the exact
-preserved body (spliced into `src/sound/PlacementGridVabSound.c` via `#if 1`/`#else
+preserved body (spliced into `src/sound/vab_sound.c` via `#if 1`/`#else
 INCLUDE_ASM`/`#endif`, then reverted) and reconfirmed **11/76**, no drift
 (compiled length matches retail's 76 words exactly, consistent with this
 being a pure register-allocation-order residue, not a length gap).
@@ -468,7 +468,7 @@ alone; names/types not relevant.**
 On the revisit hypothesis specifically: this unit's own types and names
 (`Entry278`, `Obj278`, `Ctx278`, `Ctx278Sub`) were authored BY this
 function's own earlier attempts and were already live in
-`src/sound/PlacementGridVabSound.c`, so there was nothing newer to import; the unit's
+`src/sound/vab_sound.c`, so there was nothing newer to import; the unit's
 other matched functions (`New_PlacementGrid`, `PlacementGrid__PlacementGrid`,
 `PlacementGrid__Finalize`, `PlacementGrid__OnRequestDone`) touch a different object family
 (`Obj6D940`/`Table6D940`) and share no field with this one. **Nothing in
@@ -667,7 +667,7 @@ Both build. Neither is kept in `src/` — `INCLUDE_ASM` is restored.
 **(A) Highest scoring: 54/76, length EXACT, 0 insertions / 0 deletions.**
 Carries the alias `p`, which is a probe rather than plausible 1998 source
 (retail has two long-lived pointers, this has three). Every declaration it
-needs is in `src/sound/PlacementGridVabSound.c` already (`Entry278`, `Obj278`, `Ctx278`,
+needs is in `src/sound/vab_sound.c` already (`Entry278`, `Obj278`, `Ctx278`,
 `Ctx278Sub`, `Ctx278SubMethods`); drop it in place of the `INCLUDE_ASM`.
 
 ```c
@@ -718,7 +718,7 @@ body to read to understand the function, and the right base for a
 changes the image length, so it must never be live.
 
 **Round 73 (runner echo): this is the body promoted into
-`src/sound/PlacementGridVabSound.c`'s `#ifdef NON_MATCHING` block.** (A)'s alias `p` is a
+`src/sound/vab_sound.c`'s `#ifdef NON_MATCHING` block.** (A)'s alias `p` is a
 probe, not plausible 1998 source (retail has two long-lived pointers,
 that body has three) — exactly what track 1b's "written for the reader"
 rule excludes, and the report itself names (B) as the right base for this

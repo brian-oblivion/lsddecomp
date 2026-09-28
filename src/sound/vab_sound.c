@@ -1,5 +1,5 @@
 /*
- * PlacementGridVabSound -- two subjects in one file: PlacementGrid, then the
+ * vab_sound -- two subjects in one file: PlacementGrid, then the
  * VAB sound backend (NullDriver, VabStreamObj and the SoundCueSet's init,
  * flush and per-tick service), with ReturnZero between them.
  *

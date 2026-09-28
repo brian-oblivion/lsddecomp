@@ -214,7 +214,7 @@ true for twenty rounds and is now false.
 
 The `gp_rel` load in the live queue also concentrates, which matters for
 judging what a fix would return: `game_shell` (14), `DreamSys` (13),
-`dream_aux` (8) and `PlacementGridVabSound` (8) hold over half of it between them.
+`dream_aux` (8) and `vab_sound` (8) hold over half of it between them.
 `game_shell` is 14 of its 27 queued functions and `dream_aux` is 8 of 17 —
 two units a fix would roughly halve on its own.
 
