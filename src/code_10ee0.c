@@ -46,7 +46,7 @@ extern DrawSystem *gDrawSystem; /* sdata: the singleton GetDrawSystem returns */
 void ConvertRect(RECT *dst, DrawRect *src);
 
 DrawSystem *New_DrawSystem(void) {
-    DrawSystem *obj = BMemPMgrAlloc(0x34);
+    DrawSystem *obj = BMemPMgrAlloc(sizeof(DrawSystem));
 
     if (obj != NULL) {
         Get_vtable_DrawSystem()->ctor(obj);
@@ -63,13 +63,16 @@ void DrawSystem__DrawSystem(DrawSystem *self) {
 
 void DrawSystem__Init(DrawSystem *self) {
     self->running = 0;
+    /* runLoop waits 3 vertical blanks per pass; transfers wait for DrawSync. */
     self->methods->setVSyncCount(self, 3);
     self->methods->setSyncMode(self, 1);
     self->callback = NULL;
 }
 
 void DrawSystem__InitGraph(DrawSystem *self, ScreenDims *size, s32 vramMode) {
-    GsInitGraph(size->w, size->h, 0, 1, vramMode);
+    /* Non-interlaced, GTE offsets; the 1 turns dithering on. */
+    GsInitGraph(size->w, size->h, GsOFSGTE | GsNONINTER, 1, vramMode);
+    /* The two display buffers stacked in VRAM: (0, 0) and (0, h). */
     GsDefDispBuff(0, 0, 0, size->h);
     self->size = *size;
     self->vramMode = vramMode;
