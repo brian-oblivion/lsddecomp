@@ -14,7 +14,7 @@
 Returns the address of `gTodActorMethods`, this class's own 80-slot method table
 (header word `0x234`, per `tools/classtable.py gTodActorMethods --vs 0x800878D4`).
 The `Get_vtable`-style accessor for this class, same shape as
-`Get_vtable_DreamSys` and `GetGameApplicationMethods` (`GameApplicationFileResource`'s equivalent for
+`GetDreamSysMethods` and `GetGameApplicationMethods` (`GameApplicationFileResource`'s equivalent for
 `gGameApplicationMethods`): a plain `lui`/`addiu` address computation, no load — this is
 `&gTodActorMethods`, not `*gTodActorMethods`.
 

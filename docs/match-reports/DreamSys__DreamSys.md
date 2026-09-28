@@ -18,7 +18,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 	void *val;
 
 	GetActorMethods()->ctor(this);
-	this->vt = Get_vtable_DreamSys();
+	this->vt = GetDreamSysMethods();
 	this->unk_0x58 = arg2;
 	this->unk_0x5C = (DreamSysUnk5C *)arg3;
 	this->unk_0x64 = 0;

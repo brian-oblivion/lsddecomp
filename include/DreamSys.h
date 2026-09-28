@@ -3,7 +3,7 @@
 
 /*
  * DreamSys -- the dream in progress (class id 0x1F34, method table
- * gDreamSysMethods, getter Get_vtable_DreamSys): an Actor subclass
+ * gDreamSysMethods, getter GetDreamSysMethods): an Actor subclass
  * (include/Actor.h); no class derives from it. The ctor calls Actor's first
  * (DreamSys__DreamSys: GetActorMethods()->ctor), so the id parent is the
  * ctor-chain parent. Every method is in src/world/DreamSys.c. One instance, made
@@ -967,7 +967,7 @@ void DreamSys__ResetFlashbackList(DreamSys *this);
 
 /* @brief Gets the jumptable of "Virtual methods" assigned to the DreamSys class. */
 /* @return &gDreamSysMethods */
-DreamSysMethods *Get_vtable_DreamSys(void);
+DreamSysMethods *GetDreamSysMethods(void);
 
 /* @brief Allocates and constructs a DreamSys instance. */
 DreamSys *New_DreamSys(struct LinkResource *arg0, s32 arg1, s32 arg2);

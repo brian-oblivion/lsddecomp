@@ -19,7 +19,7 @@
 
 The `New_X` allocator wrapper for `DreamSys`: `malloc(sizeof(DreamSys))`
 (literal `0x928` in the asm -- see below), and if non-NULL, calls
-`Get_vtable_DreamSys()->Constructor(this, arg0, arg1, arg2)` (still
+`GetDreamSysMethods()->Constructor(this, arg0, arg1, arg2)` (still
 `INCLUDE_ASM`: `DreamSys__DreamSys`) before returning the allocation
 regardless of the constructor's own return value. This is allocator
 sub-shape (1) from `DECOMPILATION_LEARNINGS.md`'s "at least three `New_X`
@@ -49,7 +49,7 @@ DreamSys *New_DreamSys(void *arg0, s32 arg1, s32 arg2)
 
 	this = BMemPMgrAlloc(sizeof(DreamSys));
 	if (this != NULL) {
-		Get_vtable_DreamSys()->Constructor(this, arg0, arg1, arg2);
+		GetDreamSysMethods()->Constructor(this, arg0, arg1, arg2);
 		return this;
 	}
 	return NULL;

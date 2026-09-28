@@ -13,7 +13,7 @@
 The `Get_vtable_X`-shaped accessor for the class implemented by most of this
 unit's remaining functions: returns `&gDayTaskMethods`, a 33-slot method table
 (`tools/classtable.py 0x800865C8`). No parameters, matching the
-`Get_vtable_DreamSys` / `GetGameApplicationMethods` shape from
+`GetDreamSysMethods` / `GetGameApplicationMethods` shape from
 `docs/research/class-framework.md`.
 
 ## Derivation

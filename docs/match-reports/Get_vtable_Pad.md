@@ -50,7 +50,7 @@ range before calling it "unidentified."
 
 **Tier A.** Renamed from `func_80025E9C` to match the project-wide
 `Get_vtable_X` convention for a class's own no-argument vtable-table
-accessor (`GetBasicClassMethods`, `Get_vtable_Entity`, `Get_vtable_DreamSys`,
+accessor (`GetBasicClassMethods`, `Get_vtable_Entity`, `GetDreamSysMethods`,
 `Get_vtable_TaskCore`, `GetTodActorMethods`, etc. -- all the identical
 `return &gXMethods;` shape). The body itself (`return &gPadMethods;`) is a
 pure leaf whose mechanics are its whole purpose.

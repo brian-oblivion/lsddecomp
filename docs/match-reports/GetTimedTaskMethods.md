@@ -9,7 +9,7 @@
 ## What it does
 
 Returns the address of `gTimedTaskMethods`, the 28-slot method table for
-`TimedTask`. A "Get_vtable" accessor, same shape as `Get_vtable_DreamSys`.
+`TimedTask`. A "Get_vtable" accessor, same shape as `GetDreamSysMethods`.
 
 ## Derivation
 

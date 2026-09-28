@@ -82,7 +82,7 @@ DreamSys *New_DreamSys(LinkResource *modelSource, s32 soundObj, s32 viewport) {
 
     this = BMemPMgrAlloc(sizeof(DreamSys));
     if (this != NULL) {
-        Get_vtable_DreamSys()->ctor(this, modelSource, soundObj, viewport);
+        GetDreamSysMethods()->ctor(this, modelSource, soundObj, viewport);
         return this;
     }
     return NULL;
@@ -92,7 +92,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, LinkResource *modelSource, s32 soun
     void *model;
 
     GetActorMethods()->ctor((Actor *)this);
-    this->methods = Get_vtable_DreamSys();
+    this->methods = GetDreamSysMethods();
     this->soundObj = soundObj;
     this->viewport = (Viewport *)viewport;
     this->etcTim = 0;
@@ -1481,7 +1481,7 @@ s32 DreamSys__func_5ba20(DreamSys *this, s32 value) {
     return old;
 }
 
-DreamSysMethods *Get_vtable_DreamSys(void) {
+DreamSysMethods *GetDreamSysMethods(void) {
     return &gDreamSysMethods;
 }
 

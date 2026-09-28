@@ -18,7 +18,7 @@ set, notifies `self->subB` (guarded slot, same pattern as
 `include/GameApplication.h`'s `unk18`/`GameApplication__InitSystems` comment). Then chains to the
 BASE class's own dtor, fetched through `Get_vtable_IntermediateBase()` (a plain
 no-parameter accessor returning `&gIntermediateBaseMethods`, same shape as
-`Get_vtable_DreamSys`).
+`GetDreamSysMethods`).
 
 ## Derivation
 

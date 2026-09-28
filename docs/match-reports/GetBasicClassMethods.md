@@ -51,7 +51,7 @@ returning one known address.
 Evidence: the whole body is `return &gBasicClassMethods;`, and `gBasicClassMethods` is
 BasicClass's own 14-slot method table (`tools/classtable.py gBasicClassMethods`).
 The spelling is the house convention rather than an invention:
-`Get_vtable_DreamSys` (`src/world/DreamSys.c`) and `Get_vtable_Entity`
+`GetDreamSysMethods` (`src/world/DreamSys.c`) and `Get_vtable_Entity`
 (`src/world/Entity.c`) are the two existing vtable accessors in the tree and
 both are `Get_vtable_<Class>`. 62 files reference this function, which is
 what makes matching the existing convention worth more than a tidier one.

@@ -46,7 +46,7 @@ None beyond what's already documented (`lui`/`addiu` with no surrounding
 
 `Get_vtable_Entity` -- tier A (round 71, runner echo, FINISHING-PLAN track 3).
 
-Kept. A getter returning `&gEntityMethods`. `New_Entity` calls it directly by name, and it follows the project's `Get_vtable_X` accessor convention (`Get_vtable_DreamSys`). Tier A by definition, since the mechanics of a pure getter are its purpose.
+Kept. A getter returning `&gEntityMethods`. `New_Entity` calls it directly by name, and it follows the project's `Get_vtable_X` accessor convention (`GetDreamSysMethods`). Tier A by definition, since the mechanics of a pure getter are its purpose.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

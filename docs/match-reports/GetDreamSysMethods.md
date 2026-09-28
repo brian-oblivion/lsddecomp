@@ -1,4 +1,6 @@
-# Get_vtable_DreamSys
+# GetDreamSysMethods
+
+> Renamed from `Get_vtable_DreamSys` on 2026-09-28 (tools/rename.py). Address 0x8005ba40.
 
 **Unit:** DreamSys · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
@@ -12,7 +14,7 @@ gate, no computation.
 ## The C
 
 ```c
-struct vtable_DreamSys *Get_vtable_DreamSys(void)
+struct vtable_DreamSys *GetDreamSysMethods(void)
 {
 	return &gDreamSysMethods;
 }
