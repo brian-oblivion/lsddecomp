@@ -47,7 +47,7 @@ global, not unit-static -- moot here since it already carries its Sony name.
 
 ### Sibling note
 
-`func_8003FB0C` (`src/libgs_gs_101.c`, charlie's unit this round) is the
+`func_8003FB0C` (`src/psyq/libgs_gs_101.c`, charlie's unit this round) is the
 identical shape one function earlier in the same original segment
 (`D_800902E4 = a0`), called from the same caller (`Viewport__Update`) two
 lines above this one. `D_800902E4` is NOT referenced outside

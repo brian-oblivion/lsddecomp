@@ -5,7 +5,7 @@
 > `Gssub_make_matrix`.** The object's 0xC8 of text covers exactly it. It sat
 > one function INTO `ScreenWidgets`, so that unit is split
 > `[c libgs_gs_101][o libgs/gs_123][c ScreenWidgets]` and GsSetNearClip, the
-> single function in front, moved to `src/libgs_gs_101.c`.
+> single function in front, moved to `src/psyq/libgs_gs_101.c`.
 >
 > **This RECLASSIFIES a matched function out of the game-code count, which is
 > the correction CLAUDE.md asks for, not a regression.** `libgs/gs_131`, linked
