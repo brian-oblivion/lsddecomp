@@ -81,8 +81,8 @@ same symbol: no precedent for naming a non-uniform, non-unit-fraction scale.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `EntityMethods::slot134` (+0x134) | `applyTodFrame` | A | `tools/classtable.py gEntityMethods` +0x134 = `TodActor__ApplyTodFrame`; `code_55dd4.h` already calls the same slot `applyTodFrame` in TodActor's own method table. Here: `todFramePtr = applyTodFrame(this, todFramePtr, 0)` 24 times, i.e. fast-forward 24 TOD frames |
-| `Entity::unk88` (+0x88) | `todFramePtr` | A | TodActor's own +0x88 is `todFramePtr` (`code_55dd4.h`; `TodActor__SetTod` writes it, `TodActor__Tick` stores `applyTodFrame`'s return in it), and Entity inherits TodActor's layout (`Entity__Entity` runs TodActor's ctor). The only accessor, this loop, uses it exactly that way |
+| `EntityMethods::slot134` (+0x134) | `applyTodFrame` | A | `tools/classtable.py gEntityMethods` +0x134 = `TodActor__ApplyTodFrame`; `code_55dd4.c` already calls the same slot `applyTodFrame` in TodActor's own method table. Here: `todFramePtr = applyTodFrame(this, todFramePtr, 0)` 24 times, i.e. fast-forward 24 TOD frames |
+| `Entity::unk88` (+0x88) | `todFramePtr` | A | TodActor's own +0x88 is `todFramePtr` (`code_55dd4.c`; `TodActor__SetTod` writes it, `TodActor__Tick` stores `applyTodFrame`'s return in it), and Entity inherits TodActor's layout (`Entity__Entity` runs TodActor's ctor). The only accessor, this loop, uses it exactly that way |
 
 Types were left as they were (`s32`), not corrected to TodActor's `u8 *`;
 no offset or size moved. Both oracles green after each.

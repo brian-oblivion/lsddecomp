@@ -67,7 +67,7 @@
 typedef struct TodActor TodActor;
 typedef struct TodActorMethods TodActorMethods;
 
-/* Tags completed in the unit that reads them (include/code_55dd4.h), so
+/* Tags completed in the unit that reads them (src/code_55dd4.c), so
  * that any header may repeat these declarations. */
 struct ModelData;    /* include/ModelData.h */
 struct TodActorDesc; /* the ctor's descriptor: +0x00C a ModelData to borrow */

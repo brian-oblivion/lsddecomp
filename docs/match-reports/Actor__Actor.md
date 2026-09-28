@@ -29,12 +29,12 @@ fail:
 
 ## Class identification (this file's central finding)
 
-This function IS `D800878D4Methods::ctor` (`code_55dd4.h`, TodActor's own
+This function IS `D800878D4Methods::ctor` (`code_55dd4.c`, TodActor's own
 reading of the shared base) and simultaneously IS `vtable_DreamSys`'s
 implicit base-construction step -- confirmed three ways:
 
 1. `GetActorMethods()` (TodActor's own getter, already declared in
-   `code_55dd4.h` returning `D800878D4Methods *`) is called here to
+   `code_55dd4.c` returning `D800878D4Methods *`) is called here to
    install `self->methods`, i.e. this function is establishing the exact
    table `GetActorMethods` returns.
 2. The functions this unit defines right after this one --

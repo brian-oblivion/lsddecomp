@@ -44,7 +44,7 @@ void *New_TodSet(s32 arg0) {
 
 ## Naming
 
-- **New_TodSet**, tier A. include/code_55dd4.h's Unk30Obj is already "the TOD set, see Unk30Obj", built by this allocator over an array of Tod objects.
+- **New_TodSet**, tier A. src/code_55dd4.c's Unk30Obj is already "the TOD set, see Unk30Obj", built by this allocator over an array of Tod objects.
 
 ## Track 4 (2026-09-26, round 88, delta)
 

@@ -186,7 +186,7 @@ fail:
 ```
 
 (`Unk5CMethods::slot80` and `New_Actor` are kept live in
-`include/code_55dd4.h` — both confirmed correct by the byte-identical
+`src/code_55dd4.c` — both confirmed correct by the byte-identical
 setup/allocation section and teardown call, independent of this stall.)
 
 ### Proposed learning

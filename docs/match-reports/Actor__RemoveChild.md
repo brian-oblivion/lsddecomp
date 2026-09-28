@@ -6,7 +6,7 @@
 
 Unit: `class_3bb8c_k` (round 17). `BaseObjOMethods::slot14` -- the
 "unlink" companion of `Actor__AddChild` (`slot10`), already named by both
-`code_55dd4.h` and `DreamSys.h` at the identical offset in sibling classes.
+`code_55dd4.c` and `DreamSys.h` at the identical offset in sibling classes.
 
 ## Final source
 

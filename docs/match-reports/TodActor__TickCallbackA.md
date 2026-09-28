@@ -31,7 +31,7 @@ semantically equivalent but is not what was tried first — the combined form
 matched immediately).
 
 Corrects `self->unk68`'s type from the generic `void *` the first pass gave
-it to `Unk68Obj *` (a new minimal type in `include/code_55dd4.h`, typed
+it to `Unk68Obj *` (a new minimal type in `src/code_55dd4.c`, typed
 only at its `+0x088` slot, the only one this unit calls). Adds `slotC4`
 (`+0x0C4`) to `TodActorMethods`.
 

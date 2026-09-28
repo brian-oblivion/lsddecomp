@@ -39,7 +39,7 @@ fail:
 }
 ```
 
-Adds `TodActorDesc` (`include/code_55dd4.h`) for the constructor's `arg1`,
+Adds `TodActorDesc` (`src/code_55dd4.c`) for the constructor's `arg1`,
 typed only at its `+0x00C` field (a `Unk5CObj *`, borrowed or freshly
 allocated), and retypes the `arg1` parameter all the way from
 `TodActor__TodActor` through `slot_setup5C`/`TodActor__SetupModelData` to here as
@@ -104,7 +104,7 @@ Round 75 (charlie), track 3.
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. code_55dd4.c includes it, and include/code_55dd4.h's local `extern Unk5CObj *New_ModelData(TodActorDesc *arg)` is deleted. The call reads `self->modelData = (Unk5CObj *)New_ModelData((struct ResourceSource *)other)`, pointer casts with no code. The field's type, Unk5CObj (a view of ModelData), belongs to TodActor and is left for that class's unification. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. code_55dd4.c includes it, and src/code_55dd4.c's local `extern Unk5CObj *New_ModelData(TodActorDesc *arg)` is deleted. The call reads `self->modelData = (Unk5CObj *)New_ModelData((struct ResourceSource *)other)`, pointer casts with no code. The field's type, Unk5CObj (a view of ModelData), belongs to TodActor and is left for that class's unification. Image byte-identical.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

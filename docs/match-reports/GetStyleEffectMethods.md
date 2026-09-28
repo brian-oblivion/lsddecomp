@@ -6,7 +6,7 @@
 
 Unit: `class_3bb8c_k` (round 17). A sibling class's own method-table
 getter, analogous to `GetActorMethods`/`GetTodActorMethods` already documented in
-`code_55dd4.h`.
+`code_55dd4.c`.
 
 ## Final source
 

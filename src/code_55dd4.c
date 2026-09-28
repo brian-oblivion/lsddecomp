@@ -2,8 +2,8 @@
  * TodActor's methods (include/TodActor.h: an Actor that owns one Actor part
  * per object of a TOD animation and plays the TOD over them), in ROM order,
  * ending with its getter GetTodActorMethods. The TOD layouts they read (file,
- * frame and packet headers, a TodSet's table of Tods) are this unit's, in
- * include/code_55dd4.h.
+ * frame and packet headers, a TodSet's table of Tods) are this file's, below
+ * the includes.
  *
  * - construction and teardown: New_TodActor, the ctor, Finalize; the
  *   ModelData is borrowed from the descriptor or made (AcquireModelData /
@@ -22,7 +22,111 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "code_55dd4.h"
+#include "TodActor.h"
+#include "ModelData.h"
+#include "Tod.h"
+#include "LinkResource.h"
+#include "VabStreamObj.h"
+#include "FrameClock.h"
+
+/*
+ * This file's own readings of what TodActor (include/TodActor.h) reaches
+ * that is not TodActor: the ctor's descriptor, onNotify's sender, the TOD
+ * format (file, frame and packet headers, packet types and flags, the
+ * rotation unit) and a TodSet's table of Tods, plus the unit's own tuning
+ * values. The class itself -- object, table, getter, method prototypes -- is
+ * include/TodActor.h's; the sound bank is include/VabStreamObj.h's and a
+ * part's coordinate parameters are Sony's GsCOORD2PARAM.
+ */
+
+/* TodActor__OnNotify's sender: any object. Only its method table's header
+ * word is read (the low 16 bits), compared with MODEL_DATA_CLASS_HEADER. */
+typedef struct TaggedObj {
+    u16 header; /* +0x000, the method table's header word */
+} TaggedObj;
+
+typedef struct TagCheckArg {
+    TaggedObj *methods; /* +0x000 */
+} TagCheckArg;
+
+/* Header word of gModelDataMethods (tools/classtable.py), the class New_ModelData
+ * allocates and TodActor.modelData points at. */
+#define MODEL_DATA_CLASS_HEADER 0x5F03
+
+/* TOD packet types and coordinate-packet flag bits, as
+ * TodActor__ApplyTodPacket decodes them (the decoded header is
+ * {object id, type, flag, length in words}). */
+#define TOD_PACKET_ATTRIBUTE 0
+#define TOD_PACKET_COORDINATE 1
+#define TOD_PACKET_MODEL_ID 2
+#define TOD_PACKET_PARENT 3
+#define TOD_COORD_DIFFERENTIAL 1
+#define TOD_COORD_ROTATE 2
+#define TOD_COORD_SCALE 4
+#define TOD_COORD_TRANSLATE 8
+
+/* A TOD rotation is in 1/4096 degree; divided by 360 it is a GTE angle
+ * (ONE to the turn), which ApplyTodPacket then wraps with % ONE. */
+#define TOD_ROTATE_PER_ANGLE 360
+
+/* A parent packet naming object 0 or TOD_PARENT_ROOT attaches the part to
+ * the TodActor itself rather than to another part. */
+#define TOD_PARENT_ROOT 0xFFFF
+
+/* TickCallbackA's move along local Z each tick (Actor's moveLocalZ). */
+#define TODACTOR_STEP_Z (-30)
+
+/* PlayTone's volume, both arguments of the bank's playTone (vol, endVol). */
+#define TODACTOR_TONE_VOLUME 110
+
+/* A TOD packet's header word, as decodePacketWord writes it out byte by
+ * byte. */
+typedef struct TodPacketHeader {
+    u8 objectId; /* +0x000 the low byte of the object id */
+    u8 type;     /* +0x001 TOD_PACKET_* */
+    u8 flag;     /* +0x002 TOD_COORD_* for a coordinate packet */
+    u8 length;   /* +0x003 the packet's length in words, header included */
+} TodPacketHeader;
+
+/* A TOD file's header (Sony's TOD format: id, version, resolution, then the
+ * frame count), then its frames. */
+typedef struct TodHeader {
+    u8 pad00[0x04]; /* +0x000 id, version, resolution: not read */
+    s32 frameCount; /* +0x004 */
+    u8 frames[1];   /* +0x008 the first frame (a TodFrame) */
+} TodHeader;
+
+/* A TOD frame's header (Sony's TOD format: size in words, packet count,
+ * frame number), then its packets. */
+typedef struct TodFrame {
+    u8 pad00[0x02];  /* +0x000 size in words: not read */
+    u16 packetCount; /* +0x002 */
+    u8 pad04[0x04];  /* +0x004 frame number: not read */
+    u8 packets[1];   /* +0x008 the first packet */
+} TodFrame;
+
+/* A TodSet's buffer once TodSet__BuildTods has run: a word, a count, then
+ * the table whose each entry (an offset into the buffer) it replaced with
+ * the Tod it built over that sub-block. */
+typedef struct TodSetBuffer {
+    u8 pad00[0x08]; /* +0x000 a word and the entry count: not read here */
+    Tod *tods[1];   /* +0x008 */
+} TodSetBuffer;
+
+/* The i-th Tod of a TodSet (TodActor__SetTod, TodActor__Tick). */
+#define TODSET_TOD(set, i) (((TodSetBuffer *)(set)->buffer)->tods[i])
+
+/* The ctor's descriptor, forwarded through setupModelData into
+ * TodActor__AcquireModelData: the ModelData at +0x0C is borrowed; when there
+ * is none, New_ModelData(&desc->src) makes one and the TodActor owns it. */
+typedef struct TodActorDesc {
+    /* +0x000 */ ResourceSource src;
+    /* +0x008 */ u8 pad8[4];
+    /* +0x00C */ ModelData *modelData;
+} TodActorDesc;
+
+extern void *BMemPMgrAlloc(s32 size);
+extern void *BMemPMgrFree(void *ptr);
 
 void *New_TodActor(void *desc, void *sound) {
     TodActor *self;

@@ -47,7 +47,7 @@ including `$a1`, un-clobbered by anything in between. That is only
 consistent with the call site **never naming a second argument** — not
 "the value happens to survive", but "the C source never asked the compiler
 to track it as live here". Removing `arg1` from both call sites (typing
-`slot108`/`slot04` as taking only `self` in `include/code_55dd4.h`) is what
+`slot108`/`slot04` as taking only `self` in `src/code_55dd4.c`) is what
 matched: with no reference to `arg1` after the call, GCC never spills it,
 and `$a1` is left holding whatever it already had — which, from the
 *outside*, looks like "forwarded", but which the source never actually

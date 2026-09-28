@@ -6,7 +6,7 @@
 
 Unit: `class_3bb8c_k` (round 17). `BaseObjOMethods::slot10` -- the "link"
 half of a buddy-object pair, already named `slot10`
-(`code_55dd4.h`/`D800878D4Methods`) and `vtable_DreamSys::slot10`
+(`code_55dd4.c`/`D800878D4Methods`) and `vtable_DreamSys::slot10`
 (`DreamSys.h`) by two sibling units, both citing this exact function
 address. Chains to a fixed base handler, then classifies `arg` by its own
 vtable header word and records it into one of two companion-pointer
@@ -54,7 +54,7 @@ void Actor__AddChild(BaseObjO *self, TagWordObjO *arg) {
   `lbu`) -- kept as a separate local type, `TagWordObjO`, rather than
   conflating the two shapes.
 - **`self->unk4C = arg;` / `self->unk50 = arg;` are companion-object
-  pointers**, mirroring `code_55dd4.h`'s already-documented `TodActor`
+  pointers**, mirroring `code_55dd4.c`'s already-documented `TodActor`
   field `unk50` ("companion-object pointer, unlinked via slot14") at the
   exact same offset in a sibling class built on the same base -- this
   function is the "link" (sets the pointer); `Actor__RemoveChild` right after
@@ -78,7 +78,7 @@ classifies `arg` by its own vtable header tag (`(header&0xFFF)==0x114` or
 `(header&0xF)==5`) and stores it into the matching one of two companion
 pointer fields (`companion1`/`companion2`) -- a "link" operation exactly
 as the existing term "companion-object pointer" (already used by
-`code_55dd4.h` for the identical field pattern at the same shared slot) is
+`code_55dd4.c` for the identical field pattern at the same shared slot) is
 already established for. `func_800570B4` is the "link" half of the
 `slot10`/`slot14` pair; `Actor__RemoveChild` (`slot14`) is the other
 half, right after it in ROM order.

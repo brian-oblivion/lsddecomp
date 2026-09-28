@@ -10,7 +10,7 @@
 ## What it does
 
 `TodActorMethods` slot `+0x0F4` (`slot_setup5C`, already typed in
-`include/code_55dd4.h` from the constructor's call site). Guards
+`src/code_55dd4.c` from the constructor's call site). Guards
 `self->unk5C`: if it is already set, returns 0 (success, nothing to do);
 otherwise defers to `TodActor__AcquireModelData(self, arg1)` and returns its result
 directly. `arg1` is never touched in this function's own body — retail

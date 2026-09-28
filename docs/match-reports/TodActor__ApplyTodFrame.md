@@ -391,7 +391,7 @@ gitignored directory:
 
 ```c
 #include "common.h"
-#include "code_55dd4.h"
+#include "code_55dd4.c"
 
 void *TodActor__ApplyTodFrame(TodActor *self, void *hdr, void *extra)
 {
@@ -702,7 +702,7 @@ were both traced/built and rejected in rounds 24/31/49 and never touched
 `src/`) is placed in `src/code_55dd4.c` as `#ifdef NON_MATCHING ... #else
 INCLUDE_ASM ... #endif`. No new declarations needed; `slot138`'s signature
 (`void *(*)(TodActor *, void *, void *)`) already matches in
-`include/code_55dd4.h`. `./build-and-verify.sh` stays green (no bytes
+`src/code_55dd4.c`. `./build-and-verify.sh` stays green (no bytes
 changed) and `tools/check-nonmatching.sh` compiles it clean.
 
 NON_MATCHING body promoted, round 61.

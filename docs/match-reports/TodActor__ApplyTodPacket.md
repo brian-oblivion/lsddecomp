@@ -447,7 +447,7 @@ end:
 All types this body depends on (`TimeTargetObj`, `Elem14Obj`, `Unk2CObj`/
 `Unk2CMethods`, the `Unk70ElemObj`/`Unk70ElemMethods`/`Unk5CMethods` field
 and slot additions, and the `SceneNode__LinkModel` signature correction) are kept
-live in `include/code_55dd4.h` — every one of them is confirmed correct by
+live in `src/code_55dd4.c` — every one of them is confirmed correct by
 byte-identical surrounding code, independent of the six-word residue above.
 
 ### Proposed learning
@@ -1098,7 +1098,7 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 
 ## Track 4 (LinkResource)
 
-2026-09-26, round 89 (delta): `Unk2CObj`/`Unk2CMethods` (include/code_55dd4.h)
+2026-09-26, round 89 (delta): `Unk2CObj`/`Unk2CMethods` (src/code_55dd4.c)
 were a view of LinkResource (gLinkResourceMethods), now unified in
 `include/LinkResource.h`; ModelData's `linkResource` is typed
 `struct LinkResource *`. The model-id packet calls its `getModel` (+0x080,
@@ -1118,7 +1118,7 @@ delay slot, replacing the `nop` retail keeps there. Instruction order.
 ## Track 6 (round 93, echo)
 
 The part's coordinate parameters, read through `coord2->param`, were
-code_55dd4.h's `TimeTargetObj` ({s32 scale[3]; pad; s16 rotate[3]; pad;
+code_55dd4.c's `TimeTargetObj` ({s32 scale[3]; pad; s16 rotate[3]; pad;
 s32 trans[3]}): that is Sony's `GsCOORD2PARAM` ({VECTOR scale; SVECTOR rotate;
 VECTOR trans}), same offsets and same use. The local type is deleted and the
 body reads `&param->rotate.vx`, `&param->scale.vx`, `&param->trans.vx` and
@@ -1132,7 +1132,7 @@ SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX
 ## Track 7 (round 99, bravo): readable spelling, byte-identical
 
 The live body now spells the decoded header as a `TodPacketHeader head`
-(`objectId`, `type`, `flag`, `length`; `include/code_55dd4.h`) instead of
+(`objectId`, `type`, `flag`, `length`; `src/code_55dd4.c`) instead of
 `u8 outbuf[4]`, and the data as `s32 *data` indexed `data[i]` (still the
 round-75 lever: the blob is indexed, not walked) with `data += 3` / `data += 2`
 for the old `+ 0xC` / `+ 8`. Locals: `packet` (was `acc`), `part` (`elem`),

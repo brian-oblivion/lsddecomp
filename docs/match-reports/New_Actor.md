@@ -37,7 +37,7 @@ literal `ori $a0,$zero,0x58` allocation, an unconditional test of the
 result, then `GetActorMethods()->ctor(self)`'s OWN return checked against
 NULL -- nonzero means success (return `self`), zero means failure
 (`BMemPMgrFree(self)` then return `NULL`). `GetActorMethods` is already
-declared elsewhere (`code_55dd4.h`) returning `D800878D4Methods *`; this
+declared elsewhere (`code_55dd4.c`) returning `D800878D4Methods *`; this
 unit uses its own local `BaseObjOMethods *` reading of the same table (see
 `Actor__Actor`'s report). `BMemPMgrAlloc`/`BMemPMgrFree` are the
 project's established single-argument pool allocator pair.
@@ -65,7 +65,7 @@ argument, which only makes sense if that slot resolves to
 `TodActor`'s real, 3-argument constructor
 (`code_55dd4.c:TodActor__TodActor`) -- confirmed directly by
 `GetActorMethods`'s declared return type, `BaseObjOMethods *` here (this
-unit's own reading of the SAME table `code_55dd4.h` calls
+unit's own reading of the SAME table `code_55dd4.c` calls
 `D800878D4Methods`).
 
 ## Track 4 (2026-09-25, round 82, delta)

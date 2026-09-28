@@ -10,7 +10,7 @@
 ## What it does
 
 The constructor for the class at method table `gTodActorMethods` (see
-`include/code_55dd4.h` for the resolved inheritance:
+`src/code_55dd4.c` for the resolved inheritance:
 `BasicClass -> gActorMethods (intermediate, header 0x34) -> this class`).
 Signature `(self, arg1, arg2)`, matching `New_TodActor`'s call. Sequence:
 
@@ -68,7 +68,7 @@ byte-exact on the first successful build.
 
 ## Notes on the header
 
-The struct/vtable derivation is in `include/code_55dd4.h`. Key point for
+The struct/vtable derivation is in `src/code_55dd4.c`. Key point for
 future work in this unit: `self->methods->ctor`/`slot_setup5C`/etc. are
 **vtable slots**, resolved indirectly at runtime; calling into
 `TodActor__SetupModelData` (`slot_setup5C`) and `TodActor__Reset` (`slot40`), both still
@@ -95,7 +95,7 @@ Round 75 (charlie), track 3.
 
 - `TodActor__TodActor` (was `class_65650__Constructor`), tier A. Occupies gTodActorMethods +0x008 (`tools/classtable.py gTodActorMethods --vs gActorMethods`: overrides Actor__Actor); chains the base ctor, installs gTodActorMethods, zeroes modelData/mainPart/parts/peer, runs setupModelData, links the model data as a companion, calls initDefaults. `Class__Class` convention; replaces FirecatFG's `class_65650__Constructor`.
 
-### Field and slot names (round 75, code_55dd4.h)
+### Field and slot names (round 75, code_55dd4.c)
 
 Every rename below was made in the struct definition first; the compiler
 listed 162 accessors, all in `src/code_55dd4.c`, and `check-nonmatching.sh`

@@ -11,7 +11,7 @@
 
 The `New_X` allocator for the class whose method table is `gTodActorMethods`
 (resolved with `tools/classtable.py gTodActorMethods --vs 0x800878D4`; see
-`include/code_55dd4.h` for the full inheritance chain). Allocates a 0x98-byte
+`src/code_55dd4.c` for the full inheritance chain). Allocates a 0x98-byte
 instance through the game allocator `BMemPMgrAlloc`, fetches the class's own
 vtable via `GetTodActorMethods()` (a `Get_vtable`-style accessor, matched
 separately, see its own report), and calls the constructor slot (`+0x008`)
@@ -68,7 +68,7 @@ rewrite to every `New_X` residue.
 
 ## Notes on the header
 
-`include/code_55dd4.h` types `BMemPMgrAlloc` as taking a single `s32 size`
+`src/code_55dd4.c` types `BMemPMgrAlloc` as taking a single `s32 size`
 parameter (matching the correction the head made to `class_16334.h`'s
 `BMemPMgrAlloc` prototype in the same round) — the call site here sets only
 `$a0` before `jal`.

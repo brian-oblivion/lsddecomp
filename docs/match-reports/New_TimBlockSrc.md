@@ -85,10 +85,10 @@ Verbatim as it stood before the round-93 comment pass; the new banner says what 
  *     (include/TimArraySrc.h, track 4, round 88).
  *   - Tod / TodSet (gTodMethods / gTodSetMethods, TodSet a Tod subclass): one
  *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
- *     of them; named from include/code_55dd4.h's own "TOD set" (Unk30Obj).
+ *     of them; named from src/code_55dd4.c's own "TOD set" (Unk30Obj).
  *   - ModelData / TriggerWorld (gModelDataMethods / gTriggerWorldMethods, TriggerWorld a
  *     ModelData subclass): a LinkResource+TodSet pair, and an array of
- *     those pairs; ModelData named from code_55dd4.h/.c's own "tmd"/"tods"/
+ *     those pairs; ModelData named from code_55dd4.c/.c's own "tmd"/"tods"/
  *     "modelData" fields, TriggerWorld from DreamAux.c's own declared
  *     return type.
  *   - TileMap / TileAtlas (gTileMapMethods / gTileAtlasMethods): a 20x15 grid of

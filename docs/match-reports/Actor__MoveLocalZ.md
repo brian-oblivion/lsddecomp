@@ -6,7 +6,7 @@
 
 Unit: `class_3bb8c_k` (round 17). A shared `BasicClass`-inherited slot
 occupant (`slotC4`), already independently confirmed `void` from BOTH
-`Entity.h` and `code_55dd4.h`'s `TodActorMethods::slotC4` (both tables
+`Entity.h` and `code_55dd4.c`'s `TodActorMethods::slotC4` (both tables
 hold this exact function at `+0xC4`, per `Entity.h`'s own comment). Tail-
 calls `Actor__MoveAlongLocalAxis` (still `INCLUDE_ASM`, sibling unit
 `class_3bb8c_k`) with a fixed global address and a literal `6`.
@@ -58,7 +58,7 @@ generalizes past the two instances (`Entity__MoodCue32`, `Entity__MoodCue00`)
 
 **`Actor__MoveLocalZ` -- tier C.** Class is known (occupies the shared
 `slotC4` `BasicClass`-inherited slot, confirmed by `tools/classtable.py`
-against `Entity.h`/`code_55dd4.h`'s independent readings of the same
+against `Entity.h`/`code_55dd4.c`'s independent readings of the same
 address), but the function tail-calls a still-`INCLUDE_ASM` sibling-unit
 function (`Actor__MoveAlongLocalAxis`, `class_3bb8c_k.c`) with a fixed global address
 and a literal mode value `6`, and no occupant of `slotC4` anywhere in the

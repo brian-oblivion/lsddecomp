@@ -190,7 +190,7 @@ void TodActor__SetLightMode(TodActor *self, void *arg)
 ```
 
 (`Unk70ElemMethods::slot70` and `D800878D4Methods::slot70` are kept live
-in `include/code_55dd4.h` — both are confirmed correct by the
+in `src/code_55dd4.c` — both are confirmed correct by the
 byte-identical loop body, call sequence, and trailing call, independent
 of this stall.)
 

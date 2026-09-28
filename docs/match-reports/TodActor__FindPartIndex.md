@@ -47,7 +47,7 @@ s32 TodActor__FindPartIndex(TodActor *self, s32 value)
 
 Confirms `self->unk74` is genuinely a `u8 *` (indexed with `lbu`), not the
 generic `void *` it was typed as after the first pass — updated in
-`include/code_55dd4.h`.
+`src/code_55dd4.c`.
 
 ## Two residues, two different fixes
 

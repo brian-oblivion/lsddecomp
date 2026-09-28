@@ -132,7 +132,7 @@ void TodActor__SetDisplay(TodActor *self, void *arg)
 ```
 
 This retypes `self->unk70` from the first pass's generic `void *` to
-`Unk70ElemObj **` (a new minimal type in `include/code_55dd4.h`, typed only
+`Unk70ElemObj **` (a new minimal type in `src/code_55dd4.c`, typed only
 at its `+0x060` slot, the only one this unit calls). The **entire loop body
 is byte-identical to retail** — confirmed across every attempt below, the
 diff never touched a single loop-body word. Only the five-word prologue
@@ -636,7 +636,7 @@ only `#if 0` block, hand-derived across 15+ manual attempts plus two
 permuter campaigns that never found a candidate below the base score) is
 placed in `src/code_55dd4.c` as `#ifdef NON_MATCHING ... #else INCLUDE_ASM
 ... #endif`. No declarations needed beyond what the unit already has
-(`Unk70ElemObj` comes from `include/code_55dd4.h`, already included).
+(`Unk70ElemObj` comes from `src/code_55dd4.c`, already included).
 `./build-and-verify.sh` stays green (no bytes changed; the verified build
 never takes the `NON_MATCHING` branch) and `tools/check-nonmatching.sh`
 compiles it clean.
