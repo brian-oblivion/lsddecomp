@@ -2373,7 +2373,7 @@ void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
  * include/Actor.h (modelChildren) and include/VariantSprite.h (sprites). */
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
-extern s32 gSpriteShiftX[];
+extern s32 sSpriteShiftX[];
 extern Ratio16 sSpriteScaleLarge[3];
 extern Ratio16 sSpriteScaleHalf[3];
 extern Ratio16 sSpriteScaleSmall[3];
@@ -2541,7 +2541,7 @@ void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
 
 /* Per-`tableIndex` z step for the model children (0 = no drift), also the
  * divisor of MODEL_CHILD_DRIFT_RANGE for the reset period below. Same index space as
- * gSpriteShiftX. */
+ * sSpriteShiftX. */
 extern s32 sModelChildDriftZ[];
 /* All-zero LongVec3, the start value of each child's per-frame z delta. */
 extern LongVec3 sModelChildDriftInit;
@@ -2615,7 +2615,7 @@ void StyleEffect__ReleaseModelChildren(StyleEffect *self) {
 
 /* Kind 2's init: five sprites, all scaled by sSpriteScaleHalf on an even
  * rand(); then sprites[1] is either shifted along x by
- * gSpriteShiftX[tableIndex] and recoloured (tableIndex >= 2) or made
+ * sSpriteShiftX[tableIndex] and recoloured (tableIndex >= 2) or made
  * semi-transparent (rate 0) and rescaled, and sprites[2] is hidden. */
 void StyleEffect__BuildRandomSprites(StyleEffect *self) {
     s32 parity = rand() % 2;
@@ -2629,7 +2629,7 @@ void StyleEffect__BuildRandomSprites(StyleEffect *self) {
         VariantSpriteMethods *methods;
 
         sprite = self->sprites[1];
-        sSpriteShiftScratch.x = gSpriteShiftX[self->params.tableIndex];
+        sSpriteShiftScratch.x = sSpriteShiftX[self->params.tableIndex];
         /* Called directly, not through the sprite's table: a VariantSprite
          * is a Sprite, not an Actor, and the function only touches the
          * SceneNode coord2 both share. */

@@ -171,14 +171,14 @@ Round 70 (alpha). `func_80056BBC` -> `StyleEffect__BuildRandomSprites`, **tier B
 Only caller StyleEffect__InitByKind, kind 2. Body: parity = rand() % 2;
 StyleEffect__SpawnSprites with sSpriteScaleHalf on parity 0, NULL otherwise;
 then tableIndex >= 2: sprites[1] gets Actor__AddTranslation by
-(gSpriteShiftX[tableIndex], 0, 0) and slotB8 with altColor or color; else
+(sSpriteShiftX[tableIndex], 0, 0) and slotB8 with altColor or color; else
 sprites[1] gets setSemiTrans(1), setSemiTransRate(0) and updateScale(set,
 parity ? sSpriteScaleLarge : sSpriteScaleSmall); finally sprites[2]
 setDisplay(0). "Sprites" rests on the D800879C4 reading (see
 StyleEffect__SpawnSprites); B.
 
 Globals named in this pass (only this unit references them, tier B, named by
-their ratio-triple values): `gSpriteShiftX` (was D_80087844, s32[6]),
+their ratio-triple values): `sSpriteShiftX` (was D_80087844, s32[6]),
 `sSpriteScaleLarge` (was D_8008785C, {6/5, 6/5, 1/1}), `sSpriteScaleHalf`
 (was D_80087868, {3/6, 3/6, 1/1}), `sSpriteScaleSmall` (was D_80087874,
 {4/6, 4/6, 1/1}), `sSpriteShiftScratch` (was D_80087880, a zero Vec3S whose

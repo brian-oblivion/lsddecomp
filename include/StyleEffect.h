@@ -72,7 +72,7 @@ struct StyleEffectParams {
     /* +0x00C */ Ratio16 *rotation; /* Ratio16[3] degrees, self's and the model children's updateRotation (AttachWithRotScale) */
     /* +0x010 */ Ratio16 *scale; /* Ratio16[3], their updateScale; scale[0].num also scales the model-child spacing (PlaceModelChildren) */
     /* +0x014 */ s32 modelChildLayout; /* 0 = no modelChildren, else an index 1..4 into sModelChildSpacing: 1-2 along x, 3-4 along y */
-    /* +0x018 */ s32 tableIndex;   /* index into sModelChildDriftZ and gSpriteShiftX */
+    /* +0x018 */ s32 tableIndex;   /* index into sModelChildDriftZ and sSpriteShiftX */
     /* +0x01C */ SpriteRgb *color; /* every sprite's setColor (SpawnSprites) */
     /* +0x020 */ SpriteRgb *altColor; /* sprites[1]'s colour instead, when non-NULL (BuildRandomSprites) */
 };
