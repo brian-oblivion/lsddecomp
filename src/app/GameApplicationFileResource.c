@@ -244,7 +244,7 @@ void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
 }
 
 /* +0x05C: empty. */
-void GameApplication__NoOpSlot5C(void) {}
+void GameApplication__OnRepeatMenu(void) {}
 
 /* +0x060: runs one DayTask. Its CINEMATIC result plays the cinematic
  * (PlayCinematic), CLOSED sets skipGraphRoomPoll. Returns nonzero when the

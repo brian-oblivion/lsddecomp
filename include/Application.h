@@ -52,7 +52,7 @@ struct Pad; /* initSystems's pad: main()'s New_Pad(0, 0) */
     /* +0x050 */ void (*showIntroLogos)(Self *self);     /* once, before the loop */        \
     /* +0x054 */ void (*playOpeningMovie)(Self *self);     /* each outer iteration */         \
     /* +0x058 */ s32 (*runTitleMenu)(Self *self);        /* 0 ends the inner loop, 1 and 2 dispatch */ \
-    /* +0x05C */ void (*slot5C)(Self *self);                    /* on status 1; GameApplication__NoOpSlot5C */ \
+    /* +0x05C */ void (*slot5C)(Self *self);                    /* on status 1; GameApplication__OnRepeatMenu */ \
     /* +0x060 */ s32 (*runDayTask)(Self *self);              /* on status 2; nonzero runs +0x064 */ \
     /* +0x064 */ void (*playEndingMovie)(Self *self)    /* GameApplication__PlayEndingMovie */
 /* clang-format on */

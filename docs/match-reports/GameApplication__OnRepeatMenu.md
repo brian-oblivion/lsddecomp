@@ -1,4 +1,6 @@
-# GameApplication__NoOpSlot5C -- MATCHED (2/2)
+# GameApplication__OnRepeatMenu -- MATCHED (2/2)
+
+> Renamed from `GameApplication__NoOpSlot5C` on 2026-09-28 (tools/rename.py). Address 0x80026690.
 
 > Renamed from `Class6D3C8__NoOpSlot5C` on 2026-09-26 (tools/rename.py). Address 0x80026690.
 
@@ -15,7 +17,7 @@ one of the "not every matched function was work" cases CLAUDE.md's
 ## Body
 
 ```c
-void GameApplication__NoOpSlot5C(void) {
+void GameApplication__OnRepeatMenu(void) {
 }
 ```
 
@@ -27,7 +29,7 @@ references any argument, so the definition needs none).
 
 ## Naming
 
-**`GameApplication__NoOpSlot5C` -- tier A.** A pure no-op leaf: mechanics ARE the
+**`GameApplication__OnRepeatMenu` -- tier A.** A pure no-op leaf: mechanics ARE the
 purpose (nothing happens). Named after the established project convention
 for exactly this shape -- compare `Actor__NoOpSlotD8`/`NoOpSlotE8`
 (`src/world/ObjMStyleActor.c`), `TextRow__NoOpSlotD0` (`src/ui/ScreenWidgets.c`),
@@ -40,7 +42,7 @@ unknown purpose. No carved caller currently dispatches this slot on a
 
 ```
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
-.venv/bin/python3 tools/funcdiff.py GameApplication__NoOpSlot5C   # 2/2
+.venv/bin/python3 tools/funcdiff.py GameApplication__OnRepeatMenu   # 2/2
 ```
 
 ## Track 7 polish (round 100, echo)

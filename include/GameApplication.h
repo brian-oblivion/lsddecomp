@@ -29,7 +29,7 @@
  *   +0x058 runTitleMenu    RunTitleMenu: GraphRoom and TitleMenu against
  *                                 the DreamSys; returns 0 or 2 to the loop
  *                                 (enum ApplicationLoopStatus)
- *   +0x05C slot5C                 empty (GameApplication__NoOpSlot5C)
+ *   +0x05C slot5C                 empty (GameApplication__OnRepeatMenu)
  *   +0x060 runDayTask          RunDayTask: one DayTask (include/DayTask.h),
  *                                 then maybe the current cinematic;
  *                                 nonzero (a year gone by) runs +0x064
@@ -98,7 +98,7 @@ s32 GameApplication__RegisterFilesCallback(void);
 void GameApplication__PlayOpeningMovie(GameApplication *self);
 s32 GameApplication__RunTitleMenu(GameApplication *self);
 void GameApplication__PlaySpecialDayMovies(GameApplication *self);
-void GameApplication__NoOpSlot5C(void);
+void GameApplication__OnRepeatMenu(void);
 s32 GameApplication__RunDayTask(GameApplication *self);
 void GameApplication__PlayCinematic(GameApplication *self);
 void GameApplication__PlayEndingMovie(GameApplication *self);
