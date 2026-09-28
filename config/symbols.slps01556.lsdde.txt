@@ -605,7 +605,7 @@ gStg10PermalinkTriggers = 0x800886F8;
 gStg11PermalinkTriggers = 0x80088700;
 gStg12PermalinkTriggers = 0x80088708;
 sStagePermalinkTriggers = 0x80088710;
-LEN_STAGE_PERMALINK_TRIGGERS = 0x80088748;
+sStagePermalinkTriggersCount = 0x80088748;
 SPECIAL_DAYS = 0x80088CCC;
 SPECIAL_COLORS = 0x80088D20;
 // identified: libc2/rand.o .sbss (its weak `n`, the rand seed), pinned by
