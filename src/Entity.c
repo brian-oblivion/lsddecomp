@@ -2140,7 +2140,7 @@ void Entity__MoodCue80(Entity *this, SoundCueSet *out) {
         }
     } else {
         this->methods->stopTod(this);
-        this->methods->addTranslation(this, TRANSLATE_Y_MINUS512);
+        this->methods->addTranslation(this, sTranslateYMinus512);
     }
     SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
 }

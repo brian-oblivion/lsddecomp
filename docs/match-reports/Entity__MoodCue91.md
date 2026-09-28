@@ -71,7 +71,7 @@ What it does, in the unit's current field names: Tick 0: gets/creates `unk100`, 
 
 | old | new | tier | bytes |
 | --- | --- | --- | --- |
-| `D_80089D90` | `TRANSLATE_Y_MINUS256` | A | three s32 `(0, -256, 0)`, the format of `TRANSLATE_Y_MINUS512`/`sTranslateYMinus64`; passed to `addVec14` like the other `TRANSLATE_*` tables |
+| `D_80089D90` | `TRANSLATE_Y_MINUS256` | A | three s32 `(0, -256, 0)`, the format of `sTranslateYMinus512`/`sTranslateYMinus64`; passed to `addVec14` like the other `TRANSLATE_*` tables |
 
 `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` (`(4,5, 6,5, 5,5)` as s16 pairs, a non-uniform 4/5, 6/5, 1
 scale) is left unnamed, as Entity's header comment already decided for the
