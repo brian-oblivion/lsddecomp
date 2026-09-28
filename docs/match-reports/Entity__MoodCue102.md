@@ -38,7 +38,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         out->unk34 = -2;
     }
     if (this->unkFC >= 0x33) {
-        this->methods->slot44(this, 0, ROTATION_YAW_MINUS_THIRD);
+        this->methods->slot44(this, 0, sRotationYawMinusThird);
     }
     if (this->unkFC >= 0x30D) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
@@ -146,12 +146,12 @@ elsewhere in this unit -- same symbol, not redecoded per call site.
 
 ## Three constants left unnamed this round
 
-- `ROTATION_YAW_MINUS_THIRD` (`updateRotation` arg, `moodTimer >= 0x33` branch): s16-pair
+- `sRotationYawMinusThird` (`updateRotation` arg, `moodTimer >= 0x33` branch): s16-pair
   decoded `(0,1, -1,3, 0,1, 0,1)` -- only Y nonzero, but -1/3 degree is not
   a whole number, so it does not fit the established `sRotationYawPlus2`/
   `sRotationYawPlus9`/`sRotationYawPlus1` whole-degree convention. No
   fractional-degree rotation constant has a name anywhere in the project
-  yet, so inventing one here (`ROTATION_YAW_MINUS_THIRD`-style) would be a
+  yet, so inventing one here (`sRotationYawMinusThird`-style) would be a
   new naming style, not an application of an existing one.
 - `sScaleUnit` (`updateScale` arg, `moodTimer >= 0x790` arm): decoded
   `(1,1, 1,1, 1,1, 1,8)` -- uniform X=Y=Z=1/1, i.e. the same VALUE as the
@@ -173,7 +173,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_80089CAC` | `ROTATION_YAW_MINUS_THIRD` | A (by value) | `.word 0x00010000, 0x0003FFFF, 0x00010000` = {0/1, -1/3, 0/1}: yaw -1/3 degree per call |
+| `D_80089CAC` | `sRotationYawMinusThird` | A (by value) | `.word 0x00010000, 0x0003FFFF, 0x00010000` = {0/1, -1/3, 0/1}: yaw -1/3 degree per call |
 | `D_80089DE4` | `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` | A (by value) | `.word 0x00050004, 0x00050006, 0x00050005` = {4/5, 6/5, 5/5}; z is 5/5 = 1, omitted like `sScaleY2`'s unit axes |
 | local `a2` | `scale` (now `Ratio16 *`, was `void *`) | -- | the `updateScale` argument; byte-exact |
 

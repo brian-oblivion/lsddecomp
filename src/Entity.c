@@ -2634,7 +2634,7 @@ void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
         out->slots[1].octave = -2;
     }
     if (this->moodTimer >= 51) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS_THIRD);
+        this->methods->updateRotation(this, 0, sRotationYawMinusThird);
     }
     if (this->moodTimer >= 781) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
