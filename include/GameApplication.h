@@ -1,10 +1,10 @@
 #ifndef GAMEAPPLICATION_H
 #define GAMEAPPLICATION_H
 
-#include "Application.h"
+#include "application.h"
 
 /*
- * GameApplication -- the game itself, as an Application (include/Application.h):
+ * GameApplication -- the game itself, as an Application (include/application.h):
  * the one object main() (src/main.c) builds, New_GameApplication(
  * &sGameApplicationConfig) into sGameApplication, before running its
  * initSystems and then runMainLoop, which never returns. Application brings the

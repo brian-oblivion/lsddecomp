@@ -1,5 +1,5 @@
 /*
- * Application.c -- the Application class (include/Application.h), the
+ * application.c -- the Application class (include/application.h), the
  * application shell: its ctor (CD init, data source, default screen), its
  * finalize, the screen size setter, initSystems (display, sound and 3D
  * bring-up, and the shared task argument block), a no-op slot, the
@@ -12,7 +12,7 @@
 #include <libcd.h>
 #include <libsnd.h>
 #include <libgs.h>
-#include "Application.h"
+#include "application.h"
 #include "BMemPMgr.h"
 #include "GameApplicationFileResource.h"
 

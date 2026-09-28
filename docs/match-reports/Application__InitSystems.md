@@ -60,7 +60,7 @@ established, only which SDK calls it makes.
 ## Track 4
 
 **2026-09-25, round 84 (echo).** The class is declared once, in
-`include/Application.h`. The parameters are now `drawSystem` and `pad`, and
+`include/application.h`. The parameters are now `drawSystem` and `pad`, and
 the aux block's first two fields likewise: the one caller chain is main()
 -> GameApplication's +0x044 override -> this slot, and main passes
 `New_DrawSystem()` and `New_Pad(0, 0)` (src/main.c). The draw system's

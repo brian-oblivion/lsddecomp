@@ -80,7 +80,7 @@ agreeing ones, so it stays B rather than A.
 ## Track 4
 
 **2026-09-25, round 84 (echo).** The class is declared once, in
-`include/Application.h`. The six slots this function calls, +0x050..+0x064,
+`include/application.h`. The six slots this function calls, +0x050..+0x064,
 are NULL words in gApplicationMethods's own data (the table is 0x68 bytes, past the 19
 slots classtable.py prints); they are named for the subclass's occupants
 (`loadIntroLogoSequence`, `startWeeklyStreamTask`, `pollGraphRoomStatus`,
@@ -90,7 +90,7 @@ GameApplication__RunDayTask, returns `s32`. Bytes unchanged.
 
 ## Track 7 (round 101, charlie)
 
-The status literals are `enum ApplicationLoopStatus` (include/Application.h):
+The status literals are `enum ApplicationLoopStatus` (include/application.h):
 `APPLICATION_LOOP_OPENING` (0, the `break` back to +0x054),
 `APPLICATION_LOOP_SLOT5C` (1, +0x05C then `continue`) and
 `APPLICATION_LOOP_DAY` (2, +0x060 and, on nonzero, +0x064). Evidence: this

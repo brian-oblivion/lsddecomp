@@ -10,7 +10,7 @@ Line numbers are as of commit b23bdf545 and drift; search for the name.
 
 **Verdict.** The function bodies are in good shape: one-line `MATCHING:`
 notes, Sony types under Sony's names, few raw casts. DrawSystem.c,
-FlatLightObj.c, TimImage.c, Pad.c, CdStream.c, Application.c, StageGrid.c,
+FlatLightObj.c, TimImage.c, Pad.c, CdStream.c, application.c, StageGrid.c,
 TodActor.c, DayTaskStageMap.c, WBgm.c and ScreenWidgets.c's FadeBox code
 are close to release quality. The debt is in declarations, a few
 conventions, names the code has outgrown, and headers written as analysis

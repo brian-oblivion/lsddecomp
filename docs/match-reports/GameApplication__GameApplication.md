@@ -155,7 +155,7 @@ slot+8 shape documented in `docs/research/class-framework.md`.
 ## Track 4
 
 **2026-09-25, round 84 (echo).** The parent class is declared once, in
-`include/Application.h`; the base-ctor call is
+`include/application.h`; the base-ctor call is
 `GetApplicationMethods()->ctor((Application *)self, arg->unk00)`, an upcast
 that emits no code. Bytes unchanged.
 

@@ -11,7 +11,7 @@
  * own fields run from TimedTask's 0x38. No class derives from it. Methods:
  * src/world/DayTaskStageMap.c, New_DayTask through GetDayTaskMethods.
  *
- * Who creates it. Application__RunMainLoop (src/app/Application.c) calls
+ * Who creates it. Application__RunMainLoop (src/app/application.c) calls
  * GameApplication__RunDayTask (src/app/GameApplicationFileResource.c) when the GraphRoom poll
  * returns 2, and that builds one with New_DayTask(the application's
  * IntermediateBaseInitArgs, its DreamSys, config->dayTaskSyncDriver), runs its init to

@@ -49,7 +49,7 @@ extern void GsSwapDispBuff(void);
 ## Naming
 
 `SetDrawSystem`, tier A. The singleton setter paired with `GetDrawSystem`;
-called exactly once, from `Application.c`'s `Application__InitSystems`, with
+called exactly once, from `application.c`'s `Application__InitSystems`, with
 the object `main.c` constructs (`New_DrawSystem`) -- the startup wiring that
 also confirms the class's identity (see `src/graphics/DrawSystem.c`'s header
 comment).
