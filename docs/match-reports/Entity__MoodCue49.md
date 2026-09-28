@@ -32,7 +32,7 @@ void Entity__MoodCue49(Entity *this, EntityMoodHandlerArg *out) {
                 methods94 = this->unk94->methods;
                 a1 = this->unk0C ? (u8 *)this->unk14 + 0x38 : NULL;
                 methods94->slotB8(this->unk94, a1);
-                this->unk94->methods->slot44(this->unk94, 1, ROTATION_YAW_MINUS90);
+                this->unk94->methods->slot44(this->unk94, 1, sRotationYawMinus90);
                 this->unk94->methods->slot130(this->unk94, 0);
                 this->unkFC = 0;
                 this->unk44 = 0xB;
@@ -58,7 +58,7 @@ went cleanly, since the shape recurs.
 
 - **Two new `Unk94Methods` vtable slots discovered in one function:
   `slot44` (`void (*)(Unk94Obj*, s32, void*)`, called as `slot44(unk94, 1,
-  ROTATION_YAW_MINUS90)`) and `slotB8` (`void (*)(Unk94Obj*, void*)`, called twice
+  sRotationYawMinus90)`) and `slotB8` (`void (*)(Unk94Obj*, void*)`, called twice
   with the identical argument-computation shape). Both carved out of the
   struct's leading pad gap, ahead of the already-known `slotCC` at `+0xCC`.
   `Unk94Obj` now has five resolved slots (`+0x44`, `+0xB8`, `+0xCC`,

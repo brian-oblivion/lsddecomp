@@ -651,13 +651,13 @@ void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 11) {
         if (this->moodTimer == 2700) {
-            turn = ROTATION_YAW_MINUS90;
+            turn = sRotationYawMinus90;
         }
         if (this->moodTimer == 3180) {
             turn = sRotationYawPlus90;
         }
         if (this->moodTimer == 3600) {
-            turn = ROTATION_YAW_MINUS90;
+            turn = sRotationYawMinus90;
         }
         if (this->moodTimer >= 3421 && this->moodTimer < 3541) {
             if (((DreamSys *)this->peer)->methods->getLinkCommandFlag((DreamSys *)this->peer) != 0) {
@@ -667,7 +667,7 @@ void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
         }
     } else if (this->state == 12) {
         if (this->moodTimer == 1980) {
-            turn = ROTATION_YAW_MINUS90;
+            turn = sRotationYawMinus90;
         }
     } else if (this->state == 13) {
         this->lastOffsetValue = -120;
@@ -682,7 +682,7 @@ void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
             turn = sRotationYawPlus90;
             this->state = 11;
         } else {
-            turn = ROTATION_YAW_MINUS90;
+            turn = sRotationYawMinus90;
             this->state = 12;
         }
     }
@@ -772,7 +772,7 @@ void Entity__MoodCue16(Entity *this) {
             this->methods->moveLocalZ(this, -90, 0);
         } else if (this->moodTimer == 64) {
             roll = rand() & 1;
-            turn = ROTATION_YAW_MINUS90;
+            turn = sRotationYawMinus90;
             if (roll != 0) {
                 turn = sRotationYawPlus90;
             }
@@ -1206,7 +1206,7 @@ void Entity__MoodCue40(Entity *this, SoundCueSet *out) {
         out->slots[0].endVol = 64;
     }
     if (this->moodTimer == 200) {
-        table = ROTATION_YAW_MINUS90;
+        table = sRotationYawMinus90;
     } else if (this->moodTimer == 400) {
         table = ROTATION_YAW_PLUS180;
     } else if (this->moodTimer == 600) {
@@ -1430,7 +1430,7 @@ void Entity__MoodCue49(Entity *this, SoundCueSet *out) {
                 peerMethods = ((DreamSys *)this->peer)->methods;
                 translation = this->parent ? this->coord2->workm.t : NULL;
                 peerMethods->setTranslation((DreamSys *)this->peer, translation);
-                ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, ROTATION_YAW_MINUS90);
+                ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, sRotationYawMinus90);
                 ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, false);
                 this->moodTimer = 0;
                 this->state = 11;
@@ -1475,7 +1475,7 @@ void Entity__MoodCue51(Entity *this, SoundCueSet *out) {
         out->slots[0].program = 8;
     }
     if (this->moodTimer == 90) {
-        table = ROTATION_YAW_MINUS90;
+        table = sRotationYawMinus90;
     } else if (this->moodTimer == 160) {
         table = sRotationYawPlus90;
     } else if (this->moodTimer == 220) {
@@ -1811,7 +1811,7 @@ void Entity__MoodCue65(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 11) {
         if (this->moodTimer == 2000) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS90);
+            this->methods->updateRotation(this, 0, sRotationYawMinus90);
         }
         this->methods->moveLocalZ(this, -20, 0);
     }
@@ -2026,7 +2026,7 @@ void Entity__MoodCue77(Entity *this, SoundCueSet *out) {
             this->methods->updateRotation(this, 0, sRotationYawPlus90);
         }
         if (this->moodTimer == 398) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS90);
+            this->methods->updateRotation(this, 0, sRotationYawMinus90);
         }
         this->methods->moveLocalZOrFindLink(this, -50, 0);
         return;

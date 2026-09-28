@@ -32,7 +32,7 @@ void Entity__MoodCue77(Entity *this, EntityMoodHandlerArg *out) {
             this->methods->slot44(this, 0, sRotationYawPlus90);
         }
         if (this->unkFC == 0x18E) {
-            this->methods->slot44(this, 0, ROTATION_YAW_MINUS90);
+            this->methods->slot44(this, 0, sRotationYawMinus90);
         }
         this->methods->slotD0(this, -0x32, 0);
         return;
@@ -88,7 +88,7 @@ fields carved from previously-unlabeled padding, plus one comment append.
   `.L80062B40` that all three `beq`s target directly and the `bne`
   (`unkFC != 0x140`) skips past. Modeled directly as one `||`-chained
   condition guarding one call, which reproduced this exactly.
-- `sRotationYawPlus90`/`ROTATION_YAW_MINUS90` reuse this file's existing per-unit externs
+- `sRotationYawPlus90`/`sRotationYawMinus90` reuse this file's existing per-unit externs
   (already declared earlier in `Entity.c` for `Entity__MoodCue65`/
   `Entity__MoodCue73`); no new externs needed here.
 

@@ -89,13 +89,13 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unk44 == 0xB) {
         if (this->unkFC == 0xA8C) {
-            row = ROTATION_YAW_MINUS90;
+            row = sRotationYawMinus90;
         }
         if (this->unkFC == 0xC6C) {
             row = sRotationYawPlus90;
         }
         if (this->unkFC == 0xE10) {
-            row = ROTATION_YAW_MINUS90;
+            row = sRotationYawMinus90;
         }
         if ((u32)(this->unkFC - 0xD5D) < 0x78) {
             if (this->unk94->methods->slot100(this->unk94) != 0) {
@@ -105,7 +105,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->unk44 == 0xC) {
         if (this->unkFC == 0x7BC) {
-            row = ROTATION_YAW_MINUS90;
+            row = sRotationYawMinus90;
         }
     } else if (this->unk44 == 0xD) {
         this->unk48 = -0x78;
@@ -120,7 +120,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
             row = sRotationYawPlus90;
             this->unk44 = 0xB;
         } else {
-            row = ROTATION_YAW_MINUS90;
+            row = sRotationYawMinus90;
             this->unk44 = 0xC;
         }
     }
@@ -202,7 +202,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 4b (round 93, charlie) — 2026-09-26
 
-The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `row`, which only ever holds `ROTATION_YAW_MINUS90`/`sRotationYawPlus90` or 0 and is passed to `updateRotation`, is now `Ratio16 *` (was `u8 *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green.
+The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `row`, which only ever holds `sRotationYawMinus90`/`sRotationYawPlus90` or 0 and is passed to `updateRotation`, is now `Ratio16 *` (was `u8 *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green.
 
 ## Track 7 (round 94, delta)
 
