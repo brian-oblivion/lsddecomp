@@ -9,7 +9,7 @@
  * (gVabDriverMethods, 0x23) sibling; and, below the class, the request
  * queue, the file table and the module state its units share.
  *
- *   src/CdDriver.c      the whole class, in five parts:
+ *   src/cd/CdDriver.c      the whole class, in five parts:
  *                       1. New_CdDriver, the ctor (FileResource's ctor, then
  *                       InitCdDrive), Finalize, NoOpSlot40
  *                       2. Open, Close, Seek, NoOpSlot50, Read, LoadFile,
@@ -26,7 +26,7 @@
  *                       the driver is not in async mode
  *
  * THE DRIVER RUNS ON OTHER CLASSES' OBJECTS. Nothing calls New_CdDriver.
- * SetActiveDataSource (src/GameApplicationFileResource.c) copies this table's eleven
+ * SetActiveDataSource (src/app/GameApplicationFileResource.c) copies this table's eleven
  * interface slots (+0x040..+0x058, +0x068..+0x074) into FileResource's table
  * and every client table, so `self` in Open/Read/... is whatever
  * FileResource object called its own `open`/`read` (a TimImage, a TodSet,

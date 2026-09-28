@@ -11,7 +11,7 @@
 > different file. Seven of `ScreenWidgets`'s functions turned out to be Sony's
 > and are now linked from SDK objects, which left this one wedged between
 > `o` segments -- so it has its own one-function unit, **`libgs_gs_124`**
-> (`src/libgs_gs_124.c`). The body below is unchanged and still compiles
+> (`src/psyq/libgs_gs_124.c`). The body below is unchanged and still compiles
 > byte-exact. `include/Task.h` still declares it for its one caller,
 > but that new file does NOT include the header, so the two are no longer
 > cross-checked by the compiler and must be kept in step by hand.
@@ -29,7 +29,7 @@ Plain global-pointer setter, same shape as `func_8003FB0C`:
 naming rule: "a pure leaf whose mechanics ARE its purpose ... is tier A by
 definition"). `GsOUT_PACKET_P` is the target -- Sony's own name, recovered by
 `tools/rename.py` when it refused a game name for it (pinned in
-`config/psyq-objects.ld`) -- and `SortTmdObject` (`src/TmdRenderer.c`)
+`config/psyq-objects.ld`) -- and `SortTmdObject` (`src/graphics/TmdRenderer.c`)
 confirms the mechanics from the reader side: its own comment calls this same
 global "the packet-buffer write cursor, reloaded ... at the top of every
 group and advanced by each submit wrapper's return value"
@@ -47,7 +47,7 @@ global, not unit-static -- moot here since it already carries its Sony name.
 
 ### Sibling note
 
-`func_8003FB0C` (`src/libgs_gs_101.c`, charlie's unit this round) is the
+`func_8003FB0C` (`src/psyq/libgs_gs_101.c`, charlie's unit this round) is the
 identical shape one function earlier in the same original segment
 (`D_800902E4 = a0`), called from the same caller (`Viewport__Update`) two
 lines above this one. `D_800902E4` is NOT referenced outside

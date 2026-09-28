@@ -98,7 +98,7 @@ void SceneNode__GetRotationDegrees(SceneNodeObj *self, Ratio16 *out) {
 ```
 
 Preserved inline (`#if 0`, positioned where it would compile back into
-`src/SceneNode.c` in place of the current `INCLUDE_ASM`):
+`src/graphics/SceneNode.c` in place of the current `INCLUDE_ASM`):
 
 ```c
 #if 0
@@ -274,7 +274,7 @@ the head cited.
 ## Round 19 (echo): claim re-verified, one more axis tried and closed negative
 
 Re-confirmed this report's own baseline claim before doing anything
-else: `INCLUDE_ASM` was still in place in `src/SceneNode.c`, a fresh
+else: `INCLUDE_ASM` was still in place in `src/graphics/SceneNode.c`, a fresh
 full build was green (`build exit=0`), and `funcdiff.py` reported the
 expected retail-vs-retail full-match warning (meaningless, confirms
 harness sanity only).
@@ -341,7 +341,7 @@ identity vs. pair-swap) before reaching for an axis that closed a
 
 GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/SceneNode.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.
 
-## Round 98 (echo): track 7, moved from src/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
 
 The old comment's `unk14->unk44->vec` is `coord2->param->rotate` (GsCOORD2PARAM.rotate, SVECTOR). The num-before-den order keeps a one-line `MATCHING:` note in the source; the derivation stays in this report.
 

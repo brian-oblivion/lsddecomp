@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002F700` on 2026-09-20 (tools/rename.py). Address 0x8002f700.
 
-Unit: `src/libsnd_vmanager.c`. Round 26, runner bravo.
+Unit: `src/psyq/libsnd_vmanager.c`. Round 26, runner bravo.
 
 ## Screens (clean)
 
@@ -830,7 +830,7 @@ Posted to the broadcast this round; see also SpuVmInit.md's own
 
 ## NON_MATCHING body promoted, round 67
 
-Placed in `src/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+Placed in `src/psyq/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
 kept in `#else`. Used the CURRENT best preserved body (round 48 echo,
 236/241 words, 5 short) rather than the older superseded 237/241 one kept
 at the end of this report for reference. All of its supporting
@@ -868,7 +868,7 @@ because splat names only addresses some asm references. Byte-identical.
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. The preserved body's `Rec16DAD4C` (0x10-byte records over `_svm_sreg`) is `SpuVoiceRegs`, one element of `SpuRegs.voice[24]` (the SPU register block at 0x1F801C00; `ObjDAD4` renamed `SpuRegs`). The activity walk reads `envx` (+0xC, the current envelope level); the dirty copy-out writes `voice[i].volL/volR/pitch/addr/adsr1/adsr2`; the tail's byte-offset stores are `keyOff[0..1]` (+0x18C, from _svm_okof1/64), `keyOn[0..1]` (+0x188, from _svm_okon1/22C) and `reverbOn[0..1]` (+0x198, from _svm_orev1/234). `SpuSetNoiseVoice` now comes from `<libspu.h>`. `Rec34HalfU2` (the 0x34-stride walk over `_svm_voice[].unk06`) is kept: it is the walk's own element type.
+Round 96 (charlie, track 6) moved `src/psyq/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. The preserved body's `Rec16DAD4C` (0x10-byte records over `_svm_sreg`) is `SpuVoiceRegs`, one element of `SpuRegs.voice[24]` (the SPU register block at 0x1F801C00; `ObjDAD4` renamed `SpuRegs`). The activity walk reads `envx` (+0xC, the current envelope level); the dirty copy-out writes `voice[i].volL/volR/pitch/addr/adsr1/adsr2`; the tail's byte-offset stores are `keyOff[0..1]` (+0x18C, from _svm_okof1/64), `keyOn[0..1]` (+0x188, from _svm_okon1/22C) and `reverbOn[0..1]` (+0x198, from _svm_orev1/234). `SpuSetNoiseVoice` now comes from `<libspu.h>`. `Rec34HalfU2` (the 0x34-stride walk over `_svm_voice[].unk06`) is kept: it is the walk's own element type.
 
 ## History (moved from src/libsnd_vmanager.c, comments pass)
 

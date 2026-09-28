@@ -128,7 +128,7 @@ report recommending a permuter budget on Sony's code.
 > `func_80050B58` -> `_card_write` (both confirmed in
 > `config/symbols.slps01556.lsdde.txt`, `lib/libcard/a80.o` /
 > `lib/libcard/a78.o`), spliced the exact round-32 body into
-> `src/libcard_card.c` in place of the `INCLUDE_ASM`, and ran the real
+> `src/psyq/libcard_card.c` in place of the `INCLUDE_ASM`, and ran the real
 > oracle: **`build exit=0`, whole-image SHA1 matches**, and
 > `funcdiff.py _card_clear` reports **9/12 words, exact length, no
 > drift** -- IDENTICAL to round 32's recorded diff (same three words: the
@@ -233,7 +233,7 @@ report recommending a permuter budget on Sony's code.
 > catches it. When a function is "one word short" with no visible diff,
 > compare the WORDS, not the text.
 
-Unit: `src/libcard_card.c` (carved this round). Round 27, by the HEAD.
+Unit: `src/psyq/libcard_card.c` (carved this round). Round 27, by the HEAD.
 Size: 12 words (0x30 bytes), vram `0x80050B28`, file `0x41328`.
 
 ## Screens (clean)
@@ -258,7 +258,7 @@ Both callees are BIOS trampolines in the neighbouring `asm` segments
 | `func_80050B58` | `0x4E` | `_card_write(chan, sector, src)` |
 
 So the function is `_new_card(); return _card_write(chan, 0x3F, NULL);` --
-`arg0` is the memory-card channel. Note `src/TitleMenuTaskObjF.c` calls that
+`arg0` is the memory-card channel. Note `src/ui/TitleMenuTaskObjF.c` calls that
 argument "a resource handle" in a field comment; that was a guess and this
 identifies it. Its declaration there is otherwise correct and is the one to
 match:
@@ -431,7 +431,7 @@ suggested search command omits `--stack-diffs`; running it that way found a
 verified by hand: the permuter's default scorer NORMALIZES stack-offset
 differences away, so a candidate compiling to the WRONG frame size
 (`addiu sp,sp,-0x18`, still 8 bytes short of retail's `-0x20`) scored 0
-against the real target.** Splicing it into `src/libcard_card.c` and
+against the real target.** Splicing it into `src/psyq/libcard_card.c` and
 running `./build-and-verify.sh` gave `5/12`, unchanged — the "zero" was
 purely an artifact of the missing flag. **Re-ran with `--stack-diffs`
 passed explicitly; this is the flag to use whenever the residue under
@@ -575,7 +575,7 @@ before concluding the order is unreachable.**
 With the order fixed, only the stack-frame `ra`-offset residue (`0x18` vs
 retail's `0x1c`, this report's already-documented granularity problem) and
 ONE OTHER instruction should remain. Spliced this exact body into
-`src/libcard_card.c` and ran the real oracle:
+`src/psyq/libcard_card.c` and ran the real oracle:
 
 ```
 build exit=2

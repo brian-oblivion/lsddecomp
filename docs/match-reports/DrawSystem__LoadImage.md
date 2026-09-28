@@ -2,7 +2,7 @@
 
 > Renamed from `func_800208F8` on 2026-09-25 (tools/rename.py). Address 0x800208f8.
 
-Round 81, runner alpha. Unit `src/DrawSystem.c`. Fresh ground, no prior attempt.
+Round 81, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x058 (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** if +0x10 is clear or +0x2C set: builds a RECT on the stack via ConvertRect, LoadImage(&rect, pixels), and DrawSync(0) when +0x2C is set. The `||` in the guard gives the retail two-branch shape directly.
@@ -26,7 +26,7 @@ void DrawSystem__LoadImage(Class6C070 *self, Class6C070Rect *src, u_long *pixels
 }
 ```
 
-The declarations it needs (unit-local view in `src/DrawSystem.c`; the class
+The declarations it needs (unit-local view in `src/graphics/DrawSystem.c`; the class
 structs start with `BASICCLASS_SLOTS`/`BASICCLASS_FIELDS` from
 `include/BasicClass.h`, and the SDK externs are local copies of the
 LIBGPU.H/LIBGS.H prototypes):

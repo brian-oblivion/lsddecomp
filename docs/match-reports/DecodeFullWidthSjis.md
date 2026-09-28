@@ -2,7 +2,7 @@
 
 > Renamed from `func_80040FC0` on 2026-09-18 (tools/rename.py). Address 0x80040fc0.
 
-Unit: `src/ScreenWidgets.c`. Blocker screen clean. No `self`/vtable
+Unit: `src/ui/ScreenWidgets.c`. Blocker screen clean. No `self`/vtable
 involvement -- a standalone byte-transcoding string function (likely a
 half/full-width character remap; see the sibling `EncodeFullWidthSjis` for
 the inverse direction).
@@ -431,7 +431,7 @@ searched, so there is no negative to record.
 ### Correction: stale cross-references to `BoxFill__ApplyColor` and class membership
 
 Before searching, checked `BoxFill__ApplyColor`'s MATCHED C in this same unit
-(`src/ScreenWidgets.c`) per the head's instruction, to see whether it already
+(`src/ui/ScreenWidgets.c`) per the head's instruction, to see whether it already
 spells the `d = dst; dst++; *d = x;` two-pointer idiom this report's
 round-37 section credits with solving the class. It does not, and the
 reason is structural, not a counter-example to the idiom:

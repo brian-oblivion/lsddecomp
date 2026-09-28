@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x044.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/GraphicsResources.c`.
+`src/graphics/GraphicsResources.c`.
 
 ```c
 typedef struct Methods458B8 {
@@ -78,4 +78,4 @@ The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Sub45
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/GraphicsResources.c` are gone; Obj458B8 is gone; `cur` is a `MoviePlayer *` straight from `gActiveMoviePlayer` (now declared `MoviePlayer *`, was the unit's DataSrc33808 view). `unk64` -> `started`. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; Obj458B8 is gone; `cur` is a `MoviePlayer *` straight from `gActiveMoviePlayer` (now declared `MoviePlayer *`, was the unit's DataSrc33808 view). `unk64` -> `started`. Byte-identical; `typeviews.py --warnings` 0 new.

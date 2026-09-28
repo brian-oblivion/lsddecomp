@@ -6,7 +6,7 @@
 /*
  * TimBlockSrc -- a FileResource data source (class id 0xF03, method table
  * gTimBlockSrcMethods) that loads a file of TIM blocks one sector-buffer at a time
- * and fades up to four 256-colour CLUT rows. Methods in src/GraphicsResources.c.
+ * and fades up to four 256-colour CLUT rows. Methods in src/graphics/GraphicsResources.c.
  *
  * Loading (setFlag, +0x064, is TimBlockSrc__AdvanceLoadState: the driver
  * runs it when a read completes). The ctor reads the file's first sector;

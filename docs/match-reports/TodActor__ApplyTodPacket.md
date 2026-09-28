@@ -447,7 +447,7 @@ end:
 All types this body depends on (`TimeTargetObj`, `Elem14Obj`, `Unk2CObj`/
 `Unk2CMethods`, the `Unk70ElemObj`/`Unk70ElemMethods`/`Unk5CMethods` field
 and slot additions, and the `SceneNode__LinkModel` signature correction) are kept
-live in `src/TodActor.c` — every one of them is confirmed correct by
+live in `src/world/TodActor.c` — every one of them is confirmed correct by
 byte-identical surrounding code, independent of the six-word residue above.
 
 ### Proposed learning
@@ -529,7 +529,7 @@ for this function this round).
 
 **Per the head's round-19 broadcast asking specifically about this
 function**: re-verified the "252/258, no drift" claim directly by
-dropping the preserved body into `src/TodActor.c` and rebuilding.
+dropping the preserved body into `src/world/TodActor.c` and rebuilding.
 Confirmed: `funcdiff.py` prints no `WARNING: the build differs OUTSIDE
 this range` line, i.e. the function's compiled length matches retail's
 258 words exactly. The 6 differing words are, position-for-position, a
@@ -647,7 +647,7 @@ constant-vs-pointer-assignment ordering), all in the two symmetric
    Reverted immediately.
 
 All three reverted; confirmed the reversion rebuilds `build exit=0`,
-whole-image green, and `git diff --stat src/TodActor.c` shows no
+whole-image green, and `git diff --stat src/world/TodActor.c` shows no
 uncommitted change.
 
 **This makes 9 manual source reshapes (6 from rounds 14/19 + 3 here) and
@@ -710,7 +710,7 @@ targets a compiler-SYNTHESIZED value's scheduling position (every new lever
 found since round 20 -- dead-parameter reuse, pointer elimination, declared
 width -- operates on a named C variable, and this residue's culprit has no
 C-source name at all), no new build attempt was spent this round. Remains a
-STALL at 252/258, `INCLUDE_ASM` restored, `src/TodActor.c` confirmed clean.
+STALL at 252/258, `INCLUDE_ASM` restored, `src/world/TodActor.c` confirmed clean.
 
 ### Proposed learning
 
@@ -942,7 +942,7 @@ ever found) + 3 reproducer-based reshapes (round 31) + 2 more (this round)
 conclusion: **the two 3-word clusters are a compiler-internal decision
 about when to hoist a magic-multiply constant relative to an adjacent
 register-to-register `move`, with no C-source lever found.** Remains a
-STALL at 252/258, `INCLUDE_ASM` restored throughout, `src/TodActor.c`
+STALL at 252/258, `INCLUDE_ASM` restored throughout, `src/world/TodActor.c`
 confirmed clean (`git status --porcelain` empty) before and after.
 
 ### Proposed learning
@@ -998,7 +998,7 @@ negative) — this round's actual search budget went to this unit's two
 never-freshly-searched siblings (`TodActor__CreateParts`, `TodActor__ApplyTodFrame`)
 instead, per the same "search coverage, not just search recency" priority
 recorded in `TodActor__SetDisplay`'s round-49 entry. Remains a STALL at 252/258,
-`INCLUDE_ASM` restored, `src/TodActor.c` confirmed clean before and
+`INCLUDE_ASM` restored, `src/world/TodActor.c` confirmed clean before and
 after.
 
 ### Proposed learning
@@ -1098,7 +1098,7 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 
 ## Track 4 (LinkResource)
 
-2026-09-26, round 89 (delta): `Unk2CObj`/`Unk2CMethods` (src/TodActor.c)
+2026-09-26, round 89 (delta): `Unk2CObj`/`Unk2CMethods` (src/world/TodActor.c)
 were a view of LinkResource (gLinkResourceMethods), now unified in
 `include/LinkResource.h`; ModelData's `linkResource` is typed
 `struct LinkResource *`. The model-id packet calls its `getModel` (+0x080,
@@ -1132,7 +1132,7 @@ SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX
 ## Track 7 (round 99, bravo): readable spelling, byte-identical
 
 The live body now spells the decoded header as a `TodPacketHeader head`
-(`objectId`, `type`, `flag`, `length`; `src/TodActor.c`) instead of
+(`objectId`, `type`, `flag`, `length`; `src/world/TodActor.c`) instead of
 `u8 outbuf[4]`, and the data as `s32 *data` indexed `data[i]` (still the
 round-75 lever: the blob is indexed, not walked) with `data += 3` / `data += 2`
 for the old `+ 0xC` / `+ 8`. Locals: `packet` (was `acc`), `part` (`elem`),

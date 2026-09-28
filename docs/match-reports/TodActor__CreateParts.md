@@ -186,7 +186,7 @@ fail:
 ```
 
 (`Unk5CMethods::slot80` and `New_Actor` are kept live in
-`src/TodActor.c` — both confirmed correct by the byte-identical
+`src/world/TodActor.c` — both confirmed correct by the byte-identical
 setup/allocation section and teardown call, independent of this stall.)
 
 ### Proposed learning
@@ -305,7 +305,7 @@ assignment last). Result: **byte-identical, 49/68, same 18 diff lines**
 (round 14), the type/declaration permuter sweep (round 18, 24
 combinations), the split-expression axis (round 19), and a second
 barrier (round 19). Reverted; confirmed the reversion rebuilds
-`build exit=0`, whole-image green, `git diff --stat src/TodActor.c`
+`build exit=0`, whole-image green, `git diff --stat src/world/TodActor.c`
 empty.
 
 Five independent axes have now failed to move this whole-function swap
@@ -374,7 +374,7 @@ This brings the total to seven independent axes ruled out (declaration
 order, statement order, type/signedness x24 combinations, split-expression,
 extra barrier, pointer-elimination, early-alias), plus the 24-combination
 exhaustive permuter sweep. Remains a STALL at 49/68, `INCLUDE_ASM` restored,
-`src/TodActor.c` confirmed clean.
+`src/world/TodActor.c` confirmed clean.
 
 ### Proposed learning
 
@@ -519,7 +519,7 @@ the swap is a genuine same-registers-different-values difference (`$s1`
 holds `self` where retail has `p`, and vice versa, confirmed by reading
 actual operand register numbers), not an encoding artifact.
 
-Remains a STALL at 49/68, `INCLUDE_ASM` restored, `src/TodActor.c`
+Remains a STALL at 49/68, `INCLUDE_ASM` restored, `src/world/TodActor.c`
 confirmed clean before and after.
 
 ### Proposed learning
@@ -616,7 +616,7 @@ round.** Combined with round 18's 24-combination exhaustive enumeration
 a manual axis sweep and a genuine 61,377-iteration open search, neither
 finding an improvement — the whole-function `self`<->`p` register-identity
 swap (per CLAUDE.md rule 6, a STALL) remains the classification. Remains
-a STALL at 49/68, `INCLUDE_ASM` restored, `src/TodActor.c` confirmed
+a STALL at 49/68, `INCLUDE_ASM` restored, `src/world/TodActor.c` confirmed
 clean before and after.
 
 ### Proposed learning

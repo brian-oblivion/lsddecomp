@@ -2,7 +2,7 @@
 
 > Renamed from `func_800207DC` on 2026-09-25 (tools/rename.py). Address 0x800207dc.
 
-Round 82, runner alpha. Unit `src/DrawSystem.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x044 (`tools/classtable.py gDrawSystemMethods`).
 - **What:** graphics setup. `GsInitGraph(w, h, 0, 1, vramMode)`,
@@ -34,7 +34,7 @@ void DrawSystem__InitGraph(Class6C070 *self, Class6C070Size *size, s32 vramMode)
 }
 ```
 
-Needs the unit-local view at the top of `src/DrawSystem.c`
+Needs the unit-local view at the top of `src/graphics/DrawSystem.c`
 (`Class6C070Size` is `{ s32 w; s32 h; }`; `Class6C070` gains
 `/* +0x01C */ s32 unk1C;`).
 

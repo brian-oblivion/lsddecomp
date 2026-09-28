@@ -535,7 +535,7 @@ incoming parameter's own storage. Negative result, reported as requested.
 
 ## Round 31 update (runner echo) — figures rebuilt, a stale symbol name found and fixed, one more variant tried
 
-Rebuilt the preserved body by splicing it into `src/PlacementGridVabSound.c` (via
+Rebuilt the preserved body by splicing it into `src/sound/PlacementGridVabSound.c` (via
 `#if 0`/`#endif`) and reproduced the title's figures exactly: `funcdiff.py`
 reports **49/175** raw word-match with the drift warning firing (~299428
 bytes outside range this round vs. the ~299450 quoted before — the small
@@ -554,12 +554,12 @@ as written now fails at link time —
 `undefined reference to 'func_80012C20'` — because the Psy-Q `printf`
 object was linked in the interim (rounds 29-30's SDK-objects work; see
 `include/code_8220.h`'s own note that the old `func_80012C20` declarations
-"moved into src/BMemPMgr.c when the SDK objects were linked"). Every other
+"moved into src/app/BMemPMgr.c when the SDK objects were linked"). Every other
 unit that calls this function now declares it as `printf` directly (see
-`src/libcd_bios.c`, `src/CdDriver.c`, `src/TitleMenuTaskObjF.c`,
-`src/ScreenWidgets.c`, each with the argument shape their own call site
+`src/psyq/libcd_bios.c`, `src/cd/CdDriver.c`, `src/ui/TitleMenuTaskObjF.c`,
+`src/ui/ScreenWidgets.c`, each with the argument shape their own call site
 needs — per-unit local views, not a shared header, matching this project's
-convention). Fixed in `src/PlacementGridVabSound.c` by declaring
+convention). Fixed in `src/sound/PlacementGridVabSound.c` by declaring
 `extern void printf(const char *fmt, ...);` and renaming all four call
 sites in the preserved body from `func_80012C20(...)` to `printf(...)` —
 this is a pure symbol-name fix, not a codegen change, and the rebuilt score

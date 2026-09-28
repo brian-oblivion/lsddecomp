@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTimArraySrcMethods +0x064 (setFlag override
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/GraphicsResources.c`.
+top of / earlier in `src/graphics/GraphicsResources.c`.
 
 ```c
 /* gTimArraySrcMethods +0x064: when the buffer is there (or flag 0x200 is set),
@@ -121,7 +121,7 @@ Class unified as TimArraySrc (include/TimArraySrc.h); the unit-local Obj43CB8 vi
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `0x200` | `CD_FLAG_LOAD_FILE_DONE` | A | src/CdDriver.c's name for the bit the driver sets when a loadFile request completes (VabStreamObj__AdvanceLoadState tests the same bit) |
+| `0x200` | `CD_FLAG_LOAD_FILE_DONE` | A | src/cd/CdDriver.c's name for the bit the driver sets when a loadFile request completes (VabStreamObj__AdvanceLoadState tests the same bit) |
 | `*(s32 *)buffer`, `(s32 *)buffer + 1` | `TimArrayBuf` `count`, `offsets` | A | a count, then that many byte offsets of images in the buffer |
 | `0x1E0` | `CLUT_FADE_Y` | A | as in TimBlockSrc__TimBlockSrc |
 | `16` | `sizeof(TimBlockSrcEntry)` | A | clutBase points at a TimBlockSrc's `entries` (AdvanceLoadState sets it), 16 bytes a ramp |

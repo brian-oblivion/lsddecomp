@@ -234,7 +234,7 @@ whether the function itself matched)
   a retype, just an ordinary new-field insertion with a forgotten pad, and
   it still broke a sibling unit silently until the full-image oracle was
   re-run. See Proposed learning below.
-- `BasicClass__GetNextParentRef` (already matched, `src/BMemPMgr.c`) is called
+- `BasicClass__GetNextParentRef` (already matched, `src/app/BMemPMgr.c`) is called
   directly here (not through a vtable) — same "verbatim inherited BasicClass
   method, called by symbol" pattern already established for
   `BasicClass__Release` etc. Declared locally with this unit's own
@@ -562,7 +562,7 @@ is a PURE 38-point stack+register penalty with zero insertions and zero
 deletions -- a lever that works by eliminating an instruction (an
 insertion/deletion-class fix) has nothing to act on in a residue that is
 already structurally minimal. Filing unchanged as STALL at 48/54,
-`INCLUDE_ASM` confirmed restored, `git diff --stat src/SceneNode.c`
+`INCLUDE_ASM` confirmed restored, `git diff --stat src/graphics/SceneNode.c`
 clean after the check (verbatim re-restore, byte-for-byte identical to
 the committed state).
 
@@ -602,7 +602,7 @@ already documents "`tools/classtable.py gSceneNodeMethods` stops at
 SceneNode__AddToActorParents" -- i.e. it is `SceneNodeMethods`'s LAST slot
 (`+0x0B4`), not evidence of anything about this function's own
 purpose beyond position. Held back from an actual rename because this
-symbol is referenced (in a comment) from `src/SceneNode.c:13` -- a
+symbol is referenced (in a comment) from `src/graphics/SceneNode.c:13` -- a
 different unit's own file banner, making exactly that boundary
 observation. Posted to the broadcast.
 
@@ -651,7 +651,7 @@ split-expression axis, round-20's three further axes, a 73118-iteration
 permuter search (round 37) that never beat the base score, and round-41's
 dead-reload-lever check (ruled inapplicable, clean negative). Filing
 unchanged as STALL at 48/54, `INCLUDE_ASM` confirmed restored,
-`git diff --stat src/SceneNode.c` empty after the check.
+`git diff --stat src/graphics/SceneNode.c` empty after the check.
 
 REVISITED (round 55): confirmed unchanged at 48/54; round-54 naming reached
 none of this function's own symbols; no new lever found or attempted beyond

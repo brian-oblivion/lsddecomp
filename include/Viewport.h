@@ -7,8 +7,8 @@
 
 /*
  * Viewport -- the object that renders a scene (class id 0x7, method table
- * gViewportMethods): a BasicClass subclass. Its methods are in src/Task.c,
- * except drawNode, in src/ViewportDraw.c. IntermediateBase and
+ * gViewportMethods): a BasicClass subclass. Its methods are in src/app/Task.c,
+ * except drawNode, in src/graphics/ViewportDraw.c. IntermediateBase and
  * TaskCore hold one as `viewport` (New_Viewport, or the caller's own).
  *
  * The name is for what the class's own methods do:

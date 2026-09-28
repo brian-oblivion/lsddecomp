@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_182cc` on 2026-09-17 (tools/rename.py). Address 0x800182cc.
 
-Unit: `src/TmdRenderer.c`. This is `BasicClassMethods` vtable slot `+0x030`,
+Unit: `src/graphics/TmdRenderer.c`. This is `BasicClassMethods` vtable slot `+0x030`,
 `notifyParents(self, s32 flag)` (already documented in
 `include/code_8220.h`'s struct comment). Walks `self->parentRefs` and, for
 each parent, calls that parent's own `slot38` (`BasicClass__OnNotify`,
@@ -74,7 +74,7 @@ it dispatches to). The inherited `notifyParents` is wrong twice: this is the
 EMITTER, not an `on*` handler, and it is not finalize-specific --
 `BasicClass__Finalize` (finalize) happens to be the only caller in carved
 C, which is a fact about how much is carved, not about the slot.
-Cross-unit: accessed from `src/TextEntryItemList.c` and `src/BMemPMgr.c`, so
+Cross-unit: accessed from `src/ui/TextEntryItemList.c` and `src/app/BMemPMgr.c`, so
 not mine to rename.
 
 ## Round 91 polish (delta, track 7)

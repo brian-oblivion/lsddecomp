@@ -63,7 +63,7 @@ blocks gives 106/114. The naive unscoped `cursor->prev->next = ...` form gives
   (`addiu vA,x,C` ... `subu x,vA,vB`), the source had `t = x + C;` as a
   separate statement.
 
-### Matched body (in `src/BMemPMgr.c`)
+### Matched body (in `src/app/BMemPMgr.c`)
 
 ```c
 void *BMemPMgrAlloc(size, pool)
@@ -111,7 +111,7 @@ before searching, all recorded:
    the residue is not pure register identity and is in principle reachable
    by a source-mutation search, unlike round 45's `ServiceSoundCueSet`.
 3. **Scaffold-vs-in-tree agreement (the new, load-bearing check).** Rebuilt
-   the 92/114 seed body live in `src/BMemPMgr.c` first and confirmed
+   the 92/114 seed body live in `src/app/BMemPMgr.c` first and confirmed
    `funcdiff.py` reproduces round 45's exact 92/114 figure and diff. Then
    objdumped the permuter's `base.o` and compared it instruction-by-
    instruction against `build/lsdde.elf`'s linked disassembly for this
@@ -132,7 +132,7 @@ number** (this project's own history has two prior instances of a permuter
 -local improvement that was fake — `SubmitPolyF3`'s cached-OT-pointer lead
 and `FlagLargePolyForDivide`'s rewritten-`end`-pointer lead, both in
 `SubmitPolyF3.md`/`FlagLargePolyForDivide.md`). Translated verbatim into
-`src/BMemPMgr.c`, ran `./build-and-verify.sh` + `funcdiff.py`: **REAL,
+`src/app/BMemPMgr.c`, ran `./build-and-verify.sh` + `funcdiff.py`: **REAL,
 non-degenerate improvement — 96/114 words, still zero out-of-range drift**
 (the file 0x83DC-0x83F4 cluster shrank and shifted to 0x83CC-0x83E0, net
 4 fewer wrong words). This is genuine: hoisting the address computation
@@ -208,7 +208,7 @@ behaviour.
 
 1. Applied verbatim on top of the committed 96/114 body (adding the
    `BMemBlockHdr *unused;` declaration once at the top, and splitting the
-   `p` declaration/read as shown) in `src/BMemPMgr.c`, swapped in for
+   `p` declaration/read as shown) in `src/app/BMemPMgr.c`, swapped in for
    `INCLUDE_ASM` temporarily.
 2. `./build-and-verify.sh` — clean compile (`build exit=2`, zero hits on the
    `error:`/`parse error`/`undefined reference`/`*** [….o]` grep — an
@@ -245,7 +245,7 @@ words, tested-vs-reused register preference in the per-if unlink hoists) —
 candidates for a further, deeper/longer search seeded from this round's
 101/114 body.
 
-### Preserved body (current best, 101/114) — see `src/BMemPMgr.c`, still `#if 0`
+### Preserved body (current best, 101/114) — see `src/app/BMemPMgr.c`, still `#if 0`
 
 ```c
 void *BMemPMgrAlloc(size, pool)
@@ -400,7 +400,7 @@ extern void *BMemPMgrFree();
 ```
 
 ```c
-/* src/BMemPMgr.c */
+/* src/app/BMemPMgr.c */
 void *BMemPMgrAlloc(size, pool)
     s32 size;
     void *pool;
@@ -725,7 +725,7 @@ register the caller happens to leave loaded.
 
 **Why `include/BMemPMgr.h`'s unprototyped pair must stay unprototyped.** Round
 45 established this and it re-measures correct. Both functions are DEFINED in
-`src/BMemPMgr.c` with old-style (K&R identifier-list) parameter lists, which is
+`src/app/BMemPMgr.c` with old-style (K&R identifier-list) parameter lists, which is
 the only way to expose the second parameter to their own bodies without
 contradicting either the ~15 external single-argument prototypes or this same
 unit's own later one-argument call sites (`PushBasicClassListNode`'s

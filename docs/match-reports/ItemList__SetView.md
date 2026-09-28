@@ -90,7 +90,7 @@ Round 75 (bravo, track 3). `func_800529FC` -> `ItemList__SetView`, **tier A**.
 
 Non-virtual helper. Stores topIndex/column/cursorIndex; if `highlight`, colours row (cursor - top) with gItemListCursorColor. Callers: CreateRows (highlight 1), RefreshRows (0).
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
 
 ## asm sites
 

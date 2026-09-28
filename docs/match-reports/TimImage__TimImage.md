@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003B3FC` on 2026-09-25 (tools/rename.py). Address 0x8003b3fc.
 
-Round 81, runner echo. Unit `src/TimImage.c`. Fresh ground, no prior attempt.
+Round 81, runner echo. Unit `src/graphics/TimImage.c`. Fresh ground, no prior attempt.
 
 - **Where:** TimImage's table (`gTimImageMethods`) slot +0x008 (the ctor; `tools/classtable.py D_8006E558`).
 - **What:** runs the active data-source driver's ctor on `self`
@@ -49,7 +49,7 @@ the local-view convention `PlacementGridVabSound.c` / `_e.c` already use.
 
 TimImage is unified in `include/TimImage.h`; `src/code_2bb9c.c`'s local
 views are gone. The field this ctor clears at +0x04C, `unk4C`, is now
-`clutBase`: TimArraySrc__BuildImages (src/GraphicsResources.c) stores
+`clutBase`: TimArraySrc__BuildImages (src/graphics/GraphicsResources.c) stores
 `((info.cy - 0x1E0) >> gTimClutRowShift) * 16 + base` there for each
 TimImage it makes, which its own view already called `clutBase`. Image
 byte-identical.

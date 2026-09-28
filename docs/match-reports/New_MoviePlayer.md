@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): none (allocator; constructs gMoviePlayerMeth
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/GraphicsResources.c`.
+`src/graphics/GraphicsResources.c`.
 
 ```c
 void *New_MoviePlayer(s32 arg0, s32 arg1, s32 arg2) {
@@ -40,11 +40,11 @@ First build. The failing-ctor allocator lever with the test inverted: this class
 
 ## Naming
 
-- **New_MoviePlayer**, tier A. Called from src/Task.c's TaskCore__TaskCore; externally typed `StreamTaskUnkB4Obj *` there. Opens a CD stream object and drives an MDEC decode/upload state machine (mechanics match the class name; the constructor/finalize/state-machine functions ARE playing a movie).
+- **New_MoviePlayer**, tier A. Called from src/app/Task.c's TaskCore__TaskCore; externally typed `StreamTaskUnkB4Obj *` there. Opens a CD stream object and drives an MDEC decode/upload state machine (mechanics match the class name; the constructor/finalize/state-machine functions ARE playing a movie).
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/GraphicsResources.c` are gone; it returns `MoviePlayer *` and takes `(DrawRect *frame, s32 speed, s32 external)`, calling the typed ctor slot instead of the `UnprototypedCtorTable` cast. Its one caller, StreamTask__StreamTask, passes `(DrawRect *)GetDefaultMovieFrame()`: the ctor hands it to InitFrame, which copies it whole into `frame`/`stripRect` and reads its w/h words, so the three-word StreamTaskInitData is the frame rectangle. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; it returns `MoviePlayer *` and takes `(DrawRect *frame, s32 speed, s32 external)`, calling the typed ctor slot instead of the `UnprototypedCtorTable` cast. Its one caller, StreamTask__StreamTask, passes `(DrawRect *)GetDefaultMovieFrame()`: the ctor hands it to InitFrame, which copies it whole into `frame`/`stripRect` and reads its w/h words, so the three-word StreamTaskInitData is the frame rectangle. Byte-identical; `typeviews.py --warnings` 0 new.
 
 ## Round 93 polish (charlie, track 7)
 

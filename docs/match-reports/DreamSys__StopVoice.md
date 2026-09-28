@@ -128,7 +128,7 @@ Renamed from `func_80059E3C`.
 voiceIndex); voiceIndex = -1; }` -- a pure leaf, so the SHAPE is tier A by the leaf
 rule. It is tier B because the word "Voice" comes from another unit, not this body:
 slot +0x84 on `soundObj`'s vtable is `VabStreamObjMethods::slot84` ==
-`VabStreamObj__StopVoice` (src/PlacementGridVabSound.c, matched), at the same offset with
+`VabStreamObj__StopVoice` (src/sound/PlacementGridVabSound.c, matched), at the same offset with
 the same signature, and `FlushSoundCueSet` in that unit guards its own call to it
 with the identical `index >= 0` test.
 

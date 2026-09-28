@@ -97,11 +97,11 @@ not established).
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/ObjMStyleActor.c`'s unprototyped declaration
+**Verdict: arity-ok idiom.** `src/world/ObjMStyleActor.c`'s unprototyped declaration
 stays.
 
 **Callee evidence** (`0x80056E44`, and the definition in
-`src/ObjMStyleActor.c`): entry is `addiu s0,a0,136` and `$a1` is never read —
+`src/world/ObjMStyleActor.c`): entry is `addiu s0,a0,136` and `$a1` is never read —
 one real argument, exactly as `void StyleEffect__RandomizeSprites(LinkOwnerObj *this)`
 says.
 
@@ -121,7 +121,7 @@ one-parameter prototype here would make every arm a `too many arguments`
 error, and dropping the argument would delete `move a1,s1`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/ObjMStyleActor.c:145`. Oracle green.
+added to `src/world/ObjMStyleActor.c:145`. Oracle green.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 

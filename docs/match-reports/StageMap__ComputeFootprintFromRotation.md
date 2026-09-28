@@ -720,7 +720,7 @@ same class, already exhausted the two most obvious levers).
 
 Track 1b promotion. Score re-verified unchanged (85/165, 3 words short,
 no outside-range drift) before promoting. Placed the existing round-34
-preserved body (carried in `src/DayTaskStageMap.c`) inside `#ifdef
+preserved body (carried in `src/world/DayTaskStageMap.c`) inside `#ifdef
 NON_MATCHING`, with `INCLUDE_ASM` restored in the `#else`. No source
 change beyond the wrapper and comment; both oracles green:
 `./build-and-verify.sh` (exit 0, `OK: build matches retail`) and

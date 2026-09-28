@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003B5CC` on 2026-09-25 (tools/rename.py). Address 0x8003b5cc.
 
-Round 81, runner echo. Unit `src/TimImage.c` (carved from `psyq_2bb9c` in
+Round 81, runner echo. Unit `src/graphics/TimImage.c` (carved from `psyq_2bb9c` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** TimImage's table (`gTimImageMethods`) slot +0x08C (resolved with `tools/classtable.py D_8006E558`).
@@ -23,7 +23,7 @@ void TimImage__NoOpSlot8C(void) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/TimImage.c`:
+The unit-local view it needs, from the top of `src/graphics/TimImage.c`:
 
 ```c
 #include "FileResource.h"

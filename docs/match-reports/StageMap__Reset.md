@@ -43,7 +43,7 @@ void StageMap__Reset(StageMap *self)
   with no other reference anywhere in the image (checked with
   `grep -rl gDefaultGridSpan asm/`). It sits in an unnamed top-level `sdata`
   segment, not owned by any carved unit, so it is declared `extern s32`
-  directly in `src/DayTaskStageMap.c` -- same pattern already used for
+  directly in `src/world/DayTaskStageMap.c` -- same pattern already used for
   `gDefaultOrigin` in this same file. `%gp_rel(gDefaultGridSpan)($gp)` loads its
   *value*, not its address, so the call argument is a plain `s32`, not a
   pointer.

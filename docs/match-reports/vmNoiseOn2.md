@@ -688,7 +688,7 @@ two of the three findings above fall straight out of that.
 
 ## NON_MATCHING body promoted, round 69
 
-Promoted the round-65 preserved body into `src/libsnd_vmanager.c` under `#ifdef NON_MATCHING` (verified build unchanged, keeps `INCLUDE_ASM`); `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
+Promoted the round-65 preserved body into `src/psyq/libsnd_vmanager.c` under `#ifdef NON_MATCHING` (verified build unchanged, keeps `INCLUDE_ASM`); `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
 
 ## Naming (round 75, runner alpha, FINISHING-PLAN track 3)
 
@@ -696,7 +696,7 @@ Already carries its real name: identified round 74 (track 2, runner bravo)
 as `libsnd/vmanager vmNoiseOn2` (shape 0.96 vs the disc-3.3 reference, 103w
 reference vs our 112w; libsnd neighborhood, right after `vmNoiseOn` as its
 paired helper -- matching this function's own position immediately after
-`vmNoiseOn` in `src/libsnd_vmanager.c`). Sony symbol; this pass does not rename
+`vmNoiseOn` in `src/psyq/libsnd_vmanager.c`). Sony symbol; this pass does not rename
 it further. The function remains a STALL (5 words short, see above).
 
 ## Track 2 (round 86, 2026-09-26, alpha)

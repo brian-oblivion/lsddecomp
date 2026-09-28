@@ -32,7 +32,7 @@ void MoviePlayer__MarkPlaying(Obj33808_50 *self) {
 
 - Only `common.h` is included; no shared header was edited. Local declarations
   (the `extern s32 D_...[]` table symbol or the unit-local struct view) sit
-  directly above the function in `src/GraphicsResources.c`.
+  directly above the function in `src/graphics/GraphicsResources.c`.
 
 ## Naming
 
@@ -40,7 +40,7 @@ void MoviePlayer__MarkPlaying(Obj33808_50 *self) {
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/GraphicsResources.c` are gone; Obj33808_50 is gone; its "class not yet identified" was MoviePlayer (Play is the one caller). `unk50` kept (1 here, -1 in MarkStopped; Advance reads it). Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; Obj33808_50 is gone; its "class not yet identified" was MoviePlayer (Play is the one caller). `unk50` kept (1 here, -1 in MarkStopped; Advance reads it). Byte-identical; `typeviews.py --warnings` 0 new.
 
 ## Round 93 polish (charlie, track 7)
 

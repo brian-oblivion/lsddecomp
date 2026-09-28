@@ -15,7 +15,7 @@ MoodGraphPoint *GetMoodFromStageChunk(s32 stage, StageChunk *chunk) {
 ```
 
 The data was the only thing standing between this function and a one-line body,
-which is why `src/StageGrid.c`'s header comment banked it as head work. Read out
+which is why `src/world/StageGrid.c`'s header comment banked it as head work. Read out
 of the executable:
 
 - `sStageGridDimensions` (`0x800861D4`) is 14 entries of an **8-byte** struct.
@@ -77,7 +77,7 @@ try the other form before reaching for anything else. (Measured here: 19/20 vs
 **`GetMoodFromStageChunk`, tier A.** Inherited from lsddecomp, confirmed: the
 body is exactly "given a stage and a chunk, return that chunk's mood point",
 which is what the name says, and the one call site outside this unit,
-`src/DreamSys.c:1460` inside `DreamSys__LogChunkMood` (`mood =
+`src/world/DreamSys.c:1460` inside `DreamSys__LogChunkMood` (`mood =
 GetMoodFromStageChunk(this->currentStage, (StageChunk *)currentPos);`, whose
 result is immediately logged via `LogMood`), passes the player's current
 stage and position and reads back a mood value, agreeing with the name.
@@ -102,8 +102,8 @@ work ends up reading this field (likely wherever the grid is actually
 rendered/laid out) to confirm or correct.
 
 **Update (round 101, track 7): `isVertical` now has accessors.** The two
-paragraphs above predate them. `src/DayTaskStageMap.c`, `src/class_3bb8c_b.c`
-and `src/ObjMStyleActor.c` read `StageGridDimensions.isVertical` (tested
+paragraphs above predate them. `src/world/DayTaskStageMap.c`, `src/class_3bb8c_b.c`
+and `src/world/ObjMStyleActor.c` read `StageGridDimensions.isVertical` (tested
 against 0 and 1) through a dimensions pointer, so the field is no longer
 padding-by-rule; confirming or sharpening its name belongs to whoever
 polishes those units, who can see what the two branches do.
@@ -111,7 +111,7 @@ polishes those units, who can see what the two branches do.
 **Globals `STAGE_CHUNK_MOODS` -> `sStageChunkMoods` and `STGnn_CHUNK_MOODS` ->
 `sStageNnChunkMoods`, nn = 00..13 (round 101, track 7; fifteen
 `tools/rename.py` runs).** `sStageChunkMoods` is named in C only by
-`src/StageGrid.c`; the fourteen per-stage arrays are named by nothing but its
+`src/world/StageGrid.c`; the fourteen per-stage arrays are named by nothing but its
 pointer initialisers in splat data. Unit-static data, so `sName`; the stage
 number stays in the name because the arrays are indexed by stage and stage nn
 is the disc's `STGnn` directory.

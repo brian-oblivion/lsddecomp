@@ -4,7 +4,7 @@
 
 > Renamed from `func_800574C4` on 2026-09-19 (tools/rename.py). Address 0x800574c4.
 
-Unit: `src/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0C8`
+Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0C8`
 (base-class-inherited; resolved via `tools/classtable.py gDreamSysMethods`
 and confirmed unchanged in the DreamSys-level table too).
 
@@ -38,7 +38,7 @@ splat's single-word `dlabel gActorLocalMove` (`asm/data/7B008.sdata.s`) is reall
 (`%hi/%lo(gActorLocalMove)`), its sibling `Actor__MoveLocalY` writes element 1
 (`%hi/%lo(gActorLocalMove + 0x2)`). Not referenced anywhere else in the repo
 (checked with `grep -rn gActorLocalMove src/ include/` before this round), so
-declared locally in `src/ObjMStyleActor.c` rather than added to a shared
+declared locally in `src/world/ObjMStyleActor.c` rather than added to a shared
 header.
 
 ## Naming
@@ -59,7 +59,7 @@ tools/funcdiff.py Actor__MoveLocalX   # 14/14
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__ApplyOffsetSlot0`. Occupant of +0x0C8 in gActorMethods (the BASE table, so the method is Actor's, not DreamSys's): writes gActorLocalMove[0], the x of the local move vector (see Actor__MoveLocalZ), event 7. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__ApplyOffsetSlot0`. Occupant of +0x0C8 in gActorMethods (the BASE table, so the method is Actor's, not DreamSys's): writes gActorLocalMove[0], the x of the local move vector (see Actor__MoveLocalZ), event 7. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 
@@ -67,7 +67,7 @@ Comments quoted below are verbatim as the file stood before this round's
 comment pass, i.e. with this round's renames already applied (the
 `LinkQueryBuf` one as it stood before step 2).
 
-The unit banner of `src/ObjMStyleActor.c` was rewritten to say what the file
+The unit banner of `src/world/ObjMStyleActor.c` was rewritten to say what the file
 holds. The old one, verbatim:
 
 ```c

@@ -62,7 +62,7 @@ All in `include/DreamSys.h`:
   `u32 unknown_functions_0x1d0[1]` / `u32 unknown_functions_0x1d8[2]`**:
   `DreamSys__TryTunnelLink` (+0x1D0, confirmed already-matched signature `bool
   (DreamSys *this, PlayerSpawnPoint *currentPos)` -- its OWN definition in
-  `src/DreamSys.c` gave the exact type), `DreamSys__TryInstantTeleportLink` (+0x1D8) and
+  `src/world/DreamSys.c` gave the exact type), `DreamSys__TryInstantTeleportLink` (+0x1D8) and
   `DreamSys__TryStaircaseLink` (+0x1DC), the latter two still `INCLUDE_ASM` but typed
   identically to `DreamSys__TryTunnelLink`/`DreamSys__TryStageTimerLink` on the strength of this
   call site alone (same argument shape, same short-circuit pattern used

@@ -28,7 +28,7 @@ jr $ra
 ```
 
 `gStyleDecorColor` is a `.sdata` pointer, already established in
-`src/ObjMStyleActor.c` as `extern const u8 *gStyleDecorColor;`, and used there as an
+`src/world/ObjMStyleActor.c` as `extern const u8 *gStyleDecorColor;`, and used there as an
 actual colour-table pointer (`gStyleDecorColor = gStylePalette[cfg[2]];`). Here it is
 only ever tested against zero, so it reads as a one-shot "pending" flag on
 top of the same storage. `gStyleDecorObj` is that unit's `LocalM4D0Obj *`
@@ -96,7 +96,7 @@ gStyleDecorObj is a BoxFill (include/BoxFill.h); the deleted `ObjAB54` view's +0
 
 ## Round 93 polish (delta, track 7)
 
-### Comments moved here from src/ObjMStyleActor.c
+### Comments moved here from src/world/ObjMStyleActor.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

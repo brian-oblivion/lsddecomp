@@ -61,7 +61,7 @@ void StageMap__ApplyToSenderFootprint(StageMap *self, UnkListObj_3ac78 *arg1, s3
 `StageMap__SetFootprintFromCell` and `StageMap__SetFootprintRect` are both defined later in this same
 unit/file (matched and STALLED respectively) — the `extern` prototypes
 above are ordinary forward declarations, needed only because ROM address
-order puts `StageMap__ApplyToSenderFootprint` before both of them in `src/DayTaskStageMap.c`.
+order puts `StageMap__ApplyToSenderFootprint` before both of them in `src/world/DayTaskStageMap.c`.
 `StageMap__DispatchToRectCells` (117 instructions, out of this round's scope) gets the
 same treatment per DECOMPILATION_LEARNINGS' "calling into a function
 still `INCLUDE_ASM` elsewhere is fine" precedent.

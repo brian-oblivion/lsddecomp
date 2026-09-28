@@ -349,7 +349,7 @@ from, is in this report's body below and in the header comments for
 
 ## SUPERSEDED by round 63 -- the matching body
 
-The round-63 match is live in `src/DayTaskStageMap.c`. It differs from the
+The round-63 match is live in `src/world/DayTaskStageMap.c`. It differs from the
 72/106 body preserved below in exactly three places: `b2`/`b3` are `s32`
 locals re-read from `out->base.b2`/`b3` (not `s8` locals carrying the
 computed value), the `0x400` sits inside the subtracted group, and
@@ -624,7 +624,7 @@ Constants: 0x5000 -> `STAGE_CHUNK_SIZE / 2`, 0x7FF -> `STAGE_CELL_SIZE - 1` (the
 
 Left: `StageMap__SplitChunkIndex(self, (u8 *)out, ...)`; the prototype and the +0x114 slot take `u8 *`. Proposed: `Descriptor10 *` (it writes b0/b1).
 
-The comment that stood above the function in `src/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
+The comment that stood above the function in `src/world/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
 
 ```c
 /* MATCH, round 63 (delta): closed a six-round stall (72/106 since round 19)

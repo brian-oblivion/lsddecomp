@@ -43,7 +43,7 @@ Renamed from `func_8005937C`.
 A pure setter for `soundObj`. The field's identity is the
 evidence, and it is cross-unit, three ways:
   1. `FlushSoundCueSet(this->soundObj, this->soundCueSet)` -- that function is
-     matched in src/PlacementGridVabSound.c with the signature
+     matched in src/sound/PlacementGridVabSound.c with the signature
      `void FlushSoundCueSet(VabStreamObj *self, SoundCueSet *set)`.
   2. This unit reads the same field as an object with a vtable at offset 0 and
      calls +0x84 through it (`DreamSys__StopVoice`). `VabStreamObjMethods::slot84`
@@ -64,7 +64,7 @@ identification comes from other units.
 `D_8008xxxx` globals in this unit, and every one of them came back
 compiler-confirmed unit-local: the renames went into the struct DEFINITIONS in
 `include/DreamSys.h` and the only accessors the compiler then listed were in
-`src/DreamSys.c` (FINISHING-PLAN track 3 step 3). So there is nothing here for
+`src/world/DreamSys.c` (FINISHING-PLAN track 3 step 3). So there is nothing here for
 the head to apply by type scope at merge time.
 
 Worth recording because it falsifies a plausible assumption rather than

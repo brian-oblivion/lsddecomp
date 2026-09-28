@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for gTodSetMethods, object s
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
 
 ```c
 /* Allocate and construct a gTodSetMethods object; freed and NULL when the constructor fails. */
@@ -44,7 +44,7 @@ void *New_TodSet(s32 arg0) {
 
 ## Naming
 
-- **New_TodSet**, tier A. src/TodActor.c's Unk30Obj is already "the TOD set, see Unk30Obj", built by this allocator over an array of Tod objects.
+- **New_TodSet**, tier A. src/world/TodActor.c's Unk30Obj is already "the TOD set, see Unk30Obj", built by this allocator over an array of Tod objects.
 
 ## Track 4 (2026-09-26, round 88, delta)
 

@@ -6,7 +6,7 @@
 /*
  * BasicClass -- the root of the game's hand-rolled class framework
  * (docs/research/class-framework.md), class id 0x0, method table gBasicClassMethods.
- * Methods live in src/BMemPMgr.c and src/TmdRenderer.c.
+ * Methods live in src/app/BMemPMgr.c and src/graphics/TmdRenderer.c.
  *
  * Every class derives from it: word +0x000 of each method table is a
  * hierarchical class id (each nibble above the lowest non-zero one is one more

@@ -112,7 +112,7 @@ i.e. `TodActor` derives from this class, it is not this class.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__BaseObjO`. Occupant of +0x008 in gActorMethods: the ctor, named for its slot. Chains SceneNode's ctor, zeroes state/grid/ticker, calls reset. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__BaseObjO`. Occupant of +0x008 in gActorMethods: the ctor, named for its slot. Chains SceneNode's ctor, zeroes state/grid/ticker, calls reset. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## History (moved from include/Actor.h, round 102)
 

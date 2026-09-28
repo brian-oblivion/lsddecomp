@@ -193,7 +193,7 @@ typedef struct {
 } D8008E978Entry;
 ```
 
-This edit is ALREADY LIVE in `src/libsnd_vmanager.c` (kept even though this
+This edit is ALREADY LIVE in `src/psyq/libsnd_vmanager.c` (kept even though this
 function stalled, since `note2pitch2` — matched — still compiles
 correctly against it and the layout is now-confirmed knowledge for whoever
 picks this function back up).

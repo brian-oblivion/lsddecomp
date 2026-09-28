@@ -108,7 +108,7 @@ unchanged). The name `TriggerWorld` now belongs to the class gTriggerWorldMethod
 +0x200 of its object's table (`lw v0,512(v0)`), so gDreamAuxWorld is not a
 TriggerWorld. Its real class is unresolved. Bytes unchanged.
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 ## Naming (round 100)
 

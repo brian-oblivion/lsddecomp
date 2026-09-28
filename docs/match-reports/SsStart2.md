@@ -23,7 +23,7 @@ void SsStart2(void)
 ```
 
 (shares the `extern void _SsStart(s32 arg0);` prototype declared
-above `SsStart` in `src/libsnd_ssinit.c`.)
+above `SsStart` in `src/psyq/libsnd_ssinit.c`.)
 
 ## Provenance
 

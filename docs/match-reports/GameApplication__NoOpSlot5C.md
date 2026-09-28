@@ -4,7 +4,7 @@
 
 > Renamed from `func_80026690` on 2026-09-24 (tools/rename.py). Address 0x80026690.
 
-Unit: `src/GameApplicationFileResource.c`. Class: `GameApplication`, own vtable slot `+0x05C`
+Unit: `src/app/GameApplicationFileResource.c`. Class: `GameApplication`, own vtable slot `+0x05C`
 (`GameApplicationMethods.noOpSlot5C`, confirmed the sole occupant by this unit's
 own header layout -- 25-slot table resolved with `tools/classtable.py`, see
 the unit header comment). No match report existed before this round: a
@@ -30,8 +30,8 @@ references any argument, so the definition needs none).
 **`GameApplication__NoOpSlot5C` -- tier A.** A pure no-op leaf: mechanics ARE the
 purpose (nothing happens). Named after the established project convention
 for exactly this shape -- compare `Actor__NoOpSlotD8`/`NoOpSlotE8`
-(`src/ObjMStyleActor.c`), `TextRow__NoOpSlotD0` (`src/ScreenWidgets.c`),
-`StreamTask__NoOpSlot88`/`NoOpSlot8C` (`src/Task.c`) -- all
+(`src/world/ObjMStyleActor.c`), `TextRow__NoOpSlotD0` (`src/ui/ScreenWidgets.c`),
+`StreamTask__NoOpSlot88`/`NoOpSlot8C` (`src/app/Task.c`) -- all
 `Class__NoOpSlotOFFSET` for an empty vtable-slot implementation of otherwise-
 unknown purpose. No carved caller currently dispatches this slot on a
 `GameApplication` instance.

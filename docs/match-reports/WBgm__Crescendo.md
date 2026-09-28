@@ -2,7 +2,7 @@
 
 > Renamed from `func_80039E24` on 2026-09-25 (tools/rename.py). Address 0x80039e24.
 
-Round 81, runner echo. Unit `src/WBgm.c` (carved from `psyq_2a0e0` in
+Round 81, runner echo. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x058 (resolved with `tools/classtable.py gWBgmMethods`).
@@ -17,7 +17,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 `WBgm__Crescendo`, tier A. vtable slot `crescendo`; body is exactly SsSeqSetCrescendo, scaled by GetSsTicksPerSecond()'s return.
 
 Parameter `seconds` (was `scale`, round 101 track 7): it is multiplied by
-GetSsTicksPerSecond() (src/PlacementGridVabSound.c, returns gSsTicksPerSecond)
+GetSsTicksPerSecond() (src/sound/PlacementGridVabSound.c, returns gSsTicksPerSecond)
 to give SsSeqSetCrescendo's `v_time`, which libsnd counts in ticks, so the
 argument is the fade's length in seconds.
 
@@ -29,7 +29,7 @@ void WBgm__Crescendo(WBgm *self, s16 vol, s32 scale) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/WBgm.c`:
+The unit-local view it needs, from the top of `src/sound/WBgm.c`:
 
 ```c
 #include "BasicClass.h"

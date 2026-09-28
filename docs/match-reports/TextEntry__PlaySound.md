@@ -33,8 +33,8 @@ while `$a1` is never touched inside the function body at all.
 That is the signature of a THIRD parameter being forwarded unchanged: the
 function's own second parameter arrives in `$a1` and is never moved, because
 it is already sitting in the exact register the call needs. This project has
-the same idiom at several other call sites already (`src/ObjMStyleActor.c`,
-`src/Task.c`, `src/TitleMenuTaskObjF.c`, `src/TodActor.c`:
+the same idiom at several other call sites already (`src/world/ObjMStyleActor.c`,
+`src/app/Task.c`, `src/ui/TitleMenuTaskObjF.c`, `src/world/TodActor.c`:
 `obj->methods->slot80(obj, arg1, 0x60, 0x60)` / `(..., 0x7F, 0x7F)` /
 `(..., 0x6E, 0x6E)`), so recognizing it here just meant trusting the pattern
 instead of the header's (incomplete) prior reading.
@@ -64,7 +64,7 @@ Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTe
 ## Round 94 (track 6, charlie): the target is a VabStreamObj
 
 `TargetObj86ED0`/`TargetMethods86ED0` (include/class_3bb8c.h) are deleted.
-Both attachTarget callers (TaskObjF, src/TitleMenuTaskObjF.c) pass TaskObjF's
+Both attachTarget callers (TaskObjF, src/ui/TitleMenuTaskObjF.c) pass TaskObjF's
 `sound`, already typed `struct VabStreamObj *`, and the one slot the view
 named, +0x080, is VabStreamObj's `playTone(self, index, vol, endVol)`
 (include/VabStreamObj.h): the `(code, 0x60, 0x60)` call plays tone `code`

@@ -213,14 +213,14 @@ hypothesis, not a measurement.
 ## Body as reached (195/200 words -- 5 short, all in case 11 / one register)
 
 **Round 49 note (runner charlie): rewrapped in literal `#if 0`/`#endif`,
-and the two callee names below CORRECTED to match `src/libsnd_seqread.c`'s
+and the two callee names below CORRECTED to match `src/psyq/libsnd_seqread.c`'s
 actual current preserved body**, per `tools/stalesyms.py`'s finding
 (relayed by the head) that this report's body sat in a plain fenced code
 block, unwrapped, and had drifted from the real source: round 34's SDK
 renaming retyped case 64's `func_80036518`/`func_800363FC` local guesses
 into the real `SpuVmDamperOff`/`SpuVmDamperOn` Psy-Q symbols, case 91's
 `func_80036118` into `SsUtSetReverbDepth`, and case 11's `func_800307F0`
-into `SpuVmSetProgVol` -- `src/libsnd_seqread.c` itself already carries the
+into `SpuVmSetProgVol` -- `src/psyq/libsnd_seqread.c` itself already carries the
 corrected names (it was never broken there), only this report's copy was
 stale. No behavioral change; this is a documentation fix so the next
 resume starts from the real names instead of pre-round-34 guesses.
@@ -395,7 +395,7 @@ Two, both generalizing the GetSeqData block-order finding:
 ## ROUND 35 (runner alpha): re-verified, SKIPPED after re-confirming the round-32 permuter rejection with a clean seed
 
 Rebuilt this report's preserved body (using the current SDK-renamed callees
-already reflected in `src/libsnd_seqread.c` -- `SpuVmSetProgVol`,
+already reflected in `src/psyq/libsnd_seqread.c` -- `SpuVmSetProgVol`,
 `SpuVmDamperOn`/`Off`, `SsUtSetReverbDepth`) to reconfirm the recorded score
 before spending any budget: clean build, **195 words** compiled
 (`mipsel-linux-gnu-objdump` symbol-to-symbol distance on
@@ -442,7 +442,7 @@ how round 32 happened to build its scaffold.
 deeply worked (rounds 24/31/32/33) and this round's own contribution is
 negative-but-informative: the permuter route is closed for this specific
 residue class regardless of scaffold quality, which future rounds can take
-as settled rather than re-litigating. `src/libsnd_seqread.c` unchanged
+as settled rather than re-litigating. `src/psyq/libsnd_seqread.c` unchanged
 (still `INCLUDE_ASM`); no commit needed for this function beyond this
 report addendum.
 

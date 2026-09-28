@@ -323,7 +323,7 @@ pass is DEFERRED, not run, this round -- the scaffold is left in place
 next, or for a future round of this same runner once `StageMap__UnloadAllSlots`'s
 search completes.
 
-Inlined the literal per-axis body into `src/SceneNode.c` as `#if 0`
+Inlined the literal per-axis body into `src/graphics/SceneNode.c` as `#if 0`
 (the report's own prose placeholder is preserved here as compilable
 code for the first time). No header changes needed -- all supporting
 types/slots were already present from the original round-13 pass.
@@ -406,7 +406,7 @@ interact via cross-jumping with which others.
 
 Preserved body updated below to the 141/143 best. Filing as STALL,
 `INCLUDE_ASM` restored; confirmed clean rebuild (`build exit=0`,
-whole-image OK, `git diff --stat src/SceneNode.c` shows only the
+whole-image OK, `git diff --stat src/graphics/SceneNode.c` shows only the
 preserved-body text differs from the committed state, no functional
 change).
 
@@ -527,7 +527,7 @@ single confirmation check, not a fresh attempt cycle.
 
 **Re-verified the 141/143 claim live first**, per this round's "build
 any inherited body before trusting its score" discipline: dropped the
-preserved round-20 body into `src/SceneNode.c`, confirmed via `nm -S`
+preserved round-20 body into `src/graphics/SceneNode.c`, confirmed via `nm -S`
 on the built object that it compiles to exactly **`0x234` bytes = 141
 words**, matching the report's own figure exactly (retail is `0x23C` =
 143 words, the same 2-word deficit). No drift beyond what the 2-word
@@ -567,7 +567,7 @@ exactly on 143. Filing unchanged as STALL at 141/143 words (2 words
 short), raw funcdiff word-match figure not meaningful without
 realignment (see above), first realigned/real divergence at retail vram
 `0x8001DA18` (the Y-axis positive-branch un-merge). `INCLUDE_ASM`
-restored, `src/SceneNode.c` confirmed byte-identical to the committed
+restored, `src/graphics/SceneNode.c` confirmed byte-identical to the committed
 state after the check.
 
 ### Proposed learning (round 41)
@@ -624,7 +624,7 @@ into the shared merge point instead of ending in its own `slti`/`beqz`).
    as much of the old shared path as retail's own un-merged structure
    implies it should.
 
-Both variants reverted immediately; `git diff --stat src/SceneNode.c`
+Both variants reverted immediately; `git diff --stat src/graphics/SceneNode.c`
 confirmed empty and whole-image build restored to `OK` after each check.
 Filing unchanged as STALL at 141/143 words (2 short), first real diff
 unchanged at retail vram `0x8001DA18`.
@@ -861,7 +861,7 @@ closed 2 more words via a permuter-found pointer-caching lever (138 ->
 hand declaration/caching variants plus two bounded permuter searches
 (79117 + 52653 = 131770 combined iterations, neither beating its own base
 score). `INCLUDE_ASM` restored, preserved body updated below to the new
-best, `git diff --stat src/SceneNode.c` confirmed clean after the check.
+best, `git diff --stat src/graphics/SceneNode.c` confirmed clean after the check.
 
 ### Proposed learning (round 55)
 

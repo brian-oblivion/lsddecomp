@@ -11,13 +11,13 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Forwarder: `return self->unk30->methods->slot78(self->unk30, arg1, arg2);` returning u8 (`andi 0xFF`).
 
-Table slot (`tools/classtable.py`): gModelDataMethods +0x080 and gTriggerWorldMethods +0x080 (src/TodActor.c names this slot `getObjectIds` in its Unk5CObj view).
+Table slot (`tools/classtable.py`): gModelDataMethods +0x080 and gTriggerWorldMethods +0x080 (src/world/TodActor.c names this slot `getObjectIds` in its Unk5CObj view).
 
 ## Source
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c

@@ -15,7 +15,7 @@ Record lookup: `gStageFirstRecord` is an s16 table of record indices; returns `&
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/GameFiles.c`
+Declarations it needs are the local views at the top of `src/cd/GameFiles.c`
 (`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c

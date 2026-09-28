@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002D6A4` on 2026-09-24 (tools/rename.py). Address 0x8002d6a4.
 
-Unit `src/libsnd_vmanager.c` (carved round 24). Size: 143 words (0x23C bytes).
+Unit `src/psyq/libsnd_vmanager.c` (carved round 24). Size: 143 words (0x23C bytes).
 Round 26, runner delta.
 
 **Read the raw-word-match caveat before trusting the 10/143 figure at face
@@ -350,7 +350,7 @@ load + manual extend), never both together the way retail's source
 apparently got for free.
 
 **Disposition: closing this lever, not just "not tried" anymore.** Restored
-to `INCLUDE_ASM`; `src/libsnd_vmanager.c` is otherwise unchanged from before
+to `INCLUDE_ASM`; `src/psyq/libsnd_vmanager.c` is otherwise unchanged from before
 this follow-up (confirmed via `git diff --stat` showing no diff after
 reverting). If this function is picked up again, the productive angle is
 almost certainly NOT this lh/lhu residue in isolation — per variant 1's
@@ -605,7 +605,7 @@ unaffected at `0x100` bytes = 64 words.
 
 **The shared `D8008E978Entry` typedef this report's round-37 section noted
 as "requires moving the struct's declaration point earlier in the file" is
-now PERMANENTLY relocated in `src/libsnd_vmanager.c`**, ahead of
+now PERMANENTLY relocated in `src/psyq/libsnd_vmanager.c`**, ahead of
 `SpuVmDoAllocate`'s own (still-`INCLUDE_ASM`) slot, with the extended
 `unk16`/`unk18` fields this function's derivation needs -- committed
 separately this round as a byte-exact, zero-functional-change struct move

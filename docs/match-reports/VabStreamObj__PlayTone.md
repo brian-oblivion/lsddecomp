@@ -49,7 +49,7 @@ fold, so it is not a volatile-insn check that stops combine here.
 **SsUtKeyOn extern: observed, NOT changed, because this function did not need
 it.** The unit declares `extern s16 SsUtKeyOn(s16, s16, s16, s16, s32, s32,
 s32);`. `include/psyq/libsnd.h` has `short SsUtKeyOn(short x7)`, and the
-`#ifdef NON_MATCHING` definition in `src/libsnd_vm_vol_ut_key_ut_keyv.c` reads it as `s32
+`#ifdef NON_MATCHING` definition in `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c` reads it as `s32
 SsUtKeyOn(s16, s16, s16, s16, u16, s16, s16)`. That definition is a stall
 (65/252), not a byte-exact one. Callers checked: `grep -rln "jal *SsUtKeyOn$"
 asm/` finds exactly one, this function, and `grep` in `src/` finds no other C
@@ -275,7 +275,7 @@ same-named bytes. Bytes/derivation unchanged.)
 Needs, from this unit's top-of-file scaffolding: `VabStreamObj`,
 `VagAtrView`, `extern s16 SsUtKeyOn(s16, s16, s16, s16, s32, s32,
 s32);`, `extern void SsUtAutoVol(s16, s16, s16, s32);` -- all already
-present in `src/PlacementGridVabSound.c`.
+present in `src/sound/PlacementGridVabSound.c`.
 
 ### Proposed learning
 
@@ -419,7 +419,7 @@ established from this unit alone, so not tier A.
 
 Promoted the "Preserved best-effort body" above (the `hi = index / 16;
 lo = index - hi * 16;` form, 5/55 words, byte-drift outside range) into
-`src/PlacementGridVabSound.c` under `#ifdef NON_MATCHING ... #else INCLUDE_ASM ...
+`src/sound/PlacementGridVabSound.c` under `#ifdef NON_MATCHING ... #else INCLUDE_ASM ...
 #endif`, per docs/FINISHING-PLAN.md track 1b. This is the body actually
 verified against the real function in this unit; the HEAD ADJUDICATION's
 narrowing probe above it is a generic reproducer that was never re-applied

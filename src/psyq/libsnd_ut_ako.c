@@ -110,4 +110,4 @@ void SsUtAllKeyOff(void)
     }
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/libsnd_ut_ako", SsUtAllKeyOff);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_ut_ako", SsUtAllKeyOff);

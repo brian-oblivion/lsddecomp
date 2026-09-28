@@ -126,7 +126,7 @@ function).
 **Verdict: arity-ok idiom.** `src/main.c`'s unprototyped declaration stays.
 
 **Callee evidence** (`0x80017A20`): the body does `move s1,a0` and never touches
-`$a1` on any path — the definition in `src/BMemPMgr.c`
+`$a1` on any path — the definition in `src/app/BMemPMgr.c`
 (`void *BMemPMgrInit(s32 poolSize)`) is right, one argument.
 
 **Why the extern must keep saying nothing.** `main` (src/main.c) calls

@@ -53,7 +53,7 @@ NON_MATCHING body promoted, round 65.
 
 Track 1b mechanical promotion. The "Best body reached (46/54 words)" section
 below (the HEAD PASS body, already the live `#if 0` snapshot in
-`src/TmdRenderer.c`, using the current `RCpolyF3` name per the round-36
+`src/graphics/TmdRenderer.c`, using the current `RCpolyF3` name per the round-36
 rename) is hand-derived, not a permuter candidate — see the HEAD PASS/RUNNER
 PASS sections. Wrapped it in `#ifdef NON_MATCHING ... #else INCLUDE_ASM
 ... #endif` in place of the standing `#if 0`/`INCLUDE_ASM` pair, no bytes
@@ -108,7 +108,7 @@ analysis, unchanged.
 ## ROUND 40 (alpha): Job 1 rebuild-verify, third independent reproduction — 46/54, byte-identical
 
 Re-ran the Job-1 rebuild independently of round 36 and round 39 (bravo): took
-the LIVE `#if 0` body already sitting in `src/TmdRenderer.c` (the round-36
+the LIVE `#if 0` body already sitting in `src/graphics/TmdRenderer.c` (the round-36
 symbol-corrected snapshot, `RCpolyF3` not `func_8001A564`), toggled it over
 `INCLUDE_ASM`, ran the full oracle in isolation (no other sibling live), and
 reverted. `build exit=2`, zero compile-error/`undefined reference` hits —
@@ -278,7 +278,7 @@ this round's two candidate levers, for reasons specific to each** (the GTE
 layer's domain doesn't overlap this family's; the hoist lever's precondition
 —two independently-producible values consumed later—doesn't describe a
 single already-atomic bitfield RMW). No new match this round. All eight
-siblings' `src/TmdRenderer.c` bodies are unchanged (`git diff --stat` empty
+siblings' `src/graphics/TmdRenderer.c` bodies are unchanged (`git diff --stat` empty
 throughout every experiment, confirmed after each revert).
 
 ### Proposed learning
@@ -299,7 +299,7 @@ connect them.
 
 Round 34's SDK-object conversion renamed this function's Psy-Q callee
 `func_8001A564` -> `RCpolyF3` (a real `libgte` symbol, in
-`config/symbols.slps01556.lsdde.txt`). `src/TmdRenderer.c`'s own preserved
+`config/symbols.slps01556.lsdde.txt`). `src/graphics/TmdRenderer.c`'s own preserved
 `#if 0` snapshot (the HEAD PASS's `OtTag`-bitfield body, below) was updated
 to the new name in that same commit (`50fd52c`), but it was never swapped
 back in and rebuilt — every score this report records for that body,
@@ -317,7 +317,7 @@ attribution).
 `funcdiff` raised no drift warning.** The rename did not disturb the
 residue in any way; it only converts the existing figure from assumed to
 measured. The corrected, LINKABLE snapshot (identical to what's live in
-`src/TmdRenderer.c` right now):
+`src/graphics/TmdRenderer.c` right now):
 
 ```c
 #if 0
@@ -364,7 +364,7 @@ edit the history to retrofit the new name into it.
 > at 46/54 words and "not reachable from C"; the head reached correct
 > instruction count and length. See the HEAD PASS section.
 
-Unit: `src/TmdRenderer.c`. `void SubmitPolyF3(void *arg0, void *arg1)` —
+Unit: `src/graphics/TmdRenderer.c`. `void SubmitPolyF3(void *arg0, void *arg1)` —
 either splices `arg0` into an OT-style singly-linked list threaded through
 `arg1->0x30` (packed pointer: top byte is a tag preserved across the
 splice, low 24 bits are the address), or — when `arg1->0x78` is set —
@@ -761,7 +761,7 @@ real negative, checked, not assumed:**
   is exactly the "one shared local" shape and is DIFFERENT from the round-13
   head's already-tried "cache the fully-formed VALUE" attempts. **Verified
   against the real oracle, not trusted on the permuter's own number:**
-  swapped it into `src/TmdRenderer.c` in place of the `INCLUDE_ASM`, ran
+  swapped it into `src/graphics/TmdRenderer.c` in place of the `INCLUDE_ASM`, ran
   `./build-and-verify.sh` (build exit=0, no compile error) and
   `funcdiff.py SubmitPolyF3` — **17/54 words, and funcdiff's own drift
   warning fired: "the build differs OUTSIDE this range too (296814 bytes)."**
@@ -770,7 +770,7 @@ real negative, checked, not assumed:**
   re-evaluation rule says must stay — reproducing, from a different angle,
   the same address-drift failure round 13 already hit trying to give the
   "one past self" address a cross-branch-live local. Reverted immediately;
-  `src/TmdRenderer.c` is back to the committed `INCLUDE_ASM` state (confirmed
+  `src/graphics/TmdRenderer.c` is back to the committed `INCLUDE_ASM` state (confirmed
   via `git diff --stat`, empty).
 - The two 240/215 near-duplicates not individually oracle-tested are the same
   cached-`head` shape or the same truncating-cast shape as the ones above,
@@ -1071,7 +1071,7 @@ raw-register `__asm__` written for an ordinary struct copy that had a plain
 C form all along, misdiagnosed as a scheduling residue) does NOT recur
 anywhere in this nine-function family.** Every one of these nine functions'
 preserved best-body sources (see each one's own report, and the bodies
-still inlined in `src/TmdRenderer.c` under `#if 0`) is already ordinary C —
+still inlined in `src/graphics/TmdRenderer.c` under `#if 0`) is already ordinary C —
 the `OtTag` bitfield splice plus the `FillDivPolygonHeader`/`FillRVectors3`/
 `FillRVectors4` call sequence — with no asm block anywhere in any of them.
 So the two residue classes on this unit's work list are genuinely distinct:
@@ -1287,7 +1287,7 @@ residue, not a second hidden instance of the ADDIU/ORI blind spot.
 ## Naming (round 77, alpha)
 
 `func_800197C4` -> `SubmitPolyF3`, parameters (`arg0`, `arg1`) -> (`prim`, `ctx`). **Tier
-A.** TmdRenderer's own comment (`src/TmdRenderer.c`, the "eight submit
+A.** TmdRenderer's own comment (`src/graphics/TmdRenderer.c`, the "eight submit
 wrappers" block) already names this whole family collectively: each is a
 tail call to Sony's `RCpolyF3` (unrenamed, RCpoly* polygon-subdivision
 family, `libgte`) or a direct OT splice, matching every sibling's shape.

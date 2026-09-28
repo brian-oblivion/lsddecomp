@@ -18,7 +18,7 @@ recorded:
    (insertions) + 2×100=200 (deletions). NOT 0/0 — real insertions/deletions,
    in principle reachable by source mutation.
 3. **Scaffold-vs-in-tree agreement.** Rebuilt the 99/107 seed body live in
-   `src/BMemPMgr.c`, confirmed `funcdiff.py` reproduces the round-45 99/107
+   `src/app/BMemPMgr.c`, confirmed `funcdiff.py` reproduces the round-45 99/107
    figure exactly with zero out-of-range drift. Then objdumped the
    permuter's `base.o` and diffed it mnemonic-by-mnemonic against
    `build/lsdde.elf`'s linked disassembly for this function: **identical
@@ -37,7 +37,7 @@ they were tested separately before either was trusted:**
 1. Retyping the shared `extern void SetBMemPMgrBusy(s32 val);` declaration in
    this file's copy to `extern volatile unsigned long long SetBMemPMgrBusy(s32
    val);` — a fabricated, incompatible prototype against the function's real
-   definition (`void SetBMemPMgrBusy(s32 val)` in `src/TmdRenderer.c`). This
+   definition (`void SetBMemPMgrBusy(s32 val)` in `src/graphics/TmdRenderer.c`). This
    is exactly the class of scorer exploitation this round's instructions say
    to reject, so it was **not adopted and not even needed** — see below.
 2. In the second (coalesce-with-next) free-list unlink block, replacing
@@ -366,7 +366,7 @@ register the caller happens to leave loaded.
 
 **Why `include/BMemPMgr.h`'s unprototyped pair must stay unprototyped.** Round
 45 established this and it re-measures correct. Both functions are DEFINED in
-`src/BMemPMgr.c` with old-style (K&R identifier-list) parameter lists, which is
+`src/app/BMemPMgr.c` with old-style (K&R identifier-list) parameter lists, which is
 the only way to expose the second parameter to their own bodies without
 contradicting either the ~15 external single-argument prototypes or this same
 unit's own later one-argument call sites (`PushBasicClassListNode`'s

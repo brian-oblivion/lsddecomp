@@ -360,7 +360,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B44C` | `ComputeCellWorldOffsets` | B | Free function (no `self` parameter, per the naming convention's `VerbNoun` form for non-methods). Round 40's permuter-found fix hoisted a literal `0x400` used identically in both symmetric output blocks; both blocks compute `(byteN << 11) + outBufN + (halfM + 0x400)`, and `0x800`/`0xA000`/`0x5000` (all powers of the grid's own `0x800` lattice unit and `gDefaultGridSpan`, per `src/DayTaskStageMap.c`'s unit header) recur throughout -- consistent with converting a `Descriptor10` grid-cell descriptor plus a base `Unk54Struct` into world-space offsets. The `sum` return value's own meaning is NOT established (no caller-agreed name for it beyond "also returns a scalar derived from the same divisor arithmetic"), so the name covers only the `arg0[]`/`outBuf[]` side, which is the function's dominant, better-evidenced behaviour. |
+| `func_8004B44C` | `ComputeCellWorldOffsets` | B | Free function (no `self` parameter, per the naming convention's `VerbNoun` form for non-methods). Round 40's permuter-found fix hoisted a literal `0x400` used identically in both symmetric output blocks; both blocks compute `(byteN << 11) + outBufN + (halfM + 0x400)`, and `0x800`/`0xA000`/`0x5000` (all powers of the grid's own `0x800` lattice unit and `gDefaultGridSpan`, per `src/world/DayTaskStageMap.c`'s unit header) recur throughout -- consistent with converting a `Descriptor10` grid-cell descriptor plus a base `Unk54Struct` into world-space offsets. The `sum` return value's own meaning is NOT established (no caller-agreed name for it beyond "also returns a scalar derived from the same divisor arithmetic"), so the name covers only the `arg0[]`/`outBuf[]` side, which is the function's dominant, better-evidenced behaviour. |
 
 ## Track 6 (2026-09-26, round 93, alpha)
 
@@ -396,7 +396,7 @@ Parameters and locals, tier A from the body: `arg0` -> `outPos` (the cell point)
 
 Constants: 0x5000 -> `STAGE_CHUNK_SIZE / 2`, 0xA000 -> `STAGE_CHUNK_SIZE`, `<< 11` -> `<< STAGE_CELL_SHIFT`, 0x400 -> `STAGE_CELL_SIZE / 2` (include/StageMap.h; evidence on the definitions). The one-line `/* MATCHING */` on `halfCell` replaces the history below.
 
-The comment that stood above the function in `src/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
+The comment that stood above the function in `src/world/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
 
 ```c
 /* MATCH, round 40 (bravo): permuter-found zero, first-ever search on this

@@ -173,7 +173,7 @@ void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
 }
 ```
 
-Current best body (round 32, 61/70 -- this is what `src/libsnd_seqread.c`
+Current best body (round 32, 61/70 -- this is what `src/psyq/libsnd_seqread.c`
 actually preserves in `#if 0` now):
 
 ```c
@@ -359,7 +359,7 @@ assigned as its own statement right after `speed = a3;`, used at both
 `packed` sites in place of `a0`.** Rebuilt and measured: **61/70,
 byte-identical to both the baseline and round 39's combined-form
 attempt** -- no change in either direction. Reverted (`git checkout --
-src/libsnd_seqread.c`), `build-and-verify.sh` reconfirmed byte-exact.
+src/psyq/libsnd_seqread.c`), `build-and-verify.sh` reconfirmed byte-exact.
 
 Combined with the `Snd_setVabAttr` round-46 result (same split-lever
 experiment, there actively REGRESSIVE), this function's result shows the
@@ -400,7 +400,7 @@ exit via the 600s timeout.** ~91000+ iterations. One output directory
 `do { return; } while (0);` instead of a bare `return;`. This LOOKS like
 pure syntactic noise (semantically identical to a bare `return`), and the
 report almost dismissed it as such without checking -- but the real
-oracle disagrees: dropped into `src/libsnd_seqread.c` and rebuilt,
+oracle disagrees: dropped into `src/psyq/libsnd_seqread.c` and rebuilt,
 **`funcdiff.py` reports 62/70, one MORE real word than the 61/70 baseline,
 with `build-and-verify.sh` showing zero drift outside this function's own
 range.** `asm-differ` confirms the residue shrank from 9 words to 8: the
@@ -413,7 +413,7 @@ a0-copy rotation and one `$a3`/`$t0` site remain, down from three
 distinct rotations).
 
 **Kept as the new best (62/70).** `INCLUDE_ASM` restored; this body (with
-the `do { return; } while (0);` wrapper) is what `src/libsnd_seqread.c`
+the `do { return; } while (0);` wrapper) is what `src/psyq/libsnd_seqread.c`
 preserves in `#if 0` now.
 
 ### Proposed learning

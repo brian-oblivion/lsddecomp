@@ -17,7 +17,7 @@ void ObjM__TeardownStyle(Obj87034_3bb8c_l *self) {
 ```
 
 Straight-line dispatch chain. `ReleaseDreamAuxEntities` is already matched
-elsewhere (`src/DreamAux.c`); `StyleTeardown` is still uncarved ground
+elsewhere (`src/world/DreamAux.c`); `StyleTeardown` is still uncarved ground
 (`asm/ObjMStyleActor.s`). Both are called with no arguments and their
 return values are unused, declared as plain `extern void func(void);` in
 `include/class_3bb8c.h`.

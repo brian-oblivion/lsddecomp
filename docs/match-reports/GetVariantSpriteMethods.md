@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057F58` on 2026-09-26 (tools/rename.py). Address 0x80057f58.
 
-Unit: `src/ObjMStyleActor.c`. Class: `gVariantSpriteMethods` (49 slots) -- plain
+Unit: `src/world/ObjMStyleActor.c`. Class: `gVariantSpriteMethods` (49 slots) -- plain
 no-argument getter, `return &gVariantSpriteMethods;`. Not itself a vtable slot.
 
 ## Body

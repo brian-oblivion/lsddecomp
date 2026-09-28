@@ -86,7 +86,7 @@ larger, partially-opaque) extent.
   bare 3-word local (`Vec3O buf`). The old typing matched by offset
   coincidence with `GsCOORD2PARAM.scale`. Byte-identical after the retype.
 
-## Round 98 (echo): track 7, moved from src/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
 
 The `u8 buf[0x20]` rotation buffer is now `MATRIX rot` (0x20 bytes, the type getRotMatrix fills): byte-identical.
 

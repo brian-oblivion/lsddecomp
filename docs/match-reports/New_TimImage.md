@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003B39C` on 2026-09-26 (tools/rename.py). Address 0x8003b39c.
 
-Round 81, runner echo. Unit `src/TimImage.c`. Fresh ground, no prior attempt.
+Round 81, runner echo. Unit `src/graphics/TimImage.c`. Fresh ground, no prior attempt.
 
 - **What:** `new TimImage(name)`: `BMemPMgrAlloc(0x50)`, and when that is
   non-NULL, calls the class ctor through the table getter
@@ -28,7 +28,7 @@ TimImage *New_TimImage(char *name) {
 }
 ```
 
-Declarations (top of `src/TimImage.c`): `TimImageMethods`, a local table
+Declarations (top of `src/graphics/TimImage.c`): `TimImageMethods`, a local table
 struct expanding `FILERESOURCE_SLOTS(TimImage, (TimImage *self, char *name))`
 plus slots +0x07C..+0x09C; `extern void *BMemPMgrAlloc(s32 size);`;
 `TimImageMethods *GetTimImageMethods(void);`.

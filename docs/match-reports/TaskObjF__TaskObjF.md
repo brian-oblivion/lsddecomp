@@ -80,7 +80,7 @@ SLPS_015.56`.
   object `TitleMenuTaskObjF.c` calls `Node3bb8cE`.
 - New extern `sTaskObjFCount` (`s32`, the one-shot init counter).
 
-`src/TitleMenuTaskObjF.c`: local (not shared-header) externs for
+`src/ui/TitleMenuTaskObjF.c`: local (not shared-header) externs for
 `TaskObjF__ClearLinks` (already matched elsewhere, under this unit's own `void *`
 view rather than `TitleMenuTaskObjF`'s `Node3bb8cE *`) and for `InitCARD`/
 `StartCARD`/`_bu_init` (Sony's, linked from `lib/libcard`, declared the

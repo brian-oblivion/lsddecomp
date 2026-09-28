@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gModelDataMethods +0x008 (the allocator New_
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/GraphicsResources.c`.
+`src/graphics/GraphicsResources.c`.
 
 ```c
 #include "ModelData.h"

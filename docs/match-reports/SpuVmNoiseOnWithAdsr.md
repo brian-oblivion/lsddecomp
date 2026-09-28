@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002F20C` on 2026-09-20 (tools/rename.py). Address 0x8002f20c.
 
-Unit: `src/libsnd_vmanager.c`. Round 24, runner bravo.
+Unit: `src/psyq/libsnd_vmanager.c`. Round 24, runner bravo.
 
 ## Result
 

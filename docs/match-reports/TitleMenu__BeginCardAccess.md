@@ -41,7 +41,7 @@ SLPS_015.56`.
   (`iconHandle`/`unkAC`).
 - `New_TimImage(sSaveIconTimPath)` -- `New_TimImage` is already matched
   project-wide under many independent local arities/return types (see
-  e.g. `src/TitleMenuTaskObjF.c`, `src/TextEntryItemList.c`); this unit's own view
+  e.g. `src/ui/TitleMenuTaskObjF.c`, `src/ui/TextEntryItemList.c`); this unit's own view
   returns exactly what it is stored into, `GenericReleaseObj_3bb8c_d *`.
   `sSaveIconTimPath` is a real dlabel string, `"CARD\FILEICN1.TIM"`
   (`asm/data/1C34.rodata.s`) -- referenced by symbol per CLAUDE.md's rule
@@ -82,7 +82,7 @@ SLPS_015.56`.
 - New externs: `sSaveIconTimPath` (`const char[]`, a real string dlabel),
   `sCardFilePrefix` (`void *`, VALUE-of `%gp_rel`), `sSaveFileSuffixes` (`s32`,
   address-of placeholder for a real 16-entry pointer table).
-- `src/TitleMenuTaskObjF.c`: local extern for `New_TimImage` (own arity/
+- `src/ui/TitleMenuTaskObjF.c`: local extern for `New_TimImage` (own arity/
   return type, per the project's established independent-views
   convention for this widely-shared external symbol).
 

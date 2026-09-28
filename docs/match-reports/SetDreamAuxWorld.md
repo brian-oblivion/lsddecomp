@@ -86,7 +86,7 @@ one word is otherwise constrained -- the buffer exists here purely to give
 saved registers + this one 4-word local + no other locals).
 
 `New_Entity`'s first parameter is declared `void *` in `include/Entity.h`
-(`src/Entity.c`), but every call so far (including this one) passes what is
+(`src/world/Entity.c`), but every call so far (including this one) passes what is
 clearly an integer id (`i + 0x62`, i.e. `moodIndex` per `Entity__Entity`'s
 own reading of that argument). The cast to `(void *)` here is cosmetic --
 GCC 2.6.3 does not care about the mismatch for either codegen or scoring, and
@@ -130,7 +130,7 @@ only caller, ObjM__SetupSceneStyle (ObjMStyleActor), passes its DreamSys
 `target`; DreamAux calls +0x200 of its table (getDreamColor) and passes
 it as Entity's peer. Byte-identical.
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 Parameters named from the caller (ObjM__SetupSceneStyle, ObjMStyleActor.c,
 whose own declaration already says `stage, grid, world, sound, clock`, and

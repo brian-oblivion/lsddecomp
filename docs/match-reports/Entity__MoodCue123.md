@@ -79,7 +79,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Track 7 (2026-09-26, round 94, alpha)
 
 The two `onPadEvent(peer, 0, 2)` / `(0, 7)` calls carry a comment: in
-`DreamSys__OnPadEvent` (`src/DreamSys.c`) event 2 sets
+`DreamSys__OnPadEvent` (`src/world/DreamSys.c`) event 2 sets
 `MOVE_COMMAND_FORWARD` and event 7 switches to `MOVE_MODE_RUN` while moving
 forward. No pad-event enum exists; one in `include/DreamSys.h` would also
 change `DreamSys.c`, so it is proposed rather than added.

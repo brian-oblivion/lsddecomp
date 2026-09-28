@@ -50,13 +50,13 @@ Evidence considered and why it falls short of tier A/B:
   function with the constant 1", which says nothing about game purpose.
 - **Callee**: `func_80038E44` is itself unnamed, uncarved, and lives in the
   "game's own libspu build" gap (`0x29644..0x2976C`, no SDK disc covers it;
-  see `src/libspu_s_ih.c`'s header and `config/splat.slps01556.lsdde.yaml`
+  see `src/psyq/libspu_s_ih.c`'s header and `config/splat.slps01556.lsdde.yaml`
   line ~1131). It is not a placed Sony object (`tools/sdkstalls.py` has no
   hit for `SpuInitHot`), so this is not the "give no game name to
   anything Sony owns" case -- but its own purpose is equally undetermined
   (round 78 did not investigate `func_80038E44`'s body; out of scope for
   this one-function unit), so there is nothing to inherit a name from.
-- **Caller**: the ONLY caller is `_SsInit` (`src/libsnd_ssinit.c`), which
+- **Caller**: the ONLY caller is `_SsInit` (`src/psyq/libsnd_ssinit.c`), which
   branches `if (arg0 == 0) SpuInit(); else SpuInitHot();` -- i.e. this is
   the alternate sound-init path taken when `_SsInit`'s own argument is
   nonzero. `_SsInit` itself is reached only through `SsInit` (calls

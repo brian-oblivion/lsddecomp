@@ -8,7 +8,7 @@
 
 > Renamed from `func_80052110` on 2026-09-24 (tools/rename.py). Address 0x80052110.
 
-Unit: `src/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`.
+Unit: `src/ui/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`.
 
 ## Body
 
@@ -98,7 +98,7 @@ cleared word is `result`.
 ## Round 94 (track 6, charlie): the target is a VabStreamObj
 
 `TargetObj86ED0`/`TargetMethods86ED0` (include/class_3bb8c.h) are deleted.
-Both attachTarget callers (TaskObjF, src/TitleMenuTaskObjF.c) pass TaskObjF's
+Both attachTarget callers (TaskObjF, src/ui/TitleMenuTaskObjF.c) pass TaskObjF's
 `sound`, already typed `struct VabStreamObj *`, and the one slot the view
 named, +0x080, is VabStreamObj's `playTone(self, index, vol, endVol)`
 (include/VabStreamObj.h): the `(code, 0x60, 0x60)` call plays tone `code`

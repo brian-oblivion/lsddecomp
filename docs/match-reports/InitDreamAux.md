@@ -33,7 +33,7 @@
 > oracle passed outright, which is the strongest possible confirmation: no
 > per-function window, no drift caveat, just a green `build-and-verify.sh`.
 >
-> **This is now real C in `src/DreamAux.c`, committed.** The rodata
+> **This is now real C in `src/world/DreamAux.c`, committed.** The rodata
 > ownership trap documented below (defining `gMomPathSymSpy`/`gMomPathSymDog` as real
 > string data ahead of the function) was exactly as described and is now
 > permanent, not a note for a future attempt.
@@ -238,9 +238,9 @@ extern are gone. `req.buffer`/`req.name` become `req.src.buffer`/`req.src.name`,
 `(ResourceSource *)&req` becomes `&req.src`. Byte-identical.
 The two MOM path names are `const char[]` and are passed as `(char *)`, since ResourceSource.name is `char *`.
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
-The pass rewrote the unit's banner (now at the top of src/DreamAux.c) and
+The pass rewrote the unit's banner (now at the top of src/world/DreamAux.c) and
 every declaration comment in include/DreamAux.h. The comments that carried
 history or superseded readings are kept here verbatim, as they stood before
 the pass (names as they were at round 99).

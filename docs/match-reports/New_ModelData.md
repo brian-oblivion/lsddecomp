@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for gModelDataMethods, objec
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
 
 ```c
 #include "ModelData.h"
@@ -46,7 +46,7 @@ ModelData *New_ModelData(ResourceSource *src) {
 
 ## Naming
 
-- **New_ModelData**, tier A. include/TodActor.h's Unk5CObj already names this object's own +0x2C/+0x30 fields "tmd"/"tods" (populated by New_LinkResource/New_TodSet), and src/TodActor.c's own header comment calls this allocator's result "modelData".
+- **New_ModelData**, tier A. include/TodActor.h's Unk5CObj already names this object's own +0x2C/+0x30 fields "tmd"/"tods" (populated by New_LinkResource/New_TodSet), and src/world/TodActor.c's own header comment calls this allocator's result "modelData".
 
 ## Track 4
 

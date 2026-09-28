@@ -83,7 +83,7 @@ not in registers.
   generic.
 - **`other` is not narrowed.** Other units call this symbol with a different
   class as the receiver and a plain `s32` second argument
-  (`src/TodActor.c`, `src/ObjMStyleActor.c`); the `SceneNode__` prefix
+  (`src/world/TodActor.c`, `src/world/ObjMStyleActor.c`); the `SceneNode__` prefix
   is still right, because any caller must carry the GsDOBJ2 layout this body
   dereferences.
 
@@ -92,10 +92,10 @@ not in registers.
 The signature is now `(SceneNode *self, void *model)`. The argument is the
 class-9 child (gTmdModelMethods) that SceneNode__AddChild tag-tests. That class
 has no C yet, so the two words LinkModel reads live in a local
-`ModelObj_d294` view in `src/SceneNode.c`: `+0x0C tmdFile` and `+0x10 tmd`.
+`ModelObj_d294` view in `src/graphics/SceneNode.c`: `+0x0C tmdFile` and `+0x10 tmd`.
 The object fields are renamed: +0x18 `unk18` is now `tmd` (GsDOBJ2.tmd), and
-+0x20 `unk20` is now `model`. The local externs in `src/TodActor.c` and
-`src/ObjMStyleActor.c`, `(void *self, s32 arg)`, are deleted, and their
++0x20 `unk20` is now `model`. The local externs in `src/world/TodActor.c` and
+`src/world/ObjMStyleActor.c`, `(void *self, s32 arg)`, are deleted, and their
 callers upcast. Byte-identical.
 
 ## Track 4 (2026-09-26, round 87, delta)
@@ -126,7 +126,7 @@ spells the embedded GsDOBJ2 as four separate fields; embedding Sony's struct
 there is proposed, not done: SceneNode.h has many includers).
 Byte-identical.
 
-## Round 98 (echo): track 7, moved from src/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
 
 The re-read of `self->model` keeps a one-line `MATCHING:` note in the source.
 

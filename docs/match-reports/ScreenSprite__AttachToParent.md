@@ -4,7 +4,7 @@
 
 > Renamed from `func_80041DAC` on 2026-09-25 (tools/rename.py). Address 0x80041dac.
 
-Round 82, runner alpha (fourth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior attempt.
 
 - **Where:** gCharSpriteMethods and gScreenSpriteMethods slot +0x04C (attachToParent override).
 - **What:** if `parent` (+0x00C) is still NULL, calls Sprite's attachToParent (`GetSpriteMethods()->attachToParent`, i.e. the inherited SceneNode one) with the zero offset `gVec3Zero` (three zero words in .data), then calls the object's own slot +0x0BC (ScreenSprite__SetPosition) with the caller's third argument. No return value is produced on the skip path (`$v0` holds the loaded parent), so it is written `void` although the SceneNode slot type returns a pointer.

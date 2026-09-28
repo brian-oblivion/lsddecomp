@@ -48,7 +48,7 @@ extern s32 gStyleCueCallbacks[];                                /* 14-slot table
 extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
 ```
 
-`InitSoundCueSet` is defined in `src/PlacementGridVabSound.c`
+`InitSoundCueSet` is defined in `src/sound/PlacementGridVabSound.c`
 (`s32 InitSoundCueSet(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32
 arg4)`); this call site only needs `void *`/`s32` at the ABI level (matches
 the looser local signatures `Entity.c` and `DreamSys.c` already use for the

@@ -7,7 +7,7 @@
  * VabDriver -- the SPU/VAB data-source driver (class id 0x23, method table
  * gVabDriverMethods), a FileResource subclass and the CD-ROM driver's
  * (gCdDriverMethods, 0x13) sibling. The id is DATASOURCE_SPU: SetActiveDataSource
- * (src/GameApplicationFileResource.c) binds this table's driver-interface slots into
+ * (src/app/GameApplicationFileResource.c) binds this table's driver-interface slots into
  * FileResource's table and every client table whenever the active source is
  * not DATASOURCE_CD, and GetActiveDataSourceMethods returns it then.
  *
@@ -16,8 +16,8 @@
  * `jr $ra; nop`, `return 0` or a bare 0x40-byte frame (Open, NoOpSlot40),
  * so with the VAB source active the file-I/O interface does nothing; the
  * VAB streaming itself is VabStreamObj's (gVabStreamObjMethods, 0xA03,
- * src/PlacementGridVabSound.c), a separate FileResource subclass. Methods in
- * src/PlacementGridVabSound.c (ctor through NoOpSlot50) and src/PlacementGridVabSound.c
+ * src/sound/PlacementGridVabSound.c), a separate FileResource subclass. Methods in
+ * src/sound/PlacementGridVabSound.c (ctor through NoOpSlot50) and src/sound/PlacementGridVabSound.c
  * (Read onward, and the getter). Each is named for its slot
  * (`classtable.py gVabDriverMethods --vs gFileResourceMethods`); the slot names are
  * FileResource's.

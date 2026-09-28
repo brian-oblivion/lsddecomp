@@ -2,7 +2,7 @@
 
 > Renamed from `func_80025E1C` on 2026-09-24 (tools/rename.py). Address 0x80025e1c.
 
-**Unit:** `src/Pad.c` (runner ALPHA, `runner/alpha`)
+**Unit:** `src/app/Pad.c` (runner ALPHA, `runner/alpha`)
 **Status:** MATCHED (30/30 words, full build verified byte-exact)
 **Vtable slot:** `gPadMethods+0x50` (`PadMethods.loadButtonTable`)
 

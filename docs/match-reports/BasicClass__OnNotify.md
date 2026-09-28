@@ -56,10 +56,10 @@ Evidence:
   notifying. Hence `sender`.
 - `arg2` is not a boolean, and that is why `event` and not `isFinalizing`.
   Two overrides in other units forward to the base and then keep using the
-  same value: `SceneNode__OnNotify` (`src/SceneNode.c`) calls
+  same value: `SceneNode__OnNotify` (`src/graphics/SceneNode.c`) calls
   `Get_vtable_BasicClass()->slot38(self, other, arg2)` and then dispatches
   to slot `+0x094`/`+0x098`/`+0x09C` **by the sender's class tag**, passing
-  `arg2` through each time; `TodActor__OnNotify` (`src/TodActor.c`) calls the
+  `arg2` through each time; `TodActor__OnNotify` (`src/world/TodActor.c`) calls the
   base and then tests `arg1->tagged->tag == 0x5F03 && arg2 == 1`.
 - Slot census (`tools/classtable.py`, all 60 tables): 27 tables use this
   base implementation at `+0x038` and 14 more override it with
@@ -73,7 +73,7 @@ Evidence:
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/CdDriver.c:143`
+mis-hit had to be resolved by receiver type: `src/cd/CdDriver.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80040948` on 2026-09-18 (tools/rename.py). Address 0x80040948.
 
-Unit: `src/ScreenWidgets.c`. 12 attempts. **Re-attempted after a
+Unit: `src/ui/ScreenWidgets.c`. 12 attempts. **Re-attempted after a
 coordinator correction**: this function had originally been triaged
 out as "predicted-hard" purely on its 6-callee-saved-register count,
 using a threshold derived from round 13's 22-sample ceiling of 4. A
@@ -168,4 +168,4 @@ purpose is the unit's working hypothesis only).
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__Construct`: the +0x008 ctor occupant (chains to GetCharSpriteMethods()->ctor with cell 0x20). `(TextRow *self, void *texture, s32 count, char *text)`; `cellCount` = `visibleCount` = count, `firstVisible` = `gapIndex` = 0, then count New_CharSprite cells and reset(text) through TextRowResetFn, the override's parameter list (the slot is SceneNode's `reset(self)`). Image byte-identical; the current source is src/ScreenWidgets.c.
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__Construct`: the +0x008 ctor occupant (chains to GetCharSpriteMethods()->ctor with cell 0x20). `(TextRow *self, void *texture, s32 count, char *text)`; `cellCount` = `visibleCount` = count, `firstVisible` = `gapIndex` = 0, then count New_CharSprite cells and reset(text) through TextRowResetFn, the override's parameter list (the slot is SceneNode's `reset(self)`). Image byte-identical; the current source is src/ui/ScreenWidgets.c.

@@ -1,6 +1,6 @@
 # InitGsSprite -- MATCHED (57/57 words), round 82
 
-Round 82, runner alpha (fifth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** not in any method table (called by Sprite__Reset) (`tools/classtable.py`).
 - **What:** Fills the GsSPRITE: attribute = (pmode & 3) << 24 (colour mode), x = y = 0, w/h from the cell, mx/my = w/2, h/2 read back from the sprite, tpage = GetTPage(pmode & 3, abr, px, py), u/v the cell origin's low bytes, cx/cy from the image (the CLUT position), r = g = b = 0x80, rotate 0, scalex = scaley = 0x1000.

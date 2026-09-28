@@ -19,7 +19,7 @@ start, 0 otherwise. State 10 is completed by LbdFile__AdvanceLoadState.
 
 ## Source
 
-Needs the local views at the top of `src/GameFiles.c`, with
+Needs the local views at the top of `src/cd/GameFiles.c`, with
 `DataSrc39094Methods.releaseAlloc` declared UNPROTOTYPED (`void (*releaseAlloc)();`),
 plus:
 

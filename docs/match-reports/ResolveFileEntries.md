@@ -2,7 +2,7 @@
 
 > Renamed from `func_80027FFC` on 2026-09-17 (tools/rename.py). Address 0x80027ffc.
 
-Round 45, runner echo (third sitting), `src/CdDriver.c`. Last remaining
+Round 45, runner echo (third sitting), `src/cd/CdDriver.c`. Last remaining
 function in this unit.
 
 ## Result
@@ -211,7 +211,7 @@ element. Turning names into disc positions is the entire function; tier A.
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/CdDriver.c:143`
+mis-hit had to be resolved by receiver type: `src/cd/CdDriver.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),

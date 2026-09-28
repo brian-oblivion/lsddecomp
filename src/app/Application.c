@@ -17,7 +17,7 @@ extern int CdInit(void);
 extern void SsInit(void);
 extern void GsInit3D(void);
 
-extern void SetActiveDataSource(s32 source); /* src/GameApplicationFileResource.c */
+extern void SetActiveDataSource(s32 source); /* src/app/GameApplicationFileResource.c */
 extern void *BMemPMgrAlloc(s32 size);
 
 void Application__Application(Application *self, s32 dataSource) {

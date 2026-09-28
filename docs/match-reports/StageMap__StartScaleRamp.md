@@ -377,7 +377,7 @@ half's assignment target did. This means writing directly to the struct
 field (vs. through a local) perturbed cc1's block-layout choice for the
 WHOLE function, not just the second half — the two halves are not
 independently compiled the way their separately-diagnosed residues implied.
-Reverted (`git checkout -- src/DayTaskStageMap.c`; clean `OK: build matches
+Reverted (`git checkout -- src/world/DayTaskStageMap.c`; clean `OK: build matches
 retail` confirmed immediately after).
 
 **Disposition unchanged: `INCLUDE_ASM`, still 25/28 (best-attempt body from

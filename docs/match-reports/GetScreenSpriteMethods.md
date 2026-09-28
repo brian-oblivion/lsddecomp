@@ -4,7 +4,7 @@
 
 > Renamed from `func_80041ED8` on 2026-09-25 (tools/rename.py). Address 0x80041ed8.
 
-Round 82, runner alpha (second re-staffed slot of the round). Unit `src/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (second re-staffed slot of the round). Unit `src/graphics/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table (`tools/classtable.py`).
 - **What:** Returns the gScreenSpriteMethods method table.

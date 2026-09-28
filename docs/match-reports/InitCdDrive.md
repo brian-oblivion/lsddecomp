@@ -2,7 +2,7 @@
 
 > Renamed from `func_80027E78` on 2026-09-17 (tools/rename.py). Address 0x80027e78.
 
-Round 45, runner echo (second sitting), `src/CdDriver.c`.
+Round 45, runner echo (second sitting), `src/cd/CdDriver.c`.
 
 ## Result
 
@@ -40,7 +40,7 @@ then a do-while retry loop calling `CdControlB(0xE /* CdlSetmode */, &mode,
 0)` until it returns nonzero, then set the guard.
 
 `CdSetDebug`/`CdControlB` are libcd/sys.o entry points (Psy-Q `libcd`,
-linked since round 34 per `src/CdDriver.c`'s header comment) — real
+linked since round 34 per `src/cd/CdDriver.c`'s header comment) — real
 signatures are in `include/psyq/libcd.h` (`int CdSetDebug(int level);`,
 `int CdControlB(u_char com, u_char *param, u_char *result);`). Followed the
 existing `CdDriver.c` convention of a unit-local, per-call-site `extern`

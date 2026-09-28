@@ -108,14 +108,14 @@ as tier A by FINISHING-PLAN's "pure leaf whose mechanics are its purpose"
 rule regardless of why the caller (`DayTask__Finalize`, apparently a destructor)
 invokes it once at that point.
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 ## Naming (round 100)
 
 **ReleaseDreamAuxModels** (was TickDreamAuxSlots) -- tier A. The method
 table slot it calls, +0x004, is BasicClass's `release` (finalize, free,
 return NULL), not a tick, and the slots hold the ModelData InitDreamAux made.
-Its only caller is DayTask__Finalize (src/DayTaskStageMap.c), right after the
+Its only caller is DayTask__Finalize (src/world/DayTaskStageMap.c), right after the
 other releases, mirroring DayTask's ctor calling InitDreamAux. The call is
 now `model->methods->release(model)` through ModelData's own table;
 DreamAuxObj/DreamAuxTickFn are gone. `done` -> `i`, bound

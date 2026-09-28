@@ -56,7 +56,7 @@ void StyleEffect__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
 }
 ```
 
-Declarations added to `src/ObjMStyleActor.c` (kept regardless of any other
+Declarations added to `src/world/ObjMStyleActor.c` (kept regardless of any other
 function's match state):
 
 ```c
@@ -156,9 +156,9 @@ StyleEffect__UpdateByKind; only this unit references it).
 
 ### Field and slot names in this unit's local view (applied, round 70)
 
-`LinkNode` and `LinkNodeMethods` are defined only in `src/ObjMStyleActor.c`,
+`LinkNode` and `LinkNodeMethods` are defined only in `src/world/ObjMStyleActor.c`,
 so the compiler's accessor list after renaming the definition was entirely in
-this unit (every `has no member` error was in src/ObjMStyleActor.c, all fixed; build and `tools/check-nonmatching.sh`
+this unit (every `has no member` error was in src/world/ObjMStyleActor.c, all fixed; build and `tools/check-nonmatching.sh`
 green). `typedef struct LinkNode StyleEffect;` was added for the owner's
 method signatures; zero bytes changed.
 

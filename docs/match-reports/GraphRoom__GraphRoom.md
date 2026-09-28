@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057FC8` on 2026-09-24 (tools/rename.py). Address 0x80057fc8.
 
-Unit: `src/ObjMStyleActor.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x008`
+Unit: `src/world/ObjMStyleActor.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x008`
 -- THIS is `gGraphRoomMethods`'s own ctor (resolved via `tools/classtable.py
 gGraphRoomMethods`), the callee of this unit's own `New_GraphRoom`'s `ctor(...)`
 call.
@@ -68,7 +68,7 @@ tools/funcdiff.py GraphRoom__GraphRoom   # 44/44
 **`GraphRoom__GraphRoom`** -- tier B. `Class__Class` ctor
 convention; this IS `GraphRoomObj`'s own vtable slot +0x008
 (`tools/classtable.py gGraphRoomMethods`). Class identity: see
-`src/ObjMStyleActor.c`'s header comment.
+`src/world/ObjMStyleActor.c`'s header comment.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

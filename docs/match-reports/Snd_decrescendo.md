@@ -271,7 +271,7 @@ search, not a repeat of this one.
 
 Both need `SsScore` from `include/SsScore.h` (`unk40` is **`s16`** there,
 as these bodies require) and these declarations, all already present in
-`src/libsnd_decre.c`:
+`src/psyq/libsnd_decre.c`:
 
 ```c
 extern s32 SpuVmSetSeqVol(s16 a0, u16 a1, u16 a2, s32 a3);
@@ -281,7 +281,7 @@ extern s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2);
 
 ### Body A — 200/202 words, 21/202, `regs=6/0`. THE ONE TO BUILD ON.
 
-Live in `src/libsnd_decre.c` inside `#if 0`. Block-for-block and
+Live in `src/psyq/libsnd_decre.c` inside `#if 0`. Block-for-block and
 instruction-for-instruction retail; the only differences are the three-way
 callee-saved permutation and the 8-byte `vars` gap.
 

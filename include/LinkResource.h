@@ -7,7 +7,7 @@
  * LinkResource -- a FileResource data source (class id 0xD03, method table
  * gLinkResourceMethods) over one loaded TMD file: it builds one TmdModel
  * (include/TmdModel.h) per object of the TMD and hands them out by index.
- * Methods in src/GraphicsResources.c; no subclasses.
+ * Methods in src/graphics/GraphicsResources.c; no subclasses.
  *
  * What its own methods do: map the file's TMD
  * (LinkResource__MapModel: GsMapModelingData(&file->flags)) and build and

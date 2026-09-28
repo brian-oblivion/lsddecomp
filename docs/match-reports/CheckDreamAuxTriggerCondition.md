@@ -776,7 +776,7 @@ hence B not A. Renamed `record->unk0` to `triggered` in the struct
 definition as part of this pass (see the commit renaming struct fields);
 every accessor was confined to this unit, confirmed by rebuild.
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 `value` -> `day`, `sel` -> `condition`, `idx` -> `id`. The ids are
 enum TriggerCondition (include/DreamAux.h), and `switch (idx - 2)` with

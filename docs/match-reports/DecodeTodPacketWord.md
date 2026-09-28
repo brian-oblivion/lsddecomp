@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Decodes one packet word: `*out0 = v; *out1 = (v >> 16) & 0xF; *out2 = (v >> 20) & 0xF; *out3 = v >> 24; return acc + 1;` out2/out3 are the o32 5th/6th arguments (stack +0x10/+0x14), and self's a0 is reused for out2. Same signature as the `decodeTodPacket` slot in src/TodActor.c.
+Decodes one packet word: `*out0 = v; *out1 = (v >> 16) & 0xF; *out2 = (v >> 20) & 0xF; *out3 = v >> 24; return acc + 1;` out2/out3 are the o32 5th/6th arguments (stack +0x10/+0x14), and self's a0 is reused for out2. Same signature as the `decodeTodPacket` slot in src/world/TodActor.c.
 
 Table slot (`tools/classtable.py`): gTodMethods +0x080 and gTodSetMethods +0x080.
 
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gTodMethods +0x080 and gTodSetMethods +0x080
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c

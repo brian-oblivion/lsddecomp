@@ -7,7 +7,7 @@
  * NodeGuardedViewport -- a Viewport that skips its frame while no view node
  * is attached (class id 0x17, method table gNodeGuardedViewportMethods). Its
  * ctor chains to Viewport's (GetViewportMethods()->ctor) first. Methods in
- * src/TitleMenuTaskObjF.c. No class derives from it.
+ * src/ui/TitleMenuTaskObjF.c. No class derives from it.
  *
  * What it changes (`classtable.py gNodeGuardedViewportMethods --vs
  * gViewportMethods`):
@@ -22,7 +22,7 @@
  *    initDefaults again; the override makes that second call a no-op;
  *  - four own slots, +0x0B8..+0x0C4, hold empty functions nothing calls.
  *
- * Lifecycle: DayTask__DayTask (src/DayTaskStageMap.c), the one
+ * Lifecycle: DayTask__DayTask (src/world/DayTaskStageMap.c), the one
  * construction site, builds it as its IntermediateBaseInitArgs' viewport.
  * DayTask__Init hands it to the DreamSys (setViewport), and ObjM, built
  * from the same init args, drives it through Viewport's slots: InitStyleAndWorld

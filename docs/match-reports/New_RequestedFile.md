@@ -6,7 +6,7 @@
 
 > Renamed from `func_800422CC` on 2026-09-25 (tools/rename.py). Address 0x800422cc.
 
-Round 82, runner alpha (fourth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior attempt.
 
 - **Where:** not in any method table (allocator). Called by WBgm.c (`self->seqData = New_RequestedFile(arg)`).
 - **What:** `BMemPMgrAlloc(0x30)`; if non-NULL, calls slot +0x008 (ctor, RequestedFile__RequestedFile) of `GetRequestedFileMethods()` (the gRequestedFileMethods table) with `(obj, arg)` and returns obj, else NULL.
@@ -45,7 +45,7 @@ unit-local views `D_8006EED8Obj`/`D_8006EED8Methods` and the single-slot cast
 views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
 `CtorArg1Methods_322b4` are gone; `GetActiveDataSourceMethods` is declared
 `FileResourceMethods *`. The Source block above is the round-82 text; the live
-body in `src/Sprite.c` is byte-identical.
+body in `src/graphics/Sprite.c` is byte-identical.
 
 Renamed from `New_D8006EED8` with rename.py (the class name). It now
 takes `char *name` and returns `RequestedFile *`: the ctor it forwards to

@@ -77,7 +77,7 @@ Round 78 (track 3, naming pass, bravo).
 ## Proposed field names
 
 Both below are read/written by `Obj866E8`-typed code OUTSIDE this unit
-(`src/DayTaskStageMap.c`), confirmed by actually attempting the rename: the
+(`src/world/DayTaskStageMap.c`), confirmed by actually attempting the rename: the
 field definition was changed, the whole-image oracle re-run, and
 `DayTaskStageMap.c`'s own `StageMap__ComputeFootprintFromRotation`
 (`self->unk6C->unk14->unk44`) failed to compile with no matching member.

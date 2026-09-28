@@ -212,7 +212,7 @@ void GetSeqData(s16 a0, s16 a1) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_seqread", GetSeqData);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_seqread", GetSeqData);
 #endif
 
 #ifdef NON_MATCHING
@@ -246,7 +246,7 @@ void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_seqread", NoteOn);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_seqread", NoteOn);
 #endif
 
 void SetProgramChange(s16 a0, s16 a1, u8 a2) {
@@ -680,7 +680,7 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
     rec->unk88 = ReadDeltaValue(ch, slot);
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_seqread", ContDataEntry);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_seqread", ContDataEntry);
 #endif
 
 /* Both Sony's libsnd/adsr: */
@@ -960,7 +960,7 @@ void GetMetaEvent(s16 a0, s16 a1, u8 a2) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_seqread", GetMetaEvent);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_seqread", GetMetaEvent);
 #endif
 
 /* MATCHING: the `goto combine` keeps the single-byte and loop-exit `val`

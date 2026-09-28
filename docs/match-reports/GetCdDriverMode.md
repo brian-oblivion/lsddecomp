@@ -2,7 +2,7 @@
 
 > Renamed from `func_80027EF8` on 2026-09-17 (tools/rename.py). Address 0x80027ef8.
 
-Round 45, runner echo (second sitting), `src/CdDriver.c`.
+Round 45, runner echo (second sitting), `src/cd/CdDriver.c`.
 
 ## Result
 
@@ -74,11 +74,11 @@ the `.c` now carries this paragraph as a comment instead.
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/GameApplicationFileResource.c`'s `(void)` declaration stays.
+**Verdict: arity-ok idiom.** `src/app/GameApplicationFileResource.c`'s `(void)` declaration stays.
 
 **Callee evidence** (`0x80027EF8`): the very first instruction is `beqz a0,...`
 — `$a0` is read before it is written, so the definition in
-`src/CdDriver.c` (`s32 GetCdDriverMode(s32 *outMode2)`) is right: one real
+`src/cd/CdDriver.c` (`s32 GetCdDriverMode(s32 *outMode2)`) is right: one real
 argument, an optional out-pointer that is written only when non-NULL.
 
 **Why the `(void)` extern is right anyway.** Its only carved caller,
@@ -96,7 +96,7 @@ parameter would force this call site to materialise an argument retail does
 not have. Same shape as `GetVabDriverMode` two lines down.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/GameApplicationFileResource.c:230`. Oracle green.
+added to `src/app/GameApplicationFileResource.c:230`. Oracle green.
 
 ## Track 7 (round 101, echo): comments moved here, and names
 

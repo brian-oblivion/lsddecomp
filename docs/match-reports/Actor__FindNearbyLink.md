@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057668` on 2026-09-19 (tools/rename.py). Address 0x80057668.
 
-Unit: `src/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0BC`'s
+Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0BC`'s
 caller? No -- checked all 6 method tables reachable from this unit's
 addresses with `tools/classtable.py`: no hit. Plain internal helper,
 called by this unit's own `Actor__MoveOrFindNearbyLink` (already matched).
@@ -108,7 +108,7 @@ is not established, which keeps this tier B rather than A.
 ## Proposed field names
 
 `DreamSys::unk_0x28` and `DreamSys::unk_0x4C` are accessed from OTHER
-units too (`src/DreamSys.c`, per `grep -rn -- '->unk_0x28\b\|->unk_0x4C\b'
+units too (`src/world/DreamSys.c`, per `grep -rn -- '->unk_0x28\b\|->unk_0x4C\b'
 src/`), so per FINISHING-PLAN.md track 3 step 3 they are proposed here,
 not renamed, and posted to the broadcast for the head to apply by type
 scope at merge.
@@ -124,7 +124,7 @@ scope at merge.
   B). Evidence: this function calls `unk_0x4C->methods->queryLinkAtPos`
   to look up a link at a position; `include/DreamSys.h`'s own existing
   comments show it used the same way by `DreamSys__WallLink`,
-  `DreamSys__TryInstantTeleportLink` and `DreamSys__DetachFromParent` in `src/DreamSys.c` -- every access
+  `DreamSys__TryInstantTeleportLink` and `DreamSys__DetachFromParent` in `src/world/DreamSys.c` -- every access
   across every unit is link-related.
 
 ## Verify
@@ -149,7 +149,7 @@ for another.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__FindNearbyLink`. Reached only from Actor__MoveOrFindNearbyLink (base slots +0x0D0/+0x0D4), so the method is Actor's. Accessors now: grid (+0x04C, the StageMap child; cast to DreamSys.h's DreamSysUnk4CObj view for queryLinkAtPos), &coord2->tx, linkTarget, addTranslation, notifyIfUnk20Active (-1 found, -2 not). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__FindNearbyLink`. Reached only from Actor__MoveOrFindNearbyLink (base slots +0x0D0/+0x0D4), so the method is Actor's. Accessors now: grid (+0x04C, the StageMap child; cast to DreamSys.h's DreamSysUnk4CObj view for queryLinkAtPos), &coord2->tx, linkTarget, addTranslation, notifyIfUnk20Active (-1 found, -2 not). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 

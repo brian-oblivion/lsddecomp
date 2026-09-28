@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x008 (its allocator Ne
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/GraphicsResources.c`.
+top of / earlier in `src/graphics/GraphicsResources.c`.
 
 ```c
 /* gMoviePlayerMethods +0x008: constructor -- BasicClass's, then this table; open a
@@ -93,7 +93,7 @@ The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Strea
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/GraphicsResources.c` are gone; it takes `(MoviePlayer *self, DrawRect *frame, s32 speed, s32 external)` (BASICCLASS_SLOTS_R with an `s32` return: 0 success, 1 failure). `unk60` -> `stream`, `ring`, `unk50`; the +0x06C call is `setAutoPlay(self, 1)`. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; it takes `(MoviePlayer *self, DrawRect *frame, s32 speed, s32 external)` (BASICCLASS_SLOTS_R with an `s32` return: 0 success, 1 failure). `unk60` -> `stream`, `ring`, `unk50`; the +0x06C call is `setAutoPlay(self, 1)`. Byte-identical; `typeviews.py --warnings` 0 new.
 
 ## Round 93 polish (charlie, track 7)
 

@@ -38,4 +38,4 @@ separately-fetched vtable getter" shape.
 `BaseMethods3bb8cE` view had already named `finalize`. `TaskObjF__` prefix:
 round 78 cross-checked the whole `gTaskObjFMethods` table and confirmed
 `Node3bb8cE` (this unit's independent local view) is `TaskObjF`
-(include/class_3bb8c.h) -- see src/TitleMenuTaskObjF.c's unit header comment.
+(include/class_3bb8c.h) -- see src/ui/TitleMenuTaskObjF.c's unit header comment.

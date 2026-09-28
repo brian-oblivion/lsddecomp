@@ -2,7 +2,7 @@
 
 > Renamed from `func_80028218` on 2026-09-17 (tools/rename.py). Address 0x80028218.
 
-Round 45, runner echo (second sitting), `src/CdDriver.c`.
+Round 45, runner echo (second sitting), `src/cd/CdDriver.c`.
 
 ## Result
 
@@ -40,7 +40,7 @@ block only entered when `gCdTickStep == 0` AND `sCdCallbackInstalled != 0` (the 
 `sCdQueueEnabled` are cleared; falls through either way to clear the latch
 (`UnlockCd`). The `VSyncCallback(0)` idiom (`extern void
 VSyncCallback(void (*cb)(void));` then call with a literal `0`) is not new —
-it already appears in `src/libsnd_ssinit_libapi_counter.c:131-153`, reused verbatim here.
+it already appears in `src/psyq/libsnd_ssinit_libapi_counter.c:131-153`, reused verbatim here.
 
 Called from `CdDriver__StopService` (this unit, matched alongside it), so it needed a
 forward `extern void StopCdServiceIfIdle(void);` in this file since `CdDriver__StopService`

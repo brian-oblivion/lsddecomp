@@ -6,7 +6,7 @@
 19/31 after rebuilding the preserved body; a bare `__asm__("")` barrier tried
 at two positions, both inert (no score or diff-set change).**
 
-Unit: `src/ScreenWidgets.c`. Round 27 (second pass), runner bravo, off the
+Unit: `src/ui/ScreenWidgets.c`. Round 27 (second pass), runner bravo, off the
 head's fresh-ground list.
 
 ## Screens (clean)

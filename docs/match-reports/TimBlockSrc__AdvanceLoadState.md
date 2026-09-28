@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x064 (setFlag override
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/GraphicsResources.c`.
+top of / earlier in `src/graphics/GraphicsResources.c`.
 
 ```c
 /* gTimBlockSrcMethods +0x064: the loader's state machine, under the data-source
@@ -113,7 +113,7 @@ Second build (the first was already 183/183; the second only added local Lock/Un
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of FileResource's `setFlag` slot (+0x064); keeps its name because the body is the whole loader state machine, not a flag set. Correction to the prose above: the 0x24-byte header is a count, four file offsets (+0x04) and four sizes (+0x14, what FindMaxTimBlockSize maximises), not eight offsets. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of FileResource's `setFlag` slot (+0x064); keeps its name because the body is the whole loader state machine, not a flag set. Correction to the prose above: the 0x24-byte header is a count, four file offsets (+0x04) and four sizes (+0x14, what FindMaxTimBlockSize maximises), not eight offsets. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
@@ -126,7 +126,7 @@ TimArraySrc unified (include/TimArraySrc.h): TimBlockSrc's `blocks` is now `stru
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `9` / `10` / `0` | `TIMBLOCK_LOAD_HEADER` / `TIMBLOCK_LOAD_BLOCK` / `TIMBLOCK_LOAD_IDLE` (enum TimBlockLoadState, include/TimBlockSrc.h) | A | 9 is set by the ctor before the header read and its branch parses the header; 10 is set before each block read and its branch consumes a block; 0 after the last |
-| `0x80` | `CD_FLAG_READ_DONE` | A | src/CdDriver.c's name for the flags bit the CD driver sets when a read request completes; both branches wait on it after a read() |
+| `0x80` | `CD_FLAG_READ_DONE` | A | src/cd/CdDriver.c's name for the flags bit the CD driver sets when a read request completes; both branches wait on it after a read() |
 | `((u32 *)buffer)[0]`, `[1]`, `[n + 1]` | `TimBlockHeader` `count`, `offsets[0]`, `offsets[n]` | A | the header's words from +0x04 are what each block read seeks to; the words from +0x14 (FindMaxTimBlockSize) size the buffer every block is read into, so they are the sizes |
 | `* 4` | `* sizeof(*self->blocks)` | A | the TimArraySrc pointer array |
 

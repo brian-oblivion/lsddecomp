@@ -13,7 +13,7 @@
 > different file. Seven of `ScreenWidgets`'s functions turned out to be Sony's
 > and are now linked from SDK objects, which left this one wedged between
 > `o` segments -- so it has its own one-function unit, **`libgs_gs_101`**
-> (`src/libgs_gs_101.c`). The body below is unchanged and still compiles
+> (`src/psyq/libgs_gs_101.c`). The body below is unchanged and still compiles
 > byte-exact. `include/Task.h` still declares it for its one caller,
 > but that new file does NOT include the header, so the two are no longer
 > cross-checked by the compiler and must be kept in step by hand.

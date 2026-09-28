@@ -6,7 +6,7 @@
 
 > Renamed from `func_800423A8` on 2026-09-25 (tools/rename.py). Address 0x800423a8.
 
-Round 82, runner alpha (third re-staffed slot of the round). Unit `src/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (third re-staffed slot of the round). Unit `src/graphics/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** gRequestedFileMethods slot +0x00C (finalize) (`tools/classtable.py`).
 - **What:** Clears +0x02C (the flag `RequestedFile__MarkLoaded` sets), then calls slot +0x00C of `GetActiveDataSourceMethods()` (GameApplicationFileResource). The store lands in the `jal` delay slot. `GetActiveDataSourceMethods` is declared locally with a local `Slot0CMethods_322b4` return type, as `PlacementGridVabSound.c` does with its own view.
@@ -35,7 +35,7 @@ unit-local views `D_8006EED8Obj`/`D_8006EED8Methods` and the single-slot cast
 views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
 `CtorArg1Methods_322b4` are gone; `GetActiveDataSourceMethods` is declared
 `FileResourceMethods *`. The Source block above is the round-82 text; the live
-body in `src/Sprite.c` is byte-identical.
+body in `src/graphics/Sprite.c` is byte-identical.
 
 Renamed from `D8006EED8__Finalize` with rename.py (the class name).
 Accessors: `flag2C` -> `loaded`, `slot0C` -> the inherited `finalize`

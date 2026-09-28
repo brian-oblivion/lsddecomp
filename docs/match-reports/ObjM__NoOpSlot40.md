@@ -31,7 +31,7 @@ The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_800870
 
 ## Round 95 (track 7, echo)
 
-The unit banner of `src/ObjMStyleActor.c` was rewritten as documentation.
+The unit banner of `src/world/ObjMStyleActor.c` was rewritten as documentation.
 Its history, moved here verbatim in substance:
 
 > ObjMStyleActor -- sixth carved slice of the DayTaskStageMap block

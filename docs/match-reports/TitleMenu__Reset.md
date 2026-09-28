@@ -64,7 +64,7 @@ Renamed `func_8004D814` -> `TitleMenu__Reset`. **Tier B**: Passes `&sTitleTimPat
 **Head, round 77:** `unkA4 -> dreamSysView` APPLIED by type scope.
 
 `TitleMenu::unkA4` has a real accessor outside this unit
-(`src/TitleMenuTaskObjF.c`'s `TitleMenu__TitleMenu` sets it from its own
+(`src/ui/TitleMenuTaskObjF.c`'s `TitleMenu__TitleMenu` sets it from its own
 `dreamSys` parameter), so per the compiler-ownership rule this is a
 PROPOSAL, not a rename. Also posted to the round-77 broadcast.
 

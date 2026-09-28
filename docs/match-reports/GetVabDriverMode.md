@@ -74,11 +74,11 @@ itself) is not established, only that it's read/written alongside the mode.
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/GameApplicationFileResource.c`'s `(void)` declaration stays.
+**Verdict: arity-ok idiom.** `src/app/GameApplicationFileResource.c`'s `(void)` declaration stays.
 Identical in shape to `GetCdDriverMode`, its sibling on the previous line.
 
 **Callee evidence** (`0x8002C448`): the first instruction is `beqz a0,...`, so
-`$a0` is read before it is written. The definition in `src/PlacementGridVabSound.c`
+`$a0` is read before it is written. The definition in `src/sound/PlacementGridVabSound.c`
 (`s32 GetVabDriverMode(s32 *arg0)`) is right: one real argument, an optional
 out-pointer written only when non-NULL.
 
@@ -96,7 +96,7 @@ consumes it. A real one-parameter prototype would force an argument retail does
 not have.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/GameApplicationFileResource.c:231`. Oracle green.
+added to `src/app/GameApplicationFileResource.c:231`. Oracle green.
 
 ## Round 98 (charlie, track 7): parameter
 

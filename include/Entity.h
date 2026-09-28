@@ -12,7 +12,7 @@
  * Get_vtable_Entity): TodActor's one subclass (include/TodActor.h); no
  * class derives from it. The ctor calls TodActor's first
  * (GetTodActorMethods()->ctor), so the id parent is the ctor-chain
- * parent. Its methods and its MoodCue handlers are in src/Entity.c. The
+ * parent. Its methods and its MoodCue handlers are in src/world/Entity.c. The
  * MoodCue handlers are not in the table: they are
  * the `handler` of gEntityMoodHandlerTable's rows. Spawned by DreamAux
  * (SetDreamAuxWorld, SpawnDreamAuxTriggerEntity).
@@ -247,7 +247,7 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 
                                             s32 deactivateTimer, s32 zStep); /* Entity; called by Entity */
 
 /* The motion templates (.data, in address order):
- * the constant triples the MoodCue handlers in src/Entity.c pass to
+ * the constant triples the MoodCue handlers in src/world/Entity.c pass to
  * updateRotation (+0x044) and updateScale (+0x048) -- three Ratio16s
  * (include/SceneNode.h), degrees or scale factors, {x, y, z} -- and to
  * addTranslation (+0x0BC), three s32 deltas. Named by value. The slots take

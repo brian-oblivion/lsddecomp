@@ -11,7 +11,7 @@
  * 0xE03, method table gPlacementGridMethods, parent FileResource (the ctor
  * chains to GetActiveDataSourceMethods()->ctor, and Finalize and SetFlag
  * forward to the active driver's, as TimBlockSrc, Tod and ModelData do); no
- * subclasses. Methods in src/PlacementGridVabSound.c. GetPlacementGridMethods is the
+ * subclasses. Methods in src/sound/PlacementGridVabSound.c. GetPlacementGridMethods is the
  * first entry of gDataSourceClientGetters, so SetActiveDataSource rebinds
  * its file-I/O slots like every client's.
  *

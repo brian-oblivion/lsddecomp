@@ -8,23 +8,23 @@
  * direct BasicClass subclass (its ctor calls Get_vtable_BasicClass()->ctor
  * first; `classtable.py gFrameClockMethods --vs gBasicClassMethods` overrides the
  * ctor, finalize, removeParentRef and notifyParents and adds seven slots).
- * Methods in src/Sprite.c. No class derives from it.
+ * Methods in src/graphics/Sprite.c. No class derives from it.
  *
  * A per-frame clock that its parents listen to. Each tick (+0x044) sends
  * notifyParents(self, event) with event 2 (running: frameCount += 1 first),
  * 3 (paused: not counted) or 4 (flag14 set: not counted, takes precedence).
  * Its tick comes from the DrawSystem's per-VSync event 2
- * (include/DrawSystem.h): IntermediateBase__Init (src/Task.c) keeps
+ * (include/DrawSystem.h): IntermediateBase__Init (src/app/Task.c) keeps
  * one at +0x010 (initArgs->unk8, or New_FrameClock()), adds it as a child of
  * itself, of the viewport and of the LightRig, and IntermediateBase__OnTag1Notify
  * calls its tick on the DrawSystem's event 2. DayTask__DayTask
- * (src/DayTaskStageMap.c) makes the one handed in as initArgs->unk8.
+ * (src/world/DayTaskStageMap.c) makes the one handed in as initArgs->unk8.
  *
  * Its listeners, all dispatching on the sender's class nibble 5:
  * IntermediateBase's update counts every event; Viewport__OnNotifyTag5
  * redraws on 2 and 3 but not 4; DreamSys__TimerTick advances the dream timer
  * on 2 only; TodActor__Update ticks on 2 and releases itself on 4.
- * `paused` is named from ObjM (src/ObjMStyleActor.c): ObjM__AdvancePauseSetup
+ * `paused` is named from ObjM (src/world/ObjMStyleActor.c): ObjM__AdvancePauseSetup
  * calls +0x04C pause on its +0x010 FrameClock in the same step as WBgm__Pause
  * on its WBgm (the same slot, +0x04C), and ObjM__TeardownPauseOverlay calls
  * +0x050 resume beside WBgm__Resume. What sets flag14 (+0x058) is not found

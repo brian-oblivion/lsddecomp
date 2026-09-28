@@ -117,7 +117,7 @@ Renamed from `Unk18Obj__AttachViewChild`. Slot +0x070 `attachViewChild(self, nod
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/Task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSetRefView2((GsRVIEW2 *)&self->refView)`: `ViewportRefView` is Sony's GsRVIEW2 under a local name (include/Viewport.h).
+src/app/Task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSetRefView2((GsRVIEW2 *)&self->refView)`: `ViewportRefView` is Sony's GsRVIEW2 under a local name (include/Viewport.h).
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 

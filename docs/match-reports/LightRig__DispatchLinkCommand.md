@@ -4,7 +4,7 @@
 
 > Renamed from `func_80042820` on 2026-09-25 (tools/rename.py). Address 0x80042820.
 
-Round 82, runner alpha (re-staffed slot). Unit `src/Sprite.c`. Fresh
+Round 82, runner alpha (re-staffed slot). Unit `src/graphics/Sprite.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 - **Where:** gLightRigMethods slot +0x09C (dispatchLinkCommand, over SceneNode__DispatchLinkCommand) (`tools/classtable.py`).

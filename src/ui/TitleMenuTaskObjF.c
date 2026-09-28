@@ -187,7 +187,7 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSy
     target->registrationSlots[TITLEMENU_FLASHBACK] = (void *)locked;
 }
 
-/* src/ScreenWidgets.c: `value` as `width` full-width decimal digits into dst,
+/* src/ui/ScreenWidgets.c: `value` as `width` full-width decimal digits into dst,
  * zero-padded unless `unpadded`. */
 extern void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded);
 
@@ -310,7 +310,7 @@ void TitleMenu__RefreshViewValue(TitleMenu *self) {
 extern char *strcpy(char *dest, char *src);
 extern s32 strlen(char *s);
 
-/* Decodes full-width SJIS into one byte a character (src/ScreenWidgets.c);
+/* Decodes full-width SJIS into one byte a character (src/ui/ScreenWidgets.c);
  * nothing here reads its result. */
 extern void DecodeFullWidthSjis(void *dst, void *src);
 

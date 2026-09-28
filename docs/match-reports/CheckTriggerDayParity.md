@@ -101,7 +101,7 @@ without being proven to be the same field (see the header's own caveat on
 `TriggerRecord`'s offset-0x2 comment) -- "Trigger" alone reflects that
 looser confidence.
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 ## Naming (round 100)
 

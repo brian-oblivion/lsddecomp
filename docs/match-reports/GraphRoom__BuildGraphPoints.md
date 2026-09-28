@@ -32,7 +32,7 @@ values of a mutable local copy of `gGraphPointBaseColor` (also 3 bytes), decreme
 by 0x14 for the first 6 loop iterations and by 1 thereafter. Finally
 allocates a 4-byte scratch buffer into `self->unk_0x240`.
 
-## Final body (landed in `src/ObjMStyleActor.c`)
+## Final body (landed in `src/world/ObjMStyleActor.c`)
 
 ```c
 /* A 3-byte colour-ish triple, read/written strictly byte-for-byte in

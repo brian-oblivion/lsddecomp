@@ -8,8 +8,8 @@
 /*
  * MoviePlayer -- CD-streamed, MDEC-decoded FMV playback (class id 0x70,
  * method table gMoviePlayerMethods, a direct BasicClass subclass). Methods in
- * src/GraphicsResources.c; the object is 0x6C bytes (New_MoviePlayer). The one
- * holder is StreamTask (`player`, include/StreamTask.h, src/Task.c),
+ * src/graphics/GraphicsResources.c; the object is 0x6C bytes (New_MoviePlayer). The one
+ * holder is StreamTask (`player`, include/StreamTask.h, src/app/Task.c),
  * which builds it with New_MoviePlayer(GetDefaultMovieFrame(), 0, 0)
  * and calls +0x06C setAutoPlay, +0x040 play, +0x048 advance, +0x04C abort
  * and +0x004 release.

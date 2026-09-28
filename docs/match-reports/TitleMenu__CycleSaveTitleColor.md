@@ -183,7 +183,7 @@ skip:
 ```
 
 This is preserved verbatim, `#if 0`-wrapped, immediately above the
-`INCLUDE_ASM` in `src/TitleMenuTaskObjF.c`.
+`INCLUDE_ASM` in `src/ui/TitleMenuTaskObjF.c`.
 
 ## Derivation (all confirmed by the diff -- this is not in question)
 

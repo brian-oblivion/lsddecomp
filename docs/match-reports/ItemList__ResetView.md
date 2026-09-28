@@ -8,7 +8,7 @@
 
 > Renamed from `func_80051F14` on 2026-09-24 (tools/rename.py). Address 0x80051f14.
 
-Unit: `src/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`.
+Unit: `src/ui/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`.
 
 ## Body
 

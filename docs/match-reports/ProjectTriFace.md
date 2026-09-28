@@ -2,7 +2,7 @@
 
 > Renamed from `func_800193C0` on 2026-09-17 (tools/rename.py). Address 0x800193c0.
 
-Unit: `src/TmdRenderer.c`. Triangle submission routine: computes three
+Unit: `src/graphics/TmdRenderer.c`. Triangle submission routine: computes three
 vertex-array pointers from a shared base and three `u16` indices, stores
 them into the primitive/context struct (`prim`, same struct
 `TransformAndCullPoly` operates on — see that report), loads them into the GTE

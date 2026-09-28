@@ -14,7 +14,7 @@
 > already-documented register-identity class. Round 45 is this function's
 > first-ever attempt.
 
-Unit: `src/libsnd_vmanager.c` (carved round 24, 2026-09-08) · Size: 316 words
+Unit: `src/psyq/libsnd_vmanager.c` (carved round 24, 2026-09-08) · Size: 316 words
 (0x4F0 bytes), file offset `0x1D9B4`, vram `0x8002D1B4`.
 
 ## What it computes
@@ -371,7 +371,7 @@ restructuring reached it this round.
 > Delta ran out of round budget before reaching it; nothing about it was tried
 > and found difficult.
 
-Unit: `src/libsnd_vmanager.c` (carved round 24, 2026-09-08) · Size: 316 words.
+Unit: `src/psyq/libsnd_vmanager.c` (carved round 24, 2026-09-08) · Size: 316 words.
 
 ## Evidence (obsolete -- kept for history)
 
@@ -850,7 +850,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
 ## NON_MATCHING body promoted, round 69
 
 Promoted the round-65 FINAL preserved body (316/316 exact, 201/316 matched,
-the one this report's TITLE figures describe) into `src/libsnd_vmanager.c`
+the one this report's TITLE figures describe) into `src/psyq/libsnd_vmanager.c`
 under `#ifdef NON_MATCHING` (verified build unchanged, keeps `INCLUDE_ASM`);
 `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green. One
 cosmetic change from the literal preserved text: the permuter's reused `tmp`

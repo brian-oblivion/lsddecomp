@@ -2,7 +2,7 @@
 
 > Renamed from `func_80025E9C` on 2026-09-24 (tools/rename.py). Address 0x80025e9c.
 
-**Unit:** `src/Pad.c` (runner ALPHA, `runner/alpha`)
+**Unit:** `src/app/Pad.c` (runner ALPHA, `runner/alpha`)
 **Status:** MATCHED (4/4 words, full build verified byte-exact)
 **Vtable slot:** none -- this function *returns* the table itself.
 

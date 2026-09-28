@@ -61,7 +61,7 @@ offset in the struct moves). Posted to the broadcast.
 `GenericCtorTable_3bb8c_d` (TitleMenuTaskObjF's view of `gTaskObjFMethods`, used by
 `TaskObjF__TaskObjF`), not through `TaskObjFMethods`. So the head renamed THAT
 view's `slot40` -> `setCardSlot` by type scope (one accessor,
-`src/TitleMenuTaskObjF.c`), and declined the `TaskObjFMethods` pad split: adding a
+`src/ui/TitleMenuTaskObjF.c`), and declined the `TaskObjFMethods` pad split: adding a
 field no code reads through that struct is unifying two views of one table,
 which is track 4's job. Left for track 4: `TaskObjFMethods` and
 `GenericCtorTable_3bb8c_d` are two views of `gTaskObjFMethods`.

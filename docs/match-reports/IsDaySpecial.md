@@ -4,7 +4,7 @@
 > It was blocked by `nop_mflo_mfhi`, which is RESOLVED this round: maspsx gained
 > `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
 > the whole image is byte-exact with the flags on, and this function was one of
-> the live tests -- the body preserved below, unchanged except for dropping a redundant `extern` that DreamSys.h already declares. The C is in `src/DreamSys.c`. Everything below is the
+> the live tests -- the body preserved below, unchanged except for dropping a redundant `extern` that DreamSys.h already declares. The C is in `src/world/DreamSys.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
 > **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was

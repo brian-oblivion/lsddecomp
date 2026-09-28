@@ -26,7 +26,7 @@ StreamTaskObj *New_StreamTask(s32 a1, s32 a2, s32 a3, s32 a4)
 }
 ```
 
-See `src/Task.c` for the exact text.
+See `src/app/Task.c` for the exact text.
 
 ## Why it matched: `return NULL;` goes LAST
 

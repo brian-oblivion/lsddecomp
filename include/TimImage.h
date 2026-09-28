@@ -6,7 +6,7 @@
 /*
  * TimImage -- a FileResource data source (class id 0x103, method table
  * gTimImageMethods) whose buffer holds one TIM image. Methods in
- * src/TimImage.c. No classes derive from it (`typeviews.py --tree`), so
+ * src/graphics/TimImage.c. No classes derive from it (`typeviews.py --tree`), so
  * there are no FIELDS/SLOTS macros.
  *
  * The ctor chain agrees with the id: TimImage__TimImage's first call is
@@ -24,7 +24,7 @@
  * usually freeBuffer (+0x05C) or release (+0x004) once the sprites made
  * from it hold what they need. A Sprite's `texture` is a TimImage: its
  * reset keeps &texture->tim (include/Sprite.h). TimArraySrc (gTimArraySrcMethods,
- * src/GraphicsResources.c) makes them with New_TimImage(NULL), points `buffer`
+ * src/graphics/GraphicsResources.c) makes them with New_TimImage(NULL), points `buffer`
  * into its own block and sets `clutBase`.
  *
  * +0x078 is FileResource's `void *slot78` (NULL there); this table's occupant

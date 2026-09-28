@@ -48,7 +48,7 @@ char *TaskObjF__FindUnusedMemcardName(Node3bb8cE *self, char *buf, char *middle,
 (`pad00[0x00C]`); this function proves it's a real vtable pointer (the
 object's OWN methods table, distinct from the base-class table obtained
 via `Get_vtable_BasicClass()`). Added `SelfMethods3bb8cE` (local to
-`src/TitleMenuTaskObjF.c`) with only the one reached slot, `+0x054`.
+`src/ui/TitleMenuTaskObjF.c`) with only the one reached slot, `+0x054`.
 
 ### Proposed learning
 

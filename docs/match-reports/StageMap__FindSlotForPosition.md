@@ -552,7 +552,7 @@ order. Whatever retail's source does here, it does it once.
 
 **69/70, exact length, one word remaining** at vram `0x8004C500` -- the mirror
 `addu` in the second bounds comparison, the one the asymmetry protects. The
-`INCLUDE_ASM` is restored and the preserved body in `src/DayTaskStageMap.c` has
+`INCLUDE_ASM` is restored and the preserved body in `src/world/DayTaskStageMap.c` has
 been updated to the 69/70 form.
 
 ### Proposed learning
@@ -658,7 +658,7 @@ Parameters and locals, tier A: `arg1` -> `pos`, `tol` -> `span` (a chunk's width
 
 Constants: 0xA000 -> `STAGE_CHUNK_SIZE`; loop bound 7 -> `CHUNK_NEIGHBOUR_COUNT`; 0x800 -> the unit-local `VERTICAL_LAYER_HEIGHT` (2048). Not `STAGE_CELL_SIZE`: nothing shows a vertical layer is one cell tall, only that the value is the same.
 
-The comment that stood above the function in `src/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
+The comment that stood above the function in `src/world/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
 
 ```c
 /* MATCH, round 73 (bravo): 70/70. The last word was the operand order

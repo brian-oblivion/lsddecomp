@@ -242,7 +242,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > targeted, because nothing in the residue's own description as "register
 > identity" pointed at a reload site rather than the loads/stores the
 > manual attempts focused on. **Disposition: 137/140, exact length,
-> `INCLUDE_ASM` restored, preserved body updated in `src/DayTaskStageMap.c`.**
+> `INCLUDE_ASM` restored, preserved body updated in `src/world/DayTaskStageMap.c`.**
 > The remaining 3-word residue (second loop's row pointer) is unchanged
 > register-identity, consistent with everything else already confirmed
 > inert for this class in this unit.
@@ -441,7 +441,7 @@ time expecting monotonic improvement.
 
 ## SUPERSEDED by round 63 -- the matching body
 
-The round-63 match is live in `src/DayTaskStageMap.c`. Against the 137/140 body it
+The round-63 match is live in `src/world/DayTaskStageMap.c`. Against the 137/140 body it
 differs in exactly two places: the `Elem *e2;` declaration is gone and the
 second loop uses `e`, and the first loop's `__asm__("")` barrier is gone (no
 longer needed once `e` is merged; verified by whole-image rebuild).
@@ -776,7 +776,7 @@ Parameters and locals, tier A: `val` -> `centreChunk`, `arg2` -> `centrePos`, `a
 
 Constants: the key loop runs to `CHUNK_NEIGHBOUR_COUNT` (enum ChunkNeighbour), the slot loop to `ARRAY_COUNT(self->slots)`, `loads` is `[CHUNK_NEIGHBOUR_COUNT]`, 0x5000 -> `STAGE_CHUNK_SIZE / 2`. The reuse of `slot` in the second loop keeps a one-line `/* MATCHING */`.
 
-The comment that stood above the function in `src/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
+The comment that stood above the function in `src/world/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
 
 ```c
 /* MATCH, round 63 (delta): closed a 137/140 stall that had stood since round

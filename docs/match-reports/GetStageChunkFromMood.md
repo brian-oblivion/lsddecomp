@@ -97,7 +97,7 @@ residue with a one-word fix (`u32`), and it survives `return stage;` from an
 **`GetStageChunkFromMood`, tier A.** Inherited from lsddecomp, confirmed:
 the body's own name (`Get<output>From<input>`) matches what it does — search
 every stage's mood table for a value equal to `*mood` and return the owning
-chunk — and the one call site outside this unit, `src/DreamSys.c:2003`
+chunk — and the one call site outside this unit, `src/world/DreamSys.c:2003`
 inside `GenerateInitialSpawn` (`stage = GetStageChunkFromMood(&chunk,
 mood);`), passes a `MoodGraphPoint *mood` and uses the returned stage to
 index `sStageTimeLimits`/`sStageSpawnPoints` and the returned `chunk` to

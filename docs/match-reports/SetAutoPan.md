@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002EA44` on 2026-09-20 (tools/rename.py). Address 0x8002ea44.
 
-Unit: `src/libsnd_vmanager.c`. Round 24 (second pass), runner bravo.
+Unit: `src/psyq/libsnd_vmanager.c`. Round 24 (second pass), runner bravo.
 
 ## Screens (clean)
 
@@ -608,7 +608,7 @@ not established from this function's body alone.
 
 ## NON_MATCHING body promoted, round 67
 
-Placed in `src/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+Placed in `src/psyq/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
 kept in `#else`. All of the preserved body's own local `Rec34HalfU`/
 `Rec16D7F0`/plain-byte-global declarations were already present in the
 unit's shared prelude (moved up for `SetAutoVol`, first in ROM
@@ -877,7 +877,7 @@ The NON_MATCHING body now uses `_svm_voice[voice].unk28`..`unk32` (and `*(u8 *) 
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `ObjE970` is `VabHdr` (`_svm_vh`): this body reads `D_8008E970->mvol` (+0x18, was `masterVolume`). Normalized disassembly unchanged.
+Round 96 (charlie, track 6) moved `src/psyq/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `ObjE970` is `VabHdr` (`_svm_vh`): this body reads `D_8008E970->mvol` (+0x18, was `masterVolume`). Normalized disassembly unchanged.
 
 ## History (moved from src/libsnd_vmanager.c, comments pass)
 

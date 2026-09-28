@@ -1,6 +1,6 @@
 # Sprite__Sprite -- MATCHED (41/41 words), round 82
 
-Round 82, runner alpha (fifth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gSpriteMethods slot +0x008 (ctor) (`tools/classtable.py`).
 - **What:** SceneNode's ctor through `GetSceneNodeMethods()`, installs `GetSpriteMethods()`, then calls the installed reset (+0x040) with all five ctor arguments (arg4/arg5 re-stored at sp+0x10/0x14). Nothing after the call touches `$v0`, so it returns whatever reset returns; the byte match says nothing about the return type.

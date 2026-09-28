@@ -81,7 +81,7 @@ table family may read them.
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
-`src/DayTaskStageMap.c`'s `SoundObj_3ac78`/`SoundObjMethods_3ac78` view is
+`src/world/DayTaskStageMap.c`'s `SoundObj_3ac78`/`SoundObjMethods_3ac78` view is
 deleted. `sound` is cast to `VabStreamObj *` (`include/VabStreamObj.h`) and
 calls `playTone`, the same slot at the same type. The whole image stays
 byte-identical. `TimedTask::sound` stays `BasicClass *`.

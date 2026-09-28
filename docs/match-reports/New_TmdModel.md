@@ -2,7 +2,7 @@
 
 > Renamed from `new_class_6bea0` on 2026-09-25 (tools/rename.py). Address 0x8001f250.
 
-Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/TmdModel.c`. Fresh ground, no prior attempt.
+Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/TmdModel.c`. Fresh ground, no prior attempt.
 
 - **What:** the allocator of class gTmdModelMethods: `p = BMemPMgrAlloc(0x24); if (p != NULL) { Get_vtable_TmdModel()->ctor(p, arg); return p; } return NULL;`. The ctor (slot +0x008, `TmdModel__TmdModel`) takes the allocator's argument as its second parameter.
 - **Result:** byte-exact; 24/24 words, whole-image SHA1 green. First build (the broadcast allocator shape).
@@ -67,7 +67,7 @@ first).
 
 `BMemPMgrAlloc(0x24)` -> `BMemPMgrAlloc(sizeof(TmdModel))`, the codebase-wide
 idiom once a class's allocator size matches its now-real struct (e.g.
-`src/GraphicsResources.c`'s `BMemPMgrAlloc(sizeof(TimBlockSrc))`). `sizeof(TmdModel)`
+`src/graphics/GraphicsResources.c`'s `BMemPMgrAlloc(sizeof(TimBlockSrc))`). `sizeof(TmdModel)`
 is 0x24 (`include/TmdModel.h`'s own banner already states the object is
 0x24 bytes); byte-identical, build and check-nonmatching.sh green.
 

@@ -49,7 +49,7 @@
 > force `lwl`/`lwr` at two non-adjacent offsets" — but that struct type was
 > not a guess, it was written down.
 
-Unit: `src/TmdRenderer.c`. Copies three unaligned 8-byte fields
+Unit: `src/graphics/TmdRenderer.c`. Copies three unaligned 8-byte fields
 (`arg1[0]`/`[4]`/`[8]` -> `arg0[0]`/`[4]`/`[8]`, treating `arg0`/`arg1` as
 arrays of 3 pointers) and, for each of the three destinations, an unaligned
 4-byte field from a separate source pointer (`arg2`, `arg3`, `arg4`

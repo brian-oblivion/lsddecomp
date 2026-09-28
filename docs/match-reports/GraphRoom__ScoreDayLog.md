@@ -4,7 +4,7 @@
 
 > Renamed from `func_800585B4` on 2026-09-24 (tools/rename.py). Address 0x800585b4.
 
-Unit: `src/ObjMStyleActor.c` · Size: 56 words (file 0x48DB4-0x48E94) · Round 41
+Unit: `src/world/ObjMStyleActor.c` · Size: 56 words (file 0x48DB4-0x48E94) · Round 41
 (2026-09-14), runner echo, worktree `lsddecomp2-wt-echo`.
 
 Inherited from round 24's stall: length **1 word SHORT at 55/56**, 15/56 raw
@@ -89,7 +89,7 @@ independently, after the byte-exact candidate was found:
 | the chained form, i.e. `p = gGraphScoreMoods; days = log->days;` instead of `p = (days = gGraphScoreMoods); days = log->days;` | regresses to 11/56, length wrong by ~95KB (whole-image drift) |
 
 Both are now commented in-source as **do not simplify without
-re-verifying** (`src/ObjMStyleActor.c`, directly above the function). This
+re-verifying** (`src/world/ObjMStyleActor.c`, directly above the function). This
 is not a case of dead code surviving by accident; it is dead code that
 cc1's scheduler treats differently depending on its presence, which is
 exactly the kind of compiler-idiosyncrasy the permuter is for.
@@ -106,7 +106,7 @@ mutating already-irrelevant statement shapes, not part of the real fix.
 
 ## Final matched body (56/56, byte-exact)
 
-Live in `src/ObjMStyleActor.c`, immediately following the `gGraphScoreMoods`
+Live in `src/world/ObjMStyleActor.c`, immediately following the `gGraphScoreMoods`
 declaration:
 
 ```c

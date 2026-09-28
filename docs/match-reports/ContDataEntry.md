@@ -8,7 +8,7 @@ The union of the two VagAtr views in `DataEntryLocals` (`Scratch_800357B0 s; Scr
 
 **REVISITED, round 69: STALL, improved (44/376 rebuilt -> 95/376, ins/del
 21/21 -> 6/6, frame exact) and promoted to `#ifdef NON_MATCHING` in
-`src/libsnd_seqread.c`; names/types used** (the callee's real signature, a
+`src/psyq/libsnd_seqread.c`; names/types used** (the callee's real signature, a
 union in `DataEntryLocals`, a loop counter width).
 
 ## Round 69 (runner bravo): repaired, rebuilt, three levers
@@ -90,7 +90,7 @@ No permuter search.
 
 ### Best body (95/376, 380 words, frame exact) with every declaration it needs
 
-This is the same body now in `src/libsnd_seqread.c` under `#ifdef
+This is the same body now in `src/psyq/libsnd_seqread.c` under `#ifdef
 NON_MATCHING`. It needs the unit's `Entry90902E8`, `_ss_score`,
 `ReadDeltaValue` and the `SsUtGetProgAtr`/`SsUtGetVagAtr`/`SsUtSetVagAtr`
 externs declared earlier in the unit.
@@ -499,7 +499,7 @@ combine:
 }
 ```
 
-Splicing this literal body back into `src/libsnd_seqread.c` in place of the
+Splicing this literal body back into `src/psyq/libsnd_seqread.c` in place of the
 `INCLUDE_ASM`, together with the struct/prototype block above it, builds
 clean (`build exit=2`, zero compile-error grep hits) at 380/376 words.
 
@@ -606,7 +606,7 @@ value never had, and the two are not the same lever.
 Re-verified this round's preserved body builds clean at the recorded score
 (`SsUtGetProgAtr`/`SsUtGetVagAtr`/`SsUtSetVagAtr` -- the round-34 SDK
 renames of `func_800334F0`/`func_80033260`/`func_80036230` this report
-originally used -- are already reflected in `src/libsnd_seqread.c`'s preserved
+originally used -- are already reflected in `src/psyq/libsnd_seqread.c`'s preserved
 `#if 0` body). Rebuilding it in isolation reproduces exactly the same
 **380/376 compiled length** this report already recorded (confirmed via
 `mipsel-linux-gnu-objdump` symbol-to-symbol distance on
@@ -830,7 +830,7 @@ per `tools/stalesyms.py`'s finding (relayed by the head) that this report's
 preserved body sat in a plain fenced code block with no `#if 0` markers --
 CLAUDE.md's mandated preservation form -- so it was not literally
 "positioned where it would compile" the way a copy-paste back into
-`src/libsnd_seqread.c` needs. No change to the body itself, and see the
+`src/psyq/libsnd_seqread.c` needs. No change to the body itself, and see the
 round-49 note above: this body's `Snd_setVabAttr` call sites still use the
 now-stale 3-way (`u32`/`Blk1_800351D0`/`Blk2_800351D0`) argument slice and
 will need reshaping to the real `(Scratch_800357B0, AdsrFields)`
@@ -934,7 +934,7 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2)
 
 (Needs the same `Blk1_800351D0`/`Blk2_800351D0`/`DataEntryLocals`/
 `Scratch800351D0` typedefs and the local `Snd_setVabAttr` prototype already
-declared earlier in `src/libsnd_seqread.c`, unchanged from before this
+declared earlier in `src/psyq/libsnd_seqread.c`, unchanged from before this
 round.)
 
 ### What is left (not investigated further this round -- flagged for next attempt)
@@ -990,7 +990,7 @@ report). Its REAL signature is `(s16 channel, s16 slot, s16 kind,
 Scratch_800357B0 scratch, AdsrFields resolved, s16 arg5, u8 arg6)` --
 a 0x20-byte scratch struct plus an 18-byte ADSR struct, both by value.
 This function's own forward declaration of it (just above this function's
-`#if 0` body in `src/libsnd_seqread.c`) instead sliced the same 50 bytes as
+`#if 0` body in `src/psyq/libsnd_seqread.c`) instead sliced the same 50 bytes as
 `(u32 a3, Blk1_800351D0 blk1, Blk2_800351D0 blk2)` -- a different, never-
 confirmed guess. Once `Snd_setVabAttr` had a real definition, the two
 conflicted (`` conflicting types for `Snd_setVabAttr' ``), so the stale

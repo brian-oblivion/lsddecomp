@@ -61,13 +61,13 @@ transferable part.** Every other unit in the project that names this slot
 already passes it a second argument:
 
 ```
-src/ObjMStyleActor.c:72   self->unk18->methods->slot64(self->unk18, v);
-src/Entity.c:244       this->unk94->unk5C->methods->slot64(..., sMoodCue74ClearColor);
-src/ScreenWidgets.c:319   self->methods->slot64(self, 0);
-src/ScreenWidgets.c:419   methods->slot64(self, 1);
-src/ScreenWidgets.c:437   methods->slot64(self, 0);
-src/ScreenWidgets.c:445   methods->slot64(self, 0);
-src/ObjMStyleActor.c:207  unk18->methods->slot64(unk18, unk50->unkC);
+src/world/ObjMStyleActor.c:72   self->unk18->methods->slot64(self->unk18, v);
+src/world/Entity.c:244       this->unk94->unk5C->methods->slot64(..., sMoodCue74ClearColor);
+src/ui/ScreenWidgets.c:319   self->methods->slot64(self, 0);
+src/ui/ScreenWidgets.c:419   methods->slot64(self, 1);
+src/ui/ScreenWidgets.c:437   methods->slot64(self, 0);
+src/ui/ScreenWidgets.c:445   methods->slot64(self, 0);
+src/world/ObjMStyleActor.c:207  unk18->methods->slot64(unk18, unk50->unkC);
 ```
 
 (`PlacementGridVabSound.c`'s `s32 (*slot64)(void *)` is a different class's table and
@@ -114,7 +114,7 @@ own entry point and would not have resolved for the next reader.
 
 ## Final body
 
-Lives in `src/ObjMStyleActor.c` in ROM order between `StyleEffect__ReleaseModelChildren` and
+Lives in `src/world/ObjMStyleActor.c` in ROM order between `StyleEffect__ReleaseModelChildren` and
 `StyleEffect__SpawnSprites`.
 
 ### Proposed learning
@@ -132,7 +132,7 @@ find and are themselves the evidence.
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/ObjMStyleActor.c`'s unprototyped declaration
+**Verdict: arity-ok idiom.** `src/world/ObjMStyleActor.c`'s unprototyped declaration
 stays.
 
 **Callee evidence** (`0x80056BBC`, and the matched definition *in this same
@@ -162,7 +162,7 @@ line 146 would make the `StyleEffect__BuildRandomSprites(self, 0)` call at line 
 `too many arguments` error against the definition 187 lines further down.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/ObjMStyleActor.c:146`. Oracle green.
+added to `src/world/ObjMStyleActor.c:146`. Oracle green.
 
 ## Naming
 

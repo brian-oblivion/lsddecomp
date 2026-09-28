@@ -351,7 +351,7 @@ The `arity-ok` line's retail evidence: the dead second argument of
 | --- | --- | --- | --- |
 | local `obj` | `drawSystem` | A | it holds `New_DrawSystem()`'s return and is passed as `initSystems`'s `DrawSystem *drawSystem` |
 | `2` (SetMem) | `CONSOLE_RAM_MB` | A | Psy-Q libapi's `SetMem(n)` takes the RAM size in megabytes, 2 on a retail console, 8 on a development board |
-| `0x166C00` | `DEFAULT_POOL_SIZE` = `(1435 * 1024)` | A | `BMemPMgrInit(s32 poolSize)` (src/BMemPMgr.c) stores it as `pool->poolSize`; the pool is installed by `SetDefaultBMemPMgr`, whose only caller is `main`, as the `gDefaultBMemPMgr` every `BMemPMgrAlloc` uses |
+| `0x166C00` | `DEFAULT_POOL_SIZE` = `(1435 * 1024)` | A | `BMemPMgrInit(s32 poolSize)` (src/app/BMemPMgr.c) stores it as `pool->poolSize`; the pool is installed by `SetDefaultBMemPMgr`, whose only caller is `main`, as the `gDefaultBMemPMgr` every `BMemPMgrAlloc` uses |
 
 `New_Pad(0, 0)` keeps its literals with a comment: they are `PadInit`'s mode
 and the port, and a name would restate them.

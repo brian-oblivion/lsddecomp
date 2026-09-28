@@ -177,7 +177,7 @@ ModelData, which is why it goes to `scratch[3]`: New_Entity's descriptor word
 `TriggerWorld { void **vtable; }` / `TriggerWorldFn` view in
 include/DreamAux.h is gone. Bytes unchanged.
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 TriggerRecord is 8 bytes (FireDreamAuxTriggerEntries' and InitDreamAux's
 stride), so the kind-2 recursion, `record + 1` of a 0x38-byte struct, is

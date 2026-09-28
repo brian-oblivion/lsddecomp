@@ -25,7 +25,7 @@ jr $ra
 
 Same one-shot-flag shape as `StyleFlushDecoration`: test `gStyleDecorVariant`, act, then
 clear the flag. `ReleaseBasicClassArray` is already established across the codebase
-(`src/TmdRenderer.c`, `src/class_3bb8c_o.c`, `src/ObjMStyleActor.c`) as
+(`src/graphics/TmdRenderer.c`, `src/class_3bb8c_o.c`, `src/world/ObjMStyleActor.c`) as
 `void ReleaseBasicClassArray(void **array, s32 count)`. `gStyleDecorSlots` is plain `.bss`
 (no `.sdata`/`.sbss` dlabel anywhere; resolved via
 `config/undefined_syms_auto.slps01556.lsdde.txt`, confirmed in

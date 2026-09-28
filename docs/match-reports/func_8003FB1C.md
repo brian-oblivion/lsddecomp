@@ -5,7 +5,7 @@
 > `Gssub_make_matrix`.** The object's 0xC8 of text covers exactly it. It sat
 > one function INTO `ScreenWidgets`, so that unit is split
 > `[c libgs_gs_101][o libgs/gs_123][c ScreenWidgets]` and GsSetNearClip, the
-> single function in front, moved to `src/libgs_gs_101.c`.
+> single function in front, moved to `src/psyq/libgs_gs_101.c`.
 >
 > **This RECLASSIFIES a matched function out of the game-code count, which is
 > the correction CLAUDE.md asks for, not a regression.** `libgs/gs_131`, linked
@@ -63,7 +63,7 @@ void func_8003FB1C(Matrix2cc8c *dst, s16 sin, s16 cos, u8 axis) {
 }
 ```
 
-with, unit-locally in `src/ScreenWidgets.c`:
+with, unit-locally in `src/ui/ScreenWidgets.c`:
 
 ```c
 typedef struct Matrix2cc8c {
@@ -110,7 +110,7 @@ translation vector on a copied identity matrix.
 
 Neither declaration was moved. `ScreenWidgets` does not include
 `class_3bb8c.h`, so there is no collision, and the matrix view lives in
-`src/ScreenWidgets.c` rather than in the six-unit `Task.h`. This is the
+`src/ui/ScreenWidgets.c` rather than in the six-unit `Task.h`. This is the
 multiple-independent-local-views convention working as intended: the
 cross-reference belongs in a report, not in a shared header.
 

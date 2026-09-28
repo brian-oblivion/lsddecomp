@@ -108,7 +108,7 @@ it with no other change.
 this is a shared-header vtable slot edit** (`include/Task.h`, six units):
 
 - `slot110`'s occupant `TaskCore__CancelElementScroll` is **already matched** in
-  `src/Task.c` as `void TaskCore__CancelElementScroll(Obj86B60 *self)`. That is positive
+  `src/app/Task.c` as `void TaskCore__CancelElementScroll(Obj86B60 *self)`. That is positive
   evidence, not inference from the function under test.
 - Neither slot had any other caller anywhere: the header's own comment recorded
   both as `OBSERVED: TaskCore__SetState (STALL, not attempted)` — i.e. the `s32` had

@@ -9,7 +9,7 @@
  * at +0x064 instead of its GsDOBJ2 model. Viewport__DrawNode hands
  * `self + 0x64` to GsSortSprite for every class whose id's low byte is 0x44:
  * screen-space for 0x144 (ScreenSprite and below), otherwise world-space,
- * projected from the inherited coordinate. Methods in src/Sprite.c; four
+ * projected from the inherited coordinate. Methods in src/graphics/Sprite.c; four
  * classes derive from it (`typeviews.py --tree`): ScreenSprite (0x144, the
  * screen-space sprite, include/ScreenSprite.h), CharSprite (0x1144, one 8x8
  * font character, include/CharSprite.h), TextRow (0x11144) and gVariantSpriteMethods (0x1F44,

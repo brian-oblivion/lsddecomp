@@ -7,8 +7,8 @@
  * CdStream -- one streamed CD file (an FMV's sectors) read through Sony's
  * libcd streaming library (StSetRing/StSetStream/StGetNext/StFreeRing), class
  * id 0x40, method table gCdStreamMethods, a direct BasicClass subclass.
- * Methods in src/CdStream.c. The one holder is MoviePlayer (gMoviePlayerMethods,
- * src/GraphicsResources.c), whose ctor builds one with New_CdStream(cdSpeed, MOVIE_FPS, 0)
+ * Methods in src/cd/CdStream.c. The one holder is MoviePlayer (gMoviePlayerMethods,
+ * src/graphics/GraphicsResources.c), whose ctor builds one with New_CdStream(cdSpeed, MOVIE_FPS, 0)
  * into its +0x060 and drives it through the slots below.
  *
  * One stream at a time. `gActiveCdStream` is the stream that owns the drive:

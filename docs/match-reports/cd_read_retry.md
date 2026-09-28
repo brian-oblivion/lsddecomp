@@ -41,7 +41,7 @@ the length was nearly right, which is what made its score readable.
 ## Body, as salvaged
 
 Uncompiled and unmeasured beyond the above. Everything it references was
-declared in `src/libcd_bios.c` at the time, including the `extern volatile`
+declared in `src/psyq/libcd_bios.c` at the time, including the `extern volatile`
 hardware-register block (`D_8006D8C0` and neighbours) that delta established
 for this unit.
 
@@ -208,7 +208,7 @@ nothing to re-derive there.
 
 Restored to `INCLUDE_ASM` (no score short of byte-exact stays in
 `src/`); the two extern declarations for `D_80010AAC`/`D_80010ABC` are
-kept live in `src/libcd_bios.c` since they're needed by any future
+kept live in `src/psyq/libcd_bios.c` since they're needed by any future
 attempt and cost nothing to carry forward.
 
 ### Proposed learning

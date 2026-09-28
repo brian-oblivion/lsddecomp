@@ -71,7 +71,7 @@ extern char *BuildCdFilePath(char *dest, char *name);
  * into its clients' tables, so the request methods below run on other
  * objects. The ctor runs InitCdDrive (part 3) once per boot. */
 
-/* The game's pool allocator, src/BMemPMgr.c. */
+/* The game's pool allocator, src/app/BMemPMgr.c. */
 extern void *BMemPMgrAlloc(s32 size);
 /* Defined in CdDriver.c. */
 extern void InitCdDrive(void);
@@ -802,7 +802,7 @@ extern void UnlockCd(void);
 /* Polls of CdSync that answer CdlNoIntr before the seek is issued again. */
 #define CD_WAIT_TIMEOUT 601
 
-/* The game's pool allocator, src/BMemPMgr.c. */
+/* The game's pool allocator, src/app/BMemPMgr.c. */
 extern void *BMemPMgrAlloc(s32 size);
 /* BMemPMgrFree is GameApplicationFileResource.h's, included above. */
 

@@ -633,7 +633,7 @@ where its old value could have been considered dead. The "mention it twice"
 lever's precondition (a value whose lifetime the compiler is currently
 choosing to SHORTEN) does not hold for a parameter that is live throughout.
 
-Both reverted (`git checkout -- src/DayTaskStageMap.c`; clean `OK: build
+Both reverted (`git checkout -- src/world/DayTaskStageMap.c`; clean `OK: build
 matches retail` confirmed after each).
 
 **Disposition unchanged: `INCLUDE_ASM`, still 55/97, still a clean 3-register
@@ -918,7 +918,7 @@ allocation that is already the right size.
 
 Track 1b promotion. Score re-verified unchanged (62/97, exact length, zero
 drift) before promoting. Placed the existing round-58 preserved body
-(the do-while(0)-plus-named-h8Val body carried in `src/DayTaskStageMap.c`)
+(the do-while(0)-plus-named-h8Val body carried in `src/world/DayTaskStageMap.c`)
 inside `#ifdef NON_MATCHING`, with `INCLUDE_ASM` restored in the `#else`.
 No source change beyond the wrapper and comment; both oracles green:
 `./build-and-verify.sh` (exit 0, `OK: build matches retail`) and

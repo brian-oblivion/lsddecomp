@@ -2,7 +2,7 @@
 
 > Renamed from `func_800280EC` on 2026-09-17 (tools/rename.py). Address 0x800280ec.
 
-Round 45, runner echo (second sitting), `src/CdDriver.c`. Its address is
+Round 45, runner echo (second sitting), `src/cd/CdDriver.c`. Its address is
 taken 3x elsewhere in the slice (this function itself, twice as a
 `VSyncCallback` argument, once by `StartCdService`) — a function pointer.
 

@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for gTodMethods, object size
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
 
 ```c
 /* Allocate and construct a gTodMethods object. */
@@ -42,7 +42,7 @@ void *New_Tod(s32 arg0) {
 
 ## Naming
 
-- **New_Tod**, tier A. Allocator for gTodMethods; the packet fields it decodes (byte value, 4-bit type/sub-type nibbles, byte length) match src/TodActor.c's own description of TOD packets (attribute, coordinate, model-id, parent), and its array-of-these subclass is externally named TodSet.
+- **New_Tod**, tier A. Allocator for gTodMethods; the packet fields it decodes (byte value, 4-bit type/sub-type nibbles, byte length) match src/world/TodActor.c's own description of TOD packets (attribute, coordinate, model-id, parent), and its array-of-these subclass is externally named TodSet.
 
 ## Track 4 (2026-09-26, round 86, charlie)
 

@@ -116,7 +116,7 @@ particular call site once a subclass's vtable is installed.
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
 `include/DayTaskStageMap.h`'s local `extern BasicClass *New_VabStreamObj(char *)`
-is deleted. `src/DayTaskStageMap.c` now includes `include/VabStreamObj.h`, where
+is deleted. `src/world/DayTaskStageMap.c` now includes `include/VabStreamObj.h`, where
 the allocator returns `VabStreamObj *`, and casts the result to
 `BasicClass *` for `TimedTask::sound`. The whole image stays
 byte-identical.
@@ -153,7 +153,7 @@ on init's return through DayTask; 2 and 3 are DayTask's own codes.
 Proposed, not applied (accessors outside this job's units):
 - slot +0x074 `slot74` -> `togglePause`: NULL here, its one occupant is
   ObjM__TogglePause and its one caller ObjM__DispatchPadEvent's 0x21 case
-  (`src/ObjMStyleActor.c`).
+  (`src/world/ObjMStyleActor.c`).
 - field +0x034 `sound` `BasicClass *` -> `struct VabStreamObj *`, with the
   ctor's and New_TimedTask's `sound` parameter: every object that reaches it
   is a New_VabStreamObj, and four units cast it back. Needs ObjM.h's ctor

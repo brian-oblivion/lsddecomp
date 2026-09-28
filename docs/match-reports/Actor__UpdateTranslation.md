@@ -96,7 +96,7 @@ function needs; the two one-line callers get the more specific
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__UpdateVec14`. The body behind +0x0B8/+0x0BC: sets or adds coord2->coord.t (tx/ty/tz of SceneNodeSub14; the set path is a whole-Vec3 copy through a LongVec3 cast, as the old Vec3 member was), then clears coord2->flg so the coordinate is recomputed. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__UpdateVec14`. The body behind +0x0B8/+0x0BC: sets or adds coord2->coord.t (tx/ty/tz of SceneNodeSub14; the set path is a whole-Vec3 copy through a LongVec3 cast, as the old Vec3 member was), then clears coord2->flg so the coordinate is recomputed. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 

@@ -11,7 +11,7 @@
 > here is assignable.
 >
 > **The C this report derives was MATCHED and is now DELETED from
-> `src/libsnd_decre.c`.** That is the correction CLAUDE.md asks for, not a
+> `src/psyq/libsnd_decre.c`.** That is the correction CLAUDE.md asks for, not a
 > regression. Do not write C for it again.
 >
 > This report is the one place in the round where the prose had ALREADY

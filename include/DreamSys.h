@@ -6,8 +6,8 @@
  * gDreamSysMethods, getter Get_vtable_DreamSys): an Actor subclass
  * (include/Actor.h); no class derives from it. The ctor calls Actor's first
  * (DreamSys__DreamSys: GetActorMethods()->ctor), so the id parent is the
- * ctor-chain parent. Every method is in src/DreamSys.c. One instance, made
- * by GameApplication__GameApplication (src/GameApplicationFileResource.c, New_DreamSys) and kept in
+ * ctor-chain parent. Every method is in src/world/DreamSys.c. One instance, made
+ * by GameApplication__GameApplication (src/app/GameApplicationFileResource.c, New_DreamSys) and kept in
  * GameApplication::dreamSys; the same object is GraphRoom::dreamSys, the
  * `target` ObjMStyleActor hands SetDreamAuxWorld (DreamAux's
  * gDreamAuxWorld), and the `peer` every Entity links to.
@@ -168,7 +168,7 @@ extern s8 sMoveCommandSigns[8];
    object's rotation vector (flag != 0) or ADDS them modulo a full turn
    (flag == 0). Every constant this unit hands that slot is three of these:
    see sRotationYaw180 / _PLUS45 / _MINUS45 below and sCardinalRotations
-   (src/DreamSys.c). */
+   (src/world/DreamSys.c). */
 typedef struct RotationRatio {
     s16 numerator;
     s16 denominator;
@@ -605,7 +605,7 @@ extern s32 (*sStaircaseTickFns[4])(DreamSys *this);
 
 /* Called by DreamSys__TryStaircaseLink with no argument setup; its return
    value indexes sStaircaseTickFns. Defined after its caller in
-   src/DreamSys.c. */
+   src/world/DreamSys.c. */
 extern s32 GetLastSpawnExtra(void);
 
 typedef enum DreamColors {
@@ -789,7 +789,7 @@ extern s8 sSpecialColors[];
    Test4InstantTeleporters, each of which forwards its own three args
    straight through and appends a fixed trailing quadruple (length table,
    trigger table, spawn table, literal 1); every call site tests the result
-   with `bltz`. Defined after those callers in src/DreamSys.c. */
+   with `bltz`. Defined after those callers in src/world/DreamSys.c. */
 extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
                           s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
 

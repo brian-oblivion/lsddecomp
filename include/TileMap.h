@@ -7,7 +7,7 @@
  * TileMap -- a FileResource data source (class id 0x203, method table
  * gTileMapMethods) whose own fields, +0x02C..+0x03B, are exactly libgs's GsMAP
  * (LIBGS.H: cellw, cellh, ncellw, ncellh, base, index). Methods in
- * src/GraphicsResources.c. No classes derive from it (`typeviews.py --tree`), so
+ * src/graphics/GraphicsResources.c. No classes derive from it (`typeviews.py --tree`), so
  * there are no FIELDS/SLOTS macros.
  *
  * The ctor chain agrees with the id: TileMap__TileMap's first call is
@@ -22,7 +22,7 @@
  * cellw * ncellw by cellh * ncellh.
  *
  * How it is used, at the one New_TileMap call site (TaskCore__TaskCore,
- * src/Task.c): New_TileAtlas(0), then New_TileMap(0, atlas), then
+ * src/app/Task.c): New_TileAtlas(0), then New_TileMap(0, atlas), then
  * New_BgLayer(tileMap, 1); TaskCore__Finalize releases the three (+0x004).
  * The atlas is a TileAtlas (gTileAtlasMethods, include/TileAtlas.h, by tag here):
  * its `cells` is the 300-GsCELL array BuildMap copies into map.base.

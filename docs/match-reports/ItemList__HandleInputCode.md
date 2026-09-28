@@ -4,7 +4,7 @@
 
 > Renamed from `func_800522DC` on 2026-09-24 (tools/rename.py). Address 0x800522dc.
 
-Unit `src/ObjMStyleActor.c`. Round 26, runner delta.
+Unit `src/world/ObjMStyleActor.c`. Round 26, runner delta.
 
 ## What it is
 
@@ -65,7 +65,7 @@ to read the jump table's own body layout off the `.s` before writing the
 ## Struct edit (unit-local, NOT the shared header)
 
 `Class87034Methods_3bb8c_k` is declared directly in
-`src/ObjMStyleActor.c` (not `include/class_3bb8c.h`) -- this unit's own
+`src/world/ObjMStyleActor.c` (not `include/class_3bb8c.h`) -- this unit's own
 independent, disjoint-slot view of table `gObjMMethods`, per the header's
 own standing note that `ObjMStyleActor` reaches a different, non-overlapping
 slot set on the identical table. Added six new slots, all inside the
@@ -101,7 +101,7 @@ Round 75 (bravo, track 3). `func_800522DC` -> `ItemList__HandleInputCode`, **tie
 
 Slot +0x05C (`tools/classtable.py gItemListMethods`), which ItemList__OnNotify dispatches for notifications from its tag-2 child (the one ItemList__AddChild caches as `inputSource`). Code 25: forwardToTarget(0x10) then setState(2); 23: forwardToTarget(0x10) then setState(3); 5: scrollRight; 4: scrollLeft; 18: cursorUp; 19: cursorDown (each resolved to its method through the same table). TaskObjF (TitleMenuTaskObjF) also branches on 0x19/0x17. Tier B: that these codes are controller buttons is not established. Retyped round 75 from the unit's ObjM view to `ItemList *`: the function's own table is gItemListMethods and every slot it calls holds a ItemList method.
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
 
 ## Round 99 (delta, track 7)
 

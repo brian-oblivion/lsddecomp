@@ -376,7 +376,7 @@ state to hand over under this project's rule that length-exactness comes
 first, and because a body one word short re-poisons every later function's
 window.
 
-## Preserved near-miss body (49/79, length exact, `#if 0` in src/ObjMStyleActor.c)
+## Preserved near-miss body (49/79, length exact, `#if 0` in src/world/ObjMStyleActor.c)
 
 ```c
 extern s32 gStyleDay;
@@ -512,7 +512,7 @@ per the round-64 revisit.
 
 Locals: `slots`, `pos`, `r`, `color`, `altColor`, `rotation`.
 
-### Comments moved here from src/ObjMStyleActor.c
+### Comments moved here from src/world/ObjMStyleActor.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

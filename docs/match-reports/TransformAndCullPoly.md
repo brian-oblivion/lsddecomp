@@ -2,7 +2,7 @@
 
 > Renamed from `func_800195EC` on 2026-09-17 (tools/rename.py). Address 0x800195ec.
 
-Unit: `src/TmdRenderer.c`. GTE transform/clip/OT-bucket routine: runs `rtpt`
+Unit: `src/graphics/TmdRenderer.c`. GTE transform/clip/OT-bucket routine: runs `rtpt`
 on the three vertices the caller loaded with `gte_ldv3`, checks the FLAG
 register, runs `nclip` (backface cull) and `avsz3` (Z average for the
 ordering table), and on success caches the three screen coordinates and
@@ -156,7 +156,7 @@ op does. See `docs/MATCHING-GUIDE.md` step 2 for the screen.
 `func_800195EC` -> `TransformAndCullPoly`. **Tier A** -- the body is a
 transform followed by three reject tests, and that is the whole of it.
 Local types: `GteCullCtx` -> `PolyDrawCtx`, `GteCullOwner` -> `GpuPrim`,
-both defined in `src/TmdRenderer.c` and used nowhere else.
+both defined in `src/graphics/TmdRenderer.c` and used nowhere else.
 
 Evidence for the function name: `gte_rtpt()` transforms the three vertices
 the caller loaded, then the function returns 1 on any of three conditions

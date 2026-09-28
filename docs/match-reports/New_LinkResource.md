@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for LinkResource (gLinkResou
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
 
 ```c
 /* Allocate and construct a LinkResource (gLinkResourceMethods) object; freed and NULL when the constructor fails. */
@@ -44,7 +44,7 @@ void *New_LinkResource(s32 arg0) {
 
 ## Naming
 
-- **New_LinkResource**, tier B (head review, round 83: was A). src/DayTaskStageMap.c and include/TodActor.h already declare this allocator's return type as `LinkResource *` at their own call sites.
+- **New_LinkResource**, tier B (head review, round 83: was A). src/world/DayTaskStageMap.c and include/TodActor.h already declare this allocator's return type as `LinkResource *` at their own call sites.
   Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (DayTaskStageMap.c round 20 for LinkResource; DreamAux.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
 - **UnprototypedCtorTable** (type, was `Ctor33808`), tier A (round 95, bravo, track 6). A method-table view with only the +0x008 ctor slot, typed `s32 (*)()`: New_LinkResource, New_ModelData, New_TriggerWorld, New_TodSet and New_Tod call the ctor through it (TriggerWorld__TriggerWorld calls ModelData's with an extra `owns` argument), because each class header declares the slot returning void with a fixed parameter list (BASICCLASS_SLOTS), and all but New_Tod test the result. The name says what it is to the code: the table, its ctor unprototyped.
 

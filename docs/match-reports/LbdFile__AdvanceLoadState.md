@@ -42,7 +42,7 @@ void LbdFile__AdvanceLoadState(DataSrc39094 *self) {
 ## Notes
 
 The local view's `DataSrc39094Methods.loadDataBlock` was retyped from `void *` to
-`void (*)(void)` (local to `src/GameFiles.c`, no other reader), and later in
+`void (*)(void)` (local to `src/cd/GameFiles.c`, no other reader), and later in
 the same session to the unprototyped `s32 (*)()` once LbdFile__LoadDataBlock (its
 occupant, which returns s32 and reads `self`) was matched; still byte-exact. Retail does
 not set `$a0` before `jalr` on slot +0x080 even though its occupant
@@ -71,7 +71,7 @@ block load in flight.
   load-in-progress marker -- established only from this one subclass's
   usage; FileResource.h's own comment says only that it is the last field
   before a subclass's own fields start, with no meaning of its own).
-- **Evidence:** every read/write of `unk2A` in `src/GameFiles.c` (this
+- **Evidence:** every read/write of `unk2A` in `src/cd/GameFiles.c` (this
   report; LbdFile__CancelRequests, LbdFile__LoadHeader,
   LbdFile__LoadDataBlock).
 - **Caution for the head applying this:** FileResource has sixteen
@@ -83,7 +83,7 @@ block load in flight.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__SetFlag` -> `LbdFile__AdvanceLoadState` with `rename.py`. The slot is +0x064, FileResource's `setFlag`, which the CD driver calls when a request completes (src/CdDriver.c); the bit this body tests, 0x80, is that driver's CD_FLAG_READ_DONE. The body advances the load state (`unk2A` 9 -> 0 with the header ready, maybe starting the data block; 10 -> 0 with the data ready), which is what TimBlockSrc__AdvanceLoadState and VabStreamObj__AdvanceLoadState, the same slot's occupants in two siblings, were named for. Its no-argument call of +0x080 is kept through `LbdFileLoadDataBlockNoArgFn` (include/LbdFile.h): retail sets no $a0 for it. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `DataSrc39094__SetFlag` -> `LbdFile__AdvanceLoadState` with `rename.py`. The slot is +0x064, FileResource's `setFlag`, which the CD driver calls when a request completes (src/cd/CdDriver.c); the bit this body tests, 0x80, is that driver's CD_FLAG_READ_DONE. The body advances the load state (`unk2A` 9 -> 0 with the header ready, maybe starting the data block; 10 -> 0 with the data ready), which is what TimBlockSrc__AdvanceLoadState and VabStreamObj__AdvanceLoadState, the same slot's occupants in two siblings, were named for. Its no-argument call of +0x080 is kept through `LbdFileLoadDataBlockNoArgFn` (include/LbdFile.h): retail sets no $a0 for it. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)

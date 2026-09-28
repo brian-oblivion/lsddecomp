@@ -66,7 +66,7 @@ for every populated sound-cue slot, always returning `-1` (the SoundCueSlot
 free/sentinel value), so it reads as "release/stop whatever `index`
 refers to." The `0x18` branch boundary is the concrete tell: 0x18 == 24,
 the PS1 SPU's own hardware voice count -- named `SPU_VOICE_COUNT` in
-`src/PlacementGridVabSound.c` (FINISHING-PLAN track 3 step 4: replace an
+`src/sound/PlacementGridVabSound.c` (FINISHING-PLAN track 3 step 4: replace an
 established magic constant with a named one) -- so `index < SPU_VOICE_COUNT`
 is "a real SPU voice number" and the `else` arm (`SsUtAllKeyOff(0)`,
 uncarved) is a

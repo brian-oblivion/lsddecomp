@@ -5,7 +5,7 @@
 > EXACTLY IT.** It was `GameApplicationFileResource`'s LAST function, so the conversion is a
 > pure suffix split -- `[c GameApplicationFileResource 0x171E0][o libc2/strcat 0x17930]` -- with
 > no new unit name, no function reordering and no rodata attach to move. The C
-> body is deleted from `src/GameApplicationFileResource.c`; callers keep spelling it `strcat`
+> body is deleted from `src/app/GameApplicationFileResource.c`; callers keep spelling it `strcat`
 > and now resolve to the object. Whole-image SHA1 green.
 >
 > **This RECLASSIFIES a matched function out of the game-code count, and that

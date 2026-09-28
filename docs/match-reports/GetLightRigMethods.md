@@ -4,7 +4,7 @@
 
 > Renamed from `func_800428E4` on 2026-09-25 (tools/rename.py). Address 0x800428e4.
 
-Round 82, runner alpha (second re-staffed slot of the round). Unit `src/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (second re-staffed slot of the round). Unit `src/graphics/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table (`tools/classtable.py`).
 - **What:** Returns the gLightRigMethods method table (`DayTaskStageMap.c` declares it `BaseCtorTable_3ac78 *`).

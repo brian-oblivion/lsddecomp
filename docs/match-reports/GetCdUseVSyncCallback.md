@@ -2,7 +2,7 @@
 
 > Renamed from `func_80028B6C` on 2026-09-21 (tools/rename.py). Address 0x80028b6c.
 
-Unit: `src/CdDriver.c` (carved mid-round 17, 2026-09-04). Size: 3 words
+Unit: `src/cd/CdDriver.c` (carved mid-round 17, 2026-09-04). Size: 3 words
 (0xC bytes), file offset `0x1936C`, vram `0x80028B6C`.
 
 The report below (kept for history) marked this a `gp_rel` blocker, citing
@@ -88,6 +88,6 @@ body is `return gCdUseVSyncCallback;` -- and per CLAUDE.md/FINISHING-PLAN.md
 track 3, "a pure leaf whose mechanics ARE its purpose (a getter, a clamp, a
 list push) is tier A by definition." `gCdUseVSyncCallback` itself was
 already properly named (not a placeholder) before this round, by
-`src/CdDriver.c`'s own header comment ("the driver mode:
+`src/cd/CdDriver.c`'s own header comment ("the driver mode:
 gCdAsyncEnabled and gCdUseVSyncCallback, set through SetCdDriverMode"); no
 further rename needed there.

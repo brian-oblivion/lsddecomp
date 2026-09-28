@@ -37,7 +37,7 @@ s32 SeedAndRandom(s32 seed, s32 unused) {
 
 ## The second parameter (round 82, alpha, track 3 externcheck)
 
-The source block above had drifted from `src/GameFiles.c`, which has
+The source block above had drifted from `src/cd/GameFiles.c`, which has
 always compiled the 2-parameter form. The second parameter is dead in the
 body (`$a1` is never read), but it is real at every call: two callers load
 it explicitly (GameApplication__SeedRandom: `move a1,zero` at

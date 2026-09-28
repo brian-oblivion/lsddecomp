@@ -218,7 +218,7 @@ s32 SpuVmAlloc(s32 unused) {
     return (u8)chosen;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmAlloc);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SpuVmAlloc);
 #endif
 
 #ifdef NON_MATCHING
@@ -318,16 +318,16 @@ void SpuVmKeyOnNow(s32 unused, s32 pitch) {
 
 #undef KEYON_VOICE
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmKeyOnNow);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SpuVmKeyOnNow);
 #endif
 
 /* Not yet C: the best body (142/143 words) is in
  * docs/match-reports/SpuVmDoAllocate.md. */
-INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmDoAllocate);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SpuVmDoAllocate);
 
 /* Not yet C: the best body (309/311 words) is in
  * docs/match-reports/vmNoiseOn.md. */
-INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", vmNoiseOn);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", vmNoiseOn);
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 107/112 words, 5 short; the residue is a register role swap
@@ -383,7 +383,7 @@ void vmNoiseOn2(s32 voice, s32 volL, s32 volR, s32 unusedAdsr1, s32 unusedAdsr2)
     _svm_sreg->noiseOn[1] = highBit;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", vmNoiseOn2);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", vmNoiseOn2);
 #endif
 
 /* The SPU pitch of _svm_cur's note on its tone: semitones from the centre
@@ -642,7 +642,7 @@ void SetAutoVol(s16 voice) {
     _svm_sreg_dirty[v] |= 3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SetAutoVol);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SetAutoVol);
 #endif
 
 void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
@@ -749,7 +749,7 @@ void SetAutoPan(s16 voice) {
     _svm_sreg_dirty[v] |= 3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SetAutoPan);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SetAutoPan);
 #endif
 
 extern void _spu_setInTransfer(s32 a0);
@@ -1011,7 +1011,7 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmPBVoice);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SpuVmPBVoice);
 #endif
 
 
@@ -1165,7 +1165,7 @@ void SpuVmFlush(void) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmFlush);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SpuVmFlush);
 #endif
 
 #ifdef NON_MATCHING
@@ -1310,7 +1310,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
     return s3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmKeyOn);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SpuVmKeyOn);
 #endif
 
 
@@ -1423,7 +1423,7 @@ s32 SpuVmSeKeyOff(s16 vabId, s16 prog, u16 note) {
 
 void KeyOnCheck(void) {}
 
-INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmSetSeqVol);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SpuVmSetSeqVol);
 
 /* Returns the packed number, read back through D_8008EA22. */
 s32 SpuVmGetSeqVol(s32 seqSepNo, s16 *volL, s16 *volR) {
@@ -1460,4 +1460,4 @@ s32 SpuVmGetSeqRVol(s32 seqSepNo) {
     return (s16)seqs[(seqSepNo & 0xFF00) >> 8].unk76;
 }
 
-INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmSeqKeyOff);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SpuVmSeqKeyOff);

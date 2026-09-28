@@ -9,7 +9,7 @@ Unit `ObjMStyleActor`. **29/29 words, byte-exact.** First build.
 Fresh ground, carved round 45, never attempted. Already declared in the
 shared header (`include/class_3bb8c.h:2557`, `extern void
 StyleTeardown(void);`) and called with no arguments from
-`src/ObjMStyleActor.c:173`, which fixed its signature before any decompiling
+`src/world/ObjMStyleActor.c:173`, which fixed its signature before any decompiling
 started here.
 
 ## Derivation
@@ -47,7 +47,7 @@ loops twice over `gStyleCueSlots[i]`, replacing each element with
 the two-slot array), then clears the `gStyleGrid` flag if set. Since
 `FlushStyleCue` is defined later in this unit (higher ROM address) but
 called here, it needs a forward declaration -- matching the pattern already
-used for `ObjM__StartFadeUp` in `src/ObjMStyleActor.c`.
+used for `ObjM__StartFadeUp` in `src/world/ObjMStyleActor.c`.
 
 `gStyleCueSlots` holds two elements of a local per-unit type introduced here,
 `ObjN14` (named for its two accessed fields: `unk0`, address-taken then
@@ -109,7 +109,7 @@ before.
 Calls `StyleFlushDecoration`, `StyleReleaseDecorSet`, `StyleReleaseEffectSlots`
 unconditionally, then flushes both `gStyleCueSlots[2]` entries via
 `FlushStyleCue`, then clears `gStyleGrid`. Called from
-`src/ObjMStyleActor.c`'s `ObjM__TeardownStyle` (itself calling `self->methods->slot84`
+`src/world/ObjMStyleActor.c`'s `ObjM__TeardownStyle` (itself calling `self->methods->slot84`
 and `ReleaseDreamAuxEntities()`, an end-of-scene-style teardown), which is the
 evidence for "Teardown" over a narrower "Reset" -- it releases every
 resource `TickStyle` builds, matching a scene-exit shape rather than a
@@ -117,7 +117,7 @@ per-frame reset. MATCHED, 29/29, first build.
 
 ## Round 93 polish (delta, track 7)
 
-### Comments moved here from src/ObjMStyleActor.c
+### Comments moved here from src/world/ObjMStyleActor.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

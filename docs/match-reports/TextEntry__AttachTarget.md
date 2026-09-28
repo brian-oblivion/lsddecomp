@@ -40,7 +40,7 @@ Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTe
 ## Round 94 (track 6, charlie): the target is a VabStreamObj
 
 `TargetObj86ED0`/`TargetMethods86ED0` (include/class_3bb8c.h) are deleted.
-Both attachTarget callers (TaskObjF, src/TitleMenuTaskObjF.c) pass TaskObjF's
+Both attachTarget callers (TaskObjF, src/ui/TitleMenuTaskObjF.c) pass TaskObjF's
 `sound`, already typed `struct VabStreamObj *`, and the one slot the view
 named, +0x080, is VabStreamObj's `playTone(self, index, vol, endVol)`
 (include/VabStreamObj.h): the `(code, 0x60, 0x60)` call plays tone `code`

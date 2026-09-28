@@ -119,7 +119,7 @@ just-loaded `this->unk14`, not a fresh load).
   (`void (*)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3)`), immediately
   after the existing `slotD0`.
 - `extern Unk100Obj *Entity__GetOrCreateFadeBox(...)` — `Entity__GetOrCreateFadeBox` was already
-  matched in `src/Entity.c` (defined there, not `INCLUDE_ASM`) but had no
+  matched in `src/world/Entity.c` (defined there, not `INCLUDE_ASM`) but had no
   cross-unit prototype; this is its first caller outside that file.
 - `Entity::unk50` split out of the existing `pad50[0x58-0x50]` padding as a
   named `s32` field (padding narrowed to `pad54[0x58-0x54]`) — a pad split,

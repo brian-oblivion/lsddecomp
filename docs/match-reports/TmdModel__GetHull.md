@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001F51C` on 2026-09-25 (tools/rename.py). Address 0x8001f51c.
 
-Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/TmdModel.c`. Fresh ground, no prior attempt.
+Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/TmdModel.c`. Fresh ground, no prior attempt.
 
 - **What:** computes the model's bounding box into a stack local (`TmdModel__ComputeBounds`) and writes its eight corners into `out` (bottom face min-z in order (minx,miny) (minx,maxy) (maxx,maxy) (maxx,miny), then the same at max-z), with `out->type = 1`. The local is `{ s32 type; Box box; }` at sp+0x10 and its `type` is set to 1 too (retail stores it, nothing reads it).
 - **Result:** byte-exact; 84/84 words, whole-image SHA1 green. Second build.

@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-/* The dream's aux entities and chunk triggers (src/DreamAux.c; its banner
+/* The dream's aux entities and chunk triggers (src/world/DreamAux.c; its banner
  * describes the subsystem). Only that unit includes this header. */
 
 /* The per-stage tables hold 14 pointers each (0x38 bytes between one

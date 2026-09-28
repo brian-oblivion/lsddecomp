@@ -171,7 +171,7 @@ s32 getintr(void) {
     }
 }
 
-INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_sync);
+INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_sync);
 
 /* CD_ready's near-miss body, kept for reading: a stall, 2 words short
  * (docs/match-reports/CD_ready.md). */
@@ -312,7 +312,7 @@ ret1:
     return 0;
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_ready);
+INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_ready);
 
 /* CD_cw's near-miss body, kept for reading: a stall, length exact
  * (docs/match-reports/CD_cw.md). */
@@ -481,7 +481,7 @@ skip_timeout3:
     return (D_8006D8D8[0] == 5) ? -1 : 0;
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_cw);
+INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_cw);
 
 /* Driver state: plain scalar and pointer globals, not object fields. */
 
@@ -752,7 +752,7 @@ s32 CD_init(void) {
     return -(CD_sync(0, 0) != 2);
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_init);
+INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_init);
 #endif
 
 #ifdef NON_MATCHING
@@ -867,7 +867,7 @@ s32 cd_read_retry(void) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libcd_bios", cd_read_retry);
+INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", cd_read_retry);
 #endif
 
 s32 CD_readm(s32 arg0, s32 arg1, s32 arg2) {
@@ -1076,7 +1076,7 @@ s32 CD_datasync(s32 arg0) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libcd_bios", CD_datasync);
+INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_datasync);
 #endif
 
 s32 CD_getsector(s32 arg0, s32 arg1) {
@@ -1133,7 +1133,7 @@ void callback(void) {
     *D_8006D8C0 = status;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libcd_bios", callback);
+INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", callback);
 #endif
 
 void cb_read(s32 arg0, s32 arg1) {

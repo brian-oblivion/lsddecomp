@@ -7,7 +7,7 @@
  * FlatLightObj -- one Psy-Q flat light, class id 0x6, method table
  * gFlatLightObjMethods, a direct BasicClass subclass (`tools/classtable.py
  * gFlatLightObjMethods --vs gBasicClassMethods`: overrides the ctor, adds three
- * slots). No class derives from it. Methods in src/FlatLightObj.c, which holds
+ * slots). No class derives from it. Methods in src/graphics/FlatLightObj.c, which holds
  * the whole class: allocator, ctor, the three own slots and the getter.
  *
  * "FlatLight" is Sony's own name (LIBGS.H's GsF_LIGHT and GsSetFlatLight),
@@ -16,13 +16,13 @@
  * address to GsSetFlatLight(lightId, &light). FlatLightParams is GsF_LIGHT's
  * layout (`int vx,vy,vz; unsigned char r,g,b;`, same offsets) with r,g,b
  * grouped as FlatLightColor, which setColor's whole-struct copy needs;
- * src/FlatLightObj.c takes GsSetFlatLight from <libgs.h> and casts to GsF_LIGHT *.
+ * src/graphics/FlatLightObj.c takes GsSetFlatLight from <libgs.h> and casts to GsF_LIGHT *.
  *
- * Who holds one: LightRig__LightRig (src/Sprite.c, include/LightRig.h)
+ * Who holds one: LightRig__LightRig (src/graphics/Sprite.c, include/LightRig.h)
  * makes three with New_FlatLightObj(0), (1), (2), keeps them in
  * LightRig::lights and adds each as a child; LightRig__Finalize releases
  * them. The one caller of setColor (+0x044) and setDirection (+0x048) is
- * StageMap__SetChildParams (src/DayTaskStageMap.c), through LightRig's
+ * StageMap__SetChildParams (src/world/DayTaskStageMap.c), through LightRig's
  * getLight, with update = 1 and sources stepping 3 bytes (an r,g,b) and 6
  * bytes (an s16 vx,vy,vz) per light. That call site casts getLight's
  * BasicClass * to FlatLightObj * and its s32 sources to the slots' types.

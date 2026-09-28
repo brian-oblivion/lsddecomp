@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057B54` on 2026-09-19 (tools/rename.py). Address 0x80057b54.
 
-Unit: `src/ObjMStyleActor.c`. Class: `DreamSys` family (called only from
+Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys` family (called only from
 this unit's own `Actor__ScanGridWindow`, still queued at time of writing, twice, as
 `AcceptGridElem(elemOrHead, arg1, arg2)`). Not itself a vtable slot in any
 of the class tables reachable from this unit's addresses.
@@ -32,7 +32,7 @@ void *AcceptGridElem(void *arg0, void *arg1, void *arg2) {
 ```
 
 `SceneNode__RaycastVertical` is declared locally (`extern s32 SceneNode__RaycastVertical(void);`) --
-it is matched/queued in a different unit (`src/SceneNode.c`), so its
+it is matched/queued in a different unit (`src/graphics/SceneNode.c`), so its
 prototype belongs here, not in a shared header.
 
 ## Shape note
@@ -115,7 +115,7 @@ and docs/match-reports/SceneNode__RaycastVertical.md, round 57)
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__AcceptGridElem`. Helper of Actor__ScanGridWindow. No self parameter, so no class prefix. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__AcceptGridElem`. Helper of Actor__ScanGridWindow. No self parameter, so no class prefix. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 

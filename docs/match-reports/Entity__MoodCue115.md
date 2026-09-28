@@ -88,7 +88,7 @@ direction. This function's bytes ARE evidence, and they say `void`.
 ### Blast radius, all re-verified byte-exact
 
 35 `this->methods->slotCC(...)` call sites across `Entity/c/d/e/g`. Only two
-use the value, both in `src/Entity.c`:
+use the value, both in `src/world/Entity.c`:
 
 - the local function-pointer variable in `func_8005FE1C`'s block
   (`s32 (**slotCC)(Entity *, s32, s32);` → `void (**slotCC)(...)`)
@@ -129,7 +129,7 @@ from every path) is a `slot144(this, target) < 0x200` check driving
 
 ## Final body
 
-As committed in `src/Entity.c` — the inherited near-miss body unchanged
+As committed in `src/world/Entity.c` — the inherited near-miss body unchanged
 apart from the renames. The fix was entirely in the header.
 
 ```c
@@ -354,7 +354,7 @@ lever stays cleanly scoped.
 directly from `disk/SLPS_015.56`. Row 115 is NOT contiguous with this
 unit's other rows (39-52, 55-58) or with Entity's own rows (59-92ish),
 confirming the row index tracks moodIndex assignment rather than code
-address -- flagged in `src/Entity.c`'s unit header comment so the next
+address -- flagged in `src/world/Entity.c`'s unit header comment so the next
 reader doesn't assume a typo. Mechanics established (mood-tick sound-cue-set
 callback); which dream object owns the row is not.
 

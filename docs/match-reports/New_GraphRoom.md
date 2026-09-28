@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057F68` on 2026-09-24 (tools/rename.py). Address 0x80057f68.
 
-Unit: `src/ObjMStyleActor.c`. Class: `gVariantSpriteMethods` family -- plain
+Unit: `src/world/ObjMStyleActor.c`. Class: `gVariantSpriteMethods` family -- plain
 allocator/constructor wrapper (`New_X` shape), not a vtable slot.
 
 ## Signature
@@ -51,17 +51,17 @@ tools/funcdiff.py New_GraphRoom   # 24/24
 
 **`New_GraphRoom`** -- tier B. `New_X`-shaped allocator (allocate
 `0x244` bytes, null-check, dispatch the ctor slot) for the class named
-`GraphRoomObj` this round -- see `src/ObjMStyleActor.c`'s own header
+`GraphRoomObj` this round -- see `src/world/ObjMStyleActor.c`'s own header
 comment for the class-identity evidence (loads "ETC\HGRAPH.TIM", builds
 100 coloured points from a day-type ring).
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `New_GraphRoomObj` -> `New_GraphRoom`
 
-The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Now returns `GraphRoom *` and takes `struct DreamSys *`: its one caller, GameApplication__RunTitleMenu (src/GameApplicationFileResource.c), passes `self->dreamSys` through GameApplication__RunTask, and casts New_GraphRoom to PollTaskCtor there; include/GameApplication.h's own `extern PollTask *New_GraphRoom(void *)` is deleted.
+The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Now returns `GraphRoom *` and takes `struct DreamSys *`: its one caller, GameApplication__RunTitleMenu (src/app/GameApplicationFileResource.c), passes `self->dreamSys` through GameApplication__RunTask, and casts New_GraphRoom to PollTaskCtor there; include/GameApplication.h's own `extern PollTask *New_GraphRoom(void *)` is deleted.
 
 ## Track 7 (2026-09-27, round 97, delta): the unit banner, moved here
 
-The unit banner of `src/ObjMStyleActor.c` was rewritten to say what the file holds. Its history, verbatim as it stood before the pass (the class-identity reading and the round-87 correction are this class's, so they live with its allocator):
+The unit banner of `src/world/ObjMStyleActor.c` was rewritten to say what the file holds. Its history, verbatim as it stood before the pass (the class-identity reading and the round-87 correction are this class's, so they live with its allocator):
 
 ```c
 /*

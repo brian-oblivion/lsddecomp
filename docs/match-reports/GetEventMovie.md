@@ -15,7 +15,7 @@ Record accessor: calls GetEventMovieRecords(&count) (writes 8, returns record 0x
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/GameFiles.c`
+Declarations it needs are the local views at the top of `src/cd/GameFiles.c`
 (`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c

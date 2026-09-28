@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020A74` on 2026-09-25 (tools/rename.py). Address 0x80020a74.
 
-Round 82, runner alpha. Unit `src/DrawSystem.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x068 (`tools/classtable.py gDrawSystemMethods`);
   DrawSystem__Start calls it through `methods->slot68` after setting +0x10.
@@ -33,7 +33,7 @@ void DrawSystem__RunLoop(Class6C070 *self) {
 }
 ```
 
-Needs the unit-local `Class6C070` view at the top of `src/DrawSystem.c`, with
+Needs the unit-local `Class6C070` view at the top of `src/graphics/DrawSystem.c`, with
 `/* +0x030 */ void (*callback)(void);` and the `BASICCLASS_SLOTS` method table
 (`notifyParents` at +0x030).
 

@@ -80,7 +80,7 @@ into a corroborated one.
 ## Naming
 
 **StreamTask__Init** -- tier B. Occupies `gStreamTaskMethods` slot
-`+0x044`. Cross-unit call sites in `src/GameApplicationFileResource.c`
+`+0x044`. Cross-unit call sites in `src/app/GameApplicationFileResource.c`
 (`GameApplication__ShowIntroLogos`/`GameApplication__PlayOpeningMovie`, via `include/GameApplication.h`'s independent
 `StreamTaskMethods::slot44` view) show this stores a resource
 name-or-derived-value, a type lookup and a flag before up-calling the base

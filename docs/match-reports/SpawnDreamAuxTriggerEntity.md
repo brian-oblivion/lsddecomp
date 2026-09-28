@@ -173,7 +173,7 @@ The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 Parameters kind/out/ctx/entry -> moodIndex/desc/trigger/spawnIndex (`ctx` is
 the chunk's DreamAuxTriggerEntry; `*(u16 *)ctx` is `trigger->key`; reading it

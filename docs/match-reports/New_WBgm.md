@@ -2,7 +2,7 @@
 
 > Renamed from `func_800398E0` on 2026-09-25 (tools/rename.py). Address 0x800398e0.
 
-Round 81, runner delta. Unit `src/WBgm.c` (carved from `psyq_2a0e0` in
+Round 81, runner delta. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot none (not in the table); allocator (slots resolved with `tools/classtable.py gWBgmMethods`).
@@ -41,7 +41,7 @@ WBgm *New_WBgm(s32 vabArg, s32 seqArg, s32 autoPlay) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/WBgm.c`:
+The unit-local view it needs, from the top of `src/sound/WBgm.c`:
 
 ```c
 #include "BasicClass.h"
@@ -124,13 +124,13 @@ extern u8 gSsSizeTableBuf[];
 
 The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
 
-Parameters retyped `(s32 vabArg, s32 seqArg, s32 autoPlay)` -> `(char *vabPath, char *seqPath, s32 autoPlay)`. Caller checked: the only one is `DayTask__DayTask` (src/DayTaskStageMap.c), `New_WBgm(PickSoundBank(0), 0, 1)`; PickSoundBank (src/GameFiles.c) returns a word of gSoundBankPaths, and all seven words point at VAB path strings ("SND\\AMBIENT", "SND\\CARTOON", "SND\\ELECTRO", "SND\\ETHNOVA", "SND\\HUMAN", "SND\\LOVELY", "SND\\STANDERD"; asm/data/1B84.rodata.s), and the path reaches New_VabStreamObj(char *) through setVab. That call site now casts `(char *)` on the word and `(SubObjG *)` on the result, and `include/DayTaskStageMap.h`'s local `extern SubObjG *New_WBgm(s32, s32, s32)` view is deleted.
+Parameters retyped `(s32 vabArg, s32 seqArg, s32 autoPlay)` -> `(char *vabPath, char *seqPath, s32 autoPlay)`. Caller checked: the only one is `DayTask__DayTask` (src/world/DayTaskStageMap.c), `New_WBgm(PickSoundBank(0), 0, 1)`; PickSoundBank (src/cd/GameFiles.c) returns a word of gSoundBankPaths, and all seven words point at VAB path strings ("SND\\AMBIENT", "SND\\CARTOON", "SND\\ELECTRO", "SND\\ETHNOVA", "SND\\HUMAN", "SND\\LOVELY", "SND\\STANDERD"; asm/data/1B84.rodata.s), and the path reaches New_VabStreamObj(char *) through setVab. That call site now casts `(char *)` on the word and `(SubObjG *)` on the result, and `include/DayTaskStageMap.h`'s local `extern SubObjG *New_WBgm(s32, s32, s32)` view is deleted.
 
 ## Proposed field names
 
 For the owners of those classes (NOT applied: they are other classes' views):
 - `Obj865C8::unk40` (include/DayTaskStageMap.h, table gObjMMethods family): `bgm`, typed `struct WBgm *`, tier A. Evidence: assigned from `New_WBgm` in DayTask__DayTask, released through +0x004 in DayTask__Finalize, forwarded as New_ObjM's 2nd argument.
-- The ObjM field at +0x054 (`ObjM_3bb8c_k::unk54`, src/ObjMStyleActor.c; shared view `FieldM50 *unk54`, include/class_3bb8c.h): `bgm`, `struct WBgm *`, tier A. Evidence: ObjM__ObjM stores New_ObjM's 2nd argument there (the WBgm above); ObjM__AdvancePauseSetup calls its +0x04C (WBgm__Pause) and ObjM__TeardownPauseOverlay its +0x050 (WBgm__Resume), both with `self` only, which agrees with WBgm's slot arity. `FieldM50` is also the type of ObjM's +0x010, a different object, so the retype would split the two fields' types rather than retype FieldM50.
+- The ObjM field at +0x054 (`ObjM_3bb8c_k::unk54`, src/world/ObjMStyleActor.c; shared view `FieldM50 *unk54`, include/class_3bb8c.h): `bgm`, `struct WBgm *`, tier A. Evidence: ObjM__ObjM stores New_ObjM's 2nd argument there (the WBgm above); ObjM__AdvancePauseSetup calls its +0x04C (WBgm__Pause) and ObjM__TeardownPauseOverlay its +0x050 (WBgm__Resume), both with `self` only, which agrees with WBgm's slot arity. `FieldM50` is also the type of ObjM's +0x010, a different object, so the retype would split the two fields' types rather than retype FieldM50.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 

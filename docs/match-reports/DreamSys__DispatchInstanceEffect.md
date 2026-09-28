@@ -24,7 +24,7 @@ to `Actor__OnActorLinkCommand`, out of this unit's scope. `this->vt->slot0x1E8` 
 The vtable's own field name at `+0x1E8` was a stale placeholder,
 `InstanceEffectsOnPlayer` -- it never matched the actual symbol
 (`DreamSys__InstanceEffectsOnJournal`, confirmed by `tools/classtable.py`
-and already used as the `INCLUDE_ASM` name in `src/DreamSys.c`). Corrected
+and already used as the `INCLUDE_ASM` name in `src/world/DreamSys.c`). Corrected
 in this round; no call site referenced the old name, so this is a plain
 fix, not a rename requiring an out-of-scope edit.
 

@@ -55,7 +55,7 @@ header -- consistent with the project's per-unit-view convention
 (CLAUDE.md's "keep next to your code anything that encodes *your* reading of
 a class"). `SceneNode__LocalOffsetToWorldPos`'s 4th argument register is always 0 at every
 known call site despite the function's own 3-parameter C signature not
-reading it (see `src/DreamSys.c`'s identical local prototype); this unit's
+reading it (see `src/world/DreamSys.c`'s identical local prototype); this unit's
 local prototype reproduces that the same way.
 
 Vtable slot 0x13 (byte offset 0x4C) is the SAME shared-ancestor slot
@@ -116,7 +116,7 @@ not read directly off any single instruction.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 ## Naming (round 100)
 

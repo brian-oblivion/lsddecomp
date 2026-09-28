@@ -4,7 +4,7 @@
 
 > Renamed from `func_80020510` on 2026-09-25 (tools/rename.py). Address 0x80020510.
 
-Round 82, runner charlie (matching slot). Unit `src/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner charlie (matching slot). Unit `src/graphics/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table; called from ObjMStyleActor.c as `TmdModel__SetFirstPrimClut(obj, &gStyleEffectClutPos)` (`tools/classtable.py gTmdModelMethods`).
 - **What:** `t = self->unk10->unk10; v = xy[0] / 16; t->unk6 = v; t->unk6 = v + xy[1] * 64;`: a double store to one s16 field, the second one reusing the first value without reloading it.
@@ -29,7 +29,7 @@ void TmdModel__SetFirstPrimClut(Outer_fa50 *self, s16 *xy) {
 
 `TmdModel__SetFirstPrimClut` -- KEPT (not renamed this round). Tier C: mechanics known
 (`t->unk6 = xy[0]/16; t->unk6 = ... + xy[1]*64;`, a double store overwriting
-the field), but its only caller is `src/ObjMStyleActor.c`, a live types-runner
+the field), but its only caller is `src/world/ObjMStyleActor.c`, a live types-runner
 unit this round; the class owning the `Outer_fa50`/`Inner_fa50`/`Target_fa50`
 chain is itself unconfirmed (see `TmdModel__AddFirstPrimClut.md`, its sibling).
 

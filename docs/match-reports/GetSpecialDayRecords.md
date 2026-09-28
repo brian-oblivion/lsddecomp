@@ -15,7 +15,7 @@ Record accessor: base is record 0x23E (byte +0x3EC8) of GetRecordTable's table, 
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/GameFiles.c`
+Declarations it needs are the local views at the top of `src/cd/GameFiles.c`
 (`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c

@@ -58,11 +58,11 @@ Kept the tier-C `Class__func_xxxxx` form per FINISHING-PLAN track 3.
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/ObjMStyleActor.c`'s unprototyped declaration
+**Verdict: arity-ok idiom.** `src/world/ObjMStyleActor.c`'s unprototyped declaration
 stays.
 
 **Callee evidence** (`0x80056E1C`, and the definition in
-`src/ObjMStyleActor.c`): the whole body is a forwarding tail call, and it
+`src/world/ObjMStyleActor.c`): the whole body is a forwarding tail call, and it
 *writes* `$a1`/`$a2`/`$a3` to zero before reading anything, passing only its
 incoming `$a0` through:
 
@@ -91,7 +91,7 @@ dispatch forwards `(self, 0)` uniformly; a one-parameter prototype would break
 every arm.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/ObjMStyleActor.c:144`. Oracle green.
+added to `src/world/ObjMStyleActor.c:144`. Oracle green.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 

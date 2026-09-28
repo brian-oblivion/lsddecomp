@@ -85,7 +85,7 @@ segments:
       - [0xABC, rodata]   # psyq_GsLinkObject4 (D_800102BC, jtbl_800102DC)
       # jtbl_80010354 is TmdModel.c's switch table: `.L` labels local to its
       # function's own `.s`, so the sub-slot is ATTACHED (Gate 2). 0x80 bytes.
-      - [0xB54, .rodata, TmdModel]
+      - [0xB54, .rodata, graphics/TmdModel]
       - [0xBD4, rodata]   # 0xEBC..0xF25 is libetc/intr's .rdata, SHADOWED (see the manifest)
       - [0xF28, o, libetc/intr_dma, .rdata]   # "DMA bus error" strings
       - [0xF54, o, libetc/vsync, .rdata]      # "VSync: timeout"
@@ -100,7 +100,7 @@ segments:
       # slot can see, so they are attached to the unit that owns them.
       # (Round 14's shared-slot dance, docs/PARALLEL-RUNS.md Gate 2.)
       - [0xFD8, rodata]   # D_800107D8, D_800107F4 -> code_179d8_q / _h, NOT ours
-      - [0x1010, .rodata, CdDriver]   # jtbl_80010810, jtbl_80010828
+      - [0x1010, .rodata, cd/CdDriver]   # jtbl_80010810, jtbl_80010828
       # ROUND 34 (head): libcd/sys's .rdata is the 5-byte "none" at 0x1040
       # (vram 0x80010840, D_80010840 -- referenced only from sys's own text).
       # It ends at 0x1045; retail has three zero bytes and the plain
@@ -117,7 +117,7 @@ segments:
       # standalone. Survey before moving a boundary here: of the 483 words in
       # the original 0xFD8..0x1764 slot, 179 are vram addresses inside
       # code_179d8's own text and the rest are ASCII.
-      - [0x11F8, .rodata, libcd_bios]
+      - [0x11F8, .rodata, psyq/libcd_bios]
       - [0x120C, rodata]  # was 'code_179d8_mid remainder'; that text
                           # segment is now the code_179d8_n C unit, which
                           # owns no jump table, so this slot stays
@@ -131,7 +131,7 @@ segments:
       - [0x14D6, pad]
       # jtbl_80010CD8 belongs to func_80032588, in the code_179d8_c slice --
       # same situation as 0x11F8 above.
-      - [0x14D8, .rodata, libsnd_ssinit_libapi_counter]
+      - [0x14D8, .rodata, psyq/libsnd_ssinit_libapi_counter]
       # 0x14F0 holds EXACTLY three jump tables and nothing else --
       # jtbl_80010CF0 (func_80034690) and jtbl_80010ED8 + jtbl_80010F38
       # (func_800357B0, a double switch), all three in the code_179d8_k
@@ -141,7 +141,7 @@ segments:
       # none of the split dance that 0x1908 needs.  Its words are `.L`
       # labels local to those two functions' own `.s` files, so leaving it
       # standalone fails the link with `undefined reference to '.L800346..'`.
-      - [0x14F0, .rodata, libsnd_seqread]
+      - [0x14F0, .rodata, psyq/libsnd_seqread]
       # 0x1764..0x1890 was one plain slot serving psyq_SpuSetMute. Its first
       # 0x40 bytes are EXACTLY jtbl_80010F64 + jtbl_80010F84, the two switch
       # tables of libspu/s_sca's SpuSetCommonAttr: relocated words, so `place`
@@ -165,7 +165,7 @@ segments:
       # its references the other way. That remainder is renamed by each
       # carve of this block (code_2cc8c_b -> code_2cc8c_c in round 11), so
       # the owning function is named here rather than the segment.
-      - [0x1890, .rodata, Task]
+      - [0x1890, .rodata, app/Task]
       # 0x1908 holds jtbl_80011108, func_8003FB1C's jump table. ATTACHED to
       # code_2cc8c_e in round 14 when that segment was carved: its words are
       # `.L` labels LOCAL to func_8003FB1C's own .s file, which a standalone
@@ -232,7 +232,7 @@ segments:
       - [0x19B4, o, libc2/sprintf, .rdata]
       # jtbl_80011290 (5 words) is code_322b4's switch table, ATTACHED for its
       # `.L` labels; D_800112A4 onward is psyq_36654's (libpress) and stays plain.
-      - [0x1A90, .rodata, Sprite]
+      - [0x1A90, .rodata, graphics/Sprite]
       - [0x1AA4, rodata]
       # 0x1B -> 0x1B6B; retail's next string is at 0x1B6C, which is exactly
       # where SUBALIGN(2) puts it, so no pad line is needed.
@@ -247,7 +247,7 @@ segments:
       # slot (strings, then jtbl_8001157C and jtbl_80011594, whose targets
       # are at 0x8004Fxxx/0x8005xxx and still live in `asm`) stays a
       # standalone rodata object from 0x1C34.
-      - [0x1C0C, .rodata, DayTaskStageMap]
+      - [0x1C0C, .rodata, world/DayTaskStageMap]
       # Slot 0x1C34 is shared by FIVE units. Only the two JUMP TABLES need
       # attaching -- they hold `.L` labels local to class_3bb8c_g's own
       # function .s files, which a standalone rodata object cannot resolve.
@@ -260,7 +260,7 @@ segments:
       #   D_80011530  class_3bb8c_f       jtbl_8001157C/jtbl_80011594  _g
       #   D_800115D0  (unreferenced)      D_80011610/D_8001161C  class_3bb8c_h
       - [0x1C34, rodata]
-      - [0x1D7C, .rodata, TitleMenuTaskObjF]   # jtbl_8001157C + jtbl_80011594
+      - [0x1D7C, .rodata, ui/TitleMenuTaskObjF]   # jtbl_8001157C + jtbl_80011594
       - [0x1DD0, rodata]
       # Split at the ownership boundary (third instance of the shared-slot
       # case this round -- see PARALLEL-RUNS Gate 2). Ownership, one grep per
@@ -268,7 +268,7 @@ segments:
       # that unit's own function .s, so it MUST be attached);
       # D_800116A4 unreferenced; D_800116E4 -> class_3bb8c_j, still uncarved,
       # so it must stay in a standalone object.
-      - [0x1E28, .rodata, TextEntryItemList]   # jtbl_80011628
+      - [0x1E28, .rodata, ui/TextEntryItemList]   # jtbl_80011628
       - [0x1EA4, rodata]                   # D_800116A4 / D_800116E4 -> not ours
       # Slot 0x1EF4 has THREE owners, so it splits twice (the shared-slot case
       # from PARALLEL-RUNS Gate 2). Ownership, one grep per symbol:
@@ -279,7 +279,7 @@ segments:
       #     func_80058084, both still in the uncarved class_3bb8c_m
       #     remainder, so they must stay in a STANDALONE object -- attaching
       #     them to _l would strand them (nowhere to migrate to).
-      - [0x1EF4, .rodata, ObjMStyleActor]   # jtbl_800116F4
+      - [0x1EF4, .rodata, world/ObjMStyleActor]   # jtbl_800116F4
       - [0x1F6C, rodata]                   # two strings -> remainder, NOT ours
       # JUMP TABLES, and the one rodata slot that MUST stay attached to its
       # unit. Its words are pointers to `.L8005....` labels INSIDE DreamSys's
@@ -287,12 +287,12 @@ segments:
       # standalone rodata object cannot resolve them and the link dies. The
       # dot form plus `migrate_rodata_to_functions` puts each table in the same
       # .s as the switch that uses it, where the label is in scope.
-      - [0x1F88, .rodata, DreamSys]
+      - [0x1F88, .rodata, world/DreamSys]
       # Jump tables for code_4cd08's switches -- its words point at
       # `.L8005....` labels inside that unit's functions, so it must be
       # attached (the yaml's inherited `# greyman` guess was wrong about
       # which unit owns it).
-      - [0x206C, .rodata, DreamAux]
+      - [0x206C, .rodata, world/DreamAux]
 
       # ---- text -----------------------------------------------------------
       # `psyq_*` blocks are Sony SDK library code compiled into the executable.
@@ -332,7 +332,7 @@ segments:
       # 0x2864..0x2F68 is func_80012064 ALONE. It was psyq_2864 ("no SDK disc
       # places it") until revision 18 measured it as GAME code: it calls the
       # game's own functions and sits in a game method table. A C unit now.
-      - [0x2864, c, ViewportDraw]
+      - [0x2864, c, graphics/ViewportDraw]
       - [0x2F68, o, libapi/c159]      # SetMem
       - [0x2F78, o, libc2/bcopy]      # bcopy, bzero, bcmp
       - [0x3038, o, libgs/matrix]     # GsInitCoordinate2 .. print_vector
@@ -380,7 +380,7 @@ segments:
       # standalone rodata object resolves it by symbol. (PARALLEL-RUNS.md
       # Gate 2 previously listed 0xA8C as a text-pointer slot needing
       # attachment; that was wrong, and the carve links green without it.)
-      - [0x8220, c, BMemPMgr]
+      - [0x8220, c, app/BMemPMgr]
       # code_8220_b: second 20-function slice, 0x8A88..0x9F74.
       # 0x9F74 (func_80019774) is a real boundary -- func_8001974C is a
       # 10-word frameless leaf that ends in its own `jr $ra; nop`, and
@@ -397,7 +397,7 @@ segments:
       # ONE OUTLIER TO KNOW ABOUT: func_80018464 is 954 words, by far the
       # largest function in any carved unit. It is not blocked, but it is
       # not cold-runner ground either -- budget it separately.
-      - [0x8A88, c, TmdRenderer]
+      - [0x8A88, c, graphics/TmdRenderer]
       # code_8220_c: third and FINAL slice of the code_8220 block,
       # 0x9F74..0xAD64 (the next segment is psyq_rcpolyf3), 16 functions.
       # Carved round 13. Gate 2 checks, all run before the carve and all
@@ -433,7 +433,7 @@ segments:
       # `jr $ra; nop` leaf. Blocker census over the slice: zero gp_rel,
       # zero addiu-$at, zero `jlabel`, zero `jr $t2` -- so no rodata slot
       # to attach and no hasm/.word disposition.
-      - [0xD294, c, SceneNode]     # 0xD294..0xF770: code_d294, _b and _c, merged round 101 (track 8)
+      - [0xD294, c, graphics/SceneNode]     # 0xD294..0xF770: code_d294, _b and _c, merged round 101 (track 8)
       # (carve history; merged into SceneNode above, round 101)
       # code_d294_b: second 20-function slice, 0xDC24..0xED8C.
       # 0xED8C (func_8001E58C) is a real boundary -- func_8001E57C is a
@@ -467,12 +467,12 @@ segments:
       - [0xF8C8, o, libgte/ratan]       # ratan2, ratan (Psy-Q 3.3). .data at 0x5BE9C
       # 0xFA50..0x10D48: game code (revision 18; was psyq_fa50). Owns
       # jtbl_80010354 through the attached 0xB54 rodata sub-slot.
-      - [0xFA50, c, TmdModel]
+      - [0xFA50, c, graphics/TmdModel]
       - [0x10D48, o, libgs/gs_105]      # GsMapModelingData (Psy-Q 3.3). bss via the fragment
       - [0x10DC0, o, libgte/msc01]      # SquareRoot0, SquareRoot12. .data at 0x5C6F0
       # 0x10EE0..0x11474: game code (revision 18; was the head of psyq_10ee0).
       # 0x11474..0x14098: libgpu/sys from ResetGraph, Sony's, still asm.
-      - [0x10EE0, c, DrawSystem]
+      - [0x10EE0, c, graphics/DrawSystem]
       - [0x11474, asm, psyq_11474]      # libgpu/sys from ResetGraph (Dec 1995 build, never places)
       - [0x14098, o, libapi/c73]        # GPU_cw (Psy-Q 3.3)
       - [0x140A8, o, libc2/memcpy]      # memcpy
@@ -518,12 +518,12 @@ segments:
       - [0x15FD4, o, libetc/intr_vb]    # startIntrVSync ...
       - [0x16100, o, libetc/vsync]      # VSync, v_wait
       - [0x162E4, o, libc2/puts]        # puts
-      - [0x16334, c, Pad]
+      - [0x16334, c, app/Pad]
       - [0x166AC, o, libetc/pad]        # PadInit, PadRead, PadStop   (Psy-Q 3.5 build)
       - [0x1674C, o, libapi/a22]        # BIOS A-function stubs
       - [0x1675C, o, libapi/a20]
       - [0x1676C, o, libapi/a21]
-      - [0x1677c, c, GameApplicationFileResource]
+      - [0x1677c, c, app/GameApplicationFileResource]
       # ROUND 34: the unit's LAST function, `strcat` (0x80027130, 42w), is
       # Sony's -- libc2/strcat, Psy-Q 3.3, 0xA8 covering exactly it. It had
       # been matched as C since round 8 and counted as game code; linking the
@@ -626,7 +626,7 @@ segments:
       # on a `lw %gp_rel(...)($gp)` scheduled ahead of its own
       # `addiu $sp,$sp,-0x88` -- that is an ordinary hoisted global load, NOT
       # the pre-prologue `$sp` touch Gate 2 warns about.
-      - [0x179d8, c, CdDriver]
+      - [0x179d8, c, cd/CdDriver]
       # code_179d8: the head remainder.  ROUND 45 (2026-09-15) SPLIT IT IN
       # THREE and corrected the census below it, which had gone stale in the
       # expensive direction.
@@ -725,7 +725,7 @@ segments:
       # code_179d8_b: what is left of window [60..79] after libcd/sys took its
       # first 19 functions -- 0x19C78..0x1A1BC, ONE function (func_80029478),
       # which still owns jtbl_800109F8 and therefore the 0x11F8 rodata attach.
-      - [0x19C78, c, libcd_bios]
+      - [0x19C78, c, psyq/libcd_bios]
       # code_179d8_n: functions 80..82 of the original monolith, 0x1A1BC..
       # 0x1AB78 (3 functions).  Carved round 26 (2026-09-09) out of what was
       # the `code_179d8_mid` UNCARVED remainder -- renamed on carve because
@@ -789,7 +789,7 @@ segments:
       # Owns NO jump table (the 0xFD8 slot's seven jtbl blocks all fall
       # outside 0x8002BC40..0x8002C408), so unlike _b and _c it needs no
       # rodata attach.
-      - [0x1C92C, c, PlacementGridVabSound]     # 0x1C92C..0x1D508: code_179d8_d and _e, merged round 100 (track 8)
+      - [0x1C92C, c, sound/PlacementGridVabSound]     # 0x1C92C..0x1D508: code_179d8_d and _e, merged round 100 (track 8)
       # (carve history; merged into PlacementGridVabSound above, round 100)
       # code_179d8_e: functions 120..148 of the original, 0x1CC08..0x1D508
       # (29 functions).  Census 2026-09-04, three-grep screen per function:
@@ -838,7 +838,7 @@ segments:
       #
       # Expect this slice to span more than one class; identify each with
       # tools/classtable.py rather than assuming the unit has one.
-      - [0x1D508, c, libsnd_vmanager]
+      - [0x1D508, c, psyq/libsnd_vmanager]
       # (carve history; merged into libsnd_vmanager above, round 100)
       # code_179d8_m: BACK half of the old `code_179d8_mid_c` remainder --
       # functions 161..172 of the original, 0x1ECD8..0x20ADC (12 functions,
@@ -904,7 +904,7 @@ segments:
       # This is the one respect in which the split differs from round 33's
       # code_179d8_c_b, which DID have to carry its attach across.
       - [0x20FF0, o, libsnd/vm_prog]    # SpuVmSet/GetProgVol, SpuVmSet/GetProgPan
-      - [0x21180, c, libsnd_vm_vol_ut_key_ut_keyv]
+      - [0x21180, c, psyq/libsnd_vm_vol_ut_key_ut_keyv]
       # ROUND 34, SECOND split of the same original slice: `libsnd/ut_pb`
       # (Psy-Q 3.6 only, 0x90) covers 0x221B4..0x22244 = `SsUtPitchBend`, which
       # was func_800319B4 and had been MATCHED as C.  It sits in the MIDDLE of
@@ -913,7 +913,7 @@ segments:
       # above, which is what the `_c` suffix records.  Text-only; still no
       # rodata attach anywhere in this family.
       - [0x221B4, o, libsnd/ut_pb]      # SsUtPitchBend
-      - [0x22244, c, libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop]
+      - [0x22244, c, psyq/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop]
       # code_179d8_mid_d: the one function left between the code_179d8_j
       # carve above and code_179d8_c below -- func_80031F3C (131w).  A carve
       # remainder, not a unit.
@@ -943,7 +943,7 @@ segments:
       # and D_8006DAD4), so the "split scaled index" idiom and its
       # loop-versus-non-loop refinement in DECOMPILATION_LEARNINGS are
       # likely to apply directly.  Read that entry before starting.
-      - [0x2273C, c, libsnd_ut_ako]
+      - [0x2273C, c, psyq/libsnd_ut_ako]
       # code_179d8_c: window [200..219], 0x22948..0x23500 (20 functions).
       # ROUND 33: func_80032148 (53w), the first function of this slice, is
       # Sony's `libsnd/vm_vsu` and is linked from the object.  Text-only, and
@@ -951,7 +951,7 @@ segments:
       # is a pure prefix trim: no matched C is reclassified and the unit keeps
       # its name, its remaining 19 functions and its 0x14D8 rodata attach.
       - [0x22948, o, libsnd/vm_vsu]
-      - [0x22A1C, c, libsnd_ssinit]
+      - [0x22A1C, c, psyq/libsnd_ssinit]
       # ROUND 33: func_800323A8 (120w) is Sony's `SsSetTableSize`
       # (`libsnd/sstable`, Psy-Q 3.5 -- the 3.3 disc does not carry it).
       # Text-only, 0x1E0 covering exactly that one function, and it sat in
@@ -961,7 +961,7 @@ segments:
       # func_80032588, which is in the tail; left on code_179d8_c the link
       # fails with `undefined reference to '.L800325xx'`.
       - [0x22BA8, o, libsnd/sstable]
-      - [0x22D88, c, libsnd_ssinit_libapi_counter]
+      - [0x22D88, c, psyq/libsnd_ssinit_libapi_counter]
       # code_179d8_tail: functions 220..255 of the original.  UNCARVED
       # remainder in front of the code_179d8_f carve below, and left that
       # way deliberately: 0x23500..0x2673C is addiu-$at dense (26 of its 36
@@ -1035,7 +1035,7 @@ segments:
       - [0x23F38, o, libsnd/sscall]     # SsSeqCalledTbyT
       - [0x241AC, o, libsnd/pause]      # Snd_pause, Snd_nextpause
       - [0x242B0, o, libsnd/tempo]      # Snd_tempo
-      - [0x24490, c, libsnd_decre]
+      - [0x24490, c, psyq/libsnd_decre]
       # ROUND 34, second run in the same unit: `libsnd/replay` (Snd_replay) and
       # `libsnd/vs_vab` (SsVabClose, SsVabOpen) -- func_80033FB8, func_80034020
       # and func_800340B0, all three previously MATCHED as C.  This run sits in
@@ -1046,7 +1046,7 @@ segments:
       # unit owns no jump table, so NO rodata attach moved.
       - [0x247B8, o, libsnd/replay]     # Snd_replay
       - [0x24820, o, libsnd/vs_vab]     # SsVabClose, SsVabOpen
-      - [0x2490C, c, libsnd_play]
+      - [0x2490C, c, psyq/libsnd_play]
       # code_179d8_k: what was the `code_179d8_tail` remainder after the
       # code_179d8_i carve -- functions 238..255 of the original,
       # 0x24938..0x2673C (18 functions, func_80034138 .. func_80035E80).
@@ -1081,7 +1081,7 @@ segments:
       #
       # Expect this slice to span more than one class; identify each with
       # tools/classtable.py rather than assuming the unit has one.
-      - [0x24938, c, libsnd_seqread]
+      - [0x24938, c, psyq/libsnd_seqread]
       # code_179d8_f: functions 256..273 of the original, 0x2673C..0x272C8
       # (18 functions).  Census 2026-09-04, three-grep screen per function:
       # 16/18 clean, the two blocked are func_80036230 and func_80036528,
@@ -1109,7 +1109,7 @@ segments:
       - [0x26BFC, o, libsnd/vm_don]     # SpuVmDamperOn
       - [0x26C10, o, libsnd/next]       # _SsSndNextSep
       - [0x26D18, o, libsnd/vm_doff]    # SpuVmDamperOff
-      - [0x26D28, c, libsnd_cres]
+      - [0x26D28, c, psyq/libsnd_cres]
       # ROUND 34, second run in the same unit: `libsnd/stop` (3.3, 0x1C0)
       # covers func_800368E8/A54/A7C = `Snd_stop`, `SsSeqStop`, `SsSepStop`,
       # all three previously MATCHED as C.  This one sits in the MIDDLE of
@@ -1119,7 +1119,7 @@ segments:
       # Text-only; the unit owns no jump table, so NO rodata attach moved --
       # the 0xFD8 rodata slot list names no `code_179d8_f` line at all.
       - [0x270E8, o, libsnd/stop]       # Snd_stop, SsSeqStop, SsSepStop
-      - [0x272A8, c, libspu_s_ih]
+      - [0x272A8, c, psyq/libspu_s_ih]
       # psyq_SpuSetMute (0x272C8..0x2C054) is converted to linked Sony objects
       # one run at a time. 35 objects tile nine runs exactly, all from the 3.3
       # disc; the eight gaps between the runs are the game's own libspu/libsnd
@@ -1166,7 +1166,7 @@ segments:
       # Gap: 0x2A0E0..0x2A878. Called "the game's own libspu build" until
       # revision 18 measured it: game code (BasicClass-table methods that
       # call the framework), carved as a C unit.
-      - [0x2a0e0, c, WBgm]
+      - [0x2a0e0, c, sound/WBgm]
       # Chunk D: three libsnd runs, all text-only.
       - [0x2a878, o, libsnd/ssvol]       # Snd_SetVol, SsSeqSetVol, SsSepSetVol
       - [0x2a918, asm, psyq_2a918]       # 0x2A918..0x2A94C, unowned
@@ -1181,13 +1181,13 @@ segments:
       - [0x2b660, o, libsnd/sspause]     # Snd_SetPauseMode, SsSeqPause, SsSepPause
       # Gap: 0x2B78C..0x2BA1C. Called "the game's own libsnd build" until
       # revision 18: game code, carved as a C unit.
-      - [0x2b78c, c, Application]
+      - [0x2b78c, c, app/Application]
       # Chunk E: the block's last two runs.
       - [0x2ba1c, o, libgs/gs_104]       # GsInit3D
       - [0x2ba94, o, libcd/event]        # CdInit, def_cbsync, def_cbready, def_cbread
-      - [0x2bb9c, c, TimImage]       # 0x2BB9C..0x2BF70, game code (revision 18)
+      - [0x2bb9c, c, graphics/TimImage]       # 0x2BB9C..0x2BF70, game code (revision 18)
       - [0x2bf70, o, libgs/gs_122]       # GsGetTimInfo, closing the block at 0x2C054
-      - [0x2c054, c, Task]
+      - [0x2c054, c, app/Task]
       # code_2cc8c is 153 functions. Round 10 carved the first 20-function
       # slice (0x2CC8C..0x2D548) as a C unit; the remainder stays asm as
       # code_2cc8c_b. Blocker census at carve time: 4 of 153 functions
@@ -1314,15 +1314,15 @@ segments:
       # 0xA0 `.bss` that "no relocation names" -- informational only, bss is
       # never placed in this yaml. gs_108's `.rdata` is the 0x1994 string
       # slot, split out above with its `pad`.
-      - [0x3030C, c, libgs_gs_101]     # GsSetNearClip (was func_8003FB0C)
+      - [0x3030C, c, psyq/libgs_gs_101]     # GsSetNearClip (was func_8003FB0C)
       - [0x3031C, o, libgs/gs_123]      # Gssub_make_matrix (was func_8003FB1C)
-      - [0x303E4, c, libgs_gs_124]     # GsSetWorkBase (was func_8003FBE4)
+      - [0x303E4, c, psyq/libgs_gs_124]     # GsSetWorkBase (was func_8003FBE4)
       - [0x303F4, o, libgs/gs_111]      # GsDrawOt        (was func_8003FBF4)
       - [0x30418, o, libgs/gs_113]      # GsClearOt       (was func_8003FC18)
       - [0x30470, o, libgs/gs_108]      # GsSetLightMode  (was func_8003FC70)
       - [0x304FC, o, libgte/fgo_00]     # TransposeMatrix (was func_8003FCFC)
       - [0x3054C, o, libgte/fog_01]     # SetFogNear      (was func_8003FD4C)
-      - [0x305B0, c, ScreenWidgets]
+      - [0x305B0, c, ui/ScreenWidgets]
       # (carve history; merged into ScreenWidgets above, round 100)
       # code_2cc8c_f: #30..#59, 0x30E64..0x3197C (psyq_memset follows, so no
       # data tail). Zero blocked functions.
@@ -1331,19 +1331,19 @@ segments:
       - [0x319A8, o, libc2/itoa]       # itoa
       - [0x319E8, o, libc2/sprintf]    # sprintf
       - [0x32248, o, libc2/memmove]    # memmove
-      - [0x322b4, c, Sprite]       # game code (revision 18; was psyq_322b4)
+      - [0x322b4, c, graphics/Sprite]       # game code (revision 18; was psyq_322b4)
       # psyq_memset chunk B: three short runs in the libgs/libcd remainder.
       - [0x330F4, o, libgs/gs_110]     # GsSetAmbient
-      - [0x3311c, c, FlatLightObj]       # game code (revision 18; was psyq_3311c)
+      - [0x3311c, c, graphics/FlatLightObj]       # game code (revision 18; was psyq_3311c)
       - [0x3328C, o, libgs/gs_107]     # GsSetFlatLight, gte_set_lc, gte_read_lc
-      - [0x33808, c, GraphicsResources] # game code (revision 18; was the head of psyq_33808)
+      - [0x33808, c, graphics/GraphicsResources] # game code (revision 18; was the head of psyq_33808)
       - [0x36654, asm, psyq_36654]     # libpress/libpress from DecDCTReset
       - [0x36D38, o, libc2/exit]       # exit
       - [0x36d48, asm, psyq_36d48]
       # psyq_memset chunk C: libpress, the MDEC variable-length decoder.
       - [0x36DB8, o, libpress/vlc]     # MDEC_vlc_brk, MDEC_vlc
       - [0x3711C, o, libpress/vlc2]    # MDEC_vlc2, ivlc_dct_dc_size
-      - [0x3770c, c, CdStream]       # game code (revision 18; was psyq_3770c)
+      - [0x3770c, c, cd/CdStream]       # game code (revision 18; was psyq_3770c)
       # psyq_memset chunk D: the libcd streaming/BIOS-command core. Eight of
       # these objects carry an identical, unreferenced 0x10-byte .data; only
       # c_003's is placeable, and the other eight are left out of the yaml on
@@ -1360,7 +1360,7 @@ segments:
       - [0x38EAC, o, libcd/c_009]      # StGetNext
       - [0x38F70, o, libcd/c_004]      # data_ready_callback
       - [0x38FD8, o, libcd/c_007]      # StFreeRing
-      - [0x39094, c, GameFiles]       # game code (revision 18; was psyq_39094)
+      - [0x39094, c, cd/GameFiles]       # game code (revision 18; was psyq_39094)
       # psyq_rand, retired whole. Its 4-byte .sbss seed is placed NOLOAD by
       # config/psyq-objects.ld at 0x8008AC68; the plain sbss slot below is
       # unchanged.
@@ -1370,8 +1370,8 @@ segments:
       # These are the units runners work in. Everything else is still a
       # monolithic `asm` segment awaiting a carve (docs/PARALLEL-RUNS.md
       # Gate 2).
-      - [0x39cb4, c, StageGrid]
-      - [0x39e08, c, DayTaskStageMap]
+      - [0x39cb4, c, world/StageGrid]
+      - [0x39e08, c, world/DayTaskStageMap]
       # class_3bb8c is 365 functions -- the largest uncarved block in the
       # game, and the one holding all 13 PSX BIOS trampolines (`jr $t2`,
       # not expressible in C). Carved in slices from the front, like Entity.
@@ -1414,7 +1414,7 @@ segments:
       # never through the caller's frame.
       # Clear of both remainder hazards (zero `jlabel`, zero `jr $t2`), so
       # no rodata slot to attach and no hasm/.word disposition here either.
-      - [0x3DA54, c, TitleMenuTaskObjF]
+      - [0x3DA54, c, ui/TitleMenuTaskObjF]
       # class_3bb8c_d / _e / _f: front of the 305-function class_3bb8c
       # remainder, split into three ~20-function C units in round 14. The
       # tail (#59 onward, 0x403E4) deliberately STAYS asm as class_3bb8c_g
@@ -1593,7 +1593,7 @@ segments:
       # clusters, so the only way to make it assignable without putting
       # trampolines in a C unit is to give it its own segment.  12 words -- it
       # should close in one sitting and then this unit is finished.
-      - [0x41328, c, libcard_card]
+      - [0x41328, c, psyq/libcard_card]
       # class_3bb8c_h_c WAS 5 trampolines (0xB0 x4 at 0x41358/68/78/98, 0xA0 x1
       # at 0x41388), 0x41358..0x413A8.
       # ROUND 34: all five are Sony's, one libcard object each, tiling the
@@ -1612,7 +1612,7 @@ segments:
       # jump table, so expect the rodata attach/split from Gate 2). 18 clean,
       # none wanting 7+ callee-saved registers (the corrected threshold; the
       # one function at 5 is ordinary work, see DECOMPILATION_LEARNINGS).
-      - [0x413A8, c, TextEntryItemList]
+      - [0x413A8, c, ui/TextEntryItemList]
       # class_3bb8c_j: first 20-function slice of the 193-function remainder,
       # 0x41F84..0x429D4. Carved round 15. Boundary checked on both sides:
       # func_8005217C closes `jr $ra; nop` + endlabel and func_800521D4 opens
@@ -1628,7 +1628,7 @@ segments:
       # Blocker profile: 2 of 20 -- func_800522DC (addiu-$at, and it OWNS
       # jtbl_800116F4, so the rodata slot at 0x1EF4 is attached here) and
       # func_80052644 (gp_rel). 18 clean.
-      - [0x429D4, c, ObjMStyleActor]
+      - [0x429D4, c, world/ObjMStyleActor]
       # class_3bb8c_l: third 20-function slice, 0x435E0..0x44518. Carved
       # round 15. Boundary checked on both sides: func_80053C94 closes
       # `jr $ra; nop` + endlabel and func_80053D18 opens with its own
@@ -1736,8 +1736,8 @@ segments:
       # are STRINGS referenced by symbol, which a standalone rodata object
       # resolves fine (the 0xA8C precedent), so no attach is expected; the
       # slice owns no `jtbl_` reference either.
-      - [0x48F74, c, DreamSys]
-      - [0x4CD08, c, DreamAux]   # DreamAux
+      - [0x48F74, c, world/DreamSys]
+      - [0x4CD08, c, world/DreamAux]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
       # one runner may own a unit. Carved in slices; the remainder stays
       # `asm` until someone needs it. Both 0x4E618 (func_8005DE18) and
@@ -1746,7 +1746,7 @@ segments:
       # touches $sp, and the function before it ends in a `jr $ra`.
       # Entity_b carries NO switch jump tables -- the whole 117-function
       # block had zero `jlabel`s -- so no rodata slot needed attaching.
-      - [0x4D7DC, c, Entity]
+      - [0x4D7DC, c, world/Entity]
       # Entity_c: first 20-function slice of the 97-function remainder,
       # 0x4F754..0x5077C. 0x5077C (func_8005FF7C) is a real boundary --
       # func_8005FEF8 ends `jr $ra; nop` and func_8005FF7C opens with its
@@ -1794,7 +1794,7 @@ segments:
       #
       # Entity_f: first 17, 0x53CA8..0x54E18.
       # Entity_g: remaining 20, 0x54E18..0x55DD4.
-      - [0x55DD4, c, TodActor]
+      - [0x55DD4, c, world/TodActor]
       # ---- data ------------------------------------------------------------
       # ALL DATA STARTS AS ASSEMBLY, including the slots that belong to the two
       # carved C units. splat's dot-prefixed form (`.data, DreamSys`) means

@@ -246,7 +246,7 @@ class rather than two coincidences; see that function's own report.
 
 NON_MATCHING body promoted, round 59. The exact preserved body above (29/35
 words, length exact, instruction-scheduling residue on the `li $a1,1`
-materialization) is now live in `src/ScreenWidgets.c` under `#ifdef
+materialization) is now live in `src/ui/ScreenWidgets.c` under `#ifdef
 NON_MATCHING`, with the verified build still taking the `#else INCLUDE_ASM`
 branch. `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
 

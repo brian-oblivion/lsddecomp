@@ -425,7 +425,7 @@ function (not just the isolated reproducer), none closed it:**
 plateau, append the negative and stop").** The preserved body below is
 the 211/213 state (narrowed volatile only, `divisor` cached and reused,
 no cast/nesting/reordering) since that was the best measured and every
-further reshape either did nothing or regressed. `src/libsnd_seqread.c` is
+further reshape either did nothing or regressed. `src/psyq/libsnd_seqread.c` is
 back to `INCLUDE_ASM` and the whole-image build is confirmed green.
 
 **Process note, not a code finding:** running `make extract` while this
@@ -599,7 +599,7 @@ context). Marking this residue **permuter-exhausted** per
 duplicate-arm forms reach zero and no idiomatic translation scores the
 same, mark the class permuter-exhausted in the report and move on").
 
-`src/libsnd_seqread.c` restored to `INCLUDE_ASM`; whole-image build confirmed
+`src/psyq/libsnd_seqread.c` restored to `INCLUDE_ASM`; whole-image build confirmed
 green (`build-and-verify.sh` exit 0) before moving on.
 
 ### Round 35 lever checklist

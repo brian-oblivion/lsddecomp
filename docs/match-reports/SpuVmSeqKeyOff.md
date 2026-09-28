@@ -235,7 +235,7 @@ round 23 already showed backfires.
 ## Round 47 (2026-09-16), runner delta -- rebuilt in-tree (third confirmation), then permuter DECLINED on check (b)
 
 **Rebuild-before-trusting-the-score, third time.** Spliced the preserved
-body into `src/libsnd_vmanager.c` (with this unit's own local reduced-view
+body into `src/psyq/libsnd_vmanager.c` (with this unit's own local reduced-view
 declarations for `spuVmMaxVoice`, `D_8008D996`/`D_8008D9A3`/`_svm_voice`/
 `D_8008D98C`, `D_8008EA26`, `_svm_okof1`/`_svm_okof2`, `_svm_okon1`/
 `_svm_okon2`, copied from `libsnd_vm_vol_ut_key_ut_keyv.c`'s equivalents per this

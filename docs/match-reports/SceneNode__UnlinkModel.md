@@ -22,7 +22,7 @@ void SceneNode__UnlinkModel(SceneNodeObj *self) {
 Already MEASURED and documented verbatim in `include/SceneNode.h`'s own
 standing comment before this carve existed ("SceneNode__UnlinkModel's whole body is
 `self->unk18 = 0; self->unk20 = 0;`") -- this round only had to move the
-body from documentation into `src/SceneNode.c` and confirm it still
+body from documentation into `src/graphics/SceneNode.c` and confirm it still
 matches now that the function has its own real address. No residue.
 Comment in the header updated (round 14) to say "now carved" instead of
 "still uncarved" since the function moved out of `asm/` into this unit;
@@ -43,7 +43,7 @@ No new struct or vtable-slot knowledge.
   `SceneNode__AddChild` -- the +0x010 slot -- is what forwards into
   `SceneNode__LinkModel`.
 
-## Round 98 (echo): track 7, moved from src/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
 
 The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
 

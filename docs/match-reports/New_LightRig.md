@@ -4,7 +4,7 @@
 
 > Renamed from `func_80042694` on 2026-09-25 (tools/rename.py). Address 0x80042694.
 
-Round 82, runner alpha (fourth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior attempt.
 
 - **Where:** not in any method table (allocator).
 - **What:** `BMemPMgrAlloc(0x54)`; if non-NULL, calls slot +0x008 (ctor) of `GetLightRigMethods()` (the gLightRigMethods table) on it and returns it, else NULL.

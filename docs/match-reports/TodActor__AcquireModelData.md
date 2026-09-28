@@ -39,7 +39,7 @@ fail:
 }
 ```
 
-Adds `TodActorDesc` (`src/TodActor.c`) for the constructor's `arg1`,
+Adds `TodActorDesc` (`src/world/TodActor.c`) for the constructor's `arg1`,
 typed only at its `+0x00C` field (a `Unk5CObj *`, borrowed or freshly
 allocated), and retypes the `arg1` parameter all the way from
 `TodActor__TodActor` through `slot_setup5C`/`TodActor__SetupModelData` to here as

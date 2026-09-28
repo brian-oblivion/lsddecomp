@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003B4A8` on 2026-09-25 (tools/rename.py). Address 0x8003b4a8.
 
-Round 81, runner echo. Unit `src/TimImage.c`. Fresh ground, no prior attempt.
+Round 81, runner echo. Unit `src/graphics/TimImage.c`. Fresh ground, no prior attempt.
 Three builds.
 
 - **Where:** TimImage's table (`gTimImageMethods`) slot +0x078 (`tools/classtable.py D_8006E558`).

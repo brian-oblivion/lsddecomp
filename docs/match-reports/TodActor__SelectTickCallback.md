@@ -32,7 +32,7 @@ void TodActor__SelectTickCallback(TodActor *self, s32 value)
 ```
 
 `slot118`/`slot11C`/`slot120` are typed as plain `void *` in
-`src/TodActor.c`, not function pointers — this function only ever
+`src/world/TodActor.c`, not function pointers — this function only ever
 takes their *address* out of the vtable and stores it, it never `jalr`s
 through them, so there is no evidence here for their call signature (a
 future function that actually invokes `self->unk78` would be the place to

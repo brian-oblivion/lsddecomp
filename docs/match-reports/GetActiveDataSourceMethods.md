@@ -36,7 +36,7 @@ inverted-condition idiom GCC sometimes uses) -- confirmed by matching, first
 try, with the straightforward `if`/`else` written in source order.
 
 `GetVabDriverMethods` is confirmed elsewhere in the repo
-(`src/PlacementGridVabSound.c`: `TableD9BC *GetVabDriverMethods(void) { return &gVabDriverMethods; }`)
+(`src/sound/PlacementGridVabSound.c`: `TableD9BC *GetVabDriverMethods(void) { return &gVabDriverMethods; }`)
 to return a pointer, not void -- direct positive evidence this whole function
 is non-void per CLAUDE.md's tail-call caution. `GetCdDriverMethods` is still
 uncarved (`asm/code_179d8.s`) but is declared elsewhere in the repo

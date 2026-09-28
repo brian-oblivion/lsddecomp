@@ -2,7 +2,7 @@
 
 > Renamed from `func_80053ACC` on 2026-09-24 (tools/rename.py). Address 0x80053acc.
 
-Unit: `src/ObjMStyleActor.c`. Originally stalled by echo (round 16), CLOSED by
+Unit: `src/world/ObjMStyleActor.c`. Originally stalled by echo (round 16), CLOSED by
 bravo (round 19) via the permuter. `./build-and-verify.sh` green,
 byte-exact (verified directly against `disk/SLPS_015.56` at
 `0x442CC-0x443E8`, independent of the whole-image SHA1 which was still red
@@ -72,7 +72,7 @@ live when 12+ manual attempts have already covered order/shape/polarity.
 
 # Prior state (round 16-18), preserved for context
 
-Unit: `src/ObjMStyleActor.c`. Runner: echo, round 16. `INCLUDE_ASM` restored;
+Unit: `src/world/ObjMStyleActor.c`. Runner: echo, round 16. `INCLUDE_ASM` restored;
 `./build-and-verify.sh` green.
 
 ## Signature

@@ -17,7 +17,7 @@ word-match, first real diff at file 0x1F69C / vram 0x8002EE9C -- pure
 REGISTER-IDENTITY residue (a0 vs s0), same instructions, banned to fix by
 pinning
 
-Unit: `src/libsnd_vmanager.c`. Round 26 (second pass), runner bravo, incorporating the
+Unit: `src/psyq/libsnd_vmanager.c`. Round 26 (second pass), runner bravo, incorporating the
 HEAD's diagnosis of the "split scaled index" residue (see below).
 
 ## Screens (clean)
@@ -775,7 +775,7 @@ Round 89 (runner delta, track 5 `asm-sites`), two sites:
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile.
+Round 96 (charlie, track 6) moved `src/psyq/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile.
 
 - The local `SpuVolume`/`SpuReverbAttr` mirrors and the local `SpuInitMalloc(s32, void *)` prototype are gone: `<libspu.h>` supplies all three (`SpuInitMalloc(long, char *)`, so `D_8008DEB0` is declared `char[]`).
 - `ObjDAD4` is now `SpuRegs` (`tools/renametype.py ObjDAD4 SpuRegs`): `_svm_sreg` holds 0x1F801C00, the first `.data` word of libsnd/vmanager.o on disc 3.3 (`001c801f`), the PS1 SPU register block. It is laid out as `SpuVoiceRegs voice[24]` (volL, volR, pitch, addr, adsr1, adsr2, envx at +0x0..+0xC) plus the keyOn (+0x188), keyOff (+0x18C), noiseOn (+0x194) and reverbOn (+0x198) words. The six cast stores here are unchanged (their index spelling carries the match); each comment now names the register: +0x6 addr = 0x200, +0x4 pitch = 0x1000 (44.1 kHz), +0x8 adsr1 = 0x80FF, +0x0/+0x2 volL/volR = 0, +0xA adsr2 = 0x4000.

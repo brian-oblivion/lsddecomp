@@ -52,7 +52,7 @@ buffer being two GsOT headers plus tags plus packet area, and with both
 halves being handed to `GsClearOt`. Left as an `s32` field layout (no
 struct edit this round).
 
-### Matched body (as committed in `src/Task.c`)
+### Matched body (as committed in `src/app/Task.c`)
 
 ```c
 extern void GsClearOt(s32 a0, s32 a1, s32 a2);
@@ -186,7 +186,7 @@ even though neither run is "exhaustive" in any formal sense.
 
 ## ROUND 46 (runner delta): drift-checked fresh, no new lever -- DELIBERATE SKIP, plus a self-caught cross-contamination scare worth recording
 
-Re-spliced the round-36 body (with `GsClearOt`) into `src/Task.c`
+Re-spliced the round-36 body (with `GsClearOt`) into `src/app/Task.c`
 and rebuilt. **First attempt showed a spurious `WARNING: differs OUTSIDE
 this range too (22 bytes)`** that had nothing to do with this function --
 `cmp -l build/SLPS_015.56 disk/SLPS_015.56` plus
@@ -490,7 +490,7 @@ actually been rebuilt in its current form since that rename — the 71/73
 figure was correct but unverified against the current tree.
 
 **Rebuilt with the corrected name.** `extern void GsClearOt(s32, s32, s32);`
-already existed in `src/Task.c` (added when round 34 retyped this
+already existed in `src/app/Task.c` (added when round 34 retyped this
 unit's other Sony calls), just declared after this function's own call
 sites; added a second, identical declaration ahead of `Viewport__InitOt`
 itself (same pattern this unit already uses for its other local externs)
@@ -676,7 +676,7 @@ Renamed from `Unk18Obj__InitOt`. Slot +0x08C `initOt`. Its carving names the fie
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/Task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsClearOt(0, 0, (GsOT *)self->ot[0])` and `[1]`: `ViewportOt` is Sony's GsOT under a local name (include/Viewport.h).
+src/app/Task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsClearOt(0, 0, (GsOT *)self->ot[0])` and `[1]`: `ViewportOt` is Sony's GsOT under a local name (include/Viewport.h).
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 

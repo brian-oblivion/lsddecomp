@@ -5,7 +5,7 @@
 
 /*
  * Tod -- a FileResource data source (class id 0x4F03, method table gTodMethods)
- * over one TOD animation's packet stream. Methods in src/GraphicsResources.c; one
+ * over one TOD animation's packet stream. Methods in src/graphics/GraphicsResources.c; one
  * subclass, TodSet (gTodSetMethods, 0x14F03), whose ctor calls this class's
  * first (TodSet__TodSet: GetTodMethods()->ctor(self, arg)) and whose
  * TodSet__BuildTods makes one Tod per sub-block of its buffer (New_Tod).
@@ -49,7 +49,7 @@ struct ResourceSource;
 #define TOD_PACKET_NIBBLE 0xF /* the type and flag fields' mask */
 
 /* The packet types ScanTodPackets tests. TOD_PACKET_MODEL_ID is spelled
- * exactly as src/TodActor.c's, which defines the other types. */
+ * exactly as src/world/TodActor.c's, which defines the other types. */
 #define TOD_PACKET_MODEL_ID 2       /* data: the TMD id the object is drawn with */
 #define TOD_PACKET_OBJECT_CONTROL 8 /* the flag says create or kill */
 #define TOD_OBJECT_CREATE 0         /* an object-control packet's flag: create */

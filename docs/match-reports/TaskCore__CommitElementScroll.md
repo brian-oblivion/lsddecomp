@@ -124,7 +124,7 @@ best-posed never-searched target in the whole brief). Ran all three
 mandated checks before spending the search:
 
 1. **Correctness:** the preserved body below (byte-identical to the copy
-   already on file) was spliced into `src/Task.c` in place of the
+   already on file) was spliced into `src/app/Task.c` in place of the
    `INCLUDE_ASM` and rebuilt through the full oracle in isolation (every
    other INCLUDE_ASM in all four of this runner's units confirmed still
    wrapped first). Reproduces **exactly 114/118, zero outside-range
@@ -671,7 +671,7 @@ listView is a BoxFill (include/BoxFill.h); the `Unk68Obj` slot50 call is detachF
 ## Track 7 (2026-09-27, round 98, bravo)
 
 `SlotEntry` and `SrcDesc` moved out of `include/Task.h` into
-`src/Task.c` (only this unit uses them). `SlotEntry`'s `unk10`/`unk14`
+`src/app/Task.c` (only this unit uses them). `SlotEntry`'s `unk10`/`unk14`
 pair is now a `SlotPos pos` field, so the `SLOT_POS()` macro and its
 `*(SlotPos *)&target->unk10` cast are gone; the source still reads
 `pos = entry->pos;`, the same whole-struct copy round 75 found, byte-exact.

@@ -91,7 +91,7 @@ accesses are plain uses of existing fields, not new ones.
 
 **Callee evidence** (`0x8001E600`): entry is `move s1,a0` / `move s2,a1` /
 `move s0,a2` and `$a3` is never read — three real arguments, exactly what the
-definition in `src/SceneNode.c` says.
+definition in `src/graphics/SceneNode.c` says.
 
 **Why both externs must keep the 4th parameter.** Every known call site sets
 `$a3` to zero, and that instruction is in retail:
@@ -110,11 +110,11 @@ the call site deletes the `move a3,zero` and breaks both matches. The callee
 ignores the value; the caller still has to place it.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/DreamSys.c:364` and `src/DreamAux.c:443`. Oracle green.
+added to `src/world/DreamSys.c:364` and `src/world/DreamAux.c:443`. Oracle green.
 
 ## Track 4 (2026-09-25, round 81, charlie)
 
-The two 4-argument `arity-ok` externs (`src/DreamSys.c`, `src/DreamAux.c`)
+The two 4-argument `arity-ok` externs (`src/world/DreamSys.c`, `src/world/DreamAux.c`)
 are gone. SceneNode's one header, `include/SceneNode.h`, declares the
 method, and a 3-parameter prototype there would make both callers a compile
 error. Both callers set `$a3 = 0` (0x80059460, 0x8005CF7C), so the
@@ -127,7 +127,7 @@ parameter added. The callers upcast (`(SceneNode *)this`,
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
 
-## Round 98 (echo): track 7, moved from src/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
 
 The `u8 buf[0x20]` buffer is now `MATRIX rot`, and `table` is `worldPos`: byte-identical. The per-axis parent test was re-measured: hoisting it to one `worldPos` computation scores 17/48 with 294257 bytes drifted, so the source comment keeps a one-line `MATCHING:` note. The old comment's `self->unkC` is `self->parent` (SceneNode.h).
 

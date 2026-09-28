@@ -95,7 +95,7 @@ void SsSetTickMode(s32 a0) {
     VBLANK_MINUS = cmd;
 }
 
-INCLUDE_ASM("asm/nonmatchings/libsnd_ssinit_libapi_counter", _SsStart);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_ssinit_libapi_counter", _SsStart);
 
 extern void _SsStart(s32 arg0);
 

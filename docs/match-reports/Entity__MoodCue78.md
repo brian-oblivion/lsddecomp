@@ -18,7 +18,7 @@ resolved round 42). Closed in **11 builds** this round.
 The unit's names and types **did change** since round 45 — `unkFC` is now
 `moodTimer`, `unk94` is `target`, `slot148` is `getProximityRatio`,
 `slot16C` is `stopSoundCue` — and `tools/rename.py` had already rewritten
-the preserved `#if 0` body in `src/Entity.c` accordingly. **None of it
+the preserved `#if 0` body in `src/world/Entity.c` accordingly. **None of it
 mattered.** Every renamed field was already correctly identified in round
 45's derivation; the new names made the body easier to read and changed
 nothing about what compiled. Re-reading the callers likewise produced

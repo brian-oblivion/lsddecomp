@@ -2,7 +2,7 @@
 
 > Renamed from `func_800281B0` on 2026-09-17 (tools/rename.py). Address 0x800281b0.
 
-Round 45, runner echo (second sitting), `src/CdDriver.c`.
+Round 45, runner echo (second sitting), `src/cd/CdDriver.c`.
 
 ## Result
 

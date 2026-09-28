@@ -27,7 +27,7 @@ void *GetLinkResourceMethods(void) {
 
 - Only `common.h` is included; no shared header was edited. Local declarations
   (the `extern s32 D_...[]` table symbol or the unit-local struct view) sit
-  directly above the function in `src/GraphicsResources.c`.
+  directly above the function in `src/graphics/GraphicsResources.c`.
 
 ## Naming
 

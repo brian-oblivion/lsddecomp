@@ -41,7 +41,7 @@ plus a stray `j` into the middle of it, growing the function by 8 bytes and
 shifting every later address in the unit.
 
 The proven idiom already used elsewhere in this project's `New_X` functions
-(`src/TitleMenuTaskObjF.c`: `self = BMemPMgrAlloc(sz); if (self != NULL) {
+(`src/ui/TitleMenuTaskObjF.c`: `self = BMemPMgrAlloc(sz); if (self != NULL) {
 ctor(self); return self; } return NULL;`) is what actually matches --
 returning INSIDE the `if` block, with the final `return NULL;` falling
 through from outside it. Applying that exact shape closed it to 27/27.
@@ -70,7 +70,7 @@ Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTe
 Allocation size `0x4C` is `sizeof(TextEntry)` (the struct ends with
 `panelSprite` at +0x048). Zero bytes changed.
 
-Moved here from the unit banner of src/TextEntryItemList.c (history, not
+Moved here from the unit banner of src/ui/TextEntryItemList.c (history, not
 documentation): "TextEntryItemList -- third carved slice of the DayTaskStageMap
 block, 20 functions, carved round 14. All 20 are TextEntry methods
 (gTextEntryMethods, `D_80086ED0`, 42 slots; `tools/classtable.py

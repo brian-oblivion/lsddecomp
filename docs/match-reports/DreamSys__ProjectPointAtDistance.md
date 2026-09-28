@@ -8,7 +8,7 @@ Closed round 19 (second pass, runner delta) from a mid-attempt snapshot that
 did not even compile. History below in arrival order; read this section
 first.
 
-## Final body (landed in `src/DreamSys.c`)
+## Final body (landed in `src/world/DreamSys.c`)
 
 ```c
 extern void SceneNode__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
@@ -265,7 +265,7 @@ carry `position` fields, and the z component of a local offset -- a distance.
 Tier B: the computation is certain, what the projected point is FOR is not (it has
 no carved caller; the vtable slot is +0x120).
 
-## Comment moved from src/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/DreamSys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

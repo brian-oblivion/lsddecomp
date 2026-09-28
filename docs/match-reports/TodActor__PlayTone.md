@@ -13,7 +13,7 @@
 
 `TodActorMethods` slot `+0x124`. Reads `self->arg2` (`+0x58`, the
 constructor's stashed third parameter, of an unidentified class — see
-`src/TodActor.c`'s new `UnkArg2Obj`/`UnkArg2Methods`, typed only at its
+`src/world/TodActor.c`'s new `UnkArg2Obj`/`UnkArg2Methods`, typed only at its
 `+0x080` slot since that is all this function needs). If non-NULL, calls
 that object's own vtable slot `+0x080` with **four** arguments: the object
 itself, this function's own second parameter forwarded verbatim, and the

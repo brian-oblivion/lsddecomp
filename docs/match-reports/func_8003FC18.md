@@ -13,7 +13,7 @@
 > Its declaration left `include/Task.h` (six units) in the same step
 > rather than being renamed in place -- under Sony's name in a shared header
 > it is the `conflicting types` failure against LIBGS.H that round 33 flagged
-> for GsSetRefView2. The caller, `src/Task.c`, declares it locally
+> for GsSetRefView2. The caller, `src/app/Task.c`, declares it locally
 > under the Sony name with its own call site's shape.
 >
 > **Everything below is kept as the derivation it was, not as live guidance.**

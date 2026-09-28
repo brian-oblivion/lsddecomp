@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for gTileAtlasMethods, objec
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
 
 ```c
 /* Allocate and construct a gTileAtlasMethods object. */
@@ -42,11 +42,11 @@ void *New_TileAtlas(s32 arg0) {
 
 ## Naming
 
-- **New_TileAtlas**, tier A. src/Task.c builds this object first and hands it to New_TileMap; its BuildCells lays out exactly the 300-cell (20x15) atlas TileMap__BuildMap indexes.
+- **New_TileAtlas**, tier A. src/app/Task.c builds this object first and hands it to New_TileMap; its BuildCells lays out exactly the 300-cell (20x15) atlas TileMap__BuildMap indexes.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a FileResource subclass, 0x38 bytes). Returns `TileAtlas *` (was `void *`; include/Task.h's local view returned `StreamTaskUnkB4Obj *` and is deleted); the ctor is reached through the typed `TileAtlasMethods` ctor slot `(TileAtlas *self, s32 arg1)` instead of the unit's `UnprototypedCtorTable` cast. One caller, TaskCore__TaskCore (src/Task.c), which stores the result in TaskCore::tileAtlas and passes it to New_TileMap. No rename. Byte-identical.
+Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a FileResource subclass, 0x38 bytes). Returns `TileAtlas *` (was `void *`; include/Task.h's local view returned `StreamTaskUnkB4Obj *` and is deleted); the ctor is reached through the typed `TileAtlasMethods` ctor slot `(TileAtlas *self, s32 arg1)` instead of the unit's `UnprototypedCtorTable` cast. One caller, TaskCore__TaskCore (src/app/Task.c), which stores the result in TaskCore::tileAtlas and passes it to New_TileMap. No rename. Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

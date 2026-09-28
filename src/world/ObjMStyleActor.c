@@ -473,9 +473,9 @@ void ObjM__DetachTarget(ObjM *self) {
     GetTimedTaskMethods()->deinit((TimedTask *)self);
 }
 
-/* Defined elsewhere, no header: src/GameFiles.c (PickStageBgm and
+/* Defined elsewhere, no header: src/cd/GameFiles.c (PickStageBgm and
  * PickStageTexture return a FilePathRecord *, a 0x1C-byte record handed on here as a
- * name), src/SceneNode.c (GetSetHitHeightGate sets the flag
+ * name), src/graphics/SceneNode.c (GetSetHitHeightGate sets the flag
  * SceneNode__RaycastHullAgainstFaces tests). RegisterStyleConfig, which
  * keeps `sceneRefs` as gStyleSceneRefs, is defined below, after ObjM. */
 extern s32 PickStageBgm(s32 stage, s32 unused);
@@ -684,7 +684,7 @@ void ObjM__TogglePause(ObjM *self) {
 
 void ObjM__NoOpSlot7C(void) {}
 
-/* src/DreamAux.c's; no header declares it. It keeps the stage, the
+/* src/world/DreamAux.c's; no header declares it. It keeps the stage, the
  * StageMap, the DreamSys (gDreamAuxWorld), the sound and the FrameClock for
  * the dream's aux entities. */
 struct FrameClock;
@@ -924,7 +924,7 @@ typedef struct ChunkCoord {
     u8 row;
 } ChunkCoord;
 
-/* src/DreamAux.c; it reads `coord` as one s16 trigger key. */
+/* src/world/DreamAux.c; it reads `coord` as one s16 trigger key. */
 extern s32 TryDreamAuxTrigger(s32 data, ChunkCoord *coord, s32 day);
 
 /* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"

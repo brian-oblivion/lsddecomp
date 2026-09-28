@@ -31,7 +31,7 @@ it did for the five siblings. No search was run; no other variants were
 needed. The preserved `self`/`prim` locals and the `Vec2s16` whole-struct
 copies (`lwl`/`lwr` + `swl`/`swr`) are kept unchanged from the old body.
 
-**Callers checked:** `SortTmdObject` in `src/TmdRenderer.c` (one call site,
+**Callers checked:** `SortTmdObject` in `src/graphics/TmdRenderer.c` (one call site,
 `prim = (u8 *)SubmitPolyGT4(prim, ctx);`), declared there as
 `extern void *SubmitPolyGT4(void *prim, void *ctx);`. No other reference in `src/`,
 `asm/` or `config/`. The return type agrees. `RCpolyGT4` stays declared `void` in
@@ -46,7 +46,7 @@ NON_MATCHING body promoted, round 65.
 ## ROUND 65 (charlie): NON_MATCHING body promoted
 
 Track 1b mechanical promotion. The standing `#if 0` snapshot in
-`src/TmdRenderer.c` (family-shared register-identity residue plus the
+`src/graphics/TmdRenderer.c` (family-shared register-identity residue plus the
 missing delay-slot filler, hand-derived per the round-13 HEAD PASS
 analysis — see `SubmitPolyF3.md`) is not a permuter candidate. Wrapped it
 in `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif` in place, no
@@ -163,7 +163,7 @@ round.
 ## ROUND 40 (alpha): Job 1 rebuild-verify, third independent reproduction — 104/112, byte-identical
 
 Re-ran the Job-1 rebuild independently of round 36 and round 39 (bravo): the
-LIVE `#if 0` body in `src/TmdRenderer.c` (round-36 symbol-corrected,
+LIVE `#if 0` body in `src/graphics/TmdRenderer.c` (round-36 symbol-corrected,
 `RCpolyGT4` not `func_8001C474`) toggled over `INCLUDE_ASM`, full oracle in
 isolation, reverted. `build exit=2`, zero compile-error/`undefined
 reference` hits.
@@ -210,7 +210,7 @@ shared position.
 ## ROUND 36: symbol rename verified, rebuilt LIVE, MEASURED (confirms the figure below)
 
 Round 34's SDK-object conversion renamed this function's Psy-Q callee
-`func_8001C474` -> `RCpolyGT4` (a real `libgte` symbol). `src/TmdRenderer.c`'s
+`func_8001C474` -> `RCpolyGT4` (a real `libgte` symbol). `src/graphics/TmdRenderer.c`'s
 preserved `#if 0` snapshot was updated to the new name in that same commit
 (`50fd52c`) but never rebuilt, so the `104/112` figure below was carried
 forward UNVERIFIED. This round swapped the snapshot in over the
@@ -222,7 +222,7 @@ against the linked SDK object, no `undefined reference`), and re-ran
 drift warning.** The rename did not disturb the residue.
 
 The corrected, LINKABLE snapshot (identical to what's live in
-`src/TmdRenderer.c`):
+`src/graphics/TmdRenderer.c`):
 
 ```c
 #if 0
@@ -280,7 +280,7 @@ INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyGT4);
 (`OtTag` and `RCpolyGT4`'s prototype come from `include/code_8220.h`,
 already included by the unit.)
 
-Unit: `src/TmdRenderer.c`. Eighth and final sibling of the
+Unit: `src/graphics/TmdRenderer.c`. Eighth and final sibling of the
 `SubmitPolyF3` OT-splice-or-calls family, and the largest (Gouraud-quad
 flavor: `FillDivPolygonHeader` with `a3=1`, `FillRVectors4` quad copy, 4 output
 records, two full passes of `u16` widen-stores). Calls `func_8001C474`
@@ -518,7 +518,7 @@ residue, not a second hidden instance of the ADDIU/ORI blind spot.
 ## Naming (round 77, alpha)
 
 `func_8001A064` -> `SubmitPolyGT4`, parameters (`arg0`, `arg1`) -> (`prim`, `ctx`). **Tier
-A.** TmdRenderer's own comment (`src/TmdRenderer.c`, the "eight submit
+A.** TmdRenderer's own comment (`src/graphics/TmdRenderer.c`, the "eight submit
 wrappers" block) already names this whole family collectively: each is a
 tail call to Sony's `RCpolyGT4` (unrenamed, RCpoly* polygon-subdivision
 family, `libgte`) or a direct OT splice, matching every sibling's shape.

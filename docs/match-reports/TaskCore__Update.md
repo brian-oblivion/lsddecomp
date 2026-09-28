@@ -44,7 +44,7 @@ void TaskCore__Update(Obj86B60 *self, s32 a1, s32 a2)
 
 First forwards to the shared "IntermediateBase" utility class
 (`Get_vtable_IntermediateBase()->slot5C(self, a1, a2)`, same idiom already used in
-`src/Task.c`/`src/DayTaskStageMap.c`). Then, if `unk3C` is set and
+`src/app/Task.c`/`src/world/DayTaskStageMap.c`). Then, if `unk3C` is set and
 `unk40` is (unsigned) less than `unk1C`, calls `slot60` with reason `6`.
 Finally switches on `unk20` and forwards to one of four more vtable slots
 depending on its value -- two of which (`slotAC`/`slotC0`) ARE this unit's

@@ -23,7 +23,7 @@ void SsInitHot(void)
 ```
 
 (shares the `extern void _SsInit(s32 arg0);` prototype declared
-above `SsInit` in `src/libsnd_ssinit.c`.)
+above `SsInit` in `src/psyq/libsnd_ssinit.c`.)
 
 ## Provenance
 

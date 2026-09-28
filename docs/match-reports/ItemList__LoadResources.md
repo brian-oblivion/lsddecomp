@@ -6,7 +6,7 @@
 
 > Renamed from `func_80051F24` on 2026-09-24 (tools/rename.py). Address 0x80051f24.
 
-Unit: `src/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`.
+Unit: `src/ui/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`.
 
 ## Semantics (established with reasonable confidence from the disassembly)
 
@@ -126,7 +126,7 @@ register diffs, nothing else).
 **A permuter lead that scores well against the permuter's own stripped
 scaffold does not always transfer to the real build.** Confirmed here:
 a score-30 candidate (down from 140) translated by hand back into
-`src/TextEntryItemList.c` and rebuilt through `./build-and-verify.sh`
+`src/ui/TextEntryItemList.c` and rebuilt through `./build-and-verify.sh`
 reproduced the ORIGINAL 75/95 score exactly, no improvement. Worth a
 `--debug` re-check of the CANDIDATE (not just the base) before trusting
 a non-zero permuter score as a real lead -- this project's existing
@@ -225,7 +225,7 @@ reordering attempt first.
 
 Track 1b: the preserved body above (75/95, pure register-identity
 rotation of the two repeated global addresses and the handle across the
-same three registers) is now live in `src/TextEntryItemList.c` under
+same three registers) is now live in `src/ui/TextEntryItemList.c` under
 `#ifdef NON_MATCHING`, with the verified build still taking the `#else`
 `INCLUDE_ASM` branch. `./build-and-verify.sh` stayed green (no bytes
 changed) and `tools/check-nonmatching.sh` compiles and link-resolves it.
@@ -257,7 +257,7 @@ handle has a short, dense live range, outranks the addresses, and takes `$s0`
 in turn, as retail does.
 
 The template was the MATCHED sibling `TextEntry__LoadCardResources` in
-`src/TextEntryItemList.c`: the same "CARD\\<name>.TIM" resource loader, with
+`src/ui/TextEntryItemList.c`: the same "CARD\\<name>.TIM" resource loader, with
 `char path[0x20]`, `dir`/`ext` locals and `handle1`/`handle2`. Screen for the
 next case: a cross-unit sibling with the same call skeleton (here
 `BuildFileName` -> `New_TimImage` -> `slot78` -> `New_ScreenSprite`).

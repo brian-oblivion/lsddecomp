@@ -17,7 +17,7 @@ This report originally typed `self` as `Obj866E8` (gStageMapMethods) and typed
 `self->unk44` through a unit-local `Unk44Obj866E8`/`Unk44Obj866E8Methods`
 duplicate. Both were wrong, for the same reason as its sibling
 `TextEntry__SetCursorPos` (see that report and
-`src/TextEntryItemList.c`'s file header comment): `self` is `Obj86ED0`
+`src/ui/TextEntryItemList.c`'s file header comment): `self` is `Obj86ED0`
 (`tools/classtable.py gTextEntryMethods` places this function at +0x0A8), whose
 shared struct already types `self->unk44` as `ChildObj86ED0 *`. The
 `+0x0C4` slot is now `ChildMethods86ED0::slotC4`, added additively next to

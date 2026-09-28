@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTodMethods +0x07C and gTodSetMethods +0x07C
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/GraphicsResources.c`.
+top of / earlier in `src/graphics/GraphicsResources.c`.
 
 ```c
 /* gTodMethods/gTodSetMethods +0x07C: walk the packet words after the u16 count
@@ -84,7 +84,7 @@ A loop pre-test that retail does as a SIGNED compare (`blez`) on a value cc1 can
 
 ## Naming
 
-- **ScanTodPackets**, tier A. Free function occupying slot7C, shared between Tod and TodSet: walks the TOD packet stream counting/looking up type-8/type-2 packets; the packet shape matches src/TodActor.c's TOD-packet description exactly.
+- **ScanTodPackets**, tier A. Free function occupying slot7C, shared between Tod and TodSet: walks the TOD packet stream counting/looking up type-8/type-2 packets; the packet shape matches src/world/TodActor.c's TOD-packet description exactly.
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
@@ -98,5 +98,5 @@ A loop pre-test that retail does as a SIGNED compare (`blez`) on a value cc1 can
 | --- | --- | --- | --- |
 | `value`, `sub`, `n`, `cnt`, `found`, `sel` | `objId`, `flag`, `packetCount`, `created`, `index`, `tmdId` | A/B | DecodeTodPacketWord splits Sony's TOD packet header (object id, type, flag, length); `tmdId` is B: in, the TMD id matched against model-id packets; out, the index or count |
 | `8`, `0` | `TOD_PACKET_OBJECT_CONTROL`, `TOD_OBJECT_CREATE` (include/Tod.h) | A | Sony's TOD packet type 8 is object control, flag 0 create; the function collects those packets' object ids |
-| `2` | `TOD_PACKET_MODEL_ID` (include/Tod.h, the same spelling as src/TodActor.c's) | A | type 2 carries the TMD id, read at packet +4 |
+| `2` | `TOD_PACKET_MODEL_ID` (include/Tod.h, the same spelling as src/world/TodActor.c's) | A | type 2 carries the TMD id, read at packet +4 |
 | `((u16 *)data)[1]`, `[2]` | `TodFrame.packetCount`, `TodPacket.tmdId` | A | a TOD frame header is {size, packet count, frame number}; a model-id packet's data starts with the id |

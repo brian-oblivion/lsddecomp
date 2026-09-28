@@ -10,7 +10,7 @@
  * WBgm -- class id 0x50, method table gWBgmMethods (24 slots), a direct
  * BasicClass subclass (its ctor calls Get_vtable_BasicClass()->ctor first;
  * `classtable.py gWBgmMethods --vs gBasicClassMethods` overrides the ctor, finalize
- * and onNotify and adds nine slots). Methods in src/WBgm.c. No class
+ * and onNotify and adds nine slots). Methods in src/sound/WBgm.c. No class
  * derives from it. Name from rodata sSeqOpenErrorMsg, "Seq Open error in
  * WBgmHandleMonitorEvent", printed by WBgm__HandleMonitorEvent's own body.
  *
@@ -25,7 +25,7 @@
  * sender (DRAWSYSTEM_CLASS_ID) to +0x040 update, which retries on that
  * event.
  *
- * Its one construction: DayTask__DayTask (src/DayTaskStageMap.c),
+ * Its one construction: DayTask__DayTask (src/world/DayTaskStageMap.c),
  * New_WBgm(PickSoundBank(0), NULL, 1): the VAB path is one of the seven
  * gSoundBankPaths strings ("SND\\AMBIENT" ... "SND\\STANDERD",
  * asm/data/1B84.rodata.s), no SEQ yet, autoPlay on. That caller keeps the
@@ -35,7 +35,7 @@
  * ObjM__TeardownPauseOverlay; include/ObjM.h).
  *
  * gWBgmActive is 1 from the ctor to finalize; IsWBgmActive returns it, and
- * VabStreamObj__Finalize (src/PlacementGridVabSound.c) shuts libsnd down (SsEnd,
+ * VabStreamObj__Finalize (src/sound/PlacementGridVabSound.c) shuts libsnd down (SsEnd,
  * SsQuit) only when the last VAB closes AND no WBgm is active.
  */
 

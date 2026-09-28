@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003995C` on 2026-09-25 (tools/rename.py). Address 0x8003995c.
 
-Round 81, runner delta. Unit `src/WBgm.c` (carved from `psyq_2a0e0` in
+Round 81, runner delta. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x008 (ctor) (slots resolved with `tools/classtable.py gWBgmMethods`).
@@ -25,12 +25,12 @@ one of them (`DrawSystem.c`) has a live matching runner this round
 this pass started). Recorded as proposals for the head to apply with
 `tools/rename.py` once safe.
 
-- `GetDrawSystem` (defined `src/DrawSystem.c`, returns `Class6C070 *`): called
+- `GetDrawSystem` (defined `src/graphics/DrawSystem.c`, returns `Class6C070 *`): called
   here only as `addChild`/`removeChild`'s argument, registering `WBgm` as a
   child of that singleton for lifecycle notification -- the same pattern
   `DayTaskStageMap.c` and `TimImage.c` use it for. No WBgm-specific evidence for
   its own name; not proposing one.
-- `New_RequestedFile` (defined `src/Sprite.c`, an un-matched `INCLUDE_ASM`
+- `New_RequestedFile` (defined `src/graphics/Sprite.c`, an un-matched `INCLUDE_ASM`
   stall, signature `SeqData *New_RequestedFile(s32 arg)`): the only function that
   produces a `SeqData` object (the +0x10 child this unit reads `addr`/`loaded`
   from). A name like `GetSeqData`/`LoadSeqData` is plausible from this call
@@ -67,7 +67,7 @@ void WBgm__WBgm(WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/WBgm.c`:
+The unit-local view it needs, from the top of `src/sound/WBgm.c`:
 
 ```c
 #include "BasicClass.h"

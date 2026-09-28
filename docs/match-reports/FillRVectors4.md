@@ -11,7 +11,7 @@
 > MATCH" at the end for what actually closed it and why the whole prior
 > approach could never have reached retail's own instruction sequence.
 
-Unit: `src/TmdRenderer.c`. `void FillRVectors4(PolyVtx **dst, PolyVtx **src,
+Unit: `src/graphics/TmdRenderer.c`. `void FillRVectors4(PolyVtx **dst, PolyVtx **src,
 PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2, PolyUV4 *uv3)` — calls
 `FillRVectors3(dst, src, uv0, uv1, uv2)` (matched round 13, same unit), then
 does its own single unaligned 8-byte copy (`src[3]->xy` -> `dst[3]->xy`) and
@@ -303,9 +303,9 @@ whole-function raw-register `__asm__`).
 ## ROUND 20 (runner echo): raw-`__asm__` audit, secondary assignment
 
 Per the coordinator's secondary assignment, audited every `__asm__` block
-in `src/libsnd_ssinit.c`, `src/PlacementGridVabSound.c`, `src/Pad.c`,
-`src/Entity.c`, `src/Entity_c.c`, `src/DreamSys.c`, and
-`src/TmdRenderer.c` (this unit's own family) for the same mistake found
+in `src/psyq/libsnd_ssinit.c`, `src/sound/PlacementGridVabSound.c`, `src/app/Pad.c`,
+`src/world/Entity.c`, `src/Entity_c.c`, `src/world/DreamSys.c`, and
+`src/graphics/TmdRenderer.c` (this unit's own family) for the same mistake found
 in this function -- a whole-function raw-register transcription standing
 in for an idiom ordinary C already expresses via an already-matched
 sibling.

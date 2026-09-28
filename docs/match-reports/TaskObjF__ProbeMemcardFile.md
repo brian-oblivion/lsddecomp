@@ -63,7 +63,7 @@ The two-argument / `filterName` reading of `BuildMemcardPath` above is
 superseded. Round 75 matched `TaskObjF__OpenAndReadMemcardFile` by calling it with THREE
 arguments `(pathBuf, self->unkC, suffix)`, the third forwarded from the
 caller's own third parameter already in `$a2` (so no `$a2` set-up is
-emitted, which is why it read as two). `src/TitleMenuTaskObjF.c` now declares
+emitted, which is why it read as two). `src/ui/TitleMenuTaskObjF.c` now declares
 one real prototype, `extern void *BuildMemcardPath(void *dest, s32 selector,
 void *suffix);`, replacing the unprototyped `arity-ok` declarations; this
 function's bytes are unchanged (see `TaskObjF__OpenAndReadMemcardFile.md`).

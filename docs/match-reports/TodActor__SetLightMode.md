@@ -190,7 +190,7 @@ void TodActor__SetLightMode(TodActor *self, void *arg)
 ```
 
 (`Unk70ElemMethods::slot70` and `D800878D4Methods::slot70` are kept live
-in `src/TodActor.c` — both are confirmed correct by the
+in `src/world/TodActor.c` — both are confirmed correct by the
 byte-identical loop body, call sequence, and trailing call, independent
 of this stall.)
 
@@ -252,7 +252,7 @@ UB-adjacent form (`new_var` assigned inside a dereference expression
 purely to perturb liveness, a dead `i = i;` self-assignment, `i = 0;`
 hoisted above the guard and the guard rewritten as `i < self->unk6C`
 instead of `self->unk6C > 0`). **How the false positive was caught:**
-translating it to `src/TodActor.c` in place of the `INCLUDE_ASM` and
+translating it to `src/world/TodActor.c` in place of the `INCLUDE_ASM` and
 running `./build-and-verify.sh` + `tools/funcdiff.py` -- the mandatory
 "a permuter zero is a LEAD, not an answer" step -- showed it was
 **NOT a real match**: 28/40 words, WITH an 8-byte frame-size drift
@@ -448,7 +448,7 @@ lever at all (the preserved body has neither a barrier nor any other
 addition, so there is nothing to audit for the "levers do not commute"
 rule). None applicable -- no new build attempt spent.
 
-Remains a STALL at 33/40, `INCLUDE_ASM` restored, `src/TodActor.c`
+Remains a STALL at 33/40, `INCLUDE_ASM` restored, `src/world/TodActor.c`
 confirmed clean.
 
 ### Proposed learning
@@ -479,7 +479,7 @@ permutation plus a deferred parameter copy, both genuinely scheduling
 questions, not a layout one.
 
 Also re-verified this round by temporarily un-wrapping the `#if 0` body
-already embedded in `src/TodActor.c` and rebuilding: `funcdiff.py`
+already embedded in `src/world/TodActor.c` and rebuilding: `funcdiff.py`
 reproduces **33/40** exactly (file `0x0562E0-0x056380`), no drift.
 `INCLUDE_ASM` restored immediately after; `git diff --stat` confirmed
 empty before moving on. This function is next in this round's priority
@@ -597,7 +597,7 @@ s3,a1` present in retail, absent here) is a genuine missing/deferred
 instruction, not an addiu/ori encoding artifact — confirmed via
 `asm-differ`'s operand-level read, unaffected by this round's checks.
 
-Remains a STALL at 33/40, `INCLUDE_ASM` restored, `src/TodActor.c`
+Remains a STALL at 33/40, `INCLUDE_ASM` restored, `src/world/TodActor.c`
 confirmed clean before and after.
 
 ### Proposed learning
@@ -715,7 +715,7 @@ hand analysis, re-verified without change across rounds 20/24/25/31/33/49,
 never bettered by two independent permuter campaigns whose only sub-zero
 candidate is a confirmed frame-size regression — see round 49's CHECK-3
 entry above) is hand-derived, not permuter-sourced, so it qualifies for
-track 1b promotion as-is. Placed in `src/TodActor.c` in the project's
+track 1b promotion as-is. Placed in `src/world/TodActor.c` in the project's
 `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif` shape, in ROM order,
 immediately after `TodActor__SetDisplay`'s own NON_MATCHING block. Comment names
 the score (33/40 words, length exact), the residue class (the compound of

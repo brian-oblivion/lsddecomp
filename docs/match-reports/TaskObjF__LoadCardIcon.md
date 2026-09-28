@@ -63,7 +63,7 @@ three independent `beqz`/`bnez` to the identical label.
 
 The path-building block does NOT call the already-matched
 `BuildFileName` (`dest[0]=0; if(arg2) strcat(dest,arg2); strcat(dest,arg1);
-strcat(dest,arg3);`, `src/GameApplicationFileResource.c`) -- it inlines the same three-strcat
+strcat(dest,arg3);`, `src/app/GameApplicationFileResource.c`) -- it inlines the same three-strcat
 shape directly with no null-guard on the first strcat, which is what rules
 out an actual call to that helper (a call would need the conditional
 branch). Reading the `strcat` argument order off the delay slots

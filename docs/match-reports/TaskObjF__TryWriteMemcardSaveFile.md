@@ -243,7 +243,7 @@ either way).
 
 **RENAMED round 60** (track 3 naming pass; these are local typedefs, not
 symbol-table entries, so `tools/rename.py` does not touch them -- edited
-by hand in `src/TitleMenuTaskObjF.c` and re-verified with an isolated
+by hand in `src/ui/TitleMenuTaskObjF.c` and re-verified with an isolated
 `cpp|cc1` syntax check since the body sits in `#if 0` and the normal
 build never compiles it; see `## Naming` below). Original names, carried
 from the round that first derived this body: `StreamSmallSub`/
@@ -289,7 +289,7 @@ typedef struct McSaveHeader {
 `IconPaletteHalf` deliberately has no `s32` member (alignment 2) so a
 whole-struct copy compiles to the unaligned `lwl`/`lwr` + `swl`/`swr`
 idiom already documented for `Descriptor10`
-(`include/class_3bb8c.h`) and `Block24` (`src/ObjMStyleActor.c`).
+(`include/class_3bb8c.h`) and `Block24` (`src/world/ObjMStyleActor.c`).
 `IconFrame` is a plain byte array (alignment 1) so a whole-struct
 copy compiles to the RUNTIME-alignment-checked dual-path copy retail
 actually shows for the three 0x80-byte spans -- confirmed against
@@ -357,7 +357,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
 ```
 
 (round 60: this snapshot now matches the LIVE preserved body in
-`src/TitleMenuTaskObjF.c` exactly -- the `func_80050908`/`func_80050938`/
+`src/ui/TitleMenuTaskObjF.c` exactly -- the `func_80050908`/`func_80050938`/
 `func_800508F8`/`func_80013488`/`func_80012C20`-style names in the prose
 above this point in the report are historical, from before round 34
 relinked these as Sony's `delete`/`open`/`close`/`write`/`printf`; the
@@ -478,7 +478,7 @@ Evidence: this unit's own `TaskObjF__WriteMemcardSaveFile` (its only
 caller) is the bounded-retry wrapper around it, and the "Try" prefix
 matches this project's existing convention for a single, non-retrying
 attempt a caller may retry (`SceneNode__TryAttachNearby`,
-`src/SceneNode.c`). "Memcard" is established by `BuildMemcardPath`'s
+`src/graphics/SceneNode.c`). "Memcard" is established by `BuildMemcardPath`'s
 own `bu00:`/`bu10:` device templates; "SaveFile" is established by the
 0x200-byte buffer's structural match to the PS1 memory-card save file
 header format (see the local-type naming note below) plus the BIOS
@@ -493,7 +493,7 @@ well-known format, not a string/symbol-table fact): `StreamSmallSub` ->
 magic1`, `b2` -> `iconFrameFlag`, `b3` -> `blockCount`, `name` ->
 `title`, `arr` -> `palette`, `blkA/blkB/blkC` -> `frame0/frame1/frame2`).
 These are unit-local typedefs, not symbols in `config/symbols.slps01556.lsdde.txt`,
-so `tools/rename.py` does not apply; edited directly in `src/TitleMenuTaskObjF.c`
+so `tools/rename.py` does not apply; edited directly in `src/ui/TitleMenuTaskObjF.c`
 and confirmed to still parse with an isolated `cpp|cc1` pass (the body is
 `#if 0`, so the normal build never compiles it and could not have caught
 a syntax error here).
@@ -561,7 +561,7 @@ as one field. `McIconSource` reads as a 4bpp TIM with one 16-colour CLUT:
 CLUT to 0x34, a 12-byte pixel block header to 0x40, pixels after -- which
 is why the frames sit at 0x40/0xC0/0x140.
 
-### Moved from src/TitleMenuTaskObjF.c
+### Moved from src/ui/TitleMenuTaskObjF.c
 
 The type block's naming note, the types' comments, and the comments on
 the function's local declarations, as they stood before track 7:
@@ -593,7 +593,7 @@ typedef struct IconPaletteHalf {
 /* One 16x16 4bpp icon animation frame -- a raw, opaque 0x80-byte span
  * (alignment 1, a plain byte array), so a whole-struct copy compiles to
  * the RUNTIME-alignment-checked lw/sw-vs-lwl/lwr dual path retail shows
- * for these three chunks (the same idiom src/ObjMStyleActor.c's Block24
+ * for these three chunks (the same idiom src/world/ObjMStyleActor.c's Block24
  * documents: "a byte array... compiles the copy as a generic
  * runtime-alignment-checked memcpy loop instead"). Three of these are
  * copied in sequence. */

@@ -4,7 +4,7 @@
 
 > Renamed from `func_800408CC` on 2026-09-18 (tools/rename.py). Address 0x800408cc.
 
-Unit: `src/ScreenWidgets.c`. 3 attempts.
+Unit: `src/ui/ScreenWidgets.c`. 3 attempts.
 
 ```c
 Obj6EAC0Methods *GetTextRowMethods(void);
@@ -31,7 +31,7 @@ established convention).
 
 `include/Task.h` already declared
 `extern Unk64Elem *New_TextRow(void *ctx, s32 len, char *name);`
-from a DIFFERENT unit's caller-side guess (`src/Task.c`, two
+from a DIFFERENT unit's caller-side guess (`src/app/Task.c`, two
 call sites: `New_TextRow(handle, len, *list)`). That guess is
 actually CORRECT at the ABI level -- `handle`/`len`/`*list` forward
 straight through to the constructor as raw register values, so typing
@@ -118,4 +118,4 @@ chain are certain; the specific in-game role is this unit's own reading.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `New_Obj6EAC0`: the allocator (0xB8 bytes, the object size), now `TextRow *New_TextRow(void *texture, s32 count, char *text)` calling ctor through GetTextRowMethods(). Its callers make one per string: TaskCore__CreateSlotElements and the item lists (Task, stored as TextRow in TaskCore's slotElements/itemLists, which were the `Unk64Elem` view), ItemList__CreateRows, TitleMenu__CreateSaveTitle, TextEntry__LoadCardResources, ObjM__AdvancePauseSetup ("Pause"). Image byte-identical; the current source is src/ScreenWidgets.c.
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `New_Obj6EAC0`: the allocator (0xB8 bytes, the object size), now `TextRow *New_TextRow(void *texture, s32 count, char *text)` calling ctor through GetTextRowMethods(). Its callers make one per string: TaskCore__CreateSlotElements and the item lists (Task, stored as TextRow in TaskCore's slotElements/itemLists, which were the `Unk64Elem` view), ItemList__CreateRows, TitleMenu__CreateSaveTitle, TextEntry__LoadCardResources, ObjM__AdvancePauseSetup ("Pause"). Image byte-identical; the current source is src/ui/ScreenWidgets.c.

@@ -18,7 +18,7 @@ Non-negative `group`: `rec = GetSpecialDayRecords(&count, group)`, writes
 
 ## Source
 
-Declarations: `FilePathRecord` at the top of `src/GameFiles.c`, plus:
+Declarations: `FilePathRecord` at the top of `src/cd/GameFiles.c`, plus:
 
 ```c
 typedef struct RecPick {

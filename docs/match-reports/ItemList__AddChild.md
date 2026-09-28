@@ -6,7 +6,7 @@
 
 > Renamed from `func_80051D1C` on 2026-09-24 (tools/rename.py). Address 0x80051d1c.
 
-Unit: `src/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`. This is the "add
+Unit: `src/ui/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`. This is the "add
 child" method: registers `arg1` with the inherited `BasicClass::addChild`
 and additionally caches it into one of two single-slot fields depending
 on a tag read off `arg1`'s own vtable header word.

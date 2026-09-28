@@ -86,7 +86,7 @@ sets `this->unkF8 = 1`. Pairs with `Entity__StopSoundCue`.
 
 - `Entity::unkF8` -> `soundCueActive` -- **tier B.** Set here, cleared by
   `Entity__StopSoundCue`; read directly by Entity.c
-  (`grep -rn -- '->unkF8\b' src/Entity.c`). CROSS-UNIT, proposed rather
+  (`grep -rn -- '->unkF8\b' src/world/Entity.c`). CROSS-UNIT, proposed rather
   than applied.
 - `EntityMethods::slot168` -> `startSoundCue` -- **tier B.** `tools/
   classtable.py` resolves +0x168 to this very function (self-referential

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001934C` on 2026-09-17 (tools/rename.py). Address 0x8001934c.
 
-Unit: `src/TmdRenderer.c`. Not previously declared in `include/code_8220.h`;
+Unit: `src/graphics/TmdRenderer.c`. Not previously declared in `include/code_8220.h`;
 called only from the still-`INCLUDE_ASM` giant `SortTmdObject` (13 call
 sites), so its two arguments' real struct types are unknown outside this
 function's own body. Treated both as raw byte-offset accesses rather than

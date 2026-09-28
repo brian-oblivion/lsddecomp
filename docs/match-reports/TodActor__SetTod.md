@@ -34,7 +34,7 @@ void TodActor__SetTod(TodActor *self, s32 index)
 ```
 
 This is the first function in the unit to touch `self->unk5C->unk30`, so it
-derives (and adds to `src/TodActor.c`) an entirely new chain of
+derives (and adds to `src/world/TodActor.c`) an entirely new chain of
 minimal types:
 
 - `Unk5CObj` gained a `+0x30` field, `Unk30Obj *unk30`.
@@ -146,7 +146,7 @@ void TodActor__SetTod(TodActor *self, s32 index)
 
 (Types `GroupObj`, `EntryObj2`, `Unk30Obj`, and the `Unk5CObj::unk30` /
 `TodActor::unk7C..unk88` / `TodActorMethods::slot134` fields this body
-depends on are kept live in `src/TodActor.c` — they are confirmed
+depends on are kept live in `src/world/TodActor.c` — they are confirmed
 correct by the byte-identical first 27 words, independent of this stall.)
 
 ### Proposed learning
@@ -234,7 +234,7 @@ void TodActor__SetTod(TodActor *self, s32 index)
 }
 ```
 
-This is now the committed source in `src/TodActor.c`, replacing the
+This is now the committed source in `src/world/TodActor.c`, replacing the
 `INCLUDE_ASM`. No header/type changes were needed beyond what round 14
 already derived (`GroupObj`, `EntryObj2`, `Unk30Obj`, `Unk5CObj::unk30`,
 and the `TodActor`/`TodActorMethods` fields this body reads) --
@@ -275,7 +275,7 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 `GroupObj` (a holder with its data pointer at +0x010) is a `Tod`, whose
 FileResource `buffer` is that pointer: TodSet__BuildTods replaces each word of
 its buffer's counted offset table, from +0x8, with the Tod it built there. The
-expression is now `TODSET_TOD(set, i)` (src/TodActor.c), and `EntryObj2`,
+expression is now `TODSET_TOD(set, i)` (src/world/TodActor.c), and `EntryObj2`,
 the TOD data's header with the frame count at +0x4, is `TodHeader`. Same
 address arithmetic, byte-identical.
 

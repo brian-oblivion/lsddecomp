@@ -54,7 +54,7 @@ anywhere) made it obvious before writing any C.
 
 - **`DreamSysBaseMethods` (this unit's local view of the shared `gActorMethods`
   base table) gets a new slot at `+0x008`: `ctor`.** Cross-confirmed against
-  `src/TodActor.c`'s `D800878D4Methods`, which ALREADY names and
+  `src/world/TodActor.c`'s `D800878D4Methods`, which ALREADY names and
   resolves this exact slot as `Actor__Actor`, taking/returning
   `TodActor *self` — the same base constructor, just viewed through a
   different subclass's local header (per this project's established
@@ -99,7 +99,7 @@ DreamSysCtorArgObj/DreamSysCtorArgMethods view is gone and the call is
 first TmdModel, added as a child). `unk_0x60`, the ctor slot's and
 New_DreamSys's parameter are typed `struct LinkResource *`. Byte-identical.
 
-## Comment moved from src/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/DreamSys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 
@@ -161,7 +161,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
   "ETC\DREAME5.TMD" -- as its child.
 - Field `DreamSys::unk_0x60` -> `modelSource` (tier A: its one writer is this
   ctor, storing that LinkResource; nothing reads it back). Every accessor is in
-  src/DreamSys.c.
+  src/world/DreamSys.c.
 
 ## History (moved from include/DreamSys.h, round 102)
 

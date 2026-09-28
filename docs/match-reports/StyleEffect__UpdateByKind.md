@@ -86,7 +86,7 @@ silent-on-grep semantic errors.
 here the declaration has FEWER parameters than the definition, not more.
 
 **Callee evidence** (`0x80056640`, and the matched definition in
-`src/ObjMStyleActor.c`): the body reads both argument registers before writing
+`src/world/ObjMStyleActor.c`): the body reads both argument registers before writing
 them, and forwards `$a1` straight on:
 
 ```
@@ -101,7 +101,7 @@ them, and forwards `$a1` straight on:
 (`move a1,s1` at `0x800566D8`, `0x800566EC`, `0x800566FC`). So the definition's
 `void StyleEffect__UpdateByKind(LinkNode *self, void *arg1)` is right: two real arguments.
 
-**Why `src/ObjMStyleActor.c`'s one-parameter declaration stays.** Its caller
+**Why `src/world/ObjMStyleActor.c`'s one-parameter declaration stays.** Its caller
 `StyleEffect__Update` passes only `self`, and retail sets up nothing else:
 
 ```
@@ -119,7 +119,7 @@ with the difference that here it reproduces retail, so the narrow declaration
 is correct for this unit and must not be widened.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/ObjMStyleActor.c:438`. Oracle green.
+added to `src/world/ObjMStyleActor.c:438`. Oracle green.
 
 ## Naming
 

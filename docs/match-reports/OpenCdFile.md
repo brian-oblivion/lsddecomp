@@ -103,14 +103,14 @@ field names used unchanged; the lever was control flow).
 > note PREDATES the rename and uses the old field names throughout (it is
 > historical narrative, left as written); the `## Best result` block's actual
 > function body has been updated to compile against the CURRENT struct
-> definitions in `src/CdDriver.c` -- that is the one to splice if you
+> definitions in `src/cd/CdDriver.c` -- that is the one to splice if you
 > pick this function up again.
 
 > **ROUND 54 (2026-09-18), runner charlie -- rebuilt, then two more structural
 > reshapes, both negative.**
 >
 > **Rebuild-before-trusting-the-score.** Spliced the preserved (round-36)
-> body into `src/CdDriver.c` in place of the `INCLUDE_ASM` unchanged and
+> body into `src/cd/CdDriver.c` in place of the `INCLUDE_ASM` unchanged and
 > ran the real oracle: `build exit=2`, no compile-error grep hits,
 > `build/lsdde.map` confirms `BuildCdFilePath - OpenCdFile = 0xB0` = 44
 > words against retail's 43 (one word long, unchanged since round 36/47).
@@ -221,11 +221,11 @@ field names used unchanged; the lever was control flow).
 > Round 34's SDK-object conversion renamed this function's two callees
 > (`func_8002B640` -> `CdSearchFile`, `func_80012C20` -> `printf`; both
 > confirmed in `config/symbols.slps01556.lsdde.txt` and already declared,
-> per-call-site typed, in `src/CdDriver.c` itself). The preserved body
+> per-call-site typed, in `src/cd/CdDriver.c` itself). The preserved body
 > below still spelled the old names and was never rebuilt under the new
 > ones, so its 12/43 figure was carried forward UNVERIFIED (flagged by
 > `tools/stalesyms.py`). Corrected the two names, spliced the body into
-> `src/CdDriver.c` in place of the `INCLUDE_ASM`, and ran the real
+> `src/cd/CdDriver.c` in place of the `INCLUDE_ASM`, and ran the real
 > oracle: `build exit=0`, `funcdiff.py` shows the function is exactly one
 > word longer than retail's 43 (`asm-differ` confirms it is the SAME
 > structural residue this report already documents -- `path`'s address
@@ -270,7 +270,7 @@ stat buffer.
 ```c
 #if 0
 /* Pair16_179D8H, StatBuf179D8H, ObjA34_179D8H and MethodsA34_179D8H are
- * ALREADY declared earlier in src/CdDriver.c (current field names:
+ * ALREADY declared earlier in src/cd/CdDriver.c (current field names:
  * ObjA34_179D8H::isOpen/pos/size, StatBuf179D8H::pos/size) -- do not
  * re-paste these typedefs when splicing, only the function body below. Shown
  * here again only so this block reads standalone. */
@@ -436,7 +436,7 @@ yet spent this round due to time).
 ## Round 47 (2026-09-16), runner delta -- rebuilt in-tree, then permuter DECLINED on check (b)
 
 **Rebuild-before-trusting-the-score, per this round's brief.** Spliced the
-preserved body (unchanged from round 36's, above) into `src/CdDriver.c`
+preserved body (unchanged from round 36's, above) into `src/cd/CdDriver.c`
 in place of the `INCLUDE_ASM` and ran the real oracle:
 `build exit=2`, no compile-error grep hits, `build/lsdde.map` shows
 `BuildCdFilePath - OpenCdFile = 0xB0` = 44 words against retail's 43 (one
@@ -446,7 +446,7 @@ difference in the RAW count that does not change the verdict; the
 STRUCTURE (one extra cached-address instruction, same register-role
 rotation) is bit-for-bit the same class of residue round 36 already
 measured. Restored to `INCLUDE_ASM` immediately after
-(`diff src/CdDriver.c` against the pre-splice copy: identical);
+(`diff src/cd/CdDriver.c` against the pre-splice copy: identical);
 `./build-and-verify.sh` confirms `OK: build matches retail SLPS_015.56`
 afterward.
 
@@ -511,16 +511,16 @@ before deciding whether to spend a search on it at all, not only after.
   open, builds the CD path (`BuildCdFilePath`), retries `CdSearchFile` up to
   100 times, and on success records the result and marks the object open.
   Not derived from this function's own (stalled) body alone: independently
-  confirmed by `src/CdDriver.c`'s `CdDriver__Open`, which calls this
+  confirmed by `src/cd/CdDriver.c`'s `CdDriver__Open`, which calls this
   function directly when CD-async mode is off, and otherwise reimplements
   the identical algorithm (same field offsets, same `CdSearchFile`/`CdControl`
   sequence) for its own async path. Paired with `CloseCdFile`/`GetCdFileSize`/
   `ReadCdFile` (also this unit) as an Open/Close/Size/Read quad; see those
-  reports and `src/CdDriver.c`'s unit header comment.
+  reports and `src/cd/CdDriver.c`'s unit header comment.
 - Field renames on `ObjA34_179D8H`/`StatBuf179D8H` this function reads
   (`unk0C`->`isOpen`, `unk18`->`pos`, `unk1C`->`size`; `StatBuf179D8H`
   `unk0`->`pos`, `unk4`->`size`) are recorded in `CloseCdFile.md`'s and
-  `GetCdFileSize.md`'s `## Naming` sections and in `src/CdDriver.c`
+  `GetCdFileSize.md`'s `## Naming` sections and in `src/cd/CdDriver.c`
   directly; not re-derived here.
 
 ## Round 97 (runner bravo): `StatBuf179D8H` is Sony's `CdlFILE`
@@ -533,7 +533,7 @@ takes a `CdlFILE *`. The type was deleted and the unit now includes
 `<libcd.h>`; the accessors `statBuf.pos`/`statBuf.size` keep their names as
 Sony's own fields. `CdDriver::pos` is still the project's `CdLoc16`
 (include/FileResource.h), so the copy is spelled `*(CdLoc16 *)&statBuf.pos`,
-the round 96 precedent in `src/CdDriver.c`'s `ResolveFileEntries`.
+the round 96 precedent in `src/cd/CdDriver.c`'s `ResolveFileEntries`.
 Byte-exact; whole-image SHA1 green.
 
 ## Source comment history (round 99, echo, track 7)
@@ -554,7 +554,7 @@ note. Names as of round 98 (the parameter `suffix` is now `name`, the local
 ## Naming (round 99, echo, track 7)
 
 - Parameter `suffix` -> `name`, tier A: the one caller, `CdDriver__Open`
-  (`src/CdDriver.c`), passes its own `name`, and `BuildCdFilePath`
+  (`src/cd/CdDriver.c`), passes its own `name`, and `BuildCdFilePath`
   appends it after the data directory and before `;1`, so it is the file
   name, not a suffix.
 - Locals: `i` -> `retries` (counts the lookups after the first), `statBuf` ->

@@ -6,7 +6,7 @@
 
 > Renamed from `func_80051A5C` on 2026-09-24 (tools/rename.py). Address 0x80051a5c.
 
-Unit: `src/TextEntryItemList.c`. `New_ItemList` -- the allocator for
+Unit: `src/ui/TextEntryItemList.c`. `New_ItemList` -- the allocator for
 `ItemList_3bb8c_j` (a small BasicClass-derived sibling class discovered this
 round, alloc size 0x54, vtable gItemListMethods reached through `GetItemListMethods()`
 (ObjMStyleActor) -- NOT `gTextEntryMethods`/`GetTextEntryMethods`, which is a

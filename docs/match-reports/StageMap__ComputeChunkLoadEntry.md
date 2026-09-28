@@ -172,7 +172,7 @@ were all already correct; the stall was one variable too many).
 > which variables hold which sub-computation -- not declare-vs-assign
 > form). Split all three into separate declaration and assignment
 > statements in one build, rebuilt: **58/63, IDENTICAL diff, no drift --
-> fully inert.** Reverted (`git checkout -- src/DayTaskStageMap.c`; clean
+> fully inert.** Reverted (`git checkout -- src/world/DayTaskStageMap.c`; clean
 > build confirmed after).
 >
 > This is a FOURTH confirmed instance (joining `StageMap__ApplyChunkLoads`,
@@ -390,7 +390,7 @@ this function.
 
 ## SUPERSEDED by round 63 -- the matching body
 
-The round-63 match is live in `src/DayTaskStageMap.c`. It differs from the 58/63
+The round-63 match is live in `src/world/DayTaskStageMap.c`. It differs from the 58/63
 body below only inside the `self->unk68->unk4 == 0` block: `fieldVal`, `lo`
 and `sum` collapse into a single `sum`, and `value = val + sum;` is hoisted
 out of both branches. The `do {} while (0);` is load-bearing -- see the
@@ -611,7 +611,7 @@ Parameters and locals, tier A: `arg1` -> `out`, `divisor` -> `columns`, `flag` -
 
 Left: the two `*(s32 *)((u8 *)out + 4)` writes. ChunkLoadEntry declares `chunkIndex` s16 plus a pad; retyping it `s32` (dropping `pad6`) and writing `out->chunkIndex` builds byte-identical (measured this round, then reverted: include/StageMap.h is shared and the change is not additive). Proposed to the head. The `do {} while (0);` keeps a one-line `/* MATCHING */`.
 
-The comment that stood above the function in `src/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
+The comment that stood above the function in `src/world/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
 
 ```c
 /* MATCH, round 63 (delta): closed a 58/63 stall that had stood since round

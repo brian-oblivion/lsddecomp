@@ -167,7 +167,7 @@ extern s32 sSaveTitleColorFrame;
  * only on the first construction, when it was 0 before the increment. */
 extern s32 sTaskObjFCount;
 
-/* Formats the current day into the save title (src/TitleMenuTaskObjF.c);
+/* Formats the current day into the save title (src/ui/TitleMenuTaskObjF.c);
  * TitleMenu__TitleMenu calls it with DreamSys's getCurrentDayAndYear. */
 extern void StampSaveTitleDay(s32 day);
 
@@ -204,10 +204,10 @@ typedef struct McDevicePath {
 extern McDevicePath gMcDevicePath1; /* "bu10:" */
 extern McDevicePath gMcDevicePath0; /* "bu00:" */
 
-/* The game's own strcat (src/GameApplicationFileResource.c). */
+/* The game's own strcat (src/app/GameApplicationFileResource.c). */
 extern char *strcat(char *dest, char *src);
 
-/* Game code (src/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it
+/* Game code (src/ui/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it
  * around its retry loop, and with (arg, 0) when the loop gives up. The BIOS
  * file calls (open, read, lseek, close, delete; Sony's libapi) are declared
  * in the units that call them. */
@@ -233,13 +233,13 @@ typedef struct StyleConfig {
     s32 fogNear; /* +0x01C, EnterStyleSession: the viewport's setFogNear; a sStyleFogNears value */
 } StyleConfig;
 
-/* ObjM__GetGridRecord's grid lookups (src/GameFiles.c): a
+/* ObjM__GetGridRecord's grid lookups (src/cd/GameFiles.c): a
  * non-negative code is a linear cell index (GetStageMapChunkRecord(index, code)),
  * a negative one sends x/y to GetStageMapChunkRecordXY. */
 extern s32 GetStageMapChunkRecord(s32 index, s32 sub);
 extern void GetStageMapChunkRecordXY(s32 index, s32 x, s32 y);
 
-/* ObjM__TeardownStyle's helpers (src/DreamAux.c, src/ObjMStyleActor.c). */
+/* ObjM__TeardownStyle's helpers (src/world/DreamAux.c, src/world/ObjMStyleActor.c). */
 extern void ReleaseDreamAuxEntities(void);
 extern void StyleTeardown(void);
 
