@@ -41,7 +41,7 @@ same convention as `IntermediateBase__Deinit`.
   function is the dereferencing counter-evidence. New type
   `Unk18AcObj`/`Unk18AcObjMethods` models the one slot (`slot4`, inherited
   BasicClass release) this function reaches. `New_SceneNode`'s own extern
-  declaration retyped to match (`include/code_d294.h`'s own view,
+  declaration retyped to match (`include/SceneNode.h`'s own view,
   `SceneNodeObj *`, is a separate header and unaffected).
 - `BasicClassMethodsCC8C`: added `slot0C` (`BasicClass__Finalize`,
   "finalize").

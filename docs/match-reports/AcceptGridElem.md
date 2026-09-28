@@ -32,7 +32,7 @@ void *AcceptGridElem(void *arg0, void *arg1, void *arg2) {
 ```
 
 `SceneNode__RaycastVertical` is declared locally (`extern s32 SceneNode__RaycastVertical(void);`) --
-it is matched/queued in a different unit (`src/code_d294_c.c`), so its
+it is matched/queued in a different unit (`src/SceneNode.c`), so its
 prototype belongs here, not in a shared header.
 
 ## Shape note
@@ -78,7 +78,7 @@ nested `if`s before suspecting anything else.
 ## Round 57 (head, at merge) -- the prototype was wrong and the oracle could not see it
 
 This unit declared `extern s32 SceneNode__RaycastVertical(void);` and called it with no
-arguments. In the SAME round, `code_d294_c` matched `SceneNode__RaycastVertical` and
+arguments. In the SAME round, `SceneNode` matched `SceneNode__RaycastVertical` and
 established its real signature: `s32 SceneNode__RaycastVertical(SceneNodeObj *self,
 s32 *arg1, s32 *arg2)`, a SceneNode method. The two readings met at merge.
 
@@ -131,7 +131,7 @@ comment pass, i.e. with this round's renames already applied (the
 The extern's comment, verbatim:
 
 ```c
-/* The real signature, established when code_d294_c matched this function in
+/* The real signature, established when SceneNode matched this function in
  * round 57: it is a SceneNode method taking (self, out, target). This unit
  * had long declared it `(void)` and called it with no arguments, which is
  * byte-identical here only because arg0-arg2 are already in $a0-$a2 -- the

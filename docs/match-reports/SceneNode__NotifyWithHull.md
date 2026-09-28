@@ -6,7 +6,7 @@
 
 > Renamed from `func_8001D568` on 2026-09-18 (tools/rename.py). Address 0x8001d568.
 
-Unit: `code_d294_b`. Round 13, runner delta. 38/38 words, full match.
+Unit: `SceneNode`. Round 13, runner delta. 38/38 words, full match.
 
 ## Signature
 
@@ -75,7 +75,7 @@ void SceneNode__NotifyWithHull(SceneNodeObj *self, s32 a1) {
 
 ## Header changes
 
-`include/code_d294.h`:
+`include/SceneNode.h`:
 
 - `SceneNodeMethods`: typed `+0x08C` (`slot8C`, `void (*)(SceneNodeObj*,
   void*)`, occupant `SceneNode__GetModelHull`) and `+0x090` (`slot90`, `void (*)

@@ -69,7 +69,7 @@ rewrite to every `New_X` residue.
 ## Notes on the header
 
 `include/code_55dd4.h` types `BMemPMgrAlloc` as taking a single `s32 size`
-parameter (matching the correction the head made to `class_16334.h`'s
+parameter (matching the correction the head made to `Pad.h`'s
 `BMemPMgrAlloc` prototype in the same round) — the call site here sets only
 `$a0` before `jal`.
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D0EC` on 2026-09-23 (tools/rename.py). Address 0x8001d0ec.
 
-**Unit:** code_d294 · **Size:** 46 words · **Status:** MATCHED (46/46 words)
+**Unit:** SceneNode · **Size:** 46 words · **Status:** MATCHED (46/46 words)
 
 ## What it does
 
@@ -83,7 +83,7 @@ right before an epilogue.
 
 ## Provenance
 
-round 11 (2026-09-03), runner charlie, unit code_d294, second pass. 3 build iterations (initial
+round 11 (2026-09-03), runner charlie, unit SceneNode, second pass. 3 build iterations (initial
 attempt, then one fix per residue above). Established `UnkOwner_d294`/
 `UnkOwnerMethods_d294` (the attach/detach target class, `+0x010`
 ctor-like/`+0x014` dtor-like slots) and `SceneNodeSub14`'s
@@ -99,8 +99,8 @@ Round 71 (alpha). `func_8001D0EC` -> `SceneNode__AttachToParent`, **tier A**. Ta
 
 For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
 
-- `SceneNodeObj.unkC` -> `parent` (tier A): AttachToParent stores the object it then calls addChild on; DetachFromParent calls removeChild on it and clears it. Accessors: code_d294, code_d294_b, code_d294_c.
-- `SceneNodeSub14.unk18/unk1C/unk20` -> `tx/ty/tz` (tier A): GsCOORDINATE2.coord.t[0..2] (+0x04 + 0x14), written from AttachToParent's translation argument. Accessors: code_d294, code_d294_c.
+- `SceneNodeObj.unkC` -> `parent` (tier A): AttachToParent stores the object it then calls addChild on; DetachFromParent calls removeChild on it and clears it. Accessors: SceneNode, code_d294_b, code_d294_c.
+- `SceneNodeSub14.unk18/unk1C/unk20` -> `tx/ty/tz` (tier A): GsCOORDINATE2.coord.t[0..2] (+0x04 + 0x14), written from AttachToParent's translation argument. Accessors: SceneNode, code_d294_c.
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 

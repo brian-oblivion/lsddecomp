@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001CD20` on 2026-09-23 (tools/rename.py). Address 0x8001cd20.
 
-**Unit:** code_d294 · **Size:** 16 words · **Status:** MATCHED (16/16 words)
+**Unit:** SceneNode · **Size:** 16 words · **Status:** MATCHED (16/16 words)
 
 ## What it does
 
@@ -23,10 +23,10 @@ void SceneNode__RemoveAllChildren(SceneNodeObj *self) {
 
 ## Provenance
 
-round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on the first build.
+round 11 (2026-09-03), runner charlie, unit SceneNode, second pass. Matched on the first build.
 `SceneNode__UnlinkModel`'s own (measured) body is what confirmed
 `SceneNodeObj::unk18`/`unk20` independently of the ctor's own zeroing —
-see `include/code_d294.h`.
+see `include/SceneNode.h`.
 
 ## Naming
 

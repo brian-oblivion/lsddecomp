@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020A74` on 2026-09-25 (tools/rename.py). Address 0x80020a74.
 
-Round 82, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha. Unit `src/DrawSystem.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x068 (`tools/classtable.py gDrawSystemMethods`);
   DrawSystem__Start calls it through `methods->slot68` after setting +0x10.
@@ -33,7 +33,7 @@ void DrawSystem__RunLoop(Class6C070 *self) {
 }
 ```
 
-Needs the unit-local `Class6C070` view at the top of `src/code_10ee0.c`, with
+Needs the unit-local `Class6C070` view at the top of `src/DrawSystem.c`, with
 `/* +0x030 */ void (*callback)(void);` and the `BASICCLASS_SLOTS` method table
 (`notifyParents` at +0x030).
 
@@ -42,7 +42,7 @@ Needs the unit-local `Class6C070` view at the top of `src/code_10ee0.c`, with
 `DrawSystem__RunLoop`, tier B. The VSync-synced frame loop: while `running`,
 `VSync(unk20)`, an optional per-frame callback, then `notifyParents(self, 2)`
 (BasicClass's own tick-broadcast slot) -- so every BasicClass object that
-`addChild`s this singleton gets event 2 once per VSync (`code_2a0e0.c`'s
+`addChild`s this singleton gets event 2 once per VSync (`WBgm.c`'s
 `WBgm__WBgm`, `class_3ac78.c`'s `StageMap__StageMap`, both do). +0x10 is
 named `running`: `DrawSystem__Start` sets it and enters this loop,
 `DrawSystem__Stop` clears it.

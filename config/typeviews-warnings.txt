@@ -38,8 +38,8 @@ class_3bb8c_s: warning: implicit declaration of function `rand'
 code_179d8_h: warning: unused variable `scratch'
 code_179d8_q: warning: `unassigned' might be used uninitialized in this function
 code_55dd4: warning: unused variable `unused'
-code_d294_b: warning: unused variable `pad'
-code_d294_b: warning: unused variable `unused'
+SceneNode: warning: unused variable `pad'
+SceneNode: warning: unused variable `unused'
 libcd_bios: warning: passing arg 2 of `CD_cw' makes integer from pointer without a cast
 libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop: warning: unused variable `unused'
 libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop: warning: unused variable `unused'

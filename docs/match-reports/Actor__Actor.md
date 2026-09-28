@@ -64,7 +64,7 @@ discipline and the file banner), so this unit keeps its own local reading,
   that very header (see its own long comment on why the arg list "is what
   THIS call site's bytes need", not the callee's true signature). Declared
   a fresh local `FixedBaseTable` here instead of touching the shared
-  header. `code_d294.h`'s OWN independent view (`SceneNodeMethods::ctor`,
+  header. `SceneNode.h`'s OWN independent view (`SceneNodeMethods::ctor`,
   `void *(*ctor)(void *self)`) already needed the same non-void return for
   the same reason, confirming this is not a one-off.
 - **`goto fail; ... fail: return NULL;`, not `if (cond) return NULL;`.**
@@ -84,7 +84,7 @@ discipline and the file banner), so this unit keeps its own local reading,
 ### Proposed learning
 
 - **`GetSceneNodeMethods`'s per-call-site-typing precedent is not unique to
-  `class_3bb8c.h`/`code_d294.h`/`class_3ac78.c`.** A fourth, independent
+  `class_3bb8c.h`/`SceneNode.h`/`class_3ac78.c`.** A fourth, independent
   local reading (`FixedBaseTable` here) needed the SAME non-void-vs-void
   fork on the SAME slot (`ctor`, offset `+0x008`) for the identical reason
   (this call site's return value is checked). Worth noting because it

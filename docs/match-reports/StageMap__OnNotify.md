@@ -24,7 +24,7 @@ very function) only in `StageMapMethods`, not necessarily in whatever
 
 ## GetSceneNodeMethods's inferred signature
 
-Not decompiled (lives in the still-uncarved `asm/code_d294.s`). Its second
+Not decompiled (lives in the still-uncarved `asm/SceneNode.s`). Its second
 parameter is passed as a plain `s32` from `StageMap__OnSlotEvent` (compared there
 against small integer literals 6/7 — not a pointer-shaped use), so it's
 declared here as `extern void *GetSceneNodeMethods(StageMap *self, s32
@@ -82,7 +82,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004A984` | `StageMap__OnNotify` | A | Occupant of vtable slot `+0x038`, which `include/code_8220.h` establishes as `BasicClassMethods::slot38` / `onNotify` -- the RECEIVING half of `+0x030 notifyParents`, with `(self, sender, event)`. The body is the standard override shape: call the base table's own `+0x038` with the same three arguments, then branch on the SENDER's class tag (`sender->methods->header & 0xF`). `SceneNode__OnNotify` in `code_d294` is the same shape one class up. |
+| `func_8004A984` | `StageMap__OnNotify` | A | Occupant of vtable slot `+0x038`, which `include/code_8220.h` establishes as `BasicClassMethods::slot38` / `onNotify` -- the RECEIVING half of `+0x030 notifyParents`, with `(self, sender, event)`. The body is the standard override shape: call the base table's own `+0x038` with the same three arguments, then branch on the SENDER's class tag (`sender->methods->header & 0xF`). `SceneNode__OnNotify` in `SceneNode` is the same shape one class up. |
 
 Parameters renamed from the evidence: `arg1` -> `sender`, `arg2` -> `command`
 (`code_8220.h` calls the pair sender/event; this class's own numbering is

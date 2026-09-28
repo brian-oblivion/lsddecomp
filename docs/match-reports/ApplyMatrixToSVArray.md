@@ -11,7 +11,7 @@ struct with a native `s32` member), not of the alignment idiom itself.
 
 **Historical status (kept for context): STALL (unaligned-load instruction-selection residue, 15/37 words best)
 
-Unit: `code_d294_c` (round 14). A sibling to `ApplyMatrixToLVArray` (matched this
+Unit: `SceneNode` (round 14). A sibling to `ApplyMatrixToLVArray` (matched this
 round): `count` iterations, 6 bytes/element, copying each element through
 a stack-local buffer before forwarding it to `func_80015D58`. `void
 ApplyMatrixToSVArray(void *src, void *dest, s32 count, void *fixed)`.
@@ -32,7 +32,7 @@ plain `sh` for `h`, before calling `func_80015D58(fixed, &buf, src)`.
 
 `new struct knowledge (not yet committed -- see below)`: a `Rec6_d294`
 type (`{s32 w; s16 h;}`) was drafted for this but NOT added to
-`include/code_d294.h`, since every attempt below shows the pinned `cc1`
+`include/SceneNode.h`, since every attempt below shows the pinned `cc1`
 does not select the construct this type is meant to describe; committing
 the type without the function it names would be documentation for a
 codegen fact I could not confirm.
@@ -174,7 +174,7 @@ just the trailing increment statements' order (29/37, no change) --
 neither touches WHICH value the loop bound itself is computed from,
 which is what actually mattered.
 
-Final source (verbatim, now in `src/code_d294_c.c` in place of the
+Final source (verbatim, now in `src/SceneNode.c` in place of the
 `INCLUDE_ASM`):
 
 ```c
@@ -201,7 +201,7 @@ void ApplyMatrixToSVArray(void *src, void *dest, s32 count, void *out) {
 }
 ```
 
-**This also corrects a semantic error in `include/code_d294.h`'s prior
+**This also corrects a semantic error in `include/SceneNode.h`'s prior
 comment**, invisible until this function was actually matched: the
 matched code reads FROM `dest` into the stack buffer and forwards `src`
 raw (unchanged) to `func_80015D58` -- the OPPOSITE of the header's
@@ -252,7 +252,7 @@ swap between a function's own parameters.
   destination and source the wrong way round: the loop copies an element out
   of the 2nd argument and calls `ApplyMatrixSV(m, &buf, dst)`, so the 1st
   argument is written. Both call sites (`SceneNode__TransformAndNotifyParents`, `SceneNode__ComposeAndApplyRotation`,
-  code_d294_b) pass the same address for both, which is why it was
+  SceneNode) pass the same address for both, which is why it was
   invisible. Names only -- no type, arity or order change; byte-identical.
 - **The local `Rec6_d294` typedef is gone**, replaced by the existing
   `Vec3S16_d294`. Same layout and the same all-`s16` alignment-2 property
@@ -262,28 +262,28 @@ swap between a function's own parameters.
   trailing s16" the typedef guessed. Byte-identical.
 
 
-## Round 95 (bravo): moved from include/code_d294.h
+## Round 95 (bravo): moved from include/SceneNode.h
 
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 
 ```c
-/* ApplyMatrixToSVArray (src/code_d294_c.c; MATCHED round 19, echo -- see
+/* ApplyMatrixToSVArray (src/SceneNode.c; MATCHED round 19, echo -- see
  * docs/match-reports/ApplyMatrixToSVArray.md): `dst[i] = m * src[i]` for
  * `count` elements of 6 bytes each. Each iteration copies one element out
  * of `src` into an all-s16 stack local (alignment 2, which is what makes
  * retail's unaligned lwl/lwr + swl/swr copy come out) and forwards it to
  * Sony's `ApplyMatrixSV(m, &buf, dst)` -- so the 1st parameter is the
  * WRITE destination and the 2nd the read source, confirmed against the
- * byte-exact disassembly. `SceneNode__TransformAndNotifyParents` (code_d294_b) calls it with both
+ * byte-exact disassembly. `SceneNode__TransformAndNotifyParents` (SceneNode) calls it with both
  * equal to the SAME address, which is why the asymmetry was invisible
  * until this function was actually matched; round 50 renamed the
  * parameters (names only) to say which is which. Declared with the opaque
  * shape its callers need. */
 ```
 
-## Round 98 (echo): track 7, moved from src/code_d294_c.c
+## Round 98 (echo): track 7, moved from src/SceneNode.c
 
-The definition and its prototype in include/code_d294.h now take `(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m)` and walk by element (`dst + count`, `src++`), replacing the `(u8 *)p + 6` byte walks; the local `ApplyMatrixSV` extern takes Sony's signature `SVECTOR *(MATRIX *, SVECTOR *, SVECTOR *)` (this SDK's libgte.h omits it). Byte-identical. Measured on the way: keeping `void *` parameters and copying them into typed locals (`out = dst; in = src;`) scores 31/37, because the new pseudos reorder the callee-saved register saves in the prologue; typing the parameters themselves does not.
+The definition and its prototype in include/SceneNode.h now take `(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m)` and walk by element (`dst + count`, `src++`), replacing the `(u8 *)p + 6` byte walks; the local `ApplyMatrixSV` extern takes Sony's signature `SVECTOR *(MATRIX *, SVECTOR *, SVECTOR *)` (this SDK's libgte.h omits it). Byte-identical. Measured on the way: keeping `void *` parameters and copying them into typed locals (`out = dst; in = src;`) scores 31/37, because the new pseudos reorder the callee-saved register saves in the prologue; typing the parameters themselves does not.
 
 The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
 
@@ -293,7 +293,7 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * order: the WRITE destination is the 1st argument and the read source the
  * 2nd, which is the opposite of the names this body carried before -- read
  * off the byte-exact call, `ApplyMatrixSV(m, &buf, dst)` with `buf` copied
- * out of `src`. Both of this function's call sites (code_d294_b) pass the
+ * out of `src`. Both of this function's call sites (SceneNode) pass the
  * same address for both, so the asymmetry is invisible from them.
  *
  * The per-element stack copy must be a struct whose members are ALL s16:

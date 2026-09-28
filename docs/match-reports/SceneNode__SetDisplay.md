@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D344` on 2026-09-23 (tools/rename.py). Address 0x8001d344.
 
-**Unit:** code_d294 · **Size:** 12 words · **Status:** MATCHED (12/12 words)
+**Unit:** SceneNode · **Size:** 12 words · **Status:** MATCHED (12/12 words)
 
 ## What it does
 
@@ -12,10 +12,10 @@
 `self->unk10` to `(a1 == 0)`, and returns whether the field's PREVIOUS
 value was 0 (i.e. it returns the logical negation of the old bit).
 
-See `include/code_d294.h` for `GetSetBitField`, the generic packed-bitfield
+See `include/SceneNode.h` for `GetSetBitField`, the generic packed-bitfield
 accessor all five sibling functions in this file (`SceneNode__SetDisplay`,
 `SceneNode__SetSemiTrans`, `SceneNode__SetSemiTransRate`, `SceneNode__SetLighting`, `SceneNode__SetLightMode`) wrap.
-It lives in the next, still-uncarved slice (`asm/code_d294_b.s`) and was
+It lives in the next, still-uncarved slice (`asm/SceneNode.s`) and was
 read directly off its own disassembly rather than decompiled here.
 
 ## The C
@@ -33,7 +33,7 @@ x==0" lowering, DECOMPILATION_LEARNINGS.md), matching retail's
 
 ## Provenance
 
-round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
+round 11 (2026-09-03), runner charlie, unit SceneNode (fresh carve, first attempt).
 Matched on the first build; the five bitfield-setter siblings and the
 struct fields around them (`self->unk10` as a packed flags word,
 `GetSetBitField`'s signature) were derived together as one group before any
@@ -58,7 +58,7 @@ Round 71 (alpha). `func_8001D344` -> `SceneNode__SetDisplay`, **tier A**. Table 
 
 For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
 
-- `SceneNodeObj.unk10` -> `attribute` (tier A): GsDOBJ2.attribute. SceneNode__LinkModel passes `&self->unk10` to GsLinkObject4 as the GsDOBJ2, and the five setters here write it at GsDOFF/GsALON/GsA*/GsLOFF/light-mode bit positions. Accessors: code_d294, code_d294_b, code_d294_c.
+- `SceneNodeObj.unk10` -> `attribute` (tier A): GsDOBJ2.attribute. SceneNode__LinkModel passes `&self->unk10` to GsLinkObject4 as the GsDOBJ2, and the five setters here write it at GsDOFF/GsALON/GsA*/GsLOFF/light-mode bit positions. Accessors: SceneNode, code_d294_b, code_d294_c.
 
 ## Round 101 (delta): track 7
 

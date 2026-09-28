@@ -4,14 +4,14 @@
 
 > Renamed from `func_8001CCB4` on 2026-09-23 (tools/rename.py). Address 0x8001ccb4.
 
-**Unit:** code_d294 · **Size:** 27 words · **Status:** MATCHED (27/27 words)
+**Unit:** SceneNode · **Size:** 27 words · **Status:** MATCHED (27/27 words)
 
 ## What it does
 
 `SceneNode` vtable slot `+0x014`, mirror of `SceneNode__AddChild` (`+0x010`).
 If `other`'s vtable header tag is `9`, first calls `SceneNode__UnlinkModel(self)`
 (zeroes `self->unk18`/`self->unk20` -- MEASURED from its own disassembly,
-see `include/code_d294.h`), THEN unconditionally forwards to the base
+see `include/SceneNode.h`), THEN unconditionally forwards to the base
 class's own `+0x014` slot (`Get_vtable_BasicClass()->slot14`). "Detach" to
 `SceneNode__AddChild`'s "attach": the pre-work happens before the base call here,
 where `SceneNode__AddChild` did its post-work after.
@@ -39,7 +39,7 @@ simply always live in a register here.
 
 ## Provenance
 
-round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on the first build.
+round 11 (2026-09-03), runner charlie, unit SceneNode, second pass. Matched on the first build.
 
 ## Naming
 

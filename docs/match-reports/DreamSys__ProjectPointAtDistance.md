@@ -76,9 +76,9 @@ is a `config/` change and out of scope this round.
    (`0x80087EC8`-`0x80087EDF`) -- the 8 trailing zero bytes splat lumped
    into its dlabel (`0x80087EE0`-`0x80087EE7`) are never reached by that
    indexed access and belong to something else.
-2. `SceneNode__LocalOffsetToWorldPos` (code_d294_c, already matched) forwards its own `src`
+2. `SceneNode__LocalOffsetToWorldPos` (SceneNode, already matched) forwards its own `src`
    parameter to `ApplyMatrixToLVArray(dst, src, 1, buf)`, and `ApplyMatrixToLVArray`'s
-   own doc comment (`include/code_d294.h`) confirms it treats both pointers
+   own doc comment (`include/SceneNode.h`) confirms it treats both pointers
    as 0xC-byte (3-word) elements. `DreamSys__ProjectPointAtDistance` passes
    `(s32 *)&gProjectOffsetZ - 2` as that exact `src` argument, which only
    type-checks sensibly as a 3-word vector's start -- matching the 8
@@ -123,7 +123,7 @@ literal null-pointer-plus-4 dereference when `unk_0xC == 0` -- the ADD
 itself is never skipped, only the POINTER varies. This exact idiom (a
 ternary yielding a null pointer, then indexed unconditionally) is not
 invented for this function: it is already proven byte-exact in
-`SceneNode__LocalOffsetToWorldPos`'s own matched body (`code_d294_c.c`): `table = self->unkC
+`SceneNode__LocalOffsetToWorldPos`'s own matched body (`SceneNode.c`): `table = self->unkC
 != 0 ? self->unk14->unk38 : 0; dst[0] = dst[0] + table[0];`. Recognising
 the SAME pattern here (rather than writing the more "obviously safe"
 guarded form) is what closed this bug:
@@ -255,7 +255,7 @@ Renamed from `func_8005942C`.
 
 Writes `dist` into the z word of the three-word global scratch
 offset vector, converts that LOCAL offset to a world position through
-`SceneNode__LocalOffsetToWorldPos` (code_d294_c, matched), replaces the result's Y
+`SceneNode__LocalOffsetToWorldPos` (SceneNode, matched), replaces the result's Y
 with `InterpolateKeyframeValue(heightCurve+0x14, heightCurve+0x20, dist)` plus the
 object's own world-base Y, optionally copies the point out, and optionally returns
 whether it lies within `tolerance` of `reference`.

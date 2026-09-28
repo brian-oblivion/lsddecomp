@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020B74` on 2026-09-25 (tools/rename.py). Address 0x80020b74.
 
-Round 82, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha. Unit `src/DrawSystem.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x078 (`tools/classtable.py gDrawSystemMethods`).
 - **What:** clear a rectangle to an RGB colour. With a NULL rect it asks
@@ -44,7 +44,7 @@ void DrawSystem__ClearImage(Class6C070 *self, u8 *color, Class6C070Rect *src) {
 
 Needs the unit-local `Class6C070`, `Class6C070Methods`, `RECT`,
 `Class6C070Rect`, `Class6C070Dims` and `Class6C070Size` view at the top of
-`src/code_10ee0.c`.
+`src/DrawSystem.c`.
 
 ## Naming
 

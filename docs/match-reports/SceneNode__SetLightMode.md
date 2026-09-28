@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D3F8` on 2026-09-23 (tools/rename.py). Address 0x8001d3f8.
 
-**Unit:** code_d294 · **Size:** 11 words · **Status:** MATCHED (11/11 words)
+**Unit:** SceneNode · **Size:** 11 words · **Status:** MATCHED (11/11 words)
 
 ## What it does
 
@@ -29,7 +29,7 @@ bit ranges: `[3,6)` (3 bits, this function), bit 6 (1 bit,
 
 ## Provenance
 
-round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
+round 11 (2026-09-03), runner charlie, unit SceneNode (fresh carve, first attempt).
 Matched on the first build (part of the five-function bitfield-setter
 group; see `SceneNode__SetDisplay.md`).
 

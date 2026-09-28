@@ -64,7 +64,7 @@
  * half-size is 320x240. */
 #define SPRITE_POS_LIMIT 512
 
-/* code_d294_c.c. include/code_d294.h declares it the same way; this unit
+/* SceneNode.c. include/SceneNode.h declares it the same way; this unit
  * does not include that header. */
 extern void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
 /* TmdRenderer.c */

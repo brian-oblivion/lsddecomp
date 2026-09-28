@@ -2,7 +2,7 @@
 
 > Renamed from `func_80039D68` on 2026-09-25 (tools/rename.py). Address 0x80039d68.
 
-Round 81, runner echo. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
+Round 81, runner echo. Unit `src/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x04C (resolved with `tools/classtable.py gWBgmMethods`).
@@ -27,7 +27,7 @@ void WBgm__Pause(WBgm *self) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/code_2a0e0.c`:
+The unit-local view it needs, from the top of `src/WBgm.c`:
 
 ```c
 #include "BasicClass.h"

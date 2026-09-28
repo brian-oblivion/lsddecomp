@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D280` on 2026-09-23 (tools/rename.py). Address 0x8001d280.
 
-**Unit:** code_d294 · **Size:** 47 words · **Status:** MATCHED (47/47 words)
+**Unit:** SceneNode · **Size:** 47 words · **Status:** MATCHED (47/47 words)
 
 ## What it does
 
@@ -50,7 +50,7 @@ void SceneNode__GetNextAttachedChild(SceneNodeObj *self, GenericObj_d294 **entry
 
 ## Provenance
 
-round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on the first build (no
+round 11 (2026-09-03), runner charlie, unit SceneNode, second pass. Matched on the first build (no
 iteration needed) -- the most complex function attempted this round, and
 the one whose control-flow was transcribed most literally from the
 disassembly's own branch structure (three nested `if`s rather than a
@@ -67,7 +67,7 @@ Round 71 (alpha). `func_8001D280` -> `SceneNode__GetNextAttachedChild`, **tier A
 
 For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
 
-- `GenericObj_d294.unkC` -> `parent` (tier A): the same +0x00C parent pointer on the child, compared against self to pick attached children. Accessors: code_d294, code_d294_c, plus a NON_MATCHING body in code_d294_b.
+- `GenericObj_d294.unkC` -> `parent` (tier A): the same +0x00C parent pointer on the child, compared against self to pick attached children. Accessors: SceneNode, code_d294_c, plus a NON_MATCHING body in code_d294_b.
 
 ## Track 4 (2026-09-25, round 81, charlie)
 

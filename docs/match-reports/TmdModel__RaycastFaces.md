@@ -4,7 +4,7 @@
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/TmdModel.c`. Fresh ground, no prior attempt.
 
-- **What:** segment-vs-model hit test. It walks every primitive of the model with `TmdModel__NextPrimitive`. For each one it builds the plane from the first three vertices (`OuterProduct0` of two edges, /4096, `d = -(v0 . n)`) and intersects the segment `origin -> end` with it. The parameter is a 16.16 fixed-point quotient of two fraction structs. It rejects a parallel face (status 2), a negative t, and a hit beyond the segment length (`Square0`/`SquareRoot0` on both vectors). It then checks the hit against the face's bounding box grown by 24, and keeps the nearest hit: `*best` = distance, `*hitOut` = point, `*height` = point.y - box.min.y (when `height != NULL`). Returns 1 if any face was hit. Callers: `code_d294_b.c`, `code_d294_c.c` (their own local prototypes, not touched).
+- **What:** segment-vs-model hit test. It walks every primitive of the model with `TmdModel__NextPrimitive`. For each one it builds the plane from the first three vertices (`OuterProduct0` of two edges, /4096, `d = -(v0 . n)`) and intersects the segment `origin -> end` with it. The parameter is a 16.16 fixed-point quotient of two fraction structs. It rejects a parallel face (status 2), a negative t, and a hit beyond the segment length (`Square0`/`SquareRoot0` on both vectors). It then checks the hit against the face's bounding box grown by 24, and keeps the nearest hit: `*best` = distance, `*hitOut` = point, `*height` = point.y - box.min.y (when `height != NULL`). Returns 1 if any face was hit. Callers: `SceneNode.c`, `code_d294_c.c` (their own local prototypes, not touched).
 - **Result:** byte-exact; 486/486 words, whole-image SHA1 green. Build 12 on this function.
 - **Builds / levers, measured:**
   1. first draft (all locals at function top, `org`/`dir` as separate Vec3, `ABS(x) = x < 0 ? -x : x`): 10/486, frame 0x1A0.
@@ -206,7 +206,7 @@ rejects a parallel or out-of-range hit, checks the candidate hit against the
 face's own bounding box (grown by 24), and keeps the nearest one:
 `*best`/`*hitOut`/`*height`. Returns whether anything was hit. Mechanics
 fully describe the function; the game-level purpose (what calls this with
-what segment) is settled by its callers in `code_d294_b.c`/`code_d294_c.c`,
+what segment) is settled by its callers in `SceneNode.c`/`code_d294_c.c`,
 not touched by this pass.
 
 ## Track 7 (2026-09-26, round 94, bravo)

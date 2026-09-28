@@ -4,7 +4,7 @@
 
 > Renamed from `func_80025C30` on 2026-09-24 (tools/rename.py). Address 0x80025c30.
 
-**Unit:** class_16334 · **Round:** 44 (2026-09-15)
+**Unit:** Pad · **Round:** 44 (2026-09-15)
 
 ## Provenance
 
@@ -12,7 +12,7 @@ Round-42's "REOPENED -- ASSIGNABLE" banner applies (previously stub-stalled as
 `gp_rel`-blocked on the same `sPadRefCount` global as `Pad__Pad`). The
 preserved body from the earlier runner/alpha attempt named the guarded call
 as `func_80025F2C()`; re-reading the `.s` directly shows the call target is
-`PadStop` (already declared in `include/class_16334.h`,
+`PadStop` (already declared in `include/Pad.h`,
 `void PadStop(void)`), not `func_80025F2C`. Matched byte-exact on the FIRST
 build with the corrected call target.
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001DA28` on 2026-09-18 (tools/rename.py). Address 0x8001da28.
 
-Unit: `code_d294_b`. Round 13, runner delta. This is the unit's largest
+Unit: `SceneNode`. Round 13, runner delta. This is the unit's largest
 queued function (268 asm lines / 243 words). One real attempt reached
 6/243 in-range words with a plausible but not-yet-correct shape (compiled
 body 221 words vs retail's 243 — a 22-word/frame-size deficit, not yet a
@@ -251,7 +251,7 @@ concrete, measured leads for the next attempt:
 
 ## Header changes kept
 
-`include/code_d294.h`:
+`include/SceneNode.h`:
 - New `Sixteen6_d294` (12 bytes, 6×`s16`, all-s16-struct-copy idiom) and
   `CornerList_d294` (`{ s32 count; Vec3S16_d294 hdr; }`) types.
 - New externs `TmdModel__UpdateBoundsBuffer(void *arg0)` and `TmdModel__GetBoundsBuffer(void *arg0,
@@ -282,7 +282,7 @@ shows more than one live pointer-class register surviving the loop.
 **First, a correctness note for whoever resumes this:** while re-deriving
 this function, a bug from earlier in this same session was discovered
 and fixed -- `SceneNode__TryAttachNearby` (this unit's OTHER round-13 stall, addressed
-earlier the same round) had been left LIVE in `src/code_d294_b.c`
+earlier the same round) had been left LIVE in `src/SceneNode.c`
 (missing its `#if 0`/`INCLUDE_ASM` wrapper) after an experiment, which
 silently shifted every function after it in the file by 13 words. This
 made `SceneNode__CheckBoundsOverlap`'s own vram address wrong in the LINKED build
@@ -303,7 +303,7 @@ here, but the natural instinct is to blame the function being worked on,
 not an unrelated sibling).
 
 Dropped the round-13 best-attempt body (never previously committed to
-`src/`, only preserved in this report's prose) into `src/code_d294_b.c`
+`src/`, only preserved in this report's prose) into `src/SceneNode.c`
 in place of the bare `INCLUDE_ASM`. Baseline reproduced: **5/243, frame
 `-0x98` (152 bytes) vs retail's `-0xF8` (248 bytes)**, matching the
 report's own "22-word/96-byte deficit" figure closely (96 bytes exactly).
@@ -509,7 +509,7 @@ Also: this function's frame-size fix is the THIRD instance in this one
 unit (`SceneNode__NotifyWithHull`, `SceneNode__TryAttachNearby`, now this) of "an unused-looking
 local needs to be sized to close a frame gap, not to what the function's
 own visible code needs" -- strong enough now to treat as a standing
-first-check for any `code_d294_b` stall with a non-matching frame size,
+first-check for any `SceneNode` stall with a non-matching frame size,
 not just a possibility to consider.
 
 ## Round 37 (echo) — title rebuilt with the three required figures; no new lever tried
@@ -520,7 +520,7 @@ CLAUDE.md's per-round instructions flagged explicitly as blocking the next
 round from ranking it. Per the round's "build the inherited body before
 you trust its score" discipline, spliced the round-20 preserved body
 (above, 14/243, frame + self-materialization fixes already folded in)
-back into `src/code_d294_b.c` verbatim, confirmed `SceneNode__TryAttachNearby`
+back into `src/SceneNode.c` verbatim, confirmed `SceneNode__TryAttachNearby`
 (the sibling immediately before it in ROM order) was still properly
 `#if 0`/`INCLUDE_ASM`-wrapped before trusting the address, and rebuilt.
 
@@ -664,7 +664,7 @@ reason to distrust it.
 Filing unchanged as **STALL at 14/243** (built 222/retail 243 words per
 `nm -S`, 21 words short; first real diff at file offset `0xE238` / vram
 `0x8001DA38`, unchanged from round 37's own pinned figures).
-`INCLUDE_ASM` restored, `src/code_d294_b.c` confirmed byte-identical to
+`INCLUDE_ASM` restored, `src/SceneNode.c` confirmed byte-identical to
 the committed state (`git diff --stat` empty) after the check.
 
 ### Proposed learning (round 41)
@@ -835,7 +835,7 @@ operand order, so a min whose default is loaded first is spelled `f > v`.
 
 ## Round 95 (bravo): Sixteen6_d294 and CornerList_d294 retired
 
-Both placeholders in include/code_d294.h are deleted. `Sixteen6_d294` (six
+Both placeholders in include/SceneNode.h are deleted. `Sixteen6_d294` (six
 s16s) was only ever a view of a `TmdModel__GetBoundsBuffer` record, which is a
 `TmdBox`; `SceneNode__RaycastHullAgainstFaces` now holds its `plane` as `TmdBox *`
 with no casts. `CornerList_d294` (a count, then corner[0] with the rest after

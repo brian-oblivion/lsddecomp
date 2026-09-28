@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001CAF4` on 2026-09-23 (tools/rename.py). Address 0x8001caf4.
 
-**Unit:** code_d294 · **Size:** 44 words · **Status:** MATCHED (44/44 words)
+**Unit:** SceneNode · **Size:** 44 words · **Status:** MATCHED (44/44 words)
 
 ## What it does
 
@@ -80,7 +80,7 @@ void *SceneNode__SceneNode(SceneNodeObj *self) {
 
 ## Provenance
 
-round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
+round 11 (2026-09-03), runner charlie, unit SceneNode (fresh carve, first attempt).
 Both fixes above were found within the 30-attempt budget (2 rebuild
 iterations total).
 
@@ -92,16 +92,16 @@ Round 71 (alpha). `func_8001CAF4` -> `SceneNode__SceneNode`, **tier A**. Table s
 
 For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
 
-- `SceneNodeObj.unk14` -> `coord2` (tier A): the ctor allocates exactly sizeof(GsCOORDINATE2) = 0x50 for it and Reset runs GsInitCoordinate2 on it; +0x14 of the embedded GsDOBJ2 is `coord2` in LIBGS.H. Accessors: code_d294, code_d294_b, code_d294_c (compiler-measured).
-- `UnkOwner_d294.unk14` and `GenericObj_d294.unk14` -> `coord2` (tier A): the same field on the parent and on a sibling object (AttachToParent copies the parent's into `super`). Accessors: code_d294, code_d294_c.
-- `SceneNodeSub14.unk44` -> `param` (tier A): GsCOORDINATE2.param, the 0x28-byte GsCOORD2PARAM the ctor allocates. Accessors: code_d294, code_d294_b, code_d294_c.
+- `SceneNodeObj.unk14` -> `coord2` (tier A): the ctor allocates exactly sizeof(GsCOORDINATE2) = 0x50 for it and Reset runs GsInitCoordinate2 on it; +0x14 of the embedded GsDOBJ2 is `coord2` in LIBGS.H. Accessors: SceneNode, code_d294_b, code_d294_c (compiler-measured).
+- `UnkOwner_d294.unk14` and `GenericObj_d294.unk14` -> `coord2` (tier A): the same field on the parent and on a sibling object (AttachToParent copies the parent's into `super`). Accessors: SceneNode, code_d294_c.
+- `SceneNodeSub14.unk44` -> `param` (tier A): GsCOORDINATE2.param, the 0x28-byte GsCOORD2PARAM the ctor allocates. Accessors: SceneNode, code_d294_b, code_d294_c.
 
 ## Track 6 (round 91, echo): the class is SceneNode
 
 Class6B5CC -> SceneNode (`renametype.py`), tier A for what it is: the ctor allocates a GsCOORDINATE2 (0x50) and a GsCOORD2PARAM (0x28) and the object embeds a GsDOBJ2 at +0x010 (SceneNode__LinkModel passes &attribute to GsLinkObject4); attachToParent/detachFromParent maintain `parent` and coord2->super, a libgs transform hierarchy; sixteen classes derive from it (Actor, Sprite, LightRig, BoxFill, ...). The libgs member types (SceneNodeSub14 = GsCOORDINATE2, SceneNodeSub44 = GsCOORD2PARAM, S16Quad_d294 = SVECTOR) are not yet substituted: including <libgs.h> in SceneNode.h breaks 24 units whose headers declare Sony names their own way (measured this round).
 
 
-## Round 95 (bravo): moved from include/code_d294.h
+## Round 95 (bravo): moved from include/SceneNode.h
 
 The header's banner was rewritten as documentation in round 95; the comments it carried about SceneNode and its libgs types, verbatim:
 
@@ -169,8 +169,8 @@ The header's banner was rewritten as documentation in round 95; the comments it 
 /* The model SceneNode keeps at +0x020 is a TmdModel (TmdModel). Its
  * methods -- TmdModel__GetHull, TmdModel__GetBoundsCount,
  * TmdModel__UpdateBoundsBuffer/GetBoundsBuffer, TmdModel__RaycastFaces --
- * are declared once, in include/TmdModel.h, which code_d294_b.c and
- * code_d294_c.c include themselves (track 4, round 87). */
+ * are declared once, in include/TmdModel.h, which SceneNode.c and
+ * SceneNode.c include themselves (track 4, round 87). */
 ```
 
 ## Round 97 (alpha): Sony's types substituted

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D204` on 2026-09-23 (tools/rename.py). Address 0x8001d204.
 
-**Unit:** code_d294 · **Size:** 31 words · **Status:** MATCHED (31/31 words)
+**Unit:** SceneNode · **Size:** 31 words · **Status:** MATCHED (31/31 words)
 
 ## What it does
 
@@ -48,7 +48,7 @@ be written explicitly, even though it looks logically redundant.
 
 ## Provenance
 
-round 11 (2026-09-03), runner charlie, unit code_d294, second pass. 2 build iterations (the
+round 11 (2026-09-03), runner charlie, unit SceneNode, second pass. 2 build iterations (the
 initializer fix above). Established `SceneNodeMethods::slot58`'s call
 shape (`self, GenericObj_d294 **outEntry, s32 *outCont`) and
 `GenericMethods_d294::slot50` (1-arg, `entry` itself).

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D6B4` on 2026-09-18 (tools/rename.py). Address 0x8001d6b4.
 
-Round 12, runner delta. `code_d294_b`.
+Round 12, runner delta. `SceneNode`.
 
 ## Summary
 
@@ -64,7 +64,7 @@ image SHA1 is green).
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/SceneNode__DispatchLinkCommand.s`).
+Disassembly (`asm/nonmatchings/SceneNode/SceneNode__DispatchLinkCommand.s`).
 
 ### Proposed learning
 

@@ -42,13 +42,13 @@ This closes the loop `SetDreamAuxWorld` (matched earlier this round) opened:
 offset 0x4, and `DreamAuxSlot`'s remaining 12 bytes (previously
 `u8 unkC[0xC]`) are exactly a 3-word position vector -- confirmed by this
 function passing `a0->pos` as `SceneNode__LocalOffsetToWorldPos`'s `src` parameter (that
-function, `code_d294_c.c`, treats `src` as a 3-word vector unconditionally).
+function, `SceneNode.c`, treats `src` as a 3-word vector unconditionally).
 `DreamAuxSlot` is renamed accordingly in `include/code_4cd08.h`
 (`void *obj; DreamAuxObj *entity; s32 pos[3];`, still 0x14 bytes).
 
 `SceneNode__LocalOffsetToWorldPos` and `SceneNode__FaceTarget` are both already-matched functions in a
-different unit (`code_d294_c.c`), each with its OWN unit's typed view of
-`self`/`target` (`SceneNodeObj *` / `Entity *`, per `code_d294.h` and
+different unit (`SceneNode.c`), each with its OWN unit's typed view of
+`self`/`target` (`SceneNodeObj *` / `Entity *`, per `SceneNode.h` and
 `Entity.h`'s independent local views of the same shared-ancestor slot). This
 unit adds a third, `void *`-typed, local view rather than pulling in either
 header -- consistent with the project's per-unit-view convention

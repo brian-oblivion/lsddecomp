@@ -2,7 +2,7 @@
 
 > Renamed from `func_80039B04` on 2026-09-25 (tools/rename.py). Address 0x80039b04.
 
-Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
+Round 81, runner delta. Unit `src/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x038 (onNotify) (slots resolved with `tools/classtable.py gWBgmMethods`).
@@ -37,7 +37,7 @@ void WBgm__OnNotify(WBgm *self, void *sender, s32 event) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/code_2a0e0.c`:
+The unit-local view it needs, from the top of `src/WBgm.c`:
 
 ```c
 #include "BasicClass.h"

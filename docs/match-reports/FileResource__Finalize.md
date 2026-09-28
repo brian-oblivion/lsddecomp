@@ -11,7 +11,7 @@
 ## What it does
 
 This class's own destructor — `gFileResourceMethods`'s vtable slot `+0x00C`, called
-`FileResource__Release` and `Pad__Finalize` (in `class_16334`, a different class'
+`FileResource__Release` and `Pad__Finalize` (in `Pad`, a different class'
 `dtor`, same convention) alike. It calls two more of its own slots in turn:
 `+0x048` (unimplemented/null at this level — a subclass-provided hook,
 `slot48`) and then `+0x05C`, which happens to resolve to `FileResource__FreeBuffer` *at

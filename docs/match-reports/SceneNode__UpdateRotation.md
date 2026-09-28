@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001CEB4` on 2026-09-23 (tools/rename.py). Address 0x8001ceb4.
 
-**Unit:** `code_d294` · **Size:** 85 words · **Status:** MATCHED, 85/85 exact,
+**Unit:** `SceneNode` · **Size:** 85 words · **Status:** MATCHED, 85/85 exact,
 whole-image SHA1 green.
 
 Filed since round 13/14 as blocked by `nop_mflo_mfhi` (a sibling of the
@@ -117,7 +117,7 @@ Round 71 (alpha). `func_8001CEB4` -> `SceneNode__UpdateRotation`, **tier A**. Ta
 
 For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
 
-- `SceneNodeSub44.vec` -> `rotate` (tier A): GsCOORD2PARAM.rotate (SVECTOR at +0x10), which UpdateRotation writes in 4096-per-turn units. Accessors: code_d294, code_d294_b, code_d294_c.
+- `SceneNodeSub44.vec` -> `rotate` (tier A): GsCOORD2PARAM.rotate (SVECTOR at +0x10), which UpdateRotation writes in 4096-per-turn units. Accessors: SceneNode, code_d294_b, code_d294_c.
 
 ## Round 97 (alpha): Sony's SVECTOR
 

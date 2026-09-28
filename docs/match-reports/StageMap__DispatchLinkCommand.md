@@ -65,7 +65,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AB88` | `StageMap__DispatchLinkCommand` | B | Occupant of vtable slot `+0x09C`. The base occupant of that slot is `SceneNode__DispatchLinkCommand(self, a1, a2)`, which switches on `a2` in `{2,3,4}` -- so the slot's third parameter is a COMMAND CODE, not the `count` this report previously called it. `SceneNode__OnNotify` (code_d294) dispatches `+0x09C` as `slot9C(self, sender, event)` when the sender's class tag is 4, which fixes the second parameter as the sender. This override accepts only senders whose vtable header low byte is `0x34` and forwards `(sender, command)` to `forwardAcceptedCommand`. Tier B: the filter and the forward are certain, the meaning of tag `0x34` and of the command numbering is not. |
+| `func_8004AB88` | `StageMap__DispatchLinkCommand` | B | Occupant of vtable slot `+0x09C`. The base occupant of that slot is `SceneNode__DispatchLinkCommand(self, a1, a2)`, which switches on `a2` in `{2,3,4}` -- so the slot's third parameter is a COMMAND CODE, not the `count` this report previously called it. `SceneNode__OnNotify` (SceneNode) dispatches `+0x09C` as `slot9C(self, sender, event)` when the sender's class tag is 4, which fixes the second parameter as the sender. This override accepts only senders whose vtable header low byte is `0x34` and forwards `(sender, command)` to `forwardAcceptedCommand`. Tier B: the filter and the forward are certain, the meaning of tag `0x34` and of the command numbering is not. |
 
 Parameters renamed: `other` -> `sender`, `count` -> `command`. This is the
 same parameter that `StageMap__ForwardAcceptedCommand` gates on

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8001D33C` on 2026-09-23 (tools/rename.py). Address 0x8001d33c.
 
-**Unit:** code_d294 · **Size:** 2 words · **Status:** MATCHED (an empty `void f(void) {}` body; no matching work was needed).
+**Unit:** SceneNode · **Size:** 2 words · **Status:** MATCHED (an empty `void f(void) {}` body; no matching work was needed).
 
 ## Naming
 

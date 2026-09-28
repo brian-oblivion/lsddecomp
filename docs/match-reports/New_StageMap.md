@@ -55,7 +55,7 @@ return after the success return removes the live range entirely.
 
 `goto fail;` with a trailing `fail: return NULL;` label is byte-identical and
 was how this was first cracked (copied from `New_Pad` in
-`class_16334`, matched rounds earlier). It is **not** load-bearing — two
+`Pad`, matched rounds earlier). It is **not** load-bearing — two
 runners reached the same bytes with a `goto`-free spelling. The rule is about
 statement order, not `goto`.
 

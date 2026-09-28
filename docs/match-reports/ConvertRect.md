@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020970` on 2026-09-25 (tools/rename.py). Address 0x80020970.
 
-Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
+Round 81, runner alpha. Unit `src/DrawSystem.c`. Fresh ground, no prior attempt.
 
 - **Where:** helper (not a table slot) (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** copies x/y/w from +0/+2/+4 and h from +8 of a source record into a RECT (lhu/sh pairs from plain s16 member copies).
@@ -21,7 +21,7 @@ void ConvertRect(RECT *dst, Class6C070Rect *src) {
 }
 ```
 
-The declarations it needs (unit-local view in `src/code_10ee0.c`; the class
+The declarations it needs (unit-local view in `src/DrawSystem.c`; the class
 structs start with `BASICCLASS_SLOTS`/`BASICCLASS_FIELDS` from
 `include/BasicClass.h`, and the SDK externs are local copies of the
 LIBGPU.H/LIBGS.H prototypes):

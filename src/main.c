@@ -15,7 +15,7 @@
  */
 #include "common.h"
 #include "GameApplication.h"
-#include "class_16334.h"
+#include "Pad.h"
 #include "BMemPMgr.h"
 
 /* Psy-Q libapi's SetMem (libapi/c159, a linked object). No SDK header here

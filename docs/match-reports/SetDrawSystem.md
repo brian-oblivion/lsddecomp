@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020C68` on 2026-09-25 (tools/rename.py). Address 0x80020c68.
 
-Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
+Round 81, runner bravo. Unit `src/DrawSystem.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** not a method: the singleton setter (method-table slots resolved with `tools/classtable.py gDrawSystemMethods`).
@@ -21,7 +21,7 @@ void SetDrawSystem(Class6C070 *obj) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/code_10ee0.c`:
+The unit-local view it needs, from the top of `src/DrawSystem.c`:
 
 ```c
 #include "BasicClass.h"
@@ -51,7 +51,7 @@ extern void GsSwapDispBuff(void);
 `SetDrawSystem`, tier A. The singleton setter paired with `GetDrawSystem`;
 called exactly once, from `code_2b78c.c`'s `Application__InitSystems`, with
 the object `main.c` constructs (`New_DrawSystem`) -- the startup wiring that
-also confirms the class's identity (see `src/code_10ee0.c`'s header
+also confirms the class's identity (see `src/DrawSystem.c`'s header
 comment).
 
 ## Track 4 (2026-09-26, round 87, bravo)

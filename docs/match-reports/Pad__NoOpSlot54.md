@@ -2,7 +2,7 @@
 
 > Renamed from `Pad__func_80025E94` on 2026-09-28 (tools/rename.py). Address 0x80025e94.
 
-**Unit:** `src/class_16334.c` (naming pass, round 77, `runner/echo`)
+**Unit:** `src/Pad.c` (naming pass, round 77, `runner/echo`)
 **Status:** MATCHED (2/2 words, full build verified byte-exact)
 **Vtable slot:** `gPadMethods+0x54` (`PadMethods.func54`)
 

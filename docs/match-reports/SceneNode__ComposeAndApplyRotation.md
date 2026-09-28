@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D950` on 2026-09-18 (tools/rename.py). Address 0x8001d950.
 
-Unit: `code_d294_b`. Round 13, runner delta. 54/54 words, full match.
+Unit: `SceneNode`. Round 13, runner delta. 54/54 words, full match.
 
 ## Signature
 
@@ -73,7 +73,7 @@ First attempt (declaring `buf1` before `buf2`, matching the order they're
 first *used* in the source) compiled clean but scored 3/54 with the usual
 big "differs outside range" warning (a 5th callee-saved register, `s1`,
 appeared where retail has none). Comparing `objdump -d
-build/src/code_d294_b.c.o` against retail's disassembly showed the actual
+build/src/SceneNode.c.o` against retail's disassembly showed the actual
 cause: GCC 2.6.3 recognized `&buf2` as loop-invariant (same address every
 iteration of the `self->unkC` walk) and hoisted it into a persistent
 callee-saved register (`s1`) *before* the loop, then reused it both inside
@@ -94,7 +94,7 @@ only attempt needed after the swap — full match immediately.
 
 ## Header changes
 
-`include/code_d294.h`:
+`include/SceneNode.h`:
 
 - `SceneNodeMethods`: typed `+0x084` (`slot84`, `void (*)(SceneNodeObj*,
   void*, s32)`) out of the `pad060` span that used to run `0x060`-`0x08C`.
@@ -147,7 +147,7 @@ whether `self->unkC` is a parent-hierarchy chain in the game sense is a
 reasonable reading, not an independently confirmed one. Purely local to
 this unit + its header for the FUNCTION rename; the underlying vtable
 FIELD name (`slotA4`) is proposed, not renamed -- see below, it is also
-dispatched from `code_d294_c.c` (a different unit).
+dispatched from `SceneNode.c` (a different unit).
 
 ## Round 95 (bravo): Sony's declarations
 

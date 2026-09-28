@@ -24,7 +24,7 @@ Byte-exact on the first build.
 ```c
 typedef struct DrawPoint { s16 x; s16 y; } DrawPoint;
 /* DrawRect { s16 x; s16 y; s32 w; s32 h; }; Class6C070 (the draw singleton,
- * code_10ee0.c) methods slot +0x064:
+ * DrawSystem.c) methods slot +0x064:
  * void (*moveImage)(Class6C070 *self, DrawRect *rect, s32 x, s32 y); --
  * confirmed against LIBGPU.H's MoveImage(RECT *rect, int x, int y), see
  * ## Naming below. */
@@ -75,14 +75,14 @@ void RotateVramRectRight(DrawRect *r, s32 count, DrawPoint *p) {
   A. Same rename.py-bug block as `func_8003B39C` (now `New_TimImage`) had; that bug is fixed (FINISHING-PLAN revision 19).
 - **`draw->methods->moveImage`** (this unit's own local field, not a
   cross-unit rename -- `Class6C070Methods` here is `TimImage.c`'s private
-  partial view of the singleton `code_10ee0.c` owns): tier A. The wrapped
+  partial view of the singleton `DrawSystem.c` owns): tier A. The wrapped
   slot's signature, `void (*)(Class6C070 *self, DrawRect *rect, s32 x, s32
   y)`, matches LIBGPU.H's `extern int MoveImage(RECT *rect, int x, int y)`
   exactly in shape (a rect argument plus a destination x/y), one slot below
   `loadImage`'s equally exact match to `extern int LoadImage(RECT *rect,
-  u_long *p)`. Proposed for `code_10ee0.c`'s own eventual naming of
+  u_long *p)`. Proposed for `DrawSystem.c`'s own eventual naming of
   `Class6C070`'s table (not renamed here: that struct is owned by
-  `code_10ee0.c`, still mostly `INCLUDE_ASM`, and this unit's copy is an
+  `DrawSystem.c`, still mostly `INCLUDE_ASM`, and this unit's copy is an
   independent local view per the project's convention).
 
 ## Track 4 (2026-09-26, round 87, bravo)

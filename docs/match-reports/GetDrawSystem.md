@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020C5C` on 2026-09-25 (tools/rename.py). Address 0x80020c5c.
 
-Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
+Round 81, runner bravo. Unit `src/DrawSystem.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** not a method: the singleton getter (method-table slots resolved with `tools/classtable.py gDrawSystemMethods`).
@@ -21,7 +21,7 @@ Class6C070 *GetDrawSystem(void) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/code_10ee0.c`:
+The unit-local view it needs, from the top of `src/DrawSystem.c`:
 
 ```c
 #include "BasicClass.h"
@@ -49,7 +49,7 @@ extern void GsSwapDispBuff(void);
 ## Naming
 
 `GetDrawSystem`, tier A. The singleton getter for `gDrawSystem`; three other
-units (`TimImage.c`, `code_179d8_q.c`, `code_2a0e0.c`) independently
+units (`TimImage.c`, `code_179d8_q.c`, `WBgm.c`) independently
 called this function's return "the draw singleton" in their own comments
 before this rename -- convergent naming from callers that never saw each
 other's code.

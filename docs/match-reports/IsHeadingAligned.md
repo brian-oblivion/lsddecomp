@@ -54,7 +54,7 @@ Both callers of this function (`DreamSys__CheckTunnelHeading`, `DreamSys__CheckS
 themselves stalled on the `gp_rel` blocker per their own reports) pass down,
 two levels removed, the `s32 local[4]` buffer that `DreamSys.c:727` fills via
 `SceneNode__GetRotationDegrees(this, local)`. That function's own report
-(`docs/match-reports/SceneNode__GetRotationDegrees.md`, unit `code_d294_c`) establishes it
+(`docs/match-reports/SceneNode__GetRotationDegrees.md`, unit `SceneNode`) establishes it
 writes a 3-entry `Ratio16 {s16 whole; s16 frac;}` table there, so byte
 offset +4 of `local` is `out[1].whole` — a degrees value.
 
@@ -101,7 +101,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
 
 ```c
 /* Unit-local reading of the second parameter: the caller (DreamSys__CheckTunnelHeading)
-   passes down a `s32 local[4]` buffer that SceneNode__GetRotationDegrees (code_d294_c) fills
+   passes down a `s32 local[4]` buffer that SceneNode__GetRotationDegrees (SceneNode) fills
    with a 3-entry Ratio16 table; the byte offset +4 read here lands on
    that table's `out[1].whole` (a degrees value, per SceneNode__GetRotationDegrees's own
    report). This function reads it unsigned (`lhu`), independent of

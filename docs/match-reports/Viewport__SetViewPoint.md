@@ -33,7 +33,7 @@ void Viewport__SetViewPoint(Unk18Obj *self, Vec3_2cc8c *a1) {
 
 `include/Task.h`:
 - New `Vec3_2cc8c` type (`{ s32 x, y, z; }`, local view — same shape as
-  `code_d294.h`'s own `LongVec3`, not unified per this project's
+  `SceneNode.h`'s own `LongVec3`, not unified per this project's
   convention).
 - `Unk18Obj::unk14` **retyped** from an opaque `u8[0x030-0x014]` span
   (added earlier this round by `Viewport__AttachViewChild`, which only ever took its

@@ -8,7 +8,7 @@
 
 Round 82, runner alpha (fourth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior attempt.
 
-- **Where:** not in any method table (allocator). Called by code_2a0e0.c (`self->seqData = New_RequestedFile(arg)`).
+- **Where:** not in any method table (allocator). Called by WBgm.c (`self->seqData = New_RequestedFile(arg)`).
 - **What:** `BMemPMgrAlloc(0x30)`; if non-NULL, calls slot +0x008 (ctor, RequestedFile__RequestedFile) of `GetRequestedFileMethods()` (the gRequestedFileMethods table) with `(obj, arg)` and returns obj, else NULL.
 - **Result:** byte-exact, 24/24 words, 0 ins / 0 del, whole-image SHA1 green. First build (round-82 allocator shape, one pass-through argument kept in `$s1`).
 - **Types:** unit-local `CtorArg1Methods_322b4` (ctor at +0x008 taking one s32) and a prototype for `GetRequestedFileMethods`; no shared header touched.

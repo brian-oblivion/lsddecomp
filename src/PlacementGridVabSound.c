@@ -46,8 +46,8 @@
  * setFlag, reach their parent's. */
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
-/* The pool allocator (include/class_16334.h, include/BMemPMgr.h, neither
- * included here). */
+/* The pool allocator (include/BMemPMgr.h, not included here; Pad.c
+ * declares it the same way). */
 extern void *BMemPMgrAlloc(s32 size);
 
 /* What `buffer` points at: 8 bytes nothing here reads, then each cell's

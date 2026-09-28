@@ -34,7 +34,7 @@ typedef struct DrawRect {
     s32 w;
     s32 h;
 } DrawRect;
-/* Class6C070 (the draw singleton, code_10ee0.c): methods at +0; slot +0x058
+/* Class6C070 (the draw singleton, DrawSystem.c): methods at +0; slot +0x058
  * loadImage(self, DrawRect *, u32 *) -- confirmed against LIBGPU.H's
  * LoadImage(RECT *rect, u_long *p), see ## Naming below. */
 extern Class6C070 *GetDrawSystem(void);
@@ -82,16 +82,16 @@ instead.
   block, and CLUT when present, to the draw singleton's `loadImage` slot --
   uploading the decoded image to VRAM is both the mechanics and the purpose.
 - **`draw->methods->loadImage`** (this unit's own local field on its private
-  `Class6C070Methods` view; not a rename, `code_10ee0.c` owns that struct):
+  `Class6C070Methods` view; not a rename, `DrawSystem.c` owns that struct):
   tier A. Signature `void (*)(Class6C070 *self, DrawRect *rect, u32 *data)`
   matches LIBGPU.H's `extern int LoadImage(RECT *rect, u_long *p)` exactly
   in shape.
 - **`Class6C070`/`Class6C070Methods`** (was the local placeholder
   `DrawObj`/`DrawObjMethods`), tier B: confirmed as the real class the draw
-  singleton (`GetDrawSystem`) returns -- `code_10ee0.c`'s own header comment
+  singleton (`GetDrawSystem`) returns -- `DrawSystem.c`'s own header comment
   identifies `gDrawSystem`'s class as `Class6C070` -- replacing the
   placeholder name per the round's instruction to confirm or replace it.
-  `code_10ee0.c` itself is still mostly `INCLUDE_ASM`, so this unit's struct
+  `DrawSystem.c` itself is still mostly `INCLUDE_ASM`, so this unit's struct
   stays a partial two-slot local view (pad + `loadImage` + `moveImage`), not
   a full definition.
 

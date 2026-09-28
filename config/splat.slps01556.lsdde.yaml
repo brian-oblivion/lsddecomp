@@ -434,7 +434,7 @@ segments:
       # `jr $ra; nop` leaf. Blocker census over the slice: zero gp_rel,
       # zero addiu-$at, zero `jlabel`, zero `jr $t2` -- so no rodata slot
       # to attach and no hasm/.word disposition.
-      - [0xD294, c, code_d294]
+      - [0xD294, c, SceneNode]
       # code_d294_b: second 20-function slice, 0xDC24..0xED8C.
       # 0xED8C (func_8001E58C) is a real boundary -- func_8001E57C is a
       # 4-word leaf that returns `&D_8006B5CC` and ends `jr $ra; nop`, and
@@ -446,7 +446,6 @@ segments:
       # `jr $ra`. Zero `jlabel`, zero `jr $t2`, so no rodata slot to
       # attach and no hasm/.word disposition. Blocker census over the
       # slice: 1 of 20 gp_rel-blocked (func_8001DDF4), zero addiu-$at.
-      - [0xDC24, c, code_d294_b]
       # code_d294_c: third and FINAL slice of the code_d294 block,
       # 0xED8C..0xF770 (psyq_GsLinkObject4 follows), 15 functions.
       # Carved round 13. Gate 2 checks, all run before the carve and all
@@ -462,7 +461,6 @@ segments:
       # Note func_8001EACC lives here: the function whose first two
       # arguments are symmetric with `$a3` selecting direction (see
       # DECOMPILATION_LEARNINGS and docs/match-reports/func_80061778.md).
-      - [0xED8C, c, code_d294_c]
       # 0xF770..0xF8C8: head of the old psyq_GsLinkObject4, no placed object.
       - [0xF770, asm, psyq_GsLinkObject4]
       - [0xF8C8, o, libgte/ratan]       # ratan2, ratan (Psy-Q 3.3). .data at 0x5BE9C
@@ -473,7 +471,7 @@ segments:
       - [0x10DC0, o, libgte/msc01]      # SquareRoot0, SquareRoot12. .data at 0x5C6F0
       # 0x10EE0..0x11474: game code (revision 18; was the head of psyq_10ee0).
       # 0x11474..0x14098: libgpu/sys from ResetGraph, Sony's, still asm.
-      - [0x10EE0, c, code_10ee0]
+      - [0x10EE0, c, DrawSystem]
       - [0x11474, asm, psyq_11474]      # libgpu/sys from ResetGraph (Dec 1995 build, never places)
       - [0x14098, o, libapi/c73]        # GPU_cw (Psy-Q 3.3)
       - [0x140A8, o, libc2/memcpy]      # memcpy
@@ -519,7 +517,7 @@ segments:
       - [0x15FD4, o, libetc/intr_vb]    # startIntrVSync ...
       - [0x16100, o, libetc/vsync]      # VSync, v_wait
       - [0x162E4, o, libc2/puts]        # puts
-      - [0x16334, c, class_16334]
+      - [0x16334, c, Pad]
       - [0x166AC, o, libetc/pad]        # PadInit, PadRead, PadStop   (Psy-Q 3.5 build)
       - [0x1674C, o, libapi/a22]        # BIOS A-function stubs
       - [0x1675C, o, libapi/a20]
@@ -1170,7 +1168,7 @@ segments:
       # Gap: 0x2A0E0..0x2A878. Called "the game's own libspu build" until
       # revision 18 measured it: game code (BasicClass-table methods that
       # call the framework), carved as a C unit.
-      - [0x2a0e0, c, code_2a0e0]
+      - [0x2a0e0, c, WBgm]
       # Chunk D: three libsnd runs, all text-only.
       - [0x2a878, o, libsnd/ssvol]       # Snd_SetVol, SsSeqSetVol, SsSepSetVol
       - [0x2a918, asm, psyq_2a918]       # 0x2A918..0x2A94C, unowned

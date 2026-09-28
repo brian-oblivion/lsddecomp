@@ -121,7 +121,7 @@ Method-table slots (TodActorMethods, D800878D4Methods, the part and
 model-data tables) are named for the function `tools/classtable.py` shows
 in each slot. Part views: `attribute` (SceneNode +0x10), `coord2`, and the
 GsCOORDINATE2/GsCOORD2PARAM members `flg`, `tx/ty/tz`, `param`, `scale`,
-`rotate`, `trans` (identified in code_d294.h).
+`rotate`, `trans` (identified in SceneNode.h).
 
 ### Proposed type names (for track 4, not applied)
 

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8001E4A4` on 2026-09-18 (tools/rename.py). Address 0x8001e4a4.
 
-Unit: `code_d294_b`. Round 13, runner delta; improved round 19 (echo), see
+Unit: `SceneNode`. Round 13, runner delta; improved round 19 (echo), see
 that section at the end. Best score reached: 48/54 words
 in-range, build clean at that point (verified: this score was read with
 `build exit=0` before reverting). ~15 real attempts (round 13) + a further
@@ -222,7 +222,7 @@ whether the function itself matched)
   at this edit put `slot10` immediately after `header` with no padding,
   silently shifting the already-matched `slot50` from its correct `+0x050`
   to `+0x044`. This didn't fail the build (compiles clean either way) —it
-  broke the WHOLE-IMAGE SHA1 by one byte, in `SceneNode__DetachAttachedChildren` (`code_d294.c`,
+  broke the WHOLE-IMAGE SHA1 by one byte, in `SceneNode__DetachAttachedChildren` (`SceneNode.c`,
   a different unit, already matched, calling `entry->methods->slot50`).
   Caught by running the full `./build-and-verify.sh` and then `cmp -l
   build/SLPS_015.56 disk/SLPS_015.56` to localize the single differing byte
@@ -242,7 +242,7 @@ whether the function itself matched)
 
 ## Header changes kept
 
-`include/code_d294.h`:
+`include/SceneNode.h`:
 - `GenericMethods_d294`: added `pad004[0x010-0x004]` + `slot10` (see above;
   the padding fix is the load-bearing part).
 - New extern `BasicClass__GetNextParentRef(void *self, GenericObj_d294 **outParent,
@@ -451,7 +451,7 @@ round's identified never-searched near-misses, despite already carrying
 three prior rounds of hand-lever attempts.
 
 `tools/setup-permuter.sh SceneNode__AddToActorParents <seed>` scaffolded cleanly (seed:
-the round-19 48/54 body, `#include "code_d294.h"` for the project's own
+the round-19 48/54 body, `#include "SceneNode.h"` for the project's own
 struct/extern declarations rather than re-declaring them locally, since
 this unit already shares that header). `--debug --stack-diffs` sanity
 check: **base score = 38** (8 stack-difference points, 6
@@ -533,7 +533,7 @@ matches this report's own figures with no contamination.
   the loop's masked-comparison line, then again at the dispatch
   eligibility check, then again at the `slot10` call), is not a source-level
   redundancy needing a manual fix -- reading retail's own disassembly
-  (`asm/nonmatchings/code_d294_b/SceneNode__AddToActorParents.s`) shows GCC 2.6.3
+  (`asm/nonmatchings/SceneNode/SceneNode__AddToActorParents.s`) shows GCC 2.6.3
   ALREADY reuses the SAME register (`$a1`) across the eligibility check
   (`lbu $v1,0x0($a1)`, `0x8001E530`) and the `slot10` load
   (`lw $v0,0x10($a1)`, `0x8001E540`) with no re-fetch of `entry->methods`
@@ -562,7 +562,7 @@ is a PURE 38-point stack+register penalty with zero insertions and zero
 deletions -- a lever that works by eliminating an instruction (an
 insertion/deletion-class fix) has nothing to act on in a residue that is
 already structurally minimal. Filing unchanged as STALL at 48/54,
-`INCLUDE_ASM` confirmed restored, `git diff --stat src/code_d294_b.c`
+`INCLUDE_ASM` confirmed restored, `git diff --stat src/SceneNode.c`
 clean after the check (verbatim re-restore, byte-for-byte identical to
 the committed state).
 
@@ -597,12 +597,12 @@ at the first hit. "NotifyTaggedParents" describes the measured
 mechanics (scan parents, filter by a tag byte, dispatch to matches);
 the game-level meaning of tag `4`/`0x34` and what the `+0x010`
 dispatch actually does to `entry` is not established. This is also the
-class's own table-slot BOUNDARY -- `code_d294_c.c`'s own file banner
+class's own table-slot BOUNDARY -- `SceneNode.c`'s own file banner
 already documents "`tools/classtable.py gSceneNodeMethods` stops at
 SceneNode__AddToActorParents" -- i.e. it is `SceneNodeMethods`'s LAST slot
 (`+0x0B4`), not evidence of anything about this function's own
 purpose beyond position. Held back from an actual rename because this
-symbol is referenced (in a comment) from `src/code_d294_c.c:13` -- a
+symbol is referenced (in a comment) from `src/SceneNode.c:13` -- a
 different unit's own file banner, making exactly that boundary
 observation. Posted to the broadcast.
 
@@ -651,7 +651,7 @@ split-expression axis, round-20's three further axes, a 73118-iteration
 permuter search (round 37) that never beat the base score, and round-41's
 dead-reload-lever check (ruled inapplicable, clean negative). Filing
 unchanged as STALL at 48/54, `INCLUDE_ASM` confirmed restored,
-`git diff --stat src/code_d294_b.c` empty after the check.
+`git diff --stat src/SceneNode.c` empty after the check.
 
 REVISITED (round 55): confirmed unchanged at 48/54; round-54 naming reached
 none of this function's own symbols; no new lever found or attempted beyond

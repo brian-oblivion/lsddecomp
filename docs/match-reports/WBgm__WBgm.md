@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003995C` on 2026-09-25 (tools/rename.py). Address 0x8003995c.
 
-Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
+Round 81, runner delta. Unit `src/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x008 (ctor) (slots resolved with `tools/classtable.py gWBgmMethods`).
@@ -20,12 +20,12 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Proposed names for symbols defined outside this unit
 
 Not renamed here -- both are defined in a unit this round did not touch, and
-one of them (`code_10ee0.c`) has a live matching runner this round
+one of them (`DrawSystem.c`) has a live matching runner this round
 (`GetDrawSystem`, per the round-82 broadcast: alpha finished it just before
 this pass started). Recorded as proposals for the head to apply with
 `tools/rename.py` once safe.
 
-- `GetDrawSystem` (defined `src/code_10ee0.c`, returns `Class6C070 *`): called
+- `GetDrawSystem` (defined `src/DrawSystem.c`, returns `Class6C070 *`): called
   here only as `addChild`/`removeChild`'s argument, registering `WBgm` as a
   child of that singleton for lifecycle notification -- the same pattern
   `class_3ac78.c` and `TimImage.c` use it for. No WBgm-specific evidence for
@@ -67,7 +67,7 @@ void WBgm__WBgm(WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/code_2a0e0.c`:
+The unit-local view it needs, from the top of `src/WBgm.c`:
 
 ```c
 #include "BasicClass.h"

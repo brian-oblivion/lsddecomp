@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001ECFC` on 2026-09-17 (tools/rename.py). Address 0x8001ecfc.
 
-Unit: `code_d294_c` (round 14). A standalone leaf, not yet reached by any
+Unit: `SceneNode` (round 14). A standalone leaf, not yet reached by any
 caller in this round's queue -- a Cohen-Sutherland-style "outcode"
 computation: tests a point's x/y/z against a box's min/max per axis and
 returns a 6-bit flag word. `s32 CalcBoxOutcode(s16 *box, s16 *point)`.
@@ -63,20 +63,20 @@ current derivation.
   as a 6-bit word. "Outcode" is the standard name for exactly this
   Cohen-Sutherland region code, and the original report already identified
   the shape.
-- Corroborated by its caller: `ClipSegmentToBox` (code_d294_b) computes it for
+- Corroborated by its caller: `ClipSegmentToBox` (SceneNode) computes it for
   two points and masks each result with `0xFF`, which is the classic
   outcode segment-vs-box trivial-accept/reject test.
 - Parameters already carry the derived types `BoundsBox_d294 *` /
   `Vec3S16_d294 *` from an earlier round; unchanged.
 
 
-## Round 95 (bravo): moved from include/code_d294.h
+## Round 95 (bravo): moved from include/SceneNode.h
 
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 
 ```c
 /* CalcBoxOutcode (round 54 correction: this banner was STALE -- it is
- * now carved and MATCHED in src/code_d294_c.c):
+ * now carved and MATCHED in src/SceneNode.c):
  * computes the SAME 6-bit box-vs-point outcode BisectSegmentToBox's own `flags`
  * computation does (bit-for-bit identical comparison chain against the
  * same 6 field offsets) -- MEASURED, not guessed; this is the shared
@@ -85,9 +85,9 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * repeated `andi ...,0xFF` every time it re-reads a stored result). */
 ```
 
-## Round 98 (echo): track 7, moved from src/code_d294_c.c
+## Round 98 (echo): track 7, moved from src/SceneNode.c
 
-The six bits are unit-local `OUTCODE_{X,Y,Z}_{MIN,MAX}` defines in code_d294_c.c (no other unit tests an individual bit; ClipSegmentToBox only tests the whole outcode and `r1 & r2`): byte-identical.
+The six bits are unit-local `OUTCODE_{X,Y,Z}_{MIN,MAX}` defines in SceneNode.c (no other unit tests an individual bit; ClipSegmentToBox only tests the whole outcode and `r1 & r2`): byte-identical.
 
 The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
 

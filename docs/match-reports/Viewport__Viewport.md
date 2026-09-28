@@ -12,7 +12,7 @@
 allocator constructs (`Unk18Obj`, 0xBC bytes). Runs the BasicClass ctor,
 installs its own vtable, zeroes two fields (`unkC`/`unk10`), stashes the
 return of `New_SceneNode` (a `New_SceneNode` allocator, already matched
-elsewhere as `code_d294.c`) into `unkAC`, constructs a `SubHandleObj` via
+elsewhere as `SceneNode.c`) into `unkAC`, constructs a `SubHandleObj` via
 `New_FadeBox` (already known elsewhere as `include/Entity.h`'s own
 `Unk100Obj`/`New_FadeBox`) into `unkB0`, dispatches that object's own
 `slot4C` with `(obj, self->unkAC, &gFadeBoxAttachPos)`, then runs its own freshly
@@ -70,7 +70,7 @@ before the byte-level score did.
   local view of `include/Entity.h`'s `Unk100Obj`/`New_FadeBox`, per this
   project's independent-local-views convention.
 - `New_SceneNode`: local view added, returning `void *` (this unit never
-  dereferences it) -- `include/code_d294.h`'s own view types it
+  dereferences it) -- `include/SceneNode.h`'s own view types it
   `SceneNodeObj *`, unaffected since it's a separate header.
 - `gViewportFadeBoxSize`/`gFadeBoxAttachPos`: two new address-taken-only globals.
 

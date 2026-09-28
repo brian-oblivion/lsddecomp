@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D4DC` on 2026-09-18 (tools/rename.py). Address 0x8001d4dc.
 
-Unit: `code_d294_b`. Round 13, runner delta. 35/35 words, full match on the
+Unit: `SceneNode`. Round 13, runner delta. 35/35 words, full match on the
 first attempt.
 
 ## Signature
@@ -50,7 +50,7 @@ void SceneNode__GetRotMatrix(SceneNodeObj *self, s32 a1, s32 a2) {
 
 ## Header changes
 
-`include/code_d294.h`:
+`include/SceneNode.h`:
 
 - New `S16Quad_d294` type: `{ s16 x, y, z, w; }`. All-`s16` members give it
   alignment 2, which is exactly what makes retail's whole-struct copy
@@ -64,7 +64,7 @@ void SceneNode__GetRotMatrix(SceneNodeObj *self, s32 a1, s32 a2) {
   `{ u8 pad0[0x10]; S16Quad_d294 vec; }`. Only +0x10 is known; the rest of
   the 0x28-byte block is still opaque.
 - `SceneNodeSub14::unk44` retyped from `void *` to `SceneNodeBlock44 *`.
-  Checked both other referencing sites in `src/code_d294.c` before doing
+  Checked both other referencing sites in `src/SceneNode.c` before doing
   this (`self->unk14->unk44 = blockB;` where `blockB` is `void *`, and
   `BMemPMgrFree(sub->unk44)`, which takes `void *`) — both are safe under
   implicit pointer conversion, no cast needed.
@@ -94,12 +94,12 @@ project).
 (tier B). Slot `+0x084` occupant (`tools/classtable.py gSceneNodeMethods`),
 dispatched as `slot84(self, out, flag)` from both this unit's own
 `SceneNode__ComposeAndApplyRotation` (`self` as receiver) and
-`code_d294_c.c`'s `SceneNode__RotateLocalVector` (a different
+`SceneNode.c`'s `SceneNode__RotateLocalVector` (a different
 SceneNodeObj instance) -- so the SIGNATURE this file declares
 (`SceneNode__GetRotMatrix(SceneNodeObj *self, s32 a1, s32 a2)`) is really
 `(self, MATRIX *out, s32 negate)`: builds this object's own rotation
 quad (`self->unk14->unk44->vec`, the PSY-Q-identified `GsCOORD2PARAM.rotate`
-per `include/code_d294.h`'s own "PSY-Q IDENTIFICATION" note -- negated
+per `include/SceneNode.h`'s own "PSY-Q IDENTIFICATION" note -- negated
 per-axis when `negate` is set, copied verbatim otherwise) and hands it
 to Sony's `RotMatrix(vec, out)` to fill the caller's matrix. "GetRotMatrix"
 describes the measured mechanics (compute-and-write-out this object's
@@ -107,7 +107,7 @@ rotation matrix, optionally mirrored); tier B because the negate flag's
 in-game meaning (which callers want the mirrored form, and why) is not
 established from this function's own body. Held back from an actual
 rename because this symbol is referenced (in a comment) from
-`src/code_d294_c.c:27` -- a different unit -- discussing exactly the
+`src/SceneNode.c:27` -- a different unit -- discussing exactly the
 slot-84 relationship above. Posted to the broadcast.
 
 ## Round 95 (bravo): Sony's declarations

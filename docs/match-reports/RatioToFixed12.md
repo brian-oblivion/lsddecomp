@@ -2,19 +2,19 @@
 
 > Renamed from `func_8001EC84` on 2026-09-17 (tools/rename.py). Address 0x8001ec84.
 
-Unit `code_d294_c`, carved round 13. Reopened round 42 as `nop_mflo_mfhi`-blocked
+Unit `SceneNode`, carved round 13. Reopened round 42 as `nop_mflo_mfhi`-blocked
 (the blocker is RESOLVED, see CLAUDE.md); the stub above was never actually
 attempted until now.
 
 ## Round 44 (echo)
 
 20.12 fixed-point division, matching the header's own prediction
-(`include/code_d294.h`, the `Ratio16`-adjacent comment above the
+(`include/SceneNode.h`, the `Ratio16`-adjacent comment above the
 `RatioToFixed12` prototype): `whole << 12 | frac`'s own division-derived low
 bits, via the classic split-division idiom (divide once for
 quotient+remainder, then divide the shifted remainder again for the
 fractional part). Signature kept as the header already declares it
-(`void *pair`) since that declaration is shared with `code_d294.c`, a
+(`void *pair`) since that declaration is shared with `SceneNode.c`, a
 sibling unit outside this runner's scope this round.
 
 ```c
@@ -56,7 +56,7 @@ shows the same two-`div`-block disassembly pattern.
   and remainder, a second for the shifted remainder) so the shift cannot
   overflow. Nothing about the name is inferred from context.
 - **A finding the name exposes: the pair is a RATIO.** The inherited field
-  names `whole`/`frac` on `Ratio16` (include/code_d294.h) describe a
+  names `whole`/`frac` on `Ratio16` (include/SceneNode.h) describe a
   mixed number; this body divides the first field BY the second, so they are
   numerator and denominator. Every producer in this unit
   (`SceneNode__GetRotationDegrees`, `SceneNode__FaceTarget`) writes a
@@ -67,13 +67,13 @@ shows the same two-`div`-block disassembly pattern.
 - Signature kept as `void *pair`, as the shared header already declares it.
 
 
-## Round 95 (bravo): moved from include/code_d294.h
+## Round 95 (bravo): moved from include/SceneNode.h
 
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 
 ```c
 /* RatioToFixed12 (round 54 correction: this banner was STALE -- it is
- * now carved and MATCHED in src/code_d294_c.c, not code_d294_b, and the
+ * now carved and MATCHED in src/code_d294_c.c, not SceneNode, and the
  * nop_mflo_mfhi toolchain flag it was once blocked on is RESOLVED per
  * CLAUDE.md's "Open toolchain blockers" table; see
  * docs/match-reports/RatioToFixed12.md for the current history): reads
@@ -88,7 +88,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * the pair themselves. */
 ```
 
-## Round 98 (echo): track 7, moved from src/code_d294_c.c
+## Round 98 (echo): track 7, moved from src/SceneNode.c
 
 Locals `q1`/`r1`/`q2` -> `whole`/`rem`/`frac`, and `<< 12` -> `* ONE` (GCC emits the same `sll`): byte-identical.
 

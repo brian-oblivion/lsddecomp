@@ -71,7 +71,7 @@ void ObjM__DetachTarget(ObjM *self) {
 
 /* Defined elsewhere, no header: src/GameFiles.c (PickStageBgm and
  * PickStageTexture return a FilePathRecord *, a 0x1C-byte record handed on here as a
- * name), src/code_d294_c.c (GetSetHitHeightGate sets the flag
+ * name), src/SceneNode.c (GetSetHitHeightGate sets the flag
  * SceneNode__RaycastHullAgainstFaces tests) and class_3bb8c_m
  * (RegisterStyleConfig, which keeps `sceneRefs` as gStyleSceneRefs). */
 extern s32 PickStageBgm(s32 stage, s32 unused);

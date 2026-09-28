@@ -35,7 +35,7 @@
  * records the sender as `linkTarget`. notifyWithHull is the sending side:
  * it transforms the model's hull into world space and notifies the parents.
  *
- * Methods: src/code_d294.c, code_d294_b.c, code_d294_c.c. Subclasses:
+ * Methods: src/SceneNode.c. Subclasses:
  * `python3 tools/plan.py classes` (Actor, Sprite, LightRig, BoxFill and
  * more); they expand SCENENODE_FIELDS and SCENENODE_SLOTS first.
  *
@@ -188,5 +188,70 @@ void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out);
 void SceneNode__LinkModel(SceneNode *self, void *model);
 void SceneNode__UnlinkModel(SceneNode *self);
 void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 yawOnly, s32 swapped, void *extra);
+
+
+/* SceneNode's free helpers, defined in src/SceneNode.c and called there by
+ * symbol: the rotation and scale inputs, the matrix-over-array transforms,
+ * the attribute-word accessor and the box-clipping primitives. Sony's
+ * functions (RotMatrix, MulMatrix2, ApplyMatrixLV, ratan2,
+ * GsInitCoordinate2, GsLinkObject4) come from <libgte.h> and <libgs.h>. */
+/* A Ratio16 (num / den) as 20.12 fixed point. updateRotation and updateScale
+ * apply it to each of their three entries. */
+extern s32 RatioToFixed12(void *pair);
+
+/* The identity inputs SceneNode__Reset hands to updateRotation and
+ * updateScale: three Ratio16s each, {0/1, 0/1, 0/1} and {1/1, 1/1, 1/1}. */
+extern u8 ROTATION_ZERO[0xC];
+extern u8 SCALE_ONE[0xC];
+
+/* dst[i] = m * src[i] over `count` elements, through Sony's ApplyMatrixSV
+ * (6-byte s16 vectors) and ApplyMatrixLV (0xC-byte s32 vectors). The first
+ * argument is the destination; dst == src transforms in place. */
+extern void ApplyMatrixToSVArray(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m);
+void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
+
+/* Replaces the `width` bits at bit `shift` of *word with `value` and returns
+ * the field's old contents. The attribute setters (SceneNode__SetDisplay and
+ * the rest) are wrappers around it over GsDOBJ2.attribute. */
+extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
+
+/* Bit positions in GsDOBJ2.attribute (include/psyq/libgs.h), the fields the
+ * SceneNode attribute setters (src/SceneNode.c) replace. */
+#define ATTR_LDIM_SHIFT 0      /* GsLDIM0..GsLDIM7, 3 bits */
+#define ATTR_LIGHTMODE_SHIFT 3 /* GsFOG|GsMATE|GsLLMOD, 3 bits */
+#define ATTR_LOFF_SHIFT 6      /* GsLOFF */
+#define ATTR_ZIGNR_SHIFT 7     /* GsZIGNR */
+#define ATTR_NBACKC_SHIFT 8    /* GsNBACKC */
+#define ATTR_DIV_SHIFT 9       /* GsDIV1..GsDIV5, 3 bits */
+#define ATTR_ABR_SHIFT 28      /* GsAZERO..GsATHREE, 2 bits */
+#define ATTR_ALON_SHIFT 30     /* GsALON */
+#define ATTR_DOFF_SHIFT 31     /* GsDOFF */
+
+/* Segment-against-box clipping for the link tests. CalcBoxOutcode returns
+ * a point's 6-bit outcode against a box (x 8/4, y 2/1, z 0x20/0x10; high bit
+ * past max, low bit before min), unmasked. ClipSegmentToBox returns 0 when
+ * p1..p2 misses the box, 1 when both ends are inside, 2 or 3 when only p1 or
+ * only p2 is, writing the boundary crossing to `out` when non-NULL.
+ * BisectSegmentToBox finds that crossing by halving from the inside point
+ * `near` towards the outside point `far`. */
+enum ClipResult {
+    CLIP_MISS = 0,      /* the segment misses the box */
+    CLIP_INSIDE = 1,    /* both ends are inside */
+    CLIP_P1_INSIDE = 2, /* only p1 is inside */
+    CLIP_P2_INSIDE = 3  /* only p2 is inside */
+};
+
+/* CalcBoxOutcode's bits: per axis, MAX when the point is past the box's
+ * maximum and MIN when it is before its minimum. */
+#define OUTCODE_Y_MIN 0x01
+#define OUTCODE_Y_MAX 0x02
+#define OUTCODE_X_MIN 0x04
+#define OUTCODE_X_MAX 0x08
+#define OUTCODE_Z_MIN 0x10
+#define OUTCODE_Z_MAX 0x20
+
+void BisectSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *near, TmdVec3 *far);
+extern s32 CalcBoxOutcode(TmdBox *box, TmdVec3 *point);
+s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2);
 
 #endif

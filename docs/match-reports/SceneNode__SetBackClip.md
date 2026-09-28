@@ -6,7 +6,7 @@
 
 > Renamed from `func_8001D4AC` on 2026-09-18 (tools/rename.py). Address 0x8001d4ac.
 
-Round 12, runner delta. `code_d294_b`.
+Round 12, runner delta. `SceneNode`.
 
 ## Summary
 
@@ -22,7 +22,7 @@ s32 SceneNode__SetBackClip(SceneNodeObj *self, s32 a1) {
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/SceneNode__SetBackClip.s`):
+Disassembly (`asm/nonmatchings/SceneNode/SceneNode__SetBackClip.s`):
 ```
 sltiu $a3, $a1, 0x1       # a3 (value) = (a1 == 0)
 addiu $a0, $a0, 0x10      # a0 = &self->unk10
