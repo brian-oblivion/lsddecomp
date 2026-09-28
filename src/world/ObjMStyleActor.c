@@ -1638,7 +1638,7 @@ extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
-extern u8 gStyleKind3Colors[][3];
+extern u8 sStyleKind3Colors[][3];
 
 /* MATCHING: the rotation store goes through a one-field struct, so the
  * sStyleGrid load may schedule above it (a plain pointer store blocks it). */
@@ -1658,7 +1658,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
         gStyleSpawnOffsetX = -45056;
         gStyleSpawnOffsetY = -8192;
         gStyleSpawnOffsetZ = 0;
-        gStyleSpawnColors[0] = (s32)gStyleKind3Colors[1];
+        gStyleSpawnColors[0] = (s32)sStyleKind3Colors[1];
     } else {
         offsetZ = &gStyleSpawnOffsetZ;
         if (*offsetZ > 0) {
@@ -1667,7 +1667,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
         if (*offsetZ < -30720) {
             *offsetZ = -30720;
         }
-        gStyleSpawnColors[0] = (s32)gStyleKind3Colors[(u32)rand() % 3];
+        gStyleSpawnColors[0] = (s32)sStyleKind3Colors[(u32)rand() % 3];
     }
     rotation = (PtrBoxK3 *)&gStyleSpawnRotation;
     rotation->p = gStyleSpawnRotations[0];
