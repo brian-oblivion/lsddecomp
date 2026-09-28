@@ -68,7 +68,6 @@ gCardPathPrefix
 gCardPathSuffix
 gCdAsyncEnabled
 gCdBusy
-gCdCallbackInstalled
 gCdFileVersionSuffix
 gCdIdle
 gCdInitDone
@@ -186,6 +185,7 @@ gpDinamicLinkPenalty
 gpNavChallengesComplete
 sCardFilePrefix
 sCardPathPrefix
+sCdCallbackInstalled
 sCdDriveInited
 sCdLock
 sCdQueueEnabled

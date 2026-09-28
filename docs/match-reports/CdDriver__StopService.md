@@ -51,7 +51,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence.** Slot `+0x070` of `gCdDriverMethods`. The whole body is
 `LockCd(); StopCdServiceIfIdle(); UnlockCd();` -- the locked wrapper around
 this unit's `StopCdServiceIfIdle`, which unhooks the `VSyncCallback` and
-clears `gCdCallbackInstalled`/`sCdQueueEnabled` when the state machine has
+clears `sCdCallbackInstalled`/`sCdQueueEnabled` when the state machine has
 nothing pending. The name says exactly that: the class's "stop the CD
 service" slot.
 

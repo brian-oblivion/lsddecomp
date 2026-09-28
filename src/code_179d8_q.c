@@ -287,33 +287,33 @@ s32 ServiceCdDriver(void) {
     return 0;
 }
 
-extern s32 gCdCallbackInstalled;
+extern s32 sCdCallbackInstalled;
 
 void StartCdService(void) {
     LockCd();
 
-    if (gCdCallbackInstalled == 0) {
+    if (sCdCallbackInstalled == 0) {
         if (gCdUseVSyncCallback != 0) {
             VSyncCallback((void (*)(void))ServiceCdDriver);
         }
-        gCdCallbackInstalled = 1;
+        sCdCallbackInstalled = 1;
     }
 
     sCdQueueEnabled = 1;
     UnlockCd();
 }
 
-extern s32 gCdCallbackInstalled;
+extern s32 sCdCallbackInstalled;
 extern s32 sCdQueueEnabled;
 
 void StopCdServiceIfIdle(void) {
     LockCd();
 
-    if (gCdTickStep == 0 && gCdCallbackInstalled != 0) {
+    if (gCdTickStep == 0 && sCdCallbackInstalled != 0) {
         if (gCdUseVSyncCallback != 0) {
             VSyncCallback(0);
         }
-        gCdCallbackInstalled = 0;
+        sCdCallbackInstalled = 0;
         sCdQueueEnabled = 0;
     }
 

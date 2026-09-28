@@ -9,17 +9,17 @@ Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 Byte-exact on the first attempt.
 
 ```c
-extern s32 gCdCallbackInstalled;
+extern s32 sCdCallbackInstalled;
 
 void StartCdService(void)
 {
     LockCd();
 
-    if (gCdCallbackInstalled == 0) {
+    if (sCdCallbackInstalled == 0) {
         if (gCdUseVSyncCallback != 0) {
             VSyncCallback((void (*)(void))ServiceCdDriver);
         }
-        gCdCallbackInstalled = 1;
+        sCdCallbackInstalled = 1;
     }
 
     sCdQueueEnabled = 1;
@@ -29,7 +29,7 @@ void StartCdService(void)
 
 ## Derivation
 
-Set the `sCdLock` latch, then a one-shot guard on `gCdCallbackInstalled`: if it's
+Set the `sCdLock` latch, then a one-shot guard on `sCdCallbackInstalled`: if it's
 still 0, optionally register `ServiceCdDriver` as a `VSyncCallback` (guarded
 by `gCdUseVSyncCallback`) and set the guard to 1. Either way, set `sCdQueueEnabled = 1`
 and clear the latch. All three loads/stores collapse to constant `1`s in
@@ -57,15 +57,15 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | was | now | tier |
 | --- | --- | --- |
 | `func_800281B0` | `StartCdService` | A |
-| `D_8008A89C` | `gCdCallbackInstalled` | A |
+| `D_8008A89C` | `sCdCallbackInstalled` | A |
 
-**Evidence.** Under the lock: if `gCdCallbackInstalled` is 0, register
+**Evidence.** Under the lock: if `sCdCallbackInstalled` is 0, register
 `ServiceCdDriver` with `VSyncCallback` (when the VSync path is selected) and
 set the flag; then enable queue processing. Its one caller is
 `EnqueueCdRequest`, immediately after appending a node -- "a request now
 exists, make sure the service is running". Start is what it does; the
 one-shot flag is what stops it doing it twice.
 
-`gCdCallbackInstalled` is written 1 exactly where the callback is registered
+`sCdCallbackInstalled` is written 1 exactly where the callback is registered
 and 0 exactly where `StopCdServiceIfIdle` clears it, and is read nowhere
 else. Tier A.
