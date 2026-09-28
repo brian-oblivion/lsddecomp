@@ -99,3 +99,7 @@ GameApplication's occupants, and agree with GameApplication.h's
 `GameApplicationLoopStatus` (0 = OPENING, 2 = DAY; its RunTitleMenu never
 returns 1). Tier B, like the hook names. Byte-identical. The Final C above is
 the pre-track-7 text.
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+Application slot +0x05C is `onRepeatMenu` (was `slot5C`) and its status `APPLICATION_LOOP_REPEAT_MENU` (was `APPLICATION_LOOP_SLOT5C`): runMainLoop calls it when runTitleMenu returns 1 and then runs runTitleMenu again. Tier B: the mechanics; GameApplication never returns 1, so what the hook was for is not in this game.

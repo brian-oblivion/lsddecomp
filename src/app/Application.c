@@ -65,8 +65,8 @@ void Application__RunMainLoop(Application *self) {
             self->methods->playOpeningMovie(self);
             for (;;) {
                 status = self->methods->runTitleMenu(self);
-                if (status == APPLICATION_LOOP_SLOT5C) {
-                    self->methods->slot5C(self);
+                if (status == APPLICATION_LOOP_REPEAT_MENU) {
+                    self->methods->onRepeatMenu(self);
                     continue;
                 }
                 if (status == APPLICATION_LOOP_DAY) {

@@ -49,3 +49,7 @@ unknown purpose. No carved caller currently dispatches this slot on a
 
 Body changes, all byte-identical: comment only.
 
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+Application slot +0x05C is `onRepeatMenu` (was `slot5C`) and its status `APPLICATION_LOOP_REPEAT_MENU` (was `APPLICATION_LOOP_SLOT5C`): runMainLoop calls it when runTitleMenu returns 1 and then runs runTitleMenu again. Tier B: the mechanics; GameApplication never returns 1, so what the hook was for is not in this game.
