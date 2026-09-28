@@ -45,7 +45,7 @@ s32, DreamSys *, void *)`) is the same function called with a different
 unit's own local `arg3` type -- per project convention, this file's own
 extern types `arg3` as `Entity *` instead, matching the "multiple
 independent local views" rule for cross-unit prototypes (kept local to this
-`.c`, not added to `Entity.h`, since `InitSoundCueSet` is defined in a
+`.c`, not added to `entity.h`, since `InitSoundCueSet` is defined in a
 different unit).
 
 `gEntityMoodHandlerTable` is the mood-index-selected event-dispatch table (16-byte rows:
@@ -53,13 +53,13 @@ handler fn ptr + 3 data words) already referenced by name in several match
 reports for `Entity`'s handler functions (e.g. `Entity__MoodCue05`), but this
 is the first place any unit indexes the RAW TABLE itself in C rather than
 just being one of its handler bodies. Declared a minimal
-`EntityMoodHandlerRow` (only the first word named) directly in `Entity.c`,
-not `Entity.h` -- the only field this function needs is the handler pointer,
+`EntityMoodHandlerRow` (only the first word named) directly in `entity.c`,
+not `entity.h` -- the only field this function needs is the handler pointer,
 treated opaquely (passed straight through to `InitSoundCueSet` as a `void *`,
 never called here). Whoever carves `Entity__UpdateTargetProximity` (the actual table
 dispatcher, still in the uncarved `Entity`) should check whether this
 minimal row type is enough or needs the data words added, and should
-probably promote it to `Entity.h` at that point since it would then have
+probably promote it to `entity.h` at that point since it would then have
 two real users.
 
 Two new `EntityMethods` vtable slots added, both self-only `void`:
@@ -85,19 +85,19 @@ sets `this->unkF8 = 1`. Pairs with `Entity__StopSoundCue`.
 ## Proposed field names
 
 - `Entity::unkF8` -> `soundCueActive` -- **tier B.** Set here, cleared by
-  `Entity__StopSoundCue`; read directly by Entity.c
-  (`grep -rn -- '->unkF8\b' src/world/Entity.c`). CROSS-UNIT, proposed rather
+  `Entity__StopSoundCue`; read directly by entity.c
+  (`grep -rn -- '->unkF8\b' src/world/entity.c`). CROSS-UNIT, proposed rather
   than applied.
 - `EntityMethods::slot168` -> `startSoundCue` -- **tier B.** `tools/
   classtable.py` resolves +0x168 to this very function (self-referential
-  dispatch). CROSS-UNIT: called by `Entity__UpdateSoundCueStart` (Entity.c), whose own
+  dispatch). CROSS-UNIT: called by `Entity__UpdateSoundCueStart` (entity.c), whose own
   gate (`this->unkF8 == 0`, i.e. sound cue not yet active) is exactly
   consistent with "start the sound cue when a proximity condition fires."
   Proposed rather than applied.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Polish (round 96, bravo, track 7)
 
@@ -106,7 +106,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 offset: gEntityUnlockKindTable +0x02, sEntityLinkStageTable +0x07,
 sEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
 gEntityMoodHandlerTable +0x0C), now EntityMoodRow fields; byte-identical.
-Entity.h's old claim that they were "SEPARATE global arrays (own base
+entity.h's old claim that they were "SEPARATE global arrays (own base
 symbols, own lui/addiu) ... not sub-fields of the sEntityMoodTable row" was
 wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.

@@ -13,7 +13,7 @@ No `gp_rel`/`addiu_at`/`nop_mflo_mfhi` hits.
 ## What it does
 
 Called by `Entity__MoodCue111` (this unit, also stalled) and already known
-cross-unit from `Entity.c`'s own extern
+cross-unit from `entity.c`'s own extern
 (`extern void Entity__StepYawInWindowsThenDeactivate(Entity *this, EntityMoodHandlerArg *out, s32
 arg2, s32 arg3, s32 arg4);`). Sets four `out->` fields when `out->unk4 ==
 6`. Tests `this->unkFC` against a cascade of six `arg2`-relative
@@ -199,7 +199,7 @@ L74:
 
 Verified byte-exact: `./build-and-verify.sh` -- `OK: build matches retail
 SLPS_015.56` -- and `tools/funcdiff.py Entity__StepYawInWindowsThenDeactivate` -- `70/70 words
-match`. This is now the live body in `src/world/Entity.c` (`INCLUDE_ASM`
+match`. This is now the live body in `src/world/entity.c` (`INCLUDE_ASM`
 removed).
 
 ### New struct knowledge
@@ -208,7 +208,7 @@ removed).
 handler shape, not just when `unk4 == 6` -- i.e. it is this function's own
 "clear the field before any conditional overwrite" idiom, not part of the
 `unk4==6` bundle. Worth checking whether sibling mood-handler functions in
-this unit/family (`Entity.c`, `Entity_e.c`, `Entity_g.c`) that also
+this unit/family (`entity.c`, `Entity_e.c`, `Entity_g.c`) that also
 touch `out->unk10` make the same unconditional-vs-conditional mistake if
 their own near-miss reports show a similar unexplained residue.
 
@@ -237,7 +237,7 @@ Not a `gEntityMoodHandlerTable` row (no row's `handler` word is
 method used for the row functions in this unit). It is a shared per-tick
 helper called directly (`jal`, not through any vtable) by two different
 row handlers: `Entity__MoodCue111` (this unit, twice, with different
-`arg2`/`arg3`/`arg4`) and `Entity__MoodCue40` (`Entity.c`, cross-unit,
+`arg2`/`arg3`/`arg4`) and `Entity__MoodCue40` (`entity.c`, cross-unit,
 one call site). Tier B: the mechanics are fully established from the body
 -- up to three periodic "wobble" windows relative to `arg2`
 (`[arg2,arg2+0x5B]`, `[arg2+0x155,arg2+0x1B1]`, `[arg2+0x2BA,arg2+0x317]`)
@@ -264,7 +264,7 @@ per-tick amounts.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-26, round 94, alpha)
 

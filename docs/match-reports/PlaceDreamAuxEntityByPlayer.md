@@ -49,7 +49,7 @@ function, `SceneNode.c`, treats `src` as a 3-word vector unconditionally).
 `SceneNode__LocalOffsetToWorldPos` and `SceneNode__FaceTarget` are both already-matched functions in a
 different unit (`SceneNode.c`), each with its OWN unit's typed view of
 `self`/`target` (`SceneNodeObj *` / `Entity *`, per `SceneNode.h` and
-`Entity.h`'s independent local views of the same shared-ancestor slot). This
+`entity.h`'s independent local views of the same shared-ancestor slot). This
 unit adds a third, `void *`-typed, local view rather than pulling in either
 header -- consistent with the project's per-unit-view convention
 (CLAUDE.md's "keep next to your code anything that encodes *your* reading of
@@ -59,13 +59,13 @@ reading it (see `src/world/DreamSys.c`'s identical local prototype); this unit's
 local prototype reproduces that the same way.
 
 Vtable slot 0x13 (byte offset 0x4C) is the SAME shared-ancestor slot
-`include/Entity.h` documents (`slot4C`), but that header's guessed parameter
+`include/entity.h` documents (`slot4C`), but that header's guessed parameter
 types (`s32 arg1, s32 arg2, void *arg3, s32 arg4`) do not fit this call
 site's actual last argument (`localPos`, a pointer, not a scalar) -- a
 generic vtable slot passes through whatever the concrete override expects,
 and different callers legitimately pass different real types through the
 identical calling convention. This unit keeps its own `DreamAuxObjFn13`
-alias (`s32, s32, void *, void *`) rather than importing Entity.h's.
+alias (`s32, s32, void *, void *`) rather than importing entity.h's.
 
 ## Derivation notes
 

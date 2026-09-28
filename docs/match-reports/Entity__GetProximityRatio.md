@@ -8,15 +8,15 @@ see the superseded history below, kept for the record).
 
 ## What it does
 
-Occupant of `EntityMethods::slot148` (see `include/Entity.h`'s own comment
+Occupant of `EntityMethods::slot148` (see `include/entity.h`'s own comment
 at that slot, now updated). Gated on `this->unk94` being non-NULL; if so,
 calls `this->methods->slot144(this, this->unk94)` (already documented in
-`Entity.h` as returning a value, not void, and noting that retail keeps
+`entity.h` as returning a value, not void, and noting that retail keeps
 `this->unk94` live in `$a1` from its first load all the way to this call --
 which is exactly what happens here). Looks up a per-mood byte,
 `gEntityProximityThresholdTable[this->moodIndex * 0x10]` (the same 16-byte-row family as
 `gEntityUnlockKindTable`/`sEntityLinkStageTable`/`sEntityEventVideoTable`/`D_80089EAF`, already documented in
-`Entity.h`; `gEntityProximityThresholdTable` itself was new -- added to that list, sitting
+`entity.h`; `gEntityProximityThresholdTable` itself was new -- added to that list, sitting
 between `sEntityEventVideoTable` and `D_80089EAF`), shifts it left 11, and if that value
 is less than the slot144 result, returns -1. Otherwise computes
 `slot144_result / (threshold / this->unkB0)` (two chained integer
@@ -139,14 +139,14 @@ claim.
 - `EntityMethods::slot148` -> `getProximityRatio` -- **tier A.** Its
   occupant IS this very function (self-referential dispatch, the same idiom
   every other named slot in this table uses). CROSS-UNIT caller (already
-  noted in `Entity.h`'s existing comment: "called by Entity__MoodCue05"),
+  noted in `entity.h`'s existing comment: "called by Entity__MoodCue05"),
   proposed rather than applied.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
 `proximityDivisor` (+0x0B0) is the embedded SoundCueSet's +0x14 (`soundCueSet.unk14`), the divisor InitSoundCueSet sets (10): the ratio is distance / (threshold / 10).
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 6 (2026-09-26, round 92, alpha): one SoundCueSet
 
@@ -154,7 +154,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 `SoundCueSlot`. It replaced three views: PlacementGridVabSound.c's (named
 `tag`/`owner`/`callback`/`slots[].index` only), libsnd_vmanager.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
-include/Entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
+include/entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
 whole-image SHA1 is unchanged.
 
 Layout verified against every reader: InitSoundCueSet (+0x00 tag, +0x04,
@@ -169,7 +169,7 @@ ObjMStyleActor's StyleCueNN `self` (the same offsets) and DreamSys.h's
 
 Names, tier A, each from what its readers do:
 
-| old (e / l / Entity.h) | new | evidence |
+| old (e / l / entity.h) | new | evidence |
 | --- | --- | --- |
 | slot `index` / `index` / - | `voice` | ServiceSoundCueSet stores playTone's result there (the voice, or -1) and passes it to stopVoice(voice); Flush stops it |
 | - / `note` / `unk1C` `unk30` `unk44` | `program` | ServiceSoundCueSet passes `program * 16` as playTone's `index`, which PlayTone splits into program `index >> 4` and tone `index & 0xF` (so tone 0); -1 none, -2 stops the voice |
@@ -191,7 +191,7 @@ a pitch offset (that is what setPitchOffset computes from it). `tick` and
 `callback` is typed `SoundCueCallbackFn`, `void (*)(void *owner,
 SoundCueSet *set)`; InitSoundCueSet's parameter takes that type and its
 first parameter is `sound` (it is unused). The three functions have no
-shared prototype: Entity.h, DreamSys.c and ObjMStyleActor.c declare them
+shared prototype: entity.h, DreamSys.c and ObjMStyleActor.c declare them
 with their own type for the sound object (TodActor's `arg2` is a
 `struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
 would warn in each.
@@ -203,7 +203,7 @@ would warn in each.
 offset: gEntityUnlockKindTable +0x02, sEntityLinkStageTable +0x07,
 sEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
 gEntityMoodHandlerTable +0x0C), now EntityMoodRow fields; byte-identical.
-Entity.h's old claim that they were "SEPARATE global arrays (own base
+entity.h's old claim that they were "SEPARATE global arrays (own base
 symbols, own lui/addiu) ... not sub-fields of the sEntityMoodTable row" was
 wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.

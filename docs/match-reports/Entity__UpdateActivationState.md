@@ -357,12 +357,12 @@ and only this function's OWN name (built around the wrong axis -- "what
 does detachKind gate" rather than "what does the gated call do") was wrong.
 Recorded here rather than adjudicated, since both readings are consistent
 with the bytes and re-litigating the row-field names is Track 4 territory
-(they are Entity.c-exclusive, confirmed by grep, so nothing stops a future
+(they are entity.c-exclusive, confirmed by grep, so nothing stops a future
 round from revisiting it with more cross-unit context).
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Polish (round 96, bravo, track 7)
 
@@ -370,9 +370,9 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 - Step 3: local doDetach -> doActivate (the flag gates activate).
 
-- Step 2: EntityMoodRow::detachKind -> activateKind (tier A): it selects the condition under which this body calls activate, and Entity__AttachToParent activates at once when it is 0. The Naming section above left it open between two readings; the table slots settle it. Only Entity.c reads it.
+- Step 2: EntityMoodRow::detachKind -> activateKind (tier A): it selects the condition under which this body calls activate, and Entity__AttachToParent activates at once when it is 0. The Naming section above left it open between two readings; the table slots settle it. Only entity.c reads it.
 
-- Step 4: activateKind 0..4 -> enum EntityActivateKind (ENTITY_ACTIVATE_AT_ATTACH/NEAR/FAR/NEAR_RANDOM/RANDOM, Entity.h); state 1 -> ENTITY_STATE_DONE (Entity.h already says this function tests it).
+- Step 4: activateKind 0..4 -> enum EntityActivateKind (ENTITY_ACTIVATE_AT_ATTACH/NEAR/FAR/NEAR_RANDOM/RANDOM, entity.h); state 1 -> ENTITY_STATE_DONE (entity.h already says this function tests it).
 
 - Step 5: MATCHING line for the goto layout (randCheck after the block; see the fix above).
 

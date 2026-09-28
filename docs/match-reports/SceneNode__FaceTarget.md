@@ -102,8 +102,8 @@ same base class?**
    natural order, `a3==1` <-> swapped order) is exactly what this
    mechanism predicts.
 3. **This does NOT resolve the cross-unit question of whether `Entity`
-   and `Unk94Obj` (the types `Entity_e.c`/`Entity.c` etc. pass at THEIR
-   OWN call sites, via `Entity.h`'s own separate declaration) share a
+   and `Unk94Obj` (the types `Entity_e.c`/`entity.c` etc. pass at THEIR
+   OWN call sites, via `entity.h`'s own separate declaration) share a
    named common base with `SceneNodeObj`.** That question stays open --
    this function's own two parameters are typed `SceneNodeObj *` here
    because that's what THIS unit's body actually needs and what's
@@ -121,7 +121,7 @@ same base class?**
   convention `SceneNode__GetRotationDegrees` already established for the SAME kind of
   angle field.
 - `SceneNode__FaceTarget` itself gets its own local prototype in this unit's
-  header (first declaration here; `Entity.h`'s separate, differently-typed
+  header (first declaration here; `entity.h`'s separate, differently-typed
   declaration for the same external symbol is untouched, out of scope,
   and deliberately not unified -- see the header's own comment).
 
@@ -238,7 +238,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
 
 ```c
 /* SceneNode__FaceTarget (prototype in include/SceneNode.h; round 14, this unit -- the SAME external symbol
- * Entity_b/c/d/e.c call via their own separate `Entity.h` declaration,
+ * Entity_b/c/d/e.c call via their own separate `entity.h` declaration,
  * `SceneNode__FaceTarget(Entity *this, void *arg1, s32 arg2, s32 arg3, s32
  * arg4)`; same "per-call-site signature, not a callee property"
  * precedent as `GetSceneNodeMethods`/`SceneNode__NoOpSlot5C` above -- this unit's own
@@ -259,7 +259,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * SYMMETRICALLY -- both need only a `SceneNode`-SHAPED object
  * (`->unkC` null-checked, `->unk14->unk38` read as a 3-word table), and
  * the position subtraction is always `target - self`. `arg3` is what
- * makes this safe to call with the roles swapped: `Entity.h`'s own
+ * makes this safe to call with the roles swapped: `entity.h`'s own
  * documented finding (all `a3==0` call sites pass `(this, this->unk94)`,
  * all `a3==1` sites pass `(this->unk94, this)`) now has a mechanism, not
  * just a correlation -- swapping which object is `self` vs `target`
@@ -271,7 +271,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * internally. This resolves the mechanism (not just the correlation)
  * without asserting a name for whatever base type `Entity`/`Unk94Obj`/
  * `SceneNode` share -- that question stays open, per the caller-side
- * finding in Entity.h and DECOMPILATION_LEARNINGS.
+ * finding in entity.h and DECOMPILATION_LEARNINGS.
  *
  * This unit's own two parameters are typed `SceneNode *` rather than
  * a shared/generic type: `self->methods` is dispatched directly (needs
@@ -302,6 +302,6 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * `self` and `target` are used SYMMETRICALLY -- the subtraction is always
  * target minus self -- and the `arg3 == 0` half-turn is exactly the
  * correction for a caller that already swapped the two at the call site.
- * That is the mechanism behind the argument-swap correlation Entity.h
+ * That is the mechanism behind the argument-swap correlation entity.h
  * records; see docs/match-reports/SceneNode__FaceTarget.md. */
 ```

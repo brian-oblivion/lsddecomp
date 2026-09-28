@@ -40,7 +40,7 @@ there is only one such block, hence 7 words short.
 ```
 
 Result: `98/98, insertions 0 / deletions 0`, `OK: build matches retail`,
-`tools/check-nonmatching.sh` green. Plain C in `src/world/Entity.c`; the
+`tools/check-nonmatching.sh` green. Plain C in `src/world/entity.c`; the
 NON_MATCHING block and its stall comment are removed.
 
 **Why round 20's "two call sites" variant (104 words) missed:** it also
@@ -142,7 +142,7 @@ disassembly -- the CONTROL FLOW is not in question.
 
 ## The residue
 
-Best in-window score 69/98, but `objdump -d build/src/Entity.c.o` shows
+Best in-window score 69/98, but `objdump -d build/src/entity.c.o` shows
 the actual compiled body is ~94 instructions against retail's 98 -- roughly
 4 words SHORT, which is why `funcdiff`'s "differs outside this range"
 warning fires (96753 bytes) and the raw word-match count is not
@@ -193,7 +193,7 @@ branch points and this round's remaining queue size.
 
 None beyond what the control-flow trace above already confirms
 (`unk44`, `unkFC`, `slot130`, `slot12C`, `slotCC`, and `Entity__StepYawInWindowsThenDeactivate`'s
-own 5-argument signature, cross-checked against `Entity.c`'s existing
+own 5-argument signature, cross-checked against `entity.c`'s existing
 extern for the same function).
 
 ### Proposed learning
@@ -393,7 +393,7 @@ mechanism claim through the pinned pipeline before touching anything else.
 ### 1. Rebuilding the recorded figures (PARALLEL-RUNS screen 4)
 
 Dropped the report's preserved body (verbatim, unchanged) back into
-`src/world/Entity.c` in place of the `INCLUDE_ASM`, ran the full chained oracle:
+`src/world/entity.c` in place of the `INCLUDE_ASM`, ran the full chained oracle:
 
 ```
 ./build-and-verify.sh  ->  build exit=2, no compile-error grep hits
@@ -405,7 +405,7 @@ Raw word-match (69/98) matches the existing report exactly. The LENGTH
 figure does not:
 
 ```
-tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/Entity.c.o
+tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/entity.c.o
   -> Entity__MoodCue111 compiles to 91 instructions (0x81c-0x984 in the .o)
 ```
 
@@ -417,7 +417,7 @@ range (0x557BC-0x55634 = 0x188 bytes = 98 words) and a direct count of
 
 **91 vs 98 is 7 words short, not the "~4 words" / "94 vs 98" this report
 carried since round 13.** The C body compared is byte-identical to what is
-quoted in this report (diffed the live `src/world/Entity.c` insertion against
+quoted in this report (diffed the live `src/world/entity.c` insertion against
 the `#if 0` block above before restoring `INCLUDE_ASM` — no drift). Whether
 the earlier 94-word count came from a different toolchain snapshot, a
 transcription slip, or an objdump range mis-boundary, it does not reproduce
@@ -596,7 +596,7 @@ names sort in table order.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-26, round 94, alpha)
 
@@ -609,5 +609,5 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
   the code (measured: build red, first differing word at 0x80064E90), so it
   keeps a `MATCHING` line.
 - The `EntityPlayTodFn` cast on `playTod` is not needed for THIS function's
-  bytes (measured 98/98 without it) but kept: `include/Entity.h` documents
+  bytes (measured 98/98 without it) but kept: `include/entity.h` documents
   it as the convention at every Entity call site.

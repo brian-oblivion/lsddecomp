@@ -9,7 +9,7 @@
 ## What it does
 
 A conditional teardown: if `this->unk0C` (a gate flag; see the parallel
-noted in `Entity.h`'s struct comment with `TodActor`/`DreamSys`'s own
+noted in `entity.h`'s struct comment with `TodActor`/`DreamSys`'s own
 shared-base `+0xC` gate) is set, calls this entity's own current
 `methods->slot160(this)`, then the shared "BasicClass" ancestor's own
 `slot50` (`GetTodActorMethods()->slot50(this)`, offset `+0x050` in the shared
@@ -35,13 +35,13 @@ Matched on the first attempt.
 
 This function (along with `Entity__OnGridCellLinkCommand`, `Entity__Update`, `Entity__GetOrCreateFadeBox`)
 is what established `GetTodActorMethods()`'s SHARED-vtable role for this unit —
-see the class-framework comment block now at the top of `Entity.h`. Worth
+see the class-framework comment block now at the top of `entity.h`. Worth
 flagging for anyone touching `Entity` next: `GetTodActorMethods()` (matched,
 `code_55dd4.c`) is not TodActor-specific despite living in that unit and
 returning `TodActorMethods*` there — it's the common ancestor's vtable
 accessor, reused verbatim by Entity. A local, Entity-scoped `BasicClassMethods`
 view of the SAME table (rather than importing `TodActorMethods` and
-coupling the two units) is in `Entity.h` now, typed only as far as this
+coupling the two units) is in `entity.h` now, typed only as far as this
 unit's own call sites need.
 
 ## Naming
@@ -57,4 +57,4 @@ established, the unk4C object's own purpose is not.
 
 Renamed from `Entity__DetachUnk4C`: the occupant of +0x050, SceneNode's `detachFromParent`. Body: when attached (`parent`), deactivate, TodActor's detachFromParent, clear `grid`. Tier A: an override named for its slot (FINISHING-PLAN track 4 step 6).
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

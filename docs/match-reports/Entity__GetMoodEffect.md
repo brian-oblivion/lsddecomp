@@ -6,7 +6,7 @@
 
 `return &sEntityMoodTable[this->moodIndex];` — forms the address of a 16-byte-stride
 table row selected by `this->moodIndex`, without loading through it. Same
-index (`moodIndex`, `Entity.h` offset `+0x98`) as the other three
+index (`moodIndex`, `entity.h` offset `+0x98`) as the other three
 `Entity__Get*Effect/Stage/Video` functions in this unit, each keyed to its
 own table.
 
@@ -15,7 +15,7 @@ own table.
 `* 0x10`. `Entity__UpdateActivationState`/`Entity__UpdateDeactivationState` (this same table's other readers,
 matched in that pass) needed named sub-byte fields inside each 16-byte row
 (`detachKind` at +0x3, `linkKind` at +0x4, plus `unk5`/`unk9`), so the table
-is now `extern EntityMoodRow sEntityMoodTable[];` (see `include/Entity.h`) and this
+is now `extern EntityMoodRow sEntityMoodTable[];` (see `include/entity.h`) and this
 function's own indexing changed from `sEntityMoodTable[this->moodIndex * 0x10]` to
 `sEntityMoodTable[this->moodIndex]` to match — `sizeof(EntityMoodRow)` is 16, so
 the compiler's own array-stride multiply reproduces the identical
@@ -41,7 +41,7 @@ void *Entity__GetMoodEffect(Entity *this) {
 }
 ```
 
-`sEntityMoodTable` is declared `extern EntityMoodRow sEntityMoodTable[];` in `Entity.h`
+`sEntityMoodTable` is declared `extern EntityMoodRow sEntityMoodTable[];` in `entity.h`
 (a real 16-byte struct now, see the note above — was `extern u8 sEntityMoodTable[]`
 with a manual `* 0x10` before this round).
 
@@ -76,4 +76,4 @@ getter's mechanics are its purpose by definition. Not renamed.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

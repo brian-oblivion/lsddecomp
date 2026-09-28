@@ -42,7 +42,7 @@ s32 Entity__GetEventVideo(Entity *this) {
 
 Exactly the expression the report below derived, with the `(s8)` cast
 dropped -- `sEntityEventVideoTable` is already declared `extern s8 []` in
-`include/Entity.h`, so the cast was redundant rather than wrong.
+`include/entity.h`, so the cast was redundant rather than wrong.
 
 ---
 
@@ -221,7 +221,7 @@ is exactly the check the head's round-2026-08-30-a broadcast on `strcat`
 said to make before calling anything compiler-internal; here the CFG matches
 and the *only* residue is the one-instruction addressing-mode gap above).
 Any of the four table declarations (`s8 gEntityUnlockKindTable/AB/AC[]`) and
-`Entity.h`'s `moodIndex` field are correct regardless of this stall.
+`entity.h`'s `moodIndex` field are correct regardless of this stall.
 
 ## Proposed learning
 
@@ -243,7 +243,7 @@ getter over `sEntityEventVideoTable` (named this round). Not renamed.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Polish (round 96, bravo, track 7)
 
@@ -252,7 +252,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 offset: gEntityUnlockKindTable +0x02, sEntityLinkStageTable +0x07,
 sEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
 gEntityMoodHandlerTable +0x0C), now EntityMoodRow fields; byte-identical.
-Entity.h's old claim that they were "SEPARATE global arrays (own base
+entity.h's old claim that they were "SEPARATE global arrays (own base
 symbols, own lui/addiu) ... not sub-fields of the sEntityMoodTable row" was
 wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.

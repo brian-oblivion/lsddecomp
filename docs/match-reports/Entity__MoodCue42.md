@@ -39,7 +39,7 @@ is NOT the magic-multiply constant-divisor case).
 
 New vtable slot discovered: `EntityMethods::slot12C` (`void
 (*)(Entity *self)`), called only by this function. Added to
-`include/Entity.h`, replacing part of the `pad118` gap between `slot114` and
+`include/entity.h`, replacing part of the `pad118` gap between `slot114` and
 `slot130`. `slot130`'s own "called by" comment gained this function as a
 second caller (it was previously only reached from `Entity__StopSoundCue`).
 
@@ -49,7 +49,7 @@ None beyond what's already documented -- this one was a clean first-attempt
 match once the mood-dispatch family's established shape (three-way dispatch
 on a small integer field, `this->methods->slotNN(this)` calls, `out->unkNN`
 writes) was recognized from the sibling functions already matched in
-`Entity.c`.
+`entity.c`.
 
 ## Naming
 
@@ -58,15 +58,15 @@ convention as `Entity__MoodCue00` (round 71): the function's address is the
 handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
 0x80089EB0, 0x10-byte stride) at row 42, read directly from
 `disk/SLPS_015.56` (not inferred from address proximity -- see
-`src/world/Entity.c`'s unit header comment, which flags that row order does NOT
+`src/world/entity.c`'s unit header comment, which flags that row order does NOT
 track code address once row 115 is reached). Mechanics established
 (mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
-`Entity.c`'s own header comment); which dream object owns the row is not.
+`entity.c`'s own header comment); which dream object owns the row is not.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 93, bravo)
 
-Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `SOUND_CUE_STOP` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/Entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). Byte-identical (whole image green).
+Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `SOUND_CUE_STOP` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). Byte-identical (whole image green).

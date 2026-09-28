@@ -53,7 +53,7 @@ void Entity__MoodCue59(Entity *this, EntityMoodHandlerArg *out) {
   load.
 - `this->unk4C->methods->slot138(this->unk4C, 1, 1)` is a direct instance
   of the class-framework pattern already documented on `Unk4CMethods` in
-  `include/Entity.h` (`this->unk4C` dereferenced through its own vtable at
+  `include/entity.h` (`this->unk4C` dereferenced through its own vtable at
   `+0x138`) -- no new struct knowledge, just its second confirmed call
   site (the first, in `Entity__MoodCue12`, is what typed the slot originally).
 
@@ -68,15 +68,15 @@ Reading this function's `out->` writes with the proposed `SoundCueSet` field nam
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 93, echo)
 
 Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). Byte-identical (whole image green).
 
-## Unit notes (moved from src/world/Entity.c's banner, round 93)
+## Unit notes (moved from src/world/entity.c's banner, round 93)
 
-The pre-track-7 banner of `src/world/Entity.c` carried this history, now here:
+The pre-track-7 banner of `src/world/entity.c` carried this history, now here:
 the unit was carved as the third 20-function slice of the Entity class's
 97-function remainder, after Entity and Entity_d. Its functions are the
 `gEntityMoodHandlerTable` handlers of rows 59, 61-62, 64-71 and 73-81, each

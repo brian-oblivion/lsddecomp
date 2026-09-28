@@ -18,14 +18,14 @@ not `this->methods->slot130`. Unconditionally calls the still-uncarved
 
 The `this->unk94->methods->slot130(this->unk94, 1)` call is the interesting
 part: it resolves a genuine two-argument call through `Unk94Obj`'s OWN vtable
-(new struct added to `include/Entity.h` this round, see below) — a different
+(new struct added to `include/entity.h` this round, see below) — a different
 table from `Entity`'s own `EntityMethods`, even though both happen to have
 something at offset `+0x130`. Conflating them would have forced
 `EntityMethods::slot130` (already typed self-only, matched via
-`Entity__StopSoundCue` in `src/world/Entity.c`) to grow a spurious second argument and
+`Entity__StopSoundCue` in `src/world/entity.c`) to grow a spurious second argument and
 broken that OTHER unit's already-matched function.
 
-## New struct: `Unk94Obj`/`Unk94Methods` (`include/Entity.h`)
+## New struct: `Unk94Obj`/`Unk94Methods` (`include/entity.h`)
 
 `Entity::unk94` was previously `void *`, described only as "a pointer to SOME
 object, real type unconfirmed" (known from `Entity__UpdateTargetProximity`'s call into the
@@ -98,7 +98,7 @@ Matched on the first attempt, once `Unk94Obj`/`Unk94Methods` existed and
 coincidence, and conflating them corrupts an ALREADY-MATCHED function in a
 different unit.** `this->unk94->methods->slot130` (2 args, this function) and
 `this->methods->slot130` (1 arg, `Entity`'s own, matched via `Entity__StopSoundCue`
-in `src/world/Entity.c`) are unrelated functions that only share the offset
+in `src/world/entity.c`) are unrelated functions that only share the offset
 `+0x130` because they live in different tables. Before typing a vtable call
 through a field whose OWN class isn't pinned down, check whether the same
 offset is already spoken for on `this`'s own table — and if the two call
@@ -111,11 +111,11 @@ not evidence one of them is wrong.
 
 `gEntityMoodHandlerTable` row 1. Body: attenuation 0. On tick 0 it requests tone 0x14 on all three voices and calls the target's slot +0x130 with 1. Every tick it faces the target and moves -0x5A along local z. At moodTimer 30 it calls `notifyParents(this, 0xA)`.
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `ServiceSoundCueSet` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `ServiceSoundCueSet` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 94, delta)
 

@@ -36,7 +36,7 @@ The `slot134` loop is byte-identical in shape to `Entity__MoodCue92`'s own
 `EntityMethods::slot134` slot and `Entity::unk88` field; this function is
 first in ROM order, so both are added here.
 
-## Header additions (`include/Entity.h`, additive only)
+## Header additions (`include/entity.h`, additive only)
 
 - `EntityMethods::slot134` — new slot at `+0x134`, splitting the existing
   `pad134[0x144-0x134]` gap.
@@ -58,7 +58,7 @@ address order (rounds 76-77 measured that row order does not track code
 address). Nothing else references it. `Entity__StartSoundCue` hands the row's
 handler to `InitSoundCueSet`, and `ServiceSoundCueSet` calls it once per tick
 as `callback(owner, set)`, so `out` is the `SoundCueSet` (`EntityMoodHandlerArg`
-is Entity.h's local view; field readings in `Entity__MoodCue07.md`
+is entity.h's local view; field readings in `Entity__MoodCue07.md`
 `## Proposed field names`: `unk4` tick, `unk10` attenuation, `unk1C`/`unk30`/`unk44`
 voice 0/1/2 tone request (-2 = stop), `unk20`/`unk34`/`unk48` pitch offset).
 Tier B, same as every sibling `Entity__MoodCueNN` (Entity..Entity_g): the
@@ -91,16 +91,16 @@ no offset or size moved. Both oracles green after each.
 
 `this->unk100` is a `FadeBox *` (include/FadeBox.h); the slot
 call through its +0x0D4 is now `startFadeDown` (FadeBox__StartFadeDown), with `companion2`, an
-`s32` in Entity.h, cast `(BasicClass *)` as the fade's source (FadeBox's
+`s32` in entity.h, cast `(BasicClass *)` as the fade's source (FadeBox's
 configure adds it as a child; no code). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 95, bravo)
 
 ### Constants
 
-- `notifyParents(this, 0xA)` is `ENTITY_EFFECT_LINK_STAGE` (enum EntityEffect, include/Entity.h: DreamSys__InstanceEffectsOnJournal's case 10 links to the stage `getLinkStage` names; Entity_g spells the same call this way)
+- `notifyParents(this, 0xA)` is `ENTITY_EFFECT_LINK_STAGE` (enum EntityEffect, include/entity.h: DreamSys__InstanceEffectsOnJournal's case 10 links to the stage `getLinkStage` names; Entity_g spells the same call this way)
 - Every other literal went to decimal (tick counts, TOD frames, distances, VAB programs; no masks): they are this handler's tuning, named by nothing else. The TOD skip loop runs `todFrame` to 24.

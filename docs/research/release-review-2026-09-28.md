@@ -19,8 +19,8 @@ rather than API.
 ## Track 10 `prototypes`: one declaration per name
 
 - **Allocator.** `BMemPMgrAlloc` is re-declared locally in about 20 units
-  and in DreamSys.h:376, Entity.h:308, DayTaskStageMap.h:30, Task.h:27.
-  `BMemPMgrFree` returns `void` in Entity.h:309 and
+  and in DreamSys.h:376, entity.h:308, DayTaskStageMap.h:30, Task.h:27.
+  `BMemPMgrFree` returns `void` in entity.h:309 and
   GameApplicationFileResource.h:16 but `void *` in BMemPMgr.h:83 and Task.h:28,
   so any unit including two of them fails with conflicting types. main.c:28
   declares `BMemPMgrInit`/`SetDefaultBMemPMgr` because BMemPMgr.h omits them.
@@ -29,7 +29,7 @@ rather than API.
   see it.
 - **SoundCueSet.** `InitSoundCueSet`, `FlushSoundCueSet`,
   `ServiceSoundCueSet` have three spellings each (DreamSys.c:72-73, 497;
-  Entity.c:298-299, Entity.h:310-311; ObjMStyleActor.c:1782, 1893, 1903);
+  entity.c:298-299, entity.h:310-311; ObjMStyleActor.c:1782, 1893, 1903);
   the definitions take `(VabStreamObj *, SoundCueSet *)`. Declare once in
   SoundCueSet.h.
 - **GameFiles.** No header. `GetStageMapChunkRecord`/`...XY` are declared
@@ -86,7 +86,7 @@ rather than API.
   DreamSys, Entity, CdStream, DrawSystem, FlatLightObj, FrameClock,
   IntermediateBase, Pad, StreamTask, TaskCore, TmdModel, WBgm). Rename; add
   the form to §3's conventions.
-- **Receiver:** `this` in DreamSys.c (93 methods), Entity.c (138), 7
+- **Receiver:** `this` in DreamSys.c (93 methods), entity.c (138), 7
   FileResource methods in GameApplicationFileResource.c, DreamSys.h's
   prototypes; `self` everywhere else.
 - **Guards:** DreamSys.h `CLASS_DREAMSYS`, StageGrid.h `STAGE_GRID`.
@@ -232,10 +232,10 @@ reads them, so nothing names them).
   Task.h, ItemList.h, StreamTask.h; lwl/lwr and "retail reloads" in
   StageMap.h, TitleMenu.h, TaskObjF.h, TmdModel.h, Sprite.h, StyleEffect.h,
   Viewport.h, MoviePlayer.h, GraphRoom.h, LbdFile.h, common.h; GCC and splat
-  notes in Entity.h:46-51, 102-107, 148-153; about 120 lines in gte.h; 32
+  notes in entity.h:46-51, 102-107, 148-153; about 120 lines in gte.h; 32
   pointers at `tools/` commands and `docs/` files; "(no code)" jargon (8).
 - Stale names inside header prose: StageMap.h's `buildRateEntries`
-  (`loadChunksAround`), `ChunkSlotSpec::key`, `LbdFile::ownerKey`; Entity.h's
+  (`loadChunksAround`), `ChunkSlotSpec::key`, `LbdFile::ownerKey`; entity.h's
   merged-unit names ("(Entity, then Entity)"); IntermediateBase.h's
   `args->unk0..unkC`; NullDriver.h and Task.h name one file twice; CdDriver.h
   "that unit still spells them as literals"; BasicClass.h "all 59 method

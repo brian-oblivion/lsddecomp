@@ -26,8 +26,8 @@ void Entity__MoodCue21(Entity *this, EntityMoodHandlerArg *out) {
 ## Notes
 
 - `this->unk80 / 2` is the confirmed signed-halving idiom already documented
-  on the field in `include/Entity.h` (`(x + (unsigned)x>>31) >> 1`), shared
-  with `Entity__MoodCue09`/`Entity__MoodCue11` in `Entity.c`.
+  on the field in `include/entity.h` (`(x + (unsigned)x>>31) >> 1`), shared
+  with `Entity__MoodCue09`/`Entity__MoodCue11` in `entity.c`.
 - The remainder of `out->unk4 % half` is computed once and tested against two
   literals (`0`, `3`) with different effects -- an ordinary `if`/`else if`
   reproduced the branch structure exactly; both branches converge before the
@@ -56,7 +56,7 @@ per-instance "how long this mood state runs" constant, distinct from
 `moodTimer` (the live counter) and `moodIndex` (the row selector). Not
 proposing `unk84` alongside it: `Entity__MoodCue47`'s report (round 76)
 already found `unk84` carries a SECOND, unrelated loop-counter meaning in
-`Entity.c` (`Entity__MoodCue91`/`Entity__MoodCue92`), so a single name would
+`entity.c` (`Entity__MoodCue91`/`Entity__MoodCue92`), so a single name would
 misdescribe one of its two uses; that objection does not apply to `unk80`
 itself, which this unit's three call sites and every sibling unit's reads
 treat uniformly.
@@ -70,4 +70,4 @@ either. Not re-proposed here, just corroborated.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

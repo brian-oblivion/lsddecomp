@@ -10,7 +10,7 @@ through the vtable's own `ctor` slot (`GetEntityMethods()->ctor`, see
 `GetTodActorMethods()->ctor(this, arg2, arg3)` — `GetTodActorMethods()` (matched in
 `TodActor.c`) returns the SAME shared "BasicClass" ancestor vtable that
 `TodActor` also derives from (see the big comment at the top of
-`include/Entity.h`). Only on success does it finish initializing: assigns
+`include/entity.h`). Only on success does it finish initializing: assigns
 `this->methods` to `GetEntityMethods()` (Entity's OWN vtable — the base
 ctor call above runs before this entity is "really" an Entity), stores
 `arg1` into `moodIndex`, zeroes `unk9C`/`unk100`/`unk104`, then calls its own
@@ -82,11 +82,11 @@ Not renamed (already correct).
 
 Parameters retyped to (moodIndex, desc, arg2), the ctor slot's CtorParams; `desc`/`arg2` go to TodActor's ctor without casts. `soundCueSet = 0` is now `soundCueSet.tag = 0` (the SoundCueSet is embedded).
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Polish (round 96, bravo, track 7)
 
-- Step 3: parameter arg2 -> sound: it is TodActor's ctor's second argument, the sound bank TodActor keeps in `sound` (TodActor.h). Also in Entity.h's prototype and ctor slot.
+- Step 3: parameter arg2 -> sound: it is TodActor's ctor's second argument, the sound bank TodActor keeps in `sound` (TodActor.h). Also in entity.h's prototype and ctor slot.
 
 ## History (moved from include/Entity.h, round 102)
 

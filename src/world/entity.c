@@ -1,4 +1,4 @@
-/* Entity -- the class whole (include/Entity.h): its methods, its table
+/* Entity -- the class whole (include/entity.h): its methods, its table
  * getter GetEntityMethods, and the MoodCue handlers of its mood rows.
  *
  * An Entity is a TodActor driven by one row of sEntityMoodTable, chosen by
@@ -31,7 +31,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <rand.h>
-#include "Entity.h"
+#include "entity.h"
 #include "DreamSys.h"
 #include "StageMap.h"
 #include "Viewport.h"
@@ -48,13 +48,13 @@ extern s8 sEntityLinkStageTable[];  /* the linkStage column (Entity) */
 extern s8 sEntityEventVideoTable[]; /* the eventVideo column (Entity) */
 
 /* The motion templates (.data, in address order):
- * the constant triples the MoodCue handlers in src/world/Entity.c pass to
+ * the constant triples the MoodCue handlers in src/world/entity.c pass to
  * updateRotation (+0x044) and updateScale (+0x048) -- three Ratio16s
  * (include/SceneNode.h), degrees or scale factors, {x, y, z} -- and to
  * addTranslation (+0x0BC), three s32 deltas. Named by value. The slots take
  * the table untyped, so the element type is the reader's (SceneNode__Update-
  * Rotation/UpdateScale), not the callers'. sTranslateYMinus64's label also
- * holds a second triple, (0, -0x20, 0); sScaleX3's z den is Entity.c's
+ * holds a second triple, (0, -0x20, 0); sScaleX3's z den is entity.c's
  * sScaleTemplateZDenom. */
 extern Ratio16 sRotationXPlusEighth[];
 extern Ratio16 sRotationYawPlus9[];
@@ -528,7 +528,7 @@ s32 Entity__UpdateSoundCueStart(Entity *self) {
 /* For a row with no link stage (a negative sEntityLinkStageTable entry) and
  * an event video, sends ENTITY_EFFECT_LINK_STAGE while the player is within
  * the video entry times 512 world units (Entity__IsTargetInRange). `unused`
- * is Entity.h's declared second parameter; the one caller,
+ * is entity.h's declared second parameter; the one caller,
  * Entity__UpdateDeactivationState, passes 0. */
 void Entity__NotifyIfTargetInRange(Entity *self, s32 unused) {
     if (sEntityLinkStageTable[self->moodIndex * 16] < 0 &&
@@ -863,7 +863,7 @@ void Entity__MoodCue17(Entity *self) {
  * configurations, named for its lower row (same precedent as
  * `Entity__MoodCue81`, below).
  *
- * Fields and slots are the unified Entity's (include/Entity.h): the
+ * Fields and slots are the unified Entity's (include/entity.h): the
  * inherited ones carry TodActor's, Actor's and SceneNode's names (`state`,
  * `linkTarget`, `peer`, moveLocalZ/X/Y, moveLocalZOrFindLink, ...), Entity's
  * own are named for their occupants.
@@ -1197,7 +1197,7 @@ void Entity__MoodCue38(Entity *self, SoundCueSet *out) {
  * Nineteen of Entity's MoodCue handlers and the helper two of them share.
  *
  * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
- * NN (include/Entity.h): rows 39 to 52, 55 to 58 and 115. An Entity whose
+ * NN (include/entity.h): rows 39 to 52, 55 to 58 and 115. An Entity whose
  * moodIndex selects the row installs it as its SoundCueSet callback, so
  * ServiceSoundCueSet calls it once per tick with the Entity and its cue
  * set. A handler requests tones by filling the set's slots (a VAB program
@@ -1756,7 +1756,7 @@ tail:
  * Twenty of Entity's MoodCue handlers.
  *
  * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
- * NN (include/Entity.h): rows 59, 61, 62, 64 to 71 and 73 to 81, and
+ * NN (include/entity.h): rows 59, 61, 62, 64 to 71 and 73 to 81, and
  * Entity__MoodCue81 is row 120's handler too (the row's data words
  * differ). Rows 60, 63 and 72 have no handler. An Entity whose moodIndex
  * selects the row installs it as its SoundCueSet callback, so
@@ -2269,7 +2269,7 @@ void Entity__MoodCue81(Entity *self, SoundCueSet *out) {
  * Fifteen of Entity's MoodCue handlers and the two tone setters they share.
  *
  * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
- * NN (include/Entity.h): rows 82 to 96, and Entity__MoodCue93 is row 107's
+ * NN (include/entity.h): rows 82 to 96, and Entity__MoodCue93 is row 107's
  * handler too (same `handler` word, different data words), named for its
  * lower row. An Entity whose moodIndex selects the row installs it as its
  * SoundCueSet callback, so ServiceSoundCueSet calls it once per tick with
@@ -2292,7 +2292,7 @@ void Entity__MoodCue81(Entity *self, SoundCueSet *out) {
  * counts, distances in world units, TOD frame numbers, VAB program numbers,
  * and the `state` values other than 0 and ENTITY_STATE_DONE, which are each
  * handler's own phases. The motion templates (ROTATION_*, SCALE_*,
- * TRANSLATE_*) are named by value and declared once in include/Entity.h.
+ * TRANSLATE_*) are named by value and declared once in include/entity.h.
  */
 
 /* Defined after Entity__MoodCue86, which calls them. */
@@ -2640,7 +2640,7 @@ void Entity__MoodCue96(Entity *self, SoundCueSet *out) {
  * shares with a handler above.
  *
  * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
- * NN (include/Entity.h): rows 98, 102 to 106, 108 to 111, 113, 114, 117,
+ * NN (include/entity.h): rows 98, 102 to 106, 108 to 111, 113, 114, 117,
  * 118, 121, 123, 125, 128 and 129. Entity__MoodCue123 is also row 126's
  * handler (same `handler` word, different data words), named for its lower
  * row. An Entity whose moodIndex selects the row installs it as its
@@ -2661,7 +2661,7 @@ void Entity__MoodCue96(Entity *self, SoundCueSet *out) {
  * numbers, and the `state` values other than 0 and ENTITY_STATE_DONE,
  * which are each handler's own phases. The motion templates the handlers
  * pass to updateRotation and updateScale (ROTATION_*, SCALE_*) are named
- * by value and declared once in include/Entity.h.
+ * by value and declared once in include/entity.h.
  */
 
 void Entity__MoodCue98(Entity *self, SoundCueSet *out) {

@@ -98,9 +98,9 @@ generalises past that specific phrasing.
 Renamed `func_8002CC34` -> `InitSoundCueSet`, tier B, and its
 struct/parameters accordingly (`ObjCC34` -> `SoundCueSet`,
 `Slot179D8ECC34` -> `SoundCueSlot`, `arg2`/`arg3`/`arg4` -> `tag`/`owner`/
-`callback`). Evidence: this unit's only caller list (`Entity.c`,
+`callback`). Evidence: this unit's only caller list (`entity.c`,
 `DreamSys.c`, `ObjMStyleActor.c`) shows `arg2` is always a small caller-side
-tag value -- concretely `this->moodIndex + 1` in `Entity.c` -- `arg3` is
+tag value -- concretely `this->moodIndex + 1` in `entity.c` -- `arg3` is
 always the caller's own `this` pointer, and `arg4` is a value indexed out
 of (or read directly from) a function-pointer table in every caller
 (`this->vt->DreamSys__SoundCueCallback` in `DreamSys.c`; `sStyleCueCallbacks[sub->unk6]` in
@@ -121,7 +121,7 @@ a name beyond "some default/config word").
 `SoundCueSlot`. It replaced three views: PlacementGridVabSound.c's (named
 `tag`/`owner`/`callback`/`slots[].index` only), libsnd_vmanager.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
-include/Entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
+include/entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
 whole-image SHA1 is unchanged.
 
 Layout verified against every reader: InitSoundCueSet (+0x00 tag, +0x04,
@@ -136,7 +136,7 @@ ObjMStyleActor's StyleCueNN `self` (the same offsets) and DreamSys.h's
 
 Names, tier A, each from what its readers do:
 
-| old (e / l / Entity.h) | new | evidence |
+| old (e / l / entity.h) | new | evidence |
 | --- | --- | --- |
 | slot `index` / `index` / - | `voice` | ServiceSoundCueSet stores playTone's result there (the voice, or -1) and passes it to stopVoice(voice); Flush stops it |
 | - / `note` / `unk1C` `unk30` `unk44` | `program` | ServiceSoundCueSet passes `program * 16` as playTone's `index`, which PlayTone splits into program `index >> 4` and tone `index & 0xF` (so tone 0); -1 none, -2 stops the voice |
@@ -158,7 +158,7 @@ a pitch offset (that is what setPitchOffset computes from it). `tick` and
 `callback` is typed `SoundCueCallbackFn`, `void (*)(void *owner,
 SoundCueSet *set)`; InitSoundCueSet's parameter takes that type and its
 first parameter is `sound` (it is unused). The three functions have no
-shared prototype: Entity.h, DreamSys.c and ObjMStyleActor.c declare them
+shared prototype: entity.h, DreamSys.c and ObjMStyleActor.c declare them
 with their own type for the sound object (TodActor's `arg2` is a
 `struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
 would warn in each.

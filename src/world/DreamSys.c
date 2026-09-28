@@ -36,7 +36,7 @@
 #include <memory.h>
 #include <rand.h>
 #include "DreamSys.h"
-#include "Entity.h"
+#include "entity.h"
 #include "Pad.h"
 #include "FrameClock.h"
 #include "LinkResource.h"

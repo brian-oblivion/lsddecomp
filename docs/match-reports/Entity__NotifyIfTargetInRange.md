@@ -8,7 +8,7 @@ Unit: `Entity` · Size: 36 words · Round 23 (2026-09-07), head. Fresh ground
 ## The match
 
 ```c
-/* arg1 is unused here; the canonical declaration in include/Entity.h has it
+/* arg1 is unused here; the canonical declaration in include/entity.h has it
  * and func_8005DABC passes 0. Do not drop it -- `conflicting types`. */
 void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1) {
     if (sEntityLinkStageTable[this->moodIndex * 0x10] < 0 &&
@@ -19,7 +19,7 @@ void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1) {
 }
 ```
 
-with, locally in `src/world/Entity.c`:
+with, locally in `src/world/entity.c`:
 
 ```c
 extern s32 Entity__IsTargetInRange(Entity *this, s32 arg1);
@@ -43,8 +43,8 @@ clobbered by the row index on the first instruction that uses it — so nothing
 in this function's own disassembly reveals it exists. Writing the obvious
 one-parameter signature is a **`conflicting types` compile error** against the
 long-standing `extern void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1);` in
-`include/Entity.h`, put there by whoever matched the caller
-(`src/world/Entity.c` passes `Entity__NotifyIfTargetInRange(this, 0)`).
+`include/entity.h`, put there by whoever matched the caller
+(`src/world/entity.c` passes `Entity__NotifyIfTargetInRange(this, 0)`).
 
 **And that error produces ZERO hits on `error:` and `parse error`** — it was
 caught only by the `\*\*\* \[[^]]*\.o\]` alternative added to the oracle grep in
@@ -75,12 +75,12 @@ silently without it.
 
 `Entity__NotifyIfTargetInRange` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005DF9C`.
 
-Called by `Entity__UpdateDeactivationState` (Entity.c) every active tick, with arg1 = 0 (unused). If the row's `sEntityLinkStageTable` byte is negative and its `sEntityEventVideoTable` byte is non-zero, and `Entity__IsTargetInRange(this, eventVideo << 9)` holds, it calls `notifyParents(this, 0xA)`. Tier B: the mechanics are clear. What event 0xA means is not, and both table names are inherited hypotheses (`Entity__GetEventVideo`/`GetLinkStage`), so the name deliberately does not lean on them.
+Called by `Entity__UpdateDeactivationState` (entity.c) every active tick, with arg1 = 0 (unused). If the row's `sEntityLinkStageTable` byte is negative and its `sEntityEventVideoTable` byte is non-zero, and `Entity__IsTargetInRange(this, eventVideo << 9)` holds, it calls `notifyParents(this, 0xA)`. Tier B: the mechanics are clear. What event 0xA means is not, and both table names are inherited hypotheses (`Entity__GetEventVideo`/`GetLinkStage`), so the name deliberately does not lean on them.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 94, delta)
 
-Parameter `arg1` renamed `unused` in the definition (tier A: the body never reads it; the one caller, Entity__UpdateDeactivationState, passes 0). Entity.h's prototype still spells it `arg1`; the head may rename it there (a proposal, since Entity.h is shared this round). The comment this replaced said, verbatim in substance: arg1 is unused, the canonical declaration has it, do not drop it or the unit gets `conflicting types` -- that is the section above. `notifyParents(this, 0xA)` is `ENTITY_EFFECT_LINK_STAGE`. The byte-table index `moodIndex * 16` is the tables' 16-byte stride, decimal; Entity.c spells the same stride `0x10`, so a shared name (`ENTITY_MOOD_ROW_STRIDE` in Entity.h) is proposed rather than added.
+Parameter `arg1` renamed `unused` in the definition (tier A: the body never reads it; the one caller, Entity__UpdateDeactivationState, passes 0). entity.h's prototype still spells it `arg1`; the head may rename it there (a proposal, since entity.h is shared this round). The comment this replaced said, verbatim in substance: arg1 is unused, the canonical declaration has it, do not drop it or the unit gets `conflicting types` -- that is the section above. `notifyParents(this, 0xA)` is `ENTITY_EFFECT_LINK_STAGE`. The byte-table index `moodIndex * 16` is the tables' 16-byte stride, decimal; entity.c spells the same stride `0x10`, so a shared name (`ENTITY_MOOD_ROW_STRIDE` in entity.h) is proposed rather than added.

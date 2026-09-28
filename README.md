@@ -153,7 +153,7 @@ Read each named class's header first; its banner points to the units.
 - **The dream.** `DreamSys` (`src/world/DreamSys.c`) is the dream in progress: the
   dream clock, the player's movement, the mood record that picks the next
   day's dream, and the "link" teleport that ends one stage and starts
-  another. `Entity` (`src/world/Entity.c`, over `TodActor`, `src/world/TodActor.c`) is a TOD-animated
+  another. `Entity` (`src/world/entity.c`, over `TodActor`, `src/world/TodActor.c`) is a TOD-animated
   actor driven by per-mood tables. `StageGrid` maps mood-graph values to
   stage chunks (`src/world/StageGrid.c`); `DreamAux` (`src/world/DreamAux.c`) spawns the
   dream's trigger entities;

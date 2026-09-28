@@ -493,7 +493,7 @@ func_8002CD08(...)`), and `DreamSys__StopDrift` calls the sibling
 `cueServiceActive` gating the call is about as direct as tier-A evidence
 gets: this is the "service" (per-tick) half of the cue-set's start/stop
 pair, `FlushSoundCueSet` the "flush"/stop half. `include/DreamSys.h` and
-`include/Entity.h` both already carried a stale `func_8002CD08/
+`include/entity.h` both already carried a stale `func_8002CD08/
 FlushSoundCueSet` cross-reference from an earlier round's guess that this
 was the SAME function as `FlushSoundCueSet` -- it is not (confirmed: they
 are two distinct symbols at two distinct addresses, 0x8002CD08 vs
@@ -566,7 +566,7 @@ setPitchOffset's argument is an octave: `pitchOffset = octave * 12 - 24`.
 `SoundCueSlot`. It replaced three views: PlacementGridVabSound.c's (named
 `tag`/`owner`/`callback`/`slots[].index` only), libsnd_vmanager.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
-include/Entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
+include/entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
 whole-image SHA1 is unchanged.
 
 Layout verified against every reader: InitSoundCueSet (+0x00 tag, +0x04,
@@ -581,7 +581,7 @@ ObjMStyleActor's StyleCueNN `self` (the same offsets) and DreamSys.h's
 
 Names, tier A, each from what its readers do:
 
-| old (e / l / Entity.h) | new | evidence |
+| old (e / l / entity.h) | new | evidence |
 | --- | --- | --- |
 | slot `index` / `index` / - | `voice` | ServiceSoundCueSet stores playTone's result there (the voice, or -1) and passes it to stopVoice(voice); Flush stops it |
 | - / `note` / `unk1C` `unk30` `unk44` | `program` | ServiceSoundCueSet passes `program * 16` as playTone's `index`, which PlayTone splits into program `index >> 4` and tone `index & 0xF` (so tone 0); -1 none, -2 stops the voice |
@@ -603,7 +603,7 @@ a pitch offset (that is what setPitchOffset computes from it). `tick` and
 `callback` is typed `SoundCueCallbackFn`, `void (*)(void *owner,
 SoundCueSet *set)`; InitSoundCueSet's parameter takes that type and its
 first parameter is `sound` (it is unused). The three functions have no
-shared prototype: Entity.h, DreamSys.c and ObjMStyleActor.c declare them
+shared prototype: entity.h, DreamSys.c and ObjMStyleActor.c declare them
 with their own type for the sound object (TodActor's `arg2` is a
 `struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
 would warn in each.

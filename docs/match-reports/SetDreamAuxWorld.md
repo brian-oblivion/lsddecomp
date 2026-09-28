@@ -85,14 +85,14 @@ one word is otherwise constrained -- the buffer exists here purely to give
 (confirmed by the frame size: `addiu sp, sp, -0x30`, matched exactly with 4
 saved registers + this one 4-word local + no other locals).
 
-`New_Entity`'s first parameter is declared `void *` in `include/Entity.h`
-(`src/world/Entity.c`), but every call so far (including this one) passes what is
+`New_Entity`'s first parameter is declared `void *` in `include/entity.h`
+(`src/world/entity.c`), but every call so far (including this one) passes what is
 clearly an integer id (`i + 0x62`, i.e. `moodIndex` per `Entity__Entity`'s
 own reading of that argument). The cast to `(void *)` here is cosmetic --
 GCC 2.6.3 does not care about the mismatch for either codegen or scoring, and
 `New_Entity`'s own signature is out of scope for this unit to change. Its
 prototype and the five new `%gp_rel` globals are declared locally in
-`DreamAux.c` (not in `DreamAux.h`), per the shared-header rule: `Entity.c`
+`DreamAux.c` (not in `DreamAux.h`), per the shared-header rule: `entity.c`
 owns `New_Entity`, this unit only calls it.
 
 ## Proposed learning

@@ -194,7 +194,7 @@ renametype's rewrite of the class name):
 
 Outside this job's edit set (the head applies them by type scope):
 
-- `Entity::unk100` -> `fadeBox` (include/Entity.h): a `FadeBox *` made by
+- `Entity::unk100` -> `fadeBox` (include/entity.h): a `FadeBox *` made by
   Entity__GetOrCreateFadeBox and faded by the MoodCue handlers; with it,
   `Entity__GetOrCreateUnk100` -> `Entity__GetOrCreateFadeBox` (rename.py;
   the body creates the FadeBox on first call, reattaches it and sets its

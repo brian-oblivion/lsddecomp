@@ -13,7 +13,7 @@ allocator constructs (`Unk18Obj`, 0xBC bytes). Runs the BasicClass ctor,
 installs its own vtable, zeroes two fields (`unkC`/`unk10`), stashes the
 return of `New_SceneNode` (a `New_SceneNode` allocator, already matched
 elsewhere as `SceneNode.c`) into `unkAC`, constructs a `SubHandleObj` via
-`New_FadeBox` (already known elsewhere as `include/Entity.h`'s own
+`New_FadeBox` (already known elsewhere as `include/entity.h`'s own
 `Unk100Obj`/`New_FadeBox`) into `unkB0`, dispatches that object's own
 `slot4C` with `(obj, self->unkAC, &sFadeBoxAttachPos)`, then runs its own freshly
 installed `slot40`.
@@ -67,7 +67,7 @@ before the byte-level score did.
   of a shared ancestor at this slot (contrast with the GENUINELY shared
   slots this unit has documented elsewhere, e.g. `IntermediateBase__OnStart`).
 - New type `SubHandleObj`/`SubHandleObjMethods` (`slot4C`) -- this unit's own
-  local view of `include/Entity.h`'s `Unk100Obj`/`New_FadeBox`, per this
+  local view of `include/entity.h`'s `Unk100Obj`/`New_FadeBox`, per this
   project's independent-local-views convention.
 - `New_SceneNode`: local view added, returning `void *` (this unit never
   dereferences it) -- `include/SceneNode.h`'s own view types it

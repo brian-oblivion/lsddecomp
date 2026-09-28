@@ -7,7 +7,7 @@
 ## What it does
 
 Copies a raw 3-word vector (`pos`, pointing directly at x/y/z -- NOT an
-`EntityPos*`, see `include/Entity.h`'s own extensive comment on this
+`EntityPos*`, see `include/entity.h`'s own extensive comment on this
 function, already written up before this round from its external callers)
 onto its own stack, applies a mood-table-driven Y offset, converts `arg3`
 into a fixed-point-11 distance value (either `arg3 << 11` or `0x800 /
@@ -109,13 +109,13 @@ is it".
 ## Naming
 
 **Tier B.** Renamed from `func_8005D714` this round (tools/rename.py).
-Every known caller (5+ units, per this report and `Entity.h`) compares its
+Every known caller (5+ units, per this report and `entity.h`) compares its
 return against 0, i.e. treats it as a boolean predicate; it applies a mood-
 scaled Y offset and a fixed-point-11 distance conversion, then tail-calls
 `this->unk94`'s own `slot120`. "Target" is not a fresh guess for
 `this->unk94` -- it is `SceneNode__FaceTarget`'s (SceneNode.c, a different
 unit) OWN established name for dereferencing this exact field, cited
-already in `Entity.h`'s `Unk94Obj` comment before this round.
+already in `entity.h`'s `Unk94Obj` comment before this round.
 
 ## Proposed field names
 
@@ -126,7 +126,7 @@ already in `Entity.h`'s `Unk94Obj` comment before this round.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Polish (round 96, bravo, track 7)
 
@@ -135,7 +135,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 offset: gEntityUnlockKindTable +0x02, sEntityLinkStageTable +0x07,
 sEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
 gEntityMoodHandlerTable +0x0C), now EntityMoodRow fields; byte-identical.
-Entity.h's old claim that they were "SEPARATE global arrays (own base
+entity.h's old claim that they were "SEPARATE global arrays (own base
 symbols, own lui/addiu) ... not sub-fields of the sEntityMoodTable row" was
 wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.
@@ -144,6 +144,6 @@ wrong: GCC spells a constant-offset field of a global array as
 
 - Step 3: parameters arg2, arg3 -> range, tolerance (DreamSys__ProjectPointAtDistance's dist and tolerance, each scaled by ENTITY_RANGE_UNIT); local -> point.
 
-- Step 4: `<< 11` and 0x800 -> ENTITY_RANGE_SHIFT / ENTITY_RANGE_UNIT (2048, Entity.h); `(u32)((kind + 9) & 0xFF) < 9` -> `(s8)kind >= -9 && (s8)kind < 0`, byte-identical. The y step 1024 stays a literal: nothing shows it is half a range unit rather than a distance of its own.
+- Step 4: `<< 11` and 0x800 -> ENTITY_RANGE_SHIFT / ENTITY_RANGE_UNIT (2048, entity.h); `(u32)((kind + 9) & 0xFF) < 9` -> `(s8)kind >= -9 && (s8)kind < 0`, byte-identical. The y step 1024 stays a literal: nothing shows it is half a range unit rather than a distance of its own.
 
 - Step 5: a function comment says what it tests; MATCHING line for `~tolerance + 1` (see the attempt log above).

@@ -30,7 +30,7 @@ void TaskCore__ReleaseSlotElements(Obj86B60 *self)
 - `extern void *BMemPMgrAlloc(s32 size);` and
   `extern void BMemPMgrFree(void *ptr);` — both already confirmed
   elsewhere in the project (many units use the allocator; `GameApplicationFileResource.h`
-  and `Entity.h` both type the release call `void`-returning, and this
+  and `entity.h` both type the release call `void`-returning, and this
   unit's call site discards any return too, consistent with that).
 - `extern void ReleaseBasicClassArray(void *a0, void *a1);` — not previously seen in
   this project. Typed purely from this call site: both argument registers

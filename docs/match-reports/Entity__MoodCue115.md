@@ -88,7 +88,7 @@ direction. This function's bytes ARE evidence, and they say `void`.
 ### Blast radius, all re-verified byte-exact
 
 35 `this->methods->slotCC(...)` call sites across `Entity/c/d/e/g`. Only two
-use the value, both in `src/world/Entity.c`:
+use the value, both in `src/world/entity.c`:
 
 - the local function-pointer variable in `func_8005FE1C`'s block
   (`s32 (**slotCC)(Entity *, s32, s32);` → `void (**slotCC)(...)`)
@@ -102,7 +102,7 @@ use the value, both in `src/world/Entity.c`:
 
 A mood-dispatch handler in this unit's family (`Entity *this,
 EntityMoodHandlerArg *out`). On `this->unk44 == 0`, calls
-`Entity__IsTargetInRange(this, 0x800)` (matched in `Entity.c`; this is its first
+`Entity__IsTargetInRange(this, 0x800)` (matched in `entity.c`; this is its first
 cross-unit caller); on a nonzero result it runs a "detach" burst (two
 `SceneNode__FaceTarget` calls with swapped first/second arguments — see the
 round-13 head finding below —, `activate`, `startSoundCue`,
@@ -129,7 +129,7 @@ from every path) is a `slot144(this, target) < 0x200` check driving
 
 ## Final body
 
-As committed in `src/world/Entity.c` — the inherited near-miss body unchanged
+As committed in `src/world/entity.c` — the inherited near-miss body unchanged
 apart from the renames. The fix was entirely in the header.
 
 ```c
@@ -213,7 +213,7 @@ both directions, on two different slots, by two different rounds.
 - **Diagnostic, before reshaping anything.** List the return types of every
   call in the chain. Retail's merge set must be type-uniform. This is a
   30-second check and strictly cheaper than any source reshape.
-- **Both directions are measured.** `include/Entity.h`'s `slotC4` comment
+- **Both directions are measured.** `include/entity.h`'s `slotC4` comment
   records `void` → `s32` STOPPING a merge and costing the already-matched
   `Entity__MoodCue00` 4 words. This report records `s32` → `void` RESTORING one
   and closing a 6-word, two-round stall.
@@ -354,14 +354,14 @@ lever stays cleanly scoped.
 directly from `disk/SLPS_015.56`. Row 115 is NOT contiguous with this
 unit's other rows (39-52, 55-58) or with Entity's own rows (59-92ish),
 confirming the row index tracks moodIndex assignment rather than code
-address -- flagged in `src/world/Entity.c`'s unit header comment so the next
+address -- flagged in `src/world/entity.c`'s unit header comment so the next
 reader doesn't assume a typo. Mechanics established (mood-tick sound-cue-set
 callback); which dream object owns the row is not.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 93, bravo)
 
-Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_LINK_STAGE`, `MOVE_CALLBACK_TICK_MOVE`, `LOOK_CALLBACK_STEP_LOOK` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/Entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). clearTickCallbacks' bool clearLook is `true`; setTickCallbacks(peer, 1, 1) is (MOVE_CALLBACK_TICK_MOVE, LOOK_CALLBACK_STEP_LOOK), the modes DreamSys__SetTickCallbacks hands selectCallback98 and selectCallback80. Byte-identical (whole image green).
+Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_LINK_STAGE`, `MOVE_CALLBACK_TICK_MOVE`, `LOOK_CALLBACK_STEP_LOOK` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). clearTickCallbacks' bool clearLook is `true`; setTickCallbacks(peer, 1, 1) is (MOVE_CALLBACK_TICK_MOVE, LOOK_CALLBACK_STEP_LOOK), the modes DreamSys__SetTickCallbacks hands selectCallback98 and selectCallback80. Byte-identical (whole image green).

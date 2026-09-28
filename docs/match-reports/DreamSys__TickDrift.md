@@ -26,9 +26,9 @@ void DreamSys__TickDrift(DreamSys *this)
 }
 ```
 
-`ServiceSoundCueSet` is already declared in `Entity.h` for a different struct's
+`ServiceSoundCueSet` is already declared in `entity.h` for a different struct's
 fields (`extern void ServiceSoundCueSet(s32 arg0, void *arg1);`); added the same
-declaration locally rather than cross-including `Entity.h`, same as
+declaration locally rather than cross-including `entity.h`, same as
 `FlushSoundCueSet` in an earlier round. Matched first try -- the `DreamSysVec3`
 type and `Actor__AddTranslation` slot were already established by `DreamSys__ApplyRelativeOffset`
 earlier in this round.
@@ -59,7 +59,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
 ```c
 /* libsnd_vmanager's SoundCueSet service pair, as this unit calls them
    (DreamSys__TickDrift / DreamSys__StopDrift: (soundObj, soundCueSet)).
-   Moved here from DreamSys.h in track 4 (round 88): Entity.h declares the
+   Moved here from DreamSys.h in track 4 (round 88): entity.h declares the
    same functions with `void *` parameters, and a unit including both
    headers would see conflicting types. */
 ```

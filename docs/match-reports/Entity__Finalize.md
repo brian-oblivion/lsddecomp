@@ -13,7 +13,7 @@ Entity's destructor-side teardown: tears down `this->unk100` and
 their own `slot04` (a per-object dtor-like slot, not `EntityMethods`'), then
 calls the shared "BasicClass" ancestor's own `dtor` slot,
 `GetTodActorMethods()->dtor(this)` (offset `+0x00C` in the shared table — see the
-big comment in `Entity.h`).
+big comment in `entity.h`).
 
 ## Final C
 
@@ -48,7 +48,7 @@ own `dtor`) are its purpose.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-`unk100` is a `FadeBox *` and `unk104` a `BasicClass *` (Entity.h);
+`unk100` is a `FadeBox *` and `unk104` a `BasicClass *` (entity.h);
 both calls through their +0x004 are now `release` (BasicClass__Release in
 every table). `unk104` is only ever released in Entity code, so it is typed
 no further than the slot it reaches. Image byte-identical.
@@ -57,4 +57,4 @@ no further than the slot it reaches. Image byte-identical.
 
 Renamed from `Entity__Destructor`: the occupant of +0x00C, SceneNode's `finalize`. Body: release `unk100` and `unk104`, then TodActor's finalize -- what the slot says. Tier A: an override named for its slot (FINISHING-PLAN track 4 step 6).
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

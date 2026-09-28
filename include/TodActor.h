@@ -8,7 +8,7 @@
  * object of a TOD animation and plays the TOD's frames over them. Class id
  * 0x234, method table gTodActorMethods, getter GetTodActorMethods; methods
  * in src/world/TodActor.c. Its ctor chains to Actor's (include/Actor.h). One
- * class derives from it, Entity (0x1F234, include/Entity.h), and it is only
+ * class derives from it, Entity (0x1F234, include/entity.h), and it is only
  * ever built as one: New_Entity (from DreamAux's SetDreamAuxWorld and
  * SpawnDreamAuxTriggerEntity) runs this ctor first; New_TodActor has no
  * caller.

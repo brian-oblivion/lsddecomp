@@ -30,9 +30,9 @@ Retail stores `arg1` into `unk_0xC8` in the delay slot of the `beqz $a1,
 Writing the store as a plain unconditional statement before the `if`
 reproduces this directly; no need for a delay-slot-mimicking trick.
 
-`FlushSoundCueSet` was already declared in `Entity.h` for a different struct's
+`FlushSoundCueSet` was already declared in `entity.h` for a different struct's
 fields (`extern void FlushSoundCueSet(s32 arg0, void *arg1);`); added the same
-declaration locally to `DreamSys.h` rather than cross-including `Entity.h`.
+declaration locally to `DreamSys.h` rather than cross-including `entity.h`.
 
 ## Provenance
 

@@ -46,7 +46,7 @@ void Entity__StopSoundCue(Entity *this) {
 ```
 
 `FlushSoundCueSet` declared `extern void FlushSoundCueSet(s32 arg0, void *arg1);`
-in `Entity.h`, same rationale as `ServiceSoundCueSet` in `Entity__TickSoundCue.md`.
+in `entity.h`, same rationale as `ServiceSoundCueSet` in `Entity__TickSoundCue.md`.
 `slot130`/`slot114` typed `void (*)(Entity *self)` in `EntityMethods`.
 
 ## Attempt log
@@ -70,9 +70,9 @@ two self-only slot calls, clears `this->unkF8`. Exact mirror of
 - `EntityMethods::slot16C` -> `stopSoundCue` -- **tier B.** `tools/
   classtable.py` resolves +0x16C to this very function. CROSS-UNIT: called
   by `Entity__Deactivate` (consistent: deactivating stops the sound cue),
-  `Entity__UpdateSoundCueStop` (Entity.c) and `Entity__MoodCue77` (Entity_e.c). Proposed
+  `Entity__UpdateSoundCueStop` (entity.c) and `Entity__MoodCue77` (Entity_e.c). Proposed
   rather than applied.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

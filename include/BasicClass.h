@@ -57,7 +57,7 @@ typedef struct BasicClassListNode BasicClassListNode;
 
 /* The one notifyParents event the base class defines: finalize sends it, and
  * the base onNotify answers it by dropping the sender from its children.
- * Subclasses number their own events (DreamSys.h, Entity.h). */
+ * Subclasses number their own events (DreamSys.h, entity.h). */
 enum { BASICCLASS_EVENT_FINALIZED = 1 };
 
 /* A class id's lowest nibble: which direct subclass of BasicClass (id 0x0)

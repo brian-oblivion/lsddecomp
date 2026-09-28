@@ -162,6 +162,6 @@ ApplyTodPacket, SetMainPartNotifies.
 
 The header banner was rewritten as documentation (lifecycle, playback, peer
 and companion, sound). The field `arg2` keeps its name: its other accessors
-are in src/world/Entity.c, outside this job; `sound` is PROPOSED.
+are in src/world/entity.c, outside this job; `sound` is PROPOSED.
 
 History note: `tools/renametype.py` rewrote the old class name inside this report's earlier sections too (e.g. round 85's "unified as `TodActor`" was written as `Class65650`); those lines are left as the tool wrote them, pending the operator's decision on history prose.

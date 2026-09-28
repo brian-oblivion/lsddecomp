@@ -35,7 +35,7 @@ SceneNodeObj *New_SceneNode(void) {
 }
 ```
 
-Same shape as `src/world/Entity.c`'s `New_Entity`.
+Same shape as `src/world/entity.c`'s `New_Entity`.
 
 ## Establishing the class
 

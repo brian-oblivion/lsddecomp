@@ -11,7 +11,7 @@
 ## What it does
 
 The class's own "GetMethods" accessor -- returns `&gStreamTaskMethods` and nothing
-else, the same shape as `GetEntityMethods` in `include/Entity.h` and
+else, the same shape as `GetEntityMethods` in `include/entity.h` and
 `GetTodActorMethods` in `src/world/TodActor.c`. Called (still `INCLUDE_ASM`, not
 this batch) by `New_StreamTask` (the allocator) and `StreamTask__StreamTask` (the
 constructor) to fetch the class's ctor at slot `+0x008` and to install the

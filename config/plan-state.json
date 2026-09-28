@@ -826,7 +826,6 @@
         "DrawSystem": "2026-09-25",
         "DreamAux": "2026-09-21",
         "DreamSys": "2026-09-22",
-        "Entity": "2026-09-19",
         "FlatLightObj": "2026-09-25",
         "GameApplicationFileResource": "2026-09-24",
         "GameFiles": "2026-09-25",
@@ -847,6 +846,7 @@
         "TodActor": "2026-09-24",
         "ViewportDraw": "2026-09-25",
         "WBgm": "2026-09-25",
+        "entity": "2026-09-19",
         "libcard_card": "2026-09-23",
         "libcd_bios": "2026-09-23",
         "libgs_gs_101": "2026-09-24",
@@ -918,7 +918,7 @@
         "gEntityMethods": {
           "class": "Entity",
           "date": "2026-09-26",
-          "header": "include/Entity.h"
+          "header": "include/entity.h"
         },
         "gFadeBoxMethods": {
           "class": "FadeBox",
@@ -1319,7 +1319,7 @@
       },
       "flagged": {
         "DrawNode": "ViewportDraw's local view of the scene node Viewport.h's drawNode slot types as SceneNode * (echo, round 94) (2026-09-26)",
-        "EntityMoodHandlerArg": "it is SoundCueSet (Entity.h's own comment; PlacementGridVabSound.c and libsnd_vmanager.c each define SoundCueSet locally): unify into one header, fields become slots[n].note/pitchOffset (2026-09-26)",
+        "EntityMoodHandlerArg": "it is SoundCueSet (entity.h's own comment; PlacementGridVabSound.c and libsnd_vmanager.c each define SoundCueSet locally): unify into one header, fields become slots[n].note/pitchOffset (2026-09-26)",
         "S16Quad_d294": "IS Sony's SVECTOR by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
         "SceneNodeSub14": "IS Sony's GsCOORDINATE2 by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
         "SceneNodeSub44": "IS Sony's GsCOORD2PARAM by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)"
@@ -1558,7 +1558,6 @@
         "DrawSystem": "2026-09-28",
         "DreamAux": "2026-09-27",
         "DreamSys": "2026-09-26",
-        "Entity": "2026-09-27",
         "FlatLightObj": "2026-09-28",
         "GameApplicationFileResource": "2026-09-27",
         "GameFiles": "2026-09-27",
@@ -1579,6 +1578,7 @@
         "TodActor": "2026-09-27",
         "ViewportDraw": "2026-09-27",
         "WBgm": "2026-09-28",
+        "entity": "2026-09-27",
         "libsnd_vmanager": "2026-09-27",
         "main": "2026-09-28"
       }

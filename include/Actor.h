@@ -91,7 +91,7 @@ enum ActorMoveEvent {
 /* clang-format off */
 #define ACTOR_FIELDS(Methods)                                                                      \
     SCENENODE_FIELDS(Methods);                                                                    \
-    /* +0x044 */ s32 state;               /* zeroed by the ctor; a subclass's state code (DreamSys and Entity: include/DreamSys.h, include/Entity.h) */ \
+    /* +0x044 */ s32 state;               /* zeroed by the ctor; a subclass's state code (DreamSys and Entity: include/DreamSys.h, include/entity.h) */ \
     /* +0x048 */ s16 lastOffsetValue;     /* MoveAlongLocalAxis's val, setLastOffsetValue; Reset: 300; NotifyMove's magnitude */ \
     /* +0x04A */ u8 pad4A[2];                                                                      \
     /* +0x04C */ struct StageMap *grid; /* the class-0x114 child addChild recorded; FindNearbyLink queries it */ \

@@ -97,7 +97,7 @@ a purpose.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 93, bravo)
 
@@ -125,7 +125,7 @@ derivation, verbatim:
 /* Second 20-function slice of the Entity class's 97-function remainder,
  * 0x5077C..0x52290 (Entity is the first slice, Entity_e the third).
  *
- * 19 of the 20 are gEntityMoodHandlerTable callbacks (Entity.h), named
+ * 19 of the 20 are gEntityMoodHandlerTable callbacks (entity.h), named
  * Entity__MoodCueNN for the row they occupy -- rows 39-52 and 55-58 are
  * consecutive with Entity's own tail, row 115 (Entity__MoodCue115, this
  * unit's last function) is not, confirming row order tracks moodIndex
@@ -152,6 +152,6 @@ derivation, verbatim:
 `Entity__MoodCueNN.md`'s `## Naming`; the row-115 ordering point is in
 `Entity__MoodCue115.md`'s. In the text above the helper appears under its
 old name. The old extern comment also said the tables followed "the same
-convention as Entity.c's own sScaleY2/sScaleSix/etc externs (separate
+convention as entity.c's own sScaleY2/sScaleSix/etc externs (separate
 local view per translation unit, not shared via the header)"; round 93
 retyped them from `u8[]` to `Ratio16[]`, byte-identical.)

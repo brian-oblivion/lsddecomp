@@ -70,7 +70,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
    and cpp emits "implicit declaration of function". The implicit type
    happens to agree with the real one here, so nothing miscompiled -- but an
    implicit declaration also disables argument checking, which is precisely
-   what caught Entity__IsNearTarget's over-narrow `s8` parameters in include/Entity.h
+   what caught Entity__IsNearTarget's over-narrow `s8` parameters in include/entity.h
    this round. A declaration is not a definition, so this does NOT affect the
    strict ROM-address ordering of the definitions below. */
 ```

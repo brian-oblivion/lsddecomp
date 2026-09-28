@@ -101,7 +101,7 @@ instead of interleaved with the still-live division. The two-statement
 version isn't merely "the same code, reordered" to GCC 2.6.3 -- it changes
 which instruction-scheduling window the receiver's load competes in.
 
-## Header additions (`include/Entity.h`, additive only)
+## Header additions (`include/entity.h`, additive only)
 
 - `Unk94Methods::slotC8` — new slot at `+0xC8` (before the existing
   `slotCC` at `+0xCC`, immediately adjacent, no arithmetic overlap).
@@ -117,7 +117,7 @@ which instruction-scheduling window the receiver's load competes in.
   caller, alongside the callers already on record. No type or name changed
   on any of them.
 
-`extern u8 sRotationZMinus90[];` added to `src/world/Entity.c` (file-local, same
+`extern u8 sRotationZMinus90[];` added to `src/world/entity.c` (file-local, same
 convention as this unit's other raw data-table externs).
 
 ## Proposed learning
@@ -155,8 +155,8 @@ callback); which dream object owns the row is not.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 93, bravo)
 
-Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_END_DREAM`, `ENTITY_STATE_DONE`, `DREAM_COLOR_YELLOW` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/Entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). clearTickCallbacks' bool clearLook is `false`; getDreamColor's 6 is DREAM_COLOR_YELLOW (DreamColors, DreamSys.h). Byte-identical (whole image green).
+Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_END_DREAM`, `ENTITY_STATE_DONE`, `DREAM_COLOR_YELLOW` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). clearTickCallbacks' bool clearLook is `false`; getDreamColor's 6 is DREAM_COLOR_YELLOW (DreamColors, DreamSys.h). Byte-identical (whole image green).

@@ -45,7 +45,7 @@ address computation.
 
 Round 75 (charlie), track 3.
 
-- `GetTodActorMethods` (was `func_80066818`), tier A. Returns &gTodActorMethods (lui/addiu). Named like GetEntityMethods, the same accessor for the subclass. Entity.c calls it as its base-table getter.
+- `GetTodActorMethods` (was `func_80066818`), tier A. Returns &gTodActorMethods (lui/addiu). Named like GetEntityMethods, the same accessor for the subclass. entity.c calls it as its base-table getter.
 - `gTodActorMethods` (was `D_8008A6C4`), tier A. The 80-slot method table (header 0x234) this function returns and the ctor installs; `g<Class>Methods` like gStyleEffectMethods/gSceneNodeMethods.
 
 ## Track 4 (2026-09-25, round 85, alpha)

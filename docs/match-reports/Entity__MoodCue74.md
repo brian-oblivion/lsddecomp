@@ -39,7 +39,7 @@ void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
 }
 ```
 
-## New struct knowledge (`include/Entity.h`, additive)
+## New struct knowledge (`include/entity.h`, additive)
 
 - **`Unk94Obj` gained a field, `unk5C`** (was previously only known through
   `+0x14`, unpadded past it): `u8 pad18[0x5C-0x18]; Unk5CObj *unk5C;`. It is
@@ -64,7 +64,7 @@ void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
     return discarded, same caveat.
 - `sMoodCue74ClearColor` (a single-word data table at `asm/data/7B3F8.sdata.s`,
   immediately after the already-known `sEntityFadeBoxDefaultSize`/`sEntityFadeBoxDefaultOffset`) gets its
-  own per-unit `extern u8 sMoodCue74ClearColor[];` in `Entity.c`, same convention
+  own per-unit `extern u8 sMoodCue74ClearColor[];` in `entity.c`, same convention
   as this file's other opaque data-table externs.
 
 **No existing declaration was retyped, renamed, or resized** -- every change
@@ -79,7 +79,7 @@ same byte ranges.
   both already-confirmed patterns from earlier reports in this unit
   (`Entity__MoodCue67`'s `rand() % 3`, and `this->unk80` field's own
   documented `(x + (unsigned)x>>31) >> 1` signed-halving comment in
-  `include/Entity.h`).
+  `include/entity.h`).
 - **`(u32)(this->unkFC - 0x14) < 0x64` needs an explicit unsigned cast** to
   reproduce retail's `sltiu`. Writing the bare signed subtraction/compare
   (`this->unkFC - 0x14 < 0x64`) compiles to `slti` (opcode 0x28) instead of
@@ -119,7 +119,7 @@ Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 74
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 93, echo)
 

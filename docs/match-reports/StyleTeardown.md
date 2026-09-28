@@ -135,7 +135,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * that check's own last-computed distance (also the out-parameter
  * `FindNextStyleCueInRange` writes). `cueSet` is only ever address-taken,
  * as an embedded sub-object handed to `FlushSoundCueSet`/`ServiceSoundCueSet`
- * (same discard-return caveat as `include/Entity.h`'s `unk9C` -- a field
+ * (same discard-return caveat as `include/entity.h`'s `unk9C` -- a field
  * only ever address-taken carries no evidence about its own declared
  * type). */
 ```

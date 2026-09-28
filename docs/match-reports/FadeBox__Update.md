@@ -73,7 +73,7 @@ per-tick `step` into three byte counters (gated per-bit by `unk78`) or
 calls `stop` once the countdown expires. The `(self, void *a1, s32 a2)`
 shape with `a2` acting as an event-code gate matches this project's own
 generic per-object dispatch idiom (`Entity__Update(this, a1, a2)`,
-`include/Entity.h`'s slot98 note), which is the evidence for "Update"
+`include/entity.h`'s slot98 note), which is the evidence for "Update"
 specifically rather than a bespoke name. Purpose in the actual game (what
 the color accumulation drives) is not established -- tier B, not A.
 

@@ -19,7 +19,7 @@ original `Entity`/`Entity_g` segment).
 One of the mood-dispatch handler rows of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`,
 row-aligned at file offset `0x8008A4D0`, `(0x8008A4D0 - 0x80089EB0) / 16 =
 98`, confirming this unit's functions occupy that SAME table
-`include/Entity.h`'s own comment already documents for `Entity__MoodCue05`/
+`include/entity.h`'s own comment already documents for `Entity__MoodCue05`/
 `Entity__MoodCue10`/etc). Takes the standard `(Entity *this, EntityMoodHandlerArg
 *out)` handler signature but never reads `out` in its body -- a genuinely
 unused parameter, not a derivation gap (same "declare it, never reference
@@ -27,7 +27,7 @@ it" shape CLAUDE.md's own guidance describes for an ignored callee
 parameter).
 
 Gated on `this->unkF4 != 0`: if `Entity__GetOrCreateFadeBox(this, NULL, 0, 0xA, 0)`
-(the cache-or-create accessor, already matched in `Entity.c`) returns
+(the cache-or-create accessor, already matched in `entity.c`) returns
 non-null, dispatches `this->unk100->methods->slotD4` with a literal `7`
 (same slot `Entity__MoodCue57` already established with a literal `4`),
 `this->methods->slot160`, and a NEW slot on `this->unk94`'s own table
@@ -91,12 +91,12 @@ names sort in table order.
 
 `this->unk100` is a `FadeBox *` (include/FadeBox.h); the slot
 call through its +0x0D4 is now `startFadeDown` (FadeBox__StartFadeDown), with `companion2`, an
-`s32` in Entity.h, cast `(BasicClass *)` as the fade's source (FadeBox's
+`s32` in entity.h, cast `(BasicClass *)` as the fade's source (FadeBox's
 configure adds it as a child; no code). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-26, round 94, alpha)
 

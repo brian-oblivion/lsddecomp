@@ -30,7 +30,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "Entity.h"
+#include "entity.h"
 #include "DreamAux.h"
 #include "SceneNode.h"
 #include "ModelData.h"

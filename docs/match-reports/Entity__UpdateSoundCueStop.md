@@ -7,7 +7,7 @@ whole-image build verified byte-exact)
 
 ## What it does
 
-A close sibling of `Entity__UpdateTargetProximity`/`Entity__UpdateSoundCueStart` (both in `src/world/Entity.c`,
+A close sibling of `Entity__UpdateTargetProximity`/`Entity__UpdateSoundCueStart` (both in `src/world/entity.c`,
 top of the file): another mood-row-driven "detach if too far" check, keyed off
 `row->unkB` instead of `row->unk6`/`row->unkB` in the other two. Guarded by
 `this->unkF0 != 0 && this->unkF8 != 0` (both must be true to enter the body,
@@ -40,8 +40,8 @@ s32 Entity__UpdateSoundCueStop(Entity *this) {
 }
 ```
 
-`EntityMethods::slot16C` already existed in `include/Entity.h` (called by
-`Entity__Deactivate` in `src/world/Entity.c`); only its caller-list comment was updated
+`EntityMethods::slot16C` already existed in `include/entity.h` (called by
+`Entity__Deactivate` in `src/world/entity.c`); only its caller-list comment was updated
 to add this function.
 
 ## Attempt log
@@ -74,11 +74,11 @@ gEntityMethods +0x180; `Entity__Update` calls it only when +0x17C (`Entity__Upda
 
 | member | proposed | tier | evidence |
 | --- | --- | --- | --- |
-| `EntityMethods::slot180` (+0x180) | `updateSoundCueStop` | A | occupant is this function; only accessor is Entity__Update (Entity.c), so it is cross-unit |
+| `EntityMethods::slot180` (+0x180) | `updateSoundCueStop` | A | occupant is this function; only accessor is Entity__Update (entity.c), so it is cross-unit |
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 94, delta)
 

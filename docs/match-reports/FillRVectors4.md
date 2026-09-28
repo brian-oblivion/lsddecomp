@@ -304,7 +304,7 @@ whole-function raw-register `__asm__`).
 
 Per the coordinator's secondary assignment, audited every `__asm__` block
 in `src/psyq/libsnd_ssinit.c`, `src/sound/PlacementGridVabSound.c`, `src/app/Pad.c`,
-`src/world/Entity.c`, `src/Entity_c.c`, `src/world/DreamSys.c`, and
+`src/world/entity.c`, `src/Entity_c.c`, `src/world/DreamSys.c`, and
 `src/graphics/TmdRenderer.c` (this unit's own family) for the same mistake found
 in this function -- a whole-function raw-register transcription standing
 in for an idiom ordinary C already expresses via an already-matched
@@ -314,7 +314,7 @@ sibling.
 
 - **6 bare `__asm__("");` scheduling barriers**, one each in
   `libsnd_ssinit.c` (`SetRCnt`), `PlacementGridVabSound.c`, `Pad.c`,
-  `Entity.c`, `Entity_c.c`, `DreamSys.c`. Every one is a no-operand,
+  `entity.c`, `Entity_c.c`, `DreamSys.c`. Every one is a no-operand,
   no-clobber ordering barrier -- exactly HARD RULE 6's always-permitted
   form ("if it only changes instruction ORDER, it is allowed"), each
   cited in its own surrounding comment or an existing match report as

@@ -6,8 +6,8 @@
 
 Unit: `ObjMStyleActor` (round 17). A shared `BasicClass`-inherited slot
 occupant (`slotC4`), already independently confirmed `void` from BOTH
-`Entity.h` and `TodActor.c`'s `TodActorMethods::slotC4` (both tables
-hold this exact function at `+0xC4`, per `Entity.h`'s own comment). Tail-
+`entity.h` and `TodActor.c`'s `TodActorMethods::slotC4` (both tables
+hold this exact function at `+0xC4`, per `entity.h`'s own comment). Tail-
 calls `Actor__MoveAlongLocalAxis` (still `INCLUDE_ASM`, sibling unit
 `ObjMStyleActor`) with a fixed global address and a literal `6`.
 
@@ -34,7 +34,7 @@ arg2, 6)` written left-to-right in C.
 
 **Kept `void`, a bare statement call rather than `return Actor__MoveAlongLocalAxis(...)`
 -- per CLAUDE.md's own explicit warning about this exact slot.**
-`Entity.h`'s comment on `EntityMethods::slotC4` documents that retyping
+`entity.h`'s comment on `EntityMethods::slotC4` documents that retyping
 this SHARED slot to a non-`void` return breaks an ALREADY-MATCHED sibling
 function (`Entity__MoodCue00`, which relies on GCC tail-merging two identical
 `void`-typed `slotC4(this,0x32,0)` call sites reached from different
@@ -52,17 +52,17 @@ since only its address is ever taken here, never its value.
 None -- a direct application of the already-documented `slotC4`-must-stay-
 `void` constraint to a NEW occupant of the same shared slot, confirming it
 generalizes past the two instances (`Entity__MoodCue32`, `Entity__MoodCue00`)
-`Entity.h` already names.
+`entity.h` already names.
 
 ## Naming
 
 **`Actor__MoveLocalZ` -- tier C.** Class is known (occupies the shared
 `slotC4` `BasicClass`-inherited slot, confirmed by `tools/classtable.py`
-against `Entity.h`/`TodActor.c`'s independent readings of the same
+against `entity.h`/`TodActor.c`'s independent readings of the same
 address), but the function tail-calls a still-`INCLUDE_ASM` sibling-unit
 function (`Actor__MoveAlongLocalAxis`, `ObjMStyleActor.c`) with a fixed global address
 and a literal mode value `6`, and no occupant of `slotC4` anywhere in the
-codebase has an established purpose either (`Entity.h`'s own comment on
+codebase has an established purpose either (`entity.h`'s own comment on
 this exact slot only documents a MUST-STAY-`void` return-type constraint,
 not what the slot means). Kept the tier-C `Class__func_xxxxx` form.
 

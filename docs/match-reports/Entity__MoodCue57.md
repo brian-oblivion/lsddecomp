@@ -113,13 +113,13 @@ inverted relative to retail — confirmed by objdump, not just theorized.
 `addiu $a1, $a1, 0x18` in the branch delay slot (pointer arithmetic on the
 just-loaded `this->unk14`, not a fresh load).
 
-## Header additions (`include/Entity.h`, additive only)
+## Header additions (`include/entity.h`, additive only)
 
 - `Unk100Methods::slotD4` — new slot at `+0xD4`
   (`void (*)(Unk100Obj *self, s32 arg1, s32 arg2, s32 arg3)`), immediately
   after the existing `slotD0`.
 - `extern Unk100Obj *Entity__GetOrCreateFadeBox(...)` — `Entity__GetOrCreateFadeBox` was already
-  matched in `src/world/Entity.c` (defined there, not `INCLUDE_ASM`) but had no
+  matched in `src/world/entity.c` (defined there, not `INCLUDE_ASM`) but had no
   cross-unit prototype; this is its first caller outside that file.
 - `Entity::unk50` split out of the existing `pad50[0x58-0x50]` padding as a
   named `s32` field (padding narrowed to `pad54[0x58-0x54]`) — a pad split,
@@ -160,18 +160,18 @@ callback); which dream object owns the row is not.
 
 `this->unk100` is a `FadeBox *` (include/FadeBox.h); the slot
 call through its +0x0D4 is now `startFadeDown` (FadeBox__StartFadeDown), with `companion2`, an
-`s32` in Entity.h, cast `(BasicClass *)` as the fade's source (FadeBox's
+`s32` in entity.h, cast `(BasicClass *)` as the fade's source (FadeBox's
 configure adds it as a child; no code). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
 Measured: through TodActor's `s32 playTod` slot this function grows 3 words (the final playTod call no longer cross-jumps with void siblings). Every Entity playTod call casts the slot to `EntityPlayTodFn` (void), which emits no code.
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 93, bravo)
 
-Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_EVENT_VIDEO`, `ENTITY_STATE_DONE`, `SOUND_CUE_STOP` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/Entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). The `(u32)(moodTimer - 0x80) < 0xC2` window test reads `moodTimer >= 128 && moodTimer < 322`: the same bytes. The local `mood` (a copy of todFrame) is `frame`. Byte-identical (whole image green).
+Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_EVENT_VIDEO`, `ENTITY_STATE_DONE`, `SOUND_CUE_STOP` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). The `(u32)(moodTimer - 0x80) < 0xC2` window test reads `moodTimer >= 128 && moodTimer < 322`: the same bytes. The local `mood` (a copy of todFrame) is `frame`. Byte-identical (whole image green).
 
 ## Proposed field names
 
@@ -181,7 +181,7 @@ Every literal in the live body is in its base: decimal for moodTimer ticks, dist
   writer (New_FadeBox, then setStep from its fourth argument, 10 here),
   Entity__Finalize releases it, and every other access (here, Entity x3,
   Entity x1) calls startFadeDown or startFadeUp on it. Accessors outside
-  Entity_d (Entity.c, Entity_f.c, Entity_g.c), so proposed, not applied.
+  Entity_d (entity.c, Entity_f.c, Entity_g.c), so proposed, not applied.
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 

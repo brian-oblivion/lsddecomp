@@ -8,7 +8,7 @@ REVISITED, round 59: MATCHED 217/217 byte-exact; names/types not relevant
 `insertions 0 / deletions 0`, `./build-and-verify.sh` green
 (`OK: build matches retail SLPS_015.56`), no out-of-range drift.
 
-**`src/world/Entity.c` now contains zero `INCLUDE_ASM` -- the unit is complete.**
+**`src/world/entity.c` now contains zero `INCLUDE_ASM` -- the unit is complete.**
 
 Closed in **2 builds** on top of the body this report already carried.
 Divergence #1 had been closed since round 13 (the chained

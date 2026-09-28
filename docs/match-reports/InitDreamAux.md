@@ -286,7 +286,7 @@ The slot and its object view (DreamAuxObj / DreamAuxTickFn, deleted):
 
 /* A slot in the 0x80088D28 / 0x80088D2C families: one live-object pointer
  * (ticked once per call by calling obj->vtable[1](obj) and storing the
- * result back into the same slot); an Entity at +0x4 (include/Entity.h)
+ * result back into the same slot); an Entity at +0x4 (include/entity.h)
  * that SetDreamAuxWorld makes with New_Entity and DespawnDreamAuxEntity
  * detaches and re-attaches (detachFromParent, attachToParent with the
  * player sDreamAuxWorld as the peer);

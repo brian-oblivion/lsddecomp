@@ -10,7 +10,7 @@
 
 Lazily creates-or-reuses `this->unk100` (a `Unk100Obj *`, a class instance
 of an entirely different, unidentified type that lives behind its own
-vtable — see `Unk100Methods` in `Entity.h`), then dispatches three calls
+vtable — see `Unk100Methods` in `entity.h`), then dispatches three calls
 through it: `slot50(sub)`, `slot4C(sub, this, arg2-or-default)`,
 `slotD0(sub, arg3)`. Returns the object (new or cached), or NULL if
 allocation failed.
@@ -130,7 +130,7 @@ Two generalizable points from this one:
 **Tier B.** Renamed from `func_8005D108` this round (tools/rename.py). The
 MECHANIC is fully established by the body and by its cross-unit callers
 (`Entity__MoodCue57`/`Entity__MoodCue85` in Entity/Entity_f, per this report and
-`Entity.h`): lazily get-or-create `this->unk100`, then dispatch three init
+`entity.h`): lazily get-or-create `this->unk100`, then dispatch three init
 calls through its own vtable, defaulting `name`/`arg2` to two 2-word screen-
 coordinate-shaped buffers when NULL. The PURPOSE of the cached `Unk100Obj` is
 not established -- every known call site passes `name`/`arg2` as NULL, so
@@ -141,7 +141,7 @@ not after a guess about what the object represents.
 ## Track 4 (2026-09-26, round 87, echo)
 
 `Entity::unk100` is now typed `FadeBox *` (include/FadeBox.h); the
-local `Unk100Obj`/`Unk100Methods` view and Entity.h's own
+local `Unk100Obj`/`Unk100Methods` view and entity.h's own
 `extern Unk100Obj *New_FadeBox` are deleted. This function's four slot
 calls resolve through gFadeBoxMethods (`tools/classtable.py gFadeBoxMethods`) and now
 use the unified names: slot50 -> `detachFromParent`
@@ -158,10 +158,10 @@ echo's round-87 summary). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Polish (round 96, bravo, track 7)
 
 - Step 3: parameters name, arg2, arg3, arg4 -> size, offset, step, pri (from what their receivers do with them: New_FadeBox's size and pri, BoxFill__AttachToParent's offset, FadeBox__SetStep's step); locals sub, m, dispatchArg2 -> box, boxMethods, attachOffset. The two defaults were renamed by tools/rename.py: gEntityDefaultPos -> sEntityFadeBoxDefaultSize (it is New_FadeBox's size, {320, 240}, not a position), gEntityDefaultOffset -> sEntityFadeBoxDefaultOffset. Tier A for both: the body substitutes each for its NULL argument.
 
-- Step 5: Entity.h's comment on the two defaults said they are "both plain 2-word buffers (asm/data/7B3F8.sdata.s): {0x140, 0xF0} (320, 240)"; the comment now gives the values in decimal and the data file location lives here. The body keeps one MATCHING line for its three load-bearing locals (see the attempt log above).
+- Step 5: entity.h's comment on the two defaults said they are "both plain 2-word buffers (asm/data/7B3F8.sdata.s): {0x140, 0xF0} (320, 240)"; the comment now gives the values in decimal and the data file location lives here. The body keeps one MATCHING line for its three load-bearing locals (see the attempt log above).
