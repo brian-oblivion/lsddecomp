@@ -18,7 +18,7 @@ matches `currentPos->chunk` and whose `tile` either matches
 `currentPos->tile` or is a wildcard (negative `tile.value`); on a match,
 publishes several `D_8008ACxx` globals, copies the resolved `StageSpawn`
 entry's grid position into `*target`, looks up its world-space adjustment
-from `SPAWN_POS_ADJUST`, optionally marks a nav-challenge byte complete, and
+from `sSpawnPosAdjust`, optionally marks a nav-challenge byte complete, and
 returns the matched trigger's `stage` byte. Returns `-1` on no match or an
 empty trigger list.
 
@@ -32,7 +32,7 @@ read of `trig->stage` (it kept the first in a register but re-issued an
 `lb` for the second use), costing exactly one extra instruction and
 shifting the whole function 4 bytes long, which in turn cascaded into every
 absolute-address (`lui`/`addiu`) reference after it -- what looked like a
-second bug (`SPAWN_POS_ADJUST`'s apparent offset changing in the diff) was
+second bug (`sSpawnPosAdjust`'s apparent offset changing in the diff) was
 purely a symptom of this function's own length being wrong, not a separate
 issue.
 
@@ -103,7 +103,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
 		entry = &spawns[triggerStage][spawnIndex];
 		gLinkSpawnIndex = spawnIndex;
 		*(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
-		target->position = SPAWN_POS_ADJUST[entry->adjustment];
+		target->position = sSpawnPosAdjust[entry->adjustment];
 		if (flag != 0)
 			(*gpNavChallengesComplete)[entry->extra] = 1;
 		return gLinkDstStage;
@@ -113,7 +113,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
 ```
 
 The two 4-byte-and-6-byte whole-struct copies (`*(PlayerSpawnGridPos *)target
-= ...` and `target->position = SPAWN_POS_ADJUST[...]`) both reproduce
+= ...` and `target->position = sSpawnPosAdjust[...]`) both reproduce
 retail's `lwl`/`lwr` + `swl`/`swr` unaligned copy idiom automatically -- no
 special handling needed, consistent with the already-documented
 "alignment-2 struct assignment compiles to `lwl`/`lwr`+`swl`/`swr`" pattern

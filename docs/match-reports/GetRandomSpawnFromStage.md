@@ -16,7 +16,7 @@ Picks a random stage (0-5, avoiding the current stage `stg` when `stg >= 0`
 by bumping and wrapping; or `-stg` when `stg < 0`, the "specific stage
 forced" caller shape), then a random spawn point within that stage,
 publishes the resolved `PlayerSpawnPoint` into `*target` (grid position +
-world-space adjustment, same `PlayerSpawnGridPos`/`SPAWN_POS_ADJUST` idiom
+world-space adjustment, same `PlayerSpawnGridPos`/`sSpawnPosAdjust` idiom
 as the already-matched `GenerateInitialSpawn`), increments
 `*gpDinamicLinkPenalty`, and returns the chosen stage. Called throughout
 this unit as the shared "give me somewhere to land" primitive (already
@@ -26,18 +26,18 @@ visible at several now-matched call sites: `Test4StageTransition`,
 ## `D_80087F34` is NOT a second table -- same discovery as `CARDINAL_ROTATIONS`/`CARDINAL_ANGLES`
 
 The retail disassembly references `D_80087F34` for reading the `z` field of
-the chosen `SPAWN_POS_ADJUST[adjustment]` entry, looking like a second,
-parallel array. It is not: `SPAWN_POS_ADJUST`'s own splat symbol only
+the chosen `sSpawnPosAdjust[adjustment]` entry, looking like a second,
+parallel array. It is not: `sSpawnPosAdjust`'s own splat symbol only
 claims 4 bytes (`asm/data/783DC.data.s`, one `.word`) before `D_80087F34`
 begins immediately after -- exactly 4 bytes in, which is the `.z` OFFSET
 within `RelativePos` (`{s16 x,y,z}`, 6 bytes). Walking `D_80087F34`'s raw
 shorts confirms it: every third `short` (the position that would be entry
 `i`'s `.z`) is `0x0000`, and the OTHER two positions per 6-byte group hold
 the actual varying values -- i.e. it is the SAME flat `RelativePos[]` array
-as `SPAWN_POS_ADJUST`, just split into two splat symbols because
+as `sSpawnPosAdjust`, just split into two splat symbols because
 `D_80087F34` happens to sit at exactly the byte the compiler's own `.z`
 field-address computation resolves to. A plain whole-struct copy,
-`target->position = SPAWN_POS_ADJUST[entry->adjustment];` -- literally the
+`target->position = sSpawnPosAdjust[entry->adjustment];` -- literally the
 same line `GenerateInitialSpawn` already uses, byte-exact -- reproduces
 this without ever referencing `D_80087F34` in the C source at all; the
 compiler's own unaligned-copy codegen (`lwl`/`lwr` for the 4-byte `x,y`
@@ -104,7 +104,7 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 stg, s32 unused)
 	index = rand() % LEN_STAGE_SPAWNPOINTS[stage];
 	entry = &STAGE_SPAWNPOINTS[stage][index];
 	*(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
-	target->position = SPAWN_POS_ADJUST[entry->adjustment];
+	target->position = sSpawnPosAdjust[entry->adjustment];
 	(*gpDinamicLinkPenalty)++;
 	return stage;
 }

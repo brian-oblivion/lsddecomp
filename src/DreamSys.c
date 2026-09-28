@@ -1551,7 +1551,7 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 fromStage, s32 unused)
     index = rand() % LEN_STAGE_SPAWNPOINTS[stage];
     entry = &STAGE_SPAWNPOINTS[stage][index];
     *(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
-    target->position = SPAWN_POS_ADJUST[entry->adjustment];
+    target->position = sSpawnPosAdjust[entry->adjustment];
     (*gpDinamicLinkPenalty)++;
     return stage;
 }
@@ -1785,7 +1785,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
         entry = &spawns[triggerStage][spawnIndex];
         gLinkSpawnIndex = spawnIndex;
         *(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
-        target->position = SPAWN_POS_ADJUST[entry->adjustment];
+        target->position = sSpawnPosAdjust[entry->adjustment];
         if (flag != 0)
             (*gpNavChallengesComplete)[entry->extra] = 1;
         return gLinkDstStage;
@@ -1814,7 +1814,7 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
 
     found:
         *(PlayerSpawnGridPos *)dest = *(PlayerSpawnGridPos *)entry;
-        dest->position = SPAWN_POS_ADJUST[entry->adjustment];
+        dest->position = sSpawnPosAdjust[entry->adjustment];
         return stage;
     }
 

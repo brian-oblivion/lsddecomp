@@ -816,7 +816,7 @@ typedef struct StageSpawn {
     struct MapChunk chunk;
     struct MapTile tile;
     /* u8, not s8 (round 2026-09-08, GenerateInitialSpawn): retail reads it
-	   with `lbu` -- it indexes SPAWN_POS_ADJUST, so must zero-extend. */
+	   with `lbu` -- it indexes sSpawnPosAdjust, so must zero-extend. */
     u8 adjustment;
     s8 extra;
 } StageSpawn;
@@ -838,7 +838,7 @@ extern DreamSysMethods gDreamSysMethods;
 
 extern s16 sStageTimeLimits[];
 
-extern struct RelativePos SPAWN_POS_ADJUST[];
+extern struct RelativePos sSpawnPosAdjust[];
 
 extern StageSpawn *STAGE_SPAWNPOINTS[];
 /* Retyped u8 (round 2026-09-08, GenerateInitialSpawn): retail reads it with

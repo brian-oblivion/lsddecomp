@@ -28,7 +28,7 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
 
 	found:
 		*(PlayerSpawnGridPos *)dest = *(PlayerSpawnGridPos *)entry;
-		dest->position = SPAWN_POS_ADJUST[entry->adjustment];
+		dest->position = sSpawnPosAdjust[entry->adjustment];
 		return stage;
 	}
 
@@ -66,7 +66,7 @@ by hand via grep since these are plain externs, not a padded struct).
   right after the `LEN_STAGE_SPAWNPOINTS[stage]` load, plus consequent
   address drift through the rest of the function.
 - **`include/DreamSys.h`: `StageSpawn::adjustment` `s8` -> `u8`.** It indexes
-  `SPAWN_POS_ADJUST` (a `struct RelativePos[]`, stride 6). With `s8`, the
+  `sSpawnPosAdjust` (a `struct RelativePos[]`, stride 6). With `s8`, the
   load is `lb`; retail's is `lbu`. Symptom before the fix: right register
   content, wrong sign-extension instruction, at the one spot the value is
   read.
