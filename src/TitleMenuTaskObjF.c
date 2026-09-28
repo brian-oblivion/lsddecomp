@@ -23,17 +23,14 @@
  * TaskObjF (include/TaskObjF.h) is the memory-card task TitleMenu's SAVE
  * and LOAD drive: its allocator and ctor, then its child links, card
  * events, checks and file probes, then its file I/O, buffers and the two
- * operations. Its state machine, its getter and StampSaveTitleFileLetter
- * are still src/class_3bb8c_g.c, pending the head's yaml edit (below).
+ * operations, and last its state machine, its getter and
+ * StampSaveTitleFileLetter.
  *
- * What decided its edges (python3 tools/tuboundary.py): it was four carve
- * slices (class_3bb8c_c, _d, _e, _f), merged because a class straddled
+ * What decided its edges (python3 tools/tuboundary.py): it was five carve
+ * slices (class_3bb8c_c, _d, _e, _f, _g), merged because a class straddled
  * each edge: TitleMenu the first ("start edge possible, soft-unlikely"),
- * TaskObjF the other two ("start edge possible", then "soft-unlikely").
- * TaskObjF also straddles the edge to class_3bb8c_g ("soft-unlikely"), but
- * that unit owns the region's .rodata line (its two jump tables) and this
- * one owns none, so unitfile.py leaves the merge to the head. The file's
- * end after class_3bb8c_g is real: the placed Sony object libapi/a51
+ * TaskObjF the other three ("start edge possible", then "soft-unlikely"
+ * twice). The file's end is real: the placed Sony object libapi/a51
  * follows, and it meets the forced boundary tuboundary notes there (jump
  * tables 0x80011594 / 0x80011628).
  *
@@ -206,7 +203,7 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSy
 extern void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded);
 
 /* The save title's day number, full-width characters 9..11 of
- * "LSD   Day001" (class_3bb8c_g.c's layout of the title). */
+ * "LSD   Day001" (StampSaveTitleFileLetter's layout of the title, below). */
 #define SAVE_TITLE_DAY 9
 #define SAVE_TITLE_DAY_DIGITS 3
 
@@ -329,7 +326,7 @@ extern s32 strlen(char *s);
 extern void DecodeFullWidthSjis(void *dst, void *src);
 
 /* gSaveTitle is 2-byte full-width characters; the characters from here on
- * are padding after "LSD   Day001" (class_3bb8c_g.c's SAVE_TITLE_PADDING). */
+ * are padding after "LSD   Day001". */
 #define SAVE_TITLE_PADDING 12
 /* beginSave's titleEditPos: the player's text goes in from the character
  * after the padding's first space. */
@@ -1312,16 +1309,10 @@ void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
     }
 }
 
-/* ---- merged from class_3bb8c_g ---- */
-
 /*
- * class_3bb8c_g -- TaskObjF's state machine (include/TaskObjF.h): slots
- * +0x07C..+0x0B0 of gTaskObjFMethods and the table getter, plus
- * StampSaveTitleFileLetter, which writes a save file's letter into its
- * title. TaskObjF's other methods are in TitleMenuTaskObjF.c, and this unit
- * joins that file (FINISHING-PLAN track 8) once its .rodata line (the two
- * jump tables) is renamed to it: unitfile.py leaves that yaml edit to the
- * head.
+ * TaskObjF's state machine: slots +0x07C..+0x0B0 of gTaskObjFMethods and
+ * the table getter, plus StampSaveTitleFileLetter, which writes a save
+ * file's letter into its title.
  *
  * setState (enum TaskObjFState) notifies the parent, swaps the message icon
  * (a ScreenSprite of CARD\<name>.TIM: loadCardIcon, releaseCardIcon) and
@@ -1634,7 +1625,7 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
  * (9..11), then padding. */
 #define SAVE_TITLE_LETTER_FIELD 3
 #define SAVE_TITLE_LETTER 4
-#define SAVE_TITLE_PADDING 12
+/* SAVE_TITLE_PADDING (12) is defined above, with gSaveTitle. */
 /* gSaveTitleGlyphs: the full-width letters a..o (0..14), one per save file
  * -01..-15, then three full-width spaces and "Day" (15..20). */
 #define SAVE_TITLE_GLYPH_SPACES 15
