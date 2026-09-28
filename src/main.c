@@ -18,10 +18,7 @@
 #include "common.h"
 #include "GameApplication.h"
 #include "class_16334.h"
-
-/* Local, opaque: nothing here dereferences a BMemPMgr (BMemPMgr.h), it
- * only passes the pointer through. */
-typedef struct BMemPMgr BMemPMgr;
+#include "BMemPMgr.h"
 
 /* Psy-Q libapi (`SetMem`, linked from `libapi/c159`, splat `o` segment).
  * One `s32` argument observed at this, its only call site. */
