@@ -63,3 +63,5 @@ For the head to apply by type scope. Each one fails to compile in another unit w
 ## Round 101 (delta): track 7
 
 Step 3 (locals and parameters): `a1` -> `on` (written inverted into GsDOFF, so nonzero means displayed). Byte-identical.
+
+Step 5 (comments): Function comment added (the double inversion over GsDOFF).

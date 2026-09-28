@@ -130,3 +130,5 @@ Step 2: the three raw offsets `(u8 *)data + 4` / `+ 8` read the table as what it
 Step 3 (locals and parameters): `flag` -> `set`, `data` -> `table` (the prototype's names), `vals` -> `angles`, `dst` -> `param` (GsCOORD2PARAM), `field` -> `next` (the carried pointer the loop advances ahead of `cur`). Byte-identical.
 
 Step 4 (constants): `360` -> `DEGREES_PER_TURN` (unit-local: a degree count in 20.12 over 360 is the angle in 4096ths of a turn), `% 4096` -> `% ONE` (libgte's ONE, one full turn in GsCOORD2PARAM.rotate's unit). Byte-identical.
+
+Step 5 (comments): Function comment added, and two `MATCHING:` lines, both measured this pass: dividing inside each call's statement (`RatioToFixed12(...) / DEGREES_PER_TURN`) breaks the build, as the report above records for the loop shape and the pre-branch `next`.

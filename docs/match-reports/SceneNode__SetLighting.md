@@ -33,3 +33,5 @@ Round 71 (alpha). `func_8001D3CC` -> `SceneNode__SetLighting`, **tier A**. Table
 ## Round 101 (delta): track 7
 
 Step 3 (locals and parameters): `a1` -> `on` (written inverted into GsLOFF, so nonzero means lit). Byte-identical.
+
+Step 5 (comments): Function comment added (GsLOFF inverted on write).

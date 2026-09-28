@@ -60,3 +60,5 @@ SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX
 ## Round 101 (delta): track 7
 
 Step 3 (locals and parameters): `sub` -> `coord2`. Byte-identical.
+
+Step 5 (comments): The `coord2` local (a copy of self->coord2 used once) is gone: `BMemPMgrFree(self->coord2->param)` builds byte-identical, measured.

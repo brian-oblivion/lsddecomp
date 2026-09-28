@@ -1,12 +1,23 @@
 /*
- * code_d294 -- SceneNode (include/SceneNode.h), part 1 of 3: slots +0x000
- * to +0x070. New, the ctor (allocates the GsCOORDINATE2 and GsCOORD2PARAM)
- * and Finalize; the BasicClass child-list overrides, which link or unlink a
- * TmdModel child as it is added or removed; OnNotify, which dispatches on
- * the sender's class id; Reset (identity transform); UpdateRotation and
- * UpdateScale (set or add three Ratio16s into the GsCOORD2PARAM); attach to
- * and detach from a parent's coordinate; and the first five setters over
- * GsDOBJ2.attribute. Part 2 is code_d294_b.c, part 3 code_d294_c.c.
+ * code_d294 -- SceneNode (include/SceneNode.h), part 1 of 3: the occupants
+ * of slots +0x000 to +0x070 of gSceneNodeMethods. Part 2 is code_d294_b.c,
+ * part 3 code_d294_c.c; their shared helpers are declared in code_d294.h.
+ *
+ * Lifecycle: New_SceneNode, the ctor (which allocates the node's
+ * GsCOORDINATE2 and its GsCOORD2PARAM, and fails when either allocation
+ * does) and Finalize (detach from parent and children, free both).
+ *
+ * Children: the BasicClass child-list overrides, which also link a TmdModel
+ * child into the node's GsDOBJ2 when it is added and unlink it when it is
+ * removed; OnNotify, which dispatches on the sender's class id; and the
+ * walk over the children attached to this node (GetNextAttachedChild).
+ *
+ * Transform: Reset (identity), UpdateRotation and UpdateScale (set or add
+ * three Ratio16s into the GsCOORD2PARAM), and attach to and detach from a
+ * parent's coordinate.
+ *
+ * Attribute: the first five setters over GsDOBJ2.attribute, each replacing
+ * one libgs field through GetSetBitField and returning its old value.
  */
 #include "common.h"
 #include <libgte.h>
@@ -66,13 +77,10 @@ void *SceneNode__SceneNode(SceneNode *self) {
 }
 
 void SceneNode__Finalize(SceneNode *self) {
-    GsCOORDINATE2 *coord2;
-
     self->methods->detachFromParent(self);
     self->methods->detachAttachedChildren(self);
     self->methods->slot5C(self, 0);
-    coord2 = self->coord2;
-    BMemPMgrFree(coord2->param);
+    BMemPMgrFree(self->coord2->param);
     BMemPMgrFree(self->coord2);
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
@@ -96,6 +104,9 @@ void SceneNode__RemoveAllChildren(SceneNode *self) {
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
+/* The base onNotify first, then by the SENDER's class: a Pad's event goes to
+ * onPadEvent, a FrameClock's to update, another SceneNode's to
+ * dispatchLinkCommand. */
 void SceneNode__OnNotify(SceneNode *self, BasicClass *sender, s32 event) {
     s32 tag;
 
@@ -110,6 +121,7 @@ void SceneNode__OnNotify(SceneNode *self, BasicClass *sender, s32 event) {
     }
 }
 
+/* No rotation, unit scale, tick and attribute zero. */
 void SceneNode__Reset(SceneNode *self) {
     self->tick = 0;
     self->attribute = 0;
@@ -119,6 +131,9 @@ void SceneNode__Reset(SceneNode *self) {
     self->coord2->flg = 1;
 }
 
+/* table is Ratio16[3], degrees about x, y and z. set: store them as
+ * coord2->param->rotate; else add them, wrapping at a full turn. Either way
+ * coord2->flg is cleared so libgs recomputes the matrix. */
 void SceneNode__UpdateRotation(SceneNode *self, s32 set, void *table) {
     Ratio16 *ratios = table;
     s32 angles[3];
@@ -128,10 +143,12 @@ void SceneNode__UpdateRotation(SceneNode *self, s32 set, void *table) {
     angles[0] = RatioToFixed12(&ratios[0]);
     angles[1] = RatioToFixed12(&ratios[1]);
     angles[2] = RatioToFixed12(&ratios[2]);
+    /* MATCHING: all three calls, then all three divisions */
     angles[0] /= DEGREES_PER_TURN;
     angles[1] /= DEGREES_PER_TURN;
     angles[2] /= DEGREES_PER_TURN;
     param = self->coord2->param;
+    /* MATCHING: `next` taken before the branch, and the loop's copy-then-advance walk */
     next = &param->rotate.vx;
     if (set) {
         param->rotate.vx = angles[0];
@@ -150,6 +167,8 @@ void SceneNode__UpdateRotation(SceneNode *self, s32 set, void *table) {
     self->coord2->flg = 0;
 }
 
+/* table is Ratio16[3], the x, y and z scale. set: store them as
+ * coord2->param->scale; else add them. Clears coord2->flg. */
 void SceneNode__UpdateScale(SceneNode *self, s32 set, void *table) {
     Ratio16 *ratios = table;
     s32 sx, sy, sz;
@@ -160,6 +179,7 @@ void SceneNode__UpdateScale(SceneNode *self, s32 set, void *table) {
     sz = RatioToFixed12(&ratios[2]);
     param = self->coord2->param;
     if (set) {
+        /* MATCHING: the (s16) casts, on both paths */
         param->scale.vx = (s16)sx;
         param->scale.vy = (s16)sy;
         param->scale.vz = (s16)sz;
@@ -171,11 +191,15 @@ void SceneNode__UpdateScale(SceneNode *self, s32 set, void *table) {
     self->coord2->flg = 0;
 }
 
+/* Only when the node has no parent: record `parent`, chain coord2 under the
+ * parent's, add the node to the parent's children and set its offset from
+ * the parent (zero when `offset` is NULL). */
 SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *parent, LongVec3 *offset) {
     GsCOORDINATE2 *coord2;
 
     if (self->parent == NULL) {
         self->parent = parent;
+        /* MATCHING: coord2 through a local, reloaded after addChild */
         coord2 = self->coord2;
         coord2->super = parent->coord2;
         parent->methods->addChild(parent, (BasicClass *)self);
@@ -218,28 +242,29 @@ void SceneNode__DetachAttachedChildren(SceneNode *self) {
     } while (cursor);
 }
 
+/* An iterator over self's children that are SceneNodes attached to self
+ * (their parent is self). Start with *child NULL; each call leaves the next
+ * one in *child, or NULL when the list is done (*cursor NULL). */
 void SceneNode__GetNextAttachedChild(SceneNode *self, SceneNode **child, BasicClassListNode **cursor) {
-    s32 classId;
-
-    classId = SCENENODE_CLASS_ID;
     do {
         if (*child == NULL) {
             *cursor = self->children;
         }
         GetNextBasicClass((BasicClass **)child, cursor);
-        if (*child != NULL) {
-            if ((((*child)->methods->header) & CLASS_ID_ROOT_MASK) == classId) {
-                if ((*child)->parent == self) {
-                    return;
-                }
-            }
+        if (*child != NULL && ((*child)->methods->header & CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID &&
+            (*child)->parent == self) {
+            return;
         }
     } while (*cursor != NULL);
     *child = NULL;
 }
 
+/* Slot +0x05C: empty, and no subclass table overrides it. Finalize calls it
+ * with (self, 0). */
 void SceneNode__NoOpSlot5C(void) {}
 
+/* GsDOFF is display-off, so `on` is written inverted and the old bit is
+ * returned inverted: nonzero means the node was displayed. */
 s32 SceneNode__SetDisplay(SceneNode *self, s32 on) {
     return GetSetBitField(&self->attribute, ATTR_DOFF_SHIFT, 1, on == 0) == 0;
 }
@@ -252,6 +277,7 @@ u32 SceneNode__SetSemiTransRate(SceneNode *self, u32 rate) {
     return GetSetBitField(&self->attribute, ATTR_ABR_SHIFT, 2, rate);
 }
 
+/* GsLOFF is lighting-off: `on` is written inverted; returns the old GsLOFF. */
 u32 SceneNode__SetLighting(SceneNode *self, s32 on) {
     return GetSetBitField(&self->attribute, ATTR_LOFF_SHIFT, 1, on == 0);
 }

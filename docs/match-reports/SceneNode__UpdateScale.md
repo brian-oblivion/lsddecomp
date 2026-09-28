@@ -80,3 +80,5 @@ SceneNodeSub44 is deleted: coord2->param is Sony's GsCOORD2PARAM (VECTOR scale, 
 Step 2: the three raw offsets `(u8 *)data + 4` / `+ 8` read the table as what it is, Ratio16[3] (include/SceneNode.h), through a local `Ratio16 *ratios = data`: `&ratios[0]`, `&ratios[1]`, `&ratios[2]`. The parameter stays `void *` because the prototype and the slot type in include/SceneNode.h say so (not this unit's to change; proposed). Byte-identical.
 
 Step 3 (locals and parameters): `flag` -> `set`, `data` -> `table`, `r0`/`r1`/`r2` -> `sx`/`sy`/`sz`, `dst` -> `param`. Byte-identical.
+
+Step 5 (comments): Function comment added; `MATCHING:` on the `(s16)` casts, measured this pass (dropping them breaks the build).

@@ -109,3 +109,5 @@ SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX
 ## Round 101 (delta): track 7
 
 Step 3 (locals and parameters): `obj` -> `parent`, `vec` -> `offset` (it becomes coord2->coord.t, the offset from the parent), `sub` -> `coord2`. Byte-identical.
+
+Step 5 (comments): Function comment added; `MATCHING:` on the `coord2` local reloaded after addChild, measured this pass (writing `self->coord2->...` throughout breaks the build).

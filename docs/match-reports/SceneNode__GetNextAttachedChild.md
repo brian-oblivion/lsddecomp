@@ -83,3 +83,5 @@ it only tests for NULL. Byte-identical.
 Step 3 (locals and parameters): `entry` -> `child`, `tag` -> `classId`. Byte-identical.
 
 Step 4 (constants): `TAG_SCENENODE` / `CLASS_TAG_MASK` -> `SCENENODE_CLASS_ID` / `CLASS_ID_ROOT_MASK` (include/SceneNode.h, include/BasicClass.h). Byte-identical.
+
+Step 5 (comments): The body reads as one condition: the `classId` local that held the constant 4 and the three nested `if`s become `*child != NULL && (header & CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID && parent == self`, byte-identical (measured, whole image). A function comment states the iterator protocol.

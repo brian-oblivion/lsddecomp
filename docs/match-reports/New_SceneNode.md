@@ -62,3 +62,17 @@ Round 71 (alpha). `func_8001CA94` -> `New_SceneNode`, **tier A**. Allocates 0x44
 ## Round 101 (delta): track 7
 
 Step 4 (constants): `0x44` -> `sizeof(SceneNode)` (the struct is 0x44 bytes, include/SceneNode.h; the whole-image build proves the size). Byte-identical.
+
+Step 5 (comments): the unit banner was rewritten as documentation (lifecycle, children, transform, attribute; the helpers' header). It held no project history. The banner before this pass, verbatim:
+
+```c
+/*
+ * code_d294 -- SceneNode (include/SceneNode.h), part 1 of 3: slots +0x000
+ * to +0x070. New, the ctor (allocates the GsCOORDINATE2 and GsCOORD2PARAM)
+ * and Finalize; the BasicClass child-list overrides, which link or unlink a
+ * TmdModel child as it is added or removed; OnNotify, which dispatches on
+ * the sender's class id; Reset (identity transform); UpdateRotation and
+ * UpdateScale (set or add three Ratio16s into the GsCOORD2PARAM); attach to
+ * and detach from a parent's coordinate; and the first five setters over
+ * GsDOBJ2.attribute. Part 2 is code_d294_b.c, part 3 code_d294_c.c.
+ */```
