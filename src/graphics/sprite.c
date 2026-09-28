@@ -13,7 +13,7 @@
  * a character code into its cell in the font texture. TextRow and
  * VariantSprite are Sprite subclasses too, with their methods elsewhere.
  *
- * RequestedFile (include/RequestedFile.h, 0xB03): a FileResource that asks
+ * RequestedFile (include/requested_file.h, 0xB03): a FileResource that asks
  * the active data-source driver for one named file at construction and
  * records when it has arrived.
  *
@@ -31,7 +31,7 @@
 #include "char_sprite.h"
 #include "light_rig.h"
 #include "flat_light_obj.h"
-#include "RequestedFile.h"
+#include "requested_file.h"
 #include "tim_image.h"
 #include "frame_clock.h"
 #include "bmem_pmgr.h"

@@ -1,5 +1,5 @@
-#ifndef REQUESTEDFILE_H
-#define REQUESTEDFILE_H
+#ifndef REQUESTED_FILE_H
+#define REQUESTED_FILE_H
 
 #include "file_resource.h"
 

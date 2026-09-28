@@ -28,7 +28,7 @@ void *GetRequestedFileMethods(void) {
 
 ## Track 4 (2026-09-26, round 87, delta)
 
-Class id 0xB03 is unified as `RequestedFile` in `include/RequestedFile.h`
+Class id 0xB03 is unified as `RequestedFile` in `include/requested_file.h`
 (FILERESOURCE_SLOTS/FIELDS, 0x30 bytes, one own field `loaded` at +0x02C). The
 unit-local views `D_8006EED8Obj`/`D_8006EED8Methods` and the single-slot cast
 views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
@@ -53,7 +53,7 @@ name because the only thing known beyond those mechanics was the caller's use
 (WBgm loads SEQ files through it); a mechanics name sidesteps that objection
 rather than overriding it, and `SeqFile` was rejected for the same reason.
 The table and getter followed (`gRequestedFileMethods`,
-`GetRequestedFileMethods`), and the header moved to `include/RequestedFile.h`.
+`GetRequestedFileMethods`), and the header moved to `include/requested_file.h`.
 renametype.py also rewrote the old class name inside earlier sections'
 history prose in this and sibling reports (known, pending an operator
 decision; not hand-reverted).

@@ -143,7 +143,7 @@ unchanged.
 The unit-local view `SeqData` (BASICCLASS_FIELDS, +0x010 `addr`, +0x02C
 `loaded`) and its `extern SeqData *New_RequestedFile(s32)` are gone: the
 census missed them, as New_RequestedFile's return type. `WBgm::seqData` is
-`RequestedFile *` (`include/RequestedFile.h`, round 87, delta). `addr` is
+`RequestedFile *` (`include/requested_file.h`, round 87, delta). `addr` is
 FileResource's `buffer` (+0x010), `loaded` the same field under the same
 name; the release calls lose their `(BasicClass *)` casts and WBgm__SetSeq
 casts its s32 argument to the ctor's `char *name`. The whole image stays

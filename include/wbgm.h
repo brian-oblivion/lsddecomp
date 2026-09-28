@@ -4,7 +4,7 @@
 #include "basic_class.h"
 #include "draw_system.h"
 #include "VabStreamObj.h"
-#include "RequestedFile.h"
+#include "requested_file.h"
 
 /*
  * WBgm -- class id 0x50, method table gWBgmMethods (24 slots), a direct
