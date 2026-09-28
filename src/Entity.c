@@ -1033,7 +1033,7 @@ void Entity__MoodCue32(Entity *this) {
 
 void Entity__MoodCue33(Entity *this, SoundCueSet *out) {
     if (this->targetReached != 0) {
-        this->methods->updateScale(this, 1, SCALE_QUARTER);
+        this->methods->updateScale(this, 1, sScaleQuarter);
     } else if (out->tick % 30 == 0) {
         out->attenuation = 0;
         out->slots[0].program = 3;
@@ -2645,7 +2645,7 @@ void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
         } else if (this->moodTimer >= 1926) {
             scale = sScaleHalf;
         } else if (this->moodTimer >= 1921) {
-            scale = SCALE_QUARTER;
+            scale = sScaleQuarter;
         } else {
             scale = sScaleEighth;
         }
@@ -2691,7 +2691,7 @@ void Entity__MoodCue103(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue104(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, SCALE_QUARTER);
+    this->methods->updateScale(this, 1, sScaleQuarter);
     if (this->moodTimer >= 201 && this->moodTimer < 300) {
         this->methods->moveLocalY(this, -32, 0);
     }
@@ -2839,7 +2839,7 @@ void Entity__MoodCue118(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue121(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, SCALE_QUARTER);
+    this->methods->updateScale(this, 1, sScaleQuarter);
 }
 
 void Entity__MoodCue123(Entity *this, SoundCueSet *out) {

@@ -49,7 +49,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         } else if (this->unkFC >= 0x786) {
             a2 = sScaleHalf;
         } else if (this->unkFC >= 0x781) {
-            a2 = SCALE_QUARTER;
+            a2 = sScaleQuarter;
         } else {
             a2 = sScaleEighth;
         }
@@ -76,11 +76,11 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
 ## Residue chased: two swapped row pointers in the cascading chain
 
 First attempt built and scored 146/148, differing only at the LAST two
-`addiu %lo(...)` immediates -- `sScaleEighth` and `SCALE_QUARTER` swapped. Tracing
+`addiu %lo(...)` immediates -- `sScaleEighth` and `sScaleQuarter` swapped. Tracing
 the `bnez`/delay-slot-recompute chain by hand for the last two arms (each
 delay slot recomputes `$v0` for the NEXT comparison down the chain, and the
 final arm sets `a2 = sScaleEighth` BEFORE testing whether to overwrite it with
-`SCALE_QUARTER`, i.e. the "set first, conditionally overwrite" idiom applied to
+`sScaleQuarter`, i.e. the "set first, conditionally overwrite" idiom applied to
 which POINTER a2 ends up holding, not a value) showed the two low-end arms
 were reversed from my first reading. Fixed by swapping which arm gets which
 row pointer; closed to 148/148 on the second build.
@@ -129,19 +129,19 @@ names sort in table order.
 
 ## Data constants decoded this round
 
-`sScaleEighth` (0x80089E20) and `SCALE_QUARTER` (0x80089DCC), both cascade
+`sScaleEighth` (0x80089E20) and `sScaleQuarter` (0x80089DCC), both cascade
 arms in this function's `moodTimer`-threshold chain, decoded directly from
 `disk/SLPS_015.56` as four s16 `{num,den}` pairs (X/Y(yaw)/Z/W, matching
 `sScaleHalf`/`sScaleSix`'s own layout):
 
 - `sScaleEighth`: `(1,8, 1,8, 1,8, 1,8)` -- uniform X=Y=Z=1/8, the same
   unit-fraction-word convention as `sScaleHalf` (1/2).
-- `SCALE_QUARTER`: `(1,4, 1,4, 1,4, 1,2)` -- uniform X=Y=Z=1/4, W=1/2
+- `sScaleQuarter`: `(1,4, 1,4, 1,4, 1,2)` -- uniform X=Y=Z=1/4, W=1/2
   (ignored per the established `sScaleHalf`/`sScaleSix`/
   `sRotationYawMinus120` precedent that the 4th pair is never reflected
   in the name).
 
-Also used by `Entity__MoodCue104`/`Entity__MoodCue121` (`SCALE_QUARTER`)
+Also used by `Entity__MoodCue104`/`Entity__MoodCue121` (`sScaleQuarter`)
 elsewhere in this unit -- same symbol, not redecoded per call site.
 
 ## Three constants left unnamed this round
