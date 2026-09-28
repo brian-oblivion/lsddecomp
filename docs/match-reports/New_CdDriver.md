@@ -108,3 +108,16 @@ the unit's `CDDRIVER_SIZE 0x2C` define is gone. The note above that the view
 was partial no longer holds: `CdDriver` is `FILERESOURCE_FIELDS` exactly, and
 FileResource's last field (`loadState`, +0x02A, u16) ends the object at 0x2C,
 so `sizeof` is the size. Byte-identical.
+
+## History moved from the unit banner (round 101, track 7)
+
+The `code_179d8_o.c` banner carried, until round 101: the unit's retail range,
+vram 0x800271D8..0x800272D0; the class's header word 0x13
+(GameApplicationFileResource.c's DATASOURCE_CD); the command that resolves its
+four functions' slots, `tools/classtable.py gCdDriverMethods --vs
+gFileResourceMethods` (New_CdDriver dispatches +0x008, CdDriver__CdDriver is
++0x008, CdDriver__Finalize +0x00C calling +0x074 then +0x05C,
+CdDriver__NoOpSlot40 +0x040); and the allocation's `CDDRIVER_SIZE 0x2C`
+define, now `sizeof(CdDriver)`. The two externs' comments were also corrected:
+`BMemPMgrAlloc` is the game's own pool allocator (src/BMemPMgr.c), not a Psy-Q
+one.

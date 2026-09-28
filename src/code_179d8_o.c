@@ -1,20 +1,29 @@
 /*
- * code_179d8_o -- the allocator, constructor, finalize and one empty slot
- * of CdDriver, the CD-ROM data source (include/CdDriver.h; method table
- * gCdDriverMethods, header word 0x13 = GameApplicationFileResource.c's DATASOURCE_CD).
- * vram 0x800271D8..0x800272D0. `tools/classtable.py gCdDriverMethods --vs
- * gFileResourceMethods` shows this unit's four functions as:
- *   New_CdDriver          allocates 0x2C bytes, dispatches table +0x008
- *   CdDriver__CdDriver    +0x008: FileResource ctor, own table, InitCdDrive
- *   CdDriver__Finalize    +0x00C: cancelRequests (+0x074), freeBuffer (+0x05C)
- *   CdDriver__NoOpSlot40  +0x040: empty; null in FileResource's table
- * The class's other methods are in code_179d8_s.c and code_179d8_q.c.
+ * CdDriver's lifecycle methods (the class is include/CdDriver.h's): the
+ * allocator, the constructor, the finalizer, and the empty slot +0x040.
+ *
+ *   New_CdDriver          allocate a CdDriver, construct it through its own
+ *                         table's ctor slot
+ *   CdDriver__CdDriver    FileResource's ctor, then CdDriver's own table,
+ *                         inQueueDispatch cleared, and InitCdDrive (once per
+ *                         boot: CdSetDebug(0), double-speed mode)
+ *   CdDriver__Finalize    cancel the object's queued requests, then free its
+ *                         buffer (FileResource__Finalize's shape)
+ *   CdDriver__NoOpSlot40  an empty body for slot +0x040, which FileResource's
+ *                         table leaves null
+ *
+ * Nothing calls New_CdDriver: the driver's slots are copied into its
+ * clients' tables by SetActiveDataSource (CdDriver.h), so the class's
+ * request methods run on other objects. The rest of the class is in
+ * code_179d8_s.c (the request methods) and code_179d8_q.c.
  */
 #include "common.h"
 #include "CdDriver.h"
 
-extern void *BMemPMgrAlloc(s32 size); /* Psy-Q allocator, matched signature used project-wide */
-extern void InitCdDrive(void); /* code_179d8_q: one-shot CdSetDebug(0) + CdlSetmode double speed */
+/* The game's pool allocator, src/BMemPMgr.c. */
+extern void *BMemPMgrAlloc(s32 size);
+/* Defined in code_179d8_q.c. */
+extern void InitCdDrive(void);
 
 CdDriver *New_CdDriver(void) {
     CdDriver *self;
