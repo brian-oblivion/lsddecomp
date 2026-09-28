@@ -1576,7 +1576,7 @@ void StyleTeardown(void) {
 extern Ratio16 sStyleSpawnScales[][3];
 extern s32 gStyleSpawnYChoices[];
 extern Ratio16 *sStyleSpawnScale;
-extern s32 gStyleSpawnTableIndex;
+extern s32 sStyleSpawnTableIndex;
 /* The first word of the StyleEffectParams block every effect is built from
  * (sStyleSpawnOffsetX .. sStyleSpawnColors, separate symbols in the image). */
 extern s32 sStyleSpawnOffsetX;
@@ -1592,7 +1592,7 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
     s32 offsetY;
     void (*setup)(LongVec3 *, s32);
 
-    gStyleSpawnTableIndex = rand() % 7;
+    sStyleSpawnTableIndex = rand() % 7;
     sStyleSpawnScale = sStyleSpawnScales[(u32)rand() % 5];
     offsetY = (u32)rand() % 5;
     if (offsetY != 0) {
@@ -1684,7 +1684,7 @@ extern u8 sStyleKind2Colors[][3];
 extern s32 sStyleSpawnColors[];
 extern Ratio16 *sStyleSpawnRotation;
 extern Ratio16 sStyleSpawnRotations[][3];
-extern s32 gStyleSpawnTableIndex;
+extern s32 sStyleSpawnTableIndex;
 
 /* MATCHING: the first colour store goes through a one-field struct, as
  * PtrBoxK3's does, so the sStyleDay load may schedule above it. */
@@ -1714,7 +1714,7 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     SetupStyleSpawnParamsRandom(pos, gStyleSpawnYChoice2);
     rotation = &sStyleSpawnRotation;
     *rotation = sStyleSpawnRotations[0];
-    gStyleSpawnTableIndex = rand() % 6;
+    sStyleSpawnTableIndex = rand() % 6;
     /* MATCHING: the block's address is taken back from its rotation member */
     *slots = New_StyleEffect(
         2, (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),

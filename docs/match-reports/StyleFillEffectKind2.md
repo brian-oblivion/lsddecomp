@@ -13,7 +13,7 @@ local. Four separate things were wrong, found in this order:
 
 | # | change | effect |
 | --- | --- | --- |
-| 1 | `gStyleSpawnTableIndex = randval % 6;` | retail's magic is `0x2AAAAAAB` with no shift = signed **/6**; the preserved `randval - (randval / 3) * 6` computed a different function. 49 -> 51/79 |
+| 1 | `sStyleSpawnTableIndex = randval % 6;` | retail's magic is `0x2AAAAAAB` with no shift = signed **/6**; the preserved `randval - (randval / 3) * 6` computed a different function. 49 -> 51/79 |
 | 2 | first `sStyleSpawnColors` store through `S32BoxK2 *slot` (`slot->v = ...`) | the whole `% 20` prefix (`lui 0x6666`, `lw sStyleDay`, `mult`) now interleaves into the `% 3`'s `multu` latency exactly as retail. Same mechanism as StyleFillEffectKind3 this round: a store through a plain `s32 *` is an opaque `(mem (reg))` the scheduler will not hoist a global load above; an in-struct store at a varying address does not conflict with a scalar at a fixed address. Went 1 word short (the if/else, below). |
 | 3 | `r = rand();` then `(u32) r % 3`, instead of inlining `rand()` or a separate `idx = rand() % 3` | inline put `slot` in `$s0`; `idx` put the remainder in `$a0`. With the rand RESULT in a local, both `$a2` (slot) and `$v0` (remainder) are retail's. |
 | 4 | `val = (sStyleDay / 20) * 20; if (sStyleDay != val) val = sStyleKind2AltColor; else val = 0;` | **79/79**, `OK: build matches retail` |
@@ -78,7 +78,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     SetupStyleSpawnParamsRandom(arg1, (void *) gStyleSpawnYChoice2);
     q = &sStyleSpawnRotation;
     *q = sStyleSpawnRotations;
-    gStyleSpawnTableIndex = rand() % 6;
+    sStyleSpawnTableIndex = rand() % 6;
     *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) sStyleGrid, arg1);
     arg0++;
     return arg0;
@@ -387,7 +387,7 @@ extern u8 sStyleKind2Colors[];
 extern s32 sStyleSpawnColors[];
 extern u8 *sStyleSpawnRotation;
 extern u8 sStyleSpawnRotations[];
-extern s32 gStyleSpawnTableIndex;
+extern s32 sStyleSpawnTableIndex;
 extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);
 extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3);
 
@@ -412,7 +412,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     q = &sStyleSpawnRotation;
     *q = sStyleSpawnRotations;
     randval = rand();
-    gStyleSpawnTableIndex = randval - (randval / 3) * 6;
+    sStyleSpawnTableIndex = randval - (randval / 3) * 6;
     *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) sStyleGrid, arg1);
     arg0++;
     return arg0;
