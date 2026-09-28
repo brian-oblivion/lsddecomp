@@ -31,10 +31,14 @@ extern s32 GetSsTicksPerSecond(void);
 
 extern u8 gSsSizeTableBuf[];
 
+/* The volume, left and right, a SEQ gets when it opens and again on every
+ * play (libsnd's range is 0 to 127). */
+#define WBGM_PLAY_VOL 52
+
 WBgm *New_WBgm(char *vabPath, char *seqPath, s32 autoPlay) {
     WBgm *self;
 
-    self = BMemPMgrAlloc(0x24);
+    self = BMemPMgrAlloc(sizeof(WBgm));
     if (self != NULL) {
         Get_vtable_WBgm()->ctor(self, vabPath, seqPath, autoPlay);
         return self;
@@ -48,7 +52,7 @@ void WBgm__WBgm(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay) {
     self->vab = NULL;
     self->seqData = NULL;
     self->seqId = 0;
-    self->openState = 0;
+    self->openState = WBGM_OPEN_IDLE;
     self->paused = 0;
     self->playing = 0;
     self->autoPlay = autoPlay;
@@ -74,13 +78,14 @@ void WBgm__Finalize(WBgm *self) {
 
 void WBgm__OnNotify(WBgm *self, void *sender, s32 event) {
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
-    if ((((BasicClass *)sender)->methods->header & 0xF) == 1) {
+    if ((((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK) == DRAWSYSTEM_CLASS_ID) {
         self->methods->update(self, (DrawSystem *)sender, event);
     }
 }
 
 void WBgm__Update(WBgm *self, DrawSystem *sender, s32 event) {
-    if (event == 2 && self->openState == 1 && WBgm__HandleMonitorEvent(self) && self->autoPlay != 0) {
+    if (event == DRAWSYSTEM_EVENT_VSYNC && self->openState == WBGM_OPEN_WAITING &&
+        WBgm__HandleMonitorEvent(self) && self->autoPlay != 0) {
         self->methods->play(self);
     }
 }
@@ -107,15 +112,15 @@ s32 WBgm__HandleMonitorEvent(WBgm *self) {
     if (self->seqId == -1) {
         printf(sSeqOpenErrorMsg);
     }
-    SsSeqSetVol(self->seqId, 0x34, 0x34);
-    self->openState = 2;
+    SsSeqSetVol(self->seqId, WBGM_PLAY_VOL, WBGM_PLAY_VOL);
+    self->openState = WBGM_OPEN_DONE;
     return 1;
 }
 
 void WBgm__Play(WBgm *self) {
     if (self->playing == 0) {
-        SsSeqSetVol(self->seqId, 0x34, 0x34);
-        SsSeqPlay(self->seqId, 1, 0);
+        SsSeqSetVol(self->seqId, WBGM_PLAY_VOL, WBGM_PLAY_VOL);
+        SsSeqPlay(self->seqId, SSPLAY_PLAY, SSPLAY_INFINITY);
         self->playing = 1;
     }
 }
@@ -125,7 +130,7 @@ void WBgm__Stop(WBgm *self) {
         SsSeqStop(self->seqId);
         SsSeqClose(self->seqId);
         self->playing = 0;
-        self->openState = 0;
+        self->openState = WBGM_OPEN_IDLE;
     }
 }
 
@@ -165,8 +170,8 @@ void WBgm__SetSeq(WBgm *self, char *seqPath) {
             if (self->autoPlay != 0) {
                 self->methods->play(self);
             }
-        } else if (self->openState == 0) {
-            self->openState = 1;
+        } else if (self->openState == WBGM_OPEN_IDLE) {
+            self->openState = WBGM_OPEN_WAITING;
         }
     }
 }
@@ -185,8 +190,8 @@ void WBgm__SetVab(WBgm *self, char *vabPath) {
             if (self->autoPlay != 0) {
                 self->methods->play(self);
             }
-        } else if (self->openState == 0) {
-            self->openState = 1;
+        } else if (self->openState == WBGM_OPEN_IDLE) {
+            self->openState = WBGM_OPEN_WAITING;
         }
     }
 }
