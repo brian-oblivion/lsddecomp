@@ -47,8 +47,8 @@ enum IntermediateBaseState {
 struct IntermediateBaseInitArgs {
     /* +0x000 */ BasicClass *drawSystem; /* Application__InitSystems: the DrawSystem; added as a child; onState2 calls its +0x048, onState3 its +0x04C */
     /* +0x004 */ BasicClass *pad; /* Application__InitSystems: the Pad; added as a child; onTag1Notify's event 2 calls its +0x044, +0x048 */
-    /* +0x008 */ BasicClass *frameClock; /* becomes unk10; NULL: init makes one with New_FrameClock() */
-    /* +0x00C */ BasicClass *lightRig; /* becomes unk14; DayTask passes a StageMap (a LightRig); NULL: init makes one with New_LightRig() */
+    /* +0x008 */ BasicClass *frameClock; /* becomes frameClock; NULL: init makes one with New_FrameClock() */
+    /* +0x00C */ BasicClass *lightRig; /* becomes lightRig; DayTask passes a StageMap (a LightRig); NULL: init makes one with New_LightRig() */
     /* +0x010 */ BasicClass *viewport; /* becomes viewport; NULL: init makes one with New_Viewport() */
 };
 
@@ -72,8 +72,8 @@ struct IntermediateBaseInitArgs {
 #define INTERMEDIATEBASE_FIELDS(Methods)                                                           \
     BASICCLASS_FIELDS(Methods);                                                                    \
     /* +0x00C */ IntermediateBaseInitArgs *initArgs; /* init's argument, kept */                   \
-    /* +0x010 */ BasicClass *unk10;     /* initArgs->unk8, or init's own New_FrameClock() object */ \
-    /* +0x014 */ BasicClass *unk14;     /* initArgs->unkC, or init's own New_LightRig() object */ \
+    /* +0x010 */ BasicClass *frameClock; /* initArgs->frameClock, or init's own New_FrameClock() object */ \
+    /* +0x014 */ BasicClass *lightRig;  /* initArgs->lightRig, or init's own New_LightRig() object */ \
     /* +0x018 */ BasicClass *viewport;  /* initArgs->viewport, or init's own New_Viewport() */     \
     /* +0x01C */ s32 frameCounter;      /* update adds 1; resetCounters, onState2, onState3 clear it */ \
     /* +0x020 */ s32 state;             /* setState's argument; resetCounters clears it */         \

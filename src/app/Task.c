@@ -271,8 +271,8 @@ void TaskCore__OnInit(TaskCore *self) {
     /* MATCHING: retail loads both before the first call and keeps them to the end. */
     viewport = (Viewport *)self->viewport;
     viewportMethods = viewport->methods;
-    self->methods->updateSlotElements(self, self->unk14);
-    self->bgLayer->methods->attachToParent(self->bgLayer, (SceneNode *)self->unk14, NULL);
+    self->methods->updateSlotElements(self, self->lightRig);
+    self->bgLayer->methods->attachToParent(self->bgLayer, (SceneNode *)self->lightRig, NULL);
     if (self->fadeInCallback != NULL) {
         self->methods->broadcastToSlots(self, self->baseColor);
         self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)self->baseColor);
@@ -287,7 +287,7 @@ void TaskCore__OnInit(TaskCore *self) {
     viewportMethods->setOtLength(viewport, self->otLength);
     viewportMethods->setMaxPackets(viewport, self->unk2C);
     viewportMethods->setPacketSize(viewport, self->packetSize);
-    viewportMethods->attachViewChild(viewport, self->unk14, &sTaskCoreViewOrigin,
+    viewportMethods->attachViewChild(viewport, self->lightRig, &sTaskCoreViewOrigin,
                                      &sTaskCoreViewOrigin, NULL);
     viewportMethods->initOt(viewport);
     self->result = 0;
@@ -977,7 +977,7 @@ void TaskCore__RefreshSlotView(TaskCore *self, void *parent, s32 show) {
         s32 size[2];
 
         ((BoxFillAttachToParentFn)((BoxFill *)self->listView)->methods->attachToParent)(
-            (BoxFill *)self->listView, (SceneNode *)self->unk14, (BoxFillPos *)&pos);
+            (BoxFill *)self->listView, (SceneNode *)self->lightRig, (BoxFillPos *)&pos);
         size[0] = SLOT_LIST_FRAME_WIDTH;
         size[1] = count * SLOT_LIST_FRAME_ROW_HEIGHT;
         ((BoxFill *)self->listView)->methods->setSize((BoxFill *)self->listView, size);
@@ -1019,7 +1019,7 @@ void TaskCore__BeginElementScroll(TaskCore *self) {
         return;
     }
     slot = self->activeSlot;
-    self->methods->refreshSlotView(self, self->unk14, 1);
+    self->methods->refreshSlotView(self, self->lightRig, 1);
     item = ((TextRow **)self->itemLists[slot])[self->itemCursors[slot]];
     cursorColor = &((SlotEntry *)self->target->unk24[slot])->cursorColor;
     item->methods->setColor(item, cursorColor);
@@ -1080,7 +1080,7 @@ void TaskCore__CancelElementScroll(TaskCore *self) {
     }
     slot = self->activeSlot;
     cursor = self->itemCursors[slot];
-    self->methods->refreshSlotView(self, self->unk14, 0);
+    self->methods->refreshSlotView(self, self->lightRig, 0);
     items = (TextRow **)self->itemLists[slot];
     prevItem = items[cursor];
     prevItem->methods->setColor(prevItem, (SpriteRgb *)self->target->unselectedColor);
@@ -1204,14 +1204,14 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
 
     methods = self->methods;
     if (args->frameClock != NULL) {
-        self->unk10 = args->frameClock;
+        self->frameClock = args->frameClock;
     } else {
-        self->unk10 = (BasicClass *)New_FrameClock();
+        self->frameClock = (BasicClass *)New_FrameClock();
     }
     if (args->lightRig != NULL) {
-        self->unk14 = args->lightRig;
+        self->lightRig = args->lightRig;
     } else {
-        self->unk14 = (BasicClass *)New_LightRig();
+        self->lightRig = (BasicClass *)New_LightRig();
     }
     if (args->viewport != NULL) {
         self->viewport = args->viewport;
@@ -1222,13 +1222,13 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
     viewport = self->viewport;
     methods->addChild(self, args->drawSystem);
     methods->addChild(self, args->pad);
-    methods->addChild(self, self->unk10);
+    methods->addChild(self, self->frameClock);
     methods->onInit(self, 0, 0, 0);
     self->initMode = mode;
     if (mode == 0) {
         viewport->methods->addChild(viewport, args->drawSystem);
-        viewport->methods->addChild(viewport, self->unk10);
-        self->unk14->methods->addChild(self->unk14, self->unk10);
+        viewport->methods->addChild(viewport, self->frameClock);
+        self->lightRig->methods->addChild(self->lightRig, self->frameClock);
         methods->setState(self, 2);
         methods->deinit(self);
     }
@@ -1242,21 +1242,21 @@ void IntermediateBase__Deinit(IntermediateBase *self) {
     methods->onDeinit(self);
     viewport = self->viewport;
     if (self->initMode == 0) {
-        self->unk14->methods->removeChild(self->unk14, self->unk10);
-        viewport->methods->removeChild(viewport, self->unk10);
+        self->lightRig->methods->removeChild(self->lightRig, self->frameClock);
+        viewport->methods->removeChild(viewport, self->frameClock);
         viewport->methods->removeChild(viewport, self->initArgs->drawSystem);
     }
-    methods->removeChild(self, self->unk10);
+    methods->removeChild(self, self->frameClock);
     methods->removeChild(self, self->initArgs->pad);
     methods->removeChild(self, self->initArgs->drawSystem);
     if (self->initArgs->viewport != viewport) {
         self->viewport = viewport->methods->release(viewport);
     }
-    if (self->initArgs->lightRig != self->unk14) {
-        self->unk14 = self->unk14->methods->release(self->unk14);
+    if (self->initArgs->lightRig != self->lightRig) {
+        self->lightRig = self->lightRig->methods->release(self->lightRig);
     }
-    if (self->initArgs->frameClock != self->unk10) {
-        self->unk10 = self->unk10->methods->release(self->unk10);
+    if (self->initArgs->frameClock != self->frameClock) {
+        self->frameClock = self->frameClock->methods->release(self->frameClock);
     }
 }
 
@@ -1264,7 +1264,7 @@ void IntermediateBase__OnTag1Notify(IntermediateBase *self, BasicClass *sender, 
     Pad *pad;
 
     if (event == DRAWSYSTEM_EVENT_VSYNC) {
-        ((FrameClock *)self->unk10)->methods->tick((FrameClock *)self->unk10);
+        ((FrameClock *)self->frameClock)->methods->tick((FrameClock *)self->frameClock);
         pad = (Pad *)self->initArgs->pad;
         pad->methods->updateMasks(pad);
         pad->methods->dispatchEvents(pad);

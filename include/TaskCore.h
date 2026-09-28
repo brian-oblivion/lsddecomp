@@ -147,7 +147,7 @@ struct TaskCoreTarget {
     /* +0x084 */ void (*onPadNext)(Self *self);    /* TaskCore__OnPadNext: 0x13 */ \
     /* +0x088 */ void *slot88;                                   /* NULL; StreamTask__NoOpSlot88 */ \
     /* +0x08C */ void *slot8C;                                   /* NULL; StreamTask__NoOpSlot8C */ \
-    /* +0x090 */ void (*confirmSlot)(Self *self);                       /* TaskCore__ConfirmSlot: setState(0xB) */ \
+    /* +0x090 */ void (*confirmSlot)(Self *self);                       /* TaskCore__ConfirmSlot: setState(0xB)'s call; opens the slot's list, or exits on exitSlot */ \
     /* +0x094 */ void (*exit)(Self *self);           /* TaskCore__Exit */  \
     /* +0x098 */ void (*setExitCallback)(Self *self, void (*callback)(void *ctx), void *ctx); /* TaskCore__SetExitCallback */ \
     /* +0x09C */ void (*setFadeInCallbackEnabled)(Self *self, s32 enable);    /* TaskCore__SetFadeInCallbackEnabled */ \

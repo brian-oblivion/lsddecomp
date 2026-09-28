@@ -150,7 +150,7 @@ void DayTask__Deinit(DayTask *self) {
     GetTimedTaskMethods()->deinit((TimedTask *)self);
     dreamSys->methods->setViewport(dreamSys, 0);
     dreamSys->methods->removeChild(dreamSys, self->initArgs->pad);
-    dreamSys->methods->removeChild(dreamSys, self->unk10);
+    dreamSys->methods->removeChild(dreamSys, self->frameClock);
 }
 
 void DayTask__OnInit(DayTask *self) {

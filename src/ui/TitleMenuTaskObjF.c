@@ -417,7 +417,7 @@ void TitleMenu__RefreshMenu(TitleMenu *self) {
     self->saveTitle->methods->setText(self->saveTitle, text);
     BMemPMgrFree(text);
     UpdateFlashbackLock(self, self->target, self->dreamSys);
-    self->methods->updateSlotElements(self, self->unk14);
+    self->methods->updateSlotElements(self, self->lightRig);
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
     self->activeSlot = TITLEMENU_SHAKE;
     self->methods->setState(self, 0xB);
@@ -432,17 +432,17 @@ void TitleMenu__BeginCardAccess(TitleMenu *self) {
         self->saveIcon = New_TimImage((char *)sSaveIconTimPath);
         self->saveCtrl = New_TaskObjF(1, 0);
     }
-    self->saveCtrl->methods->init(self->saveCtrl, sCardFilePrefix, sSaveFileSuffixes,
-                                  self->initArgs->pad, self->unk10, (struct SceneNode *)self->unk14,
-                                  (struct VabStreamObj *)self->sound);
+    self->saveCtrl->methods->init(
+        self->saveCtrl, sCardFilePrefix, sSaveFileSuffixes, self->initArgs->pad, self->frameClock,
+        (struct SceneNode *)self->lightRig, (struct VabStreamObj *)self->sound);
     self->methods->addChild(self, (BasicClass *)self->saveCtrl);
     self->methods->removeChild(self, self->initArgs->pad);
-    self->methods->removeChild(self, self->unk10);
+    self->methods->removeChild(self, self->frameClock);
 }
 
 void TitleMenu__EndCardAccess(TitleMenu *self) {
     self->methods->addChild(self, self->initArgs->pad);
-    self->methods->addChild(self, self->unk10);
+    self->methods->addChild(self, self->frameClock);
     self->methods->removeChild(self, (BasicClass *)self->saveCtrl);
     self->saveCtrl->methods->deinit(self->saveCtrl);
 }

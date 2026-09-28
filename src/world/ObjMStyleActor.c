@@ -522,7 +522,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
 
     self->cachedViewport = vp;
     day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-    self->styleConfig = (StyleConfig *)RegisterStyleConfig((s32)self->unk14, self->stage,
+    self->styleConfig = (StyleConfig *)RegisterStyleConfig((s32)self->lightRig, self->stage,
                                                            (s32)&self->ctorSound, day, 0);
     if (style != 0) {
         self->styleConfig = style;
@@ -547,12 +547,12 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
         if (stage == three) {
             flag = 1;
         }
-        ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, 0);
+        ((StageMap *)self->lightRig)->methods->setBounds((StageMap *)self->lightRig, 0);
     } else {
         self->tickPeriod = 16;
         self->moveMode = 2;
         flag = 1;
-        ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, &gStage0Bounds);
+        ((StageMap *)self->lightRig)->methods->setBounds((StageMap *)self->lightRig, &gStage0Bounds);
     }
 
     self->gridSpan = gridSpan;
@@ -615,7 +615,7 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
         }
     }
     if (self->timBlockPending == 0) {
-        if (((StageMap *)self->unk14)->pendingLoadCount == 0 && self->inSession == 0) {
+        if (((StageMap *)self->lightRig)->pendingLoadCount == 0 && self->inSession == 0) {
             self->unk64 = 1;
             self->methods->enterStyleSession(self);
         }
@@ -724,10 +724,10 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &gObjMViewPoint,
                                  &gObjMViewRefPoint, 0);
 
-    SetDreamAuxWorld(self->stage, (StageMap *)self->unk14, self->dreamSys,
-                     (struct VabStreamObj *)self->sound, (struct FrameClock *)self->unk10);
+    SetDreamAuxWorld(self->stage, (StageMap *)self->lightRig, self->dreamSys,
+                     (struct VabStreamObj *)self->sound, (struct FrameClock *)self->frameClock);
 
-    rig = (StageMap *)self->unk14;
+    rig = (StageMap *)self->lightRig;
     self->methods->addChild(self, (BasicClass *)rig);
 
     rig->methods->setAmbientColor(rig, (LightRigRgb *)style->ambientColor, 0);
@@ -743,7 +743,7 @@ void ObjM__ExitSceneStyle(ObjM *self) {
     self->dreamSys->methods->blockMovement(self->dreamSys);
     self->dreamSys->methods->detachFromParent(self->dreamSys);
     ((NodeGuardedViewport *)self->viewport)->methods->detachViewChild((NodeGuardedViewport *)self->viewport);
-    self->methods->removeChild(self, self->unk14);
+    self->methods->removeChild(self, self->lightRig);
 }
 
 void ObjM__EnterStyleSession(ObjM *self) {
@@ -759,7 +759,7 @@ void ObjM__EnterStyleSession(ObjM *self) {
 
     self->inSession = 1;
     self->dreamSys->methods->resetLinkState(self->dreamSys, self->moveMode, self->tickPeriod);
-    ((StageMap *)self->unk14)->methods->enable((StageMap *)self->unk14);
+    ((StageMap *)self->lightRig)->methods->enable((StageMap *)self->lightRig);
 
     vp = (NodeGuardedViewport *)self->viewport;
     style = self->styleConfig;
@@ -787,14 +787,14 @@ void ObjM__EnterStyleSession(ObjM *self) {
     } else {
         channels = flashColor;
     }
-    m2->startFadeDown(fade, self->unk10, channels, 0);
+    m2->startFadeDown(fade, self->frameClock, channels, 0);
 }
 
 /* Defined below, in the style layer. */
 extern s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue);
 
 void ObjM__TickStyle(ObjM *self) {
-    TickStyle(((StageMap *)self->unk14)->methods->getTargetDescriptor((StageMap *)self->unk14, 0, 0),
+    TickStyle(((StageMap *)self->lightRig)->methods->getTargetDescriptor((StageMap *)self->lightRig, 0, 0),
               0, 0);
 }
 
@@ -979,7 +979,7 @@ void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 fadeMode, s32 step, s32 add
     if (addChild != 0) {
         self->methods->addChild(self, (BasicClass *)fade);
     }
-    fade->methods->startFadeUp(fade, self->unk10, channels, fadeMode);
+    fade->methods->startFadeUp(fade, self->frameClock, channels, fadeMode);
 }
 
 void ObjM__OnFadeNotify(ObjM *self, FadeBox *sender, s32 event) {
@@ -1019,8 +1019,8 @@ void ObjM__OnStageMapNotify(ObjM *self, BasicClass *sender, s32 event) {
 s32 ObjM__CheckAuxTrigger(ObjM *self) {
     ChunkCoord coord;
     s32 held;
-    ChunkSlot *slot =
-        ((StageMap *)self->unk14)->methods->getLastEventSlotChunk((StageMap *)self->unk14, &coord.column);
+    ChunkSlot *slot = ((StageMap *)self->lightRig)
+                          ->methods->getLastEventSlotChunk((StageMap *)self->lightRig, &coord.column);
     s32 day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     held = TryDreamAuxTrigger((s32)slot->loader->dataBuffer, &coord, day);
     slot->heldObj = (BasicClass *)held;
@@ -1065,7 +1065,7 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 step = self->pauseSetupStep;
     if (step == 0) {
         self->pauseText = New_TextRow(self->etcTim, 5, sPauseText);
-        self->pauseText->methods->attachToParent(self->pauseText, (SceneNode *)self->unk14,
+        self->pauseText->methods->attachToParent(self->pauseText, (SceneNode *)self->lightRig,
                                                  (LongVec3 *)&sPauseTextPos);
         self->pauseText->methods->setColor(self->pauseText, &sPauseTextColor);
         self->pauseSetupStep = step + 1;
@@ -1076,7 +1076,7 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
         return;
     }
     ((NodeGuardedViewport *)self->viewport)->methods->setDrawEnabled((NodeGuardedViewport *)self->viewport, 0);
-    ((FrameClock *)self->unk10)->methods->pause((FrameClock *)self->unk10);
+    ((FrameClock *)self->frameClock)->methods->pause((FrameClock *)self->frameClock);
     self->bgm->methods->pause(self->bgm);
     ((VabStreamObj *)self->sound)->methods->mute((VabStreamObj *)self->sound);
 }
@@ -1087,7 +1087,7 @@ void ObjM__TeardownPauseOverlay(ObjM *self) {
     }
     ((VabStreamObj *)self->sound)->methods->unmute((VabStreamObj *)self->sound);
     self->bgm->methods->resume(self->bgm);
-    ((FrameClock *)self->unk10)->methods->resume((FrameClock *)self->unk10);
+    ((FrameClock *)self->frameClock)->methods->resume((FrameClock *)self->frameClock);
     ((NodeGuardedViewport *)self->viewport)->methods->setDrawEnabled((NodeGuardedViewport *)self->viewport, 1);
     self->pauseSetupStep = 0;
 }
