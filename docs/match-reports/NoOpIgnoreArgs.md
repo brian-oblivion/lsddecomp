@@ -87,3 +87,14 @@ not a class boundary (`tools/classtable.py`, confirmed round 17/52):
 Name unchanged, tier A. The body gained a one-line comment: it is
 STYLE_EFFECT_SPRITES' per-frame step in StyleEffect__UpdateByKind, whose
 `(self, pos)` it does not read.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/world/dream_scene.c`, the note above `extern void NoOpIgnoreArgs();`,
+now one `MATCHING:` line there and one above each of the four definitions:
+
+> MATCHING: StyleEffect__SpawnPlainSprites, __RandomizeSprites,
+> __BuildRandomSprites and __DriftModelChildren read only `self`, but the
+> calls below pass a second, dead argument that retail loads, so
+> include/style_effect.h declares them without a prototype. NoOpIgnoreArgs
+> (next section, empty) is declared the same way here.

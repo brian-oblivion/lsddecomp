@@ -424,28 +424,8 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
 
 /* ---- ObjM, resetCounters (+0x040) to enterLinkWall (+0x09C) ---------------
  *
- * In table order.
- *
- *  - init and deinit (AttachTarget, DetachTarget): install
- *    ObjM__GetGridRecord as the StageMap's chunk-record callback and keep
- *    the DreamSys as a child.
- *  - onInit and onDeinit (InitStyleAndWorld, TeardownStyle): pick the
- *    stage's BGM sequence and the day's TIM block, register the stage's
- *    StyleConfig, set the viewport's view and the StageMap's bounds; stop
- *    it all again.
- *  - onDrawSystemEvent's event 2 runs PollTimBlockLoad: once the TIM block has
- *    loaded (or failed) the scene is set up, and once the StageMap has
- *    nothing pending the style session starts.
- *  - onPadEvent (DispatchPadEvent) maps Start, Select and triangle onto the
- *    pause and close slots; update ticks the style, or the pause overlay
- *    while it is being built; togglePause.
- *  - the style scene slots +0x080..+0x08C: SetupSceneStyle,
- *    ExitSceneStyle, EnterStyleSession, TickStyle.
- *  - OnDreamSysNotify turns the DreamSys's link codes into the enter*
- *    slots and notifyLinkTeleport; EnterTimeUp, EnterLinkDynamic and
- *    EnterLinkWall set IntermediateBase::state and start a fade up
- *    (ObjM__StartFadeUp, next section).
- * NoOpSlot40 and NoOpSlot7C are empty.
+ * In table order; include/objm.h documents each. NoOpSlot40 and NoOpSlot7C
+ * are empty.
  */
 
 void ObjM__NoOpSlot40(void) {}
@@ -619,8 +599,8 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
 
 /* onPadEvent, only in session: Start pressed toggles the pause, Select
  * held and released sets and clears the close-ready flag, triangle pressed
- * closes (closeAndNotifyNewGame).
- * MATCHING: the gotos keep retail's compare order; a switch sorts the cases. */
+ * closes (closeAndNotifyNewGame). */
+/* MATCHING: the gotos keep retail's compare order; a switch sorts the cases. */
 void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code) {
     ObjMMethods *m = self->methods;
     void (*fn)(ObjM *);
@@ -878,41 +858,21 @@ void ObjM__EnterLinkWall(ObjM *self) {
 
 /* ---- ObjM, +0x0A0 to its getter; the style layer's setup ----------------
  *
- * ObjM's methods from +0x0A0 to the end of its table (gObjMMethods) and its
- * getter, then the style layer's setup: the four free functions that pick
- * the stage's scene style.
+ * ObjM's methods from enterLinkFlashback to the end of its table and its
+ * getter (include/objm.h documents each), then the style layer's setup: the
+ * four free functions that pick the stage's scene style.
  *
- * ObjM, in ROM order:
- *  - EnterLinkFlashback, EnterLinkTunnel, EnterLinkStageTimer and NotifyLinkTeleport, the DreamSys link codes
- *    ObjM__OnDreamSysNotify hands on (flashback, tunnel, stage timer,
- *    teleport): each sets IntermediateBase::state (enum ObjMState) and
- *    fades up through StartFadeUp, or notifies its parent at once.
- *  - StartFadeUp: the viewport's fade box (a FadeBox), optionally added as
- *    a child, fades up in the given channels.
- *  - OnFadeNotify: fade down done returns ObjM to IDLE; fade up done sets
- *    the viewport's clear colour to the fade's and notifies the state (a
- *    stage-timer link turns into TIME_UP first). OnStageMapNotify runs
- *    CheckAuxTrigger when a slot's data block is ready.
- *  - The pause overlay: AdvancePauseSetup builds the "Pause" TextRow and,
- *    four calls later, hides the viewport and pauses the FrameClock, the
- *    WBgm and the VabStreamObj; TeardownPauseOverlay undoes it. While it is
- *    up and ObjM is IDLE, the close-ready flag arms CloseAndNotify and CloseAndNotifyNewGame,
- *    which tear it down and notify a close (DayTask ends the day).
- *    NoOpSlotBC is empty.
- *
- * The style setup is not ObjM's, but ObjM is its client:
- * ObjM__InitStyleAndWorld (above) calls RegisterStyleConfig once
- * per scene and keeps the result, sStyleConfig, as ObjM::styleConfig.
- * RegisterStyleConfig stores the scene (grid, stage, ObjM's scene
- * references, day) in the gStyle globals the next section reads;
- * ApplyStyleConfig takes the stage's four-byte StyleStageConfig, or
- * PickStyleFallbackConfig's, and FillStyleFromConfig turns it into
- * StyleConfig colours and a fog distance. ApplyStyleDecorationIfSet builds
- * the decoration box, a full-screen semi-transparent BoxFill under the
- * viewport's fade box, when the config asked for one.
- *
- * What the ObjM states and the style configs stand for in the game is not
- * established; the names describe mechanics.
+ * The style layer is not ObjM's, but ObjM is its client:
+ * ObjM__InitStyleAndWorld calls RegisterStyleConfig once per scene and keeps
+ * the result, sStyleConfig, as ObjM::styleConfig. RegisterStyleConfig stores
+ * the scene (grid, stage, ObjM's scene references, day) in the sStyle
+ * globals the next section reads; ApplyStyleConfig takes the stage's
+ * four-byte StyleStageConfig, or PickStyleFallbackConfig's, and
+ * FillStyleFromConfig turns it into StyleConfig colours and a fog distance.
+ * ApplyStyleDecorationIfSet builds the decoration box, a full-screen
+ * semi-transparent BoxFill under the viewport's fade box, when the config
+ * asked for one. What the ObjM states and the style configs stand for in the
+ * game is not established; the names describe mechanics.
  */
 
 
@@ -2214,7 +2174,7 @@ void StyleEffect__Finalize(StyleEffect *self) {
 }
 
 void StyleEffect__SetParams(StyleEffect *self, StyleEffectParams *params) {
-    self->params = *params;
+    self->params = *params; /* MATCHING: one struct copy: the 4-aligned block moves 4 words a loop */
     self->tick = 0;
 }
 
@@ -2250,11 +2210,7 @@ extern LongVec3 sSpriteShiftScratch;
 void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b);
 void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, void *scale);
 
-/* MATCHING: StyleEffect__SpawnPlainSprites, __RandomizeSprites,
- * __BuildRandomSprites and __DriftModelChildren read only `self`, but the
- * calls below pass a second, dead argument that retail loads, so
- * include/style_effect.h declares them without a prototype. NoOpIgnoreArgs
- * (next section, empty) is declared the same way here. */
+/* MATCHING: unprototyped, as four StyleEffect__ helpers are: the calls below load a dead 2nd argument */
 extern void NoOpIgnoreArgs();
 
 /* New_VariantSprite: include/variant_sprite.h. */
@@ -2429,6 +2385,7 @@ extern Ratio16 sSpinRotStep[3];
  * MODEL_CHILD_DRIFT_RANGE / step ticks (the period's magnitude, whatever
  * the step's sign) snap them back to their layout. Always marks self's
  * coord2 for recompute. */
+/* MATCHING: unprototyped in style_effect.h: UpdateByKind's call loads a dead 2nd argument */
 void StyleEffect__DriftModelChildren(StyleEffect *self) {
     s32 tableIndex;
     s32 extraZ;
@@ -2485,6 +2442,7 @@ void StyleEffect__ReleaseModelChildren(StyleEffect *self) {
  * rand(); then sprites[1] is either shifted along x by
  * sSpriteShiftX[tableIndex] and recoloured (tableIndex >= 2) or made
  * semi-transparent (rate 0) and rescaled, and sprites[2] is hidden. */
+/* MATCHING: unprototyped in style_effect.h: InitByKind's call loads a dead 2nd argument */
 void StyleEffect__BuildRandomSprites(StyleEffect *self) {
     s32 parity = rand() % 2;
     void *scale = parity ? NULL : sSpriteScaleHalf;
@@ -2576,12 +2534,14 @@ void StyleEffect__ReleaseSprites(StyleEffect *self) {
 }
 
 /* Five sprites of variant 0 at their default scale. */
+/* MATCHING: unprototyped in style_effect.h: InitByKind's call loads a dead 2nd argument */
 void StyleEffect__SpawnPlainSprites(StyleEffect *self) {
     StyleEffect__SpawnSprites(self, 0, 0, 0);
 }
 
 /* STYLE_EFFECT_JITTER_SPRITES' per-frame step: every sprite but the first
  * takes a random streak shape and a random whole-degree rotation. */
+/* MATCHING: unprototyped in style_effect.h: UpdateByKind's call loads a dead 2nd argument */
 void StyleEffect__RandomizeSprites(StyleEffect *self) {
     VariantSprite **sprite = &self->sprites[1];
     s32 i;

@@ -196,3 +196,19 @@ dream_scene.c's `LinkNode` view (owner and children under one type) is gone: the
   three {num, den} halfword pairs (x and y both 6/5, 3/6 or 4/6, then z
   1/1),
   and they only reach updateScale / SpawnSprites.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/style_effect.h`, the prototype's trailing comment (the header
+now says in its @brief why the declaration has no prototype):
+
+> void StyleEffect__BuildRandomSprites(); /* MATCHING: (StyleEffect *self); a caller passes a dead 2nd argument */
+
+From `src/world/dream_scene.c`, the note above `extern void NoOpIgnoreArgs();`,
+now one `MATCHING:` line there and one above each of the four definitions:
+
+> MATCHING: StyleEffect__SpawnPlainSprites, __RandomizeSprites,
+> __BuildRandomSprites and __DriftModelChildren read only `self`, but the
+> calls below pass a second, dead argument that retail loads, so
+> include/style_effect.h declares them without a prototype. NoOpIgnoreArgs
+> (next section, empty) is declared the same way here.
