@@ -103,7 +103,7 @@ TmdObject *TmdModel__GetObject(TmdModel *self, s32 i) {
     return &self->data->objects[i];
 }
 
-void TmdModel__func_8001F37C(void) {}
+void TmdModel__NoOpSlot4C(void) {}
 
 TmdModelMethods *GetTmdModelMethods(void) {
     return &gTmdModelMethods;

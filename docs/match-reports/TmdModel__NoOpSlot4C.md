@@ -1,4 +1,6 @@
-# TmdModel__func_8001F37C -- MATCHED (2/2 words), round 82
+# TmdModel__NoOpSlot4C -- MATCHED (2/2 words), round 82
+
+> Renamed from `TmdModel__func_8001F37C` on 2026-09-28 (tools/rename.py). Address 0x8001f37c.
 
 > Renamed from `func_8001F37C` on 2026-09-25 (tools/rename.py). Address 0x8001f37c.
 
@@ -13,7 +15,7 @@ Round 82, runner charlie (matching slot). Unit `src/graphics/TmdModel.c`. Fresh 
 ## Source
 
 ```c
-void TmdModel__func_8001F37C(void) {
+void TmdModel__NoOpSlot4C(void) {
 }
 void *GetTmdModelMethods(void) {
     return gTmdModelMethods;
@@ -22,7 +24,7 @@ void *GetTmdModelMethods(void) {
 
 ## Naming
 
-`TmdModel__func_8001F37C` -- tier C, class known. Slot +0x04C is an empty
+`TmdModel__NoOpSlot4C` -- tier C, class known. Slot +0x04C is an empty
 override (`jr $ra; nop`) with no callers found in this unit and no other
 information about what the slot means. Per FINISHING-PLAN track 3's tier-C
 form for a method whose class is known (`Class__func_xxxxx`), kept as such
