@@ -12,10 +12,10 @@ first attempt, layout was not).
 ## What it does
 
 `if (gInstantTeleportersEnabled == 0) return -1; else return GetStaticSpawn(target,
-currentPos, stage, sTeleportTriggersCount, sTeleportTriggers, TELEPORT_SPAWNS, 0);` -- same
+currentPos, stage, sTeleportTriggersCount, sTeleportTriggers, sTeleportSpawns, 0);` -- same
 forwarding shape as `TestForStaticLink`/`Test4TunnelLinks`/
 `Test4StaircaseNodes` a few hundred lines above/below in this unit, using a
-dedicated table triple (`sTeleportTriggersCount`/`sTeleportTriggers`/`TELEPORT_SPAWNS`) and trailing
+dedicated table triple (`sTeleportTriggersCount`/`sTeleportTriggers`/`sTeleportSpawns`) and trailing
 flag `0` instead of `1`.
 
 ## Attempts 1-2: right values, wrong block order (2/20, then 0/20, both with 131461 bytes of whole-image drift)
@@ -24,7 +24,7 @@ flag `0` instead of `1`.
 /* attempt 1 */
 if (gInstantTeleportersEnabled == 0)
 	return -1;
-return GetStaticSpawn(target, currentPos, stage, sTeleportTriggersCount, sTeleportTriggers, TELEPORT_SPAWNS, 0);
+return GetStaticSpawn(target, currentPos, stage, sTeleportTriggersCount, sTeleportTriggers, sTeleportSpawns, 0);
 
 /* attempt 2 (same compiled result as attempt 1 -- -O2 normalizes early-return
    to if/else) */
@@ -73,7 +73,7 @@ s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentP
 		result = -1;
 	} else {
 		result = GetStaticSpawn(target, currentPos, stage, sTeleportTriggersCount,
-		                         sTeleportTriggers, TELEPORT_SPAWNS, 0);
+		                         sTeleportTriggers, sTeleportSpawns, 0);
 	}
 	return result;
 }
@@ -90,7 +90,7 @@ triples for `Test4TunnelLinks`/`Test4StaircaseNodes`):
 ```c
 extern s8 sTeleportTriggersCount[];
 extern StaticLinkTrigger* sTeleportTriggers[];
-extern StageSpawn* TELEPORT_SPAWNS[];
+extern StageSpawn* sTeleportSpawns[];
 ```
 
 ## Verification
