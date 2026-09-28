@@ -94,3 +94,9 @@ The comment above the definition, verbatim as it stood at `57fb90b6`:
 ```c
 /* Sony's _obj/none (round 79); the call to it is cc1's, inside main. */
 ```
+
+## History (source comments moved in track 12, round 106)
+
+From `src/main.c`:
+
+The comment on `__main` read "Sony's _obj/none: empty. Its one call is the one cc1 puts in main." It now says "the one generated at the top of main".

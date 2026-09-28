@@ -41,3 +41,36 @@ live in; only FIELD/SLOT ownership is unit-scoped. Named `NullDriver__X` (not
 VRAM addresses, different header words: 0x23 vs 0x00000E03).
 `rename.py` mechanically updated vab_sound.c's own comments to the new
 name; no manual edit was made to that unit's file.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/null_driver.h`:
+
+The class banner in include/null_driver.h read, before it became the header's Doxygen class documentation:
+
+> /*
+>  * NullDriver -- the data-source driver whose every method is empty (class
+>  * id 0x23, method table gNullDriverMethods), a FileResource subclass and
+>  * the CD-ROM driver's (gCdDriverMethods, 0x13) sibling. The id is DATASOURCE_NULL: SetActiveDataSource
+>  * (src/app/game_shell.c) binds this table's driver-interface slots into
+>  * FileResource's table and every client table whenever the active source is
+>  * not DATASOURCE_CD, and GetActiveDataSourceMethods returns it then.
+>  *
+>  * Every own method is empty. The ctor, the finalize and the eleven
+>  * interface slots it overrides (+0x040..+0x058, +0x068..+0x074) are
+>  * `jr $ra; nop`, `return 0` or a bare 0x40-byte frame (Open, NoOpSlot40),
+>  * so with the VAB source active the file-I/O interface does nothing; the
+>  * VAB streaming itself is VabStreamObj's (gVabStreamObjMethods, 0xA03,
+>  * src/sound/vab_sound.c), a separate FileResource subclass. Methods in
+>  * src/sound/vab_sound.c (ctor through NoOpSlot50) and src/sound/vab_sound.c
+>  * (Read onward, and the getter). Each is named for its slot
+>  * (`classtable.py gNullDriverMethods --vs gFileResourceMethods`); the slot names are
+>  * FileResource's.
+>  *
+>  * NO FIELDS/SLOTS MACROS: no class lies below 0x23 (`typeviews.py --tree`).
+>  * The object has no known own fields: nothing allocates a NullDriver (no
+>  * New_NullDriver) and no method reads `self`, so the struct is FileResource's
+>  * fields and its size is unmeasured.
+>  */
+
+Its "Methods in src/sound/vab_sound.c (ctor through NoOpSlot50) and src/sound/vab_sound.c (Read onward, and the getter)" named one file twice (release review, Track 12), a leftover of the two units the class was split across before they merged; the class doc now names the file once. "The bodies take no arguments: none of them reads a register", above the prototypes, is now worded without the register.

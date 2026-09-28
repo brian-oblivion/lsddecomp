@@ -899,3 +899,13 @@ Zero-byte rewrite of the live body, whole image green:
   byte is copied and nothing reads the copy (StageMap__PopulateSlotCells
   reads x, y, z, rotY, cellFlags, chained and next), so there is no
   behaviour to name it by.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/placement_grid.h`:
+
+The class banner in include/placement_grid.h ended "Its caller reaches it through PlacementGridResolveEntryFn, a cast of the untyped inherited slot (no code)." and said Finalize and "SetFlag" forward to the active driver's; the slot at +0x064 is onRequestDone and its occupant PlacementGrid__OnRequestDone. The banner is now the header's Doxygen class documentation, with the parenthesis dropped and the slot named as it is.
+
+From `src/sound/vab_sound.c`:
+
+The `PlacementGridGetModelFn` comment read "The occupant reads only (self, index); a function-pointer cast, no code. MATCHING: the four arguments keep `placement` in $a3 across the call." The source keeps the first sentence and the `MATCHING:` line on its own.

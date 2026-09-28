@@ -155,3 +155,44 @@ The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it come
 The class is now declared once, in `include/wbgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
 
 Parameters retyped to `(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay)`, and the ctor slot with them: both paths are forwarded unchanged to setSeq/setVab, whose bodies hand them to New_RequestedFile(char *) and New_VabStreamObj(char *). See New_WBgm's Track 4 paragraph for the one caller.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/wbgm.h`:
+
+The class banner in include/wbgm.h read, before it became the header's Doxygen class documentation:
+
+> #include "vab_stream_obj.h"
+> #include "requested_file.h"
+> 
+> /*
+>  * WBgm -- class id 0x50, method table gWBgmMethods (24 slots), a direct
+>  * BasicClass subclass (its ctor calls GetBasicClassMethods()->ctor first;
+>  * `classtable.py gWBgmMethods --vs gBasicClassMethods` overrides the ctor, finalize
+>  * and onNotify and adds nine slots). Methods in src/sound/wbgm.c. No class
+>  * derives from it. Name from rodata sSeqOpenErrorMsg, "Seq Open error in
+>  * WBgmHandleMonitorEvent", printed by WBgm__HandleMonitorEvent's own body.
+>  *
+>  * A background-music player: one libsnd SEQ played on one VAB bank. The
+>  * bank is a VabStreamObj (`vab`), the SEQ file a RequestedFile (`seqData`);
+>  * both load asynchronously, so the SEQ is SsSeqOpen'd (HandleMonitorEvent)
+>  * only once `vab->attrsReady` and `seqData->loaded` are both set, and
+>  * played at once if `autoPlay`. Until then `openState` is WBGM_OPEN_WAITING
+>  * and the DrawSystem retries: the ctor adds the DrawSystem as a child, so
+>  * the DrawSystem's per-VSync notifyParents(self, DRAWSYSTEM_EVENT_VSYNC)
+>  * (include/draw_system.h) reaches onNotify, which forwards a DrawSystem
+>  * sender (DRAWSYSTEM_CLASS_ID) to +0x040 update, which retries on that
+>  * event.
+>  *
+>  * Its one construction: DayTask__DayTask (src/world/dream_day.c),
+>  * New_WBgm(PickSoundBank(0), NULL, 1): the VAB path is one of the seven
+>  * sSoundBankPaths strings ("SND\\AMBIENT" ... "SND\\STANDERD",
+>  * asm/data/1B84.rodata.s), no SEQ yet, autoPlay on. That caller keeps the
+>  * object as DayTask::bgm (include/day_task.h), and
+>  * hands it to New_ObjM, whose ObjM keeps it at +0x054 and calls +0x04C
+>  * pause and +0x050 resume on it (ObjM__AdvancePauseSetup,
+>  * ObjM__TeardownPauseOverlay; include/objm.h).
+>  *
+>  * sWBgmActive is 1 from the ctor to finalize; IsWBgmActive returns it, and
+
+The class doc now drops the classtable command, the rodata path and the ObjM offsets; the slot comments became `@see` references.

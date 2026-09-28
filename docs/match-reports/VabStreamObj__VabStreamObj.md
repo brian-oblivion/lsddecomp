@@ -179,3 +179,74 @@ what the code is.
  * VabStreamObj__OnBodyReady, is called through this typedef. That takes no
  * code (FINISHING-PLAN track 4 step 6). */
 ```
+
+## History (source comments moved in track 12, round 106)
+
+From `include/vab_stream_obj.h`:
+
+The class banner in include/vab_stream_obj.h read, before it became the header's Doxygen class documentation:
+
+> /*
+>  * VabStreamObj -- one VAB sound bank, loaded from disc through the active
+>  * data source and played through Sony's libsnd (class id 0xA03, method table
+>  * gVabStreamObjMethods). It is a FileResource subclass and a sibling of the
+>  * drivers (NullDriver 0x23, the CD driver 0x13), not derived from either. Like
+>  * every data source, its ctor and finalize chain to the ACTIVE driver's
+>  * (GetActiveDataSourceMethods). Methods in src/sound/vab_sound.c.
+>  *
+>  * Loading. The ctor copies the base path (`baseFilename`) and asks the
+>  * driver for "<base>.VH" (requestLoadFile, +0x06C), with `loadState` set to
+>  * VABSTREAM_LOAD_HEADER. The driver calls onRequestDone (+0x064,
+>  * VabStreamObj__AdvanceLoadState) when a request completes. In the header
+>  * state, with CD_FLAG_LOAD_FILE_DONE (0x200) in `flags`, it opens the
+>  * header (SsVabOpenHead) and loads "<base>.VB" (loadFile, +0x058) in
+>  * VABSTREAM_LOAD_BODY. In that state it transfers the body (SsVabTransBody)
+>  * and calls processBuffer (+0x078), VabStreamObj__OnBodyReady. That waits on SsVabTransCompleted and then
+>  * runs loadVagAttrs (+0x07C), which caches the bank's VagAtr records per
+>  * program. +0x058 and +0x06C are NULL in the static table.
+>  * SetActiveDataSource fills them from the active driver
+>  * (GetVabStreamObjMethods is in sDataSourceClientGetters).
+>  *
+>  * Playing. playTone(index, vol, endVol) keys on program index >> 4, tone
+>  * index & 0xF, at the tone's centre note plus `pitchOffset`. It returns the
+>  * voice, or -1. stopVoice(voice) keys one voice off, or all voices when
+>  * voice >= 24. The holders keep the object as whatever their own field type
+>  * is (TaskCore::sound, TimedTask::sound, DreamSys::soundObj, WBgm::vab) and
+>  * cast to VabStreamObj * where they call through it. The SoundCueSet queue
+>  * (InitSoundCueSet/FlushSoundCueSet/ServiceSoundCueSet) takes this object
+>  * as its first argument, but those are free functions, not methods.
+>  *
+>  * NO FIELDS/SLOTS MACROS: no class lies below 0xA03 (`typeviews.py --tree`).
+>  */
+
+From `src/sound/vab_sound.c`:
+
+The banner above the VAB sound backend in src/sound/vab_sound.c read, before track 12 split it between include/vab_stream_obj.h's class documentation and a shorter section comment:
+
+> /*
+>  * The VAB sound backend: the rest of the NullDriver data source's empty slots and mode
+>  * accessors, the VabStreamObj class (one sound bank, loaded through the
+>  * active data source and played through libsnd), and the SoundCueSet
+>  * start/flush pair.
+>  *
+>  * NullDriver (include/null_driver.h, class id 0x23 = DATASOURCE_NULL) is the
+>  * data source game_shell.c selects when it is not reading the CD; the CD
+>  * driver (include/cd_driver.h, 0x13) is the other. Its Read, LoadFile,
+>  * RunRequestQueue, RequestLoadFile, StopService and CancelRequests slots do
+>  * nothing. GetNullDriverMode, SetNullDriverMode and GetNullDriverUseVSyncCallback
+>  * answer the queries game_shell.c's GetActiveDataSource* functions forward
+>  * to the CD driver's GetCdDriverMode, SetCdDriverMode and
+>  * GetCdUseVSyncCallback: they keep the two mode words and report no VSync
+>  * callback.
+>  *
+>  * VabStreamObj (include/vab_stream_obj.h, 0xA03) is a FileResource subclass
+>  * whose ctor and finalize chain to the active driver's. The header's banner
+>  * describes the load sequence and the slots. The first bank constructed
+>  * initialises libsnd (SsInit, the score size table, a 60 Hz tick); the first
+>  * whose attributes load starts it (SsStart, the master volume). Finalizing
+>  * the last open bank (sOpenVabCount) while no WBgm plays ends it.
+>  *
+>  * InitSoundCueSet and FlushSoundCueSet (include/sound_cue_set.h) are free
+>  * functions, not methods: they take the sound object first, and Flush stops
+>  * the cue's voices through its stopVoice slot.
+>  */

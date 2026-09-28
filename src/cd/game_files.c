@@ -1,29 +1,9 @@
 /*
- * game_files.c -- the LbdFile class, and the getters over the game's table of
- * file names.
- *
- * LbdFile (include/lbd_file.h, which documents the class): New_LbdFile to
- * LbdFile__SetAutoLoadData and GetLbdFileMethods, the loader for one stage
- * map chunk, STGnn\Mnnn.LBD.
- *
- * sRecordTable is an array of 0x1C-byte records (CdFileEntry), each a file path
- * padded with zeros; dream_day.c's RegisterRecordTableFiles hands them to
- * the CD driver. In order:
- *  - the seven sound banks' SND\name.VH/VB pairs and SND\SE.VH/VB;
- *  - each stage's files, from sStageFirstRecord[stage]: its four textures
- *    (TEXA..TEXD.TIX), five BGM sequences (BGA..BGE.SEQ) and map chunks
- *    (Mnnn.LBD, laid out as stage_grid.h's grid);
- *  - from RECORD_TABLE_COUNT, the movies (ETC\OPENINGA..G.STR,
- *    ETC\ENDING.STR, FILM\EVENTn.STR), then six records per special day
- *    (FILM\SPDAYnnA/B.STR, IMG1\SPDAYnnC..F.TIM).
- * The stage getters return a record, used as a path: PickStageBgm's goes to
- * the WBgm's setSeq, PickStageTexture's to New_TimBlockSrc, and a map
- * chunk's to an LbdFile. The movie getters also hand back a movie id, the
- * movie's index in sMovieFrameCounts, whose value GetMovieFrameCount gives
- * game_shell.c's StreamTasks as the MoviePlayer's frame count.
- *
- * The random pickers draw through SeedAndRandom; SetPickOverrides forces
- * PickSoundBank's and PickStageBgm's choice (1-based, 0 for random).
+ * game_files.c -- the LbdFile class (include/lbd_file.h), the loader for one
+ * stage map chunk, STGnn\Mnnn.LBD: New_LbdFile to LbdFile__SetAutoLoadData
+ * and GetLbdFileMethods; then the getters over the game's table of file
+ * names, the record table (include/game_files.h, whose file documentation
+ * lists the table's layout).
  */
 #include "common.h"
 #include "lbd_file.h"
@@ -185,7 +165,7 @@ void LbdFile__ReleaseDataBlock(LbdFile *self) {
     }
 }
 
-extern char *sDefaultDataDirectory; /* "CDI\\" (sdata) */
+extern char *sDefaultDataDirectory; /* "CDI\\" */
 extern s32 sForcedSoundBank;
 extern s32 sForcedStageBgm;
 extern u8 sSoundBankPaths[];
@@ -257,6 +237,7 @@ char **GetSoundEffectDirRef(void) {
     return &sSoundEffectDirPtr;
 }
 
+/* MATCHING: game_files.h declares it unprototyped: DayTask's ctor passes a dead argument, which a prototype would drop */
 char *GetSoundEffectDir(void) {
     return *GetSoundEffectDirRef();
 }
@@ -342,6 +323,7 @@ CdFileEntry *GetEndingMovieRecord(s32 *movieIdOut) {
     return &GetRecordTable(NULL)[RECORD_ENDING_MOVIE];
 }
 
+/* MATCHING: game_files.h declares it unprototyped: PlayEndingMovie passes a dead second argument, which a prototype would drop */
 CdFileEntry *GetEndingMovie(s32 *movieIdOut) {
     s32 movieId;
     CdFileEntry *rec = GetEndingMovieRecord(&movieId);

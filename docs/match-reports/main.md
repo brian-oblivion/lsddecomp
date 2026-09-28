@@ -361,3 +361,9 @@ Two constructs carry `/* MATCHING: */` lines. The unread `0` passed to
 `GameApplicationInitSystemsFn` cast is measured: calling the slot through its
 own four-parameter type with a trailing `0` compiles to 41/46 words
 (`funcdiff.py main`, reverted), so the cast is what matches.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/main.c`:
+
+The file banner of src/main.c said: "`main` does not call `__main` in the C. cc1 inserts `jal __main` at the top of any function named `main`, and that call is retail's first instruction. `__main` is Sony's empty stub (the SDK's `_obj/none`); no linked object places it, so it is written here." The source now says the same without the toolchain, the instruction or the word "compiler", which the track-12 census also counts as toolchain text. CONSOLE_RAM_MB's comment called a 2 MB console a "retail console"; it now says "production console".

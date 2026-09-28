@@ -266,3 +266,11 @@ The inner `{ ... }` block that wrapped the body after the `entry == NULL`
 return since round 47 was removed in round 100 (charlie): byte-identical.
 The `(u8 *)gCdSeekParam + 0x14` CdlSetloc argument became
 `(u_char *)&gCdSeekParam->pos`, Sony's `CdControl` parameter type.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/cd/cd_driver.c`:
+
+The `LoadFileNoArgsFn` comment ended "MATCHING: called through a no-argument
+type, so no argument is reloaded before the jal." It is now its own one-line
+`MATCHING:` comment.

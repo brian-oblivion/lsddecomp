@@ -43,3 +43,12 @@ round 64 note that it is "referenced only from the still-uncarved
 `code_179d8` remainder" no longer holds; it is unreferenced, at least by
 `jal`, stored pointer, or `lui`/`addiu`/`ori` address build (no `addiu`
 or `ori` anywhere in the image carries its address's low half).
+
+## History (source comments moved in track 12, round 106)
+
+From `src/cd/cd_driver.c`:
+
+Part 5's banner said nothing calls the install/destroy pair or NoOp2, NoOp3
+and NoOp4: "no jal, stored pointer or built address reaches them". The
+banner now says the same in C terms; the rest of it moved to
+include/cd_driver.h's file documentation.

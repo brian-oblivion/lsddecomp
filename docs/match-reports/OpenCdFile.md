@@ -564,3 +564,18 @@ note. Names as of round 98 (the parameter `suffix` is now `name`, the local
   the same `BuildCdFilePath` call). `100` -> `CD_SEARCH_ATTEMPTS - 1`:
   `retries++ < 100` searches 101 times in all, the same 101 that
   `ResolveFileEntries` spells as its local `CD_SEARCH_RETRIES 0x65`.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/cd/cd_driver.c`:
+
+The function comment read:
+
+> Resolves `name` once and marks the object open; an open object is left
+> alone. After CD_SEARCH_ATTEMPTS failed lookups it prints the path and
+> returns with the object still closed.
+> MATCHING: the retry is a label and goto; a while or for loop hoists &path
+> out of it and rotates the saved registers.
+
+The description is now the prototype's `@brief` in include/cd_driver.h; the
+source keeps the `MATCHING:` line, shortened to the hoist.

@@ -64,3 +64,9 @@ line carries `/* arity-ok: ... */`.
 ## Track 10 (2026-09-28, round 104, echo)
 
 game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/game_files.h`:
+
+include/game_files.h carried the justification on the declaration line: "MATCHING: unprototyped, PlayEndingMovie passes a dead second argument retail loads (arity-ok: dead argument)". The header keeps an `arity-ok:` note for tools/externcheck.py and tools/declcheck.py; the `MATCHING:` line moved above the definition in src/cd/game_files.c.

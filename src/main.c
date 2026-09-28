@@ -8,10 +8,10 @@
  * both to the application's initSystems. Then it calls runMainLoop, which
  * never returns: the game loop is Application's, not this file's.
  *
- * `main` does not call `__main` in the C. cc1 inserts `jal __main` at the
- * top of any function named `main`, and that call is retail's first
- * instruction. `__main` is Sony's empty stub (the SDK's `_obj/none`); no
- * linked object places it, so it is written here.
+ * `main` does not call `__main` in the C: a call to `__main` is generated at
+ * the top of any function named `main`. `__main` is Sony's empty stub (the
+ * SDK's `_obj/none`); no linked SDK object provides it, so it is written
+ * here.
  */
 #include "common.h"
 #include "game_application.h"
@@ -24,7 +24,7 @@ extern GameApplication *sGameApplication;
 extern GameApplicationConfig sGameApplicationConfig;
 
 /* SetMem's argument: the RAM size in megabytes (Psy-Q libapi takes 2, a
- * retail console, or 8, a development board). */
+ * production console, or 8, a development board). */
 #define CONSOLE_RAM_MB 2
 
 /* Bytes of blocks in the game's one BMemPMgr pool, BMemPMgrInit's poolSize
@@ -49,5 +49,6 @@ void main(void) {
     sGameApplication->methods->runMainLoop(sGameApplication);
 }
 
-/* Sony's _obj/none: empty. Its one call is the one cc1 puts in main. */
+/* Sony's _obj/none: empty. Its one call is the one generated at the top of
+ * main. */
 void __main(void) {}
