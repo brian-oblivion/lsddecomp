@@ -717,3 +717,41 @@ The declarations above GetMetaEvent carried:
 > _SsSndNextSep is Sony's `libsnd/next`, linked from the SDK object since
 > round 34; this signature is the one libsnd_cres.c's matched C used
 > before the conversion.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_seqread.c`:
+
+> The function comment, before it was cut under the banner limit:
+>
+> "Meta-event handler, reached from GetSeqData's 0xFF ("running status
+> for a 0xF0 event") and new-status 0xF0 dispatch arms with `a2` = the
+> meta-event TYPE byte. Only two types are understood; everything else is
+> silently ignored:
+>
+> 0x2F (End of Track): bumps the repeat counter (playsDone). playCount == 0 means
+> "loop forever" -- rewind readPos to the saved track start (trackStart) and keep
+> going. Otherwise, while the counter is still under the limit (playCount),
+> rewind BOTH readPos and loopPos. Once the limit is reached, clear the
+> playback-state flags (flags), rewind loopPos one more time, and run the
+> stop-sequence callbacks (_SsSndNextSep gated on nextSepAccess != 0xFF, then an
+> unconditional SpuVmSeqKeyOff notify) before priming deltaLeft from ticksPerCall for
+> the next tick.
+>
+> 0x51 (Set Tempo): reads a 3-byte big-endian microseconds-per-quarter-note
+> value, converts it to a BPM-like rate (60000000 / value -- the standard
+> MIDI tempo formula) into tempo, then recomputes the scheduling
+> threshold (callsPerTick/ticksPerCall) against ticksPerBeat and the global tick-rate constant
+> VBLANK_MINUS, in whichever of two regimes avoids losing precision to
+> integer truncation (the `else` regime also derives a rounding bit from
+> the division's remainder). callsPerTick doubles as a mode flag: -1 means
+> "ticksPerCall holds the reciprocal-regime value", any other value means
+> "ticksPerCall holds the same value callsPerTick does"."
+>
+> The NON_MATCHING body's score comment: "NON_MATCHING: 211/213 words, length
+> 2 short. Residue: register identity: retail's second divu re-reads
+> rec->ticksPerBeat with a plain `lh`, and this body keeps the first read live
+> in a register (docs/match-reports/GetMetaEvent.md). The volatile on the
+> word-sized tempo, below, defeats GCC's div/mod fusion." And inside the body:
+> "NON_MATCHING: only the word-sized field is volatile; that defeats GCC's
+> div/mod fusion and leaves the plain `lh` for ticksPerBeat alone."

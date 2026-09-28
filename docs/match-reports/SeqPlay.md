@@ -643,3 +643,26 @@ Snd_play is `void`. The comment the definition carried:
 > The third parameter is unused; retail reuses its dead register
 > ($a2) to hold rec->unk70 for that store (docs/match-reports/SeqPlay.md).
 
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_seqread.c`:
+
+> The file banner (the unit's; SeqPlay is its first function):
+>
+> "Every function here is Sony's. Retail links libsnd 3.3's seqread with one
+> function changed (_SsSetControlChange), so the object never placed and the
+> module is carried as C. progress.py counts all of it as library by address
+> (config/sdk-in-game.txt, and the `identified` symbols entry for
+> _SsSetControlChange). The functions keep Sony's names and are never retyped
+> as game code."
+>
+> "The controller handlers edit the VAB in place through Sony's SsUtGet/Set
+> ProgAtr/VagAtr calls. Snd_setVabAttr is ContDataEntry's per-NRPN VagAtr
+> editor, and it unpacks the ADSR registers into an AdsrFields to do so.
+> ContModulation and ContPortaTime have no caller in this executable."
+> (both already said at those functions), and
+>
+> "This unit owns three switch jump tables in rodata: jtbl_80010CF0
+> (_SsSetControlChange), and jtbl_80010ED8 and jtbl_80010F38
+> (Snd_setVabAttr's nested switch)."

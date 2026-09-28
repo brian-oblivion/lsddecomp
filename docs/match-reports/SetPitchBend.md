@@ -303,3 +303,12 @@ SetPitchBend is live C and the image is byte-exact; the stale STALL comment abov
 > (rec->unk4C) the compiler schedules earlier than retail does, not a
 > logic or CFG difference -- no if/else arm ordering applies here (see
 > report for the round-25 head lever's explicit negative answer).
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_seqread.c`:
+
+> On the unit's declaration of SpuVmPitchBend: "libsnd/vmanager. MATCHING: the
+> arguments as SetPitchBend passes them; with the definition's (s16, s16, s16,
+> u16) the call narrows its first argument, two words retail does not have."
+> Now one line.

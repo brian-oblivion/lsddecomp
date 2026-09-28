@@ -263,3 +263,11 @@ channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
 `build/nonmatching/src/code_179d8_k.c.o` before/after).
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_seqread.c`:
+
+> The shared comment above the three VagAtr editors said "`tones` is re-read
+> from memory on every iteration because the compiler cannot prove the SsUt
+> calls leave the ProgAtr alone."

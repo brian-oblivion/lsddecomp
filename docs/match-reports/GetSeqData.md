@@ -468,3 +468,12 @@ The forward declarations above GetSeqData carried:
 > signature is the one already established in its own (still-stalled) STALL
 > comment above; _SsSetControlChange's and GetMetaEvent's are this function's own
 > reading, derived from the registers loaded before each call below.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_seqread.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: 122/172 words, length
+> exact. Residue: register identity (retail's widened "channel" lives in $s4
+> and its per-case data byte in $s3; this C compiles the same roles the other
+> way around) (docs/match-reports/GetSeqData.md)."

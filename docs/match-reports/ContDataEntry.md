@@ -1054,3 +1054,19 @@ The comment on DataEntryLocals, ContDataEntry's frame view, read:
 > both the VagAtr buffer the unk29==2 loops hand to SsUtGet/SetVagAtr
 > (retail addresses it at sp+0x58 = list+0x10) and, with the 18 bytes
 > after it, the two by-value arguments of Snd_setVabAttr (round 69).
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_seqread.c`:
+
+> On DataEntryLocals: "(retail addresses it at sp+0x58 = list+0x10)".
+>
+> The NON_MATCHING body's score comment: "NON_MATCHING: 380/376 words, 4
+> long; frame exact (-0x108). Residue: retail keeps the two dead `unused`
+> values in a callee-saved register ($s5, set and never read) where this body
+> needs `volatile` stack slots, and with $s5 free this build hoists the
+> loop-invariant `a2 & 0x7F` out of the first loop, which renumbers $s3-$s5
+> through the loops (docs/match-reports/ContDataEntry.md). Written for the
+> reader: the byte-shaped body's `dead[16]` frame pad and `volatile` on the
+> two `unused` locals are omitted here and kept in the report." The two
+> `unused` locals' comments said "computed and never read, as in retail".
