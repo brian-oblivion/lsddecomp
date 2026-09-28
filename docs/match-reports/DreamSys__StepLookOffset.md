@@ -67,7 +67,7 @@ void DreamSys__StepLookOffset(DreamSys *this)
 	idx = this->unk_0x88;
 	if (idx != 0) {
 		delta = sLookOffsetSteps[idx];
-		threshold = LOOK_OFFSET_LIMITS[idx];
+		threshold = sLookOffsetLimits[idx];
 		sum = delta + this->unk_0x8C;
 		if (sum >= 0) {
 			if (sum < threshold)
@@ -365,7 +365,7 @@ void DreamSys__StepLookOffset(DreamSys *this)
 	idx = this->unk_0x88;
 	if (idx != 0) {
 		delta = sLookOffsetSteps[idx];
-		threshold = LOOK_OFFSET_LIMITS[idx];
+		threshold = sLookOffsetLimits[idx];
 		sum = delta + this->unk_0x8C;
 		if (sum >= 0) {
 			if (sum < threshold)
@@ -451,7 +451,7 @@ void DreamSys__StepLookOffset(DreamSys *this)
 	idx = this->unk_0x88;
 	if (idx != 0) {
 		delta = sLookOffsetSteps[idx];
-		threshold = LOOK_OFFSET_LIMITS[idx];
+		threshold = sLookOffsetLimits[idx];
 		sum = delta + this->unk_0x8C;
 		inRange = (sum < 0) ? (-sum < threshold) : (sum < threshold);
 		if (inRange) {
@@ -469,7 +469,7 @@ void DreamSys__StepLookOffset(DreamSys *this)
 ```
 
 Vtable slot `0x144`. Reads `this->unk_0x88` as an index into a
-delta/threshold table pair (`sLookOffsetSteps`/`LOOK_OFFSET_LIMITS`); if the resulting sum
+delta/threshold table pair (`sLookOffsetSteps`/`sLookOffsetLimits`); if the resulting sum
 stays within the threshold, nudges `this->unk_0x5C->unk_0x24` and
 `this->unk_0x8C` by the delta and clears `unk_0x88`; otherwise (idx==0) it
 decays `unk_0x8C` towards zero by a fixed step of 600, applying the same
@@ -602,7 +602,7 @@ Renamed from `func_80059814`.
 
 Steps `heightCurve->endValue` (the far keyframe's value) by the
 per-tick delta `sLookOffsetSteps[lookOffsetCommand]` (+-600), refuses the step
-once the accumulator `lookOffset` would pass `LOOK_OFFSET_LIMITS` (+-9000), and when
+once the accumulator `lookOffset` would pass `sLookOffsetLimits` (+-9000), and when
 no command is queued decays `lookOffset` back toward 0 by 600 a tick, applying that
 decay to the curve as well. Consumes the command (resets it to 0) either way.
 Tier B: the arithmetic is exact and measured off the tables; "look" is the shared

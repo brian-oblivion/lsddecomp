@@ -542,7 +542,7 @@ void DreamSys__StepLookOffset(DreamSys *this) {
     idx = this->lookOffsetCommand;
     if (idx != 0) {
         delta = sLookOffsetSteps[idx];
-        threshold = LOOK_OFFSET_LIMITS[idx];
+        threshold = sLookOffsetLimits[idx];
         sum = delta + this->lookOffset;
         if (sum >= 0) {
             if (sum < threshold)

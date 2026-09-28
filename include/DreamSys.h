@@ -141,12 +141,12 @@ extern s32 gLinkDstStage;
 extern s32 gLinkSpawnIndex;
 
 /* Delta/threshold table pairs consumed by DreamSys__StepLookOffset (sLookOffsetSteps /
-   LOOK_OFFSET_LIMITS, indexed by DreamSys::lookOffsetCommand) and DreamSys__StepLookYaw (LOOK_YAW_STEPS /
+   sLookOffsetLimits, indexed by DreamSys::lookOffsetCommand) and DreamSys__StepLookYaw (LOOK_YAW_STEPS /
    LOOK_YAW_LIMITS, indexed by DreamSys::lookYawCommand). Index 0 is unused/zero in both
    pairs; indices 1 and 2 are the negative/positive delta and its matching
    threshold. Still raw `nonmatching` data (round 2026-08-30). */
 extern s32 sLookOffsetSteps[3];
-extern s32 LOOK_OFFSET_LIMITS[3];
+extern s32 sLookOffsetLimits[3];
 extern s32 LOOK_YAW_STEPS[3];
 extern s32 LOOK_YAW_LIMITS[3];
 
@@ -468,7 +468,7 @@ struct DreamSys {
     /* Set unconditionally to arg1 by DreamSys__SelectCallback80(this, arg1); no other
 	   observed use (round 2026-08-30). */
     s32 lookCallbackMode;
-    /* Index into the (sLookOffsetSteps, LOOK_OFFSET_LIMITS) delta/threshold table pair,
+    /* Index into the (sLookOffsetSteps, sLookOffsetLimits) delta/threshold table pair,
 	   consumed and reset to 0 by DreamSys__StepLookOffset (round 2026-08-30). */
     s32 lookOffsetCommand;
     /* Running accumulator nudged by lookOffsetCommand's table entry, or decayed by
