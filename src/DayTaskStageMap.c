@@ -27,20 +27,8 @@
  * path; placing, loading and querying the slots; the drawn window and the
  * scale ramp. Its data tables and SplitCoord2 are in include/class_3bb8c.h.
  *
- * What decided its edges (python3 tools/tuboundary.py): the start is
- * "start edge possible" after StageGrid.c, which follows the placed Sony
- * object libc2/rand; the binary is silent there and content keeps the two
- * apart (StageGrid's free lookups, then DayTask). The forced boundary noted
- * on DayTask's early gaps is the jump-table pair 0x80011290 / 0x8001140c,
- * whose interval runs from Sprite.c to DayTask__OnObjMNotify across placed
- * Sony objects, so it forces nothing here. Inside, it was four carve
- * slices (class_39e08, class_3ac78, class_3bb8c, class_3bb8c_b), merged
- * because a class straddled each edge: TimedTask the first (PlaySound and
- * the getter opened class_3ac78, "start edge possible"), StageMap the other
- * two ("start edge possible, soft-unlikely" at both). The end is "start edge
- * possible" before TitleMenuTaskObjF.c and nothing straddles it; see that
- * file's banner for why NodeGuardedViewport and GridCell, which content
- * would put here, sit there.
+ * NodeGuardedViewport and GridCell, which DayTask and StageMap use, are
+ * defined in TitleMenuTaskObjF.c.
  */
 #include "common.h"
 #include <libgte.h>
