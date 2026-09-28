@@ -30,7 +30,7 @@ void Viewport__Viewport(Unk18Obj *self)
     self->unkC = 0;
     self->unk10 = 0;
     self->unkAC = New_SceneNode();
-    obj = New_FadeBox(gViewportFadeBoxSize, 0, 0);
+    obj = New_FadeBox(sViewportFadeBoxSize, 0, 0);
     self->unkB0 = obj;
     obj->methods->slot4C(obj, self->unkAC, sFadeBoxAttachPos);
     self->methods->slot40(self);
@@ -72,7 +72,7 @@ before the byte-level score did.
 - `New_SceneNode`: local view added, returning `void *` (this unit never
   dereferences it) -- `include/SceneNode.h`'s own view types it
   `SceneNodeObj *`, unaffected since it's a separate header.
-- `gViewportFadeBoxSize`/`sFadeBoxAttachPos`: two new address-taken-only globals.
+- `sViewportFadeBoxSize`/`sFadeBoxAttachPos`: two new address-taken-only globals.
 
 ## Head-broadcast levers (round 13): applicability check
 
@@ -110,7 +110,7 @@ pass, the round 82/85 track-4 unification of Viewport) moved to
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_8008A90C` | `gViewportFadeBoxSize` | A | Its only reader is this ctor, which passes it as New_FadeBox's `size`; FadeBox's ctor hands it to BoxFill__Reset, which reads `size->x`/`size->y` into boxW/boxH. The words are (320, 240), the full screen. splat's symbol runs 24 bytes (then (10, 10), (-10, -10)); nothing here reads past the first two words. |
+| `D_8008A90C` | `sViewportFadeBoxSize` | A | Its only reader is this ctor, which passes it as New_FadeBox's `size`; FadeBox's ctor hands it to BoxFill__Reset, which reads `size->x`/`size->y` into boxW/boxH. The words are (320, 240), the full screen. splat's symbol runs 24 bytes (then (10, 10), (-10, -10)); nothing here reads past the first two words. |
 
 Local `obj` -> `fadeBox` (it is stored in `self->fadeBox`); pointer
 stores of 0 spelled NULL. Byte-identical.

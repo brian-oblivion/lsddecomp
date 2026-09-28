@@ -1341,7 +1341,7 @@ void Viewport__Viewport(Viewport *self) {
     self->drawSystem = NULL;
     self->viewNode = NULL;
     self->sceneRoot = New_SceneNode();
-    fadeBox = (SceneNode *)New_FadeBox(gViewportFadeBoxSize, 0, 0);
+    fadeBox = (SceneNode *)New_FadeBox(sViewportFadeBoxSize, 0, 0);
     self->fadeBox = fadeBox;
     fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)sFadeBoxAttachPos);
     self->methods->initDefaults(self);

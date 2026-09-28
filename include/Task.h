@@ -48,11 +48,11 @@ extern DrawRect *GetDefaultMovieFrame(void);
  * GetDefaultMovieFrame. */
 extern DrawRect sDefaultMovieFrame;
 
-/* Viewport's ctor data: gViewportFadeBoxSize is the (320, 240) it passes
+/* Viewport's ctor data: sViewportFadeBoxSize is the (320, 240) it passes
  * New_FadeBox; sFadeBoxAttachPos the (-100, -100) screen position the ctor
  * and SetSubHandle attach the sub handle at; sDefaultViewTwist ({0, 1}) is
  * Viewport__AttachViewChild's twist when its own is NULL. */
-extern u8 gViewportFadeBoxSize[];
+extern u8 sViewportFadeBoxSize[];
 extern u8 sFadeBoxAttachPos[];
 extern Ratio16 sDefaultViewTwist;
 
