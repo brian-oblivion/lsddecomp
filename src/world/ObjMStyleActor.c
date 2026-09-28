@@ -2928,10 +2928,10 @@ void Actor__AddLocalTranslation(Actor *self, s16 *local) {
 
 /* The z of the s16 local move vector whose x and y are sActorLocalMove
  * (next section, with MoveLocalX/Y and MoveAlongLocalAxis). */
-extern s16 gActorLocalMoveZ;
+extern s16 sActorLocalMoveZ;
 
 void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
-    Actor__MoveAlongLocalAxis(self, &gActorLocalMoveZ, val, notify, ACTOR_EVENT_MOVED_Z);
+    Actor__MoveAlongLocalAxis(self, &sActorLocalMoveZ, val, notify, ACTOR_EVENT_MOVED_Z);
 }
 
 /* ---- Actor's movement and link search; VariantSprite's ctor -------------
@@ -2958,7 +2958,7 @@ void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
  *    class (include/VariantSprite.h) that happens to follow in ROM.
  */
 
-/* The local move vector's x and y (s16; the z, gActorLocalMoveZ, is the next
+/* The local move vector's x and y (s16; the z, sActorLocalMoveZ, is the next
  * halfword, previous section). All three stay 0 between moves: a move sets
  * one component, addLocalTranslation rotates the whole vector by the
  * actor's orientation, and the component is cleared again. */
