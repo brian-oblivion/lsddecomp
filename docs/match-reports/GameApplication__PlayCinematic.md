@@ -6,7 +6,7 @@
 
 > Renamed from `func_8002677C` on 2026-09-24 (tools/rename.py). Address 0x8002677c.
 
-**Unit:** code_1677c · **Size:** 97 instructions (0x184 bytes) · **Status:** MATCHED (97/97 words, whole-image SHA1 green)
+**Unit:** GameApplicationFileResource · **Size:** 97 instructions (0x184 bytes) · **Status:** MATCHED (97/97 words, whole-image SHA1 green)
 
 ## What it does
 
@@ -159,7 +159,7 @@ The task these functions build with New_TaskCore is a plain TaskCore (include/Ta
 
 **`GameApplication__PlayCinematic` -- tier B** (renamed from `GameApplication__StartCinematicStream` with tools/rename.py). Evidence: resolves DreamSys's getCinematic pair with GetSpecialDayOrEventRecord: a movie (movie id != -1) is streamed, gated by config->playStreams, with no skip on confirm; a special day's TIM image (movie id -1) is shown by a TaskCore for 10 seconds (setFrameBound(10), TASKCORE_FRAMES_PER_SECOND). Tier B: "cinematic" is DreamSys's slot name, and what the pair selects in the game is not established (GetSpecialDayOrEventRecord.md).
 
-Body changes, all byte-identical: chanBuf {s32 chan; u32 unk04, unk08} -> idBuf {s32 movieId; u8 pad04[8]} (MATCHING: 12 bytes, the read word first); groupId/lookup -> path/frameCount; GetSpecialDayOrEventRecord's extern returns const char * (the record, used as a path by both branches). The old reading ("channel index", a "no cinematic" fallback path, SetActiveDataSourceDriverMode's return "kept") is in the history section below: the value kept across SetActiveDataSourceDriverMode is GetSpecialDayOrEventRecord's return, and SetActiveDataSourceDriverMode returns void (code_1677c.c).
+Body changes, all byte-identical: chanBuf {s32 chan; u32 unk04, unk08} -> idBuf {s32 movieId; u8 pad04[8]} (MATCHING: 12 bytes, the read word first); groupId/lookup -> path/frameCount; GetSpecialDayOrEventRecord's extern returns const char * (the record, used as a path by both branches). The old reading ("channel index", a "no cinematic" fallback path, SetActiveDataSourceDriverMode's return "kept") is in the history section below: the value kept across SetActiveDataSourceDriverMode is GetSpecialDayOrEventRecord's return, and SetActiveDataSourceDriverMode returns void (GameApplicationFileResource.c).
 
 ### History: code_1677c.c comments before the round-100 polish
 

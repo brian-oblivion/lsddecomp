@@ -43,7 +43,7 @@
 /* getNextFrame's poll count when `tries` is negative. */
 #define CDSTREAM_NEXT_FRAME_TRIES 8388608
 
-/* Defined in other units: GetDataDirectory (code_1677c.c) returns the data
+/* Defined in other units: GetDataDirectory (GameApplicationFileResource.c) returns the data
  * directory's name; strcpy and strcat are Sony's libc2; BMemPMgrAlloc is the
  * game's heap allocator. */
 char *GetDataDirectory(void);

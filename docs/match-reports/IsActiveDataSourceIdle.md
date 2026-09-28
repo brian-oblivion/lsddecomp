@@ -2,7 +2,7 @@
 
 > Renamed from `func_80026E98` on 2026-09-18 (tools/rename.py). Address 0x80026e98.
 
-**Unit:** code_1677c · **Size:** 13 words · **Status:** MATCHED, round 43
+**Unit:** GameApplicationFileResource · **Size:** 13 words · **Status:** MATCHED, round 43
 (2026-09-15, runner bravo). 13/13 words, byte-exact whole-image build.
 
 ## History

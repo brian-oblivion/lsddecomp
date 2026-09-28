@@ -2,7 +2,7 @@
 
 > Renamed from `GetActiveDataSourceMethods` on 2026-09-18 (tools/rename.py). Address 0x80026cac.
 
-**Unit:** code_1677c · **Size:** 15 words · **Status:** MATCHED, round 43
+**Unit:** GameApplicationFileResource · **Size:** 15 words · **Status:** MATCHED, round 43
 (2026-09-15, runner bravo). 15/15 words, byte-exact whole-image build.
 
 ## History

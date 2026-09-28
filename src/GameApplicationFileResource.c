@@ -1,5 +1,5 @@
 /*
- * code_1677c -- GameApplication (include/GameApplication.h, which documents
+ * GameApplicationFileResource -- GameApplication (include/GameApplication.h, which documents
  * the class): the game's Application. Its allocator and ctor, the RNG seed
  * and initSystems overrides, then the hooks Application__RunMainLoop calls,
  * each with the helpers it uses, in ROM order:
@@ -34,7 +34,7 @@
 #include "GraphRoom.h"
 #include "TitleMenu.h"
 #include "DayTask.h"
-#include "code_1677c.h"
+#include "GameApplicationFileResource.h"
 #include "VabDriver.h"
 #include "CdDriver.h"
 

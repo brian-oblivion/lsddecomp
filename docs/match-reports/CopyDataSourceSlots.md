@@ -4,7 +4,7 @@
 
 > Renamed from `func_80026D88` on 2026-09-18 (tools/rename.py). Address 0x80026d88.
 
-**Unit:** code_1677c · **Size:** 33 instructions · **Status:** MATCHED (33/33 words, whole-image build verified byte-exact)
+**Unit:** GameApplicationFileResource · **Size:** 33 instructions · **Status:** MATCHED (33/33 words, whole-image build verified byte-exact)
 
 ## What it does
 

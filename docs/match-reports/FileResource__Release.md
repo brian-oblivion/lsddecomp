@@ -6,11 +6,11 @@
 
 > Renamed from `func_800269F0` on 2026-09-18 (tools/rename.py). Address 0x800269f0.
 
-**Unit:** code_1677c · **Size:** 24 instructions · **Status:** MATCHED (24/24 words, whole-image build verified byte-exact)
+**Unit:** GameApplicationFileResource · **Size:** 24 instructions · **Status:** MATCHED (24/24 words, whole-image build verified byte-exact)
 
 ## What it does
 
-Slot `+0x004` of the `gFileResourceMethods` method table (see `include/code_1677c.h`'s
+Slot `+0x004` of the `gFileResourceMethods` method table (see `include/GameApplicationFileResource.h`'s
 `FileResourceMethods`). It clears one flag, then explicitly chains
 **both** destructors available to it: the class's own (`this->methods->dtor`,
 itself `FileResource__Finalize`, resolved through the vtable rather than by name) and
@@ -75,7 +75,7 @@ void *FileResource__Release(FileResource *this) {
 `BasicClassMethods` (header @0, an own-class slot @+0x004, ctor @+0x008,
 dtor @+0x00C) — confirmed by dumping the table's raw words directly from
 `disk/SLPS_015.56` rather than trusting a null-slot scan in isolation (see
-`include/code_1677c.h`). A function occupying a class's own `+0x004` slot
+`include/GameApplicationFileResource.h`). A function occupying a class's own `+0x004` slot
 explicitly re-invoking `+0x00C` (its own dtor) *and* the base class's dtor is
 a legitimate "Destroy()" idiom distinct from the raw dtor slot itself, and is
 worth checking for on any other class's `+0x004`-equivalent slot before

@@ -9,7 +9,7 @@
 ## What it does
 
 The gApplicationMethods constructor (slot `+0x008`). GameApplication__GameApplication
-(code_1677c) calls it through `GetApplicationMethods()->ctor(self, arg->unk00)`.
+(GameApplicationFileResource) calls it through `GetApplicationMethods()->ctor(self, arg->unk00)`.
 
 1. base ctor through BasicClass's table;
 2. installs its own table (GetApplicationMethods);
@@ -42,7 +42,7 @@ by the scheduler. `gCdInitDone` is gp-relative through
 **Round 81 (delta), track 3.** Renamed `func_8003AF8C` -> `Application__Application`
 (constructor convention, `Class__Class`). **Tier A**: it is the +0x008 ctor
 slot (`classtable.py 0x8006E4F0 --vs 0x8006B58C`), confirmed by
-`GameApplication__GameApplication` (code_1677c) calling it through
+`GameApplication__GameApplication` (GameApplicationFileResource) calling it through
 `GetApplicationMethods()->ctor(self, arg->unk00)` as the base-constructor step
 before installing its own vtable -- the base-ctor-through-slot+8 shape from
 docs/research/class-framework.md. The body is substantive ctor work (base

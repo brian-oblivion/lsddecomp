@@ -21,7 +21,7 @@
  *     LockCd/UnlockCd, the latch that keeps that tick out of a half-updated
  *     queue.
  *
- * code_1677c.c reaches all of this through wrappers gated on
+ * GameApplicationFileResource.c reaches all of this through wrappers gated on
  * `gActiveDataSource == 0x13`, this class's header word; the other value that gate
  * takes, 0x23, selects the SPU/VAB streamer in PlacementGridVabSound.c. So the two
  * are interchangeable data sources behind one small dispatch layer.

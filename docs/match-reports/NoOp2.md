@@ -29,7 +29,7 @@ visible in carved code (referenced, if at all, only from the still-uncarved
 address anywhere), so there is no evidence for WHICH slot or subsystem this
 serves. Named `NoOp2` following the existing project-wide precedent for
 multiple distinct no-op functions at different addresses (`NoOp` at
-0x80026C80, `NoOpIgnoreArgs` at 0x80056DF0, both in `code_1677c.c`/
+0x80026C80, `NoOpIgnoreArgs` at 0x80056DF0, both in `GameApplicationFileResource.c`/
 elsewhere) -- the suffix numbers this unit's three no-op leaves in ROM
 order (`NoOp2`/`NoOp3`/`NoOp4`) purely for disambiguation, not because they
 share a slot or a caller; no such link is established.

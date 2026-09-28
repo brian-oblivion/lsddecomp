@@ -4,7 +4,7 @@
 
 > Renamed from `func_80025FDC` on 2026-09-24 (tools/rename.py). Address 0x80025fdc.
 
-**Unit:** code_1677c · **Size:** 50 instructions (0xC8 bytes) · **Status:** MATCHED (50/50 words, whole-image SHA1 green)
+**Unit:** GameApplicationFileResource · **Size:** 50 instructions (0xC8 bytes) · **Status:** MATCHED (50/50 words, whole-image SHA1 green)
 
 ## What it does
 
@@ -181,7 +181,7 @@ Types renamed with it:
   static instance, `{0x13, 0, 1, 1, 1, 1}`, whose words are the data source and
   on/off switches the hooks test (`playStreams`, `showIntroLogos`,
   `pollGraphRoom`). The field that keeps it, `ctorArgs`, is now `config`
-  (header edit; the compiler listed 8 accessors, all in code_1677c.c).
+  (header edit; the compiler listed 8 accessors, all in GameApplicationFileResource.c).
 - `Class6D3C8SetDayFn` -> `GameApplicationSeedRandomFn`, following its occupant
   `GameApplication__SeedRandom` (see that report).
 - `Class6D3C8InitSystemsFn` -> `GameApplicationInitSystemsFn`,
@@ -210,7 +210,7 @@ level the name claims.
 
 ## Track 6 (round 96, delta): the request local is ResourceSourceRequest
 
-src/code_1677c.c `LoadModelRequest`, `{ s32 type; const char *path; s32 unk08; s32 unk0C; }`, is the same
+src/GameApplicationFileResource.c `LoadModelRequest`, `{ s32 type; const char *path; s32 unk08; s32 unk0C; }`, is the same
 0x10-byte record as class_3bb8c.c's and the third caller's: the body writes
 `type = 0` (ResourceSource's NULL `buffer`: no buffer to adopt) and `path`
 (its `name`: the file to request) and passes it to New_LinkResource. It

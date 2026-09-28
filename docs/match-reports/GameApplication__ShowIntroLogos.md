@@ -6,7 +6,7 @@
 
 > Renamed from `func_80026170` on 2026-09-24 (tools/rename.py). Address 0x80026170.
 
-**Unit:** code_1677c · **Size:** 57 instructions (0xE4 bytes) · **Status:** MATCHED (57/57 words, whole-image SHA1 green)
+**Unit:** GameApplicationFileResource · **Size:** 57 instructions (0xE4 bytes) · **Status:** MATCHED (57/57 words, whole-image SHA1 green)
 
 ## What it does
 

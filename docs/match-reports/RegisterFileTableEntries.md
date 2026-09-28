@@ -2,7 +2,7 @@
 
 > Renamed from `func_80027024` on 2026-09-18 (tools/rename.py). Address 0x80027024.
 
-**Unit:** code_1677c · **Size:** 34 words · **Status:** MATCHED, round 43
+**Unit:** GameApplicationFileResource · **Size:** 34 words · **Status:** MATCHED, round 43
 (2026-09-15, runner bravo). 34/34 words, byte-exact whole-image build.
 
 ## History

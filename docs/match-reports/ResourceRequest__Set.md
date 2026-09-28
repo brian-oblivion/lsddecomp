@@ -4,11 +4,11 @@
 
 > Renamed from `func_80026CE8` on 2026-09-18 (tools/rename.py). Address 0x80026ce8.
 
-**Unit:** code_1677c · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
+**Unit:** GameApplicationFileResource · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 ## What it does
 
-Fills a `ResourceRequest` (`include/code_1677c.h`) -- `buffer`, `name`,
+Fills a `ResourceRequest` (`include/GameApplicationFileResource.h`) -- `buffer`, `name`,
 `mode` -- and returns the pointer. That is the descriptor the LinkResource,
 Tod, TodSet, ModelData and TriggerWorld ctors take (GraphicsResources.c's
 `ResourceSource` declares only its first two words).
@@ -91,7 +91,7 @@ Not `LongVec3` (the words are a pointer, a string and a flag) and not Sony's
 Several unit-local views of this same descriptor remain, under other names:
 `ResourceSource` and `ResourceSourceArgs` (GraphicsResources.c),
 `DreamAuxLoadReq` (code_4cd08.h), `LoadRequest` (class_39e08.h),
-`LoadModelRequest` (code_1677c), `ResourceSourceRequest` (class_3bb8c.c). Some are
+`LoadModelRequest` (GameApplicationFileResource), `ResourceSourceRequest` (class_3bb8c.c). Some are
 0x10-byte locals, where the stack slot size may be what matches, so merging
 them is a head decision (proposed below), not a rename.
 
@@ -105,7 +105,7 @@ them is a head decision (proposed below), not a rename.
 - `include/code_4cd08.h`'s comment above `DreamAuxLoadReq` still quotes the
   old body (`this->x=x; ...`) and calls the record "physically the same shape"
   as the vector; it now reads as the same descriptor as `ResourceRequest`.
-- `ResourceRequest__Set`'s prototype is not in `include/code_1677c.h`: three
+- `ResourceRequest__Set`'s prototype is not in `include/GameApplicationFileResource.h`: three
   units declare their own (typed to their local view), and code_4cd08.h's
   would conflict with it in any file including both.
 
@@ -113,7 +113,7 @@ them is a head decision (proposed below), not a rename.
 
 `ResourceRequest` now lives in `include/FileResource.h`, beside the
 `ResourceSource` it extends, as `{ ResourceSource src; s32 mode; }`, with
-`ResourceRequest__Set`'s one prototype under it. `include/code_1677c.h` no
+`ResourceRequest__Set`'s one prototype under it. `include/GameApplicationFileResource.h` no
 longer defines it. The body reads `this->src.buffer = buffer;
 this->src.name = name; this->mode = mode;`. Retired onto it:
 GraphicsResources.c's `ResourceSourceArgs` (ModelData__BuildResources,

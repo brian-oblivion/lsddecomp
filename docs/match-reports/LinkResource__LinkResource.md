@@ -68,7 +68,7 @@ ResourceSource moved up the file to precede this function (no layout change); To
 
 - **LinkResource__LinkResource**, tier B (head review, round 83: was A). Constructor of the class external code already names LinkResource.
   Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (class_3bb8c.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
-- **ResourceSource** (type, was `Src6F240`), tier A (round 95, bravo, track 6). This ctor, and Tod's, TodSet's, ModelData's and TriggerWorld's, read `src->buffer` and adopt it when non-NULL, else call `requestLoadFile(self, src->name)`: a buffer to adopt, or a file to request. Named for that mechanism, not for any one class, since five ctors share it. Callers in class_39e08.c, code_1677c.c, class_3bb8c.c, code_4cd08.c and code_55dd4.c pass larger locals of their own cast to it (their stack sizes matter), so it stays defined in src/GraphicsResources.c; the five class headers forward-declare it.
+- **ResourceSource** (type, was `Src6F240`), tier A (round 95, bravo, track 6). This ctor, and Tod's, TodSet's, ModelData's and TriggerWorld's, read `src->buffer` and adopt it when non-NULL, else call `requestLoadFile(self, src->name)`: a buffer to adopt, or a file to request. Named for that mechanism, not for any one class, since five ctors share it. Callers in class_39e08.c, GameApplicationFileResource.c, class_3bb8c.c, code_4cd08.c and code_55dd4.c pass larger locals of their own cast to it (their stack sizes matter), so it stays defined in src/GraphicsResources.c; the five class headers forward-declare it.
 
 ## Track 4
 

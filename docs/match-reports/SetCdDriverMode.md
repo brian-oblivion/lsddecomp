@@ -125,7 +125,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence for the function.** It refuses (returns 0) while `gCdBusy`, and
 otherwise stores its three arguments into `gCdUseVSyncCallback`,
 `gCdAsyncEnabled` and `gCdSyncQueueMode` and returns 1 -- the write half of the
-pair `GetCdDriverMode` reads back. `code_1677c.c`'s `SetActiveDataSourceDriverMode` calls it
+pair `GetCdDriverMode` reads back. `GameApplicationFileResource.c`'s `SetActiveDataSourceDriverMode` calls it
 in a `do {} while (fn(...) == 0)` loop, i.e. "retry until the driver accepts
 the new mode", which is what the refusal-while-busy return value is for.
 Parameters are now named `async`, `mode2`, `useVSyncCallback`. Tier B: the

@@ -62,7 +62,7 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
 
 ## Deriving the shape
 
-`BuildFileName` is already matched (`src/code_1677c.c`):
+`BuildFileName` is already matched (`src/GameApplicationFileResource.c`):
 `dest[0]=0; if (arg2) strcat(dest,arg2); strcat(dest,arg1); strcat(dest,arg3); return dest;`
 -- i.e. it builds `arg2 + arg1 + arg3` into `dest`. The two call sites here
 pass `(path, "COMINPUT", "CARD\\", ".TIM")` and

@@ -21,7 +21,7 @@ vtable is `gCdDriverMethods` (29 slots, header word `0x13`, resolved with
   `CdDriver__CancelRequests` (this unit's next three queued functions, at `+0x06C`/
   `+0x070`/`+0x074`)
 
-Compared against `gFileResourceMethods` (`include/code_1677c.h`'s
+Compared against `gFileResourceMethods` (`include/GameApplicationFileResource.h`'s
 `FileResourceMethods`) with `classtable.py gCdDriverMethods --vs gFileResourceMethods`:
 `FileResource__Release` at `+0x004` and `FileResource__FreeBuffer`/`NoOp`/
 `FileResource__SetFlag` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
@@ -32,7 +32,7 @@ slot block and several of the same concrete method implementations.
 `GetCdDriverMethods` itself is the same "return my own vtable's address"
 accessor the project already names elsewhere: `GetGameApplicationMethods` for
 `gGameApplicationMethods` and `GetFileResourceMethods` for `gFileResourceMethods` (both in
-`include/code_1677c.h`'s doc comment).
+`include/GameApplicationFileResource.h`'s doc comment).
 
 ## The C
 
@@ -75,7 +75,7 @@ purpose, so tier A by the plan's own rule. The same accessor shape
 says why.** What the class IS, is now well evidenced: every method reachable
 from this table bottoms out in Psy-Q libcd (`CdSearchFile`, `CdRead`,
 `CdControlF`, `CdSync`, `CdFlush`, `CdPosToInt`/`CdIntToPos`), its objects
-cache a disc position and a byte size, and `code_1677c.c` selects this
+cache a disc position and a byte size, and `GameApplicationFileResource.c` selects this
 class's module functions only when `gActiveDataSource == 0x13`, this table's own
 header word -- the other value that gate takes, `0x23`, is `gVabDriverMethods`, the
 SPU/VAB streamer in `PlacementGridVabSound.c`. So the two are interchangeable data

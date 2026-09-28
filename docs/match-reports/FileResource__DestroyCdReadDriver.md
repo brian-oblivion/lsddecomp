@@ -19,7 +19,7 @@ Byte-exact, 14/14 words.
 ## Notes
 
 Chains directly to `gFileResourceMethods`'s own dtor slot (`GetFileResourceMethods()->dtor`,
-i.e. `FileResource__Finalize`, matched in `code_1677c.c`) rather than through
+i.e. `FileResource__Finalize`, matched in `GameApplicationFileResource.c`) rather than through
 `self->methods` -- same "call the base class's own copy of a slot, not the
 possibly-overridden one on `self`" idiom `FileResource__Release` in that same file
 uses for `Get_vtable_BasicClass()->dtor(this)`. Presumably this unit's own

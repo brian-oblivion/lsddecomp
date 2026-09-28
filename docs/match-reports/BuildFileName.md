@@ -2,7 +2,7 @@
 
 > Renamed from `func_800270C4` on 2026-09-18 (tools/rename.py). Address 0x800270c4.
 
-**Unit:** code_1677c · **Size:** 27 instructions · **Status:** MATCHED (27/27 words, whole-image build verified byte-exact)
+**Unit:** GameApplicationFileResource · **Size:** 27 instructions · **Status:** MATCHED (27/27 words, whole-image build verified byte-exact)
 
 ## What it does
 
@@ -68,7 +68,7 @@ Matched on the first attempt.
 ## Proposed learning
 
 None new. Straightforward confirmation that `strcat`'s prototype
-(`char *strcat(char *dest, char *src);`, declared in `include/code_1677c.h`
+(`char *strcat(char *dest, char *src);`, declared in `include/GameApplicationFileResource.h`
 so this forward reference to a later-defined-in-file function resolves) is
 right in shape even though `strcat`'s own body is still stalled — the two
 are independent findings.

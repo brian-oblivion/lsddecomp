@@ -41,7 +41,7 @@ Matched first as a 1-parameter function passing an uninitialised local as
 SeedAndRandom's second argument (cc1: ``'unused' might be used
 uninitialized``). The body never writes `$a1` before `jal SeedAndRandom`, so
 SeedAndRandom receives PickOpeningMovie's own incoming `$a1`, and its
-caller (code_1677c.c, via GameApplication.h's 2-parameter extern) loads it
+caller (GameApplicationFileResource.c, via GameApplication.h's 2-parameter extern) loads it
 explicitly (`move a1,zero` at the jal). Forwarding idiom: the definition now
 takes `s32 arg1` and forwards it, as PickStageTexture does. Byte-identical;
 the warning is gone and the extern agrees with the definition.

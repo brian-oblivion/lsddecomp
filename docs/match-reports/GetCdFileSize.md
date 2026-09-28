@@ -43,19 +43,19 @@ below); retyping the field itself was cleaner and is arguably the more
 honest reading anyway -- nothing suggests this quantity is ever negative.
 
 **`ObjA34_179D8H` is a local type, not an extension of
-`code_1677c.h`'s `FileResource`**, even though the offsets coincide
+`GameApplicationFileResource.h`'s `FileResource`**, even though the offsets coincide
 suspiciously well: `self->isOpen` (offset +0x0C) lines up with
 `FileResource::pendingGeneration` (same offset, "saved/restored around the
 buffer (re)alloc"), and `self->size` falls inside that struct's
 `pad18[0x20-0x18]` gap (explicitly documented there as "unknown, 8 bytes").
 Extending the shared header would require splitting that padding without
 shifting anything after it, which is mechanically safe -- but
-`code_1677c.h` is OUT OF UNIT (shared with `code_1677c.c` and
+`GameApplicationFileResource.h` is OUT OF UNIT (shared with `GameApplicationFileResource.c` and
 `code_179d8_q.c`, neither this unit) and the rule is explicit that nothing
 outside the assigned unit + its reports gets edited. Kept as this unit's own
 narrower local reading instead, per the project's multiple-independent-
 local-views convention. Worth flagging for the head: if this coincidence
-holds up under more scrutiny, `code_1677c.h`'s owner may want to fold
+holds up under more scrutiny, `GameApplicationFileResource.h`'s owner may want to fold
 `size` in properly -- though round 64 notes the semantic mismatch this
 would need to resolve first (see `## Naming` below).
 
@@ -126,13 +126,13 @@ reasoning.
   uses. Not derived from this function's body in isolation.
 - **Note on the `FileResource::pendingGeneration` coincidence (see `## Notes`
   above): the SEMANTICS now look different, not just the offset.**
-  `pendingGeneration` is documented in `code_1677c.h` as "saved/restored
+  `pendingGeneration` is documented in `GameApplicationFileResource.h` as "saved/restored
   around the buffer (re)alloc" (implying a counter), while this unit's
   reading at the same offset is a plain 0/1 open flag. These could still be
   the same field serving double duty (0 = no generation yet = "closed"),
   but that is now a SPECIFIC claim to verify, not just an offset match --
   flagged here rather than resolved, per the park-rule spirit for anything
-  short of direct evidence. Not applied to `code_1677c.h` (out of unit).
+  short of direct evidence. Not applied to `GameApplicationFileResource.h` (out of unit).
 
 ## Naming (round 99, echo, track 7)
 

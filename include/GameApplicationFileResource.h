@@ -1,5 +1,5 @@
-#ifndef CODE_1677C_H
-#define CODE_1677C_H
+#ifndef GAMEAPPLICATIONFILERESOURCE_H
+#define GAMEAPPLICATIONFILERESOURCE_H
 
 #include "common.h"
 #include "FileResource.h"
@@ -15,7 +15,7 @@
 
 /* ResourceRequest, which ResourceRequest__Set fills, is include/FileResource.h's. */
 
-extern void *BMemPMgrAlloc(s32 size); /* one arg confirmed by New_GameApplication.md (code_1677c) */
+extern void *BMemPMgrAlloc(s32 size); /* one arg confirmed by New_GameApplication.md (GameApplicationFileResource) */
 extern void BMemPMgrFree(void *arg);
 extern s32 strlen(char *s);
 

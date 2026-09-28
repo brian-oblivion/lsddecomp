@@ -50,11 +50,11 @@ extern const char sDreamerTmdPath[];
  * passes to New_WBgm as its vabPath. */
 extern s32 PickSoundBank(s32 unused);
 
-/* Defined in src/class_39e08.c, after DayTask's methods; code_1677c.c
+/* Defined in src/class_39e08.c, after DayTask's methods; GameApplicationFileResource.c
  * declares it too. */
 extern s32 RegisterRecordTableFiles(s32 all);
 
-/* src/code_1677c.c (a void function); code_1677c.c declares it the same
+/* src/GameApplicationFileResource.c (a void function); GameApplicationFileResource.c declares it the same
  * way. */
 extern s32 SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
 

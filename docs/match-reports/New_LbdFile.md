@@ -40,7 +40,7 @@ DataSrc39094 *New_LbdFile(void) {
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
-  (`s32 unused`): PickSoundBank passes one in `$a1`, as code_1677c's own
+  (`s32 unused`): PickSoundBank passes one in `$a1`, as GameApplicationFileResource's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.

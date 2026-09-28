@@ -9,7 +9,7 @@
 Round 82, runner alpha (third re-staffed slot of the round). Unit `src/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** gRequestedFileMethods slot +0x00C (finalize) (`tools/classtable.py`).
-- **What:** Clears +0x02C (the flag `RequestedFile__MarkLoaded` sets), then calls slot +0x00C of `GetActiveDataSourceMethods()` (code_1677c). The store lands in the `jal` delay slot. `GetActiveDataSourceMethods` is declared locally with a local `Slot0CMethods_322b4` return type, as `PlacementGridVabSound.c` does with its own view.
+- **What:** Clears +0x02C (the flag `RequestedFile__MarkLoaded` sets), then calls slot +0x00C of `GetActiveDataSourceMethods()` (GameApplicationFileResource). The store lands in the `jal` delay slot. `GetActiveDataSourceMethods` is declared locally with a local `Slot0CMethods_322b4` return type, as `PlacementGridVabSound.c` does with its own view.
 - **Result:** byte-exact; 15/15 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** local views and prototypes live in the unit; no shared header was touched.
 

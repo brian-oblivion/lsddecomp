@@ -19,7 +19,7 @@ Byte-exact, 2/2 words (`jr $ra; addu $v0,$zero,$zero`) -- identical body to
 
 Not a slot in either `gVabDriverMethods` or `gVabStreamObjMethods` (checked
 `tools/classtable.py --scan` output for both tables -- absent from each).
-Its only caller is `code_1677c/GetActiveDataSourceUseVSyncCallback.s`, which `jal`s it with no
+Its only caller is `GameApplicationFileResource/GetActiveDataSourceUseVSyncCallback.s`, which `jal`s it with no
 argument register set up, and its return value flows straight through as
 the caller's own return. `s32` chosen over `void` because the body
 explicitly materialises `$v0 = 0` before returning -- CLAUDE.md's
@@ -31,7 +31,7 @@ call), but the explicit `addu $v0,$zero,$zero` is the same evidence: a
 what looks like a per-class-ID constructor dispatcher, alongside
 `func_8002C438` for a different ID" -- `tools/rename.py` textually carried
 that name through its later rename to `GetVabDriverMethods`, but the
-CLAIM itself was never right. `code_1677c.c`'s actual source (read in full
+CLAIM itself was never right. `GameApplicationFileResource.c`'s actual source (read in full
 this round, not just the one `.s` file) shows `func_80026FE8`'s caller
 context is: `if (gActiveDataSource == 0x13) return GetCdUseVSyncCallback(); else
 return GetVabUseVSyncCallback();` -- this function is the `else` arm alongside
@@ -54,7 +54,7 @@ purpose from a body that's just `return 0;`.
 
 The objection above ("its own counterpart is still unnamed") no longer
 holds: the counterpart is `GetCdUseVSyncCallback` (code_179d8_h.c, returns
-`gCdUseVSyncCallback`), and the one caller, code_1677c.c's
+`gCdUseVSyncCallback`), and the one caller, GameApplicationFileResource.c's
 `GetActiveDataSourceUseVSyncCallback`, calls it when `gActiveDataSource` is
 DATASOURCE_CD and this function otherwise. This is the VAB driver's answer
 to the same query, and the answer is a constant 0: the VAB backend never

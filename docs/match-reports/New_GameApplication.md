@@ -4,7 +4,7 @@
 
 > Renamed from `new_class_6d3c8` on 2026-09-24 (tools/rename.py). Address 0x80025f7c.
 
-**Unit:** code_1677c · **Size:** 24 words (0x60 bytes) ·
+**Unit:** GameApplicationFileResource · **Size:** 24 words (0x60 bytes) ·
 **Status: MATCHED 24/24**, whole-image SHA1 green. Closed by the head in
 round 8 (2026-09-02) with the project's first permuter run.
 

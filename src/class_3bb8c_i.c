@@ -145,7 +145,7 @@ void TextEntry__SetText(TextEntry *self, char *text, s32 mode) {
     }
 }
 
-/* LoadCardResources' data. BuildFileName (code_1677c.c) writes dir, name
+/* LoadCardResources' data. BuildFileName (GameApplicationFileResource.c) writes dir, name
  * and ext into dest and returns it. Positions are percent of half the
  * screen from the centre (include/ScreenSprite.h). */
 extern char *BuildFileName(char *dest, const char *name, const char *dir, const char *ext);

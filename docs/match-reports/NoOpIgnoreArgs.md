@@ -38,7 +38,7 @@ body never reads, so it is not meaningfully a method of `LinkOwnerObj`
 despite being defined among that group's functions.
 
 HEAD (round 52), at merge: bravo named this `Noop`, which collided with
-`NoOp` (0x80026C80, runner alpha's `code_1677c` unit) in nothing but the case
+`NoOp` (0x80026C80, runner alpha's `GameApplicationFileResource` unit) in nothing but the case
 of one letter -- two distinct empty functions a reader cannot tell apart.
 Resolved here, not in the runner's unit, because the collision only existed
 once both branches were in one tree. `NoOp` keeps the plain name: it is the

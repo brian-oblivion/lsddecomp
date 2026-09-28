@@ -130,7 +130,7 @@ For the head to apply by type scope (out of unit):
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
 | code_179d8_h | `MethodsA34_179D8H` | `onError` | `close` | A | `+0x048` of `gCdDriverMethods` is `CdDriver__Close`; `ReadCdFile` calls it when the file is not open, which is a close of an unopened file, not an error report |
-| include/code_1677c.h | `FileResourceMethods` | `onBufferChanged` | `close` | A | `+0x048`; `FileResource__LoadFile` calls it after the read and on allocation failure, `FileResource__Finalize` before freeing the buffer; the one populated override is `CdDriver__Close` |
+| include/GameApplicationFileResource.h | `FileResourceMethods` | `onBufferChanged` | `close` | A | `+0x048`; `FileResource__LoadFile` calls it after the read and on allocation failure, `FileResource__Finalize` before freeing the buffer; the one populated override is `CdDriver__Close` |
 
 
 Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Close` -> `CdDriver__Close` by rename.py.

@@ -24,7 +24,7 @@ Byte-exact, 26/26 words.
 ## Notes
 
 Builds a CD-ROM path string: a leading `\` (0x5C), the directory/disc-label
-string `GetDataDirectory()` returns (`code_1677c.c`, still `func_`-named,
+string `GetDataDirectory()` returns (`GameApplicationFileResource.c`, still `func_`-named,
 carved), the caller-supplied filename `suffix`, and a fixed `";1"` suffix
 from `gCdFileVersionSuffix` -- the ISO9660 file-version-number convention
 (`FILE.EXT;1`), strong confirmation of this unit's CD-ROM theme alongside
@@ -40,7 +40,7 @@ SDK-object conversion reclassified it as Sony's (`lib/libc2/strcpy.o`), so
 the "defined later in ROM order" clause is stale -- it is declared LOCAL
 here (per-call-site typed) the same way `CdSearchFile`/`printf` are
 elsewhere in this unit, never defined in this file. `strcat` is already
-declared identically in `code_1677c.h` (included for
+declared identically in `GameApplicationFileResource.h` (included for
 `FileResource__InstallCdReadDriver`), so the local `extern` here is a
 harmless duplicate, not a conflict.
 
@@ -57,5 +57,5 @@ pure string-building leaf whose mechanics are its whole purpose. Called by
 Parameter `suffix` -> `name`, tier A: both callers (`OpenCdFile`,
 `CdDriver__Open`/`ResolveFileEntries`) pass a file name, and the body builds
 `"\\" + <data directory> + name + ";1"`; the suffix is
-`gCdFileVersionSuffix`. `GetDataDirectory` (code_1677c.c) is the data directory
+`gCdFileVersionSuffix`. `GetDataDirectory` (GameApplicationFileResource.c) is the data directory
 getter; its name is proposed, not applied (not this unit's function).

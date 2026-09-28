@@ -46,7 +46,7 @@ void LbdFile__LbdFile(DataSrc39094 *self) {
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
-  (`s32 unused`): PickSoundBank passes one in `$a1`, as code_1677c's own
+  (`s32 unused`): PickSoundBank passes one in `$a1`, as GameApplicationFileResource's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
@@ -115,7 +115,7 @@ renamed):
  *    StageGrid.h's cell columns, and a family of "stream channel" lookups
  *    (GetAsmkMovie, PickOpeningMovie, GetEndingMovie,
  *    GetSpecialDayOrEventRecord, GetSpecialDayMovieSpan) whose shapes match
- *    their exact call sites in code_1677c.c one for one. The records' own
+ *    their exact call sites in GameApplicationFileResource.c one for one. The records' own
  *    fields and the channels' in-game meaning are not established.
  */
 ```

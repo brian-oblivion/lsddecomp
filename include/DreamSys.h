@@ -7,7 +7,7 @@
  * (include/Actor.h); no class derives from it. The ctor calls Actor's first
  * (DreamSys__DreamSys: GetActorMethods()->ctor), so the id parent is the
  * ctor-chain parent. Every method is in src/DreamSys.c. One instance, made
- * by GameApplication__GameApplication (src/code_1677c.c, New_DreamSys) and kept in
+ * by GameApplication__GameApplication (src/GameApplicationFileResource.c, New_DreamSys) and kept in
  * GameApplication::dreamSys; the same object is GraphRoom::dreamSys, the
  * `target` class_3bb8c_l hands SetDreamAuxWorld (code_4cd08's
  * gDreamAuxWorld), and the `peer` every Entity links to.
@@ -422,7 +422,7 @@ extern s8 DREAM_COLOR_TABLE[9];
 extern const s8 VOICE_BY_SELECT[0x18];
 extern const s8 VOICE_PITCH_BY_SELECT[0x18];
 
-/* BasicClass-family allocator; see code_1677c.h / code_55dd4.h / Entity.h /
+/* BasicClass-family allocator; see GameApplicationFileResource.h / code_55dd4.h / Entity.h /
    class_16334.h for the other units that also declare it locally. */
 extern void *BMemPMgrAlloc(s32 size);
 
@@ -1055,7 +1055,7 @@ DreamSysMethods *Get_vtable_DreamSys(void);
 
 /* @brief Allocates and constructs a DreamSys instance.
  * Still INCLUDE_ASM in src/DreamSys.c; declared here so other units'
- * matched C (e.g. GameApplication__GameApplication in src/code_1677c.c) can call it -- see
+ * matched C (e.g. GameApplication__GameApplication in src/GameApplicationFileResource.c) can call it -- see
  * "Calling into a function that is still INCLUDE_ASM in another unit is
  * fine" in docs/DECOMPILATION_LEARNINGS.md. */
 DreamSys *New_DreamSys(struct LinkResource *arg0, s32 arg1, s32 arg2);

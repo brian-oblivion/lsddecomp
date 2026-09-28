@@ -15,7 +15,7 @@
  * include/GameApplication.h's view already called it StreamTask. What it does,
  * measured: it owns a MoviePlayer (`player`, New_MoviePlayer, gMoviePlayerMethods)
  * and runs one "ETC\*.STR" stream through it inside TaskCore's fade/state
- * machine. Every caller is code_1677c's GameApplication (intro logo, weekly,
+ * machine. Every caller is GameApplicationFileResource's GameApplication (intro logo, weekly,
  * GraphRoom and cinematic streams): New_StreamTask(NULL, NULL, NULL, NULL),
  * optionally setFrameBound / setSkipOnConfirm(0), then init with the stream,
  * then release. The player's slots as this class calls them
@@ -62,7 +62,7 @@
  * +0x044's contradiction, settled by track 4 step 6 (round 85's TodActor
  * +0x04C rule): StreamTask__Init takes (self, args, streamName, streamGroup,
  * autoPlay) where IntermediateBase's init takes (self, args, mode) and
- * returns s32. The table keeps the inherited slot type, and code_1677c's
+ * returns s32. The table keeps the inherited slot type, and GameApplicationFileResource's
  * five callers, which forward the extra arguments, cast the slot to
  * StreamTaskInitFn (a pointer cast, no code). The override returns nothing
  * (no caller reads it), as the round-84 `configure` view had it.
@@ -105,7 +105,7 @@ struct StreamTaskMethods {
                                 BasicClass *sound, DrawRect *initData));
     /* +0x124 */ void (*setKeepActive)(StreamTask *self, s32 keepActive); /* StreamTask__SetKeepActive */
     /* +0x128 */ void (*setLoopCount)(StreamTask *self, s32 count); /* StreamTask__SetLoopCount */
-    /* +0x12C */ void (*setSkipOnConfirm)(StreamTask *self, s32 enable); /* StreamTask__SetSkipOnConfirm; code_1677c passes 0 */
+    /* +0x12C */ void (*setSkipOnConfirm)(StreamTask *self, s32 enable); /* StreamTask__SetSkipOnConfirm; GameApplicationFileResource passes 0 */
     /* +0x130 */ void (*setUnkD0)(StreamTask *self, s32 value); /* StreamTask__SetUnkD0 */
     /* +0x134 */ void (*setAbortBeforeFade)(StreamTask *self, s32 enable); /* StreamTask__SetAbortBeforeFade */
 };
