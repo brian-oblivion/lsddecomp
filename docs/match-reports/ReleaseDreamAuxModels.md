@@ -47,7 +47,7 @@ no leading guard before `.L8005C604`, and `beqz $s1, .L8005C604` as the
 back-edge test. Do not "clean this up" to a plain `if` -- the loop shape
 *is* what produces the byte-exact instruction sequence.
 
-Same shape recurs at `ReleaseDreamAuxEntities` (below, over `gDreamAuxSlots2`) and, per
+Same shape recurs at `ReleaseDreamAuxEntities` (below, over `sDreamAuxSlots2`) and, per
 splat's asm, in `SetDreamAuxWorld` and `InitDreamAux`'s second loop (both
 off-limits/gp-relative or already stalled elsewhere in this unit) -- this
 looks like a recurring internal idiom for "process slot 0 of a small

@@ -141,9 +141,9 @@ void ReleaseDreamAuxEntities(void) {
 
     /* MATCHING: assignments, not initializers, order the two spills */
     i = 0;
-    slot = gDreamAuxSlots2;
+    slot = sDreamAuxSlots2;
 
-    for (; i < ARRAY_COUNT(gDreamAuxSlots2); i++) {
+    for (; i < ARRAY_COUNT(sDreamAuxSlots2); i++) {
         Entity *entity = (Entity *)slot->model; /* one word in: the entity */
 
         if (entity != NULL) {

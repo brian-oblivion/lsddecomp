@@ -28,7 +28,7 @@ extern DreamAuxSlot sDreamAuxSlots[1];
 
 /* sDreamAuxSlots one word in, so each element's `model` is that slot's
  * entity: ReleaseDreamAuxEntities walks it. */
-extern DreamAuxSlot gDreamAuxSlots2[1];
+extern DreamAuxSlot sDreamAuxSlots2[1];
 
 /* One chunk trigger. `key` is the chunk's ChunkCoord (column, then row)
  * read as one s16. `dayParity` restricts the day: 0 any day, 1 odd days, 2

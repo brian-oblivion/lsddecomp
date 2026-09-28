@@ -162,7 +162,7 @@ rather than API.
 - **world:** DreamSys `func_59590`, `func_59598`, `func_5ba20` (a get/set of
   `unk_0x924`); DreamSys.h's `unk_0x*` fields (snake/hex spelling, no offset
   comments; `unknown_values_0x922` looks like padding); DreamAux's
-  `gDreamAuxSlots2` alias; `TestForStageTransition` and
+  `sDreamAuxSlots2` alias; `TestForStageTransition` and
   `EnableTeleportsForKind` goto ladders over raw stage/mood numbers with no
   MATCHING line; `*(s32 *)((u8 *)out + 4)` at DayTaskStageMap.c:1096.
 - **ui/sound:** class ids `0x10`/`0x20` and `kind == 2/5` at

@@ -266,7 +266,7 @@ The header banner:
  * `value` (CheckDreamAuxTriggerCondition) and a coordinate parity
  * (CheckTriggerParity), that on success spawns or despawns an Entity into
  * one of two 14-slot object-tracking families (SpawnDreamAuxTriggerEntity /
- * DespawnDreamAuxEntity, backed by sDreamAuxSlots / gDreamAuxSlots2) and can
+ * DespawnDreamAuxEntity, backed by sDreamAuxSlots / sDreamAuxSlots2) and can
  * gate the game's teleport flag (EnableTeleportsForKind, SetTeleportsEnabled
  * in DreamSys.c). InitDreamAux/TickDreamAuxSlots/TickDreamAuxSlots2 are the
  * construct/tick/destruct hooks a caller in DayTaskStageMap.c and
