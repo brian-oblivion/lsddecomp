@@ -169,7 +169,7 @@ added to `src/world/ObjMStyleActor.c:146`. Oracle green.
 Round 70 (alpha). `func_80056BBC` -> `StyleEffect__BuildRandomSprites`, **tier B**.
 
 Only caller StyleEffect__InitByKind, kind 2. Body: parity = rand() % 2;
-StyleEffect__SpawnSprites with gSpriteScaleHalf on parity 0, NULL otherwise;
+StyleEffect__SpawnSprites with sSpriteScaleHalf on parity 0, NULL otherwise;
 then tableIndex >= 2: sprites[1] gets Actor__AddTranslation by
 (gSpriteShiftX[tableIndex], 0, 0) and slotB8 with altColor or color; else
 sprites[1] gets setSemiTrans(1), setSemiTransRate(0) and updateScale(set,
@@ -179,7 +179,7 @@ StyleEffect__SpawnSprites); B.
 
 Globals named in this pass (only this unit references them, tier B, named by
 their ratio-triple values): `gSpriteShiftX` (was D_80087844, s32[6]),
-`gSpriteScaleLarge` (was D_8008785C, {6/5, 6/5, 1/1}), `gSpriteScaleHalf`
+`gSpriteScaleLarge` (was D_8008785C, {6/5, 6/5, 1/1}), `sSpriteScaleHalf`
 (was D_80087868, {3/6, 3/6, 1/1}), `gSpriteScaleSmall` (was D_80087874,
 {4/6, 4/6, 1/1}), `gSpriteShiftScratch` (was D_80087880, a zero Vec3S whose
 .x is overwritten before each use).

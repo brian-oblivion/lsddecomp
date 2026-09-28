@@ -104,7 +104,7 @@ merely aliases an existing pointer/value for readability."
 
 Round 70 (alpha). `func_80056D18` -> `StyleEffect__SpawnSprites`, **tier B**.
 
-Two callers: StyleEffect__BuildRandomSprites (tbl = gSpriteScaleHalf or NULL)
+Two callers: StyleEffect__BuildRandomSprites (tbl = sSpriteScaleHalf or NULL)
 and ObjMStyleActor.c's StyleEffect__SpawnPlainSprites (tbl = NULL, kind 3). Body:
 five `New_VariantSprite(a2, 0, gStyleEffectTim)` into +0x084, each attachToParent(self,
 no offset), slotB8(self->color), and updateScale(1, tbl) when tbl != NULL.

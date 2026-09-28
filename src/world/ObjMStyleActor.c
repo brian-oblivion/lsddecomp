@@ -2375,7 +2375,7 @@ void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
 extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 gSpriteShiftX[];
 extern Ratio16 gSpriteScaleLarge[3];
-extern Ratio16 gSpriteScaleHalf[3];
+extern Ratio16 sSpriteScaleHalf[3];
 extern Ratio16 gSpriteScaleSmall[3];
 extern LongVec3 gSpriteShiftScratch;
 
@@ -2613,13 +2613,13 @@ void StyleEffect__ReleaseModelChildren(StyleEffect *self) {
     }
 }
 
-/* Kind 2's init: five sprites, all scaled by gSpriteScaleHalf on an even
+/* Kind 2's init: five sprites, all scaled by sSpriteScaleHalf on an even
  * rand(); then sprites[1] is either shifted along x by
  * gSpriteShiftX[tableIndex] and recoloured (tableIndex >= 2) or made
  * semi-transparent (rate 0) and rescaled, and sprites[2] is hidden. */
 void StyleEffect__BuildRandomSprites(StyleEffect *self) {
     s32 parity = rand() % 2;
-    void *scale = parity ? NULL : gSpriteScaleHalf;
+    void *scale = parity ? NULL : sSpriteScaleHalf;
     VariantSprite *sprite;
     SpriteRgb *color;
 
