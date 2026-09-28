@@ -88,3 +88,10 @@ From `include/text_entry.h`:
 > The class banner: "+0x058 tickState: the slot passes (sender, event)
 > because onNotify's bytes set $a1/$a2 for it (the tag-5 call cross-jumps with
 > handleCommand's); its occupant TextEntry__TickState reads neither."
+
+From `src/ui/input_dialogs.c`:
+
+> Track 12 added a one-line MATCHING comment at the tickState call, carrying
+> the header note above into the .c: the call passes (sender, event) because
+> the FrameClock case shares its call code with the Pad case's handleCommand
+> call.

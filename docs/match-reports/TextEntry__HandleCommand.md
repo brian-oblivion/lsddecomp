@@ -270,3 +270,11 @@ call site)."
 
 Accessors were the compiler's error list (input_dialogs, class_3bb8c_j);
 zero bytes changed.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/input_dialogs.c`:
+
+> "MATCHING: the arms are in retail's code order, default first, and the down
+> press jumps into the held down's call rather than making its own." Now one
+> line.
