@@ -13,7 +13,7 @@ slot +0x044 (`setColor`): if `update`, copy a 3-byte colour into the light's r,g
 ## Source
 
 ```c
-void FlatLightObj__SetColor(FlatLightObj *self, s32 update, FlatLightColor *rgb) {
+void FlatLightObj__SetColor(FlatLightObj *self, s32 update, ColorRgb *rgb) {
     if (update) {
         /* MATCHING: a whole-struct copy; three per-byte stores compile 3 words longer */
         self->light.rgb = *rgb;
