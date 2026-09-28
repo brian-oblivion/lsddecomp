@@ -873,7 +873,7 @@ void Entity__MoodCue23(Entity *this) {
             this->methods->addTranslation(this, TRANSLATE_X_MINUS64);
         }
     } else if (this->moodTimer == 0) {
-        this->methods->addTranslation(this, TRANSLATE_Y_MINUS4096);
+        this->methods->addTranslation(this, sTranslateYMinus4096);
     } else if (this->moodTimer < 65) {
         this->methods->addTranslation(this, TRANSLATE_Y_PLUS64);
     } else if (this->moodTimer < 71) {
