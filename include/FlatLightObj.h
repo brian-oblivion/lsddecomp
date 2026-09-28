@@ -7,7 +7,7 @@
  * FlatLightObj -- one Psy-Q flat light, class id 0x6, method table
  * gFlatLightObjMethods, a direct BasicClass subclass (`tools/classtable.py
  * gFlatLightObjMethods --vs gBasicClassMethods`: overrides the ctor, adds three
- * slots). No class derives from it. Methods in src/code_3311c.c, which holds
+ * slots). No class derives from it. Methods in src/FlatLightObj.c, which holds
  * the whole class: allocator, ctor, the three own slots and the getter.
  *
  * "FlatLight" is Sony's own name (LIBGS.H's GsF_LIGHT and GsSetFlatLight),
@@ -16,7 +16,7 @@
  * address to GsSetFlatLight(lightId, &light). FlatLightParams is GsF_LIGHT's
  * layout (`int vx,vy,vz; unsigned char r,g,b;`, same offsets) with r,g,b
  * grouped as FlatLightColor, which setColor's whole-struct copy needs;
- * src/code_3311c.c takes GsSetFlatLight from <libgs.h> and casts to GsF_LIGHT *.
+ * src/FlatLightObj.c takes GsSetFlatLight from <libgs.h> and casts to GsF_LIGHT *.
  *
  * Who holds one: LightRig__LightRig (src/Sprite.c, include/LightRig.h)
  * makes three with New_FlatLightObj(0), (1), (2), keeps them in
@@ -65,7 +65,7 @@ struct FlatLightObj {
 extern FlatLightObjMethods gFlatLightObjMethods;
 extern FlatLightObjMethods *Get_vtable_FlatLightObj(void); /* returns &gFlatLightObjMethods */
 
-/* The class's own methods, code_3311c, in ROM order. */
+/* The class's own methods, FlatLightObj, in ROM order. */
 FlatLightObj *New_FlatLightObj(s32 lightId);
 void FlatLightObj__FlatLightObj(FlatLightObj *self, s32 lightId);
 void FlatLightObj__SetLightId(FlatLightObj *self, s32 lightId);
