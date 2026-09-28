@@ -27,13 +27,6 @@
 #include "Pad.h"
 #include "FrameClock.h"
 
-/* Bit positions in GsDOBJ2.attribute (self->attribute), include/psyq/libgs.h. */
-#define ATTR_LIGHTMODE_SHIFT 3 /* GsFOG|GsMATE|GsLLMOD, 3 bits */
-#define ATTR_LOFF_SHIFT 6      /* GsLOFF */
-#define ATTR_ABR_SHIFT 28      /* GsAZERO..GsATHREE, 2 bits */
-#define ATTR_ALON_SHIFT 30     /* GsALON */
-#define ATTR_DOFF_SHIFT 31     /* GsDOFF */
-
 /* UpdateRotation's divisor: its inputs are degrees, and a degree count in
  * 20.12 fixed point divided by 360 is the angle in 4096ths of a turn (ONE to
  * the turn), GsCOORD2PARAM.rotate's unit. */

@@ -37,6 +37,18 @@ void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
  * the rest) are wrappers around it over GsDOBJ2.attribute. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
+/* Bit positions in GsDOBJ2.attribute (include/psyq/libgs.h), the fields the
+ * SceneNode attribute setters (code_d294.c, code_d294_b.c) replace. */
+#define ATTR_LDIM_SHIFT 0      /* GsLDIM0..GsLDIM7, 3 bits */
+#define ATTR_LIGHTMODE_SHIFT 3 /* GsFOG|GsMATE|GsLLMOD, 3 bits */
+#define ATTR_LOFF_SHIFT 6      /* GsLOFF */
+#define ATTR_ZIGNR_SHIFT 7     /* GsZIGNR */
+#define ATTR_NBACKC_SHIFT 8    /* GsNBACKC */
+#define ATTR_DIV_SHIFT 9       /* GsDIV1..GsDIV5, 3 bits */
+#define ATTR_ABR_SHIFT 28      /* GsAZERO..GsATHREE, 2 bits */
+#define ATTR_ALON_SHIFT 30     /* GsALON */
+#define ATTR_DOFF_SHIFT 31     /* GsDOFF */
+
 /* Segment-against-box clipping for the link tests. CalcBoxOutcode returns
  * a point's 6-bit outcode against a box (x 8/4, y 2/1, z 0x20/0x10; high bit
  * past max, low bit before min), unmasked. ClipSegmentToBox returns 0 when

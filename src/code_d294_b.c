@@ -30,13 +30,6 @@
 #include "TmdModel.h"
 #include "Actor.h"
 
-/* Bit positions in GsDOBJ2.attribute (self->attribute), include/psyq/libgs.h:
- * the fields the setters in this file replace. code_d294.c names the rest. */
-#define ATTR_LDIM_SHIFT 0   /* GsLDIM0..GsLDIM7, 3 bits */
-#define ATTR_ZIGNR_SHIFT 7  /* GsZIGNR */
-#define ATTR_NBACKC_SHIFT 8 /* GsNBACKC */
-#define ATTR_DIV_SHIFT 9    /* GsDIV1..GsDIV5, 3 bits */
-
 /* TryAttachNearby's range: the other node is tested only when its world
  * position is within this distance of this node's on each axis. */
 #define ATTACH_AXIS_RANGE 16384
