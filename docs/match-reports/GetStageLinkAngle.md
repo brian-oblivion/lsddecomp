@@ -84,7 +84,7 @@ Renamed from `func_8005BF48`.
 
 A free function (no `this`, and the disassembly's call site sets
 up no arguments): returns `&sLinkAngle180` unless `gLinkDstStage` -- the
-destination stage `GetStaticSpawn` and `Test4StageTransition` record -- is 0xC, in
+destination stage `GetStaticSpawn` and `TestForStageTransition` record -- is 0xC, in
 which case 0. `DreamSys__TryStageTimerLink` stores the result in
 `stageLinkAngle`, in the same statement group that zeroes `enterRotation` and
 `exitRotation`.

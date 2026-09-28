@@ -796,8 +796,8 @@ extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos
 /* Called by DreamSys__TryStageTimerLink as (&this->linkCoordinates, this->currentStage,
    currentPos, this->tick); result tested with `bltz`, like
    TestForStaticLink's. Defined after its caller. */
-extern s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos,
-                                s32 timer);
+extern s32 TestForStageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos,
+                                  s32 timer);
 
 /* Called by DreamSys__TryStageTimerLink with no arguments; its return value
    is stored whole into this->stageLinkAngle. Defined after its caller. */

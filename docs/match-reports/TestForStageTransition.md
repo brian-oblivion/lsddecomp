@@ -1,4 +1,6 @@
-# Test4StageTransition — MATCHED 46/46
+# TestForStageTransition — MATCHED 46/46
+
+> Renamed from `Test4StageTransition` on 2026-09-28 (tools/rename.py). Address 0x8005be90.
 
 > Renamed from `func_8005BE90` on 2026-09-22 (tools/rename.py). Address 0x8005be90.
 
@@ -19,7 +21,7 @@ distinct check), validate `currentPos` against a couple of conditions and
 then call `GetRandomSpawnFromStage(target, (timer & 1) ? -0xC : stage,
 timer)`, stashing the result in `gLinkDstStage`. Any other `stage` value
 returns `-1` immediately. Called by `DreamSys__TryStageTimerLink` (still `INCLUDE_ASM`) as
-`Test4StageTransition(&this->linkCoordinates, this->currentStage, currentPos,
+`TestForStageTransition(&this->linkCoordinates, this->currentStage, currentPos,
 this->dreamTimer)`.
 
 ## Attempts 1-4: right VALUES, wrong control-flow SHAPE
@@ -62,7 +64,7 @@ once total length matches.
 ```c
 extern s32 sStage5TriggerGridPos;
 
-s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer)
+s32 TestForStageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer)
 {
 	s32 result;
 
@@ -124,7 +126,7 @@ Two levers closed the last two gaps:
 ## Verification
 
 `./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
-`tools/funcdiff.py Test4StageTransition` -> `46/46 words match`.
+`tools/funcdiff.py TestForStageTransition` -> `46/46 words match`.
 
 ### Proposed learning
 

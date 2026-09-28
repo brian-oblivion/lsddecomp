@@ -995,7 +995,7 @@ bool DreamSys__TryStageTimerLink(DreamSys *this, PlayerSpawnPoint *currentPos) {
 
     if (this->state != DREAMSYS_NO_LINK)
         return false;
-    result = Test4StageTransition(&this->linkCoordinates, this->currentStage, currentPos, this->tick);
+    result = TestForStageTransition(&this->linkCoordinates, this->currentStage, currentPos, this->tick);
     if (result < 0)
         return false;
     this->stageLinkAngle = GetStageLinkAngle();
@@ -1629,7 +1629,7 @@ s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading) {
    raw word; only ever compared here, never dereferenced field-by-field. */
 extern s32 sStage5TriggerGridPos;
 
-s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer) {
+s32 TestForStageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer) {
     s32 result;
 
     if (stage == 3)
