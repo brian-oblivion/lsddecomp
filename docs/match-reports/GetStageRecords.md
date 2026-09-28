@@ -41,7 +41,7 @@ FilePathRecord *GetStageRecords(s32 index) {
 
 - **Name:** `GetStageRecords`
 - **Tier:** A
-- **Evidence:** returns &gRecordTable[gStageFirstRecord[stage]] (gStageFirstRecord renamed from gRecordIndexTable); the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100: record 0 of each group is STGnn\TEXA.TIX, and gStageFirstRecord[0] = 16 is the first record after the sound banks. Every caller passes ObjM::stage.
+- **Evidence:** returns &sRecordTable[gStageFirstRecord[stage]] (gStageFirstRecord renamed from gRecordIndexTable); the record paths are retail's sRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100: record 0 of each group is STGnn\TEXA.TIX, and gStageFirstRecord[0] = 16 is the first record after the sound banks. Every caller passes ObjM::stage.
 
 ## Naming history
 

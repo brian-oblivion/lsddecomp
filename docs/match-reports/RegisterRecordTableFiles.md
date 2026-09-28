@@ -11,7 +11,7 @@ in round 42 (`--gp-symbols`, pinned in the Makefile).
 
 ```c
 /* Sony's, from the still-uncarved psyq_39094 SDK segment
- * (asm/psyq_39094.s): `if (out != NULL) *out = 0x230; return &gRecordTable;`
+ * (asm/psyq_39094.s): `if (out != NULL) *out = 0x230; return &sRecordTable;`
  * -- an unconditional out-param write (the address passed here is always a
  * stack address, never NULL) plus a fixed .data address, unrelated to the
  * write. Declared locally per CLAUDE.md's rule against writing C for
@@ -119,7 +119,7 @@ now says so. (The derivation above quotes the old comment as it was.)
 ## Naming (track 7, round 99, charlie)
 
 `func_8004A070` -> `RegisterRecordTableFiles` (tier B). The body, read with
-its two callees: GetRecordTable returns gRecordTable (0x230 records of 0x1C
+its two callees: GetRecordTable returns sRecordTable (0x230 records of 0x1C
 bytes, each a file path first; GameFiles.c's banner) and its count;
 RegisterFileTableEntries (GameApplicationFileResource.c) appends `count` records to the CD
 driver's file table and resolves them, returns 0 to be retried, and 1 when

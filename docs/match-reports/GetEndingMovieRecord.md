@@ -29,7 +29,7 @@ FilePathRecord *GetEndingMovieRecord(s32 *countOut) {
 
 ## Notes
 
-- GetRecordTable (already matched) returns gRecordTable and writes 0x230 to
+- GetRecordTable (already matched) returns sRecordTable and writes 0x230 to
   `*out`; every `+0x70`/`+0xFC`/`+0x3D40`/`+0x3E04`/`+0x3E20` offset in this
   unit is a whole number of 0x1C-byte records into that table, so the unit
   types the table as `FilePathRecord` (size only). The record's fields are unknown.
@@ -41,7 +41,7 @@ FilePathRecord *GetEndingMovieRecord(s32 *countOut) {
 
 - **Name:** `GetEndingMovieRecord`
 - **Tier:** A
-- **Evidence:** &gRecordTable[567], ETC\ENDING.STR (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100), and movie id 7.
+- **Evidence:** &sRecordTable[567], ETC\ENDING.STR (the record paths are retail's sRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100), and movie id 7.
 
 ## Naming history
 

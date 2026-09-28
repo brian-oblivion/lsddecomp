@@ -27,7 +27,7 @@ FilePathRecord *PickStageTexture(s32 index, s32 arg1, s32 day) {
 
 - **Name:** `PickStageTexture`
 - **Tier:** A
-- **Evidence:** picks one of the first ((day - 1) % 40) / 10 + 1 of the stage's TEX?.TIX records (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100); caller passes ObjM::stage and DreamSys's current day, and hands the record to New_TimBlockSrc.
+- **Evidence:** picks one of the first ((day - 1) % 40) / 10 + 1 of the stage's TEX?.TIX records (the record paths are retail's sRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100); caller passes ObjM::stage and DreamSys's current day, and hands the record to New_TimBlockSrc.
 
 ## Naming history
 

@@ -25,7 +25,7 @@ void *GetSoundBankPaths(void) {
 
 - **Name:** `GetSoundBankPaths`
 - **Tier:** A
-- **Evidence:** getter: returns gSoundBankPaths (renamed from gWeeklyGroupTable), whose seven words point to "SND\AMBIENT", "SND\CARTOON", "SND\ELECTRO", "SND\ETHNOVA", "SND\HUMAN", "SND\LOVELY", "SND\STANDERD" (retail data at 0x800819CC); the same seven bases as the VH/VB pairs at gRecordTable[0..13]. Nothing in the code or data is weekly.
+- **Evidence:** getter: returns gSoundBankPaths (renamed from gWeeklyGroupTable), whose seven words point to "SND\AMBIENT", "SND\CARTOON", "SND\ELECTRO", "SND\ETHNOVA", "SND\HUMAN", "SND\LOVELY", "SND\STANDERD" (retail data at 0x800819CC); the same seven bases as the VH/VB pairs at sRecordTable[0..13]. Nothing in the code or data is weekly.
 
 ## Naming history
 

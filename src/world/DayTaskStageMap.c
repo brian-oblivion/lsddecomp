@@ -12,7 +12,7 @@
  * DayTask__OnObjMNotify turns ObjM's states into the next phase or the
  * task's result.
  *
- * RegisterRecordTableFiles: registers gRecordTable's file entries with the
+ * RegisterRecordTableFiles: registers sRecordTable's file entries with the
  * CD driver in at most two batches (DayTask's ctor, and the loader-task
  * callback in GameApplicationFileResource.c).
  *
@@ -293,7 +293,7 @@ DayTaskMethods *GetDayTaskMethods(void) {
     return &gDayTaskMethods;
 }
 
-/* src/cd/GameFiles.c: returns gRecordTable and writes its record count to
+/* src/cd/GameFiles.c: returns sRecordTable and writes its record count to
  * *out. */
 extern void *GetRecordTable(s32 *out);
 /* src/app/GameApplicationFileResource.c: appends `count` records of `table` to the CD driver's
@@ -306,7 +306,7 @@ extern s32 RegisterFileTableEntries(void *table, s32 count);
 extern s32 sRecordRegisterCalls;
 extern s32 sRecordFirstBatchCount;
 
-/* Registers gRecordTable's records with the CD driver, retrying until it
+/* Registers sRecordTable's records with the CD driver, retrying until it
  * accepts them. The first call registers the whole table when `all` is set,
  * else its first half; the second call registers the rest; any later call
  * registers nothing. */

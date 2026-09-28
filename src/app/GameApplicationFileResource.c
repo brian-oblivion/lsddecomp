@@ -52,7 +52,7 @@ extern void SetDataDirectory(char *dir);    /* below */
  * task here starts with (0, 0, 0). */
 extern void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
 
-/* GameFiles.c's movie getters. Each returns a movie's path (a gRecordTable
+/* GameFiles.c's movie getters. Each returns a movie's path (a sRecordTable
  * record, or "ETC\ASMK.STR") and writes its movie id, which
  * GetMovieFrameCount turns into the frame count a StreamTask plays. */
 extern const char *GetAsmkMovie(s32 *movieIdOut);
@@ -161,7 +161,7 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
 
 extern s32 RegisterRecordTableFiles(s32 all); /* DayTaskStageMap.c */
 
-/* ShowImage's view callback: registers gRecordTable's files with the CD
+/* ShowImage's view callback: registers sRecordTable's files with the CD
  * driver. */
 s32 GameApplication__RegisterFilesCallback(void) {
     return RegisterRecordTableFiles(0);

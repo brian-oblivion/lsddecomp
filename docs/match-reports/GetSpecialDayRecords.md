@@ -45,7 +45,7 @@ FilePathRecord *GetSpecialDayRecords(s32 *countOut, s32 n) {
 
 - **Name:** `GetSpecialDayRecords`
 - **Tier:** A
-- **Evidence:** &gRecordTable[574 + 6 * day], the six SPDAYnn records of special day `day` (FILM\SPDAYnnA/B.STR, IMG1\SPDAYnnC..F.TIM; the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100), and movie id 14 + 2 * day, its A movie's. `Special day` is the files' own SPDAY.
+- **Evidence:** &sRecordTable[574 + 6 * day], the six SPDAYnn records of special day `day` (FILM\SPDAYnnA/B.STR, IMG1\SPDAYnnC..F.TIM; the record paths are retail's sRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100), and movie id 14 + 2 * day, its A movie's. `Special day` is the files' own SPDAY.
 
 ## Naming history
 

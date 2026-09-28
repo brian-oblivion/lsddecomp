@@ -7,7 +7,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** not a slot; called from GetStageRecords and src/world/DayTaskStageMap.c.
-- **What:** `if (out != NULL) *out = 0x230; return gRecordTable;` -- the `ori v0,0x230` in the beqz delay slot is the compiler's own scheduling.
+- **What:** `if (out != NULL) *out = 0x230; return sRecordTable;` -- the `ori v0,0x230` in the beqz delay slot is the compiler's own scheduling.
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
@@ -18,7 +18,7 @@ void *GetRecordTable(s32 *out) {
     if (out != NULL) {
         *out = 0x230;
     }
-    return gRecordTable;
+    return sRecordTable;
 }
 ```
 
@@ -26,4 +26,4 @@ void *GetRecordTable(s32 *out) {
 
 - **Name:** `GetRecordTable`
 - **Tier:** A
-- **Evidence:** table getter: returns gRecordTable and writes the record count (0x230) to *out.
+- **Evidence:** table getter: returns sRecordTable and writes the record count (0x230) to *out.

@@ -6,7 +6,7 @@
  * LbdFile__SetAutoLoadData and GetLbdFileMethods, the loader for one stage
  * map chunk, STGnn\Mnnn.LBD.
  *
- * gRecordTable is an array of 0x1C-byte records (FilePathRecord), each a file path
+ * sRecordTable is an array of 0x1C-byte records (FilePathRecord), each a file path
  * padded with zeros; DayTaskStageMap.c's RegisterRecordTableFiles hands them to
  * the CD driver. In order:
  *  - the seven sound banks' SND\name.VH/VB pairs and SND\SE.VH/VB;
@@ -29,7 +29,7 @@
 #include "LbdFile.h"
 #include "StageGrid.h"
 
-/* gRecordTable's record indices. The first RECORD_TABLE_COUNT are the
+/* sRecordTable's record indices. The first RECORD_TABLE_COUNT are the
  * sound banks (SND\*.VH/VB) and then each stage's files; the movie records
  * follow. */
 enum RecordIndex {
@@ -75,7 +75,7 @@ enum MovieId {
  * last. What the frames are for is not established. */
 #define MOVIE_SPAN_GAP_FRAMES 10
 
-/* One gRecordTable record: a file path, zero-padded to 0x1C bytes. */
+/* One sRecordTable record: a file path, zero-padded to 0x1C bytes. */
 typedef struct FilePathRecord {
     u8 data[0x1C];
 } FilePathRecord;
@@ -201,7 +201,7 @@ extern char *sDefaultDataDirectory; /* "CDI\\" (sdata) */
 extern s32 sForcedSoundBank;
 extern s32 sForcedStageBgm;
 extern u8 gSoundBankPaths[];
-extern u8 gRecordTable[];
+extern u8 sRecordTable[];
 extern char *gSoundEffectDirPtr; /* -> "SND\\SE" */
 extern const char sAsmkMoviePath[];
 extern s16 sMovieFrameCounts[];
@@ -243,7 +243,7 @@ void *GetRecordTable(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = RECORD_TABLE_COUNT;
     }
-    return gRecordTable;
+    return sRecordTable;
 }
 
 void *GetSoundBankPaths(void) {

@@ -7,7 +7,7 @@
  * LbdFile -- one of the stage's map-chunk files, STGnn\Mnnn.LBD, loaded for
  * one element of the grid manager (class id 0x903, method table
  * gLbdFileMethods, parent FileResource; methods in src/cd/GameFiles.c; no
- * subclasses). The files it is handed are the gRecordTable records
+ * subclasses). The files it is handed are the sRecordTable records
  * GetStageMapChunkRecord(stage, chunk) returns: StageMap__ComputeChunkLoadEntry takes
  * each entry's name from the grid's callback, ObjM__GetGridRecord, whose
  * tail call leaves that record in $v0, and the record's first bytes are the
