@@ -29,7 +29,7 @@ extern void *BMemPMgrInit(); /* arity-ok: main passes a dead 2nd argument that r
 extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 
 extern BMemPMgr *gStartupBMemPMgr;
-extern GameApplication *gGameApplication;
+extern GameApplication *sGameApplication;
 extern GameApplicationConfig gGameApplicationConfig;
 
 /* SetMem's argument: the RAM size in megabytes (Psy-Q libapi takes 2, a
@@ -48,14 +48,14 @@ void main(void) {
     /* MATCHING: the unread 0 is retail's `move $a1, $zero`. */
     gStartupBMemPMgr = BMemPMgrInit(DEFAULT_POOL_SIZE, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
-    gGameApplication = New_GameApplication(&gGameApplicationConfig);
+    sGameApplication = New_GameApplication(&gGameApplicationConfig);
     drawSystem = New_DrawSystem();
     pad = New_Pad(0, 0); /* PadInit mode 0, port 0 */
     /* MATCHING: the override, GameApplication__InitSystems, takes three
      * arguments, not the slot's four; calling the slot's type would load $a3. */
-    ((GameApplicationInitSystemsFn)gGameApplication->methods->initSystems)(gGameApplication,
+    ((GameApplicationInitSystemsFn)sGameApplication->methods->initSystems)(sGameApplication,
                                                                            drawSystem, pad);
-    gGameApplication->methods->runMainLoop(gGameApplication);
+    sGameApplication->methods->runMainLoop(sGameApplication);
 }
 
 /* Sony's _obj/none: empty. Its one call is the one cc1 puts in main. */

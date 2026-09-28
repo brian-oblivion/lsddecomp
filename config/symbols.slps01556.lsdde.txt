@@ -2439,7 +2439,7 @@ KeyOnCheck = 0x800303FC; // type:func
 // main: the C entry point; crt0 calls it at 0x80011A3C (`jal` word 0x0C004637).
 main = 0x800118DC; // type:func
 gStartupBMemPMgr = 0x8008A808;
-gGameApplication = 0x8008AC20;
+sGameApplication = 0x8008AC20;
 gGameApplicationConfig = 0x80066828;
 // identified: Psy-Q _obj/none __main (discs 3.0, 3.6), the empty stub
 // cc1 calls from `main`. Fingerprint EXACT masked 1.00 but TINY (2 words);

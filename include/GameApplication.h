@@ -6,7 +6,7 @@
 /*
  * GameApplication -- the game itself, as an Application (include/Application.h):
  * the one object main() (src/main.c) builds, New_GameApplication(
- * &gGameApplicationConfig) into gGameApplication, before running its
+ * &gGameApplicationConfig) into sGameApplication, before running its
  * initSystems and then runMainLoop, which never returns. Application brings the
  * console up and owns the outer loop; this class fills the loop's six hooks with
  * the game's sequence and owns the game's DreamSys (include/DreamSys.h). Class id

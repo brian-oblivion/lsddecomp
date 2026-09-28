@@ -12,10 +12,10 @@ This is the game's own `main()`. It runs an empty startup stub
 (`__main`, already matched, a no-op), sets a Psy-Q memory mode via
 `SetMem(2)`, stands up the game's `BMemPMgr` heap (`BMemPMgrInit`), installs
 it as the default pool (`SetDefaultBMemPMgr`), constructs the `GameApplication`
-instance at `gGameApplication` (`New_GameApplication`, seeded from the constant block
+instance at `sGameApplication` (`New_GameApplication`, seeded from the constant block
 `gGameApplicationConfig = {0x13, 0, 1, 1, 1, 1}`), allocates a second object via the
 still-uncarved `New_DrawSystem`, opens a `Pad` (`New_Pad(NULL, 0)`),
-and dispatches two methods through `gGameApplication`'s own vtable (`+0x044` and
+and dispatches two methods through `sGameApplication`'s own vtable (`+0x044` and
 `+0x04C`) before returning. It never loops -- the real game loop presumably
 lives inside whatever `slot4C` (`Application__RunMainLoop`) or a callee reached from it
 does; this function is just game-code setup, past which retail's own crt0
@@ -65,7 +65,7 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 extern void *New_DrawSystem(void);
 
 extern BMemPMgr *gStartupBMemPMgr;
-extern GameApplication *gGameApplication;
+extern GameApplication *sGameApplication;
 extern GameApplicationConfig gGameApplicationConfig;
 
 /* Matched in GameApplicationFileResource.c; not yet declared in any header (no other carved
@@ -81,11 +81,11 @@ void main(void)
     SetMem(2);
     gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
-    gGameApplication = New_GameApplication(&gGameApplicationConfig);
+    sGameApplication = New_GameApplication(&gGameApplicationConfig);
     obj = New_DrawSystem();
     pad = New_Pad(0, 0);
-    gGameApplication->methods->forwardToBaseSlot44UnlessFlagged(gGameApplication, obj, pad);
-    gGameApplication->methods->slot4C(gGameApplication);
+    sGameApplication->methods->forwardToBaseSlot44UnlessFlagged(sGameApplication, obj, pad);
+    sGameApplication->methods->slot4C(sGameApplication);
 }
 
 void __main(void) {
@@ -170,7 +170,7 @@ this is a documentation sync only.)
     pointer); whether any still-uncarved code elsewhere also reads this
     exact global (as opposed to `sDefaultBMemPMgr`, a different address,
     `BMemPMgr.c`) is not established, hence tier B rather than A.
-  - `D_8008AC20` -> `gGameApplication`, tier B. The one instance of `GameApplication`
+  - `D_8008AC20` -> `sGameApplication`, tier B. The one instance of `GameApplication`
     the game constructs, matching this header's own stated convention of
     keeping the class's identity tied to its vtable address until a
     game-purpose name is established (track 4). Read and written only here

@@ -165,7 +165,7 @@ Class `Class6D3C8` renamed `GameApplication` (`tools/renametype.py
 Class6D3C8 GameApplication`), table `D_8006D3C8` renamed
 `gGameApplicationMethods` (`tools/rename.py`). **Tier A.** It is the only
 Application subclass and the one object main() builds (`New_GameApplication(
-&gGameApplicationConfig)` into `gGameApplication`, then initSystems and the
+&gGameApplicationConfig)` into `sGameApplication`, then initSystems and the
 never-returning runMainLoop); its ctor builds and keeps the game's DreamSys,
 and its own methods are exactly the six hooks Application's main loop calls
 (intro logos, weekly stream, GraphRoom poll, DayTask run, cinematic and
