@@ -334,12 +334,12 @@ void TodActor__TeardownParts(TodActor *self) {
  * second fills partIds and turns tmdId[0] into the index of the object drawn
  * with that TMD id, which becomes mainPart. 0, or 1 with the parts released. */
 s32 TodActor__CreateParts(TodActor *self) {
-    s32 tmdId[4]; /* MATCHING: [1] changes the frame; only [0] is used */
+    u32 tmdId[4]; /* MATCHING: [1] changes the frame; only [0] is used */
     s32 count;
     s32 i;
     Actor **p;
 
-    count = self->modelData->methods->scanPackets(self->modelData, 0, (s32)tmdId);
+    count = self->modelData->methods->scanPackets(self->modelData, NULL, tmdId);
     self->parts = BMemPMgrAlloc(count * sizeof(Actor *));
     if (self->parts == NULL) {
         goto alloc_fail;
@@ -348,7 +348,7 @@ s32 TodActor__CreateParts(TodActor *self) {
     if (self->partIds == NULL) {
         goto alloc_fail;
     }
-    self->modelData->methods->scanPackets(self->modelData, (s32)self->partIds, (s32)tmdId);
+    self->modelData->methods->scanPackets(self->modelData, self->partIds, tmdId);
 
     p = self->parts;
     i = 0;
@@ -490,9 +490,8 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
     GsCOORD2PARAM *param;
     s32 i;
 
-    data = self->modelData->methods->decodePacketWord(self->modelData, (s32)packet,
-                                                      (s32)&head.objectId, (s32)&head.type,
-                                                      (s32)&head.flag, (s32)&head.length);
+    data = self->modelData->methods->decodePacketWord(self->modelData, packet, &head.objectId,
+                                                      &head.type, &head.flag, &head.length);
     partIndex = TodActor__FindPartIndex(self, head.objectId);
     if (partIndex < 0) {
         goto end;

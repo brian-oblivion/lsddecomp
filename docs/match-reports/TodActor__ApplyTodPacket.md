@@ -1144,3 +1144,7 @@ angle wrap and the fixed-point scale, `TOD_PARENT_ROOT` (0xFFFF). The return
 is `(u32 *)packet + head.length` (was `(u8 *)packet + length * 4`). The
 `__asm__("")` comment is now a one-line `MATCHING:`; its measurement is the
 "asm sites" section above. Whole image `OK`.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+Pointer types in place of `s32`: `New_TimBlockSrc(char *name)` returning `TimBlockSrc *`, ModelData's `scanPackets(self, u8 *out, u32 *tmdId)` and `decodePacketWord(self, u32 *packet, u8 *objId, u8 *type, u8 *flag, u8 *len)` slots and their forwarders, so the `(s32)` casts at the callers (ObjM__InitStyleAndWorld, TodActor__CreateParts, TodActor__ApplyTodPacket) and the forwarders' casts back are gone; CreateParts' `tmdId` buffer is `u32[4]` to match. Byte-identical, no new compiler warnings (full rebuild, 37 before and after).

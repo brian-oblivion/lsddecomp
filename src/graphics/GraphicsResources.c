@@ -124,11 +124,11 @@ typedef struct UnprototypedCtorTable {
 } UnprototypedCtorTable;
 
 /* Allocate a TimBlockSrc and construct it over the file `name`. */
-void *New_TimBlockSrc(s32 name) {
-    void *obj = BMemPMgrAlloc(sizeof(TimBlockSrc));
+TimBlockSrc *New_TimBlockSrc(char *name) {
+    TimBlockSrc *obj = BMemPMgrAlloc(sizeof(TimBlockSrc));
 
     if (obj != NULL) {
-        GetTimBlockSrcMethods()->ctor(obj, (char *)name);
+        GetTimBlockSrcMethods()->ctor(obj, name);
         return obj;
     }
     return NULL;
@@ -911,15 +911,14 @@ void ModelData__ReleaseResources(ModelData *self) {
 }
 
 /* scanPackets (+0x080): the TodSet's +0x078 (TodSet__ScanPackets). */
-u8 ModelData__ForwardScanPackets(ModelData *self, s32 out, s32 tmdId) {
+u8 ModelData__ForwardScanPackets(ModelData *self, u8 *out, u32 *tmdId) {
     return ((s32 (*)())self->todSet->methods->processBuffer)(self->todSet, out, tmdId);
 }
 
 /* decodePacketWord (+0x084): the TodSet's. */
-void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 packet, s32 objId, s32 type, s32 flag,
-                                         s32 len) {
-    return self->todSet->methods->decodePacketWord(self->todSet, (u32 *)packet, (u8 *)objId,
-                                                   (u8 *)type, (u8 *)flag, (u8 *)len);
+void *ModelData__ForwardDecodePacketWord(ModelData *self, u32 *packet, u8 *objId, u8 *type,
+                                         u8 *flag, u8 *len) {
+    return self->todSet->methods->decodePacketWord(self->todSet, packet, objId, type, flag, len);
 }
 
 ModelDataMethods *GetModelDataMethods(void) {

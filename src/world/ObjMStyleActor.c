@@ -511,7 +511,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 i
 
     day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     record = PickStageTexture(self->stage, 0, day);
-    self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc((s32)record);
+    self->timBlockSrc = New_TimBlockSrc((char *)record);
 
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sObjMViewPoint,
                                  &sObjMViewRefPoint, 0);

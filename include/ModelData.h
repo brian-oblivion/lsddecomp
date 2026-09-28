@@ -53,8 +53,8 @@ typedef struct ModelDataMethods ModelDataMethods;
 #define MODELDATA_SLOTS(Self, CtorParams)                                                          \
     FILERESOURCE_SLOTS(Self, CtorParams);                                                            \
     /* +0x07C */ void (*releaseResources)(Self *self);          /* ModelData__ReleaseResources */  \
-    /* +0x080 */ u8 (*scanPackets)(Self *self, s32 out, s32 tmdId); /* ModelData__ForwardScanPackets: todSet's +0x078; out is a u8 *, tmdId a u32 * */ \
-    /* +0x084 */ void *(*decodePacketWord)(Self *self, s32 packet, s32 objId, s32 type, s32 flag, s32 len) /* ModelData__ForwardDecodePacketWord: todSet's +0x080; packet is a u32 *, the rest u8 * */
+    /* +0x080 */ u8 (*scanPackets)(Self *self, u8 *out, u32 *tmdId); /* ModelData__ForwardScanPackets: todSet's +0x078 */ \
+    /* +0x084 */ void *(*decodePacketWord)(Self *self, u32 *packet, u8 *objId, u8 *type, u8 *flag, u8 *len) /* ModelData__ForwardDecodePacketWord: todSet's +0x080 */
 /* clang-format on */
 
 /* clang-format off */
@@ -82,8 +82,8 @@ void ModelData__Finalize(ModelData *self);
 void ModelData__Load(ModelData *self);
 s32 ModelData__BuildResources(ModelData *self);
 void ModelData__ReleaseResources(ModelData *self);
-u8 ModelData__ForwardScanPackets(ModelData *self, s32 out, s32 tmdId);
-void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 packet, s32 objId, s32 type, s32 flag,
-                                         s32 len);
+u8 ModelData__ForwardScanPackets(ModelData *self, u8 *out, u32 *tmdId);
+void *ModelData__ForwardDecodePacketWord(ModelData *self, u32 *packet, u8 *objId, u8 *type,
+                                         u8 *flag, u8 *len);
 
 #endif
