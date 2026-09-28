@@ -112,3 +112,19 @@ View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in dream_scen
 ## Track 7 (round 99, alpha)
 
 A one-line comment only.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/style_effect.h`, the prototype's trailing comment (the header
+now says in its @brief why the declaration has no prototype):
+
+> void StyleEffect__SpawnPlainSprites(); /* MATCHING: (StyleEffect *self); a caller passes a dead 2nd argument */
+
+From `src/world/dream_scene.c`, the note above `extern void NoOpIgnoreArgs();`,
+now one `MATCHING:` line there and one above each of the four definitions:
+
+> MATCHING: StyleEffect__SpawnPlainSprites, __RandomizeSprites,
+> __BuildRandomSprites and __DriftModelChildren read only `self`, but the
+> calls below pass a second, dead argument that retail loads, so
+> include/style_effect.h declares them without a prototype. NoOpIgnoreArgs
+> (next section, empty) is declared the same way here.

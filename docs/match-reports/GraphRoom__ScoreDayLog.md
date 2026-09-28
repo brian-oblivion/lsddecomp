@@ -265,3 +265,12 @@ extern MoodGraphPoint sGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT];
  * words without). Do not "simplify" this without re-running
  * ./build-and-verify.sh. */
 ```
+
+## History (source comments moved in track 12, round 106)
+
+From `src/world/dream_scene.c`, the function comment ended (now a one-line
+`MATCHING:` below it):
+
+> MATCHING: the `targets`/`days` caches, the dead else branch and the
+> chained assignment are all inert; without any one, cc1 strength-reduces
+> sGraphScoreMoods[i] into a pointer hoisted across the outer loop.

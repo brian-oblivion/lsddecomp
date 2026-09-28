@@ -241,3 +241,11 @@ The class is unified in `include/graph_room.h` (class id 0x2F130, table `gGraphR
  * unknown_values_0x5d8[8]: ScoreDayLog fails once it is set and sets it on
  * success, so the graph's highlight runs once per save. */
 ```
+
+## History (source comments moved in track 12, round 106)
+
+From `src/world/dream_scene.c`, the note above the mood reads (now one
+line):
+
+> MATCHING: indexed twice; through a `MoodGraphPoint *` to the day,
+> cc1 adds the array's +0x018 to the pointer first.

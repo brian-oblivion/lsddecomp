@@ -226,3 +226,11 @@ The local `GraphPointColor` (round 97) is retired onto include/box_fill.h's `Box
 ## Track 10 (2026-09-28, round 104, echo)
 
 The six per-class aliases of `ColorRgb` (include/draw_system.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/world/dream_scene.c`, the comment above sGraphPointSize ended
+(now a one-line `MATCHING:` at the copy):
+
+> MATCHING: exactly three bytes, so the whole-struct copy of `rgb` below is
+> three lb/sb pairs.

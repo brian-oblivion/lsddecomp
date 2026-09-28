@@ -142,3 +142,19 @@ View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in dream_scen
 ## Track 7 (round 99, alpha)
 
 `python3 tools/rename.py gLinkElemVec3Table sStyleEffectJitterScales`, **tier A**: six entries of three Ratio16 (the old local view was an s32 Vec3O, same 12-byte stride): {1/16, 7/1, 1/1}, {7/1, 1/16, 1/1}, then the same with 3 and with 2, so each one shapes a sprite into a thin streak along y or along x; this function, its only accessor, hands a rand()-picked one to each jittering sprite's updateScale (VariantSprite__UpdateScale reads x and y). It is declared `Ratio16 [6][3]` now and the index bound is ARRAY_COUNT of it; the loop bound is ARRAY_COUNT(self->sprites) - 1 (sprites[1..4]); the rotation is `(rand() % 360) * ONE` (GsSPRITE.rotate is 4096ths of a degree; the same sll 12). rand() comes from Sony's <rand.h>. Locals p/r -> sprite/pick.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/style_effect.h`, the prototype's trailing comment (the header
+now says in its @brief why the declaration has no prototype):
+
+> void StyleEffect__RandomizeSprites(); /* MATCHING: (StyleEffect *self); a caller passes a dead 2nd argument */
+
+From `src/world/dream_scene.c`, the note above `extern void NoOpIgnoreArgs();`,
+now one `MATCHING:` line there and one above each of the four definitions:
+
+> MATCHING: StyleEffect__SpawnPlainSprites, __RandomizeSprites,
+> __BuildRandomSprites and __DriftModelChildren read only `self`, but the
+> calls below pass a second, dead argument that retail loads, so
+> include/style_effect.h declares them without a prototype. NoOpIgnoreArgs
+> (next section, empty) is declared the same way here.

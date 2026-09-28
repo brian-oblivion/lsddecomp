@@ -140,3 +140,12 @@ SetStyleEffectSources and handed to New_VariantSprite as its image.
 
 - Locals: `p` -> `slot`, `node` -> `sprite`. Loop bound `5` is
   `ARRAY_COUNT(((StyleEffect *)self)->sprites)`.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/world/dream_scene.c`, the function comment ended (now a one-line
+`MATCHING:` below it):
+
+> `self` stays `void *`: it is the prototype the next section calls
+> through, and a typed local alias of it costs a callee-saved register (see
+> this function's report).

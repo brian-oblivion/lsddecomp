@@ -341,3 +341,11 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * declared type" -- that was the first, wrong, reading.
  * See docs/match-reports/SetupStyleSpawnParamsRandom.md. */
 ```
+
+## History (source comments moved in track 12, round 106)
+
+From `src/world/dream_scene.c`, the function comment ended (now a one-line
+`MATCHING:` below it):
+
+> MATCHING: sStyleSpawnOffsetX is declared a scalar, not an array (an array
+> decay is kept in a saved register across the rand() calls).

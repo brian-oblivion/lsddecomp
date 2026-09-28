@@ -56,3 +56,12 @@ ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible r
 ## Round 99 (delta, track 7)
 
 Local `old` -> `prevTicks`, then the read-increment-test written as `if (self->closeTicks++ == 0) return;`: measured byte-identical, so the two-statement form in Source above was not load-bearing. The bounds are `ITEMLIST_STATE_REPORT` and `ITEMLIST_RESULT_CHOSEN`; the dispatch is `setState(self, ITEMLIST_STATE_REPORT)`.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/item_list.h`'s class banner, which now says the slot is typed
+for onNotify's call and the occupant reads only self:
+
+> +0x058 tickClosing: the slot passes (sender, event) because onNotify's
+> bytes set $a1/$a2 for it; its occupant reads only self (TextEntry's
+> tickState is the same).

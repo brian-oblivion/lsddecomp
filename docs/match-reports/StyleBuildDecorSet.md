@@ -366,3 +366,11 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * hand-rolled pointer/counter variables.  See
  * docs/match-reports/StyleBuildDecorSet.md. */
 ```
+
+## History (source comments moved in track 12, round 106)
+
+From `src/world/dream_scene.c`, the comment above StyleBuildDecorSet on
+sStyleDecorPosX/Y and sStyleDecorSizeW/H (now a one-line `MATCHING:`):
+
+> MATCHING: copied whole, never field by field (a BLKmode copy makes cse
+> drop cached memory values; scalar copies lose retail's reloads).

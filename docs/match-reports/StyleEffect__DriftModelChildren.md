@@ -367,3 +367,26 @@ The function comment's match note, verbatim (the source keeps a
   `absPeriod`, `local` -> `delta`, `p` -> `slot`.
 - sSpinRotStep is declared `Ratio16[3]`: its data is {0/1, 1/10, 0/1}
   and it only reaches updateRotation.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/style_effect.h`, the prototype's trailing comment (the header
+now says in its @brief why the declaration has no prototype):
+
+> void StyleEffect__DriftModelChildren(); /* MATCHING: (StyleEffect *self); a caller passes a dead 2nd argument */
+
+From `src/world/dream_scene.c`, the note above `extern void NoOpIgnoreArgs();`,
+now one `MATCHING:` line there and one above each of the four definitions:
+
+> MATCHING: StyleEffect__SpawnPlainSprites, __RandomizeSprites,
+> __BuildRandomSprites and __DriftModelChildren read only `self`, but the
+> calls below pass a second, dead argument that retail loads, so
+> include/style_effect.h declares them without a prototype. NoOpIgnoreArgs
+> (next section, empty) is declared the same way here.
+
+From `src/world/dream_scene.c`, the comment above `stepZ = &sModelChildDriftZ[tableIndex];`
+(now one `MATCHING:` line):
+
+> MATCHING: the guard reads the step from the table and the pointer
+> is taken only here, after the call; either held earlier in a
+> local swaps two registers.

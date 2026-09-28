@@ -96,3 +96,17 @@ what the code is.
  * nothing: INTERMEDIATEBASE_SLOTS's ctor type is kept (the round-75 view
  * had it return the tail call's value; the bytes are the same either way).
 ```
+
+## History (source comments moved in track 12, round 106)
+
+From `include/graph_room.h`'s class banner (the header now says the call
+passes the DreamSys, which Reset does not read):
+
+> That last call passes dreamSys as a second argument the slot does not
+> have and Reset does not read ($a1 is loaded in the retail bytes), so the
+> ctor casts the slot to GraphRoomResetCallFn below.
+
+and above GraphRoomResetCallFn:
+
+> The ctor's resetCounters call, as the retail bytes make it: the slot is
+> (self), the call also passes dreamSys (see the banner). No code.

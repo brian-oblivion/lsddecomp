@@ -3,12 +3,8 @@
  * that sit between them in ROM. In address order, each under its own section
  * banner below:
  *  - ItemList's second half (include/item_list.h; the first half is in
- *    input_dialogs.c): setState and tickClosing (close, then report the
- *    result to the parents), handleInputCode (the Pad events it answers) and
- *    playSound, the cursor and scroll methods, the four visible rows
- *    (createRows, releaseRows, refreshRows, and the non-virtual helpers
- *    FormatRowText and SetView), stepCursorInView, getCursorIndex and the
- *    table getter GetItemListMethods;
+ *    input_dialogs.c): closing and reporting, the Pad events, the cursor and
+ *    scroll methods, the four visible rows and the table getter;
  *  - ObjM (include/objm.h), whole: the TimedTask DayTask starts for a day's
  *    scene;
  *  - the style layer, whose client ObjM is: its setup (RegisterStyleConfig
@@ -20,9 +16,7 @@
  *    StyleEffect;
  *  - VariantSprite (include/variant_sprite.h), whole;
  *  - GraphRoom (include/graph_room.h), whole, the mood graph screen.
- *
- * The game's own files most likely ended after each class's table getter;
- * this file keeps the classes together.
+ * The game's own files most likely ended after each class's table getter.
  */
 #include "common.h"
 #include <libgte.h>
@@ -424,28 +418,8 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
 
 /* ---- ObjM, resetCounters (+0x040) to enterLinkWall (+0x09C) ---------------
  *
- * In table order.
- *
- *  - init and deinit (AttachTarget, DetachTarget): install
- *    ObjM__GetGridRecord as the StageMap's chunk-record callback and keep
- *    the DreamSys as a child.
- *  - onInit and onDeinit (InitStyleAndWorld, TeardownStyle): pick the
- *    stage's BGM sequence and the day's TIM block, register the stage's
- *    StyleConfig, set the viewport's view and the StageMap's bounds; stop
- *    it all again.
- *  - onDrawSystemEvent's event 2 runs PollTimBlockLoad: once the TIM block has
- *    loaded (or failed) the scene is set up, and once the StageMap has
- *    nothing pending the style session starts.
- *  - onPadEvent (DispatchPadEvent) maps Start, Select and triangle onto the
- *    pause and close slots; update ticks the style, or the pause overlay
- *    while it is being built; togglePause.
- *  - the style scene slots +0x080..+0x08C: SetupSceneStyle,
- *    ExitSceneStyle, EnterStyleSession, TickStyle.
- *  - OnDreamSysNotify turns the DreamSys's link codes into the enter*
- *    slots and notifyLinkTeleport; EnterTimeUp, EnterLinkDynamic and
- *    EnterLinkWall set IntermediateBase::state and start a fade up
- *    (ObjM__StartFadeUp, next section).
- * NoOpSlot40 and NoOpSlot7C are empty.
+ * In table order; include/objm.h documents each. NoOpSlot40 and NoOpSlot7C
+ * are empty.
  */
 
 void ObjM__NoOpSlot40(void) {}
@@ -619,8 +593,8 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
 
 /* onPadEvent, only in session: Start pressed toggles the pause, Select
  * held and released sets and clears the close-ready flag, triangle pressed
- * closes (closeAndNotifyNewGame).
- * MATCHING: the gotos keep retail's compare order; a switch sorts the cases. */
+ * closes (closeAndNotifyNewGame). */
+/* MATCHING: the gotos keep retail's compare order; a switch sorts the cases. */
 void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code) {
     ObjMMethods *m = self->methods;
     void (*fn)(ObjM *);
@@ -878,41 +852,21 @@ void ObjM__EnterLinkWall(ObjM *self) {
 
 /* ---- ObjM, +0x0A0 to its getter; the style layer's setup ----------------
  *
- * ObjM's methods from +0x0A0 to the end of its table (gObjMMethods) and its
- * getter, then the style layer's setup: the four free functions that pick
- * the stage's scene style.
+ * ObjM's methods from enterLinkFlashback to the end of its table and its
+ * getter (include/objm.h documents each), then the style layer's setup: the
+ * four free functions that pick the stage's scene style.
  *
- * ObjM, in ROM order:
- *  - EnterLinkFlashback, EnterLinkTunnel, EnterLinkStageTimer and NotifyLinkTeleport, the DreamSys link codes
- *    ObjM__OnDreamSysNotify hands on (flashback, tunnel, stage timer,
- *    teleport): each sets IntermediateBase::state (enum ObjMState) and
- *    fades up through StartFadeUp, or notifies its parent at once.
- *  - StartFadeUp: the viewport's fade box (a FadeBox), optionally added as
- *    a child, fades up in the given channels.
- *  - OnFadeNotify: fade down done returns ObjM to IDLE; fade up done sets
- *    the viewport's clear colour to the fade's and notifies the state (a
- *    stage-timer link turns into TIME_UP first). OnStageMapNotify runs
- *    CheckAuxTrigger when a slot's data block is ready.
- *  - The pause overlay: AdvancePauseSetup builds the "Pause" TextRow and,
- *    four calls later, hides the viewport and pauses the FrameClock, the
- *    WBgm and the VabStreamObj; TeardownPauseOverlay undoes it. While it is
- *    up and ObjM is IDLE, the close-ready flag arms CloseAndNotify and CloseAndNotifyNewGame,
- *    which tear it down and notify a close (DayTask ends the day).
- *    NoOpSlotBC is empty.
- *
- * The style setup is not ObjM's, but ObjM is its client:
- * ObjM__InitStyleAndWorld (above) calls RegisterStyleConfig once
- * per scene and keeps the result, sStyleConfig, as ObjM::styleConfig.
- * RegisterStyleConfig stores the scene (grid, stage, ObjM's scene
- * references, day) in the gStyle globals the next section reads;
- * ApplyStyleConfig takes the stage's four-byte StyleStageConfig, or
- * PickStyleFallbackConfig's, and FillStyleFromConfig turns it into
- * StyleConfig colours and a fog distance. ApplyStyleDecorationIfSet builds
- * the decoration box, a full-screen semi-transparent BoxFill under the
- * viewport's fade box, when the config asked for one.
- *
- * What the ObjM states and the style configs stand for in the game is not
- * established; the names describe mechanics.
+ * The style layer is not ObjM's, but ObjM is its client:
+ * ObjM__InitStyleAndWorld calls RegisterStyleConfig once per scene and keeps
+ * the result, sStyleConfig, as ObjM::styleConfig. RegisterStyleConfig stores
+ * the scene (grid, stage, ObjM's scene references, day) in the sStyle
+ * globals the next section reads; ApplyStyleConfig takes the stage's
+ * four-byte StyleStageConfig, or PickStyleFallbackConfig's, and
+ * FillStyleFromConfig turns it into StyleConfig colours and a fog distance.
+ * ApplyStyleDecorationIfSet builds the decoration box, a full-screen
+ * semi-transparent BoxFill under the viewport's fade box, when the config
+ * asked for one. What the ObjM states and the style configs stand for in the
+ * game is not established; the names describe mechanics.
  */
 
 
@@ -1152,9 +1106,8 @@ void *ApplyStyleConfig(void) {
 }
 
 /* sStylePalette is 24 RGB triples (a greyscale ramp first: 0, 64, 128, 255).
- * MATCHING: indexed as `u8[][3]`, for retail's `i*2 + i + base` stride-3
- * address arithmetic. sStyleFogNears is six fogNear distances, 26624 down to
- * 2048. */
+ * sStyleFogNears is six fogNear distances, 26624 down to 2048. */
+/* MATCHING: sStylePalette is indexed as u8[][3], for the stride-3 address arithmetic. */
 extern s32 sStyleFogNears[];
 
 void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg) {
@@ -1196,44 +1149,23 @@ void ApplyStyleDecorationIfSet(void) {
 
 /* ---- The style layer's per-scene objects ---------------------------------
  *
- * What TickStyle
- * builds on a scene's first tick, updates on every tick, and StyleTeardown
- * releases.
- *
- * RegisterStyleConfig (previous section), called by ObjM__InitStyleAndWorld
- * and a no-op until StyleTeardown clears sStyleGrid, sets the state read here: sStyleGrid (the
- * scene's StageMap), sStyleStage (ObjM's stage), sStyleSceneRefs (ObjM's
- * sound, resources and viewport; StyleSceneRefs below) and sStyleDay (the
- * DreamSys day). ApplyStyleConfig then takes the stage's fixed config or,
- * with none, PickStyleFallbackConfig's: a variant (sStyleVariant, 0..3) and
- * a config record picked from day + stage.
- *
- * What TickStyle keeps, each built on the first tick:
- *  - the decoration box, sStyleDecorObj, when the config has a colour for
- *    it (ApplyStyleDecorationIfSet builds it, StyleFlushDecoration releases it);
- *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (sStyleDecorSlots)
- *    coloured from sStyleDecorColors and attached under the viewport's fade
- *    box; every tick StyleUpdateDecorSet shifts their colours, their
- *    position and the viewport's clear colour by the view point's y offset
- *    from its reference point;
- *  - the effect slots: StyleEffect objects of kinds 0..3 (sStyleEffectSlots)
- *    built from one parameter block, sStyleSpawnOffsetX..sStyleSpawnColors,
- *    that StyleFillEffectKindN and SetupStyleSpawnParamsRandom/B fill in; each
- *    tick updates them with the target position;
- *  - two positional sound cues (sStyleCueSlots, in sStyleCueSlotPool): a
- *    free slot claims the next record of the stage's cue list that lies
- *    within its cue's distance of the target and starts the record's
- *    SoundCueSet callback (sStyleCueCallbacks, next section); a claimed
- *    slot is serviced while the target stays in range and flushed when it
- *    leaves.
- * StyleScrollVramStrips also rotates a VRAM strip one column per tick on
- * stages 2 to 5.
- *
- * The target is the grid's target cell (ObjM__TickStyle passes
- * getTargetDescriptor) turned into a world position. What the style layer
- * is in the game -- what a variant, an effect kind or a cue stands for -- is
- * not established; the names describe mechanics. Evidence and tiers are in
- * each function's match report, `## Naming`.
+ * What TickStyle builds on a scene's first tick, updates every tick and
+ * StyleTeardown releases, in sStyle globals RegisterStyleConfig set (the
+ * scene's StageMap, ObjM's stage, its StyleSceneRefs and the day):
+ *  - the decoration box (sStyleDecorObj), when the config has a colour;
+ *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (sStyleDecorSlots) under
+ *    the viewport's fade box, shaded every tick by the view point's height;
+ *  - the effect slots: StyleEffects of kinds 0..3 (sStyleEffectSlots), each
+ *    built from the one parameter block the StyleFillEffectKindN functions
+ *    fill, updated every tick with the target position;
+ *  - two positional sound cues (sStyleCueSlots): a free slot claims the next
+ *    record of the stage's cue list within its cue's distance of the target
+ *    and starts the record's SoundCueSet callback; a claimed slot is
+ *    serviced while the target stays in range and flushed when it leaves.
+ * The target is the grid's target cell as a world position; on stages 2 to
+ * 5 StyleScrollVramStrips also rotates a VRAM strip. What a variant, an
+ * effect kind or a cue stands for in the game is not established; the names
+ * describe mechanics.
  */
 
 /* The decoration set: this many BoxFill bands, stacked 3 pixels apart. */
@@ -1321,9 +1253,8 @@ extern s32 sStyleDecorSizeH;
 extern BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
 
 /* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs, a
- * BoxFillPos and a BoxFillSize.
- * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
- * drop cached memory values; scalar copies lose retail's reloads). */
+ * BoxFillPos and a BoxFillSize. */
+/* MATCHING: both are copied whole, never field by field. */
 
 /* Builds the bands: band 0 in sStyleDecorColors' first colour, bands 1..17
  * attached under it, each 3 pixels lower and 7 shorter than the one before;
@@ -1535,8 +1466,8 @@ extern void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY);
 
 /* Fills `count` slots with kind-0 effects: a table index and scale for all
  * of them, an offset y (0: each setup picks one; a pick of 4 reads the word
- * after sStyleSpawnYChoices, as retail does), and per slot
- * SetupStyleSpawnParamsRandom, or B on every seventh day. Returns the next slot. */
+ * after sStyleSpawnYChoices), and per slot SetupStyleSpawnParamsRandom, or
+ * SetupStyleSpawnParamsDayMod7 on every seventh day. Returns the next slot. */
 StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
@@ -1671,9 +1602,8 @@ extern s32 sStyleSpawnModelLayout;
 
 /* Randomises the spawn parameters: offset y (offsetY, or a random choice
  * when 0), x and z offsets of 0..22 steps of 2048 either side, a rotation
- * and a model layout. `pos` is unused.
- * MATCHING: sStyleSpawnOffsetX is declared a scalar, not an array (an array
- * decay is kept in a saved register across the rand() calls). */
+ * and a model layout. `pos` is unused. */
+/* MATCHING: sStyleSpawnOffsetX is declared a scalar, not an array. */
 void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
     if (offsetY == 0) {
         offsetY = sStyleSpawnYChoices[rand() & 3];
@@ -1697,9 +1627,8 @@ extern s32 sStyleSpawnYChoice1;
  * by day % 3 (40960, -40960, 2048), then the same rotation and layout
  * picks as SetupStyleSpawnParamsRandom. Both parameters are unused; it has
  * that function's signature because StyleFillEffectKind0 calls either
- * through one pointer.
- * MATCHING: each rand() is used inline; one local for all three adds a move
- * after every call. */
+ * through one pointer. */
+/* MATCHING: each rand() is used inline; one local for all three adds a move after every call. */
 void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     s32 dayMod3;
 
@@ -1915,21 +1844,16 @@ void StyleScrollVramStrips(void) {
  *
  *  - StyleCue00..StyleCue13, the 14 rows of sStyleCueCallbacks, and their
  *    helper ComputeStyleCueFalloff. Each is a SoundCueSet callback
- *    (include/sound_cue_set.h): TryStartStyleCue (previous section) starts a
- *    style-cue slot's embedded set with the claimed cue record's index as the
- *    tag and that row of the table as the callback, as Entity does with its
+ *    (include/sound_cue_set.h): TryStartStyleCue starts a style-cue slot's
+ *    embedded set with the claimed cue record's index as the tag and that
+ *    row of the table as the callback, as Entity does with its
  *    Entity__MoodCueNN handlers. Every tick a callback sets the set's
- *    attenuation from the slot's distance to the target
- *    (ComputeStyleCueFalloff) and, on the ticks its pattern selects,
- *    requests VAB programs on the three voices; most restart the pattern by
- *    setting `tick` to -1 once it passes a limit.
- *  - IsStyleVariantEven: whether the variant PickStyleFallbackConfig chose
- *    (sStyleVariant) is even.
- *  - StyleEffect (include/style_effect.h), the Actor subclass the style layer
- *    keeps at an offset from its target: its ctor, finalize, reset
- *    (StyleEffect__SetParams) and update slot occupants, and the
- *    New_StyleEffect allocator. The per-kind work follows, in the next two
- *    sections.
+ *    attenuation from the slot's distance to the target and, on the ticks
+ *    its pattern selects, requests VAB programs on the three voices; most
+ *    restart the pattern by setting `tick` to -1 once it passes a limit.
+ *  - IsStyleVariantEven (include/dream_aux.h).
+ *  - StyleEffect's slot occupants and allocator (include/style_effect.h);
+ *    its per-kind work follows in the next two sections.
  */
 
 /* ------------------------------------------------------------------ *
@@ -2214,7 +2138,7 @@ void StyleEffect__Finalize(StyleEffect *self) {
 }
 
 void StyleEffect__SetParams(StyleEffect *self, StyleEffectParams *params) {
-    self->params = *params;
+    self->params = *params; /* MATCHING: one struct copy: the 4-aligned block moves 4 words a loop */
     self->tick = 0;
 }
 
@@ -2250,11 +2174,7 @@ extern LongVec3 sSpriteShiftScratch;
 void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b);
 void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, void *scale);
 
-/* MATCHING: StyleEffect__SpawnPlainSprites, __RandomizeSprites,
- * __BuildRandomSprites and __DriftModelChildren read only `self`, but the
- * calls below pass a second, dead argument that retail loads, so
- * include/style_effect.h declares them without a prototype. NoOpIgnoreArgs
- * (next section, empty) is declared the same way here. */
+/* MATCHING: unprototyped, as four StyleEffect__ helpers are: the calls below load a dead 2nd argument */
 extern void NoOpIgnoreArgs();
 
 /* New_VariantSprite: include/variant_sprite.h. */
@@ -2429,6 +2349,7 @@ extern Ratio16 sSpinRotStep[3];
  * MODEL_CHILD_DRIFT_RANGE / step ticks (the period's magnitude, whatever
  * the step's sign) snap them back to their layout. Always marks self's
  * coord2 for recompute. */
+/* MATCHING: unprototyped in style_effect.h: UpdateByKind's call loads a dead 2nd argument */
 void StyleEffect__DriftModelChildren(StyleEffect *self) {
     s32 tableIndex;
     s32 extraZ;
@@ -2444,9 +2365,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
         slot = self->modelChildren;
         self->methods->updateRotation(self, 0, sSpinRotStep);
         i = 0;
-        /* MATCHING: the guard reads the step from the table and the pointer
-         * is taken only here, after the call; either held earlier in a
-         * local swaps two registers. */
+        /* MATCHING: the step's pointer is taken here, after the call; held earlier, two registers swap */
         stepZ = &sModelChildDriftZ[tableIndex];
         extraZ = 0;
         for (; i < ARRAY_COUNT(self->modelChildren); i++) {
@@ -2485,6 +2404,7 @@ void StyleEffect__ReleaseModelChildren(StyleEffect *self) {
  * rand(); then sprites[1] is either shifted along x by
  * sSpriteShiftX[tableIndex] and recoloured (tableIndex >= 2) or made
  * semi-transparent (rate 0) and rescaled, and sprites[2] is hidden. */
+/* MATCHING: unprototyped in style_effect.h: InitByKind's call loads a dead 2nd argument */
 void StyleEffect__BuildRandomSprites(StyleEffect *self) {
     s32 parity = rand() % 2;
     void *scale = parity ? NULL : sSpriteScaleHalf;
@@ -2517,9 +2437,9 @@ void StyleEffect__BuildRandomSprites(StyleEffect *self) {
 
 /* Create the five sprites (New_VariantSprite), attach each to self at no offset,
  * give each self's colour (Sprite's setColor sets GsSPRITE r,g,b), and
- * assign `scale` as their scale when non-NULL. `self` stays `void *`: it is
- * the prototype the next section calls through, and a typed local alias of
- * it costs a callee-saved register (see this function's report). */
+ * assign `scale` as their scale when non-NULL. `self` is `void *`, the
+ * prototype the next section calls through. */
+/* MATCHING: self stays void * and is cast at each use; a typed local alias does not match. */
 void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale) {
     VariantSprite **slot = ((StyleEffect *)self)->sprites;
     VariantSprite *sprite;
@@ -2576,12 +2496,14 @@ void StyleEffect__ReleaseSprites(StyleEffect *self) {
 }
 
 /* Five sprites of variant 0 at their default scale. */
+/* MATCHING: unprototyped in style_effect.h: InitByKind's call loads a dead 2nd argument */
 void StyleEffect__SpawnPlainSprites(StyleEffect *self) {
     StyleEffect__SpawnSprites(self, 0, 0, 0);
 }
 
 /* STYLE_EFFECT_JITTER_SPRITES' per-frame step: every sprite but the first
  * takes a random streak shape and a random whole-degree rotation. */
+/* MATCHING: unprototyped in style_effect.h: UpdateByKind's call loads a dead 2nd argument */
 void StyleEffect__RandomizeSprites(StyleEffect *self) {
     VariantSprite **sprite = &self->sprites[1];
     s32 i;
@@ -2795,22 +2717,13 @@ void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
  * the base table gActorMethods, +0x0C8..+0x0EC), and VariantSprite's
  * allocator and ctor.
  *
- *  - Local-axis moves. Actor__MoveLocalX/Y put `val` into one component of
- *    the local move vector sActorLocalMove, apply it through
- *    addLocalTranslation and clear it again (Actor__MoveAlongLocalAxis;
- *    MoveLocalZ is in the previous section).
- *  - Move, else find a link. Actor__MoveLocalZOrFindLink/XOrFindLink clear
- *    linkTarget and move; when the move set no linkTarget,
- *    Actor__FindNearbyLink searches the StageMap grid round the actor's
- *    position for a GridCell whose model a vertical ray hits
- *    (BuildLinkQueries, ScanLinkCandidates, ScanGridWindow,
- *    AcceptGridElem), links to it and moves onto the hit.
- *  - The link-command pair (Actor__OnActorLinkCommand,
- *    Actor__OnGridCellLinkCommand): SceneNode's dispatchLinkCommand and,
- *    for an Actor sender's events 5..8, tryAttachNearby.
- *  - Actor__SetLastOffsetValue/SetPendingExtra and GetActorMethods.
- *  - New_VariantSprite and VariantSprite__VariantSprite, of an unrelated
- *    class (include/variant_sprite.h) that happens to follow in ROM.
+ * The link search: Actor__FindNearbyLink asks the StageMap grid which cell
+ * holds the Actor's position, BuildLinkQueries turns it into up to three
+ * cell windows, ScanLinkCandidates and ScanGridWindow walk them, and
+ * AcceptGridElem casts a vertical ray at each cell's model.
+ *
+ * New_VariantSprite and VariantSprite__VariantSprite are of an unrelated
+ * class (include/variant_sprite.h) that happens to follow in ROM.
  */
 
 /* The local move vector's x and y (s16; the z, sActorLocalMoveZ, is the next
@@ -3103,8 +3016,7 @@ extern SpriteRect sVariantSpriteCells[2];
 
 /* Sprite's ctor with the variant's cell, then this class's table, and the
  * reset slot (VariantSprite__SetVariantClut) with the variant, through
- * VariantSpriteResetFn. Returns nothing: it ends in that call and sets no
- * $v0. */
+ * VariantSpriteResetFn. Returns nothing: it ends in that call. */
 void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetArg, void *texture) {
     GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &sVariantSpriteCells[variant], resetArg, 0);
     self->methods = GetVariantSpriteMethods();
@@ -3126,11 +3038,9 @@ void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetA
  *   into GsSPRITE scalex/scaley.
  */
 
-/*
- * The two variants' CLUT positions, one {x, y} table in VRAM:
- * {976, 511} and {992, 511}, adjacent 16-colour rows on the bottom line.
- * MATCHING: two externs, as retail takes one %hi/%lo base for x, one for y.
- */
+/* The two variants' CLUT positions, one {x, y} table in VRAM:
+ * {976, 511} and {992, 511}, adjacent 16-colour rows on the bottom line. */
+/* MATCHING: two externs, one address base for x and one for y. */
 extern const s16 sVariantSpriteClutX[];
 extern const s16 sVariantSpriteClutY[];
 
@@ -3277,9 +3187,7 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
 }
 
 /* A graph point's colour is New_BoxFill's colour argument, a ColorRgb
- * (include/box_fill.h).
- * MATCHING: exactly three bytes, so the whole-struct copy of `rgb` below is
- * three lb/sb pairs. */
+ * (include/box_fill.h). */
 extern s32 sGraphPointSize[2];
 extern ColorRgb sGraphPointNewestColor;
 extern ColorRgb sGraphPointBaseColor;
@@ -3289,7 +3197,7 @@ void GraphRoom__BuildGraphPoints(GraphRoom *self) {
     s32 i;
 
     self->points[0] = New_BoxFill(sGraphPointSize, &sGraphPointNewestColor, 0);
-    rgb = sGraphPointBaseColor;
+    rgb = sGraphPointBaseColor; /* MATCHING: a 3-byte struct copy, byte by byte */
     for (i = 1; i < ARRAY_COUNT(self->points); i++) {
         s32 step;
 
@@ -3356,8 +3264,7 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
         if (day < 0) {
             day = DAYS_PER_YEAR - 1;
         }
-        /* MATCHING: indexed twice; through a `MoodGraphPoint *` to the day,
-         * cc1 adds the array's +0x018 to the pointer first. */
+        /* MATCHING: indexed twice; a MoodGraphPoint pointer to the day does not match */
         dx = save->moodPreviousDays[day].axis.dynamic;
         point.x = dx * GRAPH_PIXELS_PER_MOOD - GRAPH_POINT_SIZE / 2;
         dy = save->moodPreviousDays[day].axis.upper;
@@ -3384,10 +3291,8 @@ extern MoodGraphPoint sGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT];
 /* Whether every sGraphScoreMoods entry appears among the plotted days (the
  * window PopulateGraphPoints walks, newest first), recording in
  * matchedDayIndices the oldest dot holding each. Fails at once when
- * graphScored is set, and sets it on success.
- * MATCHING: the `targets`/`days` caches, the dead else branch and the
- * chained assignment are all inert; without any one, cc1 strength-reduces
- * sGraphScoreMoods[i] into a pointer hoisted across the outer loop. */
+ * graphScored is set, and sets it on success. */
+/* MATCHING: the targets/days caches, dead else and chained assignment keep the table unhoisted */
 s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
     u32 i;
     MoodGraphPoint *days;

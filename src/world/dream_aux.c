@@ -1,30 +1,10 @@
 /*
- * dream_aux.c -- the dream's aux entities: one resident Entity kept near the
- * player, and the chunk triggers that spawn Entities as the StageMap loads
- * chunks.
- *
- * Lifecycle. DayTask's ctor calls InitDreamAux, which clears every trigger
- * record's latch and loads the resident entity's ModelData (ETC\SYMSPY.MOM);
- * its finalize calls ReleaseDreamAuxModels. ObjM's scene setup calls
- * SetDreamAuxWorld with the stage, the StageMap, the player DreamSys, the
- * VabStreamObj and the FrameClock every Entity here is built and attached
- * with, and it builds the resident Entity; ObjM's teardown calls
- * ReleaseDreamAuxEntities. SetTeleportsEnabled turns DreamSys's instant
- * teleporters on for stages 3 and 11 and off elsewhere; EnableTeleportsForKind
- * turns them on when a trigger spawns mood row 11, 56, 78 or 93.
- *
- * Triggers. When the StageMap has loaded a chunk's data block, ObjM passes it
- * to TryDreamAuxTrigger with the chunk's coordinates and the day. The chunk's
- * DreamAuxTriggerEntry (LookupDreamAuxTrigger, over the stage's table) names
- * up to three TriggerRecords; on a day its dayParity allows,
- * FireDreamAuxTriggerEntries builds a TriggerWorld over the data block (its
- * models) and ProcessDreamAuxTriggerRecord spawns, for each record whose
- * condition holds (CheckDreamAuxTriggerCondition: the day, the dream colour
- * or the style variant), one Entity per spawn index, placed in the chunk's
- * cell (SpawnDreamAuxTriggerEntity). The TriggerWorld goes back to ObjM,
- * which keeps it with the chunk. When the parity rules the day out, on a
- * stage other than 0 and an even day, one time in 12 the resident entity is
- * moved next to the player instead (PlaceDreamAuxEntityByPlayer).
+ * dream_aux.c -- the dream's auxiliary entities: one resident Entity kept
+ * near the player, and the chunk triggers that spawn Entities as the
+ * StageMap loads chunks. include/dream_aux.h describes the lifecycle and
+ * the trigger flow; this file holds the tables' walkers in the order the
+ * flow runs them: load and release, the world, the lookup, the day and
+ * condition tests, and the spawn.
  */
 #include "common.h"
 #include <libgte.h>

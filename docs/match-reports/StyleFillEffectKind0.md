@@ -271,3 +271,10 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * the walking pointer itself (a separate `arr = arg0` copy reordered the
  * prologue's argument moves). */
 ```
+
+## History (source comments moved in track 12, round 106)
+
+From `src/world/dream_scene.c`, the function comment said a pick of 4
+"reads the word after sStyleSpawnYChoices, as retail does"; the clause
+"as retail does" was dropped, and the stale "or B" now names
+SetupStyleSpawnParamsDayMod7.
