@@ -34,12 +34,7 @@
 #include "ItemList.h"
 #include "ScreenSprite.h"
 #include "BMemPMgr.h"
-
-/* ScreenWidgets.c's, which types both u8 *(u8 *dst, u8 *src); declared on
- * TextEntry's char buffers. Decode turns full-width SJIS into one byte a
- * character, Encode turns it back. */
-extern char *DecodeFullWidthSjis(char *dest, char *src);
-extern void EncodeFullWidthSjis(char *dest, char *src);
+#include "FullWidthSjis.h"
 
 TextEntry *New_TextEntry(char *text, s32 mode) {
     TextEntry *self;
@@ -508,8 +503,6 @@ fail:
  * length in characters (bytes, halved for full-width SJIS), and
  * `maxTextLen` is the longest. Ends with resetView.
  */
-extern char *DecodeFullWidthSjis(char *dest, char *src);
-
 void ItemList__ItemList(ItemList *self, char **items, s32 mode) {
     char **item;
     s32 i;

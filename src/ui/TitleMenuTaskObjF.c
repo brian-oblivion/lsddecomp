@@ -55,6 +55,7 @@
 #include "TextEntry.h"
 #include "ItemList.h"
 #include "BMemPMgr.h"
+#include "FullWidthSjis.h"
 
 NodeGuardedViewport *New_NodeGuardedViewport(void) {
     NodeGuardedViewport *self;
@@ -188,10 +189,6 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSy
     target->registrationSlots[TITLEMENU_FLASHBACK] = (void *)locked;
 }
 
-/* src/ui/ScreenWidgets.c: `value` as `width` full-width decimal digits into dst,
- * zero-padded unless `unpadded`. */
-extern void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded);
-
 /* The save title's day number, full-width characters 9..11 of
  * "LSD   Day001" (StampSaveTitleFileLetter's layout of the title, below). */
 #define SAVE_TITLE_DAY 9
@@ -310,10 +307,6 @@ void TitleMenu__RefreshViewValue(TitleMenu *self) {
 /* Sony's (libc2). */
 extern char *strcpy(char *dest, char *src);
 extern s32 strlen(char *s);
-
-/* Decodes full-width SJIS into one byte a character (src/ui/ScreenWidgets.c);
- * nothing here reads its result. */
-extern void DecodeFullWidthSjis(void *dst, void *src);
 
 /* gSaveTitle is 2-byte full-width characters; the characters from here on
  * are padding after "LSD   Day001". */
