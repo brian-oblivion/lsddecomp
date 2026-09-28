@@ -19,7 +19,7 @@
  * TIM in place.
  *
  * How it is used, at the one New_TimArraySrc call site
- * (TimBlockSrc__AdvanceLoadState, include/TimBlockSrc.h): New_TimArraySrc(0)
+ * (TimBlockSrc__AdvanceLoadState, include/tim_block_src.h): New_TimArraySrc(0)
  * per block, then the block's sector buffer as `buffer` (size 0, so the
  * TimArraySrc never owns it), `clutBase` = the address of the TimBlockSrc's
  * four CLUT fade ramps, then onRequestDone (+0x064, BuildImages) and +0x078

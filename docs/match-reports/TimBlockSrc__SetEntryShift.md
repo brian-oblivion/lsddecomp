@@ -54,4 +54,4 @@ void TimBlockSrc__SetEntryShift(Obj6F0B8 *self, s32 index, s32 shift) {
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of +0x078, which is FileResource's untyped `slot78`; not given a TimBlockSrc slot of its own because the slot belongs to the parent's layout. Writes `entries[index].shift`/`.mask`. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/graphics_resources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of +0x078, which is FileResource's untyped `slot78`; not given a TimBlockSrc slot of its own because the slot belongs to the parent's layout. Writes `entries[index].shift`/`.mask`. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/tim_block_src.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/graphics_resources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

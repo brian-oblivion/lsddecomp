@@ -109,7 +109,7 @@ Seventh build. Levers, each measured: (1) the colour held in a `u32 c` read ONCE
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Takes `TimBlockSrcEntry *` (merged from the unit's Ent43068/Ent6F0B8 views); +0x0A is `clutH`, set to `mask` here, +0x0C `color`. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/graphics_resources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Takes `TimBlockSrcEntry *` (merged from the unit's Ent43068/Ent6F0B8 views); +0x0A is `clutH`, set to `mask` here, +0x0C `color`. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/tim_block_src.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/graphics_resources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Round 93 polish (charlie, track 7)
 

@@ -44,7 +44,7 @@
 #include "basic_class.h"
 #include "scene_node.h"
 #include "file_resource.h"
-#include "TimBlockSrc.h"
+#include "tim_block_src.h"
 #include "model_data.h"
 #include "Tod.h"
 #include "TodSet.h"

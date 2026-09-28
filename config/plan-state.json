@@ -1090,7 +1090,7 @@
         "gTimBlockSrcMethods": {
           "class": "TimBlockSrc",
           "date": "2026-09-25",
-          "header": "include/TimBlockSrc.h"
+          "header": "include/tim_block_src.h"
         },
         "gTimImageMethods": {
           "class": "TimImage",

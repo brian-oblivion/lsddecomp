@@ -158,7 +158,7 @@ rather than API.
   as literals (actor.h names 5-8); `New_TimBlockSrc(s32 name)` and
   `ModelData__ForwardScan*` take pointers as `s32`; the `+ 0x5C` at
   tmd_renderer.c:1194 is `offsetof(PolyDrawCtx, sxy) - sizeof(DVECTOR)`;
-  stale `unk2A` in TimBlockSrc.h/tile_map.h/tile_atlas.h (now `loadState`);
+  stale `unk2A` in tim_block_src.h/tile_map.h/tile_atlas.h (now `loadState`);
   scene_node.c's two mid-file banners and self-reference (merge leftovers);
   tmd_renderer.c opens with BasicClass/BMemPMgr helpers.
 - **world:** DreamSys `func_59590`, `func_59598`, `func_5ba20` (a get/set of

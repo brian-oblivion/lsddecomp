@@ -102,7 +102,7 @@ Twenty-ninth build (four families of levers, all needed together): (1) an `s16 s
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of +0x008. Fields now named: +0x2C `blockCount`, +0x30 `blocks`, +0x38 `sectorSize`, +0x3C `loaded`, +0x80 `failed`; each entry's +0x04..+0x0A the RECT `clutX`/`clutY`/`clutW`/`clutH` this ctor lays out (0, 0x1E0 + i * mask, 0x100, 1). The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/graphics_resources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of +0x008. Fields now named: +0x2C `blockCount`, +0x30 `blocks`, +0x38 `sectorSize`, +0x3C `loaded`, +0x80 `failed`; each entry's +0x04..+0x0A the RECT `clutX`/`clutY`/`clutW`/`clutH` this ctor lays out (0, 0x1E0 + i * mask, 0x100, 1). The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/tim_block_src.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/graphics_resources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Round 93 polish (charlie, track 7)
 

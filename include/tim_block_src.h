@@ -1,5 +1,5 @@
-#ifndef TIMBLOCKSRC_H
-#define TIMBLOCKSRC_H
+#ifndef TIM_BLOCK_SRC_H
+#define TIM_BLOCK_SRC_H
 
 #include "file_resource.h"
 #include "draw_system.h"

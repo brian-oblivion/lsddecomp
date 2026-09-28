@@ -56,4 +56,4 @@ First build. The three lb then three sb is whole-struct assignment of the 3 x s8
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of +0x080, now the `fadeEntry` slot; stores the colour into `entries[index].color` (`TimBlockSrcColor`, was the unit's `Vec3S8`). The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/graphics_resources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of +0x080, now the `fadeEntry` slot; stores the colour into `entries[index].color` (`TimBlockSrcColor`, was the unit's `Vec3S8`). The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/tim_block_src.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/graphics_resources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

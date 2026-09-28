@@ -21,7 +21,7 @@
  * PARENT BY CTOR CHAIN, NOT BY ID. The id 0x4F03 puts it under TimBlockSrc
  * (0xF03), but Tod__Tod's first call is GetActiveDataSourceMethods()->ctor,
  * as TimBlockSrc__TimBlockSrc's is: it is TimBlockSrc's sibling under
- * FileResource and carries none of TimBlockSrc's layout (include/TimBlockSrc.h).
+ * FileResource and carries none of TimBlockSrc's layout (include/tim_block_src.h).
  *
  * NO OWN FIELDS. The object is 0x2C bytes (New_Tod), FileResource's own size;
  * TodSet's is 0x2C too (New_TodSet). Everything a Tod reads is in the

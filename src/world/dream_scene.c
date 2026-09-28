@@ -40,7 +40,7 @@
 #include "dream_sys.h"
 #include "stage_map.h"
 #include "node_guarded_viewport.h"
-#include "TimBlockSrc.h"
+#include "tim_block_src.h"
 #include "wbgm.h"
 #include "lbd_file.h"
 #include "box_fill.h"
