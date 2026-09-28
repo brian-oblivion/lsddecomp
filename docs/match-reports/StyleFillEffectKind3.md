@@ -334,7 +334,7 @@ extern u8 gStyleDecorColorsB[];
 extern u8 gStyleSpawnOffsetX[];
 extern s32 gStyleGrid;
 extern s32 gStyleSpawnYChoice2;
-extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
+extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);
 extern s32 gStyleSpawnColors[];
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
@@ -349,7 +349,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     s32 *p;
     u8 **q;
 
-    SetupStyleSpawnParamsA(arg1, (void *) gStyleSpawnYChoice2);
+    SetupStyleSpawnParamsRandom(arg1, (void *) gStyleSpawnYChoice2);
     if (gStyleDecorVariant != 0 && gStyleDecorColors == (s32) gStyleDecorColorsB) {
         *(s32 *) gStyleSpawnOffsetX = 0xFFFF5000;
         gStyleSpawnOffsetY = -0x2000;
@@ -447,7 +447,7 @@ as `StyleFillEffectKind0`/`1`/`2`.
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_8008721C` | `gStyleKind3Colors` | A | 3 RGB triples stored as the params' color for kind 3. |
-| `D_80087174` | `gStyleSpawnRotations` | A | 7 Ratio16 triples, each (0/1, y/1, 0/1) with y = 0, 60, 120, 180, 230, -5 and (last) -3 with z 180: the params' rotation (SetupStyleSpawnParamsA/B pick one by `rand() % 7`); kinds 2 and 3 then take entry 0. |
+| `D_80087174` | `gStyleSpawnRotations` | A | 7 Ratio16 triples, each (0/1, y/1, 0/1) with y = 0, 60, 120, 180, 230, -5 and (last) -3 with z 180: the params' rotation (SetupStyleSpawnParamsRandom/B pick one by `rand() % 7`); kinds 2 and 3 then take entry 0. |
 | `0xFFFF5000`, `-0x2000`, `-0x7800` | `-45056`, `-8192`, `-30720` | -- | offsets, decimal per the base rule; a name would restate them. |
 | `0xC` | `offsetof(StyleEffectParams, rotation)` | A | the params block's address taken back from its rotation member. |
 

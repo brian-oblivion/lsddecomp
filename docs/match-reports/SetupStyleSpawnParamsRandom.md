@@ -1,4 +1,6 @@
-# SetupStyleSpawnParamsA -- MATCHED round 64, 110/110 words, ins 0 / del 0, length exact (0x1B8)
+# SetupStyleSpawnParamsRandom -- MATCHED round 64, 110/110 words, ins 0 / del 0, length exact (0x1B8)
+
+> Renamed from `SetupStyleSpawnParamsA` on 2026-09-28 (tools/rename.py). Address 0x80055258.
 
 > Renamed from `SetupStyleKind0Params` on 2026-09-23 (tools/rename.py). Address 0x80055258.
 
@@ -166,7 +168,7 @@ extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 gStyleSpawnModelLayout;
 
-void SetupStyleSpawnParamsA(void *arg0, void *arg1) {
+void SetupStyleSpawnParamsRandom(void *arg0, void *arg1) {
     if (arg1 == 0) {
         arg1 = (void *) gStyleSpawnYChoices[rand() & 3];
     }
@@ -278,7 +280,7 @@ practice. Confirmed here whole-image green with an already-matched sibling
 preprocessor awareness, so while iterating with the body live under `#if 1`
 and the `INCLUDE_ASM` parked in `#else`, it printed its "a full match means
 NOTHING" warning on a genuine 110/110. Harmless here because
-`build-and-verify.sh` went green and `nm` showed a real `T SetupStyleSpawnParamsA` in
+`build-and-verify.sh` went green and `nm` showed a real `T SetupStyleSpawnParamsRandom` in
 the object, but the warning is the exact opposite of reassuring at the moment
 you close a function. Reported, not acted on -- it is a tool heuristic, and
 the safe iteration form is `#if 1` / `#else` / `#endif` with the guard
@@ -299,7 +301,7 @@ removed on the way to commit, which is what shipped.
 
 ## Naming
 
-**`SetupStyleSpawnParamsA`, tier B.**
+**`SetupStyleSpawnParamsRandom`, tier B.**
 
 One of two function-pointer targets `StyleFillEffectKind0` dispatches
 through per iteration, selected when `gStyleDay % 7 != 0` (the more
@@ -337,5 +339,5 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * element type (`u8[]` vs `s32[]`) and the cast spelling (`*(s32 *) &D_X`
  * vs `D_X`) are both measurably INERT.  Do not restate this as "the
  * declared type" -- that was the first, wrong, reading.
- * See docs/match-reports/SetupStyleSpawnParamsA.md. */
+ * See docs/match-reports/SetupStyleSpawnParamsRandom.md. */
 ```

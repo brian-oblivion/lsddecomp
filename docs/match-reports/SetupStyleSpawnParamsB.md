@@ -14,7 +14,7 @@ shape rounds 46-48 recovered was already correct.**
 The inherited body did not rebuild at its recorded 25/87, for a reason that
 has nothing to do with this function: earlier in the same session I retyped
 the shared global `gStyleSpawnOffsetX` from `extern u8 gStyleSpawnOffsetX[]` to
-`extern s32 gStyleSpawnOffsetX` to close `SetupStyleSpawnParamsA`, and this body writes that
+`extern s32 gStyleSpawnOffsetX` to close `SetupStyleSpawnParamsRandom`, and this body writes that
 symbol too. So the first figure below is the inherited body under the
 already-changed declaration, and the second is the inherited body's own
 recorded state, which I recovered afterwards by experiment.
@@ -99,7 +99,7 @@ void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
 }
 ```
 
-**This is the idiom the matched sibling `SetupStyleSpawnParamsA`, two functions
+**This is the idiom the matched sibling `SetupStyleSpawnParamsRandom`, two functions
 earlier in the same unit, already used** -- inline `rand()` in every
 expression, no carrier local. Round 63's "check whether a sibling in the SAME
 function already uses the correct idiom" generalises to a sibling in the same
@@ -131,11 +131,11 @@ The `gStyleSpawnOffsetX` retype moved this function **25/87 -> 10/87** and 2 wor
 long -> 3 words long. Read at face value that is a regression, and the
 standing rule (`DECOMPILATION_LEARNINGS` 3d, "Levers do not commute: if a
 residue MOVES rather than SHRINKS, revert before the next") says revert it.
-I could not, because `SetupStyleSpawnParamsA` requires the scalar declaration. Then
+I could not, because `SetupStyleSpawnParamsRandom` requires the scalar declaration. Then
 deleting the local closed the function *with the retype still in place*,
 which makes it look as though the two levers combined.
 
-**They did not.** One build settles it: I parked `SetupStyleSpawnParamsA` back on
+**They did not.** One build settles it: I parked `SetupStyleSpawnParamsRandom` back on
 `INCLUDE_ASM` (so it contributes retail's own bytes at exact length and
 introduces no drift into this function's window), restored the array
 declaration and the `*(s32 *)` casts, and kept the no-local body. Result:
@@ -194,7 +194,7 @@ use.
   fix.
 - **Round 47 (bravo):** widened the signature to two dead `void *` params
   (`StyleFillEffectKind0` dispatches this through a function pointer shared with
-  `SetupStyleSpawnParamsA`, so the ABI slot is call-site-determined). Reproduced 25/87
+  `SetupStyleSpawnParamsRandom`, so the ABI slot is call-site-determined). Reproduced 25/87
   under the wider signature, confirming dead params cost nothing in the
   callee. **Correct and kept in the matched body.**
 - **Round 46 (alpha):** recovered the structure and every value. The four
@@ -213,7 +213,7 @@ use.
 
 The other function-pointer target `StyleFillEffectKind0` dispatches
 through (selected when `gStyleDay % 7 == 0`, the ~1/7 branch). Same
-scratch-global cluster as `SetupStyleSpawnParamsA`, different constants.
+scratch-global cluster as `SetupStyleSpawnParamsRandom`, different constants.
 MATCHED, 87/87, ins 0/del 0.
 
 ## Round 93 polish (delta, track 7)
@@ -225,7 +225,7 @@ MATCHED, 87/87, ins 0/del 0.
 | `D_8008732C` | `gStyleSpawnYChoice1` | A | the word at `gStyleSpawnYChoices[1]` (-0x2800), a separate splat symbol. |
 | `0xA000`, `0x800` | `40960`, `2048` | -- | offsets, decimal. |
 
-Parameters `(LongVec3 *pos, s32 offsetY)`, both unused (see SetupStyleSpawnParamsA); local `dayMod3`.
+Parameters `(LongVec3 *pos, s32 offsetY)`, both unused (see SetupStyleSpawnParamsRandom); local `dayMod3`.
 
 ### Comments moved here from src/world/ObjMStyleActor.c
 
@@ -240,13 +240,13 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * `rand`'s `$v0` into it and emitted `move $a1,$v0` after each `jal rand`
  * (two visible, a third word from the knock-on).  Deleting `r` and calling
  * `rand()` inline in each expression -- exactly the idiom the matched
- * sibling SetupStyleSpawnParamsA above already uses -- keeps the value in `$v0` and
+ * sibling SetupStyleSpawnParamsRandom above already uses -- keeps the value in `$v0` and
  * recolours the whole body to retail's.  `mod3` stays a local: it has two
  * genuine use points.  A permuter mutates a body but never deletes its
  * locals, which is why the 136367-iteration negative bounded the search and
  * not the function (round 63's LOCAL COUNT corollary).
  * The signature keeps round 47's two dead void* params: StyleFillEffectKind0
- * dispatches this through a function pointer shared with SetupStyleSpawnParamsA, so
+ * dispatches this through a function pointer shared with SetupStyleSpawnParamsRandom, so
  * the ABI slot is call-site-determined.  Dead params cost nothing here.
  * See docs/match-reports/SetupStyleSpawnParamsB.md. */
 ```

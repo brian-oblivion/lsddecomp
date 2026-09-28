@@ -1239,7 +1239,7 @@ void ApplyStyleDecorationIfSet(void) {
  *    from its reference point;
  *  - the effect slots: StyleEffect objects of kinds 0..3 (gStyleEffectSlots)
  *    built from one parameter block, gStyleSpawnOffsetX..gStyleSpawnColors,
- *    that StyleFillEffectKindN and SetupStyleSpawnParamsA/B fill in; each
+ *    that StyleFillEffectKindN and SetupStyleSpawnParamsRandom/B fill in; each
  *    tick updates them with the target position;
  *  - two positional sound cues (gStyleCueSlots, in gStyleCueSlotPool): a
  *    free slot claims the next record of the stage's cue list that lies
@@ -1580,13 +1580,13 @@ extern s32 gStyleSpawnTableIndex;
 /* The first word of the StyleEffectParams block every effect is built from
  * (gStyleSpawnOffsetX .. gStyleSpawnColors, separate symbols in the image). */
 extern s32 gStyleSpawnOffsetX;
-extern void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY);
+extern void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY);
 extern void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY);
 
 /* Fills `count` slots with kind-0 effects: a table index and scale for all
  * of them, an offset y (0: each setup picks one; a pick of 4 reads the word
  * after gStyleSpawnYChoices, as retail does), and per slot
- * SetupStyleSpawnParamsA, or B on every seventh day. Returns the next slot. */
+ * SetupStyleSpawnParamsRandom, or B on every seventh day. Returns the next slot. */
 StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
@@ -1600,7 +1600,7 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
     }
     setup = SetupStyleSpawnParamsB;
     if (gStyleDay % 7 != 0) {
-        setup = SetupStyleSpawnParamsA;
+        setup = SetupStyleSpawnParamsRandom;
     }
     for (i = 0; i < count; i++) {
         setup(pos, offsetY);
@@ -1623,7 +1623,7 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
     offsetY = gStyleSpawnYChoice2;
     gStyleSpawnScale = gStyleKind1Scale;
     for (i = 0; i < count; i++) {
-        SetupStyleSpawnParamsA(pos, offsetY);
+        SetupStyleSpawnParamsRandom(pos, offsetY);
         *slots =
             New_StyleEffect(1, (StyleEffectParams *)&gStyleSpawnOffsetX, (SceneNode *)gStyleGrid, pos);
         slots++;
@@ -1632,7 +1632,7 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
 }
 
 extern s32 gStyleSpawnYChoice2;
-extern void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY);
+extern void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY);
 extern s32 gStyleSpawnColors[];
 extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
@@ -1653,7 +1653,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     s32 *offsetZ;
     PtrBoxK3 *rotation;
 
-    SetupStyleSpawnParamsA(pos, gStyleSpawnYChoice2);
+    SetupStyleSpawnParamsRandom(pos, gStyleSpawnYChoice2);
     if (gStyleDecorVariant != 0 && gStyleDecorColors == gStyleDecorColorsB) {
         gStyleSpawnOffsetX = -45056;
         gStyleSpawnOffsetY = -8192;
@@ -1711,7 +1711,7 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
         altColor = 0;
     }
     color->v = altColor;
-    SetupStyleSpawnParamsA(pos, gStyleSpawnYChoice2);
+    SetupStyleSpawnParamsRandom(pos, gStyleSpawnYChoice2);
     rotation = &gStyleSpawnRotation;
     *rotation = gStyleSpawnRotations[0];
     gStyleSpawnTableIndex = rand() % 6;
@@ -1734,7 +1734,7 @@ extern s32 gStyleSpawnModelLayout;
  * and a model layout. `pos` is unused.
  * MATCHING: gStyleSpawnOffsetX is declared a scalar, not an array (an array
  * decay is kept in a saved register across the rand() calls). */
-void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY) {
+void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
     if (offsetY == 0) {
         offsetY = gStyleSpawnYChoices[rand() & 3];
     }

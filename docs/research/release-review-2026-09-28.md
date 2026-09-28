@@ -117,7 +117,7 @@ rather than API.
     and `s32` in its slots.
   - Code-suffixed method families: ObjM `EnterState4..A`,
     `CloseAndNotifyC/D`, `NotifyParentsCodeB`, TodActor `TickCallbackA/B/C`,
-    `TickStaircaseCase0..3`, `SetupStyleSpawnParamsA/B`,
+    `TickStaircaseCase0..3`, `SetupStyleSpawnParamsRandom/B`,
     `StyleEffect__ReleaseSpritesB`, numbered `NoOp2..5`.
 
 ## Track 10 `sony-code`

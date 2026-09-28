@@ -129,7 +129,7 @@ extern s32 gStyleSpawnYChoices[];
 extern u8 *gStyleSpawnScale;
 extern s32 gStyleSpawnTableIndex;
 extern u8 gStyleSpawnOffsetX[];
-extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* this unit, cold */
+extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);   /* this unit, cold */
 extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);   /* this unit, cold,
                                                          signature widened */
 extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3);
@@ -149,7 +149,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     }
     fp = SetupStyleSpawnParamsB;
     if (gStyleDay % 7 != 0) {
-        fp = SetupStyleSpawnParamsA;
+        fp = SetupStyleSpawnParamsRandom;
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
@@ -172,7 +172,7 @@ Every value confirmed directly off the raw bytes:
 - **A function pointer, not a branch, dispatches the per-iteration call.**
   `s3` is reused: first as the `%7` magic constant, then unconditionally
   loaded with `&SetupStyleSpawnParamsB` (filling the `mult`'s latency slot for free),
-  then conditionally overwritten to `&SetupStyleSpawnParamsA` if
+  then conditionally overwritten to `&SetupStyleSpawnParamsRandom` if
   `gStyleDay % 7 != 0`. This is the **same shared-dispatch idiom
   `TickStyle` uses via `ObjAB4C::slotE8`**, except here the two
   candidates are plain functions (not vtable slots), selected by a modulo
@@ -238,7 +238,7 @@ literal FIRST argument of `0`. That argument is confirmed (by reading
 `New_StyleEffect`'s own ctor chain, `ObjMStyleActor.c`) to become the new
 object's `kind` field -- so "Kind0" in the name is the literal tag value
 this function passes, not a guessed category. Selects which of two
-"spawn-parameter" setup functions (`SetupStyleSpawnParamsA`/`B`) to call each
+"spawn-parameter" setup functions (`SetupStyleSpawnParamsRandom`/`B`) to call each
 iteration via a `gStyleDay % 7` test. STALL, 93/99, whole-function
 3-register rotation; naming from mechanics, unaffected by match state.
 
@@ -252,11 +252,11 @@ iteration via a `gStyleDay % 7` test. STALL, 93/99, whole-function
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_8008E0A4`..`D_8008E0C0` | `gStyleSpawnOffsetX`, `...OffsetY`, `...OffsetZ`, `gStyleSpawnRotation`, `gStyleSpawnScale`, `gStyleSpawnModelLayout`, `gStyleSpawnTableIndex`, `gStyleSpawnColors` | A | the 0x24-byte block passed to New_StyleEffect as its `StyleEffectParams` (include/StyleEffect.h, which names each member: offset x/y/z, rotation, scale, modelChildLayout, tableIndex, color/altColor). Kept as separate symbols: SetupStyleSpawnParamsA's match depends on the scalar declarations. |
+| `D_8008E0A4`..`D_8008E0C0` | `gStyleSpawnOffsetX`, `...OffsetY`, `...OffsetZ`, `gStyleSpawnRotation`, `gStyleSpawnScale`, `gStyleSpawnModelLayout`, `gStyleSpawnTableIndex`, `gStyleSpawnColors` | A | the 0x24-byte block passed to New_StyleEffect as its `StyleEffectParams` (include/StyleEffect.h, which names each member: offset x/y/z, rotation, scale, modelChildLayout, tableIndex, color/altColor). Kept as separate symbols: SetupStyleSpawnParamsRandom's match depends on the scalar declarations. |
 | `D_800871C8` | `gStyleSpawnScales` | A | 5 Ratio16 triples, one picked by `rand() % 5` into the params' scale. |
-| `D_80087328` | `gStyleSpawnYChoices` | A | 4 words {-0x1800, -0x2800, -0x3800, -0x5000}: the offset-y values SetupStyleSpawnParamsA picks from. |
+| `D_80087328` | `gStyleSpawnYChoices` | A | 4 words {-0x1800, -0x2800, -0x3800, -0x5000}: the offset-y values SetupStyleSpawnParamsRandom picks from. |
 
-Note: the offset-y pick is `rand() % 5`, and 0 means "let SetupStyleSpawnParamsA choose"; index 4 reads one word past the 4-entry table (0x80087338, the next symbol, D_80087338: 0x0A0A0200). That is retail's behaviour, reproduced as written.
+Note: the offset-y pick is `rand() % 5`, and 0 means "let SetupStyleSpawnParamsRandom choose"; index 4 reads one word past the 4-entry table (0x80087338, the next symbol, D_80087338: 0x0A0A0200). That is retail's behaviour, reproduced as written.
 
 Locals: `slots`, `count`, `pos`, `offsetY`, `setup`.
 

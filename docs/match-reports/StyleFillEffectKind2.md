@@ -75,7 +75,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
         val = 0;
     }
     slot->v = val;
-    SetupStyleSpawnParamsA(arg1, (void *) gStyleSpawnYChoice2);
+    SetupStyleSpawnParamsRandom(arg1, (void *) gStyleSpawnYChoice2);
     q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     gStyleSpawnTableIndex = rand() % 6;
@@ -118,7 +118,7 @@ names/types USED -- one of the two levers was the parameter type.**
 
 Rebuilt the inherited body verbatim: `build exit=2`, no compile-error grep
 hits, **16/79 reproduced exactly**, and `build/lsdde.map` puts the next
-function `SetupStyleSpawnParamsA` at `0x80055254` against retail's `0x80055258`,
+function `SetupStyleSpawnParamsRandom` at `0x80055254` against retail's `0x80055258`,
 confirming the recorded "1 word short" precisely.
 
 **`insertions 10 / deletions 10`, positional skeleton diffs 59.** Round 48
@@ -388,7 +388,7 @@ extern s32 gStyleSpawnColors[];
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 gStyleSpawnTableIndex;
-extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
+extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);
 extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3);
 
 void **StyleFillEffectKind2(void **arg0, void *arg1) {
@@ -408,7 +408,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
         v0 = gStyleKind2AltColor;
     }
     *slot = v0;
-    SetupStyleSpawnParamsA(arg1, (void *) gStyleSpawnYChoice2);
+    SetupStyleSpawnParamsRandom(arg1, (void *) gStyleSpawnYChoice2);
     q = &gStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     randval = rand();
@@ -429,7 +429,7 @@ the correct signature regardless of whether the body is live.
 **1. "Retail caches an address in a callee-saved register" and "retail
 re-materialises it per access" are BOTH real shapes, they occur in adjacent
 functions in one unit, and the source spellings are different.** This session
-matched `SetupStyleSpawnParamsA` by STOPPING an address from being cached (an
+matched `SetupStyleSpawnParamsRandom` by STOPPING an address from being cached (an
 incomplete-array declaration was producing the cache) and improved
 `StyleFillEffectKind2` by FORCING one (a `u8 **q` local). Same unit, same symbol
 group, opposite directions. So neither is a rule about the codebase; read

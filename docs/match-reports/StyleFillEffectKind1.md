@@ -23,7 +23,7 @@ extern s32 gStyleSpawnYChoice2;             /* only element [0] read here */
 extern u8 gStyleKind1Scale[];            /* address only taken, never indexed */
 extern u8 gStyleSpawnOffsetX[];            /* address only taken, passed to New_X */
 extern u8 *gStyleSpawnScale;             /* set to &gStyleKind1Scale unconditionally */
-extern void *SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* forward decl, own unit, cold */
+extern void *SetupStyleSpawnParamsRandom(void *arg0, void *arg1);   /* forward decl, own unit, cold */
 extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3); /* ObjMStyleActor.c, ALREADY MATCHED */
 ```
 
@@ -33,7 +33,7 @@ an array -- if a sibling function later indexes `[1]`, retype there, not
 here (no other unit references any of these four symbols currently).
 `New_StyleEffect` is `ObjMStyleActor.c`'s already-matched `New_X`-style
 allocator (`void *(void*,void*,void*,void*)`), called cross-unit by
-prototype only. `SetupStyleSpawnParamsA` is one of this unit's own still-cold
+prototype only. `SetupStyleSpawnParamsRandom` is one of this unit's own still-cold
 functions (110w, queued later); its return value is discarded here (`jal`
 result overwritten before use), so the forward declaration's return type is
 unconstrained by this call site -- reconcile if its own definition needs a
@@ -49,7 +49,7 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
     val = gStyleSpawnYChoice2;
     gStyleSpawnScale = gStyleKind1Scale;
     for (i = 0; i < arg1; i++) {
-        SetupStyleSpawnParamsA(arg2, (void *) val);
+        SetupStyleSpawnParamsRandom(arg2, (void *) val);
         *arg0 = New_StyleEffect((void *) 1, gStyleSpawnOffsetX, (void *) gStyleGrid, arg2);
         arg0++;
     }
@@ -61,8 +61,8 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
 even when the call's return value is discarded
 
 First attempt read `gStyleSpawnYChoice2` directly inside the loop body
-(`SetupStyleSpawnParamsA(arg2, (void *) gStyleSpawnYChoice2)`), which is semantically identical
--- but GCC 2.6.3 can't prove `SetupStyleSpawnParamsA` doesn't write back to
+(`SetupStyleSpawnParamsRandom(arg2, (void *) gStyleSpawnYChoice2)`), which is semantically identical
+-- but GCC 2.6.3 can't prove `SetupStyleSpawnParamsRandom` doesn't write back to
 `gStyleSpawnYChoice2`, so it reloads the global from memory on every iteration
 (`lui`/`lw` inside the loop, one fewer callee-saved register overall: 39
 words instead of retail's 42). Retail hoists the read to a local

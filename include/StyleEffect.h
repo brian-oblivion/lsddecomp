@@ -22,7 +22,7 @@
  * several of kind 0, of kind 1 for variant 2, then one of kind 3 (variant 0)
  * or kind 2 (variant 2). `params` is one StyleEffectParams laid over the
  * separately-declared gStyleSpawnOffsetX .. gStyleSpawnColors, which the
- * fill functions and SetupStyleSpawnParamsA/B randomise before each build.
+ * fill functions and SetupStyleSpawnParamsRandom/B randomise before each build.
  * StyleUpdateEffectSlots runs every slot's update with the target position,
  * and StyleReleaseEffectSlots releases them.
  *
