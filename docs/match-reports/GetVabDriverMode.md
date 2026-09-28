@@ -78,7 +78,7 @@ itself) is not established, only that it's read/written alongside the mode.
 Identical in shape to `GetCdDriverMode`, its sibling on the previous line.
 
 **Callee evidence** (`0x8002C448`): the first instruction is `beqz a0,...`, so
-`$a0` is read before it is written. The definition in `src/PlacementGridVabSound.c`
+`$a0` is read before it is written. The definition in `src/sound/PlacementGridVabSound.c`
 (`s32 GetVabDriverMode(s32 *arg0)`) is right: one real argument, an optional
 out-pointer written only when non-NULL.
 

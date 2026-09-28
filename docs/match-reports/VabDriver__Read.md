@@ -19,7 +19,7 @@ Byte-exact, 2/2 words.
 Trivial leaf: `jr $ra; addu $v0,$zero,$zero`. This is `gVabDriverMethods`'s vtable
 slot +0x054 (confirmed with `tools/classtable.py gVabDriverMethods`), a class table
 that `tools/classtable.py --scan` recognises -- see the corrected header
-comment in `src/PlacementGridVabSound.c` for why this unit IS class-framework code,
+comment in `src/sound/PlacementGridVabSound.c` for why this unit IS class-framework code,
 contrary to the assignment's inherited "not class-framework" note (that
 finding belongs to the sibling slices' different neighbourhood, not this
 one).
@@ -44,7 +44,7 @@ that slice's own globals.
 Kept `func_8002C408`, tier C (superseded 2026-09-26, Track 4 below). The CLASS is now established (round 52:
 `gVabDriverMethods`, the generic driver-interface base class
 `VabStreamObj` chains its own ctor/close through when
-`gActiveDataSource == 0x23` -- see `src/PlacementGridVabSound.c`'s unit header
+`gActiveDataSource == 0x23` -- see `src/sound/PlacementGridVabSound.c`'s unit header
 comment), but this SLOT's own purpose within that interface is not: the
 body is `return 0;` and nothing in this unit calls the slot directly (only
 the vtable data references it). No positive evidence for what a caller

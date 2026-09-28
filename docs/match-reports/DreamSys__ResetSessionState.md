@@ -62,7 +62,7 @@ The constructor's last step (`DreamSys__DreamSys` returns
 `this->vt->DreamSys__ResetSessionState(this)`), and the only thing it does is put the
 object into its idle state: both tick callback slots NULLed directly (not via
 `DreamSys__SelectCallback80/98`), `*(s32 *)this->soundCueSet = 0` -- that word is
-`SoundCueSet::tag`, and `InitSoundCueSet` (src/PlacementGridVabSound.c, matched) refuses to
+`SoundCueSet::tag`, and `InitSoundCueSet` (src/sound/PlacementGridVabSound.c, matched) refuses to
 run unless it is 0, so this frees the cue set -- the three staircase-walk words
 `staircaseActive`/`staircaseMoveGate`/`staircaseTickFn` cleared, `unk_0x78` and
 `unk_0x924` cleared, and `SceneNode__UpdateRotation(this, 1, &ROTATION_YAW_180)`, an ABSOLUTE

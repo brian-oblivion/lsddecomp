@@ -35,7 +35,7 @@ matching CLAUDE.md's `SetActiveDataSourceDriverMode` prediction area for this un
 accessor-family shape.
 
 `SetVabDriverMode` is independently defined elsewhere
-(`src/PlacementGridVabSound.c`: `s32 SetVabDriverMode(s32 a, s32 b) { gVabDriverMode=a; gVabDriverModeArg=b; return 1; }`)
+(`src/sound/PlacementGridVabSound.c`: `s32 SetVabDriverMode(s32 a, s32 b) { gVabDriverMode=a; gVabDriverModeArg=b; return 1; }`)
 taking only **2** parameters, not 3. This unit's own local extern declares it
 with 3 (matching the call site's actual register usage: `a0`,`a1`,`a2` are
 all loaded before the `jalr`, since the alternate target `SetCdDriverMode` may

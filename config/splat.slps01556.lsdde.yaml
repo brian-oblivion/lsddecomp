@@ -789,7 +789,7 @@ segments:
       # Owns NO jump table (the 0xFD8 slot's seven jtbl blocks all fall
       # outside 0x8002BC40..0x8002C408), so unlike _b and _c it needs no
       # rodata attach.
-      - [0x1C92C, c, PlacementGridVabSound]     # 0x1C92C..0x1D508: code_179d8_d and _e, merged round 100 (track 8)
+      - [0x1C92C, c, sound/PlacementGridVabSound]     # 0x1C92C..0x1D508: code_179d8_d and _e, merged round 100 (track 8)
       # (carve history; merged into PlacementGridVabSound above, round 100)
       # code_179d8_e: functions 120..148 of the original, 0x1CC08..0x1D508
       # (29 functions).  Census 2026-09-04, three-grep screen per function:
