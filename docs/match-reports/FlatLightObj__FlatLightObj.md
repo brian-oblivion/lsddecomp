@@ -8,14 +8,14 @@ Verified: `./build-and-verify.sh` exit 0, `OK: build matches retail SLPS_015.56`
 
 ## What it does
 
-slot +0x008 (ctor): `GetBasicClassMethods()->ctor(self)`, install `Get_vtable_FlatLightObj()` as the method table, then call its own slot +0x040 with the light id. Matched first build.
+slot +0x008 (ctor): `GetBasicClassMethods()->ctor(self)`, install `GetFlatLightObjMethods()` as the method table, then call its own slot +0x040 with the light id. Matched first build.
 
 ## Source
 
 ```c
 void FlatLightObj__FlatLightObj(FlatLightObj *self, s32 lightId) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_FlatLightObj();
+    self->methods = GetFlatLightObjMethods();
     self->methods->setLightId(self, lightId);
 }
 ```

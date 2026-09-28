@@ -24,7 +24,7 @@ FlatLightObj *New_FlatLightObj(s32 lightId) {
 
     self = BMemPMgrAlloc(sizeof(FlatLightObj));
     if (self != NULL) {
-        Get_vtable_FlatLightObj()->ctor(self, lightId);
+        GetFlatLightObjMethods()->ctor(self, lightId);
         return self;
     }
     return NULL;
@@ -32,7 +32,7 @@ FlatLightObj *New_FlatLightObj(s32 lightId) {
 
 void FlatLightObj__FlatLightObj(FlatLightObj *self, s32 lightId) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_FlatLightObj();
+    self->methods = GetFlatLightObjMethods();
     self->methods->setLightId(self, lightId);
 }
 
@@ -57,6 +57,6 @@ void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir) {
     GsSetFlatLight(self->lightId, (GsF_LIGHT *)&self->light);
 }
 
-FlatLightObjMethods *Get_vtable_FlatLightObj(void) {
+FlatLightObjMethods *GetFlatLightObjMethods(void) {
     return &gFlatLightObjMethods;
 }

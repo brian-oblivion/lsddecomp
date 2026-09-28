@@ -1,4 +1,6 @@
-# Get_vtable_FlatLightObj -- MATCHED (4/4 words, round 81, alpha)
+# GetFlatLightObjMethods -- MATCHED (4/4 words, round 81, alpha)
+
+> Renamed from `Get_vtable_FlatLightObj` on 2026-09-28 (tools/rename.py). Address 0x80042a7c.
 
 > Renamed from `func_80042A7C` on 2026-09-25 (tools/rename.py). Address 0x80042a7c.
 
@@ -13,7 +15,7 @@ the class's table getter (`return &gFlatLightObjMethods;`), the `Get_vtable_*` s
 ## Source
 
 ```c
-FlatLightObjMethods *Get_vtable_FlatLightObj(void) {
+FlatLightObjMethods *GetFlatLightObjMethods(void) {
     return &gFlatLightObjMethods;
 }
 ```
@@ -26,4 +28,4 @@ No iteration needed.
 
 ## Naming
 
-`Get_vtable_FlatLightObj`, tier A. Pure getter, mechanics is its purpose by definition: returns `&gFlatLightObjMethods`. `Get_vtable_<Class>` convention (`Get_vtable_Pad`, `GetBasicClassMethods`), preferred here over the sibling `Get<Class>Methods` spelling seen elsewhere because `FlatLightObj` is a direct BasicClass child like `Pad`.
+`GetFlatLightObjMethods`, tier A. Pure getter, mechanics is its purpose by definition: returns `&gFlatLightObjMethods`. `Get_vtable_<Class>` convention (`Get_vtable_Pad`, `GetBasicClassMethods`), preferred here over the sibling `Get<Class>Methods` spelling seen elsewhere because `FlatLightObj` is a direct BasicClass child like `Pad`.
