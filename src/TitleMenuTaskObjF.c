@@ -45,6 +45,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <strings.h>
 #include "class_3bb8c.h"
 #include "DreamSys.h"
 #include "SceneNode.h"
@@ -65,6 +66,7 @@
 #include "ScreenSprite.h"
 #include "TextEntry.h"
 #include "ItemList.h"
+#include "BMemPMgr.h"
 
 NodeGuardedViewport *New_NodeGuardedViewport(void) {
     NodeGuardedViewport *self;

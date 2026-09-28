@@ -32,45 +32,6 @@
  * reading of the same name in any of them would collide.
  */
 
-/* ---- TaskObjF ---------------------------------------------------- */
-
-/* The kernel event calls TaskObjF's event methods make (OpenEvent,
- * EnableEvent, DisableEvent, TestEvent; Sony's libapi) are declared in the
- * units that call them. */
-
-/* Per TaskObjF::events slot: the event spec TaskObjF__OpenEvents passes to
- * OpenEvent, and the value WaitForReadyEvent returns for that slot.
- * Unsized: only the four slots are read. */
-extern s32 gCardEventSpecs[];
-
-/* Loops until one of `count` events tests ready (TestEvent) and returns its
- * gCardEventSpecs entry. TaskObjF__WaitForReadyEvent passes TaskObjF::events. */
-extern s32 WaitForReadyEvent(s32 *arr, s32 count);
-
-/* Returns a pointer, which TaskObjF__FreeUnusedBuffers stores back into the
- * freed slot. */
-extern void *BMemPMgrFree(void *ptr);
-
-/* A 6-byte memory-card device name, "bu00:" or "bu10:" (the BIOS names of
- * the two card slots). BuildMemcardPath copies one as a whole struct.
- * MATCHING: all-s8 members (alignment 1) make that copy retail's unaligned
- * lwl/lwr plus byte stores. */
-typedef struct McDevicePath {
-    s8 b0, b1, b2, b3, b4, b5;
-} McDevicePath;
-
-extern McDevicePath gMcDevicePath1; /* "bu10:" */
-extern McDevicePath gMcDevicePath0; /* "bu00:" */
-
-/* The game's own strcat (src/GameApplicationFileResource.c). */
-extern char *strcat(char *dest, char *src);
-
-/* Game code (src/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it
- * around its retry loop, and with (arg, 0) when the loop gives up. The BIOS
- * file calls (open, read, lseek, close, delete; Sony's libapi) are declared
- * in the units that call them. */
-extern s32 StampSaveTitleFileLetter(char *titleText, char *fileName);
-
 /* ---- ObjM -------------------------------------------------------- */
 
 /* ObjM::styleConfig's pointee (include/ObjM.h): the day's scene style, a
