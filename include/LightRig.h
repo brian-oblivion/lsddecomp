@@ -6,7 +6,7 @@
 /*
  * LightRig -- a scene node that owns the flat lights and the ambient colour
  * (class id 0x14, method table gLightRigMethods): SceneNode's subclass.
- * Methods in src/graphics/Sprite.c. The name is for what the class's own methods
+ * Methods in src/graphics/sprite.c. The name is for what the class's own methods
  * do, and the evidence is this:
  *  - The ctor makes three FlatLightObj children (New_FlatLightObj(0), (1),
  *    (2): one Psy-Q flat light each, set through GsSetFlatLight; src/

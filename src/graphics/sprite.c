@@ -1,7 +1,7 @@
 /*
  * The sprite classes, and three small classes beside them.
  *
- * Sprites (include/Sprite.h and its subclasses' headers): Sprite (class id
+ * Sprites (include/sprite.h and its subclasses' headers): Sprite (class id
  * 0x44) is a SceneNode that draws an embedded GsSPRITE; ScreenSprite
  * (0x144) places it in screen space with a position and a pivot anchor;
  * CharSprite (0x1144) is one character of an 8x8 font, its texture cell
@@ -191,7 +191,7 @@ Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *resetArg, s32
 
 /* Sprite's reset (+0x040) as its ctor calls it: with all five ctor
  * arguments, returning what the ctor returns. The slot is SceneNode's, typed
- * without them (Sprite.h, "Not settled"), and Sprite__Reset reads the first
+ * without them (sprite.h, "Not settled"), and Sprite__Reset reads the first
  * three. Local, where CharSpriteResetFn and VariantSpriteResetFn sit in their
  * headers, because only this ctor calls through it. */
 typedef void *(*SpriteResetFn)(Sprite *self, void *texture, s32 abr, SpriteRect *rect,

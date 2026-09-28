@@ -8,7 +8,7 @@
  * all of it to Sony's GsSetFlatLight under the object's light id, so a light
  * is pushed to libgs on every change. The copy is a FlatLightParams, Sony's
  * GsF_LIGHT layout with r,g,b grouped as one struct, hence the casts at the
- * two calls. LightRig (src/graphics/Sprite.c) creates the three the game uses, light
+ * two calls. LightRig (src/graphics/sprite.c) creates the three the game uses, light
  * ids 0, 1 and 2.
  */
 #include "common.h"

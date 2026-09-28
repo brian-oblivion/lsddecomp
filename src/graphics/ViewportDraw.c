@@ -43,7 +43,7 @@
 #include "GridCell.h"
 #include "BgLayer.h"
 #include "BoxFill.h"
-#include "Sprite.h"
+#include "sprite.h"
 #include "ScreenSprite.h"
 #include "Viewport.h"
 #include "TmdRenderer.h"

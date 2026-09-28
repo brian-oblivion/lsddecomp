@@ -8,7 +8,7 @@
  * direct BasicClass subclass (its ctor calls GetBasicClassMethods()->ctor
  * first; `classtable.py gFrameClockMethods --vs gBasicClassMethods` overrides the
  * ctor, finalize, removeParentRef and notifyParents and adds seven slots).
- * Methods in src/graphics/Sprite.c. No class derives from it.
+ * Methods in src/graphics/sprite.c. No class derives from it.
  *
  * A per-frame clock that its parents listen to. Each tick (+0x044) sends
  * notifyParents(self, event) with event 2 (running: frameCount += 1 first),

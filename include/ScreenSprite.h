@@ -1,12 +1,12 @@
 #ifndef SCREENSPRITE_H
 #define SCREENSPRITE_H
 
-#include "Sprite.h"
+#include "sprite.h"
 
 /*
  * ScreenSprite -- the sprite placed in screen space (class id 0x144, method
  * table gScreenSpriteMethods): Sprite's direct subclass, adding a screen
- * position and a pivot anchor. Methods in src/graphics/Sprite.c. The name is for
+ * position and a pivot anchor. Methods in src/graphics/sprite.c. The name is for
  * what the class does, and the evidence is this:
  *  - Viewport__DrawNode (ViewportDraw.c) takes a separate path for
  *    `(tag & 0xFFF) == 0x144`, i.e. this class and everything below it: the

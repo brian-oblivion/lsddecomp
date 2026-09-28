@@ -4,12 +4,12 @@
 
 > Renamed from `func_80041D18` on 2026-09-25 (tools/rename.py). Address 0x80041d18.
 
-Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gScreenSpriteMethods slot +0x008 (ctor) (`tools/classtable.py`).
 - **What:** Sprite's ctor through `GetSpriteMethods()` with (self, texture, abr 0, rect, arg4 NULL, arg3) -- the two stack words are 0 and the caller's fourth argument -- then installs `GetScreenSpriteMethods()`'s table and calls its reset (+0x040, the empty ScreenSprite__Reset) with self only.
 - **Result:** byte-exact; 35/35 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
-- **Types:** typed through the UNIFIED `Sprite`/`SpriteMethods` (include/Sprite.h), unchanged.
+- **Types:** typed through the UNIFIED `Sprite`/`SpriteMethods` (include/sprite.h), unchanged.
 
 ## Source
 

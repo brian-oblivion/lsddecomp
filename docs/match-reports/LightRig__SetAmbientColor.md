@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004283C` on 2026-09-25 (tools/rename.py). Address 0x8004283c.
 
-Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gLightRigMethods slot +0x0BC (`tools/classtable.py`).
 - **What:** Sets the 3-byte ambient colour at +0x050 from `*rgb`; when the third argument is non-zero it first swaps (old colour written back into `*rgb` via a stack temp). Then `GsSetAmbient(r << 4, g << 4, b << 4)` read back unsigned (`lbu`).
@@ -36,7 +36,7 @@ void LightRig__SetAmbientColor(LightRig *self, ColorRgb *rgb, s32 swap) {
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__SetAmbientColor`, tier A: slot +0x0BC, named `setAmbientColor` in the header. `self` is `LightRig *` (was `D_8006EFACObj`); the colour is `ColorRgb`, include/LightRig.h's own all-s8 3-byte colour (was Sprite.h's `ColorRgb`, the same shape: the lb,lb,lb/sb,sb,sb copies are unchanged). The Source block above is the unified spelling. Image byte-identical.
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__SetAmbientColor`, tier A: slot +0x0BC, named `setAmbientColor` in the header. `self` is `LightRig *` (was `D_8006EFACObj`); the colour is `ColorRgb`, include/LightRig.h's own all-s8 3-byte colour (was sprite.h's `ColorRgb`, the same shape: the lb,lb,lb/sb,sb,sb copies are unchanged). The Source block above is the unified spelling. Image byte-identical.
 
 ## Track 7 (round 99, charlie)
 

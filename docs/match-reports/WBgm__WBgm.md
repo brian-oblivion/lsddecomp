@@ -30,7 +30,7 @@ this pass started). Recorded as proposals for the head to apply with
   child of that singleton for lifecycle notification -- the same pattern
   `DayTaskStageMap.c` and `TimImage.c` use it for. No WBgm-specific evidence for
   its own name; not proposing one.
-- `New_RequestedFile` (defined `src/graphics/Sprite.c`, an un-matched `INCLUDE_ASM`
+- `New_RequestedFile` (defined `src/graphics/sprite.c`, an un-matched `INCLUDE_ASM`
   stall, signature `SeqData *New_RequestedFile(s32 arg)`): the only function that
   produces a `SeqData` object (the +0x10 child this unit reads `addr`/`loaded`
   from). A name like `GetSeqData`/`LoadSeqData` is plausible from this call

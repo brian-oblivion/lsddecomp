@@ -1,10 +1,10 @@
 #ifndef VARIANTSPRITE_H
 #define VARIANTSPRITE_H
 
-#include "Sprite.h"
+#include "sprite.h"
 
 /*
- * VariantSprite -- a world-space sprite (Sprite, include/Sprite.h) that comes
+ * VariantSprite -- a world-space sprite (Sprite, include/sprite.h) that comes
  * in two variants, and the variant is the whole of what it adds: `variant`,
  * 0 or 1, picks the texture cell the Sprite ctor binds (sVariantSpriteCells,
  * two adjacent 16x16 cells) and the CLUT the reset slot then points the

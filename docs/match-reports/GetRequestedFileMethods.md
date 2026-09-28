@@ -6,7 +6,7 @@
 
 > Renamed from `func_800423F0` on 2026-09-25 (tools/rename.py). Address 0x800423f0.
 
-Round 82, runner alpha (second re-staffed slot of the round). Unit `src/graphics/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (second re-staffed slot of the round). Unit `src/graphics/sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table (`tools/classtable.py`).
 - **What:** Returns the gRequestedFileMethods method table.
@@ -34,7 +34,7 @@ unit-local views `D_8006EED8Obj`/`D_8006EED8Methods` and the single-slot cast
 views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
 `CtorArg1Methods_322b4` are gone; `GetActiveDataSourceMethods` is declared
 `FileResourceMethods *`. The Source block above is the round-82 text; the live
-body in `src/graphics/Sprite.c` is byte-identical.
+body in `src/graphics/sprite.c` is byte-identical.
 
 Renamed from `Get_vtable_D8006EED8` with rename.py (the getter
 convention); the table `D_8006EED8` is `gRequestedFileMethods` (rename.py).

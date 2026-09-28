@@ -124,7 +124,7 @@ The slot keeps SceneNode's type; the ctor calls this through
 `VariantSpriteResetFn` because it passes the variant. Return type `void` (the
 merge's +0x040 CONFLICT: the old `void *` was the ctor's local reading; see
 `VariantSprite__VariantSprite`'s report). The local view's `spriteClutX/Y` are
-now `sprite.cx` / `sprite.cy` (Sprite.h's SpriteGs, the same s16 at
+now `sprite.cx` / `sprite.cy` (sprite.h's SpriteGs, the same s16 at
 +0x074 / +0x076). Byte-identical.
 
 ## Track 6 (2026-09-26, round 93, bravo)

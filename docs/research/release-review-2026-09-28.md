@@ -52,7 +52,7 @@ rather than API.
   `IsStyleVariantEven` `bool` vs `s32`; `ReleaseBasicClassArray` in Task.h:32
   `(void *, void *)` vs `(BasicClass **, s32)` at TmdRenderer.c:86 (plus three
   `void **` spellings); `GetActiveDataSourceMethods` local in 4 files;
-  `GetSetBitField` duplicated (Sprite.c:41, Task.h:36 vs scene_node.h:216);
+  `GetSetBitField` duplicated (sprite.c:41, Task.h:36 vs scene_node.h:216);
   `ApplyMatrixToLVArray` extern at ViewportDraw.c:62 though scene_node.h is
   included; `sHitHeightGate` declared twice in scene_node.c. cd_driver.c
   re-declares its own functions two or three times (55/60/794/795, 58/463/907,
@@ -228,9 +228,9 @@ reads them, so nothing names them).
   field lists (`*_FIELDS`) need `MACRO_EXPANSION` in the Doxyfile.
 - Process text to move out of headers (to the .c as one `MATCHING:` line,
   or to the report): register and ABI notes (`$a0`-`$v0`) in scene_node.h,
-  TaskCore.h, TextEntry.h, TextRow.h, TileAtlas.h, TileMap.h, Sprite.h,
+  TaskCore.h, TextEntry.h, TextRow.h, TileAtlas.h, TileMap.h, sprite.h,
   Task.h, ItemList.h, StreamTask.h; lwl/lwr and "retail reloads" in
-  StageMap.h, TitleMenu.h, TaskObjF.h, TmdModel.h, Sprite.h, StyleEffect.h,
+  StageMap.h, TitleMenu.h, TaskObjF.h, TmdModel.h, sprite.h, StyleEffect.h,
   Viewport.h, MoviePlayer.h, GraphRoom.h, LbdFile.h, common.h; GCC and splat
   notes in entity.h:46-51, 102-107, 148-153; about 120 lines in gte.h; 32
   pointers at `tools/` commands and `docs/` files; "(no code)" jargon (8).

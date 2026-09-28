@@ -20,7 +20,7 @@
  * copy needs;
  * src/graphics/flat_light_obj.c takes GsSetFlatLight from <libgs.h> and casts to GsF_LIGHT *.
  *
- * Who holds one: LightRig__LightRig (src/graphics/Sprite.c, include/LightRig.h)
+ * Who holds one: LightRig__LightRig (src/graphics/sprite.c, include/LightRig.h)
  * makes three with New_FlatLightObj(0), (1), (2), keeps them in
  * LightRig::lights and adds each as a child; LightRig__Finalize releases
  * them. The one caller of setColor (+0x044) and setDirection (+0x048) is

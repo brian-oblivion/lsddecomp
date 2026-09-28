@@ -4,7 +4,7 @@
 
 > Renamed from `func_800426E4` on 2026-09-25 (tools/rename.py). Address 0x800426e4.
 
-Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gLightRigMethods slot +0x008 (ctor) (`tools/classtable.py`).
 - **What:** SceneNode ctor via `GetSceneNodeMethods()`, installs `GetLightRigMethods()`'s table, creates `New_FlatLightObj(0..2)` into +0x044..+0x04C and adds each as a child (slot +0x010), then calls reset (+0x040).

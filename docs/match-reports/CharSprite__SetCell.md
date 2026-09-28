@@ -4,7 +4,7 @@
 
 > Renamed from `func_80041BDC` on 2026-09-25 (tools/rename.py). Address 0x80041bdc.
 
-Round 82, runner alpha (third re-staffed slot of the round). Unit `src/graphics/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (third re-staffed slot of the round). Unit `src/graphics/sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** gCharSpriteMethods slot +0x0C4 (`tools/classtable.py`).
 - **What:** Stores the `u8` cell index at +0x0A8, has `GetCellRect` fill a 12-byte `CellRect_322b4` local at sp+0x10, and copies its low bytes of `u`/`v` into the GsSPRITE u/v at +0x072/+0x073 (`lbu` of a `u16` field narrowed by the `u8` store).
@@ -27,7 +27,7 @@ void CharSprite__SetCell(CharSprite *self, u8 cell) {
 
 ## Track 4 (2026-09-25, round 82, alpha)
 
-`CellRect_322b4` became `SpriteRect` (include/Sprite.h): the same 12-byte {u16 u, v; s32 w, h} cell Sprite__Reset copies into Sprite.rect. This function belongs to D_8006EC74 (a Sprite subclass, since round 86 CharSprite) and keeps its unit-local `SpriteView_322b4` self type. The the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
+`CellRect_322b4` became `SpriteRect` (include/sprite.h): the same 12-byte {u16 u, v; s32 w, h} cell Sprite__Reset copies into Sprite.rect. This function belongs to D_8006EC74 (a Sprite subclass, since round 86 CharSprite) and keeps its unit-local `SpriteView_322b4` self type. The the class is unified as `Sprite` in `include/sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
 
 ## Naming
 

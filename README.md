@@ -147,7 +147,7 @@ Read each named class's header first; its banner points to the units.
   `SortTmdObject` (`src/graphics/TmdRenderer.c`) turns it into GPU primitives.
   `Viewport` (`src/app/Task.c`, its draw pass in `src/graphics/ViewportDraw.c`)
   renders a scene through libgs;
-  `FrameClock` (`src/graphics/Sprite.c`) is the per-frame tick objects listen to; `Pad` (`src/app/pad.c`)
+  `FrameClock` (`src/graphics/sprite.c`) is the per-frame tick objects listen to; `Pad` (`src/app/pad.c`)
   turns the controller into button events; `DrawSystem` (`src/graphics/draw_system.c`)
   owns the screen and the VSync loop.
 - **The dream.** `DreamSys` (`src/world/dream_sys.c`) is the dream in progress: the
@@ -169,7 +169,7 @@ Read each named class's header first; its banner points to the units.
   `src/world/ObjMStyleActor.c`) and `TitleMenu`
   (`src/ui/TitleMenuTaskObjF.c`), the START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE
   menu. `TimedTask`, IntermediateBase's other subclass, is the base of
-  `DayTask` and `ObjM`. The 2D pieces are `Sprite` and its subclasses (`src/graphics/Sprite.c`,
+  `DayTask` and `ObjM`. The 2D pieces are `Sprite` and its subclasses (`src/graphics/sprite.c`,
   down to `TextRow`), `BoxFill` and `FadeBox` (`src/ui/screen_widgets.c`) and `TextEntry`
   (`src/ui/TextEntryItemList.c`).
 - **Memory-card saves.** `TitleMenu` owns a `TaskObjF`, the save/load
