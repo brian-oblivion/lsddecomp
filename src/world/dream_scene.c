@@ -2401,9 +2401,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
         slot = self->modelChildren;
         self->methods->updateRotation(self, 0, sSpinRotStep);
         i = 0;
-        /* MATCHING: the guard reads the step from the table and the pointer
-         * is taken only here, after the call; either held earlier in a
-         * local swaps two registers. */
+        /* MATCHING: the step's pointer is taken here, after the call; held earlier, two registers swap */
         stepZ = &sModelChildDriftZ[tableIndex];
         extraZ = 0;
         for (; i < ARRAY_COUNT(self->modelChildren); i++) {
@@ -2755,22 +2753,13 @@ void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
  * the base table gActorMethods, +0x0C8..+0x0EC), and VariantSprite's
  * allocator and ctor.
  *
- *  - Local-axis moves. Actor__MoveLocalX/Y put `val` into one component of
- *    the local move vector sActorLocalMove, apply it through
- *    addLocalTranslation and clear it again (Actor__MoveAlongLocalAxis;
- *    MoveLocalZ is in the previous section).
- *  - Move, else find a link. Actor__MoveLocalZOrFindLink/XOrFindLink clear
- *    linkTarget and move; when the move set no linkTarget,
- *    Actor__FindNearbyLink searches the StageMap grid round the actor's
- *    position for a GridCell whose model a vertical ray hits
- *    (BuildLinkQueries, ScanLinkCandidates, ScanGridWindow,
- *    AcceptGridElem), links to it and moves onto the hit.
- *  - The link-command pair (Actor__OnActorLinkCommand,
- *    Actor__OnGridCellLinkCommand): SceneNode's dispatchLinkCommand and,
- *    for an Actor sender's events 5..8, tryAttachNearby.
- *  - Actor__SetLastOffsetValue/SetPendingExtra and GetActorMethods.
- *  - New_VariantSprite and VariantSprite__VariantSprite, of an unrelated
- *    class (include/variant_sprite.h) that happens to follow in ROM.
+ * The link search: Actor__FindNearbyLink asks the StageMap grid which cell
+ * holds the Actor's position, BuildLinkQueries turns it into up to three
+ * cell windows, ScanLinkCandidates and ScanGridWindow walk them, and
+ * AcceptGridElem casts a vertical ray at each cell's model.
+ *
+ * New_VariantSprite and VariantSprite__VariantSprite are of an unrelated
+ * class (include/variant_sprite.h) that happens to follow in ROM.
  */
 
 /* The local move vector's x and y (s16; the z, sActorLocalMoveZ, is the next

@@ -34,3 +34,24 @@ carry `@see` the occupant; the command still answers the question:
  * +0x038 OnNotify; `tools/classtable.py gItemListMethods --vs gBasicClassMethods`),
  * then this class's own. +0x064..+0x078 are NULL in the table. */
 ```
+
+`include/actor.h`, the class banner and the comment above ACTOR_SLOTS:
+
+```c
+ * Three classes derive from it directly (`typeviews.py --tree`): TodActor
+```
+
+```c
+/* Occupants in gActorMethods named at each slot; `tools/classtable.py
+ * <subclass table> --vs gActorMethods` lists a subclass's overrides. The
+```
+
+### Addresses
+
+`include/actor.h`'s class banner placed the local move vector by address
+(the low halves of the vram addresses of sActorLocalMove[0], [1] and
+sActorLocalMoveZ); the header now names the symbol only:
+
+```c
+ * s16 vector at sActorLocalMove (x at ABA4, y at ABA6, z at ABA8), apply it through
+```

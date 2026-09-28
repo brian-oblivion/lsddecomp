@@ -383,3 +383,10 @@ now one `MATCHING:` line there and one above each of the four definitions:
 > calls below pass a second, dead argument that retail loads, so
 > include/style_effect.h declares them without a prototype. NoOpIgnoreArgs
 > (next section, empty) is declared the same way here.
+
+From `src/world/dream_scene.c`, the comment above `stepZ = &sModelChildDriftZ[tableIndex];`
+(now one `MATCHING:` line):
+
+> MATCHING: the guard reads the step from the table and the pointer
+> is taken only here, after the call; either held earlier in a
+> local swaps two registers.
