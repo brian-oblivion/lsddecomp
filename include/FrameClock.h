@@ -12,7 +12,7 @@
  *
  * A per-frame clock that its parents listen to. Each tick (+0x044) sends
  * notifyParents(self, event) with event 2 (running: frameCount += 1 first),
- * 3 (paused: not counted) or 4 (flag14 set: not counted, takes precedence).
+ * 3 (paused: not counted) or 4 (stopped: not counted, takes precedence; only reset clears it).
  * Its tick comes from the DrawSystem's per-VSync event 2
  * (include/DrawSystem.h): IntermediateBase__Init (src/app/Task.c) keeps
  * one at +0x010 (initArgs->unk8, or New_FrameClock()), adds it as a child of
@@ -27,7 +27,7 @@
  * `paused` is named from ObjM (src/world/ObjMStyleActor.c): ObjM__AdvancePauseSetup
  * calls +0x04C pause on its +0x010 FrameClock in the same step as WBgm__Pause
  * on its WBgm (the same slot, +0x04C), and ObjM__TeardownPauseOverlay calls
- * +0x050 resume beside WBgm__Resume. What sets flag14 (+0x058) is not found
+ * +0x050 resume beside WBgm__Resume. What calls stop (+0x058) is not found
  * in C: no caller reaches the slot through a field this project has typed.
  *
  * removeParentRef and notifyParents are overridden only to keep
@@ -44,7 +44,7 @@ typedef struct FrameClockMethods FrameClockMethods;
 enum FrameClockEvent {
     FRAMECLOCK_EVENT_RUNNING = 2, /* counted: frameCount += 1 first */
     FRAMECLOCK_EVENT_PAUSED = 3,  /* paused set: not counted */
-    FRAMECLOCK_EVENT_FLAG14 = 4   /* flag14 set: not counted, takes precedence */
+    FRAMECLOCK_EVENT_STOPPED = 4  /* stopped set: not counted, takes precedence */
 };
 
 /* FrameClock's class id (gFrameClockMethods word +0x000). A single nibble,
@@ -60,15 +60,15 @@ struct FrameClockMethods {
     /* +0x048 */ s32 (*getFrameCount)(FrameClock *self); /* FrameClock__GetFrameCount */
     /* +0x04C */ void (*pause)(FrameClock *self); /* FrameClock__Pause: ObjM__AdvancePauseSetup */
     /* +0x050 */ void (*resume)(FrameClock *self); /* FrameClock__Resume: ObjM__TeardownPauseOverlay */
-    /* +0x054 */ s32 (*isPaused)(FrameClock *self);   /* FrameClock__IsPaused */
-    /* +0x058 */ void (*setFlag14)(FrameClock *self); /* FrameClock__Stop: ticks then send event 4 */
+    /* +0x054 */ s32 (*isPaused)(FrameClock *self); /* FrameClock__IsPaused */
+    /* +0x058 */ void (*stop)(FrameClock *self); /* FrameClock__Stop: ticks then send event 4 until reset */
 };
 
 struct FrameClock {
     BASICCLASS_FIELDS(FrameClockMethods);
-    /* +0x00C */ s32 frameCount; /* ticks while neither paused nor flag14; reset sets it */
+    /* +0x00C */ s32 frameCount; /* ticks while neither paused nor stopped; reset sets it */
     /* +0x010 */ s32 paused;     /* pause 1, resume 0, reset 0: tick sends 3 and does not count */
-    /* +0x014 */ s32 flag14;     /* setFlag14 1, reset 0: tick sends 4 and does not count */
+    /* +0x014 */ s32 stopped;    /* stop 1, reset 0: tick sends 4 and does not count */
     /* +0x018 */ BasicClassListNode *parentCursor; /* notifyParents' walk over parentRefs; removeParentRef steps it past a removed parent */
 }; /* 0x1C bytes: New_FrameClock */
 

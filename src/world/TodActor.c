@@ -249,7 +249,7 @@ void TodActor__Update(TodActor *self, void *sender, s32 event) {
     if (event == FRAMECLOCK_EVENT_RUNNING) {
         self->methods->tick(self);
     }
-    if (event == FRAMECLOCK_EVENT_FLAG14) {
+    if (event == FRAMECLOCK_EVENT_STOPPED) {
         self->methods->release(self);
     }
 }

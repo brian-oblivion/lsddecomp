@@ -381,18 +381,18 @@ void FrameClock__NotifyParents(FrameClock *self, s32 event) {
  * flags and the cursor. */
 void FrameClock__Reset(FrameClock *self, s32 frameCount) {
     self->frameCount = frameCount;
-    self->flag14 = 0;
+    self->stopped = 0;
     self->paused = 0;
     self->parentCursor = 0;
 }
 
-/* gFrameClockMethods slot +0x044 (tick): notify FLAG14 if flag14 is set, else
+/* gFrameClockMethods slot +0x044 (tick): notify STOPPED if stopped is set, else
  * PAUSED if paused, else count the frame and notify RUNNING. */
 void FrameClock__Tick(FrameClock *self) {
     s32 event;
 
-    if (self->flag14 != 0) {
-        event = FRAMECLOCK_EVENT_FLAG14;
+    if (self->stopped != 0) {
+        event = FRAMECLOCK_EVENT_STOPPED;
     } else if (self->paused != 0) {
         event = FRAMECLOCK_EVENT_PAUSED;
     } else {
@@ -424,7 +424,7 @@ s32 FrameClock__IsPaused(FrameClock *self) {
 
 /* gFrameClockMethods slot +0x058. */
 void FrameClock__Stop(FrameClock *self) {
-    self->flag14 = 1;
+    self->stopped = 1;
 }
 
 /* Returns the gFrameClockMethods method table. */
