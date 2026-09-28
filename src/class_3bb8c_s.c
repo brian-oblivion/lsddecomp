@@ -15,15 +15,16 @@
 #include "Actor.h"
 #include "VariantSprite.h"
 #include "StyleEffect.h"
+#include "Viewport.h"
 
 /* The class and its children: include/StyleEffect.h (the owner),
  * include/Actor.h (modelChildren) and include/VariantSprite.h (sprites). */
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 gSpriteShiftX[];
-extern s32 gSpriteScaleLarge[];
-extern s32 gSpriteScaleHalf[];
-extern s32 gSpriteScaleSmall[];
+extern Ratio16 gSpriteScaleLarge[3];
+extern Ratio16 gSpriteScaleHalf[3];
+extern Ratio16 gSpriteScaleSmall[3];
 extern LongVec3 gSpriteShiftScratch;
 
 void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b);
@@ -72,7 +73,7 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
     LongVec3 local;
     s32 state;
 
-    gStyleEffectBaseViewY = *(s32 *)((u8 *)gStyleEffectViewport + 0x18);
+    gStyleEffectBaseViewY = ((Viewport *)gStyleEffectViewport)->refView.vp.y;
     AddVec3(&local, pos, &self->params.offset);
     AttachWithRotScale((Actor *)self, parent, &local, self->params.rotation, self->params.scale);
 
@@ -107,7 +108,7 @@ void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
     LongVec3 local;
 
     AddVec3(&local, pos, &self->params.offset);
-    local.y += *(s32 *)((u8 *)gStyleEffectViewport + 0x18) - gStyleEffectBaseViewY;
+    local.y += ((Viewport *)gStyleEffectViewport)->refView.vp.y - gStyleEffectBaseViewY;
     self->methods->setTranslation(self, &local);
 
     switch (self->pendingExtra) {
@@ -180,7 +181,7 @@ void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
     p = self->modelChildren;
     for (i = 0; i < 2; i++, p++) {
         if (count < 3) {
-            accum.x += *(s16 *)self->params.scale * gModelChildSpacing[count];
+            accum.x += self->params.scale[0].num * gModelChildSpacing[count];
         } else {
             accum.y += gModelChildSpacing[count];
         }
@@ -204,7 +205,7 @@ extern s32 gModelChildDriftZ[];
 extern LongVec3 gModelChildDriftInit;
 /* Ratio triple {0/1, 1/10, 0/1}: the per-frame rotation increment
  * updateRotation(.., 0, ..) adds to self and to each model child. */
-extern s32 gSpinRotStep[];
+extern Ratio16 gSpinRotStep[3];
 
 /* After 500 frames (tick >= 0x1F5), for kinds with model children and a
  * nonzero gModelChildDriftZ step: spin self and both children, move the
