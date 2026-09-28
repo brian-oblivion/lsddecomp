@@ -1447,7 +1447,7 @@ void TaskObjF__SetState(TaskObjF *self, s32 state) {
  * call passes 0 or 1. */
 extern char *sCardIconNames[TASKOBJF_STATE_EDIT_TITLE];
 extern const char sTitleCardPathPrefix[]; /* "CARD\\" */
-extern const char gCardPathSuffix[];      /* ".TIM" */
+extern const char sCardPathSuffix[];      /* ".TIM" */
 /* {0, 0, 160, 120} */
 extern SpriteRect sCardIconRect;
 /* (-70, -60), percent of half the screen from the centre */
@@ -1477,7 +1477,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
     path[0] = '\0';
     strcat(path, sTitleCardPathPrefix);
     strcat(path, name);
-    strcat(path, gCardPathSuffix);
+    strcat(path, sCardPathSuffix);
 
     tim = New_TimImage(path);
     ((TimImageUploadFn)tim->methods->processBuffer)(tim);
