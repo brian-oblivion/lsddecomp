@@ -181,7 +181,7 @@ void TickCdStateMachine(void) {
     goto L_end;
 
 L_state1:
-    if (CdControlF(CdlSetloc, (u8 *)gCdSeekParam + 0x14) == 0)
+    if (CdControlF(CdlSetloc, (u_char *)&gCdSeekParam->pos) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -258,7 +258,7 @@ void TickCdLoadFileStateMachine(void) {
     goto L_end;
 
 L_state1:
-    if (CdControlF(CdlSetloc, (u8 *)gCdSeekParam + 0x14) == 0)
+    if (CdControlF(CdlSetloc, (u_char *)&gCdSeekParam->pos) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
