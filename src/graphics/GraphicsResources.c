@@ -134,18 +134,19 @@ void *New_TimBlockSrc(s32 name) {
     return NULL;
 }
 
-/* A TIM-block file's header, as copied. */
-typedef struct TimBlockHeaderBytes {
-    u8 bytes[36];
-} TimBlockHeaderBytes;
-
-/* The same header, read: a block count, then the blocks' file offsets and
- * their sizes. */
+/* A TIM-block file's header: a block count, then the blocks' file offsets
+ * and their sizes. */
 typedef struct TimBlockHeader {
     /* +0x00 */ u32 count;
     /* +0x04 */ u32 offsets[4];
     /* +0x14 */ u32 sizes[4];
 } TimBlockHeader;
+
+/* The same header as AdvanceLoadState copies it out of the sector buffer.
+ * MATCHING: bytes, so the copy is a byte-aligned block move. */
+typedef struct TimBlockHeaderBytes {
+    u8 bytes[sizeof(TimBlockHeader)];
+} TimBlockHeaderBytes;
 
 extern s16 sTimBlockClutShift;
 
