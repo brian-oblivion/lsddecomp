@@ -99,3 +99,7 @@ TimImage's: +0x004 `release`, +0x05C `freeBuffer` (was `slot5C`), and
 +0x078, FileResource's `void *slot78` whose occupant is TimImage__Upload,
 called through `TimImageUploadFn`. `path` is cast to `char *` for
 New_TimImage. Image byte-identical.
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).

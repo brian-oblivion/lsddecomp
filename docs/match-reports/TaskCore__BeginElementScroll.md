@@ -101,3 +101,7 @@ Renamed from Obj86B60__BeginElementScroll (tools/rename.py): the class prefix. O
 ## Track 7 (2026-09-27, round 98, bravo)
 
 `(u8 *)target->unk24[idx] + 8` is `&((SlotEntry *)...)->cursorColor` (SlotEntry +0x008, a SpriteRgb; TitleMenu's is (128, 128, 0)). setState(14) -> TASKCORE_STATE_SCROLL_OPENED.
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).

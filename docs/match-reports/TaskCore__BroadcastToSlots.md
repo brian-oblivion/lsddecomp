@@ -141,3 +141,7 @@ load's delay slot, replacing the `nop` retail keeps there. Instruction order.
 ## Track 7 (2026-09-27, round 98, bravo)
 
 The comment on the loop's `__asm__("")` is now one line, `/* MATCHING: without it GCC moves i++ into the slotCount load's delay slot. */`; the derivation stays above. Locals: origIdx -> savedSlot, arr -> widget, elem -> row, a1 -> color.
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).

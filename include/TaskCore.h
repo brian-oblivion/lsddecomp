@@ -72,6 +72,7 @@
 typedef struct TaskCore TaskCore;
 typedef struct TaskCoreMethods TaskCoreMethods;
 typedef struct TaskCoreTarget TaskCoreTarget;
+typedef struct TaskCoreItemList TaskCoreItemList; /* defined in src/app/Task.c, its one reader */
 
 /* TaskCore's states, above IntermediateBase's START/STOP. setState passes
  * each to the parents (notifyParents) before acting on it, so the codes from
@@ -129,7 +130,7 @@ struct TaskCoreTarget {
     /* +0x018 */ void **hiddenSlots; /* NULL entries are the slots find{Next,Prev}FreeSlot stop at */
     /* +0x01C */ char **names;       /* NULL-terminated; one New_TextRow widget per name */
     /* +0x020 */ u8 *slotPositions; /* 8 bytes a slot, updateSlotElements' position for each widget */
-    /* +0x024 */ void **unk24; /* per slot: NULL, or the item-list record createSlotElements and the scroll methods read */
+    /* +0x024 */ TaskCoreItemList **slotLists; /* per slot: NULL, or the item list the slot opens */
 };
 
 /* clang-format off */
@@ -173,7 +174,7 @@ struct TaskCoreTarget {
     /* +0x0EC */ void (*findPrevFreeSlot)(Self *self);           /* TaskCore__FindPrevFreeSlot */  \
     /* +0x0F0 */ void (*setActiveSlot)(Self *self, s32 slot, s32 withSound); /* TaskCore__SetActiveSlot */ \
     /* +0x0F4 */ s32 (*getActiveSlot)(Self *self);               /* TaskCore__GetActiveSlot */     \
-    /* +0x0F8 */ void (*createSlotElements)(Self *self, void *desc, void *handle); /* TaskCore__CreateSlotElements */ \
+    /* +0x0F8 */ void (*createSlotElements)(Self *self, TaskCoreItemList *list, void *handle); /* TaskCore__CreateSlotElements */ \
     /* +0x0FC */ void (*releaseSlotElements)(Self *self);        /* TaskCore__ReleaseSlotElements */ \
     /* +0x100 */ void (*refreshSlotView)(Self *self, void *parent, s32 show); /* TaskCore__RefreshSlotView */ \
     /* +0x104 */ void (*broadcastToSlotElements)(Self *self, void *color); /* TaskCore__BroadcastToSlotElements */ \
@@ -272,7 +273,7 @@ void TaskCore__FindNextFreeSlot(TaskCore *self);
 void TaskCore__FindPrevFreeSlot(TaskCore *self);
 void TaskCore__SetActiveSlot(TaskCore *self, s32 slot, void *withSound);
 s32 TaskCore__GetActiveSlot(TaskCore *self);
-void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *handle);
+void TaskCore__CreateSlotElements(TaskCore *self, TaskCoreItemList *list, void *handle);
 void TaskCore__ReleaseSlotElements(TaskCore *self);
 void TaskCore__RefreshSlotView(TaskCore *self, void *parent, s32 show);
 void TaskCore__BroadcastToSlotElements(TaskCore *self, void *color);

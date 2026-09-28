@@ -82,3 +82,7 @@ Renamed from Obj86B60__CancelElementScroll (tools/rename.py): the class prefix. 
 ## Track 7 (2026-09-27, round 98, bravo)
 
 `((s32 *)target->unk24[idx])[1]` is `((SlotEntry *)...)->savedCursor`, the same lw 4. setState(17) -> TASKCORE_STATE_SCROLL_CANCELLED, inputMode 1/2 -> TASKCORE_INPUT_CHOOSING_SLOT/SCROLLING (TaskCore.h, alpha's enums).
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
