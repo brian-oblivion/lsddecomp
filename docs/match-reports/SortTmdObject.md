@@ -500,7 +500,7 @@ position.
 ```c
 #if 0
 /* Globals this renderer publishes for SetupPrimCode and the code_8220_c
- * submit wrappers to read back. D_8008E248 is already in code_8220.h; the
+ * submit wrappers to read back. sSortLightOff is already in code_8220.h; the
  * other four are this unit's own view and stay local per CLAUDE.md's
  * cross-unit-declaration rule. */
 extern s32 D_80090C18;
@@ -614,7 +614,7 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
      * all four `lw`s. */
     *(s32 *)(ctx + 0x8) = 0xA;
     D_80090C18 = (*(u32 *)obj >> 9) & 0x7;
-    D_8008E248 = (*(u32 *)obj >> 6) & 0x1;
+    sSortLightOff = (*(u32 *)obj >> 6) & 0x1;
     sSortUseGlobalLightMode = (*(u32 *)obj >> 5) & 0x1;
     sSortLightMode = (*(u32 *)obj >> 3) & 0x3;
 
@@ -1465,7 +1465,7 @@ void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
 
         *(s32 *)(prim + 0x8) = 0xA;
         D_80090C18 = (raw >> 9) & 0x7;
-        D_8008E248 = (raw >> 6) & 0x1;
+        sSortLightOff = (raw >> 6) & 0x1;
         sSortUseGlobalLightMode = (raw >> 5) & 0x1;
         sSortLightMode = (raw >> 3) & 0x3;
     }
@@ -2076,7 +2076,7 @@ Byte-identical after every step; the three oracles green at each commit.
   object references those four names, so the game-style names above are
   used; whether the addresses ARE Sony's commons (3.3+ `libgs/global.o`
   defines all four) is left to the head (see the proposals in the round-91
-  summary). `D_8008E248` (GsLOFF) and `D_80090C18` (GsDIV) cannot be renamed
+  summary). `sSortLightOff` (GsLOFF) and `D_80090C18` (GsDIV) cannot be renamed
   by `rename.py`: it reports them inside Sony's `PSDOFSY` and `dc_cb`, whose
   pinned sizes (8) are distance-to-next-pin estimates -- `PSDOFSY` is 4 bytes
   in `libgs/gs_010.o`.

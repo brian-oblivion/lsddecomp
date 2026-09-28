@@ -108,13 +108,13 @@ s32 GetBMemPMgrBusy(void) {
 
 /* The drawn object's attribute bits, as SortTmdObject publishes them for
  * SetupPrimCode and the submit wrappers. Sony's GsSortObject4 keeps the same
- * four fields in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. D_8008E248 is bit 6 of
+ * four fields in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. sSortLightOff is bit 6 of
  * the object's flags word, which SetupPrimCode ORs into the GPU command
  * byte's shade-texture bit 0x1 (Psy-Q's SetShadeTex); it keeps its address
  * name because it is bss past the image end, where rename.py cannot reach
  * (the proposed name is in SetupPrimCode.md). D_80090C18 is the default ndiv
  * from bits 9-11. */
-extern s32 D_8008E248;              /* GsLOFF */
+extern s32 sSortLightOff;              /* GsLOFF */
 extern s32 D_80090C18;              /* GsDIV1..5: subdivision level */
 extern s32 sSortUseGlobalLightMode; /* GsLLMOD */
 extern s32 sSortLightMode;          /* GsFOG | GsMATE */
@@ -315,7 +315,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     /* MATCHING: four struct reads of attribute, hoisted by the scheduler
      * above the global stores; unk8 is stored after them as a field. */
     D_80090C18 = (obj->attribute >> 9) & 0x7;
-    D_8008E248 = (obj->attribute >> 6) & 0x1;
+    sSortLightOff = (obj->attribute >> 6) & 0x1;
     sSortUseGlobalLightMode = (obj->attribute >> 5) & 0x1;
     sSortLightMode = (obj->attribute >> 3) & 0x3;
     ctx->unk8 = 10;
@@ -753,13 +753,13 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
  * Finish the command byte of the primitive SortTmdObject has just given its
  * length and code, and cache both bytes in the context: the ABE
  * (semi-transparency) bit from the run's packet type, the TGE (texture
- * shading off) bit from D_8008E248, the object's GsLOFF bit.
+ * shading off) bit from sSortLightOff, the object's GsLOFF bit.
  * TransformAndCullPoly re-stamps the cached length onto every primitive.
  * MATCHING: two separate statements; one shared local costs the match.
  */
 void SetupPrimCode(void *prim, PolyDrawCtx *ctx) {
     setSemiTrans(prim, ctx->semiTrans);
-    setShadeTex(prim, D_8008E248);
+    setShadeTex(prim, sSortLightOff);
 
     ctx->primLen = getlen(prim);
     ctx->primCode = getcode(prim);

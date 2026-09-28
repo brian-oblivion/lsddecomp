@@ -24,7 +24,7 @@ void SetupPrimCode(void *arg0, void *arg1)
         a[7] = a[7] & 0xFD;
     }
 
-    if (D_8008E248 != 0) {
+    if (sSortLightOff != 0) {
         a[7] = a[7] | 0x1;
     } else {
         a[7] = a[7] & 0xFE;
@@ -35,7 +35,7 @@ void SetupPrimCode(void *arg0, void *arg1)
 }
 ```
 
-`D_8008E248` (a global `s32` flag, read-only from this function) is now
+`sSortLightOff` (a global `s32` flag, read-only from this function) is now
 declared `extern` in `include/code_8220.h`; no other symbol name evidence
 was available for it.
 
@@ -97,7 +97,7 @@ GPU command byte of the following colour word. That in turn identifies the
 two bits this function sets and clears: `0x2` is the GPU's ABE
 (semi-transparency) bit, taken from the draw context's flag at `ctx+0x1C`,
 and `0x1` is the shade-texture bit that Psy-Q's `SetShadeTex()` sets, taken
-from the global `D_8008E248`.
+from the global `sSortLightOff`.
 
 The function then caches the length byte and the finished command byte at
 `ctx+0x14`/`ctx+0x15`; `TransformAndCullPoly` re-stamps the length byte
@@ -105,12 +105,12 @@ onto the primitive from `ctx+0x14` on every face.
 
 ### Proposed global name for the head
 
-`D_8008E248` -> `gShadeTex`. **Tier B.** `SortTmdObject` writes it from bit
+`sSortLightOff` -> `gShadeTex`. **Tier B.** `SortTmdObject` writes it from bit
 6 of the drawn object's flags word (`srl $a0,$a0,6; andi $a0,$a0,0x1; sw
-$a0, %lo(D_8008E248)` at 0x800186D8) and this function is its only reader,
+$a0, %lo(sSortLightOff)` at 0x800186D8) and this function is its only reader,
 ORing it into the shade-texture bit; `gShadeTex` is Sony's own vocabulary
 for that bit. **`tools/rename.py` cannot do this one** -- `FATAL:
-'D_8008E248' resolves to 0x8008e248, outside the image` -- and I did not
+'sSortLightOff' resolves to 0x8008e248, outside the image` -- and I did not
 rename it by hand.
 
 ### Proposed learning
@@ -131,7 +131,7 @@ exists to prevent.
 ## Round 91 polish (delta, track 7)
 
 The body is now libgpu's own macros -- `setSemiTrans(prim, ctx->semiTrans)`,
-`setShadeTex(prim, D_8008E248)`, `ctx->primLen = getlen(prim)`,
+`setShadeTex(prim, sSortLightOff)`, `ctx->primLen = getlen(prim)`,
 `ctx->primCode = getcode(prim)` -- byte-identical (29/29). The two ternary
 macro statements stay separate, which is the shape this report's
 "independent statements" finding requires. `ctx` is the unit's
