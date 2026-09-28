@@ -30,6 +30,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "BMemPMgr.h"
+#include "DrawSystem.h"
 #include "gte.h"
 #include "TmdRenderer.h"
 
@@ -117,12 +118,6 @@ extern s32 sSortNdiv;               /* GsDIV1..5: subdivision level */
 extern s32 sSortUseGlobalLightMode; /* GsLLMOD */
 extern s32 sSortLightMode;          /* GsFOG | GsMATE */
 
-/* MATCHING: three s8s, so SortTmdObject's copy of sTexturedFaceColor is a
- * 3-byte block move (`la`, three `lb`, three `sb`). */
-typedef struct {
-    s8 r, g, b;
-} Rgb8;
-
 /*
  * The per-object draw context SortTmdObject builds in the PS1 scratchpad
  * (its caller passes 0x1F800000) and hands to every function below. Only
@@ -137,14 +132,14 @@ typedef struct PolyDrawCtx {
     /* +0x014 */ u8 primLen;        /* SetupPrimCode's cached P_TAG length byte */
     /* +0x015 */ u8 primCode;       /* ... and finished GPU command byte */
     u8 pad016[0x018 - 0x016];
-    /* +0x018 */ u32 packetType;   /* the current group's TMD mode/flag word */
-    /* +0x01C */ s32 semiTrans;    /* the group's ABE bit */
-    /* +0x020 */ s32 otz;          /* avsz3 result */
-    /* +0x024 */ s32 dp;           /* IR0, the depth-cue factor */
-    /* +0x028 */ s32 opz;          /* nclip result (MAC0) */
-    /* +0x02C */ s32 dpShift;      /* dp >> dpShift is the CLUT row offset */
-    /* +0x030 */ GsOT_TAG *otSlot; /* &otBase[otz >> otShift] */
-    /* +0x034 */ Rgb8 faceColor;   /* sTexturedFaceColor's copy */
+    /* +0x018 */ u32 packetType;     /* the current group's TMD mode/flag word */
+    /* +0x01C */ s32 semiTrans;      /* the group's ABE bit */
+    /* +0x020 */ s32 otz;            /* avsz3 result */
+    /* +0x024 */ s32 dp;             /* IR0, the depth-cue factor */
+    /* +0x028 */ s32 opz;            /* nclip result (MAC0) */
+    /* +0x02C */ s32 dpShift;        /* dp >> dpShift is the CLUT row offset */
+    /* +0x030 */ GsOT_TAG *otSlot;   /* &otBase[otz >> otShift] */
+    /* +0x034 */ ColorRgb faceColor; /* sTexturedFaceColor's copy */
     u8 pad037[0x038 - 0x037];
     /* +0x038 */ MATRIX savedRotMatrix;
     u8 pad058[0x05C - 0x058];
@@ -202,7 +197,7 @@ typedef struct TmdGroupHeader {
         ((POLY_FT3 *)(p))->clut += (rows) << 6; \
     } while (0)
 /* clang-format on */
-extern Rgb8 sTexturedFaceColor;
+extern ColorRgb sTexturedFaceColor;
 
 /* The two subdivision work buffers the SubmitPoly* wrappers hand Sony's
  * RCpoly* packers, a DIVPOLYGON3 and a DIVPOLYGON4 back to back (0x218
