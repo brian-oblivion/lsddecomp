@@ -194,3 +194,21 @@ what the code is.
    and addiu_at blockers this was once filed under are both resolved; see
    docs/match-reports/DreamSys__CheckTunnelHeading.md). */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+/* SceneNode__GetRotationDegrees (DreamSys__TryTunnelLink fills its 0x10-byte
+   `local` with it): include/scene_node.h. */
+
+/* Called by DreamSys__TryTunnelLink as (&self->exitRotation, &self->enterRotation, &local) --
+   the `local` buffer SceneNode__GetRotationDegrees fills; result a truth
+   value (`beqz`). Defined after its caller. */
+extern s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation);
+```

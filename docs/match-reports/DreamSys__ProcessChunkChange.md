@@ -50,3 +50,15 @@ function's own real signature, since this function IS that slot.
 ## Provenance
 
 round 2026-08-30-d, runner ALPHA, unit DreamSys (whole-unit, third pass).
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+/* DreamSys__ProcessChunkChange(DreamSys *self,); */
+```

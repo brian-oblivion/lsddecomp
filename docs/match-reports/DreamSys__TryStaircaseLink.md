@@ -589,3 +589,39 @@ what the code is.
    exactly that signature), indexed by GetLastSpawnExtra()'s return value and
    stashed into DreamSys::staircaseTickFn by DreamSys__TryStaircaseLink (round 2026-09-06). */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+/* The `chunk`+`tile` half of a PlayerSpawnPoint (4 bytes) as one struct.
+   DreamSys__TryStaircaseLink copies a PlayerSpawnPoint in two halves, into
+   DreamSys::staircaseGridPos (this type) and DreamSys::staircaseOrigin (the
+   `position` half).
+   MATCHING: two whole-struct copies (retail's two lwl/lwr + swl/swr groups), not one 10-byte copy. */
+```
+
+From `include/dream_sys.h`:
+
+```c
+    /* See PlayerSpawnGridPos's own comment -- the `chunk`+`tile` half of a
+           PlayerSpawnPoint whole-struct-copied here by DreamSys__TryStaircaseLink. */
+    PlayerSpawnGridPos staircaseGridPos;
+```
+
+From `src/world/dream_sys.c`:
+
+```c
+/* MATCHING: one nested `if` chain, not early returns (a label after an
+   early return keeps a redundant `move a0,s0`). The copy into
+   staircaseGridPos/staircaseOrigin is one whole-PlayerSpawnPoint copy. */
+```
+
+The first excerpt's claim that the copy is two halves was stale (round 75
+above: it is one whole-`PlayerSpawnPoint` copy); the header's new
+`PlayerSpawnGridPos` doc describes the type as the spawn lookups use it.

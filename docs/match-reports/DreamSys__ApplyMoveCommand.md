@@ -154,3 +154,16 @@ what the code is.
 	   confirmed safe since its only two writers (round 2026-08-30) both
 	   set it to the literal 0. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+    /* MATCHING: u32, for DreamSys__ApplyMoveCommand's unsigned `< 1` (sltiu); both writers store 0. */
+    u32 staircaseMoveGate;
+```

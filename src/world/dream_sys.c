@@ -1,30 +1,17 @@
-/* DreamSys -- the class that runs a dream in progress (include/dream_sys.h
- * has the class as a whole). Every DreamSys method is here, in four groups,
- * followed by the free functions the link tests are built from.
+/* DreamSys's methods (include/dream_sys.h has the class), in four groups,
+ * followed by the free functions the link tests are built from:
  *
- * 1. Construction and reset: New_DreamSys, DreamSys__DreamSys,
- *    ResetSessionState (no tick callbacks, sound cue set freed, staircase
- *    walk cleared, base orientation applied), ResetLinkState, SpawnAtLink.
- *
- * 2. The per-tick chain. TimerTick advances the dream clock (Actor's `tick`)
- *    and, at dreamTimeLimit, loads the next flashback or ends the dream;
- *    below the limit it runs UpdateTickState and RunTickCallbacks, which call
- *    the look and move callbacks SelectLookCallback/SelectMoveCallback install. The look
- *    callback is StepLook: two spring-back accumulators, StepLookOffset (the
- *    view height) and StepLookYaw (45 degrees a tick, up to 181, and back).
- *    The move callback is TickDrift or TickMove, the movement state machine
- *    (free, forced or held, by moveOverride) around AdvanceMoveCycle's
- *    four-tick step: a voice through the VabStreamObj in soundObj
- *    (StartVoice/StopVoice), a view bob, and ApplyMoveCommand, which tries
- *    the link tests before it lets the step happen.
- *
+ * 1. Construction and reset: New_DreamSys, the ctor, ResetSessionState,
+ *    ResetLinkState, SpawnAtLink.
+ * 2. The per-tick chain: TimerTick, the tick callbacks (StepLook, TickMove,
+ *    TickDrift) and the step they drive (AdvanceMoveCycle, StartVoice /
+ *    StopVoice, ApplyMoveCommand).
  * 3. Day, mood and flashback bookkeeping: StartDay/EndDay, the mood graph
  *    (two MoodGraphContributor accumulators that UpdateDreamChart averages
  *    and CalcDreamColor turns into a DreamColors value),
  *    AddFlashback/FlashbackSaving, CalcUnlockScore, and GetSaveBlock, which
  *    hands out the DREAMSYS_SAVE_SIZE bytes from saveMagic that InitNewGame
  *    initializes.
- *
  * 4. Linking: WallLink/DynamicLink and the Try...Link family, over the free
  *    TestFor.../GetStaticSpawn testers and the stage spawn tables. ExecuteLink
  *    records the link (enum DreamSysLinkCode) in Actor's `state` and tells
@@ -239,6 +226,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *self, LinkResource *modelSource, VabStrea
     self->moveOverride = 0;
     self->newGamePending = 1;
     self->methods->initNewGame(self);
+    /* MATCHING: returns reset's result, which New_DreamSys ignores */
     return ((DreamSysResetRetFn)self->methods->reset)(self);
 }
 
@@ -865,6 +853,7 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *self, s32 command) {
             !self->methods->tryInstantTeleportLink(self, pos) &&
             !self->methods->tryTunnelLink(self, pos)) {
             self->methods->saveLinkSnapshot(self);
+            /* MATCHING: staircaseMoveGate is u32 for this unsigned `< 1`; its writers store 0 or 1 */
             sMoveCommandDispatch[command](self, delta, (void *)(self->staircaseMoveGate < 1));
             if (self->currentStage == 0 && self->coord2->coord.t[1] < -2000 &&
                 self->coord2->coord.t[0] >= -499) {
@@ -1178,9 +1167,7 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 linkType, s32 playSound) {
     return true;
 }
 
-/* MATCHING: one nested `if` chain, not early returns (a label after an
-   early return keeps a redundant `move a0,s0`). The copy into
-   staircaseGridPos/staircaseOrigin is one whole-PlayerSpawnPoint copy. */
+/* MATCHING: one nested `if` chain, not early returns, and one whole-PlayerSpawnPoint copy */
 bool DreamSys__TryStaircaseLink(DreamSys *self, PlayerSpawnPoint *currentPos) {
     s32 rotation[4];
 
@@ -1563,7 +1550,8 @@ void DreamSys__AddFlashback(DreamSys *self, s32 stage, PlayerSpawnPoint *pos, s3
     }
     entry->stageID = stage;
     entry->position = *pos;
-    entry->rotation = *(FlashbackRotation *)angles;
+    entry->rotation =
+        *(FlashbackRotation *)angles; /* MATCHING: one struct assignment: every load before every store */
     entry->unk1C = unknown;
     entry->timeLimit = time;
     entry->day = day;

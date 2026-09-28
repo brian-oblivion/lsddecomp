@@ -86,3 +86,18 @@ what the code is.
    addiu_at blockers this was once filed under are both resolved; see
    docs/match-reports/DreamSys__CheckStaircaseHeading.md). */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+/* Called by DreamSys__TryStaircaseLink as (&self->exitRotation, &self->enterRotation, &local) --
+   identical call shape to DreamSys__CheckTunnelHeading above (same `local` buffer, same two
+   `self` fields), so the same signature. Defined after its caller. */
+extern s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation);
+```

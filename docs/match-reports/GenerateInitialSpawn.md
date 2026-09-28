@@ -147,3 +147,16 @@ what the code is.
    a single `beqz`) only holds if it can't be negative -- a signed `s8` here
    forces GCC to add a second `blez` check that retail does not have. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+    /* Indexes sSpawnPosAdjust, read with `lbu` (GenerateInitialSpawn). */
+    u8 adjustment;
+```

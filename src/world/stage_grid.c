@@ -18,7 +18,7 @@
 #include "common.h"
 #include "stage_grid.h"
 
-/* The two per-stage tables (splat data), read only here. */
+/* The two per-stage tables, defined as data outside C and read only here. */
 extern StageGridDimensions sStageGridDimensions[];
 extern MoodGraphPoint *sStageChunkMoods[];
 
