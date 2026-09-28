@@ -415,6 +415,18 @@
         "area-ui": true
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 9,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 9,
+          "model": "opus",
+          "note": "Track 12 done. Premium head wrote apidoc-setup (tools/apidoc.py: pycparser census of every game header from one stub unit, plus process-text and banner screens over include/ and src/; Doxyfile) and plan revision 45 (items are apidoc's areas: a .c set plus the headers it defines, disjoint edit sets). Nine Opus runners, one per area, all merged clean: apidoc.py 0 left tree-wide, byte-identical, declcheck clean. Tool tightened four times from runner findings.",
+          "round": 106,
+          "runners": 9
+        }
+      ],
       "status": "auto"
     },
     "13": {
@@ -423,6 +435,18 @@
         "readme": true
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 2,
+          "model": "opus",
+          "note": "readme and lint (tools/lint.sh, disc-free: format, apidoc, readability, declcheck, snake_case) done; licence and process-docs are the operator's.",
+          "round": 106,
+          "runners": 2
+        }
+      ],
       "status": "auto"
     },
     "14": {
