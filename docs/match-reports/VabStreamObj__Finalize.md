@@ -19,7 +19,7 @@ s32 VabStreamObj__Finalize(VabStreamObj *self) {
         sOpenVabCount = 0;
     }
     if (sOpenVabCount == 0 && IsWBgmActive() == 0) {
-        gVabSizeTableInited = 0;
+        sVabSizeTableInited = 0;
         gVabVolumeInited = 0;
         gVabStreamInited = 0;
         SsEnd();

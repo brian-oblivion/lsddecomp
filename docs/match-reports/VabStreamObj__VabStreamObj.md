@@ -58,9 +58,9 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
     self->attrsReady = 0;
     self->bodyTransferPending = 0;
     self->baseFilename = NULL;
-    if (gVabSizeTableInited == 0) {
+    if (sVabSizeTableInited == 0) {
         SsInit();
-        gVabSizeTableInited = 1;
+        sVabSizeTableInited = 1;
         SsSetTableSize(GetSsSizeTableBuf(), 2, 1);
     }
     if (gVabStreamInited == 0) {
