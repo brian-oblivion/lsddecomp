@@ -74,3 +74,7 @@ Round 71 (alpha). `func_8001D008` -> `SceneNode__UpdateScale`, **tier A**. Table
 ## Round 97 (alpha): Sony's GsCOORD2PARAM
 
 SceneNodeSub44 is deleted: coord2->param is Sony's GsCOORD2PARAM (VECTOR scale, SVECTOR rotate, VECTOR trans; 0x28 bytes, offset for offset), so `scaleX`/`scaleY`/`scaleZ` read `scale.vx`/`.vy`/`.vz`. Byte-identical.
+
+## Round 101 (delta): track 7
+
+Step 2: the three raw offsets `(u8 *)data + 4` / `+ 8` read the table as what it is, Ratio16[3] (include/SceneNode.h), through a local `Ratio16 *ratios = data`: `&ratios[0]`, `&ratios[1]`, `&ratios[2]`. The parameter stays `void *` because the prototype and the slot type in include/SceneNode.h say so (not this unit's to change; proposed). Byte-identical.

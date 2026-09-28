@@ -121,13 +121,14 @@ void SceneNode__Reset(SceneNode *self) {
 }
 
 void SceneNode__UpdateRotation(SceneNode *self, s32 flag, void *data) {
+    Ratio16 *ratios = data;
     s32 vals[3];
     GsCOORD2PARAM *dst;
     s16 *field;
 
-    vals[0] = RatioToFixed12(data);
-    vals[1] = RatioToFixed12((u8 *)data + 4);
-    vals[2] = RatioToFixed12((u8 *)data + 8);
+    vals[0] = RatioToFixed12(&ratios[0]);
+    vals[1] = RatioToFixed12(&ratios[1]);
+    vals[2] = RatioToFixed12(&ratios[2]);
     vals[0] /= 360;
     vals[1] /= 360;
     vals[2] /= 360;
@@ -151,12 +152,13 @@ void SceneNode__UpdateRotation(SceneNode *self, s32 flag, void *data) {
 }
 
 void SceneNode__UpdateScale(SceneNode *self, s32 flag, void *data) {
+    Ratio16 *ratios = data;
     s32 r0, r1, r2;
     GsCOORD2PARAM *dst;
 
-    r0 = RatioToFixed12(data);
-    r1 = RatioToFixed12((u8 *)data + 4);
-    r2 = RatioToFixed12((u8 *)data + 8);
+    r0 = RatioToFixed12(&ratios[0]);
+    r1 = RatioToFixed12(&ratios[1]);
+    r2 = RatioToFixed12(&ratios[2]);
     dst = self->coord2->param;
     if (flag) {
         dst->scale.vx = (s16)r0;
