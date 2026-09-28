@@ -629,3 +629,19 @@ end. The loop bound is `ARRAY_COUNT(set->slots)`, the tone index `program *
 VAB_TONES_PER_PROG`, defined token-identically to `PlacementGridVabSound.c`'s (the
 move of both `VAB_*` defines into `VabStreamObj.h` is proposed to the head).
 `e` is `slot`. Byte-identical.
+
+## History (moved from src/libsnd_vmanager.c, comments pass)
+
+The file's banner carried its edge evidence and the reason it is parked:
+
+> What decided its edges (python3 tools/tuboundary.py): every edge from
+> PlacementGridVabSound.c to the placed object libsnd/vm_prog, which follows
+> this file, is "boundary possible"; the binary is silent. Content decided:
+> the carve edges code_179d8_l|m and m|j were staffing cuts, and each fell
+> inside one object on every disc (vm_autov between SeAutoVol and
+> SetAutoVol, vm_key between SpuVmKeyOff and SpuVmSeKeyOn), so the three
+> units were merged. PARKED: the content puts a file boundary after
+> ServiceSoundCueSet (game code cannot sit in Sony's object) and, on the 3.6
+> reading, at each module edge above; a split is a new carve, so the file
+> keeps them and is named for the Sony object, as FINISHING-PLAN track 8
+> names Sony code carried as C.

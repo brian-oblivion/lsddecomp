@@ -878,3 +878,13 @@ The NON_MATCHING body now uses `_svm_voice[voice].unk28`..`unk32` (and `*(u8 *) 
 ## Track 6 (round 96, charlie)
 
 Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `ObjE970` is `VabHdr` (`_svm_vh`): this body reads `D_8008E970->mvol` (+0x18, was `masterVolume`). Normalized disassembly unchanged.
+
+## History (moved from src/libsnd_vmanager.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libsnd_vmanager.c read:
+
+> NON_MATCHING: 228/228 words, length exact, 220/228 raw, funcdiff
+> insertions 1 / deletions 1 (round 73). This is libsnd's SetAutoPan.
+> Residue: the pan split's `else` arm -- retail copies the volume into
+> $a1 and multiplies that copy unmasked; this body masks val1 instead
+> (docs/match-reports/SetAutoPan.md).

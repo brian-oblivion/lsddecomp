@@ -796,3 +796,10 @@ Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`
  * permuter trace, and why the naive two-variable translation regresses
  * sharply (47/270) despite being semantically identical. */
 ```
+
+## History (moved from src/libsnd_vmanager.c, comments pass)
+
+The declaration of _svm_sreg above SpuVmInit carried:
+
+> Declared without volatile, the spelling this unit's matched bodies were
+> derived against.

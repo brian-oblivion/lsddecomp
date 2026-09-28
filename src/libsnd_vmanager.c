@@ -24,17 +24,8 @@
  * SpuVmSeKeyOn, SpuVmSeKeyOff, KeyOnCheck) and vm_seq (the SpuVm*SeqVol
  * accessors and SpuVmSeqKeyOff).
  *
- * What decided its edges (python3 tools/tuboundary.py): every edge from
- * PlacementGridVabSound.c to the placed object libsnd/vm_prog, which follows
- * this file, is "boundary possible"; the binary is silent. Content decided:
- * the carve edges code_179d8_l|m and m|j were staffing cuts, and each fell
- * inside one object on every disc (vm_autov between SeAutoVol and
- * SetAutoVol, vm_key between SpuVmKeyOff and SpuVmSeKeyOn), so the three
- * units were merged. PARKED: the content puts a file boundary after
- * ServiceSoundCueSet (game code cannot sit in Sony's object) and, on the 3.6
- * reading, at each module edge above; a split is a new carve, so the file
- * keeps them and is named for the Sony object, as FINISHING-PLAN track 8
- * names Sony code carried as C.
+ * ServiceSoundCueSet is game code and ends a game file; the file is named
+ * for the Sony object that follows it.
  *
  * The data keeps Sony's types: the key-on request in _svm_cur, the current
  * VAB through <libsnd.h>'s VabHdr, ProgAtr and VagAtr (_svm_vh, _svm_pg,
@@ -569,13 +560,11 @@ extern u8 D_8008EA1A;
 extern s16 _svm_stereo_mono;
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 231/231 words, length exact, 223/231 raw, funcdiff
- * insertions 1 / deletions 1 (round 73). This is libsnd's SetAutoVol
- * (sdkname shape 0.99). Residue: in the pan split's `else` arm retail
- * copies the volume into $a1 first and multiplies THAT register (no
- * andi); this body multiplies the volume register directly and masks
- * val1 -- same residue as SetAutoPan below
- * (docs/match-reports/SetAutoVol.md). */
+/* NON_MATCHING: 231/231 words, length exact, 223/231 raw. This is libsnd's
+ * SetAutoVol. Residue: in the pan split's `else` arm retail copies the
+ * volume into $a1 first and multiplies that register (no andi); this body
+ * multiplies the volume register directly and masks val1, as in SetAutoPan
+ * below (docs/match-reports/SetAutoVol.md). */
 void SetAutoVol(s16 voice) {
     s16 v;
     s16 off;
@@ -679,10 +668,9 @@ void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
 
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 228/228 words, length exact, 220/228 raw, funcdiff
- * insertions 1 / deletions 1 (round 73). This is libsnd's SetAutoPan.
- * Residue: the pan split's `else` arm -- retail copies the volume into
- * $a1 and multiplies that copy unmasked; this body masks val1 instead
+/* NON_MATCHING: 228/228 words, length exact, 220/228 raw. This is libsnd's
+ * SetAutoPan. Residue: the pan split's `else` arm: retail copies the volume
+ * into $a1 and multiplies that copy unmasked; this body masks val1 instead
  * (docs/match-reports/SetAutoPan.md). */
 void SetAutoPan(s16 voice) {
     s16 v;
@@ -784,8 +772,7 @@ extern u16 _svm_okof2;
 extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 
-/* Declared without volatile, the spelling this unit's matched bodies were
- * derived against. */
+/* Declared without volatile. */
 extern SpuRegs *_svm_sreg;
 
 /* MATCHING: `scratch` is one local reused for the clamp and for the
@@ -914,7 +901,7 @@ extern volatile u16 D_8008EA26;
 /* Flag byte forced on unconditionally at entry. */
 extern u8 D_8008EA1B;
 
-extern s32 SpuVmAlloc(s32 a0); /* arity-ok: the callee (still INCLUDE_ASM, 0x8002CF18) reads NO argument register, but this unit's argument is byte-load-bearing -- retail emits `li a0,0xff` in the delay slot at 0x8002F244 */
+extern s32 SpuVmAlloc(s32 a0); /* arity-ok: the callee reads no argument register, but the caller sets a0 = 0xFF in the call's delay slot */
 extern void vmNoiseOn2(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
 void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
@@ -967,10 +954,8 @@ extern u8 D_8008EA18;
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 77/138 words, length exact. Residue: register-class
- * renumbering plus one deferred `& 0xFFFF` mask on the second
- * note2pitch2 argument -- a banned-to-fix register-identity case, per
- * a permuter search that plateaued at 485/770 with no candidate reaching
- * zero (docs/match-reports/SpuVmPBVoice.md). Hand-derived. */
+ * renumbering plus one deferred `& 0xFFFF` mask on the second note2pitch2
+ * argument, a register-identity case (docs/match-reports/SpuVmPBVoice.md). */
 s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     s16 threshold;
     u16 someTotal;
@@ -1049,14 +1034,8 @@ s32 SpuVmPitchBend(s16 a0, s16 a1, s16 a2, u16 a3) {
 #ifdef NON_MATCHING
 /* NON_MATCHING: 236/241 words, 5 words short. Residue: retail's
  * unconditional `move a2,v0`/`li t0,1`/`move a3,a0` do-while-style setup
- * before the count>0 loop, which this C's `for` does not reproduce (a
- * literal do-while conversion was tried and regressed hard, 236/241,
- * 93/241 raw match -> 233/241, 16/241 -- reverted), plus cosmetic
- * s0/s1 register-color swaps in phases 2-6. Round 48's frame-padding
- * lever and an `s32 count` fix (drop a spurious andi mask) already
- * applied; a permuter search (round 37) plateaued at 1578/2276 with no
- * candidate reaching zero (docs/match-reports/SpuVmFlush.md).
- * Hand-derived. */
+ * before the count>0 loop, which this C's `for` does not reproduce, plus
+ * s0/s1 register swaps in phases 2-6 (docs/match-reports/SpuVmFlush.md). */
 
 /* Ring buffer of "channel activity" bitmasks, one slot appended per
  * call, most-recent index tracked by _svm_envx_ptr (mod 16). */
@@ -1190,18 +1169,10 @@ INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmFlush);
 #endif
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 414 built words vs 387 (measured round 96; an earlier
- * score read 402). Residue as recorded then: two independent
- * pieces -- an early-materialization scheduling point (~2-3 words) and a
- * mid-loop addressing-cost difference for D_8008EA26 and neighbors
- * (~10-12 words); round 48's frame-padding lever realigned the frame
- * byte-exactly without closing either. A permuter search (round 37)
- * plateaued at 12471/15053 across 51,596 iterations with no candidate
- * reaching zero (docs/match-reports/SpuVmKeyOn.md). Hand-derived; two
- * stale-symbol fixes applied per tools/stalesyms.py (round 37): the
- * renamed-to-SpuVmVSetUp call (was func_80032148) and D_8008EA0D, which
- * has no linker symbol of its own and is read through the already-linked
- * D_8008EA24 base pointer instead. */
+/* NON_MATCHING: 414 built words vs 387. Residue: an early-materialization
+ * scheduling point and a mid-loop addressing-cost difference for D_8008EA26
+ * and its neighbours (docs/match-reports/SpuVmKeyOn.md). D_8008EA0D has no
+ * linker symbol of its own and is read through the D_8008EA24 base pointer. */
 /* libsnd's _svm_pg (pinned at this address): the current VAB's program
  * attributes. */
 extern ProgAtr *_svm_pg;

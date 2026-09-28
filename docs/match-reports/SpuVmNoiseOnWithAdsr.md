@@ -80,3 +80,9 @@ is available (`v0 < spuVmMaxVoice`, the voice count), keys it on via
 registers) forwarding all four caller-supplied parameters unchanged. The
 generic name reflects that this is the "just play it" wrapper, in
 contrast to SpuVmNoiseOn's hardcoded-parameter variant.
+
+## History (moved from src/libsnd_vmanager.c, comments pass)
+
+The arity-ok note on the SpuVmAlloc prototype above SpuVmNoiseOnWithAdsr read:
+
+> arity-ok: the callee (still INCLUDE_ASM, 0x8002CF18) reads NO argument register, but this unit's argument is byte-load-bearing -- retail emits `li a0,0xff` in the delay slot at 0x8002F244
