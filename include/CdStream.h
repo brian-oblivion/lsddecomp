@@ -76,7 +76,7 @@ struct CdStreamMethods {
     /* +0x078 */ void (*clearRing)(CdStream *self);          /* CdStream__ClearRing: StClearRing */
     /* +0x07C: the occupant, CdStream__NoOpSlot7C, is empty and takes self
      * only; the parameters are the callers'. MoviePlayer__Rewind passes
-     * (MoviePlayer__MarkStopped, player) and MoviePlayer__Abort (0, 0), in
+     * (MoviePlayer__RequestRestart, player) and MoviePlayer__Abort (0, 0), in
      * $a1/$a2, so a narrower slot would drop those argument loads. */
     /* +0x07C */ void (*slot7C)(CdStream *self, void (*fn)(), void *arg);
 }; /* 31 slots, 0x80 bytes */

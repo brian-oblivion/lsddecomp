@@ -1412,13 +1412,13 @@ void MoviePlayer__Rewind(MoviePlayer *self) {
         cur->frameDone = 1;
         cur->streamEnded = 0;
         cur->finished = 0;
-        cur->stream->methods->slot7C(cur->stream, MoviePlayer__MarkStopped, cur);
+        cur->stream->methods->slot7C(cur->stream, MoviePlayer__RequestRestart, cur);
         cur->started = 0;
         cur->stream->methods->restart(cur->stream);
     }
 }
 
-void MoviePlayer__MarkStopped(MoviePlayer *self) {
+void MoviePlayer__RequestRestart(MoviePlayer *self) {
     self->pendingStart = -1;
 }
 

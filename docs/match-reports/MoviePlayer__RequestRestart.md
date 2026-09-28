@@ -1,4 +1,6 @@
-# MoviePlayer__MarkStopped -- MATCHED (3/3 words)
+# MoviePlayer__RequestRestart -- MATCHED (3/3 words)
+
+> Renamed from `MoviePlayer__MarkStopped` on 2026-09-28 (tools/rename.py). Address 0x8004593c.
 
 > Renamed from `func_8004593C` on 2026-09-25 (tools/rename.py). Address 0x8004593c.
 
@@ -16,7 +18,7 @@ Table slot (`tools/classtable.py`): none (in no method table; called directly).
 ## Source
 
 ```c
-void MoviePlayer__MarkStopped(Obj33808_50 *self) {
+void MoviePlayer__RequestRestart(Obj33808_50 *self) {
     self->unk50 = -1;
 }
 ```
@@ -29,7 +31,7 @@ void MoviePlayer__MarkStopped(Obj33808_50 *self) {
 
 ## Naming
 
-- **MoviePlayer__MarkStopped**, tier A. Sets the tri-state play flag to -1; called from Stop.
+- **MoviePlayer__RequestRestart**, tier A. Sets the tri-state play flag to -1; called from Stop.
 
 ## Track 4 (2026-09-26, round 89)
 
