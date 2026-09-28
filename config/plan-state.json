@@ -1604,7 +1604,9 @@
       "status": "auto"
     },
     "9": {
-      "checklist": {},
+      "checklist": {
+        "style": true
+      },
       "reason": "",
       "status": "auto"
     }
