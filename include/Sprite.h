@@ -120,8 +120,8 @@ struct SpriteGs {
     /* +0x044 */ u8 pad44[4];                                                                      \
     /* +0x048 */ GsIMAGE *image;        /* reset: &texture->tim (the TimImage's +0x02C) */          \
     /* +0x04C */ SpriteRect rect;       /* reset: a copy of the ctor's cell */                     \
-    /* +0x058 */ s32 unk58;             /* zeroed by reset; VariantSprite__UpdateScale: non-zero scales accumScaleX/Y instead of the sprite */ \
-    /* +0x05C */ s32 accumScaleX;       /* VariantSprite__UpdateScale: times the x ratio (20.12) while unk58 != 0 */ \
+    /* +0x058 */ s32 accumulateScale;   /* zeroed by reset; VariantSprite__UpdateScale: non-zero scales accumScaleX/Y instead of the sprite */ \
+    /* +0x05C */ s32 accumScaleX;       /* VariantSprite__UpdateScale: times the x ratio (20.12) while accumulateScale != 0 */ \
     /* +0x060 */ s32 accumScaleY;       /* ... and this times the y ratio; no other accessor of either */ \
     /* +0x064 */ SpriteGs sprite;       /* InitGsSprite fills it; Viewport__DrawNode sorts it */    \
     /* +0x088 */ u8 pad88[0xA0 - 0x88]  /* the object is 0xA0 bytes (New_Sprite); ScreenSprite's own fields start at +0x0A0 */

@@ -40,7 +40,7 @@ void VariantSprite__SetVariantClut(VariantSprite *self, s32 variant) {
  * (the callers' tables hold three, gSpriteScaleLarge's {6,5} and
  * gSpriteScaleSmall's {4,6}; the third is not read), each turned into 20.12
  * by the split division RatioToFixed12 uses. The ratios go to the GsSPRITE's
- * scalex/scaley, or, while Sprite's unk58 is set, multiply accumScaleX/Y
+ * scalex/scaley, or, while Sprite's accumulateScale is set, multiply accumScaleX/Y
  * instead. `set` is not read.
  */
 void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
@@ -60,7 +60,7 @@ void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
     yRatio = (yWhole << FIX12_SHIFT) + yFrac;
     yScale = (s16)yRatio;
 
-    if (self->unk58 != 0) {
+    if (self->accumulateScale != 0) {
         self->accumScaleX = ((s16)xRatio * self->accumScaleX) >> FIX12_SHIFT;
         self->accumScaleY = ((s16)yRatio * self->accumScaleY) >> FIX12_SHIFT;
     } else {

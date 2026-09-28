@@ -226,7 +226,7 @@ void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
     self->image = &((TimImage *)texture)->tim;
     self->rect = *rect;
     InitGsSprite(&self->sprite, abr, rect, self->image);
-    self->unk58 = 0;
+    self->accumulateScale = 0;
 }
 
 /* Fill a GsSPRITE from a texture image and a cell: colour mode and tpage

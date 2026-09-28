@@ -203,3 +203,5 @@ the source keeps one `MATCHING:` line on `xScale`.
   outside this job. The rename touches `self->unk58` in src/Sprite.c and
   src/class_3bb8c_q.c, plus the comments on the two fields after it and
   VariantSprite.h's banner line that names it.
+
+Applied by the round 101 head at merge: `unk58` is `accumulateScale` (tier B), in `SPRITE_FIELDS`, `Sprite__Reset` and this method; zero bytes.
