@@ -70,11 +70,6 @@ enum MovieId {
 
 #define OPENING_MOVIE_COUNT 7
 
-/* Each special day's six records: FILM\SPDAYnnA/B.STR (its two movies),
- * then IMG1\SPDAYnnC..F.TIM. Special day 0 is SPDAY01. */
-#define SPECIAL_DAY_RECORD_COUNT 6
-#define SPECIAL_DAY_MOVIE_COUNT 2
-
 /* GetSpecialDayMovieSpan adds this to every movie's frame count but the
  * last. What the frames are for is not established. */
 #define MOVIE_SPAN_GAP_FRAMES 10

@@ -16,6 +16,12 @@ typedef struct FilePathRecord {
     u8 data[0x1C];
 } FilePathRecord;
 
+/* Each special day's six records, of which a CinematicCall's entry picks
+ * one: FILM\SPDAYnnA/B.STR (its two movies), then IMG1\SPDAYnnC..F.TIM.
+ * Special day 0 is SPDAY01. */
+#define SPECIAL_DAY_RECORD_COUNT 6
+#define SPECIAL_DAY_MOVIE_COUNT 2
+
 /* The cinematic DreamSys's getCinematic names, and what
  * GetSpecialDayOrEventRecord takes: bank is a special
  * day and entry one of its records, or, with bank negative, entry is an

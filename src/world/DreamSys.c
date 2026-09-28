@@ -1919,9 +1919,9 @@ MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day) {
 
     for (i = 0; (u32)i < ARRAY_COUNT(sSpecialDays); i++) {
         if (day == sSpecialDays[i]) {
-            /* One of the special day's six GameFiles records, and one of
-             * twelve special-day banks. */
-            cinematic->entry = rand() % 6;
+            /* One of the special day's records, and one of twelve
+             * special-day banks. */
+            cinematic->entry = rand() % SPECIAL_DAY_RECORD_COUNT;
             cinematic->bank = i % 12;
             return &sSpecialDayMood;
         }
