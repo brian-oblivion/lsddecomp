@@ -3595,7 +3595,7 @@ fail:
     return 0;
 }
 
-extern BoxFillRgb gGraphPointHighlightColor;
+extern BoxFillRgb sGraphPointHighlightColor;
 
 void GraphRoom__TickHighlight(GraphRoom *self) {
     if (self->scored != 0) {
@@ -3603,7 +3603,7 @@ void GraphRoom__TickHighlight(GraphRoom *self) {
             if (self->highlightCount < GRAPH_SCORE_MOOD_COUNT) {
                 if (((u32)self->frameCounter % 24) == 0) {
                     s8 dot = self->matchedDayIndices[self->highlightCount];
-                    self->points[dot]->methods->setColor(self->points[dot], 1, &gGraphPointHighlightColor);
+                    self->points[dot]->methods->setColor(self->points[dot], 1, &sGraphPointHighlightColor);
                     self->highlightCount += 1;
                 }
             }
