@@ -391,7 +391,7 @@ void ObjM__ObjM(ObjM *self, BasicClass *sound, struct WBgm *bgm, TimImage *etcTi
                 struct LinkResource *dreamerTmd, s32 stage) {
     GetTimedTaskMethods()->ctor((TimedTask *)self, 0, sound);
     self->methods = GetObjMMethods();
-    self->unk64 = 0;
+    self->loadsComplete = 0;
     self->inSession = 0;
     self->timBlockPending = 1;
     self->bgm = bgm;
@@ -498,7 +498,7 @@ extern CellBounds sStage0Bounds;
 #define DEFAULT_GRID_SPAN 40960
 
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
-void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 arg3) {
+void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 initOption) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
     FilePathRecord *record;
     s32 day;
@@ -524,7 +524,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
         self->styleConfig = style;
     }
 
-    self->unk4C = arg3;
+    self->initOption = initOption;
     if (self->stage != 0) {
         s32 stage;
         s32 three;
@@ -611,7 +611,7 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
     }
     if (self->timBlockPending == 0) {
         if (((StageMap *)self->lightRig)->pendingLoadCount == 0 && self->inSession == 0) {
-            self->unk64 = 1;
+            self->loadsComplete = 1;
             self->methods->enterStyleSession(self);
         }
     }

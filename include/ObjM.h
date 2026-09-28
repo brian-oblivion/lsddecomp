@@ -45,7 +45,7 @@
  *  - +0x044 init: ObjM__AttachTarget takes (args, DreamSys *);
  *    DayTask__StartObjM passes the DreamSys as the slot's s32 `mode`.
  *  - +0x04C onInit: ObjM__InitStyleAndWorld takes (gridSpan, style
- *    override, unk4C); IntermediateBase__Init calls it with (0, 0, 0).
+ *    override, initOption); IntermediateBase__Init calls it with (0, 0, 0).
  *  - +0x054 onDrawSystemEvent, +0x058 onPadEvent: the occupants take `void *`
  *    for the unused sender.
  *
@@ -153,13 +153,13 @@ struct ObjM {
     /* +0x040 */ s32 tickPeriod; /* InitStyleAndWorld: 16; the DreamSys's resetLinkState's tickPeriod (EnterStyleSession) */
     /* +0x044 */ s32 moveMode; /* InitStyleAndWorld: 2 or 3; resetLinkState's moveMode, a sMoveModeSpeeds index (EnterStyleSession) */
     /* +0x048 */ s32 gridSpan; /* onInit's arg1, 0 meaning 0xA000; the StageMap's setGridSpan (SetupSceneStyle) */
-    /* +0x04C */ s32 unk4C;                       /* onInit's arg3; no reader */
+    /* +0x04C */ s32 initOption; /* onInit's third argument (IntermediateBase__Init passes 0); no reader */
     /* +0x050 */ struct StyleConfig *styleConfig; /* RegisterStyleConfig's result, or onInit's arg2 */
     /* +0x054 */ struct WBgm *bgm; /* the ctor's (DayTask's bgm): setSeq, stop, pause, resume */
     /* +0x058 */ struct TimBlockSrc *timBlockSrc; /* InitStyleAndWorld's New_TimBlockSrc; PollTimBlockLoad releases it */
     /* +0x05C */ u8 pad05C[0x060 - 0x05C];
     /* +0x060 */ s32 timBlockPending; /* the ctor and InitStyleAndWorld set it; PollTimBlockLoad clears it */
-    /* +0x064 */ s32 unk64; /* the ctor zeroes it; PollTimBlockLoad sets 1 before enterStyleSession */
+    /* +0x064 */ s32 loadsComplete; /* the ctor zeroes it; PollTimBlockLoad sets 1 once the TIM block and the StageMap's chunk loads are done, before enterStyleSession; no reader */
     /* +0x068 */ s32 inSession; /* the ctor zeroes it; EnterStyleSession sets it; gates update, onPadEvent, enterStyleSession */
     /* +0x06C */ BasicClass *ctorSound; /* the ctor's sound again (also TimedTask::sound); &ctorSound is RegisterStyleConfig's arg2 (see the banner) */
     /* +0x070 */ struct LinkResource *dreamerTmd; /* the ctor's (DayTask's "ETC\DREAMER.TMD"); read through sStyleSceneRefs (ObjMStyleActor) */
@@ -184,7 +184,7 @@ void ObjM__NoOpSlot40(void);
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, struct DreamSys *dreamSys);
 struct FilePathRecord *ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y);
 void ObjM__DetachTarget(ObjM *self);
-void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, struct StyleConfig *style, s32 arg3);
+void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, struct StyleConfig *style, s32 initOption);
 void ObjM__TeardownStyle(ObjM *self);
 void ObjM__OnDrawSystemEvent(ObjM *self, void *sender, s32 event);
 void ObjM__PollTimBlockLoad(ObjM *self, struct TimBlockSrc *src);
