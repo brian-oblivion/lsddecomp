@@ -20,7 +20,7 @@ presumably only ever called with a live list head.
 void StartCdOperation(s32 arg0, s32 arg1)
 {
     sCdBusy = 1;
-    gCdOperation = arg0;
+    sCdOperation = arg0;
     gCdState = arg1;
     sCdIdle = 0;
     gCdRequestQueue->unk0 = 1;
@@ -32,7 +32,7 @@ Closed on the first attempt.
 ## Naming
 
 **Tier A.** Stores an operation code and initial phase into
-`gCdOperation`/`gCdState`, marks the driver busy (`sCdBusy = 1`,
+`sCdOperation`/`gCdState`, marks the driver busy (`sCdBusy = 1`,
 `sCdIdle = 0`) and marks the queue's head node `active`. Exact mirror image
 of `ResetCdStateMachine`; the "start the operation the head queue node
 represents" purpose is evident from the body (every field it writes is one

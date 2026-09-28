@@ -7,16 +7,16 @@
 ## What this function does
 
 A plain `$gp`-relative getter, no arguments. Reads the scalar `s32` global
-`gCdOperation` (in `.sdata`, zero-initialized) and returns it.
+`sCdOperation` (in `.sdata`, zero-initialized) and returns it.
 
 ## The C
 
 ```c
-extern s32 gCdOperation;
+extern s32 sCdOperation;
 
 s32 GetCdOperation(void)
 {
-    return gCdOperation;
+    return sCdOperation;
 }
 ```
 
@@ -32,7 +32,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | was | now | tier |
 | --- | --- | --- |
 | `func_80027EE0` | `GetCdOperation` | A |
-| `D_8008A874` | `gCdOperation` | A |
+| `D_8008A874` | `sCdOperation` | A |
 
 **Evidence.** The global has exactly one writer that sets it non-zero:
 `StartCdOperation(arg0, arg1)` (CdDriver), which stores `arg0` into it. Its

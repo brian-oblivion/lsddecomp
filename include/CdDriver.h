@@ -115,7 +115,7 @@ typedef struct CdRequestNode {
 #define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
 #define CD_TICK_LOAD_FILE 2     /* TickCdLoadFileStateMachine */
 
-/* gCdOperation: which method's request the state machine is running,
+/* sCdOperation: which method's request the state machine is running,
  * StartCdOperation's first argument and GetCdOperation's (and so
  * GetActiveDataSourceOperation's) result. Each value is passed by exactly one
  * of CdDriver.c's methods. 0 is also what ResetCdStateMachine leaves
@@ -157,7 +157,7 @@ extern s32 sCdBusy;          /* 0/1 */
 extern CdFileEntry *gFileTable;        /* SetFileTable */
 extern s32 gFileTableCount;            /* SetFileTableCount */
 extern s32 sCdIdle;                    /* 0/1 */
-extern s32 gCdOperation;               /* StartCdOperation's op, GetCdOperation's result */
+extern s32 sCdOperation;               /* StartCdOperation's op, GetCdOperation's result */
 extern s32 gCdState;                   /* the state machine's phase */
 extern CdFileEntry *gCdSeekParam;      /* the state machines seek to &gCdSeekParam->pos */
 extern s32 gCdReadSectorCount;         /* CdRead sector count */

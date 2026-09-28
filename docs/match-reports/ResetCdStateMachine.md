@@ -17,7 +17,7 @@ resets the timeout counter, and clears the busy flag. Called from both
 ```c
 void ResetCdStateMachine(void)
 {
-    gCdOperation = 0;
+    sCdOperation = 0;
     gCdState = 0;
     gCdTickStep = 0;
     sCdIdle = 1;

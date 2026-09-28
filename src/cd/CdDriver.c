@@ -572,7 +572,7 @@ s32 IsCdIdle(void) {
 }
 
 s32 GetCdOperation(void) {
-    return gCdOperation;
+    return sCdOperation;
 }
 
 s32 GetCdState(void) {
@@ -1025,7 +1025,7 @@ unlock:
  * queue's head request, which is marked active. */
 void StartCdOperation(s32 op, s32 state) {
     sCdBusy = 1;
-    gCdOperation = op;
+    sCdOperation = op;
     gCdState = state;
     sCdIdle = 0;
     gCdRequestQueue->active = 1;
@@ -1033,7 +1033,7 @@ void StartCdOperation(s32 op, s32 state) {
 
 /* No operation, no tick step: the driver is idle. */
 void ResetCdStateMachine(void) {
-    gCdOperation = 0;
+    sCdOperation = 0;
     gCdState = CD_STATE_IDLE;
     gCdTickStep = CD_TICK_NONE;
     sCdIdle = 1;
