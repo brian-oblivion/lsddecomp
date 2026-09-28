@@ -30,10 +30,6 @@ struct SubObjE {
  * resources. */
 extern void ReleaseDreamAuxModels(void);
 
-/* src/cd/GameFiles.c: the "SND\\SE" sound bank path, which DayTask's ctor
- * passes as TimedTask's soundBankPath. */
-extern char *GetSoundEffectDir(s32 unused); /* arity-ok: MATCHING: the definition takes no parameter; this dead argument is the `move a0,zero` before DayTask__DayTask's call */
-
 /* src/world/DreamAux.c; DayTask's ctor calls it, and its finalize
  * ReleaseDreamAuxModels. */
 extern void InitDreamAux(void);
@@ -41,11 +37,6 @@ extern void InitDreamAux(void);
 /* "ETC\\ETC.TIM" and "ETC\\DREAMER.TMD", the files DayTask's ctor loads. */
 extern const char sEtcTimPath[];
 extern const char sDreamerTmdPath[];
-
-/* src/cd/GameFiles.c: one of the seven gSoundBankPaths words, each a VAB
- * path string ("SND\\AMBIENT" ... "SND\\STANDERD"), which DayTask's ctor
- * passes to New_WBgm as its vabPath. */
-extern s32 PickSoundBank(s32 unused);
 
 /* Defined in src/world/DayTaskStageMap.c, after DayTask's methods; GameApplicationFileResource.c
  * declares it too. */

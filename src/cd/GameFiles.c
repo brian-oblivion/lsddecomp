@@ -29,6 +29,7 @@
 #include "LbdFile.h"
 #include "StageGrid.h"
 #include "BMemPMgr.h"
+#include "GameFiles.h"
 
 /* gRecordTable's record indices. The first RECORD_TABLE_COUNT are the
  * sound banks (SND\*.VH/VB) and then each stage's files; the movie records
@@ -75,11 +76,6 @@ enum MovieId {
 /* GetSpecialDayMovieSpan adds this to every movie's frame count but the
  * last. What the frames are for is not established. */
 #define MOVIE_SPAN_GAP_FRAMES 10
-
-/* One gRecordTable record: a file path, zero-padded to 0x1C bytes. */
-typedef struct FilePathRecord {
-    u8 data[0x1C];
-} FilePathRecord;
 
 extern int rand(void);
 extern void srand(unsigned int seed);
@@ -250,10 +246,10 @@ void *GetSoundBankPaths(void) {
 }
 
 /* One of the SND\name paths WBgm opens as its VAB, forced or random. */
-s32 PickSoundBank(s32 unused) {
+char *PickSoundBank(s32 unused) {
     u32 r = (u32)SeedAndRandom(0, unused) % SOUND_BANK_COUNT;
-    s32 *table = GetSoundBankPaths();
-    s32 *entry;
+    char **table = GetSoundBankPaths();
+    char **entry;
     s32 index;
     if (gForcedSoundBank != 0) {
         index = gForcedSoundBank - 1;

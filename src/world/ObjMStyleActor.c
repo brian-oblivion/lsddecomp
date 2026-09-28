@@ -55,6 +55,7 @@
 #include "GridCell.h"
 #include "GraphRoom.h"
 #include "BMemPMgr.h"
+#include "GameFiles.h"
 
 void ItemList__SetState(ItemList *self, s32 state) {
     /* MATCHING: the gotos keep retail's branch polarity and block order. */
@@ -457,21 +458,17 @@ void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dr
     self->methods->addChild(self, (BasicClass *)dreamSys);
 }
 
-/* ObjM__GetGridRecord's grid lookups (src/cd/GameFiles.c): a
- * non-negative code is a linear cell index (GetStageMapChunkRecord(index, code)),
- * a negative one sends x/y to GetStageMapChunkRecordXY. */
-extern s32 GetStageMapChunkRecord(s32 index, s32 sub);
-extern void GetStageMapChunkRecordXY(s32 index, s32 x, s32 y);
-
 /* The StageMap's chunkFileFn: a chunk's file record, by linear cell index,
- * or by x/y when the index is negative. The record is left as the return
- * value for the StageMap (GetStageMapChunkRecordXY is declared void). */
-void ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y) {
+ * or by x/y when the index is negative. */
+FilePathRecord *ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y) {
+    FilePathRecord *record;
+
     if (cell >= 0) {
-        GetStageMapChunkRecord(self->stage, cell);
+        record = GetStageMapChunkRecord(self->stage, cell);
     } else {
-        GetStageMapChunkRecordXY(self->stage, x, y);
+        record = GetStageMapChunkRecordXY(self->stage, x, y);
     }
+    return record;
 }
 
 void ObjM__DetachTarget(ObjM *self) {
@@ -479,13 +476,9 @@ void ObjM__DetachTarget(ObjM *self) {
     GetTimedTaskMethods()->deinit((TimedTask *)self);
 }
 
-/* Defined elsewhere, no header: src/cd/GameFiles.c (PickStageBgm and
- * PickStageTexture return a FilePathRecord *, a 0x1C-byte record handed on here as a
- * name), src/graphics/SceneNode.c (GetSetHitHeightGate sets the flag
- * SceneNode__RaycastHullAgainstFaces tests). RegisterStyleConfig, which
- * keeps `sceneRefs` as gStyleSceneRefs, is defined below, after ObjM. */
-extern s32 PickStageBgm(s32 stage, s32 unused);
-extern s32 PickStageTexture(s32 stage, s32 unused, s32 day);
+/* Defined elsewhere, no header: src/graphics/SceneNode.c (GetSetHitHeightGate
+ * sets the flag SceneNode__RaycastHullAgainstFaces tests). RegisterStyleConfig,
+ * which keeps `sceneRefs` as gStyleSceneRefs, is defined below, after ObjM. */
 extern s32 GetSetHitHeightGate(s32 value);
 extern s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadArg);
 
@@ -505,7 +498,7 @@ extern CellBounds gStage0Bounds;
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 arg3) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
-    s32 record;
+    FilePathRecord *record;
     s32 day;
     s32 flag;
 
@@ -516,7 +509,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
 
     day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     record = PickStageTexture(self->stage, 0, day);
-    self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc(record);
+    self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc((s32)record);
 
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &gObjMViewPoint,
                                  &gObjMViewRefPoint, 0);

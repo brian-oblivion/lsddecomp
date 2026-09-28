@@ -43,22 +43,15 @@
 #include "VabDriver.h"
 #include "CdDriver.h"
 #include "BMemPMgr.h"
+#include "GameFiles.h"
 
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
 
-extern char *GetDefaultDataDirectory(void); /* GameFiles.c: "CDI\\" */
-extern void SetDataDirectory(char *dir);    /* below */
+extern void SetDataDirectory(char *dir); /* below */
 
 /* Below: waits until the data source's driver takes the mode; every
  * task here starts with (0, 0, 0). */
 extern void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
-
-/* GameFiles.c's movie getters. Each returns a movie's path (a gRecordTable
- * record, or "ETC\ASMK.STR") and writes its movie id, which
- * GetMovieFrameCount turns into the frame count a StreamTask plays. */
-extern const char *GetAsmkMovie(s32 *movieIdOut);
-extern const char *PickOpeningMovie(s32 *movieIdOut, s32 unused);
-extern s32 GetMovieFrameCount(s32 movieId);
 
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
 extern const char sLogoPathOsd[];  /* "ETC\OSDLOGO.TIM" */
@@ -70,15 +63,6 @@ typedef IntermediateBase *(*NewTaskFn)(struct DreamSys *dreamSys);
 /* Defined below GameApplication__RunTitleMenu, its caller. */
 s32 GameApplication__RunTask(NewTaskFn newTask, struct DreamSys *dreamSys,
                              IntermediateBaseInitArgs *initArgs);
-
-/* The first movie of special day `day`, and the frames of dayCount days'
- * movies from it. */
-extern const char *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount);
-extern const char *GetEndingMovie(s32 *movieIdOut, s32 unused); /* arity-ok: the definition takes movieIdOut alone; retail's call still sets $a1 = 0 */
-/* A special day's record or an event movie, for DreamSys's getCinematic
- * pair packed into one word (bank low, entry high, each zero-extended);
- * *movieIdOut is -1 for a record that is a TIM image. */
-extern const char *GetSpecialDayOrEventRecord(s32 *movieIdOut, s32 packedPick);
 
 /* MATCHING: the NULL path falls off the end; any explicit return there costs
  * an instruction (BMemPMgrAlloc's NULL is already in $v0). */
@@ -111,8 +95,6 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
     self->dreamSys->methods->slot228(self->dreamSys, config->unk14);
     ((GameApplicationSeedRandomFn)self->methods->setScreenDims)(self);
 }
-
-extern s32 SeedAndRandom(s32 seed, s32 unused);
 
 /* +0x040: seeds rand() from the first scratchpad word, mod DAYS_PER_YEAR. */
 void GameApplication__SeedRandom(GameApplication *self) {
@@ -178,7 +160,7 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        moviePath = PickOpeningMovie(&movieId, 0);
+        moviePath = (const char *)PickOpeningMovie(&movieId, 0);
         frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 (s32)moviePath, frameCount, 1);
@@ -254,7 +236,7 @@ void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        moviePath = GetSpecialDayMovieSpan(&buf.frameTotal, 0, 10);
+        moviePath = (const char *)GetSpecialDayMovieSpan(&buf.frameTotal, 0, 10);
         task->methods->setFrameBound(task, (u32)buf.frameTotal / STREAMTASK_FRAMES_PER_SECOND);
         task->methods->setSkipOnConfirm(task, 0);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
@@ -315,7 +297,8 @@ void GameApplication__PlayCinematic(GameApplication *self) {
     TaskCore *task;
 
     cc = self->dreamSys->methods->getCinematic(self->dreamSys);
-    path = GetSpecialDayOrEventRecord(&idBuf.movieId, (u16)cc.bank | ((u32)(u16)cc.entry << 16));
+    path = (const char *)GetSpecialDayOrEventRecord(&idBuf.movieId,
+                                                    (u16)cc.bank | ((u32)(u16)cc.entry << 16));
     SetActiveDataSourceDriverMode(0, 0, 0);
 
     if (idBuf.movieId != -1) {
@@ -348,7 +331,7 @@ void GameApplication__PlayEndingMovie(GameApplication *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
         task->methods->setSkipOnConfirm(task, 0);
-        moviePath = GetEndingMovie(&movieId, 0);
+        moviePath = (const char *)GetEndingMovie(&movieId, 0);
         frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 (s32)moviePath, frameCount, 1);
