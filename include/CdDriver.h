@@ -78,7 +78,9 @@ void CdDriver__CancelRequests(CdDriver *self);              /* +0x074 cancelRequ
 /* One record of the file table: a name resolved once by ResolveFileEntries
  * (CdSearchFile on BuildCdFilePath(name)) and then reused as a seek target.
  * FindCdFileEntry / FindCdFileIndex / GetCdFileEntry walk it at this 0x1C
- * stride; the state machines seek to `pos` of the entry sCdSeekParam holds. */
+ * stride; the state machines seek to `pos` of the entry sCdSeekParam holds.
+ * The game's table is GameFiles.c's sRecordTable (include/GameFiles.h),
+ * whose getters hand out an entry's name as a file path. */
 typedef struct CdFileEntry {
     /* +0x00 */ char name[0x14];
     /* +0x14 */ CdlLOC pos;

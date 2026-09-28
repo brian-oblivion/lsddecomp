@@ -4,17 +4,15 @@
 /*
  * The getters over the game's table of file names, src/cd/GameFiles.c (the
  * LbdFile class it also holds is include/LbdFile.h). A record is one
- * zero-padded path in sRecordTable; the file's banner lists the table's
- * layout. The movie getters also write a movie id through movieIdOut, which
+ * sRecordTable entry, a CdFileEntry (include/CdDriver.h) whose name is a
+ * zero-padded path: RegisterRecordTableFiles hands the table to the CD
+ * driver as its file table, which fills in each entry's position and size.
+ * The file's banner lists the table's layout. The movie getters also write a movie id through movieIdOut, which
  * GetMovieFrameCount turns into the movie's frame count.
  */
 
 #include "common.h"
-
-/* One sRecordTable record: a file path, zero-padded to 0x1C bytes. */
-typedef struct FilePathRecord {
-    u8 data[0x1C];
-} FilePathRecord;
+#include "CdDriver.h"
 
 /* Each special day's six records, of which a CinematicCall's entry picks
  * one: FILM\SPDAYnnA/B.STR (its two movies), then IMG1\SPDAYnnC..F.TIM.
@@ -43,7 +41,7 @@ extern void SetPickOverrides(s32 soundBank, s32 stageBgm);
 
 /* The record table; *countOut (when not NULL) is its count of sound bank
  * and stage records, the ones before the movies. */
-extern void *GetRecordTable(s32 *countOut);
+extern CdFileEntry *GetRecordTable(s32 *countOut);
 
 /* The seven SND\name sound bank paths, one word each. */
 extern void *GetSoundBankPaths(void);
@@ -57,34 +55,34 @@ extern char *GetSoundEffectDir(); /* MATCHING: unprototyped, DayTask's ctor pass
 
 /* A stage's records, its four textures, its five BGM sequences and its map
  * chunks, and the pickers over them. */
-extern FilePathRecord *GetStageRecords(s32 stage);
-extern FilePathRecord *GetStageTextureRecords(s32 stage);
-extern FilePathRecord *PickStageTexture(s32 stage, s32 unused, s32 day);
-extern FilePathRecord *GetStageBgmRecords(s32 stage);
-extern FilePathRecord *PickStageBgm(s32 stage, s32 unused);
-extern FilePathRecord *GetStageMapChunkRecords(s32 stage);
-extern FilePathRecord *GetStageMapChunkRecord(s32 stage, s32 chunk);
-extern FilePathRecord *GetStageMapChunkRecordXY(s32 stage, s32 x, s32 y);
+extern CdFileEntry *GetStageRecords(s32 stage);
+extern CdFileEntry *GetStageTextureRecords(s32 stage);
+extern CdFileEntry *PickStageTexture(s32 stage, s32 unused, s32 day);
+extern CdFileEntry *GetStageBgmRecords(s32 stage);
+extern CdFileEntry *PickStageBgm(s32 stage, s32 unused);
+extern CdFileEntry *GetStageMapChunkRecords(s32 stage);
+extern CdFileEntry *GetStageMapChunkRecord(s32 stage, s32 chunk);
+extern CdFileEntry *GetStageMapChunkRecordXY(s32 stage, s32 x, s32 y);
 
 /* The movies: "ETC\\ASMK.STR", the seven openings (one picked at random),
  * the ending, the six events and each special day's six records. */
 extern const char *GetAsmkMovie(s32 *movieIdOut);
-extern FilePathRecord *GetOpeningMovieRecords(s32 *movieIdOut);
-extern FilePathRecord *PickOpeningMovie(s32 *movieIdOut, s32 unused);
-extern FilePathRecord *GetEndingMovieRecord(s32 *movieIdOut);
-extern FilePathRecord *GetEndingMovie(); /* MATCHING: unprototyped, PlayEndingMovie passes a dead second argument retail loads (arity-ok: dead argument) */
-extern FilePathRecord *GetEventMovieRecords(s32 *movieIdOut);
-extern FilePathRecord *GetEventMovie(s32 *movieIdOut, s32 event);
-extern FilePathRecord *GetSpecialDayRecords(s32 *movieIdOut, s32 day);
+extern CdFileEntry *GetOpeningMovieRecords(s32 *movieIdOut);
+extern CdFileEntry *PickOpeningMovie(s32 *movieIdOut, s32 unused);
+extern CdFileEntry *GetEndingMovieRecord(s32 *movieIdOut);
+extern CdFileEntry *GetEndingMovie(); /* MATCHING: unprototyped, PlayEndingMovie passes a dead second argument retail loads (arity-ok: dead argument) */
+extern CdFileEntry *GetEventMovieRecords(s32 *movieIdOut);
+extern CdFileEntry *GetEventMovie(s32 *movieIdOut, s32 event);
+extern CdFileEntry *GetSpecialDayRecords(s32 *movieIdOut, s32 day);
 
 /* A special day's record or an event movie, for the pair DreamSys's
  * getCinematic returns: *movieIdOut is -1 for a special day's TIM images. */
-extern FilePathRecord *GetSpecialDayOrEventRecord(s32 *movieIdOut, CinematicCall pick);
+extern CdFileEntry *GetSpecialDayOrEventRecord(s32 *movieIdOut, CinematicCall pick);
 
 extern s32 GetMovieFrameCount(s32 movieId);
 
 /* The first movie of special day `day`; *frameTotal is the frame count of
  * the movies of dayCount special days from it. */
-extern FilePathRecord *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount);
+extern CdFileEntry *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount);
 
 #endif

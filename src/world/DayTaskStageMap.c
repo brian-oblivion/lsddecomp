@@ -311,7 +311,7 @@ extern s32 sRecordFirstBatchCount;
  * registers nothing. */
 s32 RegisterRecordTableFiles(s32 all) {
     s32 count;
-    void *table;
+    CdFileEntry *table;
     s32 prev;
     s32 result;
 

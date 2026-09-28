@@ -234,7 +234,7 @@ void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        moviePath = (const char *)GetSpecialDayMovieSpan(&buf.frameTotal, 0, 10);
+        moviePath = GetSpecialDayMovieSpan(&buf.frameTotal, 0, 10)->name;
         task->methods->setFrameBound(task, (u32)buf.frameTotal / STREAMTASK_FRAMES_PER_SECOND);
         task->methods->setSkipOnConfirm(task, 0);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
@@ -291,7 +291,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
     TaskCore *task;
 
     cc = self->dreamSys->methods->getCinematic(self->dreamSys);
-    path = (const char *)GetSpecialDayOrEventRecord(&movieId, cc);
+    path = GetSpecialDayOrEventRecord(&movieId, cc)->name;
     SetActiveDataSourceDriverMode(0, 0, 0);
 
     if (movieId != -1) {
@@ -324,7 +324,7 @@ void GameApplication__PlayEndingMovie(GameApplication *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
         task->methods->setSkipOnConfirm(task, 0);
-        moviePath = (const char *)GetEndingMovie(&movieId, 0);
+        moviePath = GetEndingMovie(&movieId, 0)->name;
         frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 moviePath, frameCount, 1);

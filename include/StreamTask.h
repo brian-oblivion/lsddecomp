@@ -65,7 +65,7 @@
  * (no caller reads it).
  *
  * `streamName` is MoviePlayer__Play's name argument (`char *` there): the
- * movie's path, from GetAsmkMovie or a FilePathRecord the GameFiles.h
+ * movie's path, from GetAsmkMovie or a CdFileEntry the GameFiles.h
  * getters return.
  */
 

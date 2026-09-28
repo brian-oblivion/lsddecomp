@@ -463,8 +463,8 @@ void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dr
 
 /* The StageMap's chunkFileFn: a chunk's file record, by linear cell index,
  * or by x/y when the index is negative. */
-FilePathRecord *ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y) {
-    FilePathRecord *record;
+CdFileEntry *ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y) {
+    CdFileEntry *record;
 
     if (cell >= 0) {
         record = GetStageMapChunkRecord(self->stage, cell);
@@ -500,18 +500,18 @@ extern CellBounds sStage0Bounds;
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 initOption) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
-    FilePathRecord *record;
+    CdFileEntry *record;
     s32 day;
     s32 flag;
 
     vp->methods->detachViewChild(vp);
     self->timBlockPending = 1;
     record = PickStageBgm(self->stage, 0);
-    self->bgm->methods->setSeq(self->bgm, (char *)record);
+    self->bgm->methods->setSeq(self->bgm, record->name);
 
     day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     record = PickStageTexture(self->stage, 0, day);
-    self->timBlockSrc = New_TimBlockSrc((char *)record);
+    self->timBlockSrc = New_TimBlockSrc(record->name);
 
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sObjMViewPoint,
                                  &sObjMViewRefPoint, 0);
