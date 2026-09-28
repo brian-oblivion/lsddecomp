@@ -183,6 +183,33 @@ typedef struct SplitLongVec3 {
     } z; /* +0x008 */
 } SplitLongVec3;
 
+typedef struct SplitCoord2 SplitCoord2;
+
+/*
+ * A chunk slot's origin: its cellParent->coord2, a GsCOORDINATE2
+ * (Sony's, include/psyq/libgs.h), with the translation's x and z
+ * readable as the whole word or its low halfword, as SplitLongVec3's are.
+ * StageMap__LoadChunksAround writes all three words;
+ * StageMap__ComputeFootprintDescriptor reads tx/tz whole for the cell and
+ * as halfwords for the offset inside it.
+ * MATCHING: the unions; retail reloads tx/tz at the narrower width.
+ */
+struct SplitCoord2 {
+    u8 pad00[0x018]; /* +0x000, flg and coord.m */
+
+    union {
+        s32 w;
+        u16 h;
+    } tx; /* +0x018, coord.t[0] */
+
+    s32 ty; /* +0x01C, coord.t[1] */
+
+    union {
+        s32 w;
+        u16 h;
+    } tz; /* +0x020, coord.t[2] */
+};
+
 /* The step from a centre chunk's index (row * columns + column) to one of
  * the seven chunks around it, indexed by ChunkSlotSpec::neighbour
  * (sChunkNeighbourDeltas, ComputeChunkLoadEntry): rowDelta rows, then colDeltaOddRow
@@ -379,6 +406,39 @@ typedef void (*ChunkSlotFn)(StageMap *self, ChunkSlot *slot);
 
 extern StageMapMethods gStageMapMethods;
 extern StageMapMethods *GetStageMapMethods(void); /* returns &gStageMapMethods */
+
+/* The rectangle StageMap__InitFootprintRect copies into rects[index] before
+ * setting its slotIndex: no slot (-1), the whole 20 x 20 cells from (0, 0). */
+extern CellRect gFullSlotRect;
+
+/* The default "enable every element" spec table SetTargetAndLoadChunks
+ * passes to buildRateEntries: seven entries, every `flag` nonzero. */
+extern ChunkSlotSpec sDefaultTargetSpecs[7];
+
+/* Indexed by ChunkSlotSpec::key in StageMap__LoadChunksAround: the world
+ * offset of that neighbour's cellParent from the centre position. Unsized:
+ * `key` is the caller's byte. */
+extern LongVec3 sNeighbourOffsets[];
+
+/* `key`-indexed bitmask table (`1 << key`) StageMap__ComputeChunkLoadEntry
+ * tests against ComputeNeighbourMask's result. */
+extern const s32 sNeighbourBits[7];
+
+/* `key`-indexed chunk-index steps to the seven chunks around a centre chunk
+ * (ChunkNeighbourDelta, include/StageMap.h). */
+extern const ChunkNeighbourDelta sChunkNeighbourDeltas[7];
+
+/* LbdFile::ownerKey-indexed remap, read signed by
+ * StageMap__UpdateFootprintTracking (01 02 03 00 04 05 06 00). The byte
+ * (0..6) is UpdateFootprintTracking's return value and the index into
+ * sFootprintResultPtrTable. */
+extern const s8 sFootprintResultRemap[8];
+
+/* 7 pointers, the first NULL, the rest to 4-word tables of ChunkSlotSpecs
+ * (seven 2-byte entries, padded): UpdateFootprintTracking passes the
+ * selected one to buildRateEntries as its spec table, as
+ * SetTargetAndLoadChunks passes sDefaultTargetSpecs. */
+extern ChunkSlotSpec *sFootprintResultPtrTable[7];
 
 /* The class's own functions, in address order: the occupants of
  * gStageMapMethods and their non-slot helpers. */

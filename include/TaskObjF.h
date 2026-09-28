@@ -209,6 +209,36 @@ enum TaskObjFState {
 extern TaskObjFMethods gTaskObjFMethods;
 extern TaskObjFMethods *GetTaskObjFMethods(void); /* returns &gTaskObjFMethods */
 
+/* TaskObjF__TaskObjF's construction count: InitCARD/StartCARD/_bu_init run
+ * only on the first construction, when it was 0 before the increment. */
+extern s32 sTaskObjFCount;
+
+/* The kernel event calls TaskObjF's event methods make (OpenEvent,
+ * EnableEvent, DisableEvent, TestEvent; Sony's libapi) are declared in the
+ * units that call them. */
+
+/* Per TaskObjF::events slot: the event spec TaskObjF__OpenEvents passes to
+ * OpenEvent, and the value WaitForReadyEvent returns for that slot.
+ * Unsized: only the four slots are read. */
+extern s32 gCardEventSpecs[];
+
+/* A 6-byte memory-card device name, "bu00:" or "bu10:" (the BIOS names of
+ * the two card slots). BuildMemcardPath copies one as a whole struct.
+ * MATCHING: all-s8 members (alignment 1) make that copy retail's unaligned
+ * lwl/lwr plus byte stores. */
+typedef struct McDevicePath {
+    s8 b0, b1, b2, b3, b4, b5;
+} McDevicePath;
+
+extern McDevicePath gMcDevicePath1; /* "bu10:" */
+extern McDevicePath gMcDevicePath0; /* "bu00:" */
+
+/* Game code (src/ui/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it
+ * around its retry loop, and with (arg, 0) when the loop gives up. The BIOS
+ * file calls (open, read, lseek, close, delete; Sony's libapi) are declared
+ * in the units that call them. */
+extern s32 StampSaveTitleFileLetter(char *titleText, char *fileName);
+
 /* The class's own methods, in address order. */
 TaskObjF *New_TaskObjF(s32 padEnable, s32 cardSlot);
 void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot);

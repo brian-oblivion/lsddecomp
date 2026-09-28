@@ -24,7 +24,6 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <strings.h>
-#include "class_3bb8c.h"
 #include "TextEntry.h"
 #include "CharSprite.h"
 #include "TextRow.h"
@@ -34,6 +33,7 @@
 #include "FrameClock.h"
 #include "ItemList.h"
 #include "ScreenSprite.h"
+#include "BMemPMgr.h"
 
 /* ScreenWidgets.c's, which types both u8 *(u8 *dst, u8 *src); declared on
  * TextEntry's char buffers. Decode turns full-width SJIS into one byte a
