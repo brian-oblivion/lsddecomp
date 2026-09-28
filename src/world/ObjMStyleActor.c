@@ -446,7 +446,7 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
 void ObjM__NoOpSlot40(void) {}
 
 /* init. `args` is the building DayTask's init args: args->lightRig is its
- * StageMap (IntermediateBase__Init keeps it as unk14), whose callback
+ * StageMap (IntermediateBase__Init keeps it as lightRig), whose callback
  * becomes ObjM__GetGridRecord. */
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dreamSys) {
     ((StageMap *)args->lightRig)
@@ -968,7 +968,7 @@ void ObjM__NotifyParentsCodeB(ObjM *self) {
 }
 
 /* The fade box is the viewport's (IntermediateBase::viewport, a
- * NodeGuardedViewport: getFadeBox); IntermediateBase::unk10, the FrameClock,
+ * NodeGuardedViewport: getFadeBox); IntermediateBase::frameClock, the FrameClock,
  * drives it. A zero step keeps the box's own. */
 void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 fadeMode, s32 step, s32 addChild) {
     FadeBox *fade = (FadeBox *)((NodeGuardedViewport *)self->viewport)
@@ -1060,7 +1060,7 @@ void ObjM__CloseAndNotifyC(ObjM *self) {
 /* Called each update while the overlay is up. Step 0 builds the "Pause"
  * TextRow under the StageMap; the fourth call after it hides the viewport
  * and pauses the FrameClock, the WBgm and the VabStreamObj
- * (IntermediateBase::unk10, bgm, TimedTask::sound). */
+ * (IntermediateBase::frameClock, bgm, TimedTask::sound). */
 void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 step = self->pauseSetupStep;
     if (step == 0) {

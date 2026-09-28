@@ -14,7 +14,7 @@
  * sound, bgm, etcTim, dreamerTmd, stage), added as a child and init'ed with
  * DayTask's init args and its DreamSys. So the inherited
  * IntermediateBase fields hold that DayTask's init-arg objects:
- * unk10 its FrameClock, unk14 its StageMap, viewport its NodeGuardedViewport, and
+ * frameClock its FrameClock, lightRig its StageMap, viewport its NodeGuardedViewport, and
  * TimedTask's sound its VabStreamObj. Those fields keep their parents'
  * `BasicClass *` types and ObjM's methods cast them (no code).
  *
