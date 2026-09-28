@@ -2,7 +2,7 @@
 
 > Renamed from `func_8006536C` on 2026-09-24 (tools/rename.py). Address 0x8006536c.
 
-**Unit:** Entity_g · **Size:** 77 instructions
+**Unit:** Entity · **Size:** 77 instructions
 
 ## Blocker screen
 
@@ -80,7 +80,7 @@ merges it" shortcut to work.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g. 2 attempts.
+round 13 (2026-09-03), runner alpha, unit Entity. 2 attempts.
 
 
 ## Naming

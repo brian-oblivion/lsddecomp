@@ -84,6 +84,6 @@ named `Entity__MoodCueNN` for its row; row order does not track code
 address (each report derives its row). Rows 60, 63 and 72 have a NULL
 handler word: those mood indices dispatch no per-tick callback, not a gap
 in the unit. `Entity__MoodCue81` also occupies row 120 (its report), and
-`Entity__MoodCue71` is called from Entity_g's `Entity__MoodCue108`.
+`Entity__MoodCue71` is called from Entity's `Entity__MoodCue108`.
 `sMoodCue78TransitionDone` is a one-shot s32 flag used only by
 `Entity__MoodCue78`.

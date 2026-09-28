@@ -40,7 +40,7 @@ there is only one such block, hence 7 words short.
 ```
 
 Result: `98/98, insertions 0 / deletions 0`, `OK: build matches retail`,
-`tools/check-nonmatching.sh` green. Plain C in `src/Entity_g.c`; the
+`tools/check-nonmatching.sh` green. Plain C in `src/Entity.c`; the
 NON_MATCHING block and its stall comment are removed.
 
 **Why round 20's "two call sites" variant (104 words) missed:** it also
@@ -72,7 +72,7 @@ NON_MATCHING body promoted, round 73
 ## Blocker screen
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/Entity__MoodCue111.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity/Entity__MoodCue111.s
 ```
 
 No hits. Not toolchain-blocked.
@@ -142,7 +142,7 @@ disassembly -- the CONTROL FLOW is not in question.
 
 ## The residue
 
-Best in-window score 69/98, but `objdump -d build/src/Entity_g.c.o` shows
+Best in-window score 69/98, but `objdump -d build/src/Entity.c.o` shows
 the actual compiled body is ~94 instructions against retail's 98 -- roughly
 4 words SHORT, which is why `funcdiff`'s "differs outside this range"
 warning fires (96753 bytes) and the raw word-match count is not
@@ -215,12 +215,12 @@ sites, not one canonical one).
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g. 3 attempts,
+round 13 (2026-09-03), runner alpha, unit Entity. 3 attempts,
 `INCLUDE_ASM` restored.
 
 ## Round: hand analysis (runner delta), confirms redundant-rematerialization reading
 
-Read `asm/nonmatchings/Entity_g/Entity__MoodCue111.s` directly. Confirmed the
+Read `asm/nonmatchings/Entity/Entity__MoodCue111.s` directly. Confirmed the
 report's claim precisely -- `addiu $v0, $zero, -0x3C` (i.e. `li v0,-0x3c`)
 appears TWICE in a row, at consecutive branch delay slots, before either
 branch's own condition is even resolved:
@@ -393,7 +393,7 @@ mechanism claim through the pinned pipeline before touching anything else.
 ### 1. Rebuilding the recorded figures (PARALLEL-RUNS screen 4)
 
 Dropped the report's preserved body (verbatim, unchanged) back into
-`src/Entity_g.c` in place of the `INCLUDE_ASM`, ran the full chained oracle:
+`src/Entity.c` in place of the `INCLUDE_ASM`, ran the full chained oracle:
 
 ```
 ./build-and-verify.sh  ->  build exit=2, no compile-error grep hits
@@ -405,19 +405,19 @@ Raw word-match (69/98) matches the existing report exactly. The LENGTH
 figure does not:
 
 ```
-tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/Entity_g.c.o
+tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/Entity.c.o
   -> Entity__MoodCue111 compiles to 91 instructions (0x81c-0x984 in the .o)
 ```
 
 Retail is confirmed 98 words independently two ways: `funcdiff`'s own file
 range (0x557BC-0x55634 = 0x188 bytes = 98 words) and a direct count of
 `glabel`-adjacent instruction comments in
-`asm/nonmatchings/Entity_g/Entity__MoodCue111.s` (98 lines matching the
+`asm/nonmatchings/Entity/Entity__MoodCue111.s` (98 lines matching the
 `/* OFS VRAM WORD */` pattern).
 
 **91 vs 98 is 7 words short, not the "~4 words" / "94 vs 98" this report
 carried since round 13.** The C body compared is byte-identical to what is
-quoted in this report (diffed the live `src/Entity_g.c` insertion against
+quoted in this report (diffed the live `src/Entity.c` insertion against
 the `#if 0` block above before restoring `INCLUDE_ASM` — no drift). Whether
 the earlier 94-word count came from a different toolchain snapshot, a
 transcription slip, or an objdump range mis-boundary, it does not reproduce

@@ -2,12 +2,12 @@
 
 > Renamed from `func_80064618` on 2026-09-24 (tools/rename.py). Address 0x80064618.
 
-**Unit:** Entity_g · **Size:** 48 instructions
+**Unit:** Entity · **Size:** 48 instructions
 
 ## Blocker screen (mandatory)
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/Entity__MoodCue98.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity/Entity__MoodCue98.s
 ```
 
 No hits. Consistent with the coordinator's measured all-clear for this unit
@@ -71,7 +71,7 @@ function really is one of these handlers before assuming the signature.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g. Matched on the first
+round 13 (2026-09-03), runner alpha, unit Entity. Matched on the first
 build.
 
 

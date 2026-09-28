@@ -74,7 +74,7 @@ What it does, in the unit's current field names: Tick 0: gets/creates `unk100`, 
 | `D_80089D90` | `TRANSLATE_Y_MINUS256` | A | three s32 `(0, -256, 0)`, the format of `TRANSLATE_Y_MINUS512`/`TRANSLATE_Y_MINUS64`; passed to `addVec14` like the other `TRANSLATE_*` tables |
 
 `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` (`(4,5, 6,5, 5,5)` as s16 pairs, a non-uniform 4/5, 6/5, 1
-scale) is left unnamed, as Entity_g's header comment already decided for the
+scale) is left unnamed, as Entity's header comment already decided for the
 same symbol: no precedent for naming a non-uniform, non-unit-fraction scale.
 
 ### Fields renamed (round 79, applied, compiler-listed accessors all in Entity)

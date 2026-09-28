@@ -2,7 +2,7 @@
 
 > Renamed from `func_80064B80` on 2026-09-24 (tools/rename.py). Address 0x80064b80.
 
-**Unit:** Entity_g · **Size:** 73 instructions
+**Unit:** Entity · **Size:** 73 instructions
 
 ## Blocker screen
 
@@ -110,7 +110,7 @@ Neither lever (negation idiom; dual-based-type array walkers) applies.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g. 4 attempts.
+round 13 (2026-09-03), runner alpha, unit Entity. 4 attempts.
 
 
 ## Naming

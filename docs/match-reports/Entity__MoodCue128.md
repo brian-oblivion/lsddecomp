@@ -2,7 +2,7 @@
 
 > Renamed from `func_800654A0` on 2026-09-24 (tools/rename.py). Address 0x800654a0.
 
-**Unit:** Entity_g · **Size:** 29 instructions
+**Unit:** Entity · **Size:** 29 instructions
 
 ## Blocker screen
 
@@ -27,7 +27,7 @@ Matched on the first build.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g.
+round 13 (2026-09-03), runner alpha, unit Entity.
 
 
 ## Naming

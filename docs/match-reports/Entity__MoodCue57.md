@@ -180,7 +180,7 @@ Every literal in the live body is in its base: decimal for moodTimer ticks, dist
   colour (include/FadeBox.h); Entity__GetOrCreateFadeBox is its only
   writer (New_FadeBox, then setStep from its fourth argument, 10 here),
   Entity__Finalize releases it, and every other access (here, Entity x3,
-  Entity_g x1) calls startFadeDown or startFadeUp on it. Accessors outside
+  Entity x1) calls startFadeDown or startFadeUp on it. Accessors outside
   Entity_d (Entity.c, Entity_f.c, Entity_g.c), so proposed, not applied.
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2

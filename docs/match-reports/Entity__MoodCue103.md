@@ -2,7 +2,7 @@
 
 > Renamed from `func_80064928` on 2026-09-24 (tools/rename.py). Address 0x80064928.
 
-**Unit:** Entity_g · **Size:** 95 instructions
+**Unit:** Entity · **Size:** 95 instructions
 
 ## Blocker screen
 
@@ -47,7 +47,7 @@ Matched on the first build.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g. Matched on the first
+round 13 (2026-09-03), runner alpha, unit Entity. Matched on the first
 build. Adds `ROTATION_YAW_MINUS_HALF` to this unit's local externs.
 
 

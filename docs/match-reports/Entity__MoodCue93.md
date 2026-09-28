@@ -49,9 +49,9 @@ slots and the fields they write; the Entity offsets are the same.
 
 | field / slot | proposed | tier | evidence | accessor outside Entity |
 | --- | --- | --- | --- | --- |
-| `EntityMethods::slot128` | `setTod` | A | gEntityMethods +0x128 = `TodActor__SetTod` (writes todIndex +0x7C, todFrameCount +0x80, todFramePtr +0x88, todFrame +0x84 = 0) | Entity_g (first compiler failure, `Entity_g.c:184`) |
-| `EntityMethods::slot12C` | `playTod` | A | +0x12C = `TodActor__PlayTod` (todPlaying = 1) | Entity_g (first compiler failure, `Entity_g.c:239`) |
-| `EntityMethods::slot130` | `stopTod` | A | +0x130 = `TodActor__StopTod` (todPlaying = 0) | Entity_g (first compiler failure, `Entity_g.c:177`) |
+| `EntityMethods::slot128` | `setTod` | A | gEntityMethods +0x128 = `TodActor__SetTod` (writes todIndex +0x7C, todFrameCount +0x80, todFramePtr +0x88, todFrame +0x84 = 0) | Entity (first compiler failure, `Entity.c:184`) |
+| `EntityMethods::slot12C` | `playTod` | A | +0x12C = `TodActor__PlayTod` (todPlaying = 1) | Entity (first compiler failure, `Entity.c:239`) |
+| `EntityMethods::slot130` | `stopTod` | A | +0x130 = `TodActor__StopTod` (todPlaying = 0) | Entity (first compiler failure, `Entity.c:177`) |
 | `Entity::unk7C` (+0x7C) | `todIndex` | A | TodActor +0x7C; here `setTod(this, 1)` is followed by `if (unk7C == 1)`, which is SetTod's own write read back | Entity_e (first compiler failure, `Entity_e.c:338`) |
 | `Entity::unk84` (+0x84) | `todFrame` | A | TodActor +0x84; `Entity__MoodCue91/92` fast-forward only while it is 0 and increment it with each `applyTodFrame`; `Entity__MoodCue92` compares it to `moodDuration - 1` | Entity_g (first compiler failure, `Entity_g.c:93`) |
 

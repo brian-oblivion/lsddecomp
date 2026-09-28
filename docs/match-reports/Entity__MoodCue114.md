@@ -2,7 +2,7 @@
 
 > Renamed from `func_800650F4` on 2026-09-24 (tools/rename.py). Address 0x800650f4.
 
-**Unit:** Entity_g · **Size:** 42 instructions
+**Unit:** Entity · **Size:** 42 instructions
 
 ## Blocker screen
 
@@ -43,7 +43,7 @@ the second build.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g. 2 attempts.
+round 13 (2026-09-03), runner alpha, unit Entity. 2 attempts.
 
 
 ## Naming

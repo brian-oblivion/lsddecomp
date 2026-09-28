@@ -2,7 +2,7 @@
 
 > Renamed from `func_80065514` on 2026-09-24 (tools/rename.py). Address 0x80065514.
 
-**Unit:** Entity_g · **Size:** 48 instructions
+**Unit:** Entity · **Size:** 48 instructions
 
 ## Blocker screen
 
@@ -33,11 +33,11 @@ void Entity__MoodCue129(Entity *this, EntityMoodHandlerArg *out) {
 }
 ```
 
-Matched on the first build. Last function in this round's Entity_g queue.
+Matched on the first build. Last function in this round's Entity queue.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g.
+round 13 (2026-09-03), runner alpha, unit Entity.
 
 
 ## Naming

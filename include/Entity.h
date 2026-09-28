@@ -14,7 +14,7 @@
  * (GetTodActorMethods()->ctor), so the id parent is the ctor-chain
  * parent. Methods in src/Entity.c (New_Entity .. Entity__UpdateDeactivationState)
  * and src/Entity.c (the last three slots, the range helpers, the getter).
- * The MoodCue handlers in Entity..Entity_g are not in the table: they are
+ * The MoodCue handlers in Entity..Entity are not in the table: they are
  * the `handler` of gEntityMoodHandlerTable's rows. Spawned by code_4cd08
  * (SetDreamAuxWorld, SpawnDreamAuxTriggerEntity).
  *
@@ -243,13 +243,13 @@ s32 Entity__IsTargetInRange(Entity *self, s32 range);
 s32 Entity__UpdateSoundCueStop(Entity *self);
 
 /* MoodCue handlers called from another Entity unit. */
-void Entity__MoodCue51(Entity *self, SoundCueSet *out); /* Entity; called by Entity__MoodCue113 (Entity_g) */
-void Entity__MoodCue71(Entity *self, SoundCueSet *out); /* Entity; called by Entity__MoodCue108 (Entity_g) */
+void Entity__MoodCue51(Entity *self, SoundCueSet *out); /* Entity; called by Entity__MoodCue113 (Entity) */
+void Entity__MoodCue71(Entity *self, SoundCueSet *out); /* Entity; called by Entity__MoodCue108 (Entity) */
 void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 windowStart,
-                                            s32 deactivateTimer, s32 zStep); /* Entity_g; called by Entity */
+                                            s32 deactivateTimer, s32 zStep); /* Entity; called by Entity */
 
 /* The motion templates (.data, 0x80089C58..0x80089E97, in address order):
- * the constant triples the MoodCue handlers in Entity..Entity_g pass to
+ * the constant triples the MoodCue handlers in Entity..Entity pass to
  * updateRotation (+0x044) and updateScale (+0x048) -- three Ratio16s
  * (include/SceneNode.h), degrees or scale factors, {x, y, z} -- and to
  * addTranslation (+0x0BC), three s32 deltas. Named by value. The slots take

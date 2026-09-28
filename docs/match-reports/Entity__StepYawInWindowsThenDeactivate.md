@@ -4,7 +4,7 @@
 
 > Renamed from `func_80064FBC` on 2026-09-24 (tools/rename.py). Address 0x80064fbc.
 
-**Unit:** Entity_g · **Size:** 70 instructions · **Attempts:** 5
+**Unit:** Entity · **Size:** 70 instructions · **Attempts:** 5
 
 ## Blocker screen
 
@@ -138,7 +138,7 @@ risks exactly the kind of collateral reassignment attempt 3 hit.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g. 5 attempts,
+round 13 (2026-09-03), runner alpha, unit Entity. 5 attempts,
 `INCLUDE_ASM` restored.
 
 ## MATCHED -- round: permuter pass (runner delta)
@@ -199,7 +199,7 @@ L74:
 
 Verified byte-exact: `./build-and-verify.sh` -- `OK: build matches retail
 SLPS_015.56` -- and `tools/funcdiff.py Entity__StepYawInWindowsThenDeactivate` -- `70/70 words
-match`. This is now the live body in `src/Entity_g.c` (`INCLUDE_ASM`
+match`. This is now the live body in `src/Entity.c` (`INCLUDE_ASM`
 removed).
 
 ### New struct knowledge

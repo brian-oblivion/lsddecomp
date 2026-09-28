@@ -2,12 +2,12 @@
 
 > Renamed from `func_800646D8` on 2026-09-24 (tools/rename.py). Address 0x800646d8.
 
-**Unit:** Entity_g · **Size:** 148 instructions
+**Unit:** Entity · **Size:** 148 instructions
 
 ## Blocker screen
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/Entity__MoodCue102.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity/Entity__MoodCue102.s
 ```
 
 No hits.
@@ -111,7 +111,7 @@ and vtable dispatch.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g. 2 attempts (one residue,
+round 13 (2026-09-03), runner alpha, unit Entity. 2 attempts (one residue,
 two swapped row-pointer arms in a cascading range chain).
 
 

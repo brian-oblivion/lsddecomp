@@ -2,7 +2,7 @@
 
 > Renamed from `func_800650D4` on 2026-09-24 (tools/rename.py). Address 0x800650d4.
 
-**Unit:** Entity_g · **Size:** 8 instructions
+**Unit:** Entity · **Size:** 8 instructions
 
 ## Blocker screen
 
@@ -27,7 +27,7 @@ Matched on the first build. Adds an `include/Entity.h` extern for
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g.
+round 13 (2026-09-03), runner alpha, unit Entity.
 
 
 ## Naming

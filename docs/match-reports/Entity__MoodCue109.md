@@ -2,7 +2,7 @@
 
 > Renamed from `func_80064CEC` on 2026-09-24 (tools/rename.py). Address 0x80064cec.
 
-**Unit:** Entity_g · **Size:** 23 instructions
+**Unit:** Entity · **Size:** 23 instructions
 
 ## Blocker screen
 
@@ -26,7 +26,7 @@ Matched on the first build.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g.
+round 13 (2026-09-03), runner alpha, unit Entity.
 
 
 ## Naming
