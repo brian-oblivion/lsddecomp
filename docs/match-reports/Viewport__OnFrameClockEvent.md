@@ -1,4 +1,6 @@
-# Viewport__OnNotifyTag5 — MATCHED
+# Viewport__OnFrameClockEvent — MATCHED
+
+> Renamed from `Viewport__OnNotifyTag5` on 2026-09-28 (tools/rename.py). Address 0x8003ee40.
 
 > Renamed from `Unk18Obj__OnNotifyTag5` on 2026-09-25 (tools/rename.py). Address 0x8003ee40.
 
@@ -9,7 +11,7 @@ Unit: `Task`. Round 14, runner delta. 18/18 words, full match.
 ## Signature
 
 ```c
-void Viewport__OnNotifyTag5(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+void Viewport__OnFrameClockEvent(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 ```
 
 `Unk18ObjMethods`'s own `+0x094` slot occupant (`slot94`, dispatched by
@@ -21,7 +23,7 @@ Increments `self->unk90` unconditionally, and additionally dispatches
 `self->methods->slot9C` when `arg2` is 2 or 3.
 
 ```c
-void Viewport__OnNotifyTag5(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
+void Viewport__OnFrameClockEvent(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
     self->unk90 = self->unk90 + 1;
     if (arg2 == 2 || arg2 == 3) {
         self->methods->slot9C(self);

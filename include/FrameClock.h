@@ -21,7 +21,7 @@
  * (src/world/DayTaskStageMap.c) makes the one handed in as initArgs->unk8.
  *
  * Its listeners, all dispatching on the sender's class nibble 5:
- * IntermediateBase's update counts every event; Viewport__OnNotifyTag5
+ * IntermediateBase's update counts every event; Viewport__OnFrameClockEvent
  * redraws on 2 and 3 but not 4; DreamSys__TimerTick advances the dream timer
  * on 2 only; TodActor__Update ticks on 2 and releases itself on 4.
  * `paused` is named from ObjM (src/world/ObjMStyleActor.c): ObjM__AdvancePauseSetup

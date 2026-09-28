@@ -1625,7 +1625,7 @@ void Viewport__DeinitOt(Viewport *self) {
 /* A FrameClock event: counts every one in clockEventCount, and runs update
  * on a tick whether the clock is running or paused (not on
  * FRAMECLOCK_EVENT_STOPPED). */
-void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event) {
+void Viewport__OnFrameClockEvent(Viewport *self, BasicClass *sender, s32 event) {
     self->clockEventCount = self->clockEventCount + 1;
     if (event == FRAMECLOCK_EVENT_RUNNING || event == FRAMECLOCK_EVENT_PAUSED) {
         self->methods->update(self);

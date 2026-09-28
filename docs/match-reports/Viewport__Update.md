@@ -14,7 +14,7 @@ void Viewport__Update(Unk18Obj *self);
 ```
 
 `Unk18ObjMethods`'s own `+0x09C` slot occupant (`slot9C`, dispatched by
-`Viewport__OnNotifyTag5`, this round).
+`Viewport__OnFrameClockEvent`, this round).
 
 ## What it does
 
@@ -131,7 +131,7 @@ learning below.
   `self`+`Unk18Obj*` all appear).
 - Corrected two earlier comments that conflated "which function OBSERVED
   this slot" with "which function OCCUPIES it" — `slot9C`'s real occupant
-  is this function (not `Viewport__OnNotifyTag5`, which only dispatches it), and
+  is this function (not `Viewport__OnFrameClockEvent`, which only dispatches it), and
   `slotA4`'s real occupant is `Viewport__Flip` (not `Viewport__OnDrawSystemEvent`, ditto).
 - New externs: `GsSetNearClip`/`func_8003FC70`/`func_8003FD4C`/
   `GsSetWorkBase` (all `asm/ScreenWidgets.s`, next slice, uncarved) and
@@ -154,7 +154,7 @@ between two named fields).
 
 ## Naming
 
-`Unk18Obj__Update` -- tier A. The `slot9C` occupant, dispatched by `Viewport__OnNotifyTag5`; the existing (pre-round-73) report already described it in these exact terms as a "per-frame update" (light mode, fog, ref view, both `GsClearOt` halves, notifying child objects through `slotA0`), independently of this round's naming pass -- a description of MECHANICS, evident from the body, which is what a tier-A name requires.
+`Unk18Obj__Update` -- tier A. The `slot9C` occupant, dispatched by `Viewport__OnFrameClockEvent`; the existing (pre-round-73) report already described it in these exact terms as a "per-frame update" (light mode, fog, ref view, both `GsClearOt` halves, notifying child objects through `slotA0`), independently of this round's naming pass -- a description of MECHANICS, evident from the body, which is what a tier-A name requires.
 
 ## Proposed field names
 
@@ -200,7 +200,7 @@ a future pass (or track 4) with more time to cross-check every call site.
 - `unk88`/`unk8C` -> `otAPackets`/`otBPackets` (tier B): the two packet
   areas (`base + 0x14 + (4 << unk3C)`), same pairing.
 - `unk90` -> `notifyCount` (tier B): incremented unconditionally, once per
-  call, by `Viewport__OnNotifyTag5`. Never read anywhere in this unit.
+  call, by `Viewport__OnFrameClockEvent`. Never read anywhere in this unit.
 - `unk98` -> `otPacketRange` or similar (tier C): `(unk50-unk4C) /
   (1<<unk3C) + 1`, computed each `Viewport__Update` call; never read back
   anywhere in this unit either, so it may be purely an out-parameter for a
