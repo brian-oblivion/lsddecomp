@@ -48,7 +48,7 @@ typedef void (*DreamAuxObjFn3A)(DreamAuxObj *self, void *arg1, void *arg2);
 
 bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 {
-    DreamAuxObj *entity = (DreamAuxObj *)New_Entity((void *)kind, out, (void *)gDreamAuxSound);
+    DreamAuxObj *entity = (DreamAuxObj *)New_Entity((void *)kind, out, (void *)sDreamAuxSound);
 
     if (entity != NULL) {
         DreamAuxSpawnInfo *rec;
@@ -76,7 +76,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 ```
 
 `New_Entity`'s three arguments here are the exact same shape as
-`SetDreamAuxWorld`'s call: `(kind, out, gDreamAuxSound)`, where `out` is THIS
+`SetDreamAuxWorld`'s call: `(kind, out, sDreamAuxSound)`, where `out` is THIS
 function's own `void *out` parameter, itself a 4-word caller-provided
 scratch buffer per the header's existing comment on this function's
 signature (`ProcessDreamAuxTriggerRecord`'s `scratch[4]`). `gDreamAuxSpawnInfo`/`sDreamAuxPosTable` are two

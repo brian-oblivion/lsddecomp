@@ -36,7 +36,7 @@
  *
  * Sound cues. startSoundCue calls InitSoundCueSet on `soundCueSet` with
  * TodActor's `sound` (the ctor's third argument; DreamAux passes
- * gDreamAuxSound) as the sound object, itself as the owner and the mood row's
+ * sDreamAuxSound) as the sound object, itself as the owner and the mood row's
  * handler as the callback, and selects tick callback 'B' in reset
  * (Entity__TickSoundCue, +0x11C), which services the set once per tick. So a
  * MoodCue handler is a SoundCueSet callback (include/SoundCueSet.h):

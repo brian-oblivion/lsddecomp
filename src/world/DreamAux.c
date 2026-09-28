@@ -83,7 +83,7 @@ void ReleaseDreamAuxModels(void) {
 extern s32 gDreamAuxStage;
 extern StageMap *gDreamAuxStageMap;
 extern DreamSys *gDreamAuxWorld;
-extern struct VabStreamObj *gDreamAuxSound;
+extern struct VabStreamObj *sDreamAuxSound;
 extern struct FrameClock *sDreamAuxFrameClock;
 
 void SetTeleportsEnabled(s32 stage);
@@ -96,13 +96,13 @@ void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct Vab
     gDreamAuxStage = stage;
     gDreamAuxStageMap = stageMap;
     gDreamAuxWorld = world;
-    gDreamAuxSound = sound;
+    sDreamAuxSound = sound;
     sDreamAuxFrameClock = frameClock;
 
     for (i = 0; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
         s32 desc[4]; /* New_Entity's descriptor: word +0x00C the ModelData */
         desc[3] = (s32)slot->model;
-        slot->entity = New_Entity(i + DREAM_AUX_FIRST_MOOD, desc, gDreamAuxSound);
+        slot->entity = New_Entity(i + DREAM_AUX_FIRST_MOOD, desc, sDreamAuxSound);
         slot++;
     }
     SetTeleportsEnabled(stage);
@@ -427,7 +427,7 @@ extern Ratio16 gDreamAuxSpawnRotations[][3];
 /* Makes an Entity of mood row `moodIndex`, turns it and attaches it at
  * placement `spawnIndex` of `trigger`'s chunk. True when New_Entity failed. */
 bool SpawnDreamAuxTriggerEntity(s32 moodIndex, void *desc, DreamAuxTriggerEntry *trigger, s32 spawnIndex) {
-    Entity *entity = New_Entity(moodIndex, desc, gDreamAuxSound);
+    Entity *entity = New_Entity(moodIndex, desc, sDreamAuxSound);
 
     if (entity != NULL) {
         DreamAuxSpawnInfo *spawn;
