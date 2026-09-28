@@ -21,7 +21,7 @@ branch:
 ```
 
 The stall report argued `$a1` is never read on either path. That is right for
-the fallthrough (`$a1` is overwritten by `%hi(gSpriteShiftScratch)` in the very next
+the fallthrough (`$a1` is overwritten by `%hi(sSpriteShiftScratch)` in the very next
 instruction) and **wrong for the branch-taken path**, which is the half that
 decides. Read `.L80056C78` forward to its first call:
 
@@ -181,7 +181,7 @@ Globals named in this pass (only this unit references them, tier B, named by
 their ratio-triple values): `gSpriteShiftX` (was D_80087844, s32[6]),
 `sSpriteScaleLarge` (was D_8008785C, {6/5, 6/5, 1/1}), `sSpriteScaleHalf`
 (was D_80087868, {3/6, 3/6, 1/1}), `sSpriteScaleSmall` (was D_80087874,
-{4/6, 4/6, 1/1}), `gSpriteShiftScratch` (was D_80087880, a zero Vec3S whose
+{4/6, 4/6, 1/1}), `sSpriteShiftScratch` (was D_80087880, a zero Vec3S whose
 .x is overwritten before each use).
 
 ## Track 4 (2026-09-26, round 88, charlie)

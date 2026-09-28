@@ -2377,7 +2377,7 @@ extern s32 gSpriteShiftX[];
 extern Ratio16 sSpriteScaleLarge[3];
 extern Ratio16 sSpriteScaleHalf[3];
 extern Ratio16 sSpriteScaleSmall[3];
-extern LongVec3 gSpriteShiftScratch;
+extern LongVec3 sSpriteShiftScratch;
 
 void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b);
 void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, void *scale);
@@ -2629,11 +2629,11 @@ void StyleEffect__BuildRandomSprites(StyleEffect *self) {
         VariantSpriteMethods *methods;
 
         sprite = self->sprites[1];
-        gSpriteShiftScratch.x = gSpriteShiftX[self->params.tableIndex];
+        sSpriteShiftScratch.x = gSpriteShiftX[self->params.tableIndex];
         /* Called directly, not through the sprite's table: a VariantSprite
          * is a Sprite, not an Actor, and the function only touches the
          * SceneNode coord2 both share. */
-        Actor__AddTranslation((Actor *)sprite, &gSpriteShiftScratch);
+        Actor__AddTranslation((Actor *)sprite, &sSpriteShiftScratch);
         methods = sprite->methods;
         color = (self->params.altColor != NULL) ? self->params.altColor : self->params.color;
         methods->setColor(sprite, color);
