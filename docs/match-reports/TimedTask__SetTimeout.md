@@ -53,9 +53,9 @@ None beyond what's already documented.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Slot +0x06C, `setTimeout`, the first of this class's own slots; parameter `timeout`, stored as `timeout * 20` frames or kept when negative (TimedTask__CancelTimeout's -1 never fires, CheckTimeout comparing unsigned). Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Not renamed. Slot +0x06C, `setTimeout`, the first of this class's own slots; parameter `timeout`, stored as `timeout * 20` frames or kept when negative (TimedTask__CancelTimeout's -1 never fires, CheckTimeout comparing unsigned). Image byte-identical.
 
 ## Naming (track 7, round 99, charlie)
 
-`20` -> `TIMEDTASK_TIMEOUT_UNIT_FRAMES` (TimedTask.h; the frame count per
+`20` -> `TIMEDTASK_TIMEOUT_UNIT_FRAMES` (timed_task.h; the frame count per
 timeout unit, as the header banner already described it).

@@ -16,7 +16,7 @@
  * CD driver in at most two batches (DayTask's ctor, and the loader-task
  * callback in game_shell.c).
  *
- * TimedTask (include/TimedTask.h), New_TimedTask through
+ * TimedTask (include/timed_task.h), New_TimedTask through
  * GetTimedTaskMethods: an IntermediateBase with a frame timeout, a sound
  * object and a result.
  *
@@ -46,7 +46,7 @@
 #include "objm.h"
 #include "actor.h"
 #include "light_rig.h"
-#include "TimedTask.h"
+#include "timed_task.h"
 #include "draw_system.h"
 #include "placement_grid.h"
 #include "lbd_file.h"

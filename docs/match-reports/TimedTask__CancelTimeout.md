@@ -53,4 +53,4 @@ None beyond what's already documented.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. It fills IntermediateBase's `resetCounters` slot (+0x040) but does not chain to IntermediateBase__ResetCounters: its whole body is `setTimeout(-1)`, so the name says what it does rather than what the slot is. `self` is `TimedTask *`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Not renamed. It fills IntermediateBase's `resetCounters` slot (+0x040) but does not chain to IntermediateBase__ResetCounters: its whole body is `setTimeout(-1)`, so the name says what it does rather than what the slot is. `self` is `TimedTask *`. Image byte-identical.

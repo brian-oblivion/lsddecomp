@@ -77,7 +77,7 @@ table family may read them.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Renamed from `TimedTask__SetChildFlag8`, tier A. The ctor settles what +0x034 is: `New_VabStreamObj(soundBankPath)` when the first ctor argument is non-NULL (Obj865C8 passes GetSoundEffectDir()), the caller's object otherwise (ObjM passes Obj865C8's, itself a VabStreamObj); ObjM calls the same field's +0x088/+0x08C, VabStreamObj's Mute/Unmute. gVabStreamObjMethods' +0x080 is VabStreamObj__PlayTone, so this is `sound->PlayTone(tone, 0x7F, 0x7F)`, the shape of TaskCore__PlaySound (which passes 0x60, 0x60). The StageMap reading above is withdrawn: the field is `TimedTask::sound` (`BasicClass *`), cast in dream_day.c to a local SoundObj_3ac78 view with +0x080 `playTone`. Slot +0x070 is named `playSound`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Renamed from `TimedTask__SetChildFlag8`, tier A. The ctor settles what +0x034 is: `New_VabStreamObj(soundBankPath)` when the first ctor argument is non-NULL (Obj865C8 passes GetSoundEffectDir()), the caller's object otherwise (ObjM passes Obj865C8's, itself a VabStreamObj); ObjM calls the same field's +0x088/+0x08C, VabStreamObj's Mute/Unmute. gVabStreamObjMethods' +0x080 is VabStreamObj__PlayTone, so this is `sound->PlayTone(tone, 0x7F, 0x7F)`, the shape of TaskCore__PlaySound (which passes 0x60, 0x60). The StageMap reading above is withdrawn: the field is `TimedTask::sound` (`BasicClass *`), cast in dream_day.c to a local SoundObj_3ac78 view with +0x080 `playTone`. Slot +0x070 is named `playSound`. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 

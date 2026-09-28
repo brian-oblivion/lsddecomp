@@ -1,5 +1,5 @@
-#ifndef TIMEDTASK_H
-#define TIMEDTASK_H
+#ifndef TIMED_TASK_H
+#define TIMED_TASK_H
 
 #include "intermediate_base.h"
 

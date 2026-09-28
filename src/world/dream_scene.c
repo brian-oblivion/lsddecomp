@@ -29,7 +29,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "dream_day.h"
-#include "TimedTask.h"
+#include "timed_task.h"
 #include "text_row.h"
 #include "tim_image.h"
 #include "item_list.h"

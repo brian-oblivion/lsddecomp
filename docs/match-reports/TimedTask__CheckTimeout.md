@@ -90,4 +90,4 @@ assuming a scheduling quirk.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. It fills IntermediateBase's `update` slot (+0x05C) and does more than the base's frame count, so the name keeps the part it adds. Signature `(TimedTask *self, BasicClass *sender, s32 event)`, the base update's; the call it makes on timeout is the `setState` slot (was `onEventArg`) with 4. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Not renamed. It fills IntermediateBase's `update` slot (+0x05C) and does more than the base's frame count, so the name keeps the part it adds. Signature `(TimedTask *self, BasicClass *sender, s32 event)`, the base update's; the call it makes on timeout is the `setState` slot (was `onEventArg`) with 4. Image byte-identical.

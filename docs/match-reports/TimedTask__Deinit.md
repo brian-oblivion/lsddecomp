@@ -41,4 +41,4 @@ None beyond what's already documented.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. `self` is `TimedTask *`; DayTask__Deinit and ObjM__DetachTarget call it as `GetTimedTaskMethods()->deinit((TimedTask *)self)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Not renamed. `self` is `TimedTask *`; DayTask__Deinit and ObjM__DetachTarget call it as `GetTimedTaskMethods()->deinit((TimedTask *)self)`. Image byte-identical.

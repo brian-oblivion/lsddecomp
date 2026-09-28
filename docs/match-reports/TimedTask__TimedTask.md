@@ -111,7 +111,7 @@ particular call site once a subclass's vtable is installed.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `(TimedTask *self, char *soundBankPath, BasicClass *sound)`; `unk30`/`subB` are `soundBankPath`/`sound`, and the final call is IntermediateBase's `resetCounters` slot (was `resetState`), which this class fills with TimedTask__CancelTimeout. Its first call is IntermediateBase's ctor, and both subclass ctors (DayTask__DayTask, ObjM__ObjM) call this one first, so the id tree's parent links hold. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Not renamed. Signature `(TimedTask *self, char *soundBankPath, BasicClass *sound)`; `unk30`/`subB` are `soundBankPath`/`sound`, and the final call is IntermediateBase's `resetCounters` slot (was `resetState`), which this class fills with TimedTask__CancelTimeout. Its first call is IntermediateBase's ctor, and both subclass ctors (DayTask__DayTask, ObjM__ObjM) call this one first, so the id tree's parent links hold. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 

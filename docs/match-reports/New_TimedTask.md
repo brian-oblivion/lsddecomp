@@ -62,4 +62,4 @@ updated with what survived and what did not.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `TimedTask *New_TimedTask(char *soundBankPath, BasicClass *sound)`, the ctor's parameters; 0x38 is the object size TIMEDTASK_FIELDS ends at. No C caller. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Not renamed. Signature `TimedTask *New_TimedTask(char *soundBankPath, BasicClass *sound)`, the ctor's parameters; 0x38 is the object size TIMEDTASK_FIELDS ends at. No C caller. Image byte-identical.

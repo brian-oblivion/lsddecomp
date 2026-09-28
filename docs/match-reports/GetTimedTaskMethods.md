@@ -45,4 +45,4 @@ Round 67 (track 3, naming pass).
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Declared once, in include/TimedTask.h, returning `TimedTaskMethods *`; the local prototypes in dream_day.h and dream_scene.c are gone. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Not renamed. Declared once, in include/timed_task.h, returning `TimedTaskMethods *`; the local prototypes in dream_day.h and dream_scene.c are gone. Image byte-identical.

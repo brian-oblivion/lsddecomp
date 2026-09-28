@@ -1,7 +1,7 @@
 #ifndef OBJM_H
 #define OBJM_H
 
-#include "TimedTask.h"
+#include "timed_task.h"
 
 /*
  * ObjM -- class id 0x2F230, method table gObjMMethods: TimedTask's second

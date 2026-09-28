@@ -73,4 +73,4 @@ inherited/override code as a subclass relationship.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Renamed from `TimedTask__Dtor`, tier A: it occupies +0x00C, BasicClass's `finalize` slot, and its body is a finalize: release `sound` when `soundBankPath` is set (the ctor made it), then the base finalize through `GetIntermediateBaseMethods()->finalize`. `self` is `TimedTask *`; `unk30`/`subB` are `soundBankPath`/`sound`. DayTask__Finalize and ObjM__Finalize reach it as `GetTimedTaskMethods()->finalize((TimedTask *)self)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Renamed from `TimedTask__Dtor`, tier A: it occupies +0x00C, BasicClass's `finalize` slot, and its body is a finalize: release `sound` when `soundBankPath` is set (the ctor made it), then the base finalize through `GetIntermediateBaseMethods()->finalize`. `self` is `TimedTask *`; `unk30`/`subB` are `soundBankPath`/`sound`. DayTask__Finalize and ObjM__Finalize reach it as `GetTimedTaskMethods()->finalize((TimedTask *)self)`. Image byte-identical.

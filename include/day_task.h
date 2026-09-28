@@ -1,7 +1,7 @@
 #ifndef DAY_TASK_H
 #define DAY_TASK_H
 
-#include "TimedTask.h"
+#include "timed_task.h"
 
 /*
  * DayTask -- class id 0x1F230, method table gDayTaskMethods. A TimedTask
