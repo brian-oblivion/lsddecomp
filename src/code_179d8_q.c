@@ -32,8 +32,38 @@
 #include "CdDriver.h"
 #include "DrawSystem.h"
 
-extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1);
-extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
+/* This unit's own functions, called before their definitions. */
+void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1);
+void InitCdDrive(void);
+void LockCd(void);
+void UnlockCd(void);
+s32 ServiceCdDriver(void);
+void StopCdServiceIfIdle(void);
+
+/* code_179d8_r.c: the request list, the state machines, the file-table lookup. */
+extern CdRequestNode *AllocCdRequestNode(void);     /* allocate and link at the tail */
+extern void FreeCdRequestNode(CdRequestNode *node); /* unlink and free */
+extern void ResetCdStateMachine(void);              /* end the operation, mark idle */
+extern void TickCdStateMachine(void);               /* CD_TICK_STATE_MACHINE */
+extern void TickCdLoadFileStateMachine(void);       /* CD_TICK_LOAD_FILE */
+extern s32 FindCdFileIndex(char *name);             /* name -> gFileTable index */
+
+/* code_179d8_h.c */
+extern char *BuildCdFilePath(char *dest, char *name); /* "\\<data directory><name>;1" */
+
+/* TmdRenderer.c */
+extern s32 GetBMemPMgrBusy(void);
+
+extern void printf(const char *fmt, ...);
+
+extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
+
+/* This unit's module state; code_179d8_r/_s see it only through the
+ * functions below. */
+extern s32 sCdDriveInited;       /* InitCdDrive has set the drive's mode */
+extern s32 sCdLock;              /* LockCd / UnlockCd */
+extern s32 sCdCallbackInstalled; /* StartCdService has run, StopCdServiceIfIdle not since */
+extern s32 sCdQueueEnabled;      /* ServiceCdDriver runs the request queue */
 
 void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
     s32 *unassigned; /* never assigned: see the store below */
@@ -61,18 +91,11 @@ void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
     UnlockCd();
 }
 
-extern void LockCd(void);
-extern void UnlockCd(void);
-extern void StopCdServiceIfIdle(void);
-
 void CdDriver__StopService(void) {
     LockCd();
     StopCdServiceIfIdle();
     UnlockCd();
 }
-
-extern void ResetCdStateMachine(void);             /* code_179d8_r: reset the state machine */
-extern void FreeCdRequestNode(CdRequestNode *req); /* code_179d8_r: unlink+free */
 
 void CdDriver__CancelRequests(CdDriver *self) {
     CdRequestNode *entry;
@@ -112,8 +135,6 @@ void CdDriver__CancelRequests(CdDriver *self) {
 CdDriverMethods *GetCdDriverMethods(void) {
     return &gCdDriverMethods;
 }
-
-extern s32 sCdDriveInited;
 
 void InitCdDrive(void) {
     u8 mode;
@@ -157,8 +178,6 @@ s32 GetCdDriverMode(s32 *outMode2) {
     return gCdAsyncEnabled;
 }
 
-extern s32 ServiceCdDriver(void);
-
 s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     DrawSystem *obj;
 
@@ -199,13 +218,6 @@ s32 GetFileTableCount(void) {
     return gFileTableCount;
 }
 
-extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
-extern void printf(const char *fmt, void *arg1);
-extern char *BuildCdFilePath(char *dest, char *suffix); /* code_179d8_r */
-extern void InitCdDrive(void);
-
-#define CD_SEARCH_RETRIES 0x65
-
 s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
     CdFileEntry *end;
     char path[0x40];
@@ -219,7 +231,7 @@ s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
     for (; entries < end; entries++) {
         BuildCdFilePath(path, entries->name);
 
-        for (tries = 0; tries < CD_SEARCH_RETRIES; tries++) {
+        for (tries = 0; tries < CD_SEARCH_ATTEMPTS; tries++) {
             if (CdSearchFile(&info, path) != 0) {
                 goto found;
             }
@@ -240,22 +252,14 @@ s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
  * public entry point in this unit and in code_179d8_r/_s brackets its body
  * with LockCd()/UnlockCd() to keep the VSync-driven tick out of a
  * half-updated queue. Not a mutex -- nothing spins or blocks on it. */
-extern s32 sCdLock;
 
 void LockCd(void) {
     sCdLock = 1;
 }
 
-extern s32 sCdLock;
-
 void UnlockCd(void) {
     sCdLock = 0;
 }
-
-extern s32 GetBMemPMgrBusy(void);             /* TmdRenderer */
-extern void TickCdStateMachine(void);         /* code_179d8_r: state-machine step 1 */
-extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
-extern s32 sCdQueueEnabled;
 
 s32 ServiceCdDriver(void) {
     if (sCdLock != 0) {
@@ -287,8 +291,6 @@ s32 ServiceCdDriver(void) {
     return 0;
 }
 
-extern s32 sCdCallbackInstalled;
-
 void StartCdService(void) {
     LockCd();
 
@@ -302,9 +304,6 @@ void StartCdService(void) {
     sCdQueueEnabled = 1;
     UnlockCd();
 }
-
-extern s32 sCdCallbackInstalled;
-extern s32 sCdQueueEnabled;
 
 void StopCdServiceIfIdle(void) {
     LockCd();
@@ -320,15 +319,11 @@ void StopCdServiceIfIdle(void) {
     UnlockCd();
 }
 
-extern s32 sCdQueueEnabled;
-
 void DisableCdQueue(void) {
     LockCd();
     sCdQueueEnabled = 0;
     UnlockCd();
 }
-
-extern CdRequestNode *AllocCdRequestNode(void); /* code_179d8_r: alloc + link */
 
 /* Fills a node AllocCdRequestNode has already linked onto gCdRequestQueue,
  * counts it against its owner and starts the service tick.
