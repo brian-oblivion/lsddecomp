@@ -34,7 +34,7 @@ a byte-pointer argument) and `func_800238A8` (Psy-Q `psyq_GsLinkObject4.s`:
 -- a strncpy-without-null-pad) are declared LOCAL to this unit
 (`ObjMStyleActor.c`), not in a shared header, per the project's
 cross-unit-prototype rule. `func_80013348` already has a differently-typed
-local declaration elsewhere (`class_3bb8c_i.c`: `s32 func_80013348(void
+local declaration elsewhere (`TextEntryItemList.c`: `s32 func_80013348(void
 *arg0)`); this unit's own call site reads a byte pointer, so it is typed
 `char *s` here instead -- per-call-site typing of an already-established
 function, same convention documented for `DecodeFullWidthSjis` in

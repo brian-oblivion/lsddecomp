@@ -7,7 +7,7 @@
  *    the cursor and scroll methods, the four visible rows (createRows,
  *    releaseRows, refreshRows, and the non-virtual helpers FormatRowText and
  *    SetView), stepCursorInView, getCursorIndex and the table getter
- *    GetItemListMethods. Its ctor and resource methods are in class_3bb8c_i.
+ *    GetItemListMethods. Its ctor and resource methods are in TextEntryItemList.
  *  - ObjM (include/ObjM.h): its allocator, ctor, finalize and onNotify,
  *    which dispatches on the sender's class id. The rest of ObjM is in
  *    class_3bb8c_l and class_3bb8c_m.

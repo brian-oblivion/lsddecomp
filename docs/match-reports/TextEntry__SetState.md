@@ -4,7 +4,7 @@
 
 > Renamed from `func_800512C8` on 2026-09-24 (tools/rename.py). Address 0x800512c8.
 
-Unit `class_3bb8c_i`, carved round 14.
+Unit `TextEntryItemList`, carved round 14.
 
 `Obj86ED0`'s vtable slot 0x054, called by `TextEntry__TickState` (that unit's own
 sibling function, still `INCLUDE_ASM` this round) with a literal `4`.

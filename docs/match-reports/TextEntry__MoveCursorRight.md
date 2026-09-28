@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005165C` on 2026-09-24 (tools/rename.py). Address 0x8005165c.
 
-Unit `class_3bb8c_i`. Obj86ED0's own "advance frame counter, clamped at
+Unit `TextEntryItemList`. Obj86ED0's own "advance frame counter, clamped at
 `unk10`" method. Mirror pair with `TextEntry__MoveCursorLeft` (decrement/clamp-at-zero,
 matched alongside it) and `TextEntry__NextChar` (a second increment/clamp pair on
 different fields, also matched this round).
@@ -62,7 +62,7 @@ account.
 
 ## Naming
 
-- `TextEntry__MoveCursorRight` -- tier A. gTextEntryMethods +0x088 (moveCursorRight slot, classtable.py -- also confirmed as HandleCommand's own case 21/5 target). Increments the name-buffer index unk18, bounded by the name length unk10; reverts on overflow. Symmetric with TextEntry__MoveCursorLeft; forwards to TextEntry__SetCursorPos (class_3bb8c_i).
+- `TextEntry__MoveCursorRight` -- tier A. gTextEntryMethods +0x088 (moveCursorRight slot, classtable.py -- also confirmed as HandleCommand's own case 21/5 target). Increments the name-buffer index unk18, bounded by the name length unk10; reverts on overflow. Symmetric with TextEntry__MoveCursorLeft; forwards to TextEntry__SetCursorPos (TextEntryItemList).
 
 ## Track 4 (2026-09-26, round 87)
 

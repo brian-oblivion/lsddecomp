@@ -1,5 +1,5 @@
 /*
- * class_3bb8c_i -- TextEntry's methods from New_TextEntry to NextChar
+ * TextEntryItemList -- TextEntry's methods from New_TextEntry to NextChar
  * (include/TextEntry.h); PrevChar .. SetCharAt and GetTextEntryMethods are
  * in class_3bb8c_j.c.
  *
@@ -397,7 +397,7 @@ void TextEntry__NextChar(TextEntry *self) {
  * class_3bb8c_j -- the tail of TextEntry and the first half of ItemList.
  *  - TextEntry__PrevChar .. TextEntry__SetCharAt and GetTextEntryMethods
  *    finish TextEntry (include/TextEntry.h), the caller-owned string editor
- *    whose other methods are in class_3bb8c_i.
+ *    whose other methods are in TextEntryItemList.
  *  - Everything else is ItemList (include/ItemList.h), the list of strings
  *    the player picks one from: its allocator and ctor, BasicClass's
  *    overrides (finalize, child bookkeeping, onNotify), and the view and
@@ -645,7 +645,7 @@ extern const char sItemListStrFontIcon[];    /* "FONTICON" */
  * Loads CARD\SELECT.TIM as the panel sprite, placed at gItemListPanelPos
  * under `parent`, and has createRows build the rows from CARD\FONTICON.TIM.
  * Does nothing without a parent or when already loaded. The same shape as
- * TextEntry__LoadCardResources (class_3bb8c_i).
+ * TextEntry__LoadCardResources (TextEntryItemList).
  */
 void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
     char path[CARD_TIM_PATH_SIZE];

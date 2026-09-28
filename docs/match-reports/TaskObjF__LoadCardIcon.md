@@ -84,7 +84,7 @@ without needing the full contents.
 The `New_TimImage` / `slot78` / `New_ScreenSprite` / `release` sequence on
 the temp `handle` is the exact idiom already established by
 `TextEntry__LoadCardResources` (`docs/match-reports/TextEntry__LoadCardResources.md`, a DIFFERENT unit,
-`class_3bb8c_i`) using the SAME shared `ChildObj86ED0`/`ChildMethods86ED0`
+`TextEntryItemList`) using the SAME shared `ChildObj86ED0`/`ChildMethods86ED0`
 type from `class_3bb8c.h` (`slot78`/`release` already declared there).
 
 `self->unk70` is ALREADY typed `Class86E00Unk70Obj_3bb8c_g *` in this unit

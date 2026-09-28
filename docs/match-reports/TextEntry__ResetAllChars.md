@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051858` on 2026-09-24 (tools/rename.py). Address 0x80051858.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Obj86ED0` (ROUND 75 CORRECTION: was misattributed to `Obj866E8`, actually `Obj86ED0` -- gTextEntryMethods, established by class_3bb8c_i; see TextEntry__PrevChar.md for
+Unit: `src/class_3bb8c_j.c`. `self` is `Obj86ED0` (ROUND 75 CORRECTION: was misattributed to `Obj866E8`, actually `Obj86ED0` -- gTextEntryMethods, established by TextEntryItemList; see TextEntry__PrevChar.md for
 the class-identity evidence shared across this group). This is the "flush
 all" sibling: fires `slotA8` once per remaining slot (counting down from
 `self->unk10 - 1` to 0), then always fires `slotA4` once at the end.

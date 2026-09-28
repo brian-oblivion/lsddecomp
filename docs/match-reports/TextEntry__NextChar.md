@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051720` on 2026-09-24 (tools/rename.py). Address 0x80051720.
 
-Unit `class_3bb8c_i`. Obj86ED0's own "advance `unk1C` counter, clamped at
+Unit `TextEntryItemList`. Obj86ED0's own "advance `unk1C` counter, clamped at
 `unk14`, dispatch `slotA8` with `unk18`" method. Same family as
 `TextEntry__MoveCursorRight`/`TextEntry__MoveCursorLeft` (increment/decrement clamp pairs on
 `unk18`), but on a different pair of fields (`unk1C`/`unk14`) and resetting
@@ -73,7 +73,7 @@ fixed it.
 
 ## Naming
 
-- `TextEntry__NextChar` -- tier B. gTextEntryMethods +0x090 (advanceCharSelect slot, classtable.py -- HandleCommand's case 18/2). Increments the character-picker index unk1C, bounded by unk14 (gNameCharTable's own length, counted by the ctor); WRAPS to 0 on overflow (unlike the cursor pair's revert), forwarding to TextEntry__SetCharAt (class_3bb8c_i). Tier B: the wrap-vs-revert asymmetry is measured, exact on-screen semantics (cycling a soft-keyboard character list) is inferred.
+- `TextEntry__NextChar` -- tier B. gTextEntryMethods +0x090 (advanceCharSelect slot, classtable.py -- HandleCommand's case 18/2). Increments the character-picker index unk1C, bounded by unk14 (gNameCharTable's own length, counted by the ctor); WRAPS to 0 on overflow (unlike the cursor pair's revert), forwarding to TextEntry__SetCharAt (TextEntryItemList). Tier B: the wrap-vs-revert asymmetry is measured, exact on-screen semantics (cycling a soft-keyboard character list) is inferred.
 
 ## Track 4 (2026-09-26, round 87)
 

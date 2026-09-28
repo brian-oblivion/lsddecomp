@@ -6,7 +6,7 @@
 
 Round 82, runner alpha (fourth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior attempt.
 
-- **Where:** not in any method table (allocator for CharSprite, the 8x8-cell sprite). Called from class_3bb8c_i.c (`New_CharSprite(handle2, 0x5F)`) and ScreenWidgets.c (`New_CharSprite(a1, 0x20)`).
+- **Where:** not in any method table (allocator for CharSprite, the 8x8-cell sprite). Called from TextEntryItemList.c (`New_CharSprite(handle2, 0x5F)`) and ScreenWidgets.c (`New_CharSprite(a1, 0x20)`).
 - **What:** `BMemPMgrAlloc(0xAC)`; if non-NULL, calls slot +0x008 (ctor, CharSprite__CharSprite) of `GetCharSpriteMethods()` (the gCharSpriteMethods table) with `(obj, texture, cell)` and returns obj, else NULL.
 - **Result:** byte-exact, 27/27 words, 0 ins / 0 del, whole-image SHA1 green. Third build.
 - **Levers, measured:**
@@ -39,7 +39,7 @@ Allocator/wrapper whose prologue has the constant arg set (`li a0,K`) BEFORE a c
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `New_D8006EC74`, tier A: the allocator, `New_<Class>`. Returns `CharSprite *` and calls the ctor through the unified table; the unit-local `CellCtorMethods_322b4` is gone, as are the callers' local declarations (include/Task.h's `Obj6EAC0 *(s32, s32)`, class_3bb8c_i's `ChildObj86ED0 *(ChildObj86ED0 *, s32)`); both callers now cast the result to their own field types. The Source block above is the unified spelling. Image byte-identical.
+2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `New_D8006EC74`, tier A: the allocator, `New_<Class>`. Returns `CharSprite *` and calls the ctor through the unified table; the unit-local `CellCtorMethods_322b4` is gone, as are the callers' local declarations (include/Task.h's `Obj6EAC0 *(s32, s32)`, TextEntryItemList's `ChildObj86ED0 *(ChildObj86ED0 *, s32)`); both callers now cast the result to their own field types. The Source block above is the unified spelling. Image byte-identical.
 
 ## Track 7 (round 99, charlie)
 

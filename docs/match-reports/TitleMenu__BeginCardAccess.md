@@ -41,7 +41,7 @@ SLPS_015.56`.
   (`iconHandle`/`unkAC`).
 - `New_TimImage(sSaveIconTimPath)` -- `New_TimImage` is already matched
   project-wide under many independent local arities/return types (see
-  e.g. `src/class_3bb8c_g.c`, `src/class_3bb8c_i.c`); this unit's own view
+  e.g. `src/class_3bb8c_g.c`, `src/TextEntryItemList.c`); this unit's own view
   returns exactly what it is stored into, `GenericReleaseObj_3bb8c_d *`.
   `sSaveIconTimPath` is a real dlabel string, `"CARD\FILEICN1.TIM"`
   (`asm/data/1C34.rodata.s`) -- referenced by symbol per CLAUDE.md's rule

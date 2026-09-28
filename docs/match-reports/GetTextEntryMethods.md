@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051A4C` on 2026-09-24 (tools/rename.py). Address 0x80051a4c.
 
-Unit: `src/class_3bb8c_i.c`. ROUND 75 CORRECTION: this is NOT
+Unit: `src/TextEntryItemList.c`. ROUND 75 CORRECTION: this is NOT
 `ItemList_3bb8c_j`'s own getter (an earlier round assumed so, since it was
 the only table getter this unit's C had resolved at the time, and named the
 whole sibling class after it -- see `ItemList__ItemList.md`
@@ -13,7 +13,7 @@ for that history). `tools/classtable.py gTextEntryMethods` places
 `TextEntry__PrevChar` .. `TextEntry__SetCharAt` (this same
 unit's own first six functions) at that table's +0x094..+0x0A8, and
 `include/class_3bb8c.h` already types and shares the WHOLE table as
-`Obj86ED0Methods`, established independently by class_3bb8c_i from its own
+`Obj86ED0Methods`, established independently by TextEntryItemList from its own
 call sites (`New_TextEntry` there is the actual `New_X` for THIS class,
 allocating 0x4C bytes and dispatching its ctor through `->ctor(...)` on the
 pointer this function returns). So this function is `Obj86ED0`'s own
@@ -36,7 +36,7 @@ Plain address-of getter for `Obj86ED0`'s own vtable, same shape as
 
 ## Naming
 
-- `GetTextEntryMethods` -- tier A. Plain `return &gTextEntryMethods;` -- a table-getter's purpose IS its mechanics (a pure leaf returning a fixed vtable pointer), same shape as the project's other `Get_vtable_*`/`GetClass*Methods` accessors. Identity of gTextEntryMethods as Obj86ED0's table is classtable.py gTextEntryMethods (42 slots) cross-checked against class_3bb8c_i's own already-shared struct.
+- `GetTextEntryMethods` -- tier A. Plain `return &gTextEntryMethods;` -- a table-getter's purpose IS its mechanics (a pure leaf returning a fixed vtable pointer), same shape as the project's other `Get_vtable_*`/`GetClass*Methods` accessors. Identity of gTextEntryMethods as Obj86ED0's table is classtable.py gTextEntryMethods (42 slots) cross-checked against TextEntryItemList's own already-shared struct.
 
 ## Track 4 (2026-09-26, round 87)
 

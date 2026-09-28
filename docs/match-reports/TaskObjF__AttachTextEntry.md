@@ -89,7 +89,7 @@ call arity) cost one wasted, and materially WORSE, attempt.
 
 `TaskObjF__AttachTextEntry` (was `func_80050340`), tier B: lazily
 allocates `self->unk78` via `New_TextEntry` (an already-named `New_X`-shaped
-factory for the same real class the sibling `class_3bb8c_i`/`class_3bb8c_j`
+factory for the same real class the sibling `TextEntryItemList`/`class_3bb8c_j`
 units call `Obj86ED0`/`Class86ED0`, vtable `gTextEntryMethods`) on first use, then
 attaches and configures it through this class's own vtable. Named "A" to
 distinguish it from the identically-shaped `AttachChildB`

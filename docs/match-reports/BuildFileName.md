@@ -84,7 +84,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 **Evidence.** `dest[0]=0`; conditionally `strcat`s an optional prefix
 (`arg2`, only if non-NULL); unconditionally `strcat`s `arg1` then `arg3`;
 returns `dest`. Confirmed against real call sites across the tree
-(`class_3bb8c_i.c`: memory-card icon/font paths with a directory prefix and
+(`TextEntryItemList.c`: memory-card icon/font paths with a directory prefix and
 an extension suffix; `PlacementGridVabSound.c`: name+suffix with no prefix) that this
 is a general-purpose "optional-prefix + name + suffix" path/filename
 composer, not guessed from this function's body alone. Pure string

@@ -158,7 +158,7 @@ here since this function only DISPATCHES to it, never inlines its body).
 2. **`New_PlacementGrid` takes an argument, not zero.** Retail sets
    `$a0 = 0` right after the `slot88` dispatch and never touches it again
    before the `jal` -- the "leftover register is a forwarded/explicit
-   argument" tell, same family as this round's `class_3bb8c_i` slot-arity
+   argument" tell, same family as this round's `TextEntryItemList` slot-arity
    fixes, except here the argument is a plain literal `0` rather than
    forwarded. Declaring it `(s32 arg1)` and calling `New_PlacementGrid(0)`,
    plus reordering the four field-zeroing statements to match retail's

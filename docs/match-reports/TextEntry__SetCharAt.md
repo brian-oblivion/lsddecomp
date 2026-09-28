@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051998` on 2026-09-24 (tools/rename.py). Address 0x80051998.
 
-**Unit:** class_3bb8c_i · **Size:** 45 words (0xB4 bytes)
+**Unit:** TextEntryItemList · **Size:** 45 words (0xB4 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 15. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). Matched on the first
@@ -17,7 +17,7 @@ This report originally typed `self` as `Obj866E8` (gStageMapMethods) and typed
 `self->unk44` through a unit-local `Unk44Obj866E8`/`Unk44Obj866E8Methods`
 duplicate. Both were wrong, for the same reason as its sibling
 `TextEntry__SetCursorPos` (see that report and
-`src/class_3bb8c_i.c`'s file header comment): `self` is `Obj86ED0`
+`src/TextEntryItemList.c`'s file header comment): `self` is `Obj86ED0`
 (`tools/classtable.py gTextEntryMethods` places this function at +0x0A8), whose
 shared struct already types `self->unk44` as `ChildObj86ED0 *`. The
 `+0x0C4` slot is now `ChildMethods86ED0::slotC4`, added additively next to
@@ -59,7 +59,7 @@ executing unconditionally whenever `self->unk48` is set — ordinary
 plain-statement-before-`if` C, same shape as `TextEntry__SetCursorPos`.
 
 `unk28`/`unk44` were already present on the shared `Obj86ED0` (established
-by class_3bb8c_i); only `ChildMethods86ED0::slotC4` (offset 0x0C4) is a
+by TextEntryItemList); only `ChildMethods86ED0::slotC4` (offset 0x0C4) is a
 new additive field in `include/class_3bb8c.h`, alongside the sibling's
 `slotBC` — see `TextEntry__SetCursorPos`'s report for the full set.
 

@@ -16,8 +16,8 @@
  *   class_3bb8c_c      NodeGuardedViewport, GridCell, TitleMenu's ctor
  *   class_3bb8c_d      TitleMenu (include/TitleMenu.h, a TaskCore)
  *   class_3bb8c_d..g   TaskObjF (include/TaskObjF.h), the memory-card task
- *   class_3bb8c_i, _j  TextEntry (include/TextEntry.h)
- *   class_3bb8c_i, _k  ItemList (include/ItemList.h)
+ *   TextEntryItemList, _j  TextEntry (include/TextEntry.h)
+ *   TextEntryItemList, _k  ItemList (include/ItemList.h)
  *   ObjMStyleActor..m   ObjM (include/ObjM.h)
  *
  * What is here, in that order: StageMap's lookup tables and SplitCoord2,

@@ -6,7 +6,7 @@
 
 > Renamed from `func_80051E20` on 2026-09-24 (tools/rename.py). Address 0x80051e20.
 
-Unit: `src/class_3bb8c_i.c`. `self` is `ItemList_3bb8c_j`. Full reset: clears
+Unit: `src/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`. Full reset: clears
 both tagged caches and `unk50` (same three fields as `ItemList__ClearCachedRefs`),
 then chains to the inherited `BasicClass::removeAllChildren`.
 

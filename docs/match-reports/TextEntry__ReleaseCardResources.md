@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051174` on 2026-09-24 (tools/rename.py). Address 0x80051174.
 
-Unit `class_3bb8c_i`, carved round 14.
+Unit `TextEntryItemList`, carved round 14.
 
 `Obj86ED0`'s vtable slot 0x048. Releases three owned BasicClass-family
 child pointers (`unk48`/`unk44`/`unk40`), all gated on a single guard

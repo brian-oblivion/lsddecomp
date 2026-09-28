@@ -100,7 +100,7 @@ accessor the compiler listed, in both the build and
   `topIndex` (+0x20), `column` (+0x24), `cursorIndex` (+0x28), `result`
   (+0x2C), `closeTicks` (+0x30), `inputSource` (+0x34), `target` (+0x3C),
   `rows[4]` (+0x40), `resource` (+0x50). itemCount/maxTextLen/texts/
-  inputSource/resource are confirmed by the same offsets in class_3bb8c_i's
+  inputSource/resource are confirmed by the same offsets in TextEntryItemList's
   view (ItemList__ItemList, __AddChild, __LoadResources).
 - ItemListMethods: `removeChild`, `notifyParents`, `releaseResources`,
   `setState`, `forwardToTarget`, `scrollRight`/`scrollLeft`/`cursorUp`/
@@ -114,7 +114,7 @@ accessor the compiler listed, in both the build and
 None: every field and slot renamed this round had accessors only in
 ObjMStyleActor. For the head: the TYPE name `ItemList` is still an address
 name; `ListSelector` or similar would fit the reading above, but renaming it
-touches class_3bb8c_i's local `ItemList_3bb8c_j` and 20+ symbols, so it is
+touches TextEntryItemList's local `ItemList_3bb8c_j` and 20+ symbols, so it is
 left for a pass that owns both units.
 
 ## Round 99 (delta, track 7)
