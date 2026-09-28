@@ -13,15 +13,13 @@
 #include "common.h"
 #include "CdDriver.h"
 
-#define CDDRIVER_SIZE 0x2C /* New_CdDriver's BMemPMgrAlloc request: FileResource's size */
-
 extern void *BMemPMgrAlloc(s32 size); /* Psy-Q allocator, matched signature used project-wide */
 extern void InitCdDrive(void); /* code_179d8_q: one-shot CdSetDebug(0) + CdlSetmode double speed */
 
 CdDriver *New_CdDriver(void) {
     CdDriver *self;
 
-    self = BMemPMgrAlloc(CDDRIVER_SIZE);
+    self = BMemPMgrAlloc(sizeof(CdDriver));
     if (self != NULL) {
         GetCdDriverMethods()->ctor(self);
         return self;
