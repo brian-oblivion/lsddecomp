@@ -6,7 +6,7 @@
 
 108/108 words, byte-exact, file 0x17AD0-0x17C80. Cold ground. First function
 in ROM order in this unit, so the shared `Obj80027480` local struct and
-`sCdAsyncEnabled`/`gCdSyncQueueMode`/`sCdBusy`/`LockCd`/`StartCdOperation`/
+`sCdAsyncEnabled`/`sCdSyncQueueMode`/`sCdBusy`/`LockCd`/`StartCdOperation`/
 `ResetCdStateMachine`/`EnqueueCdRequest`/`UnlockCd` externs were moved ahead of
 it (they were previously declared between it and `CdDriver__Close`).
 
@@ -51,7 +51,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     s32 temp;
     s32 v0;
 
-    if (sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && sCdSyncQueueMode == 0) {
         OpenCdFile(self, suffix);
         return;
     }
@@ -248,14 +248,14 @@ uninitialised pointer).
 
 Globals: `D_8006D574` -> `sCdSeekLoc` (A: 8 bytes of .data written only by
 `CdDriver__Seek`'s `CdIntToPos` and used as its CdlSetloc target).
-`gCdSyncQueueMode` keeps its placeholder for CdDriver's stated reason: every
-read here is the `sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0` sync-mode test and
+`sCdSyncQueueMode` keeps its placeholder for CdDriver's stated reason: every
+read here is the `sCdAsyncEnabled == 0 && sCdSyncQueueMode == 0` sync-mode test and
 nothing names the second mode.
 
 
 Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Open` -> `CdDriver__Open` by rename.py.
 
-### Round 100 (charlie, track 7): `D_8008A860` -> `gCdSyncQueueMode`, tier B
+### Round 100 (charlie, track 7): `D_8008A860` -> `sCdSyncQueueMode`, tier B
 
 The paragraph above predates this rename (the tool rewrote the name in it).
 What the five methods' bodies show, read together: the mode word only ever

@@ -3134,7 +3134,7 @@ gDefaultDataDirectory = 0x8008A960;
 // check read dc_cr from the placed 3.3 vlc2.o (4 bytes, not 3.0's 8).
 // Report: SpuVmKeyOnNow.md.
 _svm_okon1 = 0x8008E228;
-gCdSyncQueueMode = 0x8008A860;
+sCdSyncQueueMode = 0x8008A860;
 gDreamAuxStageMap = 0x8008ABFC;
 gDreamAuxSound = 0x8008AC04;
 gDreamAuxFrameClock = 0x8008AC08;

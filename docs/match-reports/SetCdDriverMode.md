@@ -19,7 +19,7 @@ extern s32 GetDrawSystem(void); /* returns gDrawSystem, a singleton object */
 extern s32 ServiceCdDriver(void);
 extern s32 sCdBusy;
 extern s32 sCdAsyncEnabled;
-extern s32 gCdSyncQueueMode;
+extern s32 sCdSyncQueueMode;
 extern s32 gCdUseVSyncCallback;
 
 /* The singleton GetDrawSystem returns; only the slot this call site
@@ -59,7 +59,7 @@ s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
 
         gCdUseVSyncCallback = useVSyncCallback;
         sCdAsyncEnabled = async;
-        gCdSyncQueueMode = mode2;
+        sCdSyncQueueMode = mode2;
 
         return 1;
     }
@@ -124,7 +124,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 
 **Evidence for the function.** It refuses (returns 0) while `sCdBusy`, and
 otherwise stores its three arguments into `gCdUseVSyncCallback`,
-`sCdAsyncEnabled` and `gCdSyncQueueMode` and returns 1 -- the write half of the
+`sCdAsyncEnabled` and `sCdSyncQueueMode` and returns 1 -- the write half of the
 pair `GetCdDriverMode` reads back. `GameApplicationFileResource.c`'s `SetActiveDataSourceDriverMode` calls it
 in a `do {} while (fn(...) == 0)` loop, i.e. "retry until the driver accepts
 the new mode", which is what the refusal-while-busy return value is for.
@@ -150,7 +150,7 @@ The local view of the DrawSystem singleton quoted above is gone; the unit takes 
 
 ## Track 7 (round 101, echo): comments moved here, and names
 
-Parameter `mode2` -> `syncQueueMode` (it is stored in `gCdSyncQueueMode`),
+Parameter `mode2` -> `syncQueueMode` (it is stored in `sCdSyncQueueMode`),
 local `obj` -> `drawSystem` (GetDrawSystem's result); `setCallback(obj, 0)`
 is `setCallback(drawSystem, NULL)`. GetCdDriverMode's `outMode2` is
 `outSyncQueueMode` for the same reason.

@@ -23,7 +23,7 @@ s32 CdDriver__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
     s32 v0;
     u32 s0tmp;
 
-    if (sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && sCdSyncQueueMode == 0) {
         return GetCdFileSize(self);
     }
     LockCd();
