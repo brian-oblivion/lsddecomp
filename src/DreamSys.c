@@ -1679,14 +1679,14 @@ merge:
 
 /* The rotation TryStageTimerLink stores in stageLinkAngle for every
    destination but stage 12. */
-extern s32 LINK_ANGLE_180;
+extern s32 sLinkAngle180;
 
 s32 GetStageLinkAngle(void) {
     s32 result;
 
     result = 0;
     if (gLinkDstStage != 12)
-        result = (s32)&LINK_ANGLE_180;
+        result = (s32)&sLinkAngle180;
     return result;
 }
 
