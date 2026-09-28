@@ -46,7 +46,7 @@
 #include "DrawSystem.h"
 #include <strings.h>
 #include "GameApplicationFileResource.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include <stdio.h>
 
 /* The CD driver's module state. */

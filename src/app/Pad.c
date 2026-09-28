@@ -13,7 +13,7 @@
 #include "common.h"
 #include <libetc.h>
 #include "Pad.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 
 /* What only this file's bodies use; the class itself is include/Pad.h. The
  * pad library it wraps (PadInit, PadRead, PadStop) is Sony's <libetc.h>. */

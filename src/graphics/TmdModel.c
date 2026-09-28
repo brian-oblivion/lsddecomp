@@ -24,7 +24,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "TmdModel.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 
 extern s32 sTmdModelBoundsCount; /* boxes in the bounds buffer: 1, set by the ctor */
 

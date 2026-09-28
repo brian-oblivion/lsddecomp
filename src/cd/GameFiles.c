@@ -28,7 +28,7 @@
 #include "common.h"
 #include "LbdFile.h"
 #include "StageGrid.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include "GameFiles.h"
 #include <rand.h>
 #include "GameApplicationFileResource.h"

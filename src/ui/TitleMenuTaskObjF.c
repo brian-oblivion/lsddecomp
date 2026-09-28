@@ -54,7 +54,7 @@
 #include "ScreenSprite.h"
 #include "TextEntry.h"
 #include "ItemList.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include "FullWidthSjis.h"
 #include <stdio.h>
 #include <convert.h>

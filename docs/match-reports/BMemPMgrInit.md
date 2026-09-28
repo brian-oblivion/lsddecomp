@@ -126,7 +126,7 @@ function).
 **Verdict: arity-ok idiom.** `src/main.c`'s unprototyped declaration stays.
 
 **Callee evidence** (`0x80017A20`): the body does `move s1,a0` and never touches
-`$a1` on any path — the definition in `src/app/BMemPMgr.c`
+`$a1` on any path — the definition in `src/app/bmem_pmgr.c`
 (`void *BMemPMgrInit(s32 poolSize)`) is right, one argument.
 
 **Why the extern must keep saying nothing.** `main` (src/main.c) calls
@@ -144,7 +144,7 @@ Replacing `extern void *BMemPMgrInit();` with the real one-parameter prototype
 would make that call a `too many arguments` compile error, and dropping the
 argument from the call site would delete `move a1,zero` and break the match.
 The unprototyped form is the only spelling that reproduces retail, and it is
-the same idiom `include/BMemPMgr.h` uses for `BMemPMgrAlloc`/`BMemPMgrFree`.
+the same idiom `include/bmem_pmgr.h` uses for `BMemPMgrAlloc`/`BMemPMgrFree`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/main.c:24`. Oracle green after the edit.

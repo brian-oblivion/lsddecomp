@@ -10,7 +10,7 @@
 
 Returns the address of `gBasicClassMethods`, BasicClass's own 14-slot method table
 (`BASICCLASS_METHODS` per `docs/research/class-framework.md`). Called from
-`BasicClass__BasicClass` (`BMemPMgr.c`) to install the base vtable on a
+`BasicClass__BasicClass` (`bmem_pmgr.c`) to install the base vtable on a
 freshly-constructed `BasicClass`.
 
 ## The C

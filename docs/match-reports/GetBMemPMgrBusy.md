@@ -22,7 +22,7 @@ s32 GetBMemPMgrBusy(void)
 
 Same global as `SetBMemPMgrBusy` (this unit, matched alongside this one this
 round) — the pool allocator/free critical-section flag. Declaration shared
-via `include/BMemPMgr.h`.
+via `include/bmem_pmgr.h`.
 
 ## Provenance
 

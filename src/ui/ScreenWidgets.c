@@ -29,7 +29,7 @@
 #include "FrameClock.h"
 #include "Task.h"
 #include "TextRow.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include "FullWidthSjis.h"
 #include <strings.h>
 #include "scene_node.h"

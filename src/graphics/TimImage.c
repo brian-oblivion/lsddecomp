@@ -22,7 +22,7 @@
 #include "FileResource.h"
 #include "DrawSystem.h"
 #include "TimImage.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include "GameApplicationFileResource.h"
 
 /* new TimImage(name). */

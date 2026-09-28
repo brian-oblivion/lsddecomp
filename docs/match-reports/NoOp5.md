@@ -49,7 +49,7 @@ leaf functions; it earns no name here.
 
 ## Provenance
 
-Present in `src/app/BMemPMgr.c` since the unit's initial carve (no report
+Present in `src/app/bmem_pmgr.c` since the unit's initial carve (no report
 previously filed — the FINISHING-PLAN note that a trivial `jr $ra; nop`
 body is often not real decomp work applies here). round 74 (2026-09-24),
 runner alpha: wrote this report as part of the unit's track-3 naming

@@ -42,7 +42,7 @@
 #include "GameApplicationFileResource.h"
 #include "NullDriver.h"
 #include "CdDriver.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include "GameFiles.h"
 #include <strings.h>
 #include "DayTaskStageMap.h"

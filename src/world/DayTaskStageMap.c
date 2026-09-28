@@ -52,7 +52,7 @@
 #include "LbdFile.h"
 #include "GridCell.h"
 #include "FlatLightObj.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include "GameFiles.h"
 #include "GameApplicationFileResource.h"
 #include "DreamAux.h"

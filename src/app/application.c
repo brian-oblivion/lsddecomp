@@ -13,7 +13,7 @@
 #include <libsnd.h>
 #include <libgs.h>
 #include "application.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include "GameApplicationFileResource.h"
 
 extern s32 sCdInitDone;               /* CdInit has been called */

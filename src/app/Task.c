@@ -22,7 +22,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "Task.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include "VabStreamObj.h"
 #include "BgLayer.h"
 #include "TileMap.h"

@@ -13,7 +13,7 @@
 #include "basic_class.h"
 #include "DrawSystem.h"
 #include "WBgm.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include <stdio.h>
 #include "VabStreamObj.h"
 

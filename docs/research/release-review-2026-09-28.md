@@ -21,11 +21,11 @@ rather than API.
 - **Allocator.** `BMemPMgrAlloc` is re-declared locally in about 20 units
   and in DreamSys.h:376, entity.h:308, DayTaskStageMap.h:30, Task.h:27.
   `BMemPMgrFree` returns `void` in entity.h:309 and
-  GameApplicationFileResource.h:16 but `void *` in BMemPMgr.h:83 and Task.h:28,
+  GameApplicationFileResource.h:16 but `void *` in bmem_pmgr.h:83 and Task.h:28,
   so any unit including two of them fails with conflicting types. main.c:28
-  declares `BMemPMgrInit`/`SetDefaultBMemPMgr` because BMemPMgr.h omits them.
-  BMemPMgr.h:82 leaves Alloc unprototyped on purpose (arity); keep that as one
-  `MATCHING:` line, and put a public prototype pair where BMemPMgr.c does not
+  declares `BMemPMgrInit`/`SetDefaultBMemPMgr` because bmem_pmgr.h omits them.
+  bmem_pmgr.h:82 leaves Alloc unprototyped on purpose (arity); keep that as one
+  `MATCHING:` line, and put a public prototype pair where bmem_pmgr.c does not
   see it.
 - **SoundCueSet.** `InitSoundCueSet`, `FlushSoundCueSet`,
   `ServiceSoundCueSet` have three spellings each (DreamSys.c:72-73, 497;

@@ -60,7 +60,7 @@ Confirmed once (`FreeBasicClassList`, 6/17 -> 17/17 words).
 mechanics are its purpose.
 
 Evidence: the body frees every node of a `BasicClassListNode` chain through
-the pool allocator and nothing else. Its two callers in `BMemPMgr.c` are
+the pool allocator and nothing else. Its two callers in `bmem_pmgr.c` are
 `BasicClass__RemoveAllChildren` (removeAllChildren) and `BasicClass__ClearParentRefs`
 (clearParentRefs), and both do `FreeBasicClassList(&self->list);
 self->list = NULL;` -- i.e. the caller, not this function, clears the head

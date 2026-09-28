@@ -33,7 +33,7 @@
 #include "FrameClock.h"
 #include "ItemList.h"
 #include "ScreenSprite.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include "FullWidthSjis.h"
 #include "GameApplicationFileResource.h"
 

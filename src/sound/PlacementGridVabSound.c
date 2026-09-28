@@ -25,7 +25,7 @@
 #include <libsnd.h>
 #include "VabStreamObj.h"
 #include "SoundCueSet.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include <strings.h>
 #include "WBgm.h"
 #include "GameApplicationFileResource.h"

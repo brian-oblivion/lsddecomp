@@ -74,7 +74,7 @@ it dispatches to). The inherited `notifyParents` is wrong twice: this is the
 EMITTER, not an `on*` handler, and it is not finalize-specific --
 `BasicClass__Finalize` (finalize) happens to be the only caller in carved
 C, which is a fact about how much is carved, not about the slot.
-Cross-unit: accessed from `src/ui/TextEntryItemList.c` and `src/app/BMemPMgr.c`, so
+Cross-unit: accessed from `src/ui/TextEntryItemList.c` and `src/app/bmem_pmgr.c`, so
 not mine to rename.
 
 ## Round 91 polish (delta, track 7)

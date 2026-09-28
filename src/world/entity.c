@@ -35,7 +35,7 @@
 #include "DreamSys.h"
 #include "StageMap.h"
 #include "Viewport.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 
 /* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
  * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what

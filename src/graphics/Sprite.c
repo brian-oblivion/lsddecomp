@@ -34,7 +34,7 @@
 #include "RequestedFile.h"
 #include "TimImage.h"
 #include "FrameClock.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include <strings.h>
 #include "GameApplicationFileResource.h"
 #include "scene_node.h"

@@ -1,9 +1,9 @@
-#ifndef BMEMPMGR_H
-#define BMEMPMGR_H
+#ifndef BMEM_PMGR_H
+#define BMEM_PMGR_H
 
 #include "common.h"
 
-/* The BMemPMgr pool allocator, src/app/BMemPMgr.c, with its busy-flag
+/* The BMemPMgr pool allocator, src/app/bmem_pmgr.c, with its busy-flag
  * accessors. BasicClass, whose child and parent lists are
  * allocated from the pool, is include/basic_class.h; both files that include
  * this header use it. */
@@ -83,7 +83,7 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 /* Frees ptr back to the C heap (free), not to the pool. */
 extern void FreeMem(void *ptr);
 
-/* The pool allocator and its free. BMemPMgr.c defines both K&R with a second
+/* The pool allocator and its free. bmem_pmgr.c defines both K&R with a second
  * parameter, a fallback pool read only while sDefaultBMemPMgr is unset, that
  * no caller passes, so it must not see these one-argument prototypes.
  * BMemPMgrFree always returns NULL. */

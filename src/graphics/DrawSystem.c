@@ -17,7 +17,7 @@
 #include <libgs.h>
 #include <libetc.h>
 #include "DrawSystem.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 
 extern DrawSystem *sDrawSystem; /* sdata: the singleton GetDrawSystem returns */
 

@@ -44,7 +44,7 @@
 #include "LbdFile.h"
 #include "VabStreamObj.h"
 #include "Viewport.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 
 extern s32 sLinkSrcStage;
 extern s32 sLinkTriggerIndex;

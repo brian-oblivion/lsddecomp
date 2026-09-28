@@ -396,4 +396,4 @@ an operator decision; not hand-reverted).
 
 ## Track 7 (2026-09-27, round 98, charlie)
 
-Zero-byte polish: the cell walk indexes `GridCell **` like the ctor's; locals `entry` -> `slot`, `obj` -> `cell`; `0x668` span -> `STAGE_SLOT_CELLS`; event `6` -> `STAGEMAP_EVENT_SLOT_RELEASE`; `i < 7` -> `ARRAY_COUNT(self->slots)`; BMemPMgrFree from include/BMemPMgr.h.
+Zero-byte polish: the cell walk indexes `GridCell **` like the ctor's; locals `entry` -> `slot`, `obj` -> `cell`; `0x668` span -> `STAGE_SLOT_CELLS`; event `6` -> `STAGEMAP_EVENT_SLOT_RELEASE`; `i < 7` -> `ARRAY_COUNT(self->slots)`; BMemPMgrFree from include/bmem_pmgr.h.

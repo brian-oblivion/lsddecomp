@@ -56,7 +56,7 @@
 #include "FrameClock.h"
 #include "TmdModel.h"
 #include "Actor.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 
 /* The identity inputs SceneNode__Reset hands to updateRotation and
  * updateScale: three Ratio16s each, {0/1, 0/1, 0/1} and {1/1, 1/1, 1/1}. */

@@ -59,7 +59,7 @@
 #include "DrawSystem.h"
 #include "CdStream.h"
 #include "MoviePlayer.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include "GameApplicationFileResource.h"
 #include "CdDriver.h"
 

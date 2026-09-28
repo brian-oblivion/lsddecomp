@@ -16,7 +16,7 @@
 #include "common.h"
 #include "GameApplication.h"
 #include "Pad.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include <kernel.h>
 
 extern BMemPMgr *sStartupBMemPMgr;

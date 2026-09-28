@@ -28,7 +28,7 @@
 #include "LinkResource.h"
 #include "VabStreamObj.h"
 #include "FrameClock.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 
 /*
  * This file's own readings of what TodActor (include/TodActor.h) reaches

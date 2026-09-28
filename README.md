@@ -131,7 +131,7 @@ python3 tools/classtable.py <table> --vs <parent-table>   # what a subclass over
 Read each named class's header first; its banner points to the units.
 
 - **Boot and the main loop.** `src/main.c` sets up the `BMemPMgr` pool
-  allocator (`src/app/BMemPMgr.c`), the `DrawSystem` screen singleton and a
+  allocator (`src/app/bmem_pmgr.c`), the `DrawSystem` screen singleton and a
   `Pad`, then runs the root object, `GameApplication` (`src/app/GameApplicationFileResource.c`, a
   subclass of `Application`, `src/app/application.c`). Application's main
   loop never returns; it calls GameApplication's hooks, which show the intro

@@ -54,7 +54,7 @@
 #include "TmdModel.h"
 #include "GridCell.h"
 #include "GraphRoom.h"
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include "GameFiles.h"
 #include <strings.h>
 #include "DreamAux.h"

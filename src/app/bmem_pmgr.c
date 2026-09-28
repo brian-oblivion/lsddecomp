@@ -4,7 +4,7 @@
  *
  *  - The BMemPMgr pool allocator, the game's general-purpose allocator.
  *    BMemPMgrInit mallocs one area, a BMemPMgr header followed by the pool's
- *    blocks (the layout is in BMemPMgr.h), and SetupBMemPMgrFreeList makes
+ *    blocks (the layout is in bmem_pmgr.h), and SetupBMemPMgrFreeList makes
  *    the whole pool one free block. BMemPMgrAlloc and BMemPMgrFree split and
  *    merge blocks on the pool's free list. SetupBMemPMgrFreeList,
  *    BMemPMgrAlloc and BMemPMgrFree work on sDefaultBMemPMgr
@@ -18,9 +18,9 @@
  */
 
 #include "common.h"
-/* MATCHING: BMemPMgrAlloc/Free are defined K&R with a second parameter (BMemPMgr.h) */
+/* MATCHING: BMemPMgrAlloc/Free are defined K&R with a second parameter (bmem_pmgr.h) */
 #define BMEMPMGR_DEFINER
-#include "BMemPMgr.h"
+#include "bmem_pmgr.h"
 #include <malloc.h>
 #include <stdio.h>
 
@@ -84,7 +84,7 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool) {
  * free block that replaces it on the list. Returns the payload, or NULL.
  *
  * Defined K&R so the body can read the second argument that callers never
- * pass (BMemPMgr.h, at the declaration). */
+ * pass (bmem_pmgr.h, at the declaration). */
 /* clang-format off */
 void *BMemPMgrAlloc(size, pool)
     s32 size;

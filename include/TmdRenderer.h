@@ -6,7 +6,7 @@
  * lighting and subdivision a GsDOBJ2's TMD goes through into an ordering
  * table. The BasicClass methods and the pool allocator's busy flag at the
  * head of that file are declared by include/basic_class.h and
- * include/BMemPMgr.h.
+ * include/bmem_pmgr.h.
  */
 
 #include "common.h"
