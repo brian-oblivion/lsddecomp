@@ -110,7 +110,7 @@ renamed):
  *    turned that off.
  * 2. Free functions over gRecordTable, a table of 0x230+ fixed 0x1C-byte
  *    records (FilePathRecord): random-or-forced pickers (SeedAndRandom,
- *    SetPickOverrides/gForcedSoundBank/gForcedStageBgm), record-group
+ *    SetPickOverrides/sForcedSoundBank/gForcedStageBgm), record-group
  *    accessors indexed by gStageFirstRecord and, for GetStageMapChunkRecordXY, by
  *    StageGrid.h's cell columns, and a family of "stream channel" lookups
  *    (GetAsmkMovie, PickOpeningMovie, GetEndingMovie,

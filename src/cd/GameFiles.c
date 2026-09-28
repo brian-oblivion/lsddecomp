@@ -198,7 +198,7 @@ void LbdFile__ReleaseDataBlock(LbdFile *self) {
 }
 
 extern char *sDefaultDataDirectory; /* "CDI\\" (sdata) */
-extern s32 gForcedSoundBank;
+extern s32 sForcedSoundBank;
 extern s32 gForcedStageBgm;
 extern u8 gSoundBankPaths[];
 extern u8 gRecordTable[];
@@ -232,7 +232,7 @@ s32 SeedAndRandom(s32 seed, s32 unused) {
  * random); a negative argument leaves that one as it was. */
 void SetPickOverrides(s32 soundBank, s32 stageBgm) {
     if (soundBank >= 0) {
-        gForcedSoundBank = soundBank;
+        sForcedSoundBank = soundBank;
     }
     if (stageBgm >= 0) {
         gForcedStageBgm = stageBgm;
@@ -256,8 +256,8 @@ s32 PickSoundBank(s32 unused) {
     s32 *table = GetSoundBankPaths();
     s32 *entry;
     s32 index;
-    if (gForcedSoundBank != 0) {
-        index = gForcedSoundBank - 1;
+    if (sForcedSoundBank != 0) {
+        index = sForcedSoundBank - 1;
         entry = &table[index];
     } else {
         entry = &table[r];
