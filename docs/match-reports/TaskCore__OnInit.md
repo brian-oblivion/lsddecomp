@@ -83,7 +83,7 @@ discovered" section with a correction note** rather than rewriting it.
 fields all torn down identically via a 1-argument `slot04`. This function
 calls `self->unk78`'s own slot `+0x04C` with **3 arguments**
 (`self->unk78->methods->slot4C(self->unk78, self->unk14, 0)`), where
-`StreamTaskUnkB4Methods::slot4C` (from the already-matched `StreamTask__RefreshViewValue`,
+`StreamTaskUnkB4Methods::slot4C` (from the already-matched `StreamTask__Exit`,
 called on `self->unkB4`) is fixed at 1 argument. Same reasoning as above:
 real arity conflict at a shared offset means these are sibling classes that
 happen to agree at `slot04` (likely via a shared base), not one class.

@@ -1,4 +1,6 @@
-# StreamTask__RefreshViewValue
+# StreamTask__Exit
+
+> Renamed from `StreamTask__RefreshViewValue` on 2026-09-28 (tools/rename.py). Address 0x8003bdf4.
 
 > Renamed from `StreamTaskObj__func_8003BDF4` on 2026-09-26 (tools/rename.py). Address 0x8003bdf4.
 
@@ -11,7 +13,7 @@
 An `if`/`else` selecting one of two forwarding calls based on `self->unkD4`.
 
 ```c
-void StreamTask__RefreshViewValue(StreamTaskObj *self) {
+void StreamTask__Exit(StreamTaskObj *self) {
     if (self->unkD4 != 0) {
         self->unkB4->methods->slot4C(self->unkB4);
     } else {
@@ -40,7 +42,7 @@ None beyond what `StreamTask__OnPadConfirm`'s report already states.
 
 ## Naming
 
-**StreamTask__RefreshViewValue** -- tier C. Occupies `gStreamTaskMethods`
+**StreamTask__Exit** -- tier C. Occupies `gStreamTaskMethods`
 slot `+0x094`; an `if`/`else` choosing between tearing down through the
 private `unkB4` sub-object's slot `+0x04C` or re-entering this class's own
 state-7 transition, gated by `unkD4` -- the same `unkB4->methods->slot4C`

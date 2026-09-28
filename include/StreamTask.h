@@ -51,7 +51,7 @@
  *   +0x080 onPadPrev      StreamTask__OnPadPrev: TaskCore's only.
  *   +0x084 onPadNext      StreamTask__OnPadNext: TaskCore's only.
  *   +0x088, +0x08C        StreamTask__NoOpSlot88/8C (NULL in TaskCore).
- *   +0x094 refreshViewValue StreamTask__RefreshViewValue: abortBeforeFade,
+ *   +0x094 refreshViewValue StreamTask__Exit: abortBeforeFade,
  *                         the player's Abort now; else setState(7) and the
  *                         abort at state 8.
  * The overrides of +0x04C/+0x080/+0x084 (and TaskCore's) take self alone;
@@ -148,7 +148,7 @@ void StreamTask__OnPadPrev(StreamTask *self);
 void StreamTask__OnPadNext(StreamTask *self);
 void StreamTask__NoOpSlot88(void);
 void StreamTask__NoOpSlot8C(void);
-void StreamTask__RefreshViewValue(StreamTask *self);
+void StreamTask__Exit(StreamTask *self);
 void StreamTask__SetKeepActive(StreamTask *self, s32 keepActive);
 void StreamTask__SetLoopCount(StreamTask *self, s32 count);
 void StreamTask__SetSkipOnConfirm(StreamTask *self, s32 enable);

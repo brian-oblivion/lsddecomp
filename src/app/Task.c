@@ -154,7 +154,7 @@ void StreamTask__NoOpSlot88(void) {}
 
 void StreamTask__NoOpSlot8C(void) {}
 
-void StreamTask__RefreshViewValue(StreamTask *self) {
+void StreamTask__Exit(StreamTask *self) {
     if (self->abortBeforeFade != 0) {
         self->player->methods->abort(self->player);
     } else {

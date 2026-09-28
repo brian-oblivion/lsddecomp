@@ -43,11 +43,11 @@ void StreamTask__SetState(StreamTaskObj *self, s32 a1) {
   different unit) — result discarded, typed `void`.
 - `self->methods->slot94(self)`: new `StreamTaskObjMethods` slot `+0x094`.
   `classtable.py gStreamTaskMethods` shows it occupied by **this unit's own,
-  already-matched `StreamTask__RefreshViewValue`** — `void StreamTask__RefreshViewValue(StreamTaskObj
+  already-matched `StreamTask__Exit`** — `void StreamTask__Exit(StreamTaskObj
   *self)`, single argument, which is exactly the arity the disassembly here
   needs (only `a0` set before the `jalr`, no `a1`).
 - `case 8`'s `self->unkB4->methods->slot4C(self->unkB4)` reuses the slot
-  established for `StreamTask__RefreshViewValue`'s own body this same round.
+  established for `StreamTask__Exit`'s own body this same round.
 - `self->unkD4`/`self->unkD8` are both pre-existing fields.
 
 ## Third-learning check (per head's request)
