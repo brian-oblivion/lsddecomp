@@ -140,7 +140,7 @@ FadeBox *Entity__GetOrCreateFadeBox(Entity *this, void *size, void *offset, void
     boxMethods = box->methods;
     attachOffset = offset;
     if (attachOffset == NULL) {
-        attachOffset = gEntityFadeBoxDefaultOffset;
+        attachOffset = sEntityFadeBoxDefaultOffset;
     }
     boxMethods->attachToParent(box, (SceneNode *)this, attachOffset);
     box->methods->setStep(box, (s32)step);

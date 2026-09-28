@@ -16,7 +16,7 @@ through it: `slot50(sub)`, `slot4C(sub, this, arg2-or-default)`,
 allocation failed.
 
 `name` defaults to `gEntityFadeBoxDefaultSize` (`{320, 240}`) and `arg2` defaults to
-`gEntityFadeBoxDefaultOffset` (`{-100, -100}`) when the caller passes NULL — both plain
+`sEntityFadeBoxDefaultOffset` (`{-100, -100}`) when the caller passes NULL — both plain
 2-word data buffers, not strings, in `asm/data/7B3F8.sdata.s`.
 
 ## Derivation
@@ -57,7 +57,7 @@ Unk100Obj *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void
     m = sub->methods;
     dispatchArg2 = arg2;
     if (dispatchArg2 == NULL) {
-        dispatchArg2 = gEntityFadeBoxDefaultOffset;
+        dispatchArg2 = sEntityFadeBoxDefaultOffset;
     }
     m->slot4C(sub, this, dispatchArg2);
     sub->methods->slotD0(sub, arg3);
@@ -88,7 +88,7 @@ the way the "obviously equivalent" nested-if reads.**
    directly next time rather than "cleaning it up" first.
 3. The dispatch tail still needed two more fixes after that: `arg2`'s
    NULL-default was written by reassigning the *parameter itself*
-   (`if (arg2 == NULL) arg2 = gEntityFadeBoxDefaultOffset;`), and that block-reused `$s2`
+   (`if (arg2 == NULL) arg2 = sEntityFadeBoxDefaultOffset;`), and that block-reused `$s2`
    for both the check and the final value — but retail computes the checked
    value into `$a2` (a temp, distinct from the parameter's home register)
    and leaves `$s2` alone. Introducing a separate `dispatchArg2` local fixed
@@ -162,6 +162,6 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Polish (round 96, bravo, track 7)
 
-- Step 3: parameters name, arg2, arg3, arg4 -> size, offset, step, pri (from what their receivers do with them: New_FadeBox's size and pri, BoxFill__AttachToParent's offset, FadeBox__SetStep's step); locals sub, m, dispatchArg2 -> box, boxMethods, attachOffset. The two defaults were renamed by tools/rename.py: gEntityDefaultPos -> gEntityFadeBoxDefaultSize (it is New_FadeBox's size, {320, 240}, not a position), gEntityDefaultOffset -> gEntityFadeBoxDefaultOffset. Tier A for both: the body substitutes each for its NULL argument.
+- Step 3: parameters name, arg2, arg3, arg4 -> size, offset, step, pri (from what their receivers do with them: New_FadeBox's size and pri, BoxFill__AttachToParent's offset, FadeBox__SetStep's step); locals sub, m, dispatchArg2 -> box, boxMethods, attachOffset. The two defaults were renamed by tools/rename.py: gEntityDefaultPos -> gEntityFadeBoxDefaultSize (it is New_FadeBox's size, {320, 240}, not a position), gEntityDefaultOffset -> sEntityFadeBoxDefaultOffset. Tier A for both: the body substitutes each for its NULL argument.
 
 - Step 5: Entity.h's comment on the two defaults said they are "both plain 2-word buffers (asm/data/7B3F8.sdata.s): {0x140, 0xF0} (320, 240)"; the comment now gives the values in decimal and the data file location lives here. The body keeps one MATCHING line for its three load-bearing locals (see the attempt log above).

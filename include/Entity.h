@@ -140,7 +140,7 @@ extern EntityMethods *GetEntityMethods(void); /* returns &gEntityMethods */
  * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what
  * Viewport gives its FadeBox (FadeBox.h). */
 extern s32 gEntityFadeBoxDefaultSize[2];
-extern s32 gEntityFadeBoxDefaultOffset[2];
+extern s32 sEntityFadeBoxDefaultOffset[2];
 
 /* One row of the mood table (16 bytes): New_Entity's moodIndex selects it, and
  * every per-mood setting of an Entity is a column of it. Signed columns are
