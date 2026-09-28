@@ -1474,7 +1474,7 @@ void Viewport__InitDefaults(Viewport *self) {
     self->drawEnabled = 1;
 }
 
-void Viewport__SetScreenSize(Viewport *self, ViewportSize *size) {
+void Viewport__SetScreenSize(Viewport *self, ScreenDims *size) {
     self->screenSize = *size;
 }
 

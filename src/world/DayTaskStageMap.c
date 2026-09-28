@@ -197,12 +197,11 @@ void DayTask__OnInit(DayTask *self) {
     DrawSystem *drawSystem;
     Viewport *vp;
     SceneNode *fadeBox;
-    ViewportSize *size;
+    ScreenDims *size;
 
     drawSystem = (DrawSystem *)self->initArgs->drawSystem;
     vp = (Viewport *)self->viewport;
-    /* ScreenDims and ViewportSize are both {s32 width, s32 height}. */
-    size = (ViewportSize *)drawSystem->methods->getDims(drawSystem, NULL);
+    size = drawSystem->methods->getDims(drawSystem, NULL);
     vp->methods->setScreenSize(vp, size);
     fadeBox = vp->methods->getFadeBox(vp);
     fadeBox->methods->setDisplay(fadeBox, 1);

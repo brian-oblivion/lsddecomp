@@ -706,7 +706,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     vp->methods->detachViewChild(vp);
 
     drawSystem = (DrawSystem *)self->initArgs->drawSystem;
-    width = drawSystem->methods->getDims(drawSystem, NULL)->w;
+    width = drawSystem->methods->getDims(drawSystem, NULL)->width;
     vp->methods->setProjection(vp, width / 2 * 5 / 3 + sObjMProjectionBias);
 
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sObjMViewPoint,

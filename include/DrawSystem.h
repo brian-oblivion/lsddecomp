@@ -37,17 +37,17 @@ typedef struct DrawSystemMethods DrawSystemMethods;
  * (notifyParents(self, 2)); StageMap__OnDrawSystemEvent acts only on it. */
 #define DRAWSYSTEM_EVENT_VSYNC 2
 
-/* A {width, height} pair: the screen size initGraph hands to GsInitGraph
- * and getDims returns. Application keeps one (its default is
- * sDefaultScreenDims = {320, 240}) and passes it to initGraph. */
+/* A {width, height} screen size: the one initGraph hands to GsInitGraph
+ * and getDims returns (Application keeps one, default sDefaultScreenDims =
+ * {320, 240}, and passes it to initGraph), and a Viewport's screenSize. */
 typedef struct ScreenDims {
-    /* +0x0 */ s32 w;
-    /* +0x4 */ s32 h;
+    /* +0x0 */ s32 width;
+    /* +0x4 */ s32 height;
 } ScreenDims;
 
 /* A rectangle as DrawSystem's methods take it: 16-bit origin, 32-bit
  * extent. ConvertRect narrows it to libgpu's all-16-bit RECT (halfword
- * loads at +0/+2/+4/+8); getDims fills one with {0, 0, w, h * 2}. */
+ * loads at +0/+2/+4/+8); getDims fills one with {0, 0, width, height * 2}. */
 typedef struct DrawRect {
     /* +0x0 */ s16 x;
     /* +0x2 */ s16 y;
