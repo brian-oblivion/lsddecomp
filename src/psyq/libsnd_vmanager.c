@@ -151,8 +151,8 @@ void SpuVmKeyOnNow(s32 unused, s32 pitch) {
     volL = vol;
     volR = vol;
     if ((s16)D_8008EA22 != 33) {
-        volL = vol * score->unk74 / 127;
-        volR = vol * score->unk76 / 127;
+        volL = vol * score->volL / 127;
+        volR = vol * score->volR / 127;
     }
 
     if ((u8)D_8008EA1A < 64) {
@@ -1103,7 +1103,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
                     _svm_voice[D_8008EA26].prog = origA2;
 
                     if ((s16)a0 != 0x21) {
-                        s16 speed = s6->unk4E[s6->unk12];
+                        s16 speed = s6->channelVol[s6->channel];
 
                         _svm_voice[D_8008EA26].vol = s2 / speed;
                     }
@@ -1193,7 +1193,7 @@ s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
  *                   the volume and their ratio as the pan.
  *   SpuVmSeKeyOff   keys off a sound effect SpuVmSeKeyOn started.
  *   KeyOnCheck      vmanager's empty internal hook.
- *   SpuVmSetSeqVol  sets one sequence's L/R volume (SsScore unk74/unk76,
+ *   SpuVmSetSeqVol  sets one sequence's L/R volume (SsScore volL/volR,
  *                   clamped to 127) and rescales the voices it is playing.
  *   SpuVmGetSeqVol, SpuVmGetSeqLVol, SpuVmGetSeqRVol
  *                   read that volume back.
@@ -1245,8 +1245,8 @@ s32 SpuVmGetSeqVol(s32 seqSepNo, s16 *volL, s16 *volR) {
     s16 *cur = (s16 *)&D_8008EA22;
 
     *cur = (s16)seqSepNo;
-    *volL = seqs[(seqSepNo & 0xFF00) >> 8].unk74;
-    *volR = seqs[(seqSepNo & 0xFF00) >> 8].unk76;
+    *volL = seqs[(seqSepNo & 0xFF00) >> 8].volL;
+    *volR = seqs[(seqSepNo & 0xFF00) >> 8].volR;
     return *cur;
 }
 
@@ -1260,7 +1260,7 @@ s32 SpuVmGetSeqLVol(s32 seqSepNo) {
     __asm__("");
     D_8008EA22 = access;
     /* MATCHING: s16, for retail's sign-extending lh of the u16 field. */
-    return (s16)seqs[seq].unk74;
+    return (s16)seqs[seq].volL;
 }
 
 s32 SpuVmGetSeqRVol(s32 seqSepNo) {
@@ -1271,7 +1271,7 @@ s32 SpuVmGetSeqRVol(s32 seqSepNo) {
     __asm__("");
     D_8008EA22 = seqSepNo;
     /* MATCHING: s16, for retail's sign-extending lh of the u16 field. */
-    return (s16)seqs[(seqSepNo & 0xFF00) >> 8].unk76;
+    return (s16)seqs[(seqSepNo & 0xFF00) >> 8].volR;
 }
 
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SpuVmSeqKeyOff);

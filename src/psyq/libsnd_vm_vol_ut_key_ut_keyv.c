@@ -103,8 +103,8 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     lvl1c = lvl1b * e978c;
                     lvl2 = lvl1c / 16129;
 
-                    pan1 = (lvl2 * e->unk74) / 127;
-                    pan2 = (lvl2 * e->unk76) / 127;
+                    pan1 = (lvl2 * e->volL) / 127;
+                    pan2 = (lvl2 * e->volR) / 127;
 
                     e978d = _svm_tn[_svm_voice[i].tone].pan;
                     if (e978d < 0x40) {
