@@ -1080,7 +1080,7 @@ extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 
 extern char sCdFileNotFoundFmt[];   /* "File not found. path = %s\n" */
-extern char gCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix */
+extern char sCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix */
 
 /* Defined below, after its caller OpenCdFile: functions stay in ROM order. */
 char *BuildCdFilePath(char *dest, char *name);
@@ -1128,7 +1128,7 @@ char *BuildCdFilePath(char *dest, char *name) {
     dest[0] = '\\';
     strcpy(dest + 1, GetDataDirectory());
     strcat(dest, name);
-    strcat(dest, gCdFileVersionSuffix);
+    strcat(dest, sCdFileVersionSuffix);
     return dest;
 }
 

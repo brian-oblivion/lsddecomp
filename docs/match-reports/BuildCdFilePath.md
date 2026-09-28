@@ -11,13 +11,13 @@ char *BuildCdFilePath(char *dest, char *suffix) {
     dest[0] = '\\';
     strcpy(dest + 1, GetDataDirectory());
     strcat(dest, suffix);
-    strcat(dest, gCdFileVersionSuffix);
+    strcat(dest, sCdFileVersionSuffix);
     return dest;
 }
 ```
 
 with `extern char *GetDataDirectory(void);`, `extern char *strcpy(char *dest,
-char *src);`, and `extern char gCdFileVersionSuffix[];` declared locally.
+char *src);`, and `extern char sCdFileVersionSuffix[];` declared locally.
 
 Byte-exact, 26/26 words.
 
@@ -26,11 +26,11 @@ Byte-exact, 26/26 words.
 Builds a CD-ROM path string: a leading `\` (0x5C), the directory/disc-label
 string `GetDataDirectory()` returns (`GameApplicationFileResource.c`, still `func_`-named,
 carved), the caller-supplied filename `suffix`, and a fixed `";1"` suffix
-from `gCdFileVersionSuffix` -- the ISO9660 file-version-number convention
+from `sCdFileVersionSuffix` -- the ISO9660 file-version-number convention
 (`FILE.EXT;1`), strong confirmation of this unit's CD-ROM theme alongside
 `CdStatus`.
 
-`gCdFileVersionSuffix` sits in the `.sdata` region (`asm/data/7B008.sdata.s`) but this
+`sCdFileVersionSuffix` sits in the `.sdata` region (`asm/data/7B008.sdata.s`) but this
 function's OWN reference to it is a plain absolute `lui`/`addiu`, not
 `%gp_rel` -- the three-grep blocker screen on this function's `.s` correctly
 found zero `gp_rel` hits, so this is not an instance of the gp-relative
@@ -57,5 +57,5 @@ pure string-building leaf whose mechanics are its whole purpose. Called by
 Parameter `suffix` -> `name`, tier A: both callers (`OpenCdFile`,
 `CdDriver__Open`/`ResolveFileEntries`) pass a file name, and the body builds
 `"\\" + <data directory> + name + ";1"`; the suffix is
-`gCdFileVersionSuffix`. `GetDataDirectory` (GameApplicationFileResource.c) is the data directory
+`sCdFileVersionSuffix`. `GetDataDirectory` (GameApplicationFileResource.c) is the data directory
 getter; its name is proposed, not applied (not this unit's function).

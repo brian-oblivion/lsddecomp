@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gCdFileVersionSuffix
 gCdIdle
 gCdInitDone
 gCdOperation
@@ -177,6 +176,7 @@ sCdAsyncEnabled
 sCdBusy
 sCdCallbackInstalled
 sCdDriveInited
+sCdFileVersionSuffix
 sCdLock
 sCdQueueEnabled
 sDayDigits
