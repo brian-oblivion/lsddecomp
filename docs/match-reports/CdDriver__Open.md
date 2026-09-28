@@ -107,7 +107,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
    on its own. Re-verified all three still match after the type change.
 
 2. **`OpenCdFile` is void** (established already in its own match report,
-   `code_179d8_h.c`), so the early-return branch is `OpenCdFile(self,
+   `code_179d8_s.c`), so the early-return branch is `OpenCdFile(self,
    suffix); return;`, not a forwarded return value -- no ambiguity here since
    the callee's void-ness was already on file, unlike the general wrapper
    caution.
@@ -154,7 +154,7 @@ position, alignment 2. `Rec80028448` is a local view of the 0x1C-byte string
 records at `gFileTable` (`src/code_179d8_s.c`'s own comment already
 describes this table); only the trailing two fields this function reads are
 named. `StatBuf80027` is this unit's OWN local view of the CD stat buffer
-`code_179d8_h.c`'s `OpenCdFile` already independently discovered as
+`code_179d8_s.c`'s `OpenCdFile` already independently discovered as
 `StatBuf179D8H` -- same shape, declared separately per the project's
 multiple-local-views convention (not shared, since it is that OTHER unit's
 own reading).
@@ -190,7 +190,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 | `func_800272D0` | `CdDriver__Open` | A |
 
 **Evidence.** With the driver in plain sync mode it tail-forwards to
-`OpenCdFile` (code_179d8_h). Otherwise, outside a queue dispatch, it
+`OpenCdFile` (code_179d8_s). Otherwise, outside a queue dispatch, it
 enqueues request op 2 with `FindCdFileIndex(name)`; inside one, if the
 object is not already open, it looks the name up (`FindCdFileEntry` on the
 async path, `BuildCdFilePath` + `CdSearchFile` on the blocking path), copies
@@ -221,11 +221,11 @@ oracles green after.
 | `Rec80028448` | -- | `CdFileEntry` | A | code_179d8_s's name for the 0x1C-byte file-table record |
 | `StatBuf80027` | -- | `CdFileInfo` | A | code_179d8_s's name for CdSearchFile's CdlFILE output |
 | `Node8008A894` | -- | `CdRequestNode` | A | code_179d8_s's name for the queue node |
-| `Class6D4E8` | `unk0C` | `isOpen` | A | set 1 by Open, 0 by Close; Seek/Read require it; code_179d8_h's name |
+| `Class6D4E8` | `unk0C` | `isOpen` | A | set 1 by Open, 0 by Close; Seek/Read require it; code_179d8_s's name |
 | `Class6D4E8` | `unk10` | `buffer` | A | LoadFile's BMemPMgrAlloc result / read target; FileResource's name |
 | `Class6D4E8` | `unk14` | `bufferSize` | A | LoadFile stores the sector-rounded read size; FileResource's name |
-| `Class6D4E8` | `unk18` | `pos` | A | the file's disc position, CdlSetloc target; code_179d8_h's name |
-| `Class6D4E8` | `unk1C` | `size` | A | the file's byte size from the entry / CdSearchFile; code_179d8_h's name |
+| `Class6D4E8` | `unk18` | `pos` | A | the file's disc position, CdlSetloc target; code_179d8_s's name |
+| `Class6D4E8` | `unk1C` | `size` | A | the file's byte size from the entry / CdSearchFile; code_179d8_s's name |
 | `Class6D4E8` | `unk20` | `freeGuard` | B | FileResource's name; here only: nonzero lets LoadFile reuse an existing buffer |
 | `Class6D4E8` | `unk22` | `pendingRequests` | A | code_179d8_s's name; RunRequestQueue decrements it per completion |
 | `Class6D4E8` | `unk24` | `flags` | A | code_179d8_s's name; only ORed with CD_FLAG_* bits |
@@ -260,7 +260,7 @@ Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, i
 The paragraph above predates this rename (the tool rewrote the name in it).
 What the five methods' bodies show, read together: the mode word only ever
 matters when `gCdAsyncEnabled` is 0. Both 0: each method forwards straight
-to code_179d8_h's blocking call and never touches the queue. `gCdAsyncEnabled`
+to code_179d8_s's blocking call and never touches the queue. `gCdAsyncEnabled`
 0 and this word nonzero: the call is enqueued like an async one, and when
 `CdDriver__RunRequestQueue` dispatches it back the method runs it as a
 blocking CdControl/CdSync/CdRead spin on the spot. So the word selects

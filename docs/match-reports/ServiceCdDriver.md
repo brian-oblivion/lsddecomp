@@ -92,7 +92,7 @@ of getting a fallthrough instruction of its own.
 Body: an optional `VSyncCallback(0)` (`gCdUseVSyncCallback`), a two-way dispatch on
 `gCdTickStep` (1 -> `TickCdStateMachine`, 2 -> `TickCdLoadFileStateMachine`, both in the
 sibling `code_179d8_s` unit — declared extern here per the
-per-call-site-typed convention `code_179d8_h.c` already established for
+per-call-site-typed convention `code_179d8_s.c` already established for
 cross-unit libcd calls, now confirmed to apply to cross-unit game-code calls
 too), an optional virtual dispatch through `gCdDriverMethods`'s own table slot
 +0x68 (guarded by `sCdQueueEnabled`), and finally an optional

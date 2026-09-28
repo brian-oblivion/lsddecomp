@@ -68,7 +68,7 @@ Five-argument function (four in registers, a fifth on the caller's stack at
 standard o32 stack-arg slot). Allocates/links a list node via
 `AllocCdRequestNode` (foxtrot's `code_179d8_s`, still `INCLUDE_ASM` there —
 declared `extern` here per the cross-unit convention already established by
-`code_179d8_h.c` and `ServiceCdDriver`'s report) and fills five of its
+`code_179d8_s.c` and `ServiceCdDriver`'s report) and fills five of its
 fields with the incoming parameters. The store order to the new entry
 (`+0x08, +0x14, +0x0C, +0x10, +0x18`) is NOT ascending-offset — it's
 `arg2, arg3, arg0, arg1, arg4` in that literal order — and reproducing it
@@ -129,7 +129,7 @@ call site and false of three.
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/code_179d8_h.c:143`
+mis-hit had to be resolved by receiver type: `src/code_179d8_s.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),

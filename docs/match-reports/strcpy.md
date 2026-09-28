@@ -5,7 +5,7 @@
 > matched C counted as game code; the object owns its bytes, so the C is gone from
 > `src/` and the game-code count shrank by it -- the correction CLAUDE.md asks
 > for, not a regression. The run `libc2/strcpy` + `libc2/strstr` + `libcd/sys`
-> tiles 0x19378..0x19C78 and crosses the code_179d8_h / libcd_bios boundary;
+> tiles 0x19378..0x19C78 and crosses the code_179d8_s / libcd_bios boundary;
 > both units trimmed. Whole-image SHA1 green. Nothing here is assignable and
 > there is no stall left to work. The text below is the pre-conversion record.
 
@@ -13,14 +13,14 @@
 
 # strcpy -- MATCHED 17/17 (round 18, echo, via permuter lead + reuse-both-parameters idiom)
 
-Unit: `code_179d8_h`.
+Unit: `code_179d8_s`.
 
 ## Class: register identity (banned to fix with `register T v asm("$N")`)
 
 Screened clean on both documented blockers (no `gp_rel`, no `addiu $at`
 hits). This is a NULL-safe `strcpy` (returns `NULL` if either argument is
 `NULL`, not the textbook libc version), confirmed structurally via
-`tools/m2ctx.py code_179d8_h --sig 'char *strcpy(char *dest, char *src)'
+`tools/m2ctx.py code_179d8_s --sig 'char *strcpy(char *dest, char *src)'
 --run`, which independently reconstructs the same control flow: two early
 NULL guards, a "peeled" first-byte copy (write unconditionally, THEN test
 whether to enter the copy loop), and a tight `do`/`while` for the remaining

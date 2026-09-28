@@ -5,7 +5,7 @@
 > matched C counted as game code; the object owns its bytes, so the C is gone from
 > `src/` and the game-code count shrank by it -- the correction CLAUDE.md asks
 > for, not a regression. The run `libc2/strcpy` + `libc2/strstr` + `libcd/sys`
-> tiles 0x19378..0x19C78 and crosses the code_179d8_h / libcd_bios boundary;
+> tiles 0x19378..0x19C78 and crosses the code_179d8_s / libcd_bios boundary;
 > both units trimmed. Whole-image SHA1 green. Nothing here is assignable and
 > there is no stall left to work. The text below is the pre-conversion record.
 
@@ -13,7 +13,7 @@
 
 # CdStatus -- MATCHED (4/4 words)
 
-Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment).
+Unit: `code_179d8_s`. Runner: echo, round 17 (second assignment).
 
 ## Result
 

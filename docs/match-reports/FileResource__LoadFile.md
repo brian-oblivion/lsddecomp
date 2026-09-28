@@ -160,13 +160,13 @@ at the base-class level is not (the subclass provides that via the hooks).
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/code_179d8_h.c:143`
+mis-hit had to be resolved by receiver type: `src/code_179d8_s.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
-`FileResource` (`include/GameApplicationFileResource.h`) is included by `src/code_179d8_h.c`
+`FileResource` (`include/GameApplicationFileResource.h`) is included by `src/code_179d8_s.c`
 and `src/code_179d8_s.c` too, and `code_179d8_h.c`'s `FileResource__InstallCdReadDriver`
 genuinely reads/writes `self->unk0C` on this exact type (not a same-named
 field on a different struct), so per track 3's ownership rule these are
@@ -185,7 +185,7 @@ per FINISHING-PLAN track 3's merge procedure).
 
 `FileResourceMethods`'s slots this function dispatches through are
 null at `gFileResourceMethods`'s own level (subclass-provided), and the same
-cross-unit exposure applies (`code_179d8_h.c` types objects against this
+cross-unit exposure applies (`code_179d8_s.c` types objects against this
 table too). Proposed, not renamed:
 
 | slot | proposed name | tier | evidence |

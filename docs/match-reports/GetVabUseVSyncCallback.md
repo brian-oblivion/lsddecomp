@@ -53,7 +53,7 @@ purpose from a body that's just `return 0;`.
 ### Round 98 (charlie, track 7): `func_8002C478` -> `GetVabUseVSyncCallback`, tier A
 
 The objection above ("its own counterpart is still unnamed") no longer
-holds: the counterpart is `GetCdUseVSyncCallback` (code_179d8_h.c, returns
+holds: the counterpart is `GetCdUseVSyncCallback` (code_179d8_s.c, returns
 `gCdUseVSyncCallback`), and the one caller, GameApplicationFileResource.c's
 `GetActiveDataSourceUseVSyncCallback`, calls it when `gActiveDataSource` is
 DATASOURCE_CD and this function otherwise. This is the VAB driver's answer

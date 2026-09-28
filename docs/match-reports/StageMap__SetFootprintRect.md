@@ -395,7 +395,7 @@ nonzero," which the round's guidance didn't name explicitly. Treated it
 as still worth searching because the residue looked like a
 declaration-shape/frame-layout question (which locals exist, in what
 order) rather than a genuinely uncloseable control-flow gap (contrast
-with `code_179d8_h`'s address-caching residues, which delta declined on
+with `code_179d8_s`'s address-caching residues, which delta declined on
 the same round for exactly that reason).
 
 **Search: `timeout 600 ... permuter.py -j 8 --stop-on-zero --best-only`,

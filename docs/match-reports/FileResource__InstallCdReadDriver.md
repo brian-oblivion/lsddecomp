@@ -4,7 +4,7 @@
 
 > Renamed from `func_80028898` on 2026-09-21 (tools/rename.py). Address 0x80028898.
 
-Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment).
+Unit: `code_179d8_s`. Runner: echo, round 17 (second assignment).
 
 ## Result
 

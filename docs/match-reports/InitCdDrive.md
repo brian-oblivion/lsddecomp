@@ -10,7 +10,7 @@ Byte-exact on the first attempt.
 
 ```c
 /* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) --
- * per-call-site typed for this unit, per the code_179d8_h.c convention. */
+ * per-call-site typed for this unit, per the code_179d8_s.c convention. */
 extern s32 CdSetDebug(s32 arg0);
 extern s32 CdControlB(u_char com, void *param, void *result);
 
@@ -40,10 +40,10 @@ then a do-while retry loop calling `CdControlB(0xE /* CdlSetmode */, &mode,
 0)` until it returns nonzero, then set the guard.
 
 `CdSetDebug`/`CdControlB` are libcd/sys.o entry points (Psy-Q `libcd`,
-linked since round 34 per `src/code_179d8_h.c`'s header comment) — real
+linked since round 34 per `src/code_179d8_s.c`'s header comment) — real
 signatures are in `include/psyq/libcd.h` (`int CdSetDebug(int level);`,
 `int CdControlB(u_char com, u_char *param, u_char *result);`). Followed the
-existing `code_179d8_h.c` convention of a unit-local, per-call-site `extern`
+existing `code_179d8_s.c` convention of a unit-local, per-call-site `extern`
 rather than including `LIBCD.H` — this call site never touches `result`, so
 it's typed `void *` here instead of the header's `u_char *`, no behavioral
 difference.
@@ -56,7 +56,7 @@ directly, no manual unrolling needed.
 ### Proposed learning
 
 None new — confirms the libcd/sys.o per-call-site `extern` convention from
-`code_179d8_h.c` transfers cleanly to a second, independently-carved unit.
+`code_179d8_s.c` transfers cleanly to a second, independently-carved unit.
 
 ## Naming
 

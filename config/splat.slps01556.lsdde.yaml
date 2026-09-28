@@ -720,7 +720,6 @@ segments:
       # Both splits are made below (0x1040 in the rodata list, 0x5DD7C in
       # the data list); the 5-byte .rdata needed the pad, the 0x80 .data
       # ends 4-aligned and needed none.
-      - [0x19098, c, code_179d8_h]     # now 0x19098..0x19378, 11 functions
       - [0x19378, o, libc2/strcpy]     # strcpy
       - [0x193BC, o, libc2/strstr]     # strstr
       - [0x19434, o, libcd/sys]        # CdStatus .. CdPosToInt, 25 functions (CdControl/F/B were stalls)

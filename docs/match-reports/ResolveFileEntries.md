@@ -20,9 +20,9 @@ carries the evidence for each one.
  * track), but declared as two s16 rather than four u8: the game's own struct
  * is 2-aligned, which is why a whole-struct assignment of it compiles to
  * lwl/lwr + swl/swr instead of a plain lw/sw (the idiom CLAUDE.md and
- * code_179d8_h.c document). The two halves are never read apart here, so
+ * code_179d8_s.c document). The two halves are never read apart here, so
  * they keep placeholder names. Kept as this unit's own local view, the same
- * shape as code_179d8_h.c's Pair16_179D8H under a different name. */
+ * shape as code_179d8_s.c's Pair16_179D8H under a different name. */
 typedef struct CdLoc16 CdLoc16;
 struct CdLoc16 {
     s16 unk0;
@@ -33,7 +33,7 @@ struct CdLoc16 {
  * = 0x18 bytes (include/psyq/libcd.h). The 0x18 was derived here
  * independently, from the span between this local's stack slot (sp+0x50) and
  * the next saved register (sp+0x68), and it is the same figure
- * code_179d8_h.c's OpenCdFile derived for the same Sony function. Only
+ * code_179d8_s.c's OpenCdFile derived for the same Sony function. Only
  * the two fields this call site copies out are typed. */
 typedef struct CdFileInfo CdFileInfo;
 struct CdFileInfo {
@@ -114,7 +114,7 @@ a different, unrelated issue (see below).
    fields get merged into one `lwl`/`lwr` halfword-pair load — exactly the
    case CLAUDE.md documents (all-`s16` struct → alignment 2 → whole-struct
    assignment compiles to `lwl`/`lwr` + `swl`/`swr`), not the byte-by-byte
-   case bravo found the inverse for. `code_179d8_h.c` had already named this
+   case bravo found the inverse for. `code_179d8_s.c` had already named this
    exact shape `Pair16_179D8H` for a different call site on the same
    `CdSearchFile` output struct; this report reuses the same field shape
    under its own per-call-site type name (`Pair16Q`), not the shared header.
@@ -211,7 +211,7 @@ element. Turning names into disc positions is the entire function; tier A.
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/code_179d8_h.c:143`
+mis-hit had to be resolved by receiver type: `src/code_179d8_s.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
@@ -222,7 +222,7 @@ which is the procedure working in the direction where it can work.
 | code_179d8_s | `Rec80028448` | `unk14` | `pos` | A | same 0x1C record; filled from `CdSearchFile`'s `CdlFILE.pos` |
 | code_179d8_s | `Rec80028448` | `unk18` | `size` | A | same record; `CdDriver__LoadFile` divides it by 0x800 to get a sector count |
 | code_179d8_s | `StatBuf80027` | `unk0`/`unk4` | `pos`/`size` | A | it is `CdlFILE`; see above |
-| code_179d8_h | `StatBuf179D8H` | `unk0`/`unk4` | `pos`/`size` | A | same Sony struct, same call |
+| code_179d8_s | `StatBuf179D8H` | `unk0`/`unk4` | `pos`/`size` | A | same Sony struct, same call |
 
 ## Round 96 (track 6, echo): the local is Sony's `CdlFILE`
 
@@ -231,7 +231,7 @@ The unit now includes `<libetc.h>` and `<libcd.h>`, so the local view
 and `CdSearchFile` is Sony's prototype (`CdlFILE *CdSearchFile(CdlFILE *,
 char *)`). The deleted comment's evidence, kept here: the 0x18 size was derived
 independently from the span between this local's stack slot (sp+0x50) and the
-next saved register (sp+0x68), the same figure code_179d8_h.c's OpenCdFile
+next saved register (sp+0x68), the same figure code_179d8_s.c's OpenCdFile
 derived for the same Sony function, and it is `sizeof(CdlFILE)`.
 
 `CdFileEntry.pos` is still the project's `CdLoc16` (two `s16`), which is

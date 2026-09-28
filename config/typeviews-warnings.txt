@@ -35,7 +35,7 @@ class_3bb8c_g: warning: passing arg 2 of `strcat' discards `const' from pointer 
 class_3bb8c_k: warning: unused variable `unused'
 class_3bb8c_p: warning: unused variable `pad48Tail'
 class_3bb8c_s: warning: implicit declaration of function `rand'
-code_179d8_h: warning: unused variable `scratch'
+code_179d8_s: warning: unused variable `scratch'
 code_179d8_s: warning: `unassigned' might be used uninitialized in this function
 code_55dd4: warning: unused variable `unused'
 SceneNode: warning: unused variable `pad'

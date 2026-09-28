@@ -185,7 +185,7 @@ CdRead's 0x80, `CD_SYNC_POLL` for CdSync/CdReadSync's mode 1,
   Sony's `<libcd.h>` values 0x02, 0x80, 2, 0, 5.
 - `CD_SYNC_POLL` (1, local): libcd's mode argument for CdSync/CdReadSync,
   1 = return the status without waiting (the tick polls once per service
-  call; code_179d8_h.c's blocking read passes 0).
+  call; code_179d8_s.c's blocking read passes 0).
 - `CD_WAIT_TIMEOUT` (601, local): the count of CdlNoIntr polls before the
   seek is issued again.
 

@@ -277,7 +277,7 @@ would need to restructure roughly a third of the function's instructions
 simultaneously to reach retail -- the same class of gap (WHICH persistent
 register holds a hoisted address, whether an address computation is
 hoisted out of a loop at all) that `OpenCdFile`/`ReadCdFile` in
-`code_179d8_h` also failed check (b) on this same round. Recorded as NOT
+`code_179d8_s` also failed check (b) on this same round. Recorded as NOT
 SEARCHED (declined on evidence), not as a spent, failed search. The two
 already-identified axes (`D_8008EA26` hoisting; `loBit`/`hiBit` register
 roles) remain the right ones to attack by hand, per this report's existing

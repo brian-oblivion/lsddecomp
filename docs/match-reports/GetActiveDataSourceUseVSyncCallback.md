@@ -31,7 +31,7 @@ the direct positive evidence CLAUDE.md asks for -- the else-arm really does
 return `s32`, so the whole function (and, by the same shape, its two
 siblings `GetActiveDataSourceMethods`/`GetActiveDataSourceDriverMode`) is correctly typed non-void, not
 merely defaulted to it. `GetCdUseVSyncCallback` is still uncarved
-(`asm/nonmatchings/code_179d8_h/GetCdUseVSyncCallback.s`).
+(`asm/nonmatchings/code_179d8_s/GetCdUseVSyncCallback.s`).
 
 ## Final body
 

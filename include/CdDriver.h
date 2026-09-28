@@ -21,7 +21,7 @@
  *                       and the VSync service tick (ServiceCdDriver)
  *   src/code_179d8_s.c  the read state machine, AllocCdRequestNode /
  *                       FreeCdRequestNode, the file-table lookups
- *   src/code_179d8_h.c  the synchronous OpenCdFile / CloseCdFile /
+ *   src/code_179d8_s.c  the synchronous OpenCdFile / CloseCdFile /
  *                       GetCdFileSize / ReadCdFile the methods call when
  *                       the driver is not in async mode
  *

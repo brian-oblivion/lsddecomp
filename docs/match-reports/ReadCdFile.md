@@ -113,14 +113,14 @@ field names used unchanged; the lever was control flow and block layout).
 > and code below this note PREDATES the rename and uses the old field names
 > throughout (it is historical narrative, left as written); the
 > `## Result` block's actual function body has been updated to compile
-> against the CURRENT struct definitions in `src/code_179d8_h.c` -- that is
+> against the CURRENT struct definitions in `src/code_179d8_s.c` -- that is
 > the one to splice if you pick this function up again.
 
 > **ROUND 54 (2026-09-18), runner charlie -- rebuilt, then one more
 > structural reshape, negative.**
 >
 > **Rebuild-before-trusting-the-score.** Spliced the preserved (round-36)
-> body into `src/code_179d8_h.c` in place of the `INCLUDE_ASM` unchanged and
+> body into `src/code_179d8_s.c` in place of the `INCLUDE_ASM` unchanged and
 > ran the real oracle: `build exit=2`, no compile-error grep hits,
 > `funcdiff.py` reads 8/56, identical to the recorded figure; `build/lsdde.map`
 > confirms the function is still one word (4 bytes) long. Restored
@@ -204,11 +204,11 @@ field names used unchanged; the lever was control flow and block layout).
 > (`func_80028DF0`->`CdControl`, `func_80028D68`->`CdSync`,
 > `func_80029274`->`CdRead`, `func_80029254`->`CdReadSync`; all confirmed in
 > `config/symbols.slps01556.lsdde.txt` and already declared, per-call-site
-> typed, in `src/code_179d8_h.c` itself). The preserved body below still
+> typed, in `src/code_179d8_s.c` itself). The preserved body below still
 > spelled the old names and was never rebuilt under the new ones, so its
 > 8/56 figure was carried forward UNVERIFIED (flagged by
 > `tools/stalesyms.py`). Corrected the four names, spliced the body into
-> `src/code_179d8_h.c` in place of the `INCLUDE_ASM`, and ran the real
+> `src/code_179d8_s.c` in place of the `INCLUDE_ASM`, and ran the real
 > oracle: `build exit=0`; the function compiles one word (4 bytes) longer
 > than retail's 56, and `asm-differ` confirms it is the IDENTICAL
 > structural residue this report already documents -- retail places the
@@ -227,14 +227,14 @@ field names used unchanged; the lever was control flow and block layout).
 > restructuring this report's "next axis" note also floats (untested,
 > lower-confidence) -- out of scope for this round's time budget.
 
-Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment). Restored to
+Unit: `code_179d8_s`. Runner: echo, round 17 (second assignment). Restored to
 `INCLUDE_ASM`.
 
 ## Class: structural (basic-block placement), plus an unresolved
 register-role rotation similar to `OpenCdFile`'s stall in this same unit
 
 Screened clean on both documented blockers. Confirmed via `tools/m2ctx.py
-code_179d8_h --sig 's32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32
+code_179d8_s --sig 's32 ReadCdFile(ObjA34_179D8H *self, char *arg1, s32
 arg2)' --run`, whose independent reconstruction matches this report's
 reading of the algorithm.
 
@@ -258,7 +258,7 @@ which case retry the whole outer loop again).
 ```c
 #if 0
 /* MethodsA34_179D8H and ObjA34_179D8H are ALREADY declared earlier in
- * src/code_179d8_h.c (current names: MethodsA34_179D8H::onError,
+ * src/code_179d8_s.c (current names: MethodsA34_179D8H::onError,
  * ObjA34_179D8H::isOpen/pos) -- do not re-paste this typedef when splicing,
  * only the function body below. Shown here again only so this block reads
  * standalone. */
@@ -268,7 +268,7 @@ typedef struct MethodsA34_179D8H {
 } MethodsA34_179D8H;
 /* ObjA34_179D8H gets a `MethodsA34_179D8H *methods;` field at +0x000,
  * with the leading padding through +0xC unchanged in total size -- see
- * the struct definition already landed in src/code_179d8_h.c. */
+ * the struct definition already landed in src/code_179d8_s.c. */
 
 /* CdControl/CdSync/CdRead/CdReadSync (was func_80028DF0/func_80028D68/
  * func_80029274/func_80029254): Sony's, linked from lib/libcd/sys.o since
@@ -388,7 +388,7 @@ order) needs more work, not that the first attempt was closer to done.
 ## Round 47 (2026-09-16), runner delta -- rebuilt in-tree, then permuter DECLINED on check (b)
 
 **Rebuild-before-trusting-the-score.** Spliced the preserved (round-36)
-body into `src/code_179d8_h.c` in place of the `INCLUDE_ASM` and ran the
+body into `src/code_179d8_s.c` in place of the `INCLUDE_ASM` and ran the
 real oracle: `build exit=2`, no compile-error grep hits, `funcdiff.py`
 reads **8/56 raw word-match**, identical to the recorded figure.
 `build/lsdde.map` (`NoOp4 - ReadCdFile = 0xE4` = 57 words)
@@ -446,7 +446,7 @@ from check (b)), not as a spent, failed search.
   allocation-failure path (`CdDriver__LoadFile`) -- two unrelated give-up paths
   at the identical offset. Not applied in `code_179d8_s.c` (out of unit);
   PROPOSED there under the same name. Recorded in full in
-  `src/code_179d8_h.c`'s own field comment and in `OpenCdFile.md`.
+  `src/code_179d8_s.c`'s own field comment and in `OpenCdFile.md`.
 
 ## Proposed field names
 

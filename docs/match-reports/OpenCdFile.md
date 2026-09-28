@@ -103,14 +103,14 @@ field names used unchanged; the lever was control flow).
 > note PREDATES the rename and uses the old field names throughout (it is
 > historical narrative, left as written); the `## Best result` block's actual
 > function body has been updated to compile against the CURRENT struct
-> definitions in `src/code_179d8_h.c` -- that is the one to splice if you
+> definitions in `src/code_179d8_s.c` -- that is the one to splice if you
 > pick this function up again.
 
 > **ROUND 54 (2026-09-18), runner charlie -- rebuilt, then two more structural
 > reshapes, both negative.**
 >
 > **Rebuild-before-trusting-the-score.** Spliced the preserved (round-36)
-> body into `src/code_179d8_h.c` in place of the `INCLUDE_ASM` unchanged and
+> body into `src/code_179d8_s.c` in place of the `INCLUDE_ASM` unchanged and
 > ran the real oracle: `build exit=2`, no compile-error grep hits,
 > `build/lsdde.map` confirms `BuildCdFilePath - OpenCdFile = 0xB0` = 44
 > words against retail's 43 (one word long, unchanged since round 36/47).
@@ -221,11 +221,11 @@ field names used unchanged; the lever was control flow).
 > Round 34's SDK-object conversion renamed this function's two callees
 > (`func_8002B640` -> `CdSearchFile`, `func_80012C20` -> `printf`; both
 > confirmed in `config/symbols.slps01556.lsdde.txt` and already declared,
-> per-call-site typed, in `src/code_179d8_h.c` itself). The preserved body
+> per-call-site typed, in `src/code_179d8_s.c` itself). The preserved body
 > below still spelled the old names and was never rebuilt under the new
 > ones, so its 12/43 figure was carried forward UNVERIFIED (flagged by
 > `tools/stalesyms.py`). Corrected the two names, spliced the body into
-> `src/code_179d8_h.c` in place of the `INCLUDE_ASM`, and ran the real
+> `src/code_179d8_s.c` in place of the `INCLUDE_ASM`, and ran the real
 > oracle: `build exit=0`, `funcdiff.py` shows the function is exactly one
 > word longer than retail's 43 (`asm-differ` confirms it is the SAME
 > structural residue this report already documents -- `path`'s address
@@ -240,13 +240,13 @@ field names used unchanged; the lever was control flow).
 > for the first call's `path` use) -- out of scope for this round's time
 > budget, still open for whoever picks this up next.
 
-Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment). Restored
+Unit: `code_179d8_s`. Runner: echo, round 17 (second assignment). Restored
 to `INCLUDE_ASM`.
 
 ## Class: mixed (address-expression caching + register-role rotation), not
 one of the two documented blockers
 
-Screened clean on both. Confirmed via `tools/m2ctx.py code_179d8_h --sig
+Screened clean on both. Confirmed via `tools/m2ctx.py code_179d8_s --sig
 'void OpenCdFile(ObjA34_179D8H *self, char *suffix)' --run`, which
 independently reconstructs the same algorithm and confirms the field
 offsets/types this report uses.
@@ -270,7 +270,7 @@ stat buffer.
 ```c
 #if 0
 /* Pair16_179D8H, StatBuf179D8H, ObjA34_179D8H and MethodsA34_179D8H are
- * ALREADY declared earlier in src/code_179d8_h.c (current field names:
+ * ALREADY declared earlier in src/code_179d8_s.c (current field names:
  * ObjA34_179D8H::isOpen/pos/size, StatBuf179D8H::pos/size) -- do not
  * re-paste these typedefs when splicing, only the function body below. Shown
  * here again only so this block reads standalone. */
@@ -436,7 +436,7 @@ yet spent this round due to time).
 ## Round 47 (2026-09-16), runner delta -- rebuilt in-tree, then permuter DECLINED on check (b)
 
 **Rebuild-before-trusting-the-score, per this round's brief.** Spliced the
-preserved body (unchanged from round 36's, above) into `src/code_179d8_h.c`
+preserved body (unchanged from round 36's, above) into `src/code_179d8_s.c`
 in place of the `INCLUDE_ASM` and ran the real oracle:
 `build exit=2`, no compile-error grep hits, `build/lsdde.map` shows
 `BuildCdFilePath - OpenCdFile = 0xB0` = 44 words against retail's 43 (one
@@ -446,7 +446,7 @@ difference in the RAW count that does not change the verdict; the
 STRUCTURE (one extra cached-address instruction, same register-role
 rotation) is bit-for-bit the same class of residue round 36 already
 measured. Restored to `INCLUDE_ASM` immediately after
-(`diff src/code_179d8_h.c` against the pre-splice copy: identical);
+(`diff src/code_179d8_s.c` against the pre-splice copy: identical);
 `./build-and-verify.sh` confirms `OK: build matches retail SLPS_015.56`
 afterward.
 
@@ -516,11 +516,11 @@ before deciding whether to spend a search on it at all, not only after.
   the identical algorithm (same field offsets, same `CdSearchFile`/`CdControl`
   sequence) for its own async path. Paired with `CloseCdFile`/`GetCdFileSize`/
   `ReadCdFile` (also this unit) as an Open/Close/Size/Read quad; see those
-  reports and `src/code_179d8_h.c`'s unit header comment.
+  reports and `src/code_179d8_s.c`'s unit header comment.
 - Field renames on `ObjA34_179D8H`/`StatBuf179D8H` this function reads
   (`unk0C`->`isOpen`, `unk18`->`pos`, `unk1C`->`size`; `StatBuf179D8H`
   `unk0`->`pos`, `unk4`->`size`) are recorded in `CloseCdFile.md`'s and
-  `GetCdFileSize.md`'s `## Naming` sections and in `src/code_179d8_h.c`
+  `GetCdFileSize.md`'s `## Naming` sections and in `src/code_179d8_s.c`
   directly; not re-derived here.
 
 ## Round 97 (runner bravo): `StatBuf179D8H` is Sony's `CdlFILE`
