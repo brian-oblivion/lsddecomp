@@ -46,7 +46,7 @@ the two calls display.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__HandleUnscored` -> `GraphRoom__OnPadConfirm`
 
-The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Named for its slot, track 4 step 6: +0x078 is TaskCore's `onPadConfirm` (onPadEvent's 0x19 case). Unscored only: playSound (+0x070, was slot70) with 0x10 -- TaskCore__OnPadConfirm's own tone -- and refreshViewValue (+0x094, was slot94).
+The class is unified in `include/graph_room.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Named for its slot, track 4 step 6: +0x078 is TaskCore's `onPadConfirm` (onPadEvent's 0x19 case). Unscored only: playSound (+0x070, was slot70) with 0x10 -- TaskCore__OnPadConfirm's own tone -- and refreshViewValue (+0x094, was slot94).
 
 ## Track 7 (2026-09-27, round 97, delta)
 

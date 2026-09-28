@@ -36,7 +36,7 @@
 #include "LinkResource.h"
 #include "TaskCore.h"
 #include "StreamTask.h"
-#include "GraphRoom.h"
+#include "graph_room.h"
 #include "TitleMenu.h"
 #include "day_task.h"
 #include "data_source.h"

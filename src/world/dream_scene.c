@@ -19,7 +19,7 @@
  *  - Actor (include/actor.h), whole, the base of TodActor, DreamSys and
  *    StyleEffect;
  *  - VariantSprite (include/VariantSprite.h), whole;
- *  - GraphRoom (include/GraphRoom.h), whole, the mood graph screen.
+ *  - GraphRoom (include/graph_room.h), whole, the mood graph screen.
  *
  * The game's own files most likely ended after each class's table getter;
  * this file keeps the classes together.
@@ -53,7 +53,7 @@
 #include <rand.h>
 #include "tmd_model.h"
 #include "GridCell.h"
-#include "GraphRoom.h"
+#include "graph_room.h"
 #include "bmem_pmgr.h"
 #include "game_files.h"
 #include <strings.h>
@@ -3180,7 +3180,7 @@ void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
 /* ---- VariantSprite's tail; GraphRoom -----------------------------------
  *
  * - VariantSprite: four empty methods and the table getter.
- * - GraphRoom (include/GraphRoom.h, whose banner has the slots and fields),
+ * - GraphRoom (include/graph_room.h, whose banner has the slots and fields),
  *   a TaskCore subclass, whole: allocator, ctor, every override, ScoreDayLog
  *   and the getter.
  *
@@ -3222,7 +3222,7 @@ VariantSpriteMethods *GetVariantSpriteMethods(void) {
     return &gVariantSpriteMethods;
 }
 
-/* GraphRoom's object, table and methods: include/GraphRoom.h. The base
+/* GraphRoom's object, table and methods: include/graph_room.h. The base
  * implementations are reached through GetTaskCoreMethods() with `self`
  * upcast. */
 

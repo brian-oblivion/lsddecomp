@@ -9,7 +9,7 @@
  * are in src/app/task.c. The object is 0xA4 bytes (New_TaskCore). Three classes derive from
  * it, each ctor calling TaskCore__TaskCore first (`typeviews.py --tree`):
  * StreamTask (0x1130, gStreamTaskMethods, include/StreamTask.h), TitleMenu
- * (0x1F130, gTitleMenuMethods, include/TitleMenu.h) and GraphRoom (0x2F130, include/GraphRoom.h).
+ * (0x1F130, gTitleMenuMethods, include/TitleMenu.h) and GraphRoom (0x2F130, include/graph_room.h).
  *
  * Construction, ctor(target, soundBankPath, sound): the base ctor, then
  * setTarget(target), `sound` = New_VabStreamObj(soundBankPath) when a path
@@ -51,7 +51,7 @@
  * StreamTaskInitFn. TitleMenu (include/TitleMenu.h) expands
  * these macros too; its ctor's resetCounters call passes dreamSys and casts
  * the slot to TitleMenuResetCallFn, as GraphRoom's does. GraphRoom
- * (include/GraphRoom.h) expands these macros; its ctor is void
+ * (include/graph_room.h) expands these macros; its ctor is void
  * like every other.
  *
  * IntermediateBase's onInit slot is (self, s32, s32, s32), from init's

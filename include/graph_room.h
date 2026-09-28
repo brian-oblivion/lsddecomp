@@ -1,5 +1,5 @@
-#ifndef GRAPHROOM_H
-#define GRAPHROOM_H
+#ifndef GRAPH_ROOM_H
+#define GRAPH_ROOM_H
 
 #include "TaskCore.h"
 

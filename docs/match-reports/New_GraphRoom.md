@@ -57,7 +57,7 @@ comment for the class-identity evidence (loads "ETC\HGRAPH.TIM", builds
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `New_GraphRoomObj` -> `New_GraphRoom`
 
-The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Now returns `GraphRoom *` and takes `struct DreamSys *`: its one caller, GameApplication__RunTitleMenu (src/app/game_shell.c), passes `self->dreamSys` through GameApplication__RunTask, and casts New_GraphRoom to PollTaskCtor there; include/game_application.h's own `extern PollTask *New_GraphRoom(void *)` is deleted.
+The class is unified in `include/graph_room.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Now returns `GraphRoom *` and takes `struct DreamSys *`: its one caller, GameApplication__RunTitleMenu (src/app/game_shell.c), passes `self->dreamSys` through GameApplication__RunTask, and casts New_GraphRoom to PollTaskCtor there; include/game_application.h's own `extern PollTask *New_GraphRoom(void *)` is deleted.
 
 ## Track 7 (2026-09-27, round 97, delta): the unit banner, moved here
 
@@ -79,7 +79,7 @@ The unit banner of `src/world/dream_scene.c` was rewritten to say what the file 
  *   unrelated VariantSprite (include/VariantSprite.h; its ctor is in
  *   `dream_scene`, two more methods in `class_3bb8c_q`).
  * - The WHOLE of `GraphRoom` (round 75 name; table `gGraphRoomMethods`,
- *   73 slots), a TaskCore subclass, unified in include/GraphRoom.h (track 4,
+ *   73 slots), a TaskCore subclass, unified in include/graph_room.h (track 4,
  *   round 87; the header's banner has the slots, fields and evidence).
  *   This unit owns the entire class: allocator, ctor, every override,
  *   ScoreDayLog and the getter.

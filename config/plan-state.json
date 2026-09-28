@@ -950,7 +950,7 @@
         "gGraphRoomMethods": {
           "class": "GraphRoom",
           "date": "2026-09-26",
-          "header": "include/GraphRoom.h"
+          "header": "include/graph_room.h"
         },
         "gGridCellMethods": {
           "class": "GridCell",
