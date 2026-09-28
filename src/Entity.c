@@ -556,7 +556,7 @@ void Entity__MoodCue00(Entity *this, SoundCueSet *out) {
         if (this->moodTimer < 100) {
             this->methods->moveLocalZ(this, 50, 0);
         } else if (this->moodTimer < 250) {
-            this->methods->addTranslation(this, TRANSLATE_Y_PLUS64_Z_MINUS64);
+            this->methods->addTranslation(this, sTranslateYPlus64ZMinus64);
         }
     } else if (this->moodTimer == 250) {
         this->methods->stopTod(this);

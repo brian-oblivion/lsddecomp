@@ -21,7 +21,7 @@ range test that turned out to be exactly what retail compiled:
 4. Else (`this->unk44 != 0`), a four-way `this->unkFC` dispatch:
    - `< 0xFA` (250): the SAME `out->unk4 % 10` check as step 3, THEN its own
      inner two-way split (`< 0x64` -> `slotC4(this, 0x32, 0)`; else
-     `slotBC(this, TRANSLATE_Y_PLUS64_Z_MINUS64)`).
+     `slotBC(this, sTranslateYPlus64ZMinus64)`).
    - `== 0xFA`: `slot130(this)`, `out->unk1C = -2`.
    - `>= 0x105 && < 0x238`: `slotC4(this, -0x32, 0)` then
      `slot44(this, 1, sRotationYawMinus120)`.
@@ -49,7 +49,7 @@ needed since the literal transcription matched immediately.
   the same `Unk94Obj` vtable `Entity__MoodCue01.md`/`Entity__IsTargetInRange.md`
   established; padded out to `+0x200` with no other slots resolved in
   between (nothing else in this unit reaches that far into the table yet).
-- Three more `D_8008xxxx` opaque data-row externs: `TRANSLATE_Y_PLUS64_Z_MINUS64`,
+- Three more `D_8008xxxx` opaque data-row externs: `sTranslateYPlus64ZMinus64`,
   `sRotationYawMinus120`, `sRotationX50YMinus120Z30`.
 
 ## Final C
@@ -82,7 +82,7 @@ void Entity__MoodCue00(Entity *this, EntityMoodHandlerArg *out) {
         if (this->unkFC < 0x64) {
             this->methods->slotC4(this, 0x32, 0);
         } else if (this->unkFC < 0xFA) {
-            this->methods->slotBC(this, TRANSLATE_Y_PLUS64_Z_MINUS64);
+            this->methods->slotBC(this, sTranslateYPlus64ZMinus64);
         }
     } else if (this->unkFC == 0xFA) {
         this->methods->slot130(this);
@@ -121,7 +121,7 @@ as "cleaner" C, but it changes the source shape retail actually has.
 
 `Entity__MoodCue00` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005E160`.
 
-`gEntityMoodHandlerTable` row 0. Body: on tick 0, if the target's slot +0x200 returns 5, it sets `unk44 = 100`. It sets the attenuation. With `unk44 == 0` it requests voice 0 tone 5 (pitch -2) every 10th tick and moves along local z (slot +0xC4) +0x32 below moodTimer 0x4B0 and -0x32 from there, resetting moodTimer to -1 at 0x960, so it paces back and forth. With `unk44 != 0` it runs a timeline: below 250 the same tone plus a +0x32 move (below 100) or a `TRANSLATE_Y_PLUS64_Z_MINUS64` step; at 250 slot +0x130 and voice 0 stop (-2); from 0x105 to 0x237 a -0x32 move and `updateRotation(1, sRotationYawMinus120)`; from 0x239 `updateRotation(1, sRotationX50YMinus120Z30)`.
+`gEntityMoodHandlerTable` row 0. Body: on tick 0, if the target's slot +0x200 returns 5, it sets `unk44 = 100`. It sets the attenuation. With `unk44 == 0` it requests voice 0 tone 5 (pitch -2) every 10th tick and moves along local z (slot +0xC4) +0x32 below moodTimer 0x4B0 and -0x32 from there, resetting moodTimer to -1 at 0x960, so it paces back and forth. With `unk44 != 0` it runs a timeline: below 250 the same tone plus a +0x32 move (below 100) or a `sTranslateYPlus64ZMinus64` step; at 250 slot +0x130 and voice 0 stop (-2); from 0x105 to 0x237 a -0x32 move and `updateRotation(1, sRotationYawMinus120)`; from 0x239 `updateRotation(1, sRotationX50YMinus120Z30)`.
 
 Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `ServiceSoundCueSet` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.
 
