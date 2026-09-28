@@ -478,6 +478,12 @@ void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dr
     self->methods->addChild(self, (BasicClass *)dreamSys);
 }
 
+/* ObjM__GetGridRecord's grid lookups (src/GameFiles.c): a
+ * non-negative code is a linear cell index (GetStageMapChunkRecord(index, code)),
+ * a negative one sends x/y to GetStageMapChunkRecordXY. */
+extern s32 GetStageMapChunkRecord(s32 index, s32 sub);
+extern void GetStageMapChunkRecordXY(s32 index, s32 x, s32 y);
+
 /* The StageMap's chunkFileFn: a chunk's file record, by linear cell index,
  * or by x/y when the index is negative. The record is left as the return
  * value for the StageMap (GetStageMapChunkRecordXY is declared void). */
@@ -580,6 +586,10 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
     self->dreamSys->methods->setPendingExtra(self->dreamSys, gStagePendingExtras[self->stage]);
     self->state = 5;
 }
+
+/* ObjM__TeardownStyle's helpers (src/DreamAux.c, src/ObjMStyleActor.c). */
+extern void ReleaseDreamAuxEntities(void);
+extern void StyleTeardown(void);
 
 /* onDeinit. */
 void ObjM__TeardownStyle(ObjM *self) {
