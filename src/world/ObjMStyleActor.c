@@ -1680,7 +1680,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
 }
 
 extern s32 sStyleKind2AltColor;
-extern u8 gStyleKind2Colors[][3];
+extern u8 sStyleKind2Colors[][3];
 extern s32 gStyleSpawnColors[];
 extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
@@ -1702,7 +1702,7 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
 
     r = rand();
     color = (S32BoxK2 *)gStyleSpawnColors;
-    color->v = (s32)gStyleKind2Colors[(u32)r % 3];
+    color->v = (s32)sStyleKind2Colors[(u32)r % 3];
     color++;
     altColor = (sStyleDay / 20) * 20; /* MATCHING: not `% 20`, which jump.c folds */
     if (sStyleDay != altColor) {

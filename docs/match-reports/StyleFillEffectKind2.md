@@ -66,7 +66,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
 
     r = rand();
     slot = (S32BoxK2 *) gStyleSpawnColors;
-    slot->v = (s32) (gStyleKind2Colors + ((u32) r % 3) * 3);
+    slot->v = (s32) (sStyleKind2Colors + ((u32) r % 3) * 3);
     slot++;
     val = (sStyleDay / 20) * 20;
     if (sStyleDay != val) {
@@ -334,7 +334,7 @@ local COUNT (this session's other two matches) or a declaration.
 `output-495-1` made two changes, both using one extra local `new_var`:
 
 - **(a)** an explicit alias for the first store:
-  `new_var = slot; *new_var = (s32) (gStyleKind2Colors + idx * 3);`
+  `new_var = slot; *new_var = (s32) (sStyleKind2Colors + idx * 3);`
 - **(b)** a named local for the `sStyleGrid` load, passed as
   `New_StyleEffect`'s third argument.
 
@@ -383,7 +383,7 @@ extern s32 sStyleDay;
 extern s32 sStyleGrid;
 extern s32 sStyleKind2AltColor;
 extern s32 gStyleSpawnYChoice2;
-extern u8 gStyleKind2Colors[];
+extern u8 sStyleKind2Colors[];
 extern s32 gStyleSpawnColors[];
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
@@ -400,7 +400,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
 
     idx = (u32) rand() % 3;
     slot = gStyleSpawnColors;
-    *slot = (s32) (gStyleKind2Colors + idx * 3);
+    *slot = (s32) (sStyleKind2Colors + idx * 3);
     slot++;
     if (sStyleDay % 20 == 0) {
         v0 = 0;
@@ -507,7 +507,7 @@ per the round-64 revisit.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_80087228` | `gStyleKind2Colors` | A | 3 RGB triples stored as the params' color for kind 2. |
+| `D_80087228` | `sStyleKind2Colors` | A | 3 RGB triples stored as the params' color for kind 2. |
 | `D_80087430` | `sStyleKind2AltColor` | C | the word stored as the params' altColor when `sStyleDay % 20 != 0`. Its data word is 0 (the record is {0, &D_8008AB7C, -1, 0, 0}) and nothing in the tree writes it, so both paths store 0 unless a writer is found. |
 
 Locals: `slots`, `pos`, `r`, `color`, `altColor`, `rotation`.
