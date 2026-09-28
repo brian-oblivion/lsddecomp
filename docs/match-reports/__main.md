@@ -86,3 +86,11 @@ Sony's empty `_obj/none` stub: an EXACT (TINY) fingerprint, placed directly
 before the `_obj/malloc` object, and the call only cc1 emits. Both oracles
 green. `GameMain` is withdrawn: the name was a workaround for the link
 failure, not a claim about the code.
+
+## History (moved from src/main.c, round 101)
+
+The comment above the definition, verbatim as it stood at `57fb90b6`:
+
+```c
+/* Sony's _obj/none (round 79); the call to it is cc1's, inside main. */
+```
