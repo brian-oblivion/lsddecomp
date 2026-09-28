@@ -18,6 +18,10 @@
 #include "common.h"
 #include "StageGrid.h"
 
+/* The two per-stage tables (splat data), read only here. */
+extern StageGridDimensions sStageGridDimensions[];
+extern MoodGraphPoint *sStageChunkMoods[];
+
 /* The number of stages, STG00 to STG13 on the disc: one entry each in
  * sStageGridDimensions and sStageChunkMoods (sStage00ChunkMoods ..
  * sStage13ChunkMoods). GetStageGridDimensionsCount returns it,

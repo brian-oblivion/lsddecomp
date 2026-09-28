@@ -19,11 +19,7 @@ struct simplePair {
     s8 y;
 };
 
-extern StageGridDimensions sStageGridDimensions[];
-
-extern MoodGraphPoint *sStageChunkMoods[];
-
-/* @brief Number of entries in sStageGridDimensions / sStageChunkMoods (14). */
+/* @brief Number of stages, the length of both per-stage tables (14). */
 extern s32 GetStageGridDimensionsCount(void);
 
 /* @brief Gets the stage-dimensions table, optionally writing its length out. */
@@ -31,13 +27,13 @@ extern s32 GetStageGridDimensionsCount(void);
 extern StageGridDimensions *GetStageGridDimensionsTable(s32 *count);
 
 /* @brief Gets the dimensions entry for a single stage. */
-extern StageGridDimensions *GetStageGridDimensions(s32 index);
+extern StageGridDimensions *GetStageGridDimensions(s32 stage);
 
 /* @brief Gets the stage and chunk associated with a given point on the mood graph. */
-/* @param ret Pointer where the found chunk will be written to */
+/* @param chunk Pointer where the found chunk will be written to */
 /* @param mood The mood point to be checked */
 /* @return Stage index the found chunk belongs to */
-extern s32 GetStageChunkFromMood(StageChunk *ret, MoodGraphPoint *mood);
+extern s32 GetStageChunkFromMood(StageChunk *chunk, MoodGraphPoint *mood);
 
 /* @brief Gets the mood contribution associated with a given stage and chunk. */
 /* @param stage The stage index the chunk belongs to. */
