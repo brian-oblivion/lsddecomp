@@ -2395,12 +2395,12 @@ extern void NoOpIgnoreArgs();
  * with the same types: the DREAMER.TMD Actor the model kinds fetch their
  * model from (setBackClip), the TIM image New_VariantSprite is handed, and
  * the scene's Viewport, whose viewpoint y (refView.vp.y) InitByKind
- * snapshots into gStyleEffectBaseViewY and UpdateByKind follows. The
+ * snapshots into sStyleEffectBaseViewY and UpdateByKind follows. The
  * viewport stays `void *` because that is how the next section declares it. */
 extern Actor *gStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
 extern void *gStyleEffectTim;
 extern Viewport *gStyleEffectViewport;
-extern s32 gStyleEffectBaseViewY;
+extern s32 sStyleEffectBaseViewY;
 extern s32 gStyleEffectModelIds[];
 
 /* Called once, from the class's ctor (StyleEffect__StyleEffect): snapshot the
@@ -2415,7 +2415,7 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
     LongVec3 placed;
     s32 kind;
 
-    gStyleEffectBaseViewY = gStyleEffectViewport->refView.vp.y;
+    sStyleEffectBaseViewY = gStyleEffectViewport->refView.vp.y;
     AddVec3(&placed, pos, &self->params.offset);
     AttachWithRotScale((Actor *)self, parent, &placed, self->params.rotation, self->params.scale);
 
@@ -2450,7 +2450,7 @@ void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
     LongVec3 placed;
 
     AddVec3(&placed, pos, &self->params.offset);
-    placed.y += gStyleEffectViewport->refView.vp.y - gStyleEffectBaseViewY;
+    placed.y += gStyleEffectViewport->refView.vp.y - sStyleEffectBaseViewY;
     self->methods->setTranslation(self, &placed);
 
     switch (self->pendingExtra) {
