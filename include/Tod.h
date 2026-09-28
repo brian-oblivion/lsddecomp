@@ -59,7 +59,7 @@ struct ResourceSource;
 typedef struct TodFile {
     /* +0x00 */ u8 pad0[4]; /* id, version, resolution: not read */
     /* +0x04 */ s32 frameCount;
-    /* +0x08 */ u32 frames[1]; /* the first frame */
+    /* +0x08 */ u32 frames[1]; /* the first frame (a TodFrame) */
 } TodFile;
 
 /* A TOD packet: the header word DecodeTodPacketWord splits, then the data;

@@ -283,3 +283,7 @@ address arithmetic, byte-identical.
 
 As TodActor__Tick: `TodHeader.frames` and the `TodSetBuffer` view replace the
 `+ 8` offsets.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+TodActor.c's `TodHeader` merged into include/Tod.h's `TodFile` (the same TOD file header: 4 unread bytes, frameCount at +0x004, frames at +0x008); TodActor's `todFramePtr` is `void *` so it takes TodFile's `u32` frames and applyTodFrame's `u8 *` result alike. Byte-identical.

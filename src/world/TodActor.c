@@ -79,14 +79,6 @@ typedef struct TodPacketHeader {
     u8 length;   /* +0x003 the packet's length in words, header included */
 } TodPacketHeader;
 
-/* A TOD file's header (Sony's TOD format: id, version, resolution, then the
- * frame count), then its frames. */
-typedef struct TodHeader {
-    u8 pad00[0x04]; /* +0x000 id, version, resolution: not read */
-    s32 frameCount; /* +0x004 */
-    u8 frames[1];   /* +0x008 the first frame (a TodFrame) */
-} TodHeader;
-
 /* A TOD frame's header (Sony's TOD format: size in words, packet count,
  * frame number), then its packets. */
 typedef struct TodFrame {
@@ -398,7 +390,7 @@ void TodActor__Tick(TodActor *self) {
         if (self->todFrame >= self->todFrameCount) {
             self->todFrame = 0;
             self->todFramePtr =
-                ((TodHeader *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer)->frames;
+                ((TodFile *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer)->frames;
         }
     }
     self->coord2->flg = 0;
@@ -448,9 +440,8 @@ void TodActor__PlayTone(TodActor *self, s32 index) {
 
 void TodActor__SetTod(TodActor *self, s32 index) {
     self->todIndex = index;
-    self->todFrameCount = ((TodHeader *)TODSET_TOD(self->modelData->todSet, index)->buffer)->frameCount;
-    self->todFramePtr =
-        ((TodHeader *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer)->frames;
+    self->todFrameCount = ((TodFile *)TODSET_TOD(self->modelData->todSet, index)->buffer)->frameCount;
+    self->todFramePtr = ((TodFile *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer)->frames;
     self->todFrame = 0;
     self->methods->applyTodFrame(self, self->todFramePtr, 0);
 }
