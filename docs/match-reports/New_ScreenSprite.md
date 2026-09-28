@@ -4,7 +4,7 @@
 
 > Renamed from `func_80041C9C` on 2026-09-25 (tools/rename.py). Address 0x80041c9c.
 
-Round 82, runner alpha (fourth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior attempt.
 
 - **Where:** not in any method table (allocator for ScreenSprite (gScreenSpriteMethods), the screen-space sprite, 0xA8 bytes).
 - **What:** `BMemPMgrAlloc(0xA8)`; if non-NULL, calls slot +0x008 (ctor, ScreenSprite__ScreenSprite) of `GetScreenSpriteMethods()` (the gScreenSpriteMethods table) with `(obj, a1, a2, a3)` and returns obj, else NULL.

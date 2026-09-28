@@ -174,7 +174,7 @@ class's track 7 pass (see `VariantSprite__SetVariantClut`'s report).
 | locals `xWhole`/`xRem`/`xFrac`/`xRatio`, `y...` (were `q1`/`r1`/`q2`/`ratio1`, `q3`/`r3`/`q4`/`ratio2`) | A | The split division: whole part `num / den`, remainder, the remainder's 12 fractional bits, and their 20.12 sum. |
 | locals `xScale` / `yScale` (were `short1` / `short2`) | A | The 16-bit truncations stored into `sprite.scalex` / `.scaley`. |
 
-`unk58` itself is also written by `Sprite__Reset` (src/Sprite.c, outside
+`unk58` itself is also written by `Sprite__Reset` (src/graphics/Sprite.c, outside
 this job), so its name is proposed, not applied: see "Proposed field
 names" below.
 
@@ -196,11 +196,11 @@ the source keeps one `MATCHING:` line on `xScale`.
 ## Proposed field names
 
 - Sprite (include/Sprite.h, `SPRITE_FIELDS`) `unk58` (`+0x058`) ->
-  `accumulateScale`, tier B. Accessors: `Sprite__Reset` (src/Sprite.c)
+  `accumulateScale`, tier B. Accessors: `Sprite__Reset` (src/graphics/Sprite.c)
   zeroes it; this method reads it and, while it is non-zero, multiplies
   `accumScaleX/Y` by the ratios instead of writing `sprite.scalex/scaley`.
   No writer of a non-zero value found. Not applied: `Sprite__Reset` is
-  outside this job. The rename touches `self->unk58` in src/Sprite.c and
+  outside this job. The rename touches `self->unk58` in src/graphics/Sprite.c and
   src/ObjMStyleActor.c, plus the comments on the two fields after it and
   VariantSprite.h's banner line that names it.
 

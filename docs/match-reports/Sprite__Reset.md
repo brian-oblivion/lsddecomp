@@ -1,6 +1,6 @@
 # Sprite__Reset -- MATCHED (24/24 words), round 82
 
-Round 82, runner alpha (fourth slot on Sprite). Unit `src/Sprite.c`. Named this round from its slot by the types runner; first body attempt.
+Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/Sprite.c`. Named this round from its slot by the types runner; first body attempt.
 
 - **Where:** gSpriteMethods slot +0x040 (reset), declared in `include/Sprite.h` as `void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect)`.
 - **What:** `image = texture + 0x2C` (the TimImage's GsIMAGE), copies the 12-byte cell into `rect`, calls `InitGsSprite(&self->sprite, abr, rect, self->image)` (image RELOADED from the object, which is what the retail `lw a3,0x48(s0)` is), then zeroes `unk58`.
@@ -21,7 +21,7 @@ void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
 ## Track 4 (2026-09-26, round 88)
 
 TimImage is unified (`include/TimImage.h`, which now holds GsIMAGE).
-`src/Sprite.c`'s own copy of `struct GsIMAGE` is deleted and the unit
+`src/graphics/Sprite.c`'s own copy of `struct GsIMAGE` is deleted and the unit
 includes TimImage.h; `self->image = (struct GsIMAGE *)((u8 *)texture +
 0x2C)` is now `&((TimImage *)texture)->tim` (`texture` stays `void *`, as
 Sprite's slot types it). Same `addiu 0x2C`; image byte-identical.

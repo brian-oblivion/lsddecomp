@@ -1,6 +1,6 @@
 # Sprite__UpdateRotation -- MATCHED (39/39 words), round 82
 
-Round 82, runner alpha (fifth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gSpriteMethods slot +0x044 (updateRotation) (`tools/classtable.py`).
 - **What:** Takes table[2] (the Ratio16 z entry) as a quotient, angle = ((whole / frac) << 12) + ((whole % frac) << 12) / frac -- degrees in 4096ths -- and sets or adds it to sprite.rotate (+0x084). First build.

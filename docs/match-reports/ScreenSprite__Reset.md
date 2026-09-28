@@ -4,7 +4,7 @@
 
 > Renamed from `func_80041DA4` on 2026-09-25 (tools/rename.py). Address 0x80041da4.
 
-Round 82, runner alpha (re-staffed slot). Unit `src/Sprite.c`. Fresh
+Round 82, runner alpha (re-staffed slot). Unit `src/graphics/Sprite.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 - **Where:** gScreenSpriteMethods slot +0x040 (reset, over SceneNode__Reset) (`tools/classtable.py`).

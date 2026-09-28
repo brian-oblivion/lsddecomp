@@ -8,7 +8,7 @@
 
 > Renamed from `func_800423E4` on 2026-09-25 (tools/rename.py). Address 0x800423e4.
 
-Round 82, runner alpha (re-staffed slot). Unit `src/Sprite.c`. Fresh
+Round 82, runner alpha (re-staffed slot). Unit `src/graphics/Sprite.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 - **Where:** gRequestedFileMethods slot +0x064 (a FileResource-derived table, id 0xB03) (`tools/classtable.py`).
@@ -41,7 +41,7 @@ unit-local views `D_8006EED8Obj`/`D_8006EED8Methods` and the single-slot cast
 views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
 `CtorArg1Methods_322b4` are gone; `GetActiveDataSourceMethods` is declared
 `FileResourceMethods *`. The Source block above is the round-82 text; the live
-body in `src/Sprite.c` is byte-identical.
+body in `src/graphics/Sprite.c` is byte-identical.
 
 Renamed from `D8006EED8__SetFlag2C` with rename.py: the occupant of
 FileResource's +0x064 `setFlag`, named for its slot as `PlacementGrid__SetFlag`

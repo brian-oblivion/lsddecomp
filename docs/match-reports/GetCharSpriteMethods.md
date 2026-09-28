@@ -4,7 +4,7 @@
 
 > Renamed from `func_80041C3C` on 2026-09-25 (tools/rename.py). Address 0x80041c3c.
 
-Round 82, runner alpha (second re-staffed slot of the round). Unit `src/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (second re-staffed slot of the round). Unit `src/graphics/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table (called directly) (`tools/classtable.py`).
 - **What:** Returns the gCharSpriteMethods method table: `lui/addiu $v0; jr; nop`. Callers in `ScreenWidgets.c` (via `include/Task.h`) declare it as `Obj6EAC0Methods *`; this unit declares `void *`, which is legal because neither TU sees the other.
