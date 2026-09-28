@@ -11,7 +11,10 @@
  * DrawRect to libgpu's RECT (ConvertRect); while the loop runs they transfer
  * only when syncMode is set, and then wait for DrawSync(0).
  *
- * Sony's libgpu/sys follows this file in the image, starting at ResetGraph.
+ * Edges: Sony objects on both sides, libgte/msc01 before and libgpu/sys
+ * (from ResetGraph, still asm) after, so the file is exactly this unit.
+ * tuboundary.py finds no rodata inside it; its "a forced boundary lies in
+ * this stretch" note is satisfied by those Sony edges. Named for its class.
  */
 #include "common.h"
 #include <libgte.h>
