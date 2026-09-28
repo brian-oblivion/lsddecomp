@@ -389,7 +389,7 @@ MATCHING lines (derivation: "Round 73 (delta) -- REVISIT" above).
 ## Track 7 (round 100, charlie)
 
 Local `p` renamed `item`. Constants: `mode == 1` is
-`ITEMLIST_MODE_FULLWIDTH` (enum ItemListMode, added to include/ItemList.h);
+`ITEMLIST_MODE_FULLWIDTH` (enum ItemListMode, added to include/item_list.h);
 the two allocation sizes are `i * sizeof(*self->texts)` and
 `self->itemCount * sizeof(*self->textLens)` (were `* 4`). strlen/strcpy now
 come from Sony's `<strings.h>`, and DecodeFullWidthSjis's extern is

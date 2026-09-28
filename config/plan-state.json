@@ -965,7 +965,7 @@
         "gItemListMethods": {
           "class": "ItemList",
           "date": "2026-09-26",
-          "header": "include/ItemList.h"
+          "header": "include/item_list.h"
         },
         "gLbdFileMethods": {
           "class": "LbdFile",

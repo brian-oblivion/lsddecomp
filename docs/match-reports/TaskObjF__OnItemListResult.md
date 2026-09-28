@@ -63,5 +63,5 @@ Renamed from `TaskObjF__OnItemSelected`. Slot +0x0B0, which TaskObjF__OnNotify c
 
 Parameters `arg1`/`arg2` -> `list`/`result`; the cases are
 `ITEMLIST_RESULT_CHOSEN`/`_CANCELLED` (enum ItemListResult, added to
-include/ItemList.h this round), the targets LOAD_WARNING and ABORTED.
+include/item_list.h this round), the targets LOAD_WARNING and ABORTED.
 Image byte-identical.

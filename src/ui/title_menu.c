@@ -53,7 +53,7 @@
 #include "frame_clock.h"
 #include "ScreenSprite.h"
 #include "TextEntry.h"
-#include "ItemList.h"
+#include "item_list.h"
 #include "bmem_pmgr.h"
 #include "full_width_sjis.h"
 #include <stdio.h>

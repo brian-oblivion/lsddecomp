@@ -58,4 +58,4 @@ A/B suffixes are positional labels, not an established functional split.
 
 ## Track 4 (2026-09-26, round 89)
 
-Renamed from `TaskObjF__AttachChildB`. The child it makes is a ItemList, the list selector (New_ItemList(titles, 1), include/ItemList.h), kept in `itemList` (+0x07C, was `childB`), the slot TaskObjF__AddChild fills for a child of class id 0x20 (gItemListMethods). Its calls are ItemList's loadResources (+0x044) and attachTarget (+0x04C). SetState(0x12) calls it through +0x0A8.
+Renamed from `TaskObjF__AttachChildB`. The child it makes is a ItemList, the list selector (New_ItemList(titles, 1), include/item_list.h), kept in `itemList` (+0x07C, was `childB`), the slot TaskObjF__AddChild fills for a child of class id 0x20 (gItemListMethods). Its calls are ItemList's loadResources (+0x044) and attachTarget (+0x04C). SetState(0x12) calls it through +0x0A8.

@@ -79,4 +79,4 @@ ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible r
 
 ## Round 99 (delta, track 7)
 
-Local `tmp` -> `current`; the double read keeps a `MATCHING:` line. `0x1A` -> `ITEMLIST_ROW_CHARS` (new, include/ItemList.h): scrolling stops once the row's 26 characters reach the longest item's end.
+Local `tmp` -> `current`; the double read keeps a `MATCHING:` line. `0x1A` -> `ITEMLIST_ROW_CHARS` (new, include/item_list.h): scrolling stops once the row's 26 characters reach the longest item's end.

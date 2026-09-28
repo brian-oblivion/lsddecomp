@@ -75,5 +75,5 @@ exit"), reinforcing that this sub-shape specifically wants `goto`.
 ## Track 7 (round 100, charlie)
 
 `BMemPMgrAlloc(0x54)` is `BMemPMgrAlloc(sizeof(ItemList))` (the struct in
-include/ItemList.h ends at +0x054). The goto keeps a one-line MATCHING
+include/item_list.h ends at +0x054). The goto keeps a one-line MATCHING
 comment; its derivation is "Residue and how it closed" above.

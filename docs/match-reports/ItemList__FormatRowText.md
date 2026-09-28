@@ -122,7 +122,7 @@ ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible r
 
 ## Track 4 (2026-09-26, round 89)
 
-`texts` (+0x018) is `char **` in include/ItemList.h and `column` is an
+`texts` (+0x018) is `char **` in include/item_list.h and `column` is an
 `s32` parameter: `strlen(self->texts[idx] + column)` compiles byte-identical
 to the `s32 *texts` / `char *column` spelling above (whole-image SHA1
 green), so the pointer is on the side the ctor allocates and strcpys into,
@@ -130,7 +130,7 @@ and CreateRows/RefreshRows pass `column` without a cast.
 
 ## Round 99 (delta, track 7)
 
-Local `idx` -> `item`. `0x1B`/`0x1A` -> `ITEMLIST_ROW_CHARS` (new, include/ItemList.h: 26, the row width; `len >= 0x1B` is written `len > ITEMLIST_ROW_CHARS`), and the terminator `dest[ITEMLIST_ROW_CHARS] = '\0'`. The padding loop is now plain `for (i = len; i < ITEMLIST_ROW_CHARS; i++)`: measured byte-identical, so the `i = len; if (i < 0x1A) { for (; ...) }` split recorded under "Two residues" no longer carries residue 1 in the current source. Residue 2 (operand order `top + row`) still holds, measured: `row + top` breaks the image; it keeps a `MATCHING:` line.
+Local `idx` -> `item`. `0x1B`/`0x1A` -> `ITEMLIST_ROW_CHARS` (new, include/item_list.h: 26, the row width; `len >= 0x1B` is written `len > ITEMLIST_ROW_CHARS`), and the terminator `dest[ITEMLIST_ROW_CHARS] = '\0'`. The padding loop is now plain `for (i = len; i < ITEMLIST_ROW_CHARS; i++)`: measured byte-identical, so the `i = len; if (i < 0x1A) { for (; ...) }` split recorded under "Two residues" no longer carries residue 1 in the current source. Residue 2 (operand order `top + row`) still holds, measured: `row + top` breaks the image; it keeps a `MATCHING:` line.
 
 ## History: the strlen/memcpy comment (moved from src/class_3bb8c_k.c, round 99)
 

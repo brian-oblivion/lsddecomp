@@ -72,4 +72,4 @@ ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible r
 
 ## Round 99 (delta, track 7)
 
-Local `p` -> `row`; the one stepped address keeps a `MATCHING:` line. The notify call is `playSound(self, 0)`. Its slot's unread fourth parameter is `forwarded` (include/ItemList.h).
+Local `p` -> `row`; the one stepped address keeps a `MATCHING:` line. The notify call is `playSound(self, 0)`. Its slot's unread fourth parameter is `forwarded` (include/item_list.h).

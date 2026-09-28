@@ -16,7 +16,7 @@
  * ticks to tickState, which reports the result to the parents on the second
  * tick after the close. GetTextEntryMethods ends the class.
  *
- * ItemList (include/ItemList.h), the list of strings the player picks one
+ * ItemList (include/item_list.h), the list of strings the player picks one
  * from: see the section banner below.
  */
 #include "common.h"
@@ -31,7 +31,7 @@
 #include "VabStreamObj.h"
 #include "pad.h"
 #include "frame_clock.h"
-#include "ItemList.h"
+#include "item_list.h"
 #include "ScreenSprite.h"
 #include "bmem_pmgr.h"
 #include "full_width_sjis.h"
@@ -470,7 +470,7 @@ TextEntryMethods *GetTextEntryMethods(void) {
 
 /* ---- ItemList, first half ---------------------------------------------
  *
- * ItemList (include/ItemList.h), the list of strings the player picks one
+ * ItemList (include/item_list.h), the list of strings the player picks one
  * from: its allocator and ctor, BasicClass's overrides (finalize, child
  * bookkeeping, onNotify), and the view and resource methods resetView,
  * loadResources, releaseResources, attachTarget and detachTarget. Its list

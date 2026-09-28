@@ -119,7 +119,7 @@ left for a pass that owns both units.
 
 ## Round 99 (delta, track 7)
 
-`state < 2` / `< 4` / `== 4` are `ITEMLIST_RESULT_CHOSEN`, `ITEMLIST_STATE_REPORT` (new in include/ItemList.h, value 4: the state that passes `result` to notifyParents; TickClosing enters it, as TextEntry's `TEXTENTRY_STATE_REPORT`). The gotos carry a `MATCHING:` line (see Notes).
+`state < 2` / `< 4` / `== 4` are `ITEMLIST_RESULT_CHOSEN`, `ITEMLIST_STATE_REPORT` (new in include/item_list.h, value 4: the state that passes `result` to notifyParents; TickClosing enters it, as TextEntry's `TEXTENTRY_STATE_REPORT`). The gotos carry a `MATCHING:` line (see Notes).
 
 ## History (moved from src/ObjMStyleActor.c, comments pass)
 

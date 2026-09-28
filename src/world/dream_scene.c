@@ -2,7 +2,7 @@
  * dream_scene -- the day's scene object and what it runs, with the classes
  * that sit between them in ROM. In address order, each under its own section
  * banner below:
- *  - ItemList's second half (include/ItemList.h; the first half is in
+ *  - ItemList's second half (include/item_list.h; the first half is in
  *    input_dialogs.c): setState and tickClosing (close, then report the
  *    result to the parents), handleInputCode (the Pad events it answers) and
  *    playSound, the cursor and scroll methods, the four visible rows
@@ -32,7 +32,7 @@
 #include "TimedTask.h"
 #include "TextRow.h"
 #include "tim_image.h"
-#include "ItemList.h"
+#include "item_list.h"
 #include "ObjM.h"
 #include "VabStreamObj.h"
 #include "pad.h"
