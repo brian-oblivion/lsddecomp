@@ -17,7 +17,7 @@ result.
 ```c
 extern s32 sStyleGrid;
 extern s32 sStyleStage;
-extern s32 gStyleTickCount;
+extern s32 sStyleTickCount;
 extern s32 sStyleDay;
 extern s32 sStyleUnreadArg;
 extern s32 sStyleSceneRefs;
@@ -39,7 +39,7 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
         gStyleVariant = -1;
         sStyleDay = a3;
         sStyleUnreadArg = arg4;
-        gStyleTickCount = 0;
+        sStyleTickCount = 0;
         do {
             *p = 0;
             i--;

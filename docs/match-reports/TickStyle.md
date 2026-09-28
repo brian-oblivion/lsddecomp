@@ -184,7 +184,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
         ctx = buf;
         ((ObjAB4C *) sStyleGrid)->methods->slotE8((ObjAB4C *) sStyleGrid, ctx, arg0);
     }
-    if (gStyleTickCount++ == 0) {
+    if (sStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();
         StyleBuildDecorSet();
         StyleBuildEffectSlots(ctx);
@@ -209,7 +209,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
 
 Needs (already present earlier in the unit, in strict ROM order, at the
 point this body would compile): the `ObjAB4C`/`ObjAB4CMethods` local view
-above; `extern s32 sStyleGrid;`, `extern s32 gStyleTickCount;`,
+above; `extern s32 sStyleGrid;`, `extern s32 sStyleTickCount;`,
 `extern void ApplyStyleDecorationIfSet(void);` (matched, `ObjMStyleActor.c`),
 `extern void StyleBuildDecorSet(void);`/`extern void StyleUpdateDecorSet(void);`
 (forward, own unit, still cold), `void StyleBuildEffectSlots(void *arg0);` (matched
@@ -248,7 +248,7 @@ residue); reverted to the best body and restored `INCLUDE_ASM`.
 
 **`TickStyle`, tier B.**
 
-The per-frame orchestrator: on the FIRST call (`gStyleTickCount++ == 0`)
+The per-frame orchestrator: on the FIRST call (`sStyleTickCount++ == 0`)
 runs `ApplyStyleDecorationIfSet`/`StyleBuildDecorSet`/`StyleBuildEffectSlots`
 (one-time setup), then every call runs `StyleUpdateDecorSet`/
 `StyleUpdateEffectSlots`/`StyleScrollVramStrips` and the two `sStyleCueSlots`
@@ -279,7 +279,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * globals its functions set up or gate on, renamed via `tools/rename.py`,
  * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
  * cluster (`sStyleStage`/`sStyleDay`/`sStyleSceneRefs`/`gStyleVariant`/
- * `sStyleDecorObj`/`sStyleGrid`/`gStyleTickCount`, formerly
+ * `sStyleDecorObj`/`sStyleGrid`/`sStyleTickCount`, formerly
  * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
  * `ObjMStyleActor.c`'s already-confirmed "Style" subsystem sets
  * (`RegisterStyleConfig`/`ApplyStyleConfig`/`FillStyleFromConfig`/

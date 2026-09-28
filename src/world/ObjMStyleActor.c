@@ -1099,7 +1099,7 @@ ObjMMethods *GetObjMMethods(void) {
 
 extern s32 sStyleGrid;
 extern s32 sStyleStage;
-extern s32 gStyleTickCount;
+extern s32 sStyleTickCount;
 extern s32 sStyleDay;
 extern s32 sStyleUnreadArg;
 extern s32 sStyleSceneRefs; /* a StyleSceneRefs * (below) */
@@ -1123,7 +1123,7 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
         gStyleVariant = -1;
         sStyleDay = day;
         sStyleUnreadArg = unreadArg;
-        gStyleTickCount = 0;
+        sStyleTickCount = 0;
         do {
             *slot = 0;
             i--;
@@ -1946,7 +1946,7 @@ extern void ApplyStyleDecorationIfSet(void); /* previous section */
 extern void StyleBuildDecorSet(void);
 extern void StyleUpdateDecorSet(void);
 extern void StyleScrollVramStrips(void);
-extern s32 gStyleTickCount;
+extern s32 sStyleTickCount;
 extern s32 sStyleCueRecordIndex;
 extern StyleCueSlot sStyleCueSlotPool[];
 extern StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *target, void *unused);
@@ -1965,7 +1965,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
         target = &targetPos;
         ((StageMap *)sStyleGrid)->methods->computeCellOffsets((StageMap *)sStyleGrid, target, cell);
     }
-    if (gStyleTickCount++ == 0) {
+    if (sStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();
         StyleBuildDecorSet();
         StyleBuildEffectSlots(target);

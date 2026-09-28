@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gStyleTickCount
 gStyleVariant
 gTextEntryCursorPos
 gTextEntryPanelPos
@@ -214,6 +213,7 @@ sStyleEffectViewport
 sStyleGrid
 sStyleSceneRefs
 sStyleStage
+sStyleTickCount
 sStyleUnreadArg
 sTaskObjFCount
 sTimExt
