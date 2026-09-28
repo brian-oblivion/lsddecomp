@@ -1,16 +1,18 @@
-# TitleMenu__Tick -- MATCH
+# TitleMenu__ConfirmSlot -- MATCH
+
+> Renamed from `TitleMenu__Tick` on 2026-09-28 (tools/rename.py). Address 0x8004d9d4.
 
 > Renamed from `Class86B60__Tick` on 2026-09-26 (tools/rename.py). Address 0x8004d9d4.
 
 > Renamed from `func_8004D9D4` on 2026-09-24 (tools/rename.py). Address 0x8004d9d4.
 
 Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py TitleMenu__Tick`: 58/58 words match.
+SHA1 matches retail. `funcdiff.py TitleMenu__ConfirmSlot`: 58/58 words match.
 
 ## Source
 
 ```c
-void TitleMenu__Tick(TitleMenu *self)
+void TitleMenu__ConfirmSlot(TitleMenu *self)
 {
     void (*fn)(TitleMenu *);
 
@@ -90,7 +92,7 @@ change: it usually means they shared one cause, not two.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004D9D4` -> `TitleMenu__Tick`. **Tier B**: Unconditionally calls the base class's own `slot90`, then dispatches on the state field `state` among three of this class's own handler slots. Named for the "unconditional base call, then per-state sub-dispatch" shape; the individual state meanings are not established.
+Renamed `func_8004D9D4` -> `TitleMenu__ConfirmSlot`. **Tier B**: Unconditionally calls the base class's own `slot90`, then dispatches on the state field `state` among three of this class's own handler slots. Named for the "unconditional base call, then per-state sub-dispatch" shape; the individual state meanings are not established.
 
 ## Field rename
 

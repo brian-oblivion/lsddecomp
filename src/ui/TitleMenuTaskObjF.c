@@ -272,7 +272,7 @@ void TitleMenu__SetState(TitleMenu *self, s32 state) {
     }
 }
 
-void TitleMenu__Tick(TitleMenu *self) {
+void TitleMenu__ConfirmSlot(TitleMenu *self) {
     void (*fn)(TitleMenu *);
 
     GetTaskCoreMethods()->tick((TaskCore *)self);

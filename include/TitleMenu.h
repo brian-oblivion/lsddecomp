@@ -220,7 +220,7 @@ void TitleMenu__OnNotify(TitleMenu *self, BasicClass *sender, s32 event);
 void TitleMenu__Reset(TitleMenu *self);
 void TitleMenu__OnDeinit(TitleMenu *self);
 void TitleMenu__SetState(TitleMenu *self, s32 state);
-void TitleMenu__Tick(TitleMenu *self);
+void TitleMenu__ConfirmSlot(TitleMenu *self);
 void TitleMenu__RefreshViewValue(TitleMenu *self);
 void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target);
 void TitleMenu__DestroySaveTitle(TitleMenu *self);

@@ -77,7 +77,7 @@ round 2026-09-02, runner echo, unit Task. 2 attempts.
 
 **Tier A.** `func_8003CA1C` -> `Obj86B60__Tick`. Occupies slot90 in
 `gTaskCoreMethods`; `gTitleMenuMethods` overrides the same slot with the
-independently-named `TitleMenu__Tick`, settling the name the same way as
+independently-named `TitleMenu__ConfirmSlot`, settling the name the same way as
 `SetState` above. `GraphRoomObj` inherits this exact function unmodified
 (unoverridden occupant of its own table too).
 

@@ -29,7 +29,7 @@ stack-local buffer whose address is forwarded to `self->unkA4`
 
 - `BaseTaskCtorTable_3bb8c_c::slot94` -- new slot, `void (*)(void *self)`.
   Distinct from `TitleMenuMethods::slot94` (established by
-  `TitleMenu__Tick`'s report) -- same offset number, unrelated table, no
+  `TitleMenu__ConfirmSlot`'s report) -- same offset number, unrelated table, no
   conflict.
 - New type `TitleMenuUnk60Obj_3bb8c_d` (self->unk60's pointee, only
   `unk14` reached, a plain `s32`).
@@ -44,7 +44,7 @@ None new.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DABC` -> `TitleMenu__RefreshViewValue`. **Tier B**: Calls the base class's `slot94`, copies `self->unk60->unk14` into a stack buffer, and forwards its address to `DreamSysView::slot19C` -- the same "read a value, push it through the view's slot19C out-parameter call" idiom that recurs in `TitleMenu__SaveToCard` and `TitleMenu__RefreshMenu` in this same unit. Also the dispatch target for `TitleMenu__Tick`'s case 1/case 4. Purpose of the value itself not established.
+Renamed `func_8004DABC` -> `TitleMenu__RefreshViewValue`. **Tier B**: Calls the base class's `slot94`, copies `self->unk60->unk14` into a stack buffer, and forwards its address to `DreamSysView::slot19C` -- the same "read a value, push it through the view's slot19C out-parameter call" idiom that recurs in `TitleMenu__SaveToCard` and `TitleMenu__RefreshMenu` in this same unit. Also the dispatch target for `TitleMenu__ConfirmSlot`'s case 1/case 4. Purpose of the value itself not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
