@@ -3,7 +3,7 @@
  * documents the class and its events; main() creates the one instance).
  * Instances share the Psy-Q pad library: the first ctor calls PadInit and
  * the last finalize PadStop (sPadRefCount). On every DrawSystem vsync
- * event (IntermediateBase__OnTag1Notify) updateMasks turns two consecutive
+ * event (IntermediateBase__OnDrawSystemEvent) updateMasks turns two consecutive
  * PadRead words into held, pressed and released edge masks, and
  * dispatchEvents sends at most one event per button to the pad's parents.
  * loadButtonTable copies sDefaultButtonMasks, a fixed table of libetc's

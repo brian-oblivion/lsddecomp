@@ -33,7 +33,7 @@ Matched on the first build.
 ## Struct/table knowledge established
 
 - New type `Unk0ArgObj`/`Unk0ArgObjMethods` (slot `slot4C`) --
-  `Obj86B60InitArgs->unk0`'s real pointee type, same shape as `IntermediateBase__OnTag1Notify`
+  `Obj86B60InitArgs->unk0`'s real pointee type, same shape as `IntermediateBase__OnDrawSystemEvent`
   round's `Unk4ArgObj` for the adjacent `unk4` field. Retyped
   `Obj86B60InitArgs.unk0` from `void *` to `Unk0ArgObj *`; the already-matched
   `IntermediateBase__Init`'s `methods->slot10(self, arg1->unk0)` call site is

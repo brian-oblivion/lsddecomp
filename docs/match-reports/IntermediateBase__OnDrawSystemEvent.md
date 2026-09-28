@@ -1,4 +1,6 @@
-# IntermediateBase__OnTag1Notify — MATCH (35/35 words)
+# IntermediateBase__OnDrawSystemEvent — MATCH (35/35 words)
+
+> Renamed from `IntermediateBase__OnTag1Notify` on 2026-09-28 (tools/rename.py). Address 0x8003e418.
 
 > Renamed from `Obj86B60__OnTag1Notify` on 2026-09-25 (tools/rename.py). Address 0x8003e418.
 
@@ -22,7 +24,7 @@ rather than an opaque child pointer.
 ## The C
 
 ```c
-void IntermediateBase__OnTag1Notify(Obj86B60 *self, EventArg *arg1, s32 arg2)
+void IntermediateBase__OnDrawSystemEvent(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     Unk4ArgObj *obj4;
 
@@ -73,7 +75,7 @@ first build.
 
 ## Naming
 
-**IntermediateBase__OnTag1Notify** (renamed from `func_8003E418`, round 55, runner
+**IntermediateBase__OnDrawSystemEvent** (renamed from `func_8003E418`, round 55, runner
 alpha). Tier B: confirmed to be `Obj86B60Methods::onTag1Notify` (`+0x054`,
 exclusive to this unit, renamed from `slot54`), the handler
 `IntermediateBase__OnNotify` dispatches to when the incoming `EventArg`'s target

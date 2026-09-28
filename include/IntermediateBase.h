@@ -60,7 +60,7 @@ struct IntermediateBaseInitArgs {
     /* +0x048 */ void (*deinit)(Self *self);                 /* IntermediateBase__Deinit */      \
     /* +0x04C */ void (*onInit)(Self *self, s32 arg1, s32 arg2, s32 arg3); /* NULL; init calls it (0, 0, 0) after adding the children */ \
     /* +0x050 */ void (*onDeinit)(Self *self);               /* NULL; deinit's first call */     \
-    /* +0x054 */ void (*onTag1Notify)(Self *self, BasicClass *sender, s32 event); /* IntermediateBase__OnTag1Notify: onNotify's gDrawSystemMethods (1) case */ \
+    /* +0x054 */ void (*onTag1Notify)(Self *self, BasicClass *sender, s32 event); /* IntermediateBase__OnDrawSystemEvent: onNotify's gDrawSystemMethods (1) case */ \
     /* +0x058 */ void (*onPadEvent)(Self *self, BasicClass *sender, s32 event);   /* NULL; onNotify's Pad (2) case */ \
     /* +0x05C */ void (*update)(Self *self, BasicClass *sender, s32 event);       /* IntermediateBase__IncrementFrameCounter: onNotify's FrameClock (5) case */ \
     /* +0x060 */ void (*setState)(Self *self, s32 state);    /* IntermediateBase__SetState; TaskCore__SetState, TitleMenu__SetState */ \
@@ -96,7 +96,7 @@ void IntermediateBase__OnNotify(IntermediateBase *self, BasicClass *sender, s32 
 void IntermediateBase__ResetCounters(IntermediateBase *self);
 void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *args, s32 mode);
 void IntermediateBase__Deinit(IntermediateBase *self);
-void IntermediateBase__OnTag1Notify(IntermediateBase *self, BasicClass *sender, s32 event);
+void IntermediateBase__OnDrawSystemEvent(IntermediateBase *self, BasicClass *sender, s32 event);
 void IntermediateBase__IncrementFrameCounter(IntermediateBase *self);
 void IntermediateBase__SetState(IntermediateBase *self, s32 state);
 void IntermediateBase__OnState2(IntermediateBase *self);

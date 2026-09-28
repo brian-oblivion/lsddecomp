@@ -16,7 +16,7 @@
  * Its tick comes from the DrawSystem's per-VSync event 2
  * (include/DrawSystem.h): IntermediateBase__Init (src/app/Task.c) keeps
  * one at +0x010 (initArgs->unk8, or New_FrameClock()), adds it as a child of
- * itself, of the viewport and of the LightRig, and IntermediateBase__OnTag1Notify
+ * itself, of the viewport and of the LightRig, and IntermediateBase__OnDrawSystemEvent
  * calls its tick on the DrawSystem's event 2. DayTask__DayTask
  * (src/world/DayTaskStageMap.c) makes the one handed in as initArgs->unk8.
  *
@@ -56,7 +56,7 @@ enum FrameClockEvent {
 struct FrameClockMethods {
     BASICCLASS_SLOTS(FrameClock, (FrameClock * self)); /* FrameClock__FrameClock */
     /* +0x040 */ void (*reset)(FrameClock *self, s32 frameCount); /* FrameClock__Reset: frameCount = arg, flags and cursor cleared; the ctor passes 0 */
-    /* +0x044 */ void (*tick)(FrameClock *self); /* FrameClock__Tick: IntermediateBase__OnTag1Notify on the DrawSystem's event 2 */
+    /* +0x044 */ void (*tick)(FrameClock *self); /* FrameClock__Tick: IntermediateBase__OnDrawSystemEvent on the DrawSystem's event 2 */
     /* +0x048 */ s32 (*getFrameCount)(FrameClock *self); /* FrameClock__GetFrameCount */
     /* +0x04C */ void (*pause)(FrameClock *self); /* FrameClock__Pause: ObjM__AdvancePauseSetup */
     /* +0x050 */ void (*resume)(FrameClock *self); /* FrameClock__Resume: ObjM__TeardownPauseOverlay */

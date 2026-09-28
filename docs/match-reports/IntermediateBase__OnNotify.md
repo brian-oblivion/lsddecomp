@@ -17,7 +17,7 @@ for header values 1/2/5 respectively; any other value is a no-op.
 
 `gTitleMenuMethods`'s own `+0x038` is this same function (verbatim inherit, no
 override) -- confirmed with `tools/classtable.py gTitleMenuMethods`, which is also
-how `slot54`/`slot58`/`slot5C`'s occupants (`IntermediateBase__OnTag1Notify`,
+how `slot54`/`slot58`/`slot5C`'s occupants (`IntermediateBase__OnDrawSystemEvent`,
 `TaskCore__OnPadEvent`, `TaskCore__Update`) were identified.
 
 ## The C
@@ -47,7 +47,7 @@ void IntermediateBase__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 - `Obj86B60Methods`: added `slot10` (BasicClass addChild, inherited,
   `IntermediateBase__Init`), `slot40` (`IntermediateBase__ResetCounters`, `IntermediateBase__IntermediateBase`), `slot48`
   (`IntermediateBase__Deinit`, `IntermediateBase__Init`), `slot4C` (external `TaskCore__OnInit`,
-  `IntermediateBase__Init`), `slot54` (`IntermediateBase__OnTag1Notify`), `slot58` (external
+  `IntermediateBase__Init`), `slot54` (`IntermediateBase__OnDrawSystemEvent`), `slot58` (external
   `TaskCore__OnPadEvent`, STALL in unit `Task` -- its own report confirms
   signature `(Obj86B60 *, s32 a1, s32 a2)`; this call site's `a1` is
   genuinely `EventArg *`, an independent local view of the same shared
@@ -60,7 +60,7 @@ void IntermediateBase__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 queue in one pass** -- `gIntermediateBaseMethods` (`tools/classtable.py gIntermediateBaseMethods`) is
 literally this unit's queue: `+0x008 IntermediateBase__IntermediateBase`, `+0x038 IntermediateBase__OnNotify`,
 `+0x040 IntermediateBase__ResetCounters` (already matched), `+0x044 IntermediateBase__Init`,
-`+0x048 IntermediateBase__Deinit`, `+0x054 IntermediateBase__OnTag1Notify`, `+0x05C IntermediateBase__IncrementFrameCounter`
+`+0x048 IntermediateBase__Deinit`, `+0x054 IntermediateBase__OnDrawSystemEvent`, `+0x05C IntermediateBase__IncrementFrameCounter`
 (already matched), `+0x060 IntermediateBase__SetState`, `+0x064 IntermediateBase__OnState2` (already
 matched), `+0x068 IntermediateBase__OnState3`. Every one of this round's 12 fresh
 functions except `New_Viewport`/`Viewport__Viewport`/`Viewport__Finalize`/

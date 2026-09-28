@@ -1260,7 +1260,7 @@ void IntermediateBase__Deinit(IntermediateBase *self) {
     }
 }
 
-void IntermediateBase__OnTag1Notify(IntermediateBase *self, BasicClass *sender, s32 event) {
+void IntermediateBase__OnDrawSystemEvent(IntermediateBase *self, BasicClass *sender, s32 event) {
     Pad *pad;
 
     if (event == DRAWSYSTEM_EVENT_VSYNC) {
