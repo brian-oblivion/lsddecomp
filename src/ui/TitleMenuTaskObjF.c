@@ -1446,8 +1446,8 @@ void TaskObjF__SetState(TaskObjF *self, s32 state) {
  * "LOADERR" for states 2..16). Entries 0 and 1 are not names; no setState
  * call passes 0 or 1. */
 extern char *sCardIconNames[TASKOBJF_STATE_EDIT_TITLE];
-extern const char gCardPathPrefix[]; /* "CARD\\" */
-extern const char gCardPathSuffix[]; /* ".TIM" */
+extern const char sTitleCardPathPrefix[]; /* "CARD\\" */
+extern const char gCardPathSuffix[];      /* ".TIM" */
 /* {0, 0, 160, 120} */
 extern SpriteRect sCardIconRect;
 /* (-70, -60), percent of half the screen from the centre */
@@ -1475,7 +1475,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
     path = pathBuf;
     name = sCardIconNames[index];
     path[0] = '\0';
-    strcat(path, gCardPathPrefix);
+    strcat(path, sTitleCardPathPrefix);
     strcat(path, name);
     strcat(path, gCardPathSuffix);
 

@@ -15,7 +15,7 @@ extern ChildObj86ED0 *New_TimImage(char *path);
 extern ChildObj86ED0 *New_ScreenSprite(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 
 extern char *sCardIconNames[];
-extern const char gCardPathPrefix[]; /* "CARD\\" */
+extern const char sTitleCardPathPrefix[]; /* "CARD\\" */
 extern const char gCardPathSuffix[]; /* ".TIM" */
 extern s32 sCardIconRect; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
 extern s32 sCardIconPos; /* opaque block, the fresh unk70's own slot4C arg2, address-only here */
@@ -41,7 +41,7 @@ void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
     buf = path;
     name = sCardIconNames[arg1];
     buf[0] = '\0';
-    strcat(buf, gCardPathPrefix);
+    strcat(buf, sTitleCardPathPrefix);
     strcat(buf, name);
     strcat(buf, gCardPathSuffix);
 
