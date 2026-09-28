@@ -62,7 +62,7 @@ s32 CD_init(void)
     D_8006D61C = 0;
     CD_cbready = 0;
     CD_cbsync = 0;
-    D_8006D610 = 0;
+    CD_status1 = 0;
     CD_status = 0;
     p = &D_8006D8DC;
     for (i = 9; i != -1; i--) {
@@ -522,7 +522,7 @@ s32 CD_init(void)
     D_8006D61C = 0;
     CD_cbready = 0;
     CD_cbsync = 0;
-    D_8006D610 = 0;
+    CD_status1 = 0;
     CD_status = 0;
     p = &D_8006D8DC;
     for (i = 9; i != -1; i--) {

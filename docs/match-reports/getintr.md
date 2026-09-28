@@ -36,7 +36,7 @@ residue decomposed into five separate defects, fixed in this order
 | 3 | cases 4/5: mirror store folded (`$at`) where retail unfolds (`lui/addiu/sb 0`) | `*(volatile u8 *)&D_8006D8D9 = D_8006D8DA;` and `*(volatile u8 *)D_8006D8D8 = D_8006D8D9;` (same cast case 3 already used) | 67/67, still 0x54c |
 | 4 | cases 4/5: copy's src pointer computed after the null check, a `nop` in the `beqz` delay slot | initialise the copy's `src` BEFORE `if (dst != NULL)` | **0x544 exact**, 253/337, 27/27 |
 | 5 | all 10 copy sites: dst and counter registers swapped (`$a0`/`$v1`), src right | **the copy as a `static __inline__` function** instead of a `do{}while(0)` macro | **333/337, 0/0** |
-| 6 | one missing `andi v0,v0,0xff` after `lbu v0,0x18(sp)`; mine loaded `resp[0]` twice instead | `CD_status = *(volatile u8 *)&resp[0]; D_8006D610 = resp[1]; flags = CD_status & 0x1D;` | **337/337, OK: build matches retail** |
+| 6 | one missing `andi v0,v0,0xff` after `lbu v0,0x18(sp)`; mine loaded `resp[0]` twice instead | `CD_status = *(volatile u8 *)&resp[0]; CD_status1 = resp[1]; flags = CD_status & 0x1D;` | **337/337, OK: build matches retail** |
 
 About 30 builds in all. No permuter search was spent; Gate 3 was never
 reached.
@@ -93,7 +93,7 @@ missed condition or wrong constant anywhere):
 4. Unless cause==3 with a false `D_8006D7C0[D_8006D61D]` lookup (a per-mode
    flag table, same selector family as `D_8006D620`/`D_6006D6A0`), update
    an error counter (`D_8006D614`) when a flag bit turns on across the
-   read, latch the two response bytes into `CD_status`/`D_8006D610`, and
+   read, latch the two response bytes into `CD_status`/`CD_status1`, and
    compute a `flags` value (`resp[0] & 0x1D`) used by cases 1-3 below.
    (Round 70: the counter increments when bit 0x10 turns ON, i.e. the old
    `CD_status` bit is CLEAR and the new `resp[0]` bit is set.)
@@ -131,7 +131,7 @@ static __inline__ void copy8(u8 *d, const u8 *s)
 }
 /* ... */
         CD_status = *(volatile u8 *)&resp[0];
-        D_8006D610 = resp[1];
+        CD_status1 = resp[1];
         flags = CD_status & 0x1D;
 /* ... */
     case 4:

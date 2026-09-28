@@ -26,7 +26,7 @@
  * bios.c `getintr` (build 1.71, 1995-12, on no SDK disc, so it cannot be
  * linked as an object -- docs/research/psyq-sdk-objects.md) and is matched
  * as C instead.  Declarations are this unit's own view. */
-extern s32 D_8006D610;
+extern s32 CD_status1;
 extern s32 D_8006D614;
 extern u8 D_8006D61D;
 extern s32 D_8006D6C0[]; /* 0/1 flag table, selector 0..0x1B, same index family as D_8006D620 */
@@ -106,14 +106,14 @@ s32 getintr(void) {
          * zero-extension survives as retail's `andi v0,v0,0xff`; flags is
          * then CSE'd from the value just stored.  resp[1] is a plain read. */
         CD_status = *(volatile u8 *)&resp[0];
-        D_8006D610 = resp[1];
+        CD_status1 = resp[1];
         flags = CD_status & 0x1D;
     }
 
     if (cause == 5) {
         puts(D_800109B0);
         if (CD_debug > 0) {
-            printf(D_800109BC, D_8006D620[D_8006D61D], CD_status, D_8006D610);
+            printf(D_800109BC, D_8006D620[D_8006D61D], CD_status, CD_status1);
         }
     }
 
@@ -490,7 +490,7 @@ extern s32 CD_cbsync;
 extern s32 CD_cbready;
 extern s32 CD_cbread;
 extern s32 CD_status;
-extern s32 D_8006D610;
+extern s32 CD_status1;
 extern s32 D_8006D614;
 extern u8 D_8006D618;
 extern u8 D_8006D619;
@@ -658,7 +658,7 @@ void CD_initintr(void) {
 
     CD_cbready = 0;
     CD_cbsync = 0;
-    D_8006D610 = 0;
+    CD_status1 = 0;
     CD_status = 0;
     p = D_8006D8DC;
     for (i = 9; i != -1; i--) {
@@ -688,7 +688,7 @@ s32 CD_init(void) {
     D_8006D61C = 0;
     CD_cbready = 0;
     CD_cbsync = 0;
-    D_8006D610 = 0;
+    CD_status1 = 0;
     CD_status = 0;
     p = &D_8006D8DC;
     for (i = 9; i != -1; i--) {
