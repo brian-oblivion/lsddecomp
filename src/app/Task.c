@@ -1343,7 +1343,7 @@ void Viewport__Viewport(Viewport *self) {
     self->sceneRoot = New_SceneNode();
     fadeBox = (SceneNode *)New_FadeBox(gViewportFadeBoxSize, 0, 0);
     self->fadeBox = fadeBox;
-    fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)gFadeBoxAttachPos);
+    fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)sFadeBoxAttachPos);
     self->methods->initDefaults(self);
 }
 
@@ -1734,7 +1734,7 @@ tail_check:
 }
 
 /* Only while no view node is set: releases the current fade box, installs
- * `fadeBox`, and attaches it under sceneRoot at gFadeBoxAttachPos
+ * `fadeBox`, and attaches it under sceneRoot at sFadeBoxAttachPos
  * (-100, -100). A FadeBox's attachToParent (BoxFill__AttachToParent) takes a
  * screen position where SceneNode's slot types a LongVec3 offset, hence the
  * cast (include/Viewport.h, "Not settled here"). */
@@ -1749,7 +1749,7 @@ void Viewport__SetFadeBox(Viewport *self, SceneNode *fadeBox) {
 
     self->fadeBox = fadeBox;
     if (fadeBox != NULL) {
-        fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)gFadeBoxAttachPos);
+        fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)sFadeBoxAttachPos);
     }
 }
 

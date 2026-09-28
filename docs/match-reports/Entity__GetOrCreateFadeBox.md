@@ -152,7 +152,7 @@ arguments are, from the occupants: `name` is New_FadeBox's SIZE (read as
 two low halfwords into boxW/boxH; the default sEntityFadeBoxDefaultSize is
 {320, 240}), `arg2` is the attach position (BoxFill__AttachToParent's
 BoxFillPos; default {-100, -100}, the relative top-left, the same pair
-Viewport passes, gFadeBoxAttachPos) and `arg3` the fade step. The parameter names
+Viewport passes, sFadeBoxAttachPos) and `arg3` the fade step. The parameter names
 and the function's own name are Entity's (not renamed here; proposed in
 echo's round-87 summary). Image byte-identical.
 
