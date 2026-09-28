@@ -16,15 +16,15 @@ as the getter) was already correct.
 ```c
 void SetBMemPMgrBusy(s32 val)
 {
-    gBMemPMgrBusy = val;
+    sBMemPMgrBusy = val;
 }
 ```
 
-`gBMemPMgrBusy` is a pool allocator/free critical-section flag: this unit's
+`sBMemPMgrBusy` is a pool allocator/free critical-section flag: this unit's
 `BMemPMgrAlloc`/`BMemPMgrFree` (in `BMemPMgr.c`, still `INCLUDE_ASM` this
 round) bracket their free-list walk with `SetBMemPMgrBusy(1)` on entry and
 `SetBMemPMgrBusy(0)` on exit, per those functions' own (stale-verdict, still
-undecoded) match reports. Declared `extern s32 gBMemPMgrBusy;` in
+undecoded) match reports. Declared `extern s32 sBMemPMgrBusy;` in
 `include/BMemPMgr.h` since both `BMemPMgr.c` and `TmdRenderer.c` read/
 write it.
 
@@ -41,7 +41,7 @@ needs zero new work once rebuilt under the round-42 `--gp-symbols` pin.
 ## Naming (round 51, bravo)
 
 `func_8001844C` -> `SetBMemPMgrBusy`, and its global `D_8008A820` ->
-`gBMemPMgrBusy`.
+`sBMemPMgrBusy`.
 
 **The function: tier A** -- a one-line setter, mechanics are its purpose.
 

@@ -95,7 +95,7 @@ extern BMemPMgr *gDefaultBMemPMgr;
 /* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
  * work and back to 0 after (setter and getter in TmdRenderer.c). Nothing in
  * either waits on it. */
-extern s32 gBMemPMgrBusy;
+extern s32 sBMemPMgrBusy;
 extern void SetBMemPMgrBusy(s32 val);
 extern s32 GetBMemPMgrBusy(void);
 

@@ -93,11 +93,11 @@ void ReleaseBasicClassArray(BasicClass **array, s32 count) {
 }
 
 void SetBMemPMgrBusy(s32 busy) {
-    gBMemPMgrBusy = busy;
+    sBMemPMgrBusy = busy;
 }
 
 s32 GetBMemPMgrBusy(void) {
-    return gBMemPMgrBusy;
+    return sBMemPMgrBusy;
 }
 
 /* The drawn object's attribute bits, as SortTmdObject publishes them for
