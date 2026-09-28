@@ -676,7 +676,7 @@ extern s32 (*sStaircaseTickFns[4])(DreamSys *this);
    round 43 (2026-09-15) -- both the gp-relative and addiu_at blockers it was
    filed under are resolved (see docs/research/gp-relative-blocker.md and
    docs/research/addiu-at-blocker.md), and the one-line body
-   `STAIRCASE_SPAWNS[gLinkDstStage][gLinkSpawnIndex].extra` matched on the first rebuild
+   `sStaircaseSpawns[gLinkDstStage][gLinkSpawnIndex].extra` matched on the first rebuild
    (docs/match-reports/GetLastSpawnExtra.md). Still declared here to type
    DreamSys__TryStaircaseLink's call site, which remains INCLUDE_ASM in this unit. */
 extern s32 GetLastSpawnExtra(void);
@@ -943,7 +943,7 @@ extern StageSpawn *sTunnelSpawns[];
 /* Table triple for Test4StaircaseNodes (round 2026-08-30-d). */
 extern s8 sStaircaseTriggersCount[];
 extern StaticLinkTrigger *sStaircaseTriggers[];
-extern StageSpawn *STAIRCASE_SPAWNS[];
+extern StageSpawn *sStaircaseSpawns[];
 
 /* This function might be called when the player hits a wall?
 It tries to do an static link first, then a dynamic one */

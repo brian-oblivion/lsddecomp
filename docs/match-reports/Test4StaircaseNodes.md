@@ -17,7 +17,7 @@ s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, 
 {
 	if (arg2 == 0)
 		return GetStaticSpawn(target, currentPos, 0, sStaircaseTriggersCount,
-		                       sStaircaseTriggers, STAIRCASE_SPAWNS, 0);
+		                       sStaircaseTriggers, sStaircaseSpawns, 0);
 	return -1;
 }
 ```
