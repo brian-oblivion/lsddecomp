@@ -25,7 +25,7 @@
 #include "tod_actor.h"
 #include "ModelData.h"
 #include "Tod.h"
-#include "LinkResource.h"
+#include "link_resource.h"
 #include "VabStreamObj.h"
 #include "frame_clock.h"
 #include "bmem_pmgr.h"

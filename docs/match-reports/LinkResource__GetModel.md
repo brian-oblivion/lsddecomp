@@ -52,4 +52,4 @@ callers that use the value confirm it: tod_actor.c's TOD model-id packet
 passes it to `SceneNode__LinkModel` (whose `model` field holds a TmdModel,
 include/scene_node.h), and dream_day.c's StageMap__PopulateSlotCells
 reads its +0x010 (TmdModel's `object`) through PlacementGrid__ResolveEntry. The
-slot is `getModel`, returning `TmdModel *` (include/LinkResource.h).
+slot is `getModel`, returning `TmdModel *` (include/link_resource.h).

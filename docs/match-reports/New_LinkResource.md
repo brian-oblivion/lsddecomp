@@ -51,7 +51,7 @@ void *New_LinkResource(s32 arg0) {
 ## Track 4
 
 2026-09-26, round 89 (delta): LinkResource (table `gLinkResourceMethods`,
-renamed from D_8006F13C) is unified in `include/LinkResource.h`. The
+renamed from D_8006F13C) is unified in `include/link_resource.h`. The
 unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 `Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
 `self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is

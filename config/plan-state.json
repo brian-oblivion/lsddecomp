@@ -980,7 +980,7 @@
         "gLinkResourceMethods": {
           "class": "LinkResource",
           "date": "2026-09-26",
-          "header": "include/LinkResource.h"
+          "header": "include/link_resource.h"
         },
         "gModelDataMethods": {
           "class": "ModelData",

@@ -1100,7 +1100,7 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 
 2026-09-26, round 89 (delta): `Unk2CObj`/`Unk2CMethods` (src/world/tod_actor.c)
 were a view of LinkResource (gLinkResourceMethods), now unified in
-`include/LinkResource.h`; ModelData's `linkResource` is typed
+`include/link_resource.h`; ModelData's `linkResource` is typed
 `struct LinkResource *`. The model-id packet calls its `getModel` (+0x080,
 LinkResource__GetModel) directly, the `TmdModel *` result cast to the
 existing `s32 v`. Byte-identical.

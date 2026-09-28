@@ -39,7 +39,7 @@
 #include "entity.h"
 #include "pad.h"
 #include "frame_clock.h"
-#include "LinkResource.h"
+#include "link_resource.h"
 #include "StageMap.h"
 #include "lbd_file.h"
 #include "VabStreamObj.h"

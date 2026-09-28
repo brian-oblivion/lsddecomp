@@ -830,7 +830,7 @@ Retyped, byte-identical, with the class unified in `include/PlacementGrid.h`. `C
 ## Track 4 (LinkResource)
 
 2026-09-26, round 89 (delta): LinkResource is unified in
-`include/LinkResource.h`, and PlacementGrid's `linkResource` is now
+`include/link_resource.h`, and PlacementGrid's `linkResource` is now
 `struct LinkResource *`. The unit-local `LinkResourceView_179d8_d` is gone:
 the call reaches `link->methods->getModel` (+0x080, occupant
 LinkResource__GetModel(self, index)) through `PlacementGridGetModelFn`, a

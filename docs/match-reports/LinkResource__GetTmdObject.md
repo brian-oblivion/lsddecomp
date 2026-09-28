@@ -59,4 +59,4 @@ LinkResource__BuildModels reads the object count at +0x08 (`nobj`) and
 builds one TmdModel per 0x1C-byte record from +0x0C (`objects[]`,
 TmdObject, include/tmd_model.h). Record `index` is therefore
 `&((TmdFile *)buffer)->objects[index]`, a `TmdObject *`; the slot is
-`getTmdObject` (include/LinkResource.h).
+`getTmdObject` (include/link_resource.h).

@@ -55,7 +55,7 @@
 #include "TileMap.h"
 #include "TileAtlas.h"
 #include "tmd_model.h"
-#include "LinkResource.h"
+#include "link_resource.h"
 #include "draw_system.h"
 #include "cd_stream.h"
 #include "MoviePlayer.h"

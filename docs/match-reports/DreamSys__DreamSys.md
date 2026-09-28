@@ -92,7 +92,7 @@ reinforcement, not as a new finding.
 
 ## Track 4 (LinkResource)
 
-2026-09-26, round 89 (delta): `arg1` is a LinkResource (include/LinkResource.h:
+2026-09-26, round 89 (delta): `arg1` is a LinkResource (include/link_resource.h:
 GameApplication__GameApplication passes New_LinkResource("ETC\DREAME5.TMD")), so the
 DreamSysCtorArgObj/DreamSysCtorArgMethods view is gone and the call is
 `arg1->methods->getModel(arg1, 0)` (+0x080, LinkResource__GetModel: the

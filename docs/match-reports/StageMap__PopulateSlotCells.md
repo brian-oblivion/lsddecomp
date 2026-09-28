@@ -924,7 +924,7 @@ ResourceSource` (src/graphics/graphics_resources.c: `{ void *buffer; char *name;
 a buffer to adopt, or with `buffer` NULL a file name to request), and the
 body sets only `buffer`, to the chunk header's model block
 (`header + placementsOffset + placementsSize`). The name follows
-include/LinkResource.h's banner ("the callers outside graphics_resources
+include/link_resource.h's banner ("the callers outside graphics_resources
 build it in their own 0x10-byte request types").
 
 Its 0x10 size is load-bearing, measured this round: giving it
@@ -940,7 +940,7 @@ other names: include/dream_day.h `LoadRequest` and src/app/game_shell.c
 unk0C; }`, whose callers write `type = 0` (ResourceSource's NULL `buffer`)
 and `path` (its `name`) before `New_LinkResource`. One
 `ResourceSourceRequest { void *buffer; char *name; u8 pad8[8]; }` in the
-header owning ResourceSource (LinkResource.h, or file_resource.h, the
+header owning ResourceSource (link_resource.h, or file_resource.h, the
 common parent of the five ctors that take it, once ResourceSource itself
 moves out of graphics_resources.c) would retire all three; field renames
 `type` -> `buffer`, `path` -> `name`. The three-word ResourceRequest__Set descriptors

@@ -1,5 +1,5 @@
-#ifndef LINKRESOURCE_H
-#define LINKRESOURCE_H
+#ifndef LINK_RESOURCE_H
+#define LINK_RESOURCE_H
 
 #include "file_resource.h"
 

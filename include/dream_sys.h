@@ -222,7 +222,7 @@ struct LinkResource;
 struct VabStreamObj;
 struct TimImage;
 
-/* DreamSys__DreamSys's `modelSource` is a LinkResource (include/LinkResource.h;
+/* DreamSys__DreamSys's `modelSource` is a LinkResource (include/link_resource.h;
    GameApplication__GameApplication passes New_LinkResource("ETC\DREAME5.TMD")): the
    ctor keeps it in modelSource and adds its getModel(0), a TmdModel, as a
    child. */

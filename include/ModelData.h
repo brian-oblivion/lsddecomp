@@ -60,7 +60,7 @@ typedef struct ModelDataMethods ModelDataMethods;
 /* clang-format off */
 #define MODELDATA_FIELDS(Methods)                                                                  \
     FILERESOURCE_FIELDS(Methods);                                                                    \
-    /* +0x02C */ struct LinkResource *linkResource; /* New_LinkResource (include/LinkResource.h); released by ReleaseResources */ \
+    /* +0x02C */ struct LinkResource *linkResource; /* New_LinkResource (include/link_resource.h); released by ReleaseResources */ \
     /* +0x030 */ TodSet *todSet;       /* New_TodSet (gTodSetMethods); +0x080/+0x084 forward to it */ \
     /* +0x034 */ s32 ownsResources         /* the ctor's third argument: New_ModelData 1, TriggerWorld 0; BuildResources and ReleaseResources act only while it is set. The object is 0x38 bytes (New_ModelData): TriggerWorld's own fields start at +0x038 */
 /* clang-format on */

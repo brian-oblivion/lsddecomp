@@ -78,7 +78,7 @@ Verbatim as it stood before the round-93 comment pass; the new banner says what 
  *   - TimBlockSrc  (gTimBlockSrcMethods): a sector-header + block loader with four
  *     CLUT palette-fade channels (FadeClutRow).
  *   - LinkResource (gLinkResourceMethods): a NULL-ended array of TMD models
- *     (New_TmdModel), one per object of a loaded TMD (include/LinkResource.h,
+ *     (New_TmdModel), one per object of a loaded TMD (include/link_resource.h,
  *     track 4, round 89).
  *   - TimArraySrc  (gTimArraySrcMethods): an array of TimImage objects
  *     (tim_image.c's New_TimImage), one per TimBlockSrc block

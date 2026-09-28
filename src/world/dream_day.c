@@ -42,7 +42,7 @@
 #include "tim_image.h"
 #include "frame_clock.h"
 #include "dream_sys.h"
-#include "LinkResource.h"
+#include "link_resource.h"
 #include "ObjM.h"
 #include "actor.h"
 #include "light_rig.h"

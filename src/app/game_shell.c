@@ -33,7 +33,7 @@
 #include <libetc.h>
 #include "game_application.h"
 #include "dream_sys.h"
-#include "LinkResource.h"
+#include "link_resource.h"
 #include "TaskCore.h"
 #include "StreamTask.h"
 #include "graph_room.h"

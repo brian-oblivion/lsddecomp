@@ -20,7 +20,7 @@
 #include <libgs.h>
 #include "NullDriver.h"
 #include "PlacementGrid.h"
-#include "LinkResource.h"
+#include "link_resource.h"
 #include "StageMap.h"
 #include <libsnd.h>
 #include "VabStreamObj.h"

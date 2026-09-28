@@ -79,7 +79,7 @@ struct PlacementGridMethods {
 
 struct PlacementGrid {
     FILERESOURCE_FIELDS(PlacementGridMethods);
-    /* +0x02C */ struct LinkResource *linkResource; /* the models' LinkResource (include/LinkResource.h); zeroed by the ctor */
+    /* +0x02C */ struct LinkResource *linkResource; /* the models' LinkResource (include/link_resource.h); zeroed by the ctor */
     /* +0x030 */ s32 loaded; /* set by PlacementGrid__OnRequestDone (the driver's read-done callback); zeroed by the ctor; nothing reads it */
 }; /* 0x34 bytes: New_PlacementGrid */
 
