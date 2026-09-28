@@ -47,6 +47,7 @@
 #include <strings.h>
 #include "GameApplicationFileResource.h"
 #include "BMemPMgr.h"
+#include <stdio.h>
 
 /* `pos` (self->pos, CdFileEntry::pos) is Sony's CdlLOC; CdControl takes it
  * as the u_char * parameter bytes, hence those casts. */
@@ -468,9 +469,7 @@ extern char *BuildCdFilePath(char *dest, char *name); /* "\\<data directory><nam
 /* TmdRenderer.c */
 extern s32 GetBMemPMgrBusy(void);
 
-extern void printf(const char *fmt, ...);
-
-extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
+extern char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
 
 /* Part 2's module state; parts 2 and 4 see it only through the
  * functions below. */
@@ -1071,8 +1070,6 @@ void SetCdState(s32 state) {
 /* Defined in other units: GetDataDirectory (GameApplicationFileResource.c) returns the data
  * directory's name; strcpy and strcat are Sony's libc2. */
 extern char *GetDataDirectory(void);
-extern char *strcpy(char *dest, char *src);
-extern char *strcat(char *dest, char *src);
 
 extern char gCdFileNotFoundFmt[];   /* "File not found. path = %s\n" */
 extern char gCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix */

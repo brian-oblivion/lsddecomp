@@ -44,6 +44,7 @@
 #include "CdDriver.h"
 #include "BMemPMgr.h"
 #include "GameFiles.h"
+#include <strings.h>
 
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
 

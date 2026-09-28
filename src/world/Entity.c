@@ -30,6 +30,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <rand.h>
 #include "Entity.h"
 #include "DreamSys.h"
 #include "StageMap.h"

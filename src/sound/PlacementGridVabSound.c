@@ -26,6 +26,7 @@
 #include "VabStreamObj.h"
 #include "SoundCueSet.h"
 #include "BMemPMgr.h"
+#include <strings.h>
 
 /* FileResource's, GameApplicationFileResource.c: the active driver's table (gVabDriverMethods
  * or gCdDriverMethods, both FileResource tables), through which
@@ -176,8 +177,6 @@ void VabDriver__NoOpSlot50(void) {}
 
 /* Defined in other units. */
 extern char *BuildFileName(char *dest, char *name, char *dir, char *ext);
-extern s32 strlen(char *s);
-extern char *strcpy(char *dest, char *src);
 extern char *GetSsSizeTableBuf(void);
 extern s32 IsWBgmActive(void);
 

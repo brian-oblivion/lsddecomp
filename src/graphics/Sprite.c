@@ -35,9 +35,9 @@
 #include "TimImage.h"
 #include "FrameClock.h"
 #include "BMemPMgr.h"
+#include <strings.h>
 
 /* Defined in other units. */
-extern char *strcpy(char *dst, char *src);
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 

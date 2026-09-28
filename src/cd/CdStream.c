@@ -18,6 +18,7 @@
 #include "CdStream.h"
 #include "CdDriver.h" /* CD_SECTOR_SHIFT */
 #include "BMemPMgr.h"
+#include <strings.h>
 
 /* The ctor: a drive speed below this is double speed. */
 #define CDSTREAM_DOUBLE_SPEED_BELOW 4
@@ -44,8 +45,6 @@
  * directory's name; strcpy and strcat are Sony's libc2; BMemPMgrAlloc is the
  * game's heap allocator. */
 char *GetDataDirectory(void);
-extern char *strcpy(char *dest, char *src);
-extern char *strcat(char *dest, char *src);
 
 extern s32 gCdStreamAudioMixSet;
 extern char gCdStreamVersionSuffix[]; /* ";1" */

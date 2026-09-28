@@ -30,10 +30,6 @@ extern void ReleaseBasicClassArray(void *array, void *count);
  * (SceneNode.c), reached here by BoxFill's over `&self->boxAttribute`. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
-/* LIBGPU.H's `int ResetGraph(int)`, declared with the project's types;
- * Viewport__Flip calls it with 1 and ignores the result. */
-extern s32 ResetGraph(s32 mode);
-
 /* Defined in Task.c: &gDefaultMovieFrame. */
 extern DrawRect *GetDefaultMovieFrame(void);
 

@@ -56,6 +56,7 @@
 #include "GraphRoom.h"
 #include "BMemPMgr.h"
 #include "GameFiles.h"
+#include <strings.h>
 
 void ItemList__SetState(ItemList *self, s32 state) {
     /* MATCHING: the gotos keep retail's branch polarity and block order. */
@@ -271,11 +272,6 @@ void ItemList__ReleaseRows(ItemList *self) {
         i++;
     } while (i < count);
 }
-
-/* Psy-Q's libc2 strlen and memcpy, linked from Sony's objects, typed as
- * ItemList__FormatRowText passes them (memcpy's `void *` as <memory.h>). */
-extern s32 strlen(char *s);
-extern void *memcpy(char *dest, char *src, s32 n);
 
 void ItemList__RefreshRows(ItemList *self, s32 top, s32 column, s32 cursor, s32 notify) {
     s32 count;
@@ -1250,7 +1246,6 @@ void ApplyStyleDecorationIfSet(void) {
  * each function's match report, `## Naming`.
  */
 
-
 /* The decoration set: this many BoxFill bands, stacked 3 pixels apart. */
 #define STYLE_DECOR_BANDS 18
 
@@ -1271,7 +1266,6 @@ void ApplyStyleDecorationIfSet(void) {
 /* The palette entry that, as a variant-0 config's decor colour, selects
  * gStyleDecorColorsB instead of gStyleDecorColorsA (PickStyleFallbackConfig). */
 #define STYLE_DECOR_B_PALETTE_INDEX 18
-
 
 extern const u8 *gStyleDecorColor;
 extern s32 gStyleDecorObj; /* a BoxFill */
@@ -1459,7 +1453,6 @@ void StyleReleaseDecorSet(void) {
 
 extern s32 gStyleVariant;
 extern s32 gStyleSceneRefs;
-extern s32 rand(void);
 extern s8 gStyleKind0Counts[];
 extern s32 gStyleEffectSlotCount;
 extern StyleEffect *gStyleEffectSlots[];
@@ -3257,7 +3250,6 @@ void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetA
  * - VariantSprite__UpdateScale (updateScale, +0x048): two num/den ratios
  *   into GsSPRITE scalex/scaley.
  */
-
 
 /*
  * The two variants' CLUT positions, one {x, y} table in VRAM:

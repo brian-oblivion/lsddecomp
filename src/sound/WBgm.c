@@ -14,9 +14,9 @@
 #include "DrawSystem.h"
 #include "WBgm.h"
 #include "BMemPMgr.h"
+#include <stdio.h>
 
-extern void printf(const char *fmt);
-extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
+extern char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 
 extern s32 GetSsTicksPerSecond(void);
 

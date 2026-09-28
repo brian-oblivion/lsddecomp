@@ -32,6 +32,7 @@
 #include "Viewport.h"
 #include "LightRig.h"
 #include "FrameClock.h"
+#include <strings.h>
 
 StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound,
                            DrawRect *initData) {
@@ -632,9 +633,6 @@ epilogue:
  * row shown, cancelElementScroll goes back to savedCursor. The list is laid
  * out so that the cursor's row sits at SlotEntry::pos.
  */
-
-/* Psy-Q libc2's strlen, linked from Sony's object. */
-extern s32 strlen(char *s);
 
 /* New_BoxFill's size and colour for listView: (320, 240), (32, 32, 64). */
 extern s32 sListViewSize[2];

@@ -56,6 +56,8 @@
 #include "ItemList.h"
 #include "BMemPMgr.h"
 #include "FullWidthSjis.h"
+#include <stdio.h>
+#include <convert.h>
 
 NodeGuardedViewport *New_NodeGuardedViewport(void) {
     NodeGuardedViewport *self;
@@ -304,10 +306,6 @@ void TitleMenu__RefreshViewValue(TitleMenu *self) {
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
 }
 
-/* Sony's (libc2). */
-extern char *strcpy(char *dest, char *src);
-extern s32 strlen(char *s);
-
 /* gSaveTitle is 2-byte full-width characters; the characters from here on
  * are padding after "LSD   Day001". */
 #define SAVE_TITLE_PADDING 12
@@ -547,8 +545,6 @@ char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix);
 
 /* "TEMP": the name TaskObjF__ProbeCardFreeSpace creates to test for space. */
 extern char sMcTempFileSuffix[];
-
-extern char *strcpy(char *dest, char *src);
 
 void TaskObjF__ClearLinks(TaskObjF *self) {
     self->inputSource = NULL;
@@ -965,11 +961,7 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, 
     return result;
 }
 
-extern const char sFileNotCreatedMsg[]; /* "File not create in WriteFile\n" */
-/* Sony's libc2 functions. A local view of printf: the call here passes
- * only the format string. */
-extern char *strcpy(char *dest, char *src);
-extern void printf(const char *fmt);
+extern char sFileNotCreatedMsg[]; /* "File not create in WriteFile\n" */
 
 /* Deletes the file, creates it at its full size in blocks, then reopens it
  * to write the save header and the data, each rounded up to whole sectors.
@@ -1051,11 +1043,6 @@ s32 TaskObjF__DisableEvents(TaskObjF *self) {
 s32 TaskObjF__TestEvents(TaskObjF *self) {
     return TaskObjF__ForEachEvent(self, (s32 (*)(s32))TestEvent, 0);
 }
-
-/* Sony's libapi/a36 and a37. EnterCriticalSection returns int; nothing
- * here reads it. */
-extern void EnterCriticalSection(void);
-extern void ExitCriticalSection(void);
 
 /* Calls `callback` on each event until one returns 0, inside a critical
  * section when `critical` is set; returns the last result. */
@@ -1371,8 +1358,8 @@ void TaskObjF__SetState(TaskObjF *self, s32 state) {
  * "LOADERR" for states 2..16). Entries 0 and 1 are not names; no setState
  * call passes 0 or 1. */
 extern char *gCardIconNames[TASKOBJF_STATE_EDIT_TITLE];
-extern const char gCardPathPrefix[]; /* "CARD\\" */
-extern const char gCardPathSuffix[]; /* ".TIM" */
+extern char gCardPathPrefix[]; /* "CARD\\" */
+extern char gCardPathSuffix[]; /* ".TIM" */
 /* {0, 0, 160, 120} */
 extern SpriteRect gCardIconRect;
 /* (-70, -60), percent of half the screen from the centre */
@@ -1614,9 +1601,6 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
 /* A save file name is namePrefix ("BISLPS-01556", 12 characters) + "-NN";
  * the first digit of NN. */
 #define SAVE_FILE_NAME_NUMBER 13
-
-/* Sony's (libc2). A leading 0 makes it parse octal. */
-extern s32 atoi(char *s);
 
 extern FullWidthChar *gSaveTitleGlyphs;
 

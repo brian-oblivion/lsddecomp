@@ -31,6 +31,7 @@
 #include "TextRow.h"
 #include "BMemPMgr.h"
 #include "FullWidthSjis.h"
+#include <strings.h>
 
 FadeBox *New_FadeBox(void *size, s32 channels, s32 pri) {
     FadeBox *self;
@@ -613,9 +614,6 @@ u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
  * the left with '0' to `width` digits, or as it is when `unpadded` is set.
  * MATCHING: the declaration order text/fill/padded and `fill` computed in two
  * statements give retail's register assignment. */
-extern char *strcpy(char *dst, char *src);
-extern void *memset(unsigned char *dst, unsigned char c, int n);
-extern int strlen(char *s);
 extern char *itoa(int n);
 
 void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded) {

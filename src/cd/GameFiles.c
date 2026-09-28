@@ -30,6 +30,7 @@
 #include "StageGrid.h"
 #include "BMemPMgr.h"
 #include "GameFiles.h"
+#include <rand.h>
 
 /* gRecordTable's record indices. The first RECORD_TABLE_COUNT are the
  * sound banks (SND\*.VH/VB) and then each stage's files; the movie records
@@ -77,8 +78,6 @@ enum MovieId {
  * last. What the frames are for is not established. */
 #define MOVIE_SPAN_GAP_FRAMES 10
 
-extern int rand(void);
-extern void srand(unsigned int seed);
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* allocator: new LbdFile object */

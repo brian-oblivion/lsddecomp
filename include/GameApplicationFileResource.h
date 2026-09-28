@@ -10,8 +10,4 @@
 #include "common.h"
 #include "FileResource.h"
 
-extern s32 strlen(char *s);
-
-char *strcat(char *dest, char *src);
-
 #endif

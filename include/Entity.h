@@ -301,7 +301,4 @@ extern Ratio16 sScaleTriple[];
 extern Ratio16 sScaleThirtySecond[];
 extern Ratio16 sScaleX3[];
 
-/* Functions of other units Entity calls directly. */
-extern s32 rand(void);
-
 #endif

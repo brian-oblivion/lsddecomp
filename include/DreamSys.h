@@ -263,7 +263,6 @@ typedef struct {
     s32 day;
 } FlashbackEntry;
 
-
 /* DreamSys::viewport is a Viewport (include/Viewport.h; tag only here,
    DreamSys.c includes the header). This class moves its GsRVIEW2 refView:
    +0x014 vp and +0x020 vr (the two "points"
@@ -285,7 +284,6 @@ struct LinkResource;
    GameApplication__GameApplication passes New_LinkResource("ETC\DREAME5.TMD")): the
    ctor keeps it in modelSource and adds its getModel(0), a TmdModel, as a
    child. */
-
 
 /* Actor::grid is the grid manager, StageMap (include/StageMap.h);
    DreamSys.c includes that header and calls it directly. */
@@ -776,9 +774,6 @@ extern s16 sSpecialDays[];
    only its address is used. */
 extern MoodGraphPoint sSpecialDayMood;
 
-/* Also declared in Entity.h for the same libc-style function. */
-extern s32 rand(void);
-
 extern s8 sSpecialColors[];
 
 /* Shared by TestForStaticLink/Test4TunnelLinks/Test4StaircaseNodes/
@@ -968,7 +963,6 @@ DreamSysMethods *Get_vtable_DreamSys(void);
 /* @brief Allocates and constructs a DreamSys instance. */
 DreamSys *New_DreamSys(struct LinkResource *arg0, s32 arg1, s32 arg2);
 
-
 /* @brief Initializes the values that will be used by CalcNavigationScore. */
 /* @param arrayMem Pointer to the array of challenges completed */
 /* @param linkCounter Pointer to an integer counting up the dynamic/instance links */
@@ -1001,7 +995,6 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 stg, s32 unused);
 /* @param day The day number to check against (1-indexed). */
 /* @return The pointer to this dream's graph contribution, or NULL if the dream is *not* Special. */
 MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day);
-
 
 /* The occupants of gDreamSysMethods not declared above, in slot order. */
 DreamSys *DreamSys__DreamSys(DreamSys *this, struct LinkResource *arg1, s32 arg2, s32 arg3);

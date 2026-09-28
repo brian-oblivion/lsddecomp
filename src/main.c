@@ -17,10 +17,7 @@
 #include "GameApplication.h"
 #include "Pad.h"
 #include "BMemPMgr.h"
-
-/* Psy-Q libapi's SetMem (libapi/c159, a linked object). No SDK header here
- * declares it. */
-extern void SetMem(s32 megabytes);
+#include <kernel.h>
 
 extern BMemPMgr *gStartupBMemPMgr;
 extern GameApplication *gGameApplication;
