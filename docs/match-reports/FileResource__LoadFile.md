@@ -6,7 +6,7 @@
 
 > Renamed from `func_80026B08` on 2026-09-18 (tools/rename.py). Address 0x80026b08.
 
-**Unit:** code_171e0 · **Size:** 70 instructions · **Status:** MATCHED (70/70 words, whole-image build verified byte-exact)
+**Unit:** GameApplicationFileResource · **Size:** 70 instructions · **Status:** MATCHED (70/70 words, whole-image build verified byte-exact)
 
 ## What it does
 
@@ -14,7 +14,7 @@
 `this->unk10` is already set, it's a no-op; otherwise it calls four more of
 this class's own slots (`+0x044`, `+0x04C` twice, `+0x054`) — all four are
 null at `gFileResourceMethods`'s own level (verified by reading the table's raw words
-directly out of `disk/SLPS_015.56`; see `include/code_171e0.h`), so they only
+directly out of `disk/SLPS_015.56`; see `include/GameApplicationFileResource.h`), so they only
 resolve to real code for whichever subclass overrides them — sizes a new
 allocation via `BMemPMgrAlloc`, and on success installs the new pointer/size
 into `this->unk10`/`this->unk14` and restores a temporarily-zeroed field
@@ -96,12 +96,12 @@ emitted a **separate, non-delay-slot** `move a0,s2` plus a redundant
 an argument retail's call site never sets up at all.
 
 Cross-checked against `docs/match-reports/New_GameApplication.md` (a different
-unit, `code_1677c`), which independently derived `BMemPMgrAlloc(0x2C)` — one
+unit, `GameApplicationFileResource`), which independently derived `BMemPMgrAlloc(0x2C)` — one
 argument — for the same function. **The two-argument signature in
 `include/class_16334.h` (`s32 size, s32 zone`) is wrong**; it was never
 exercised against a call site where the phantom second argument's register
 happened to differ from whatever was already sitting in `$a1`, so the bug was
-invisible there. `include/code_171e0.h` now declares the one-argument form
+invisible there. `include/GameApplicationFileResource.h` now declares the one-argument form
 locally with a comment pointing at `New_GameApplication.md` as the confirming
 evidence; `class_16334.h` is out of this unit's scope to fix, but is flagged
 below as a proposed learning / spawn candidate.
@@ -134,7 +134,7 @@ See `docs/match-reports/BMemPMgrAlloc.md`, `## Extern arity (round 59)`.
 **`BMemPMgrAlloc` takes one argument (`size`), not two.**
 `include/class_16334.h:74`'s `extern void *BMemPMgrAlloc(s32 size, s32 zone);`
 should be corrected to `extern void *BMemPMgrAlloc(s32 size);` — confirmed
-independently in two units (`New_GameApplication` in `code_1677c`, and this
+independently in two units (`New_GameApplication` in `GameApplicationFileResource`, and this
 function). Left unfixed for now since `class_16334.h` is outside this unit's
 scope; flagged for a spawned follow-up.
 
@@ -166,7 +166,7 @@ lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
-`FileResource` (`include/code_171e0.h`) is included by `src/code_179d8_h.c`
+`FileResource` (`include/GameApplicationFileResource.h`) is included by `src/code_179d8_h.c`
 and `src/code_179d8_q.c` too, and `code_179d8_h.c`'s `FileResource__InstallCdReadDriver`
 genuinely reads/writes `self->unk0C` on this exact type (not a same-named
 field on a different struct), so per track 3's ownership rule these are
@@ -205,7 +205,7 @@ broadcast.
 **Verdict: arity-ok idiom.** `src/code_179d8_s.c`'s `(void)` declaration stays.
 
 **Callee evidence** (`0x80026B08`, and the matched definition in
-`src/code_171e0.c`): the body reads BOTH argument registers before writing
+`src/GameApplicationFileResource.c`): the body reads BOTH argument registers before writing
 them — `move s0,a0` at entry, and `$a1` is still the incoming `arg1` when it is
 forwarded to `this->methods->configureBuffer(this, arg1, 1, 0)` at `0x80026B48`
 (only `$a2`/`$a3` are re-set there, with `li a2,0x1` / `move a3,zero`). Two

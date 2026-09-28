@@ -70,7 +70,7 @@ struct Class6C070 {
 
 `DrawSystem__LoadImage`, tier A. Wraps LIBGPU.H's `LoadImage`; confirmed by
 CONVERGENT naming from two other units that never saw each other's code --
-`code_2bb9c.c` and `code_179d8_q.c` each carry their own independent local
+`TimImage.c` and `code_179d8_q.c` each carry their own independent local
 view of this class's method table and both independently named this exact
 slot (+0x058) `loadImage`.
 
@@ -78,4 +78,4 @@ slot (+0x058) `loadImage`.
 
 The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `gDrawSystem` (rename.py). Byte-identical.
 
-Callers outside this unit, now through the header: TimImage__Upload (code_2bb9c) and MoviePlayer__DrawStrip (GraphicsResources, rect cast from its own Rect45BC8).
+Callers outside this unit, now through the header: TimImage__Upload (TimImage) and MoviePlayer__DrawStrip (GraphicsResources, rect cast from its own Rect45BC8).

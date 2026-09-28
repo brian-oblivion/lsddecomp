@@ -60,7 +60,7 @@ void TaskCore__CreateSlotElements(Obj86B60 *self, SrcDesc *a1, void *a2)
   this function). Only its two touched fields are modelled: `unk4` (`s32`)
   and `unk18` (`char **`, NULL-terminated).
 - `extern s32 func_80013348(char *s);` — already matched in
-  `code_171e0.c`/`src/code_171e0.c` as a strlen-shaped helper; this unit
+  `GameApplicationFileResource.c`/`src/GameApplicationFileResource.c` as a strlen-shaped helper; this unit
   keeps its own local view (established convention).
 - `extern Unk64Elem *New_TextRow(void *ctx, s32 len, char *name);` — not
   previously seen in this project. Typed from this call site: its return

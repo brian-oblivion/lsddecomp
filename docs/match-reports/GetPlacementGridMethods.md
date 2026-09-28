@@ -48,7 +48,7 @@ Renamed `func_8002C3A8 -> GetPlacementGridMethods`, tier A. This unit's earlier
 specifically -- see the unit header comment's round-77 correction.
 `gPlacementGridMethods` is a real 30-slot FileResource-derived vtable
 (`tools/classtable.py 0x8006D940`), and this function is its getter,
-confirmed as the FIRST entry of `gDataSourceClientGetters` (code_171e0.c's
+confirmed as the FIRST entry of `gDataSourceClientGetters` (GameApplicationFileResource.c's
 NULL-terminated array of "class-method-table getters of every
 FileResource-derived client", `asm/data/5DB70.data.s`). Matches the
 established `GetXXXMethods` convention for every other entry in that same

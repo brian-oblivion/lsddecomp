@@ -17,7 +17,7 @@ passing `self` and its own first argument, hardcoding the third argument to
 **This function's signature was independently cross-checked and confirmed
 against `include/GameApplication.h`.** That header already documents
 `StreamTaskMethods::slot44` (established from a *different* unit's call
-sites, `GameApplication__ShowIntroLogos`/`GameApplication__PlayOpeningMovie`/`GameApplication__PlaySpecialDayMovies` in `code_1677c`) as
+sites, `GameApplication__ShowIntroLogos`/`GameApplication__PlayOpeningMovie`/`GameApplication__PlaySpecialDayMovies` in `GameApplicationFileResource`) as
 `void (*slot44)(void *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag)` --
 five arguments, the fifth spilled to the stack, exactly matching what this
 function's own disassembly reads at entry (`lw $v0, 0x30($sp)`, the 5th
@@ -80,7 +80,7 @@ into a corroborated one.
 ## Naming
 
 **StreamTask__Init** -- tier B. Occupies `gStreamTaskMethods` slot
-`+0x044`. Cross-unit call sites in `src/code_1677c.c`
+`+0x044`. Cross-unit call sites in `src/GameApplicationFileResource.c`
 (`GameApplication__ShowIntroLogos`/`GameApplication__PlayOpeningMovie`, via `include/GameApplication.h`'s independent
 `StreamTaskMethods::slot44` view) show this stores a resource
 name-or-derived-value, a type lookup and a flag before up-calling the base
@@ -95,4 +95,4 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__Configure. It occupies +0x044, IntermediateBase's init slot (TaskCore__Init in the parent), stores its three extra arguments and up-calls TaskCore's init(args, 0): named for its slot. Its parameter list (self, args, streamName, streamGroup, autoPlay) differs from the slot's (self, args, mode), so the table keeps the inherited slot type and code_1677c's five callers cast to `StreamTaskInitFn` (track 4 step 6, round 85's TodActor +0x04C rule); no code.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__Configure. It occupies +0x044, IntermediateBase's init slot (TaskCore__Init in the parent), stores its three extra arguments and up-calls TaskCore's init(args, 0): named for its slot. Its parameter list (self, args, streamName, streamGroup, autoPlay) differs from the slot's (self, args, mode), so the table keeps the inherited slot type and GameApplicationFileResource's five callers cast to `StreamTaskInitFn` (track 4 step 6, round 85's TodActor +0x04C rule); no code.

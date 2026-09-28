@@ -68,7 +68,7 @@ audio-stream-request object:
    `gDreamAuxGroupCounts[i]` (signed count) 8-byte records; clear byte 0 (offset `0x0`,
    named `flag`) of each.
 2. Build a request (`ResourceRequest__Set`, already matched elsewhere in
-   `code_171e0.c` as a plain 3-word field setter) with `flag=0`,
+   `GameApplicationFileResource.c` as a plain 3-word field setter) with `flag=0`,
    `name="ETC\\SYMSPY.MOM"`, `mode=1`.
 3. A `for (i = 0; i < 1; i++)` loop (see the "loop that only runs once" note
    in `ReleaseDreamAuxModels`'s report -- same confirmed idiom) that calls

@@ -31,7 +31,7 @@ ground, no prior attempt. Byte-exact on build 4; whole-image SHA1 green.
   here as `*(u32 *)&self->loc[4]`, left untyped in the shared local view
   because the ten earlier methods pass `loc` as a `u8 *`. Unit-local
   externs: `CdSearchFile`, `strcpy`/`strcat` (Sony libc2, linked),
-  `GetDataDirectory` (code_171e0.c), `gCdStreamAudioMixSet` (s32, sdata), `gCdStreamVersionSuffix`
+  `GetDataDirectory` (GameApplicationFileResource.c), `gCdStreamAudioMixSet` (s32, sdata), `gCdStreamVersionSuffix`
   (`char[]`, the rodata-style `";1"` in sdata, referenced as a symbol and
   never retyped). Added a prototype for `SetupCdStreamAudio`. Unit header comment
   updated: all 18 methods matched.

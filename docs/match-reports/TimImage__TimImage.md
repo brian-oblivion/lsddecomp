@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003B3FC` on 2026-09-25 (tools/rename.py). Address 0x8003b3fc.
 
-Round 81, runner echo. Unit `src/code_2bb9c.c`. Fresh ground, no prior attempt.
+Round 81, runner echo. Unit `src/TimImage.c`. Fresh ground, no prior attempt.
 
 - **Where:** TimImage's table (`gTimImageMethods`) slot +0x008 (the ctor; `tools/classtable.py D_8006E558`).
 - **What:** runs the active data-source driver's ctor on `self`
@@ -28,7 +28,7 @@ void TimImage__TimImage(TimImage *self, char *name) {
 ```
 
 `extern FileResourceMethods *GetActiveDataSourceMethods(void);` is a unit-local
-declaration (the definition in `code_171e0.c` returns `void *`), following
+declaration (the definition in `GameApplicationFileResource.c` returns `void *`), following
 the local-view convention `PlacementGridVabSound.c` / `_e.c` already use.
 
 ## Naming

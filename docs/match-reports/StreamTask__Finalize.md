@@ -59,7 +59,7 @@ convention basis, unconfirmed by any found caller.
 **StreamTask__Finalize** -- tier A. Occupies `gStreamTaskMethods`'s dtor
 slot `+0x00C` (a base-class layout convention independently confirmed in
 `include/class_39e08.h`'s own `ctor`/`dtor` pair at `+0x008`/`+0x00C`, and in
-`include/code_171e0.h`'s `FileResource__Finalize`). Tears down the private
+`include/GameApplicationFileResource.h`'s `FileResource__Finalize`). Tears down the private
 `unkB4` sub-object, then up-calls `TaskCore__Finalize` at the same slot --
 the "override, do extra work, call the base" shape this whole unit's slot
 comparison confirms (see the unit header comment).

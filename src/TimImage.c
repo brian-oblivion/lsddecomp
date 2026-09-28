@@ -14,6 +14,11 @@
  * RotateVramRectRight is not a TimImage method (no method table lists it): it
  * circularly scrolls a VRAM rectangle right, one column at a time, through the
  * draw singleton's moveImage slot, for class_3bb8c_n.c's StyleScrollVramStrips.
+ *
+ * Edges: both are placed Sony objects (libcd/event before, libgs/gs_122 after),
+ * so the file is this whole gap. Content alone would put RotateVramRectRight in
+ * a file of its own; no tool splits a unit and the binary is silent on it
+ * (tuboundary.py: "boundary possible" at every gap), so it stays here, parked.
  */
 #include "common.h"
 #include <libgte.h>

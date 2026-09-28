@@ -6,7 +6,7 @@
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
 > `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
 > the whole image is byte-exact with the flags on, and this function was one of
-> the live tests -- `return gDataDirectory;`, as this report predicted. The C is in `src/code_171e0.c`. Everything below is the
+> the live tests -- `return gDataDirectory;`, as this report predicted. The C is in `src/GameApplicationFileResource.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
 > **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was
@@ -20,7 +20,7 @@
 
 # GetDataDirectory
 
-**Unit:** code_171e0 · **Size:** 3 instructions · **Status:** STALLED, class TOOLCHAIN
+**Unit:** GameApplicationFileResource · **Size:** 3 instructions · **Status:** STALLED, class TOOLCHAIN
 
 ## What it does
 

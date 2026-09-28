@@ -23,7 +23,7 @@ empty body is its own complete mechanics, and FINISHING-PLAN's naming rules
 make a pure leaf whose mechanics are its purpose tier A by definition; the
 round-74 verdict below kept the placeholder only because no caller gave it
 a purpose, which a no-op does not need. Follows the project's existing
-free-function no-op names (`NoOp` in `code_171e0.c`, `NoOp2`-`NoOp4` in
+free-function no-op names (`NoOp` in `GameApplicationFileResource.c`, `NoOp2`-`NoOp4` in
 `code_179d8_h.c`); the suffix is the next free number, for disambiguation
 only, and implies no link to those functions.
 

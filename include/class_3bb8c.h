@@ -215,7 +215,7 @@ typedef struct McDevicePath {
 extern McDevicePath gMcDevicePath1; /* "bu10:" */
 extern McDevicePath gMcDevicePath0; /* "bu00:" */
 
-/* The game's own strcat (src/code_171e0.c). */
+/* The game's own strcat (src/GameApplicationFileResource.c). */
 extern char *strcat(char *dest, char *src);
 
 /* Game code (src/class_3bb8c_g.c). TaskObjF__WriteMemcardSaveFile calls it

@@ -24,7 +24,7 @@ the PRECEDING call's return" idiom, and it is what motivated retyping
 ## Existing declaration retyped
 
 `include/Task.h`'s `BMemPMgrFree` was declared `void
-BMemPMgrFree(void *ptr)`, following `code_171e0.h`/`Entity.h`'s
+BMemPMgrFree(void *ptr)`, following `GameApplicationFileResource.h`/`Entity.h`'s
 typing. Its own (still-`INCLUDE_ASM`) disassembly
 (`asm/nonmatchings/BMemPMgr/BMemPMgrFree.s`) ends with an explicit
 `addu $v0, $zero, $zero` -- it genuinely returns `NULL`, and this

@@ -524,8 +524,7 @@ segments:
       - [0x1674C, o, libapi/a22]        # BIOS A-function stubs
       - [0x1675C, o, libapi/a20]
       - [0x1676C, o, libapi/a21]
-      - [0x1677c, c, code_1677c]
-      - [0x171e0, c, code_171e0]
+      - [0x1677c, c, GameApplicationFileResource]
       # ROUND 34: the unit's LAST function, `strcat` (0x80027130, 42w), is
       # Sony's -- libc2/strcat, Psy-Q 3.3, 0xA8 covering exactly it. It had
       # been matched as C since round 8 and counted as game code; linking the
@@ -1190,7 +1189,7 @@ segments:
       # Chunk E: the block's last two runs.
       - [0x2ba1c, o, libgs/gs_104]       # GsInit3D
       - [0x2ba94, o, libcd/event]        # CdInit, def_cbsync, def_cbready, def_cbread
-      - [0x2bb9c, c, code_2bb9c]       # 0x2BB9C..0x2BF70, game code (revision 18)
+      - [0x2bb9c, c, TimImage]       # 0x2BB9C..0x2BF70, game code (revision 18)
       - [0x2bf70, o, libgs/gs_122]       # GsGetTimInfo, closing the block at 0x2C054
       - [0x2c054, c, Task]
       # code_2cc8c is 153 functions. Round 10 carved the first 20-function

@@ -22,7 +22,7 @@ carries the evidence for each one.
  * CdDriver__RequestLoadFile dispatches. `tools/classtable.py gCdDriverMethods`
  * resolves that slot to CdDriver__LoadFile (code_179d8_s), which loads a named
  * file off the disc, so the slot is named for the method it dispatches to.
- * The sibling class gFileResourceMethods (include/code_171e0.h's
+ * The sibling class gFileResourceMethods (include/GameApplicationFileResource.h's
  * FileResourceMethods) leaves the identical offset unnamed -- this
  * stays an independent local view, per the project's multiple-local-views
  * convention, rather than an edit to that shared header. */
@@ -152,9 +152,9 @@ allows.
   prototypes are identical types and nothing conflicts.
 - `self`'s own `+0x58` method-table slot is the identical offset the sibling
   class `gFileResourceMethods` leaves as an unnamed pad in
-  `include/code_171e0.h`'s `FileResourceMethods` ("FileResource__LoadFile's own
+  `include/GameApplicationFileResource.h`'s `FileResourceMethods` ("FileResource__LoadFile's own
   slot, unused here"). Rather than editing that shared header — which
-  `code_179d8_h.c` and `code_171e0.c` also include —
+  `code_179d8_h.c` and `GameApplicationFileResource.c` also include —
   this unit keeps its own local view (`Methods6D4E8_C80`/`Obj6D4E8_C80`), per the
   project's multiple-independent-local-views convention.
 

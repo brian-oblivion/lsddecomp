@@ -4,7 +4,7 @@
 
 > Renamed from `func_80026690` on 2026-09-24 (tools/rename.py). Address 0x80026690.
 
-Unit: `src/code_1677c.c`. Class: `GameApplication`, own vtable slot `+0x05C`
+Unit: `src/GameApplicationFileResource.c`. Class: `GameApplication`, own vtable slot `+0x05C`
 (`GameApplicationMethods.noOpSlot5C`, confirmed the sole occupant by this unit's
 own header layout -- 25-slot table resolved with `tools/classtable.py`, see
 the unit header comment). No match report existed before this round: a

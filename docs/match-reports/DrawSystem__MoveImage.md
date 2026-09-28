@@ -66,11 +66,11 @@ struct Class6C070 {
 `DrawSystem__MoveImage`, tier A. Wraps LIBGPU.H's `MoveImage`; confirmed by
 convergent naming -- `code_179d8_q.c`'s own independent local view of this
 class's method table names this exact slot (+0x064) `moveImage`, and
-`code_2bb9c.c`'s `RotateVramRectRight` calls it through a local `moveImage`
+`TimImage.c`'s `RotateVramRectRight` calls it through a local `moveImage`
 function-pointer variable read from the same slot.
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `gDrawSystem` (rename.py). Byte-identical.
 
-Slot +0x064 is typed `(DrawRect *, s32 x, s32 y)` in the header, not this occupant's `s16`: measured, an s16 slot prototype makes the one caller, RotateVramRectRight (code_2bb9c), emit a caller-side sll/sra per argument and the image goes red.
+Slot +0x064 is typed `(DrawRect *, s32 x, s32 y)` in the header, not this occupant's `s16`: measured, an s16 slot prototype makes the one caller, RotateVramRectRight (TimImage), emit a caller-side sll/sra per argument and the image goes red.

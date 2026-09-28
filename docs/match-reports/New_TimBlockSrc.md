@@ -81,7 +81,7 @@ Verbatim as it stood before the round-93 comment pass; the new banner says what 
  *     (New_TmdModel), one per object of a loaded TMD (include/LinkResource.h,
  *     track 4, round 89).
  *   - TimArraySrc  (gTimArraySrcMethods): an array of TimImage objects
- *     (code_2bb9c.c's New_TimImage), one per TimBlockSrc block
+ *     (TimImage.c's New_TimImage), one per TimBlockSrc block
  *     (include/TimArraySrc.h, track 4, round 88).
  *   - Tod / TodSet (gTodMethods / gTodSetMethods, TodSet a Tod subclass): one
  *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array

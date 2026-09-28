@@ -66,7 +66,7 @@ parameter -- it scopes a fresh, distinct `struct DreamSys` tag there. **Do
 NOT try to fix this with a forward `typedef struct DreamSys DreamSys;`** --
 tried it, and the LATER real typedef then errors with `redefinition of
 'DreamSys'` in every OTHER unit that includes this header (surfaced in
-`code_1677c.c`, not in `DreamSys.c` itself, because of include-order
+`GameApplicationFileResource.c`, not in `DreamSys.c` itself, because of include-order
 differences -- easy to miss if you only rebuild the one file you touched).
 The warning is cosmetic: both tags are pointer-compatible at the MIPS ABI
 level (a pointer is a pointer, regardless of struct tag), and the whole-image

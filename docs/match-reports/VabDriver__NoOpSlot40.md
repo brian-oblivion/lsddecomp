@@ -45,7 +45,7 @@ Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
 gVabDriverMethods --vs gFileResourceMethods` puts this function at `+0x040`, one of
 FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
 names it `slot40`; the CD driver's occupant is `CdDriver__NoOpSlot40`).
-`SetActiveDataSource` (code_171e0.c) copies the active driver's interface
+`SetActiveDataSource` (GameApplicationFileResource.c) copies the active driver's interface
 slots into FileResource's table and every client table, and takes this table
 (`GetVabDriverMethods()`) whenever `gActiveDataSource != DATASOURCE_CD`, so
 when the SPU/VAB source is active every `methods->slot40(...)` in the game

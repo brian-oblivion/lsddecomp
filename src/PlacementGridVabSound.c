@@ -40,7 +40,7 @@
 #include "VabStreamObj.h"
 #include "SoundCueSet.h"
 
-/* FileResource's, code_171e0.c: the active driver's table (gVabDriverMethods
+/* FileResource's, GameApplicationFileResource.c: the active driver's table (gVabDriverMethods
  * or gCdDriverMethods, both FileResource tables), through which
  * PlacementGrid's and VabStreamObj's ctors and finalizes, and PlacementGrid's
  * setFlag, reach their parent's. */
@@ -170,11 +170,11 @@ void VabDriver__NoOpSlot50(void) {}
  * start/flush pair.
  *
  * VabDriver (include/VabDriver.h, class id 0x23 = DATASOURCE_SPU) is the
- * data source code_171e0.c selects when it is not reading the CD; the CD
+ * data source GameApplicationFileResource.c selects when it is not reading the CD; the CD
  * driver (include/CdDriver.h, 0x13) is the other. Its Read, LoadFile,
  * RunRequestQueue, RequestLoadFile, StopService and CancelRequests slots do
  * nothing. GetVabDriverMode, SetVabDriverMode and GetVabUseVSyncCallback
- * answer the queries code_171e0.c's GetActiveDataSource* functions forward
+ * answer the queries GameApplicationFileResource.c's GetActiveDataSource* functions forward
  * to the CD driver's GetCdDriverMode, SetCdDriverMode and
  * GetCdUseVSyncCallback: they keep the two mode words and report no VSync
  * callback.

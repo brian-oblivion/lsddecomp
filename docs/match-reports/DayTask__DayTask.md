@@ -211,7 +211,7 @@ needed anywhere in this 107-word function.
   a DIFFERENT (but ABI-compatible) type than an existing declaration
   elsewhere in the project (`New_LinkResource`, `RegisterRecordTableFiles`,
   `SetActiveDataSourceDriverMode`, `New_StageMap`) — all four already have an extern
-  somewhere else (`GameApplication.h` or `code_1677c.c`); this unit keeps its
+  somewhere else (`GameApplication.h` or `GameApplicationFileResource.c`); this unit keeps its
   own local view rather than cross-including, per established policy. The
   other five (`GetSoundEffectDir`, `InitDreamAux`, `New_TimImage`,
   `PickSoundBank`, `New_WBgm`, `New_NodeGuardedViewport`, `New_FrameClock`) are

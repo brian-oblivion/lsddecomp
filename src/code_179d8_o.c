@@ -1,7 +1,7 @@
 /*
  * code_179d8_o -- the allocator, constructor, finalize and one empty slot
  * of CdDriver, the CD-ROM data source (include/CdDriver.h; method table
- * gCdDriverMethods, header word 0x13 = code_171e0.c's DATASOURCE_CD).
+ * gCdDriverMethods, header word 0x13 = GameApplicationFileResource.c's DATASOURCE_CD).
  * vram 0x800271D8..0x800272D0. `tools/classtable.py gCdDriverMethods --vs
  * gFileResourceMethods` shows this unit's four functions as:
  *   New_CdDriver          allocates 0x2C bytes, dispatches table +0x008

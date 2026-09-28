@@ -9,7 +9,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-Seeds the Sony RNG when the argument is nonzero, then returns `rand()`. code_1677c.c calls it with a day number (`*(s32 *)0x1F800000 % 365`) and a second argument the body never reads.
+Seeds the Sony RNG when the argument is nonzero, then returns `rand()`. GameApplicationFileResource.c calls it with a day number (`*(s32 *)0x1F800000 % 365`) and a second argument the body never reads.
 
 ## Source
 

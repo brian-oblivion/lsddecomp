@@ -4,7 +4,7 @@
 
 > Renamed from `func_80026C88` on 2026-09-18 (tools/rename.py). Address 0x80026c88.
 
-**Unit:** code_171e0 · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
+**Unit:** GameApplicationFileResource · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 ## What it does
 
@@ -25,7 +25,7 @@ jr    $ra
 
 Read-modify-write on a single word, no other fields touched. `$a0` is treated
 as `struct-pointer + 0x24`, so it gets a minimal local struct (`FileResource`
-in `include/code_171e0.h`) with padding up to that offset — following
+in `include/GameApplicationFileResource.h`) with padding up to that offset — following
 CLAUDE.md's guidance to name a field rather than write raw pointer arithmetic,
 while being honest that nothing earlier than `0x24` is known yet:
 
@@ -63,8 +63,8 @@ Mechanics fully known (sets bit 0); what bit 0 signals in the game is not
 established, so named for the mechanic only.
 
 **Field renamed alongside it.** `unknown_value_0x24` -> `flags` (in
-`include/code_171e0.h`'s `FileResource`): `grep -rn -- '->unknown_value_0x24\b'
-src/` had zero hits outside `code_171e0.c`, so unlike almost every other
+`include/GameApplicationFileResource.h`'s `FileResource`): `grep -rn -- '->unknown_value_0x24\b'
+src/` had zero hits outside `GameApplicationFileResource.c`, so unlike almost every other
 field in this struct (see `## Proposed field names
 
 **APPLIED by the head at merge, round 52** -- all four fields, both types

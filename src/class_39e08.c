@@ -12,7 +12,7 @@
  *
  * RegisterRecordTableFiles: registers gRecordTable's file entries with the
  * CD driver in at most two batches (DayTask's ctor, and the loader-task
- * callback in code_1677c.c).
+ * callback in GameApplicationFileResource.c).
  *
  * TimedTask (include/TimedTask.h), New_TimedTask through
  * TimedTask__SetTimeout: an IntermediateBase with a frame timeout, a sound
@@ -243,7 +243,7 @@ DayTaskMethods *GetDayTaskMethods(void) {
 /* src/GameFiles.c: returns gRecordTable and writes its record count to
  * *out. */
 extern void *GetRecordTable(s32 *out);
-/* src/code_171e0.c: appends `count` records of `table` to the CD driver's
+/* src/GameApplicationFileResource.c: appends `count` records of `table` to the CD driver's
  * file table and resolves them; returns 0 to be retried, and 1 when the CD
  * driver is not the active data source. */
 extern s32 RegisterFileTableEntries(void *table, s32 count);

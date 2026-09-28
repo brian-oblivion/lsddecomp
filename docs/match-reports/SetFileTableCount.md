@@ -38,6 +38,6 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 
 **Evidence.** The loop bound both table scans in `code_179d8_r` stop at
 (`while (i < gFileTableCount)`, `if (i >= gFileTableCount) return -1;`) over
-the 0x1C-stride array based at `gFileTable`. `code_171e0.c`'s `RegisterFileTableEntries`
+the 0x1C-stride array based at `gFileTable`. `GameApplicationFileResource.c`'s `RegisterFileTableEntries`
 sets it to `GetFileTableCount() + n` before resolving `n` new entries, i.e.
 the table grows by appending. Setter of the element count: tier A.

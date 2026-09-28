@@ -13,7 +13,7 @@
  * (`DrawSystem__InitGraph`, GsInitGraph setup), confirming the two units see
  * the same object. Three OTHER units independently called
  * `GetDrawSystem()`'s return "the draw singleton" in their own comments
- * before this rename, and two of them (`code_2bb9c.c`, `code_179d8_q.c`)
+ * before this rename, and two of them (`TimImage.c`, `code_179d8_q.c`)
  * independently chose the names `loadImage`/`moveImage` for the exact same
  * slots this unit matched as LoadImage/MoveImage -- three-way convergent
  * naming evidence, not a guess. libgpu/sys starts right after, at
