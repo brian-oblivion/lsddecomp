@@ -351,3 +351,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * of `base + offset`, closed the last word (a pure commutative-operand
  * encoding-order residue in the `addu`). */
 ```
+
+## History: track 10, debt-world
+
+Its record view EntrySlot is now StyleCueRecord (also replacing StyleCueEntryView and StyleCueParamMethods), and the local LocalBuf/Pos4/TabEntry are StageMap.h's CellKeyDesc/CellKey/CellOffset, shared with SpawnDreamAuxTriggerEntity. Same sizes and alignment, byte-identical.

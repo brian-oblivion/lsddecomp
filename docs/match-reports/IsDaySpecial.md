@@ -185,3 +185,7 @@ what the code is.
    (round 2026-09-02); only ever address-taken there, never dereferenced by
    this unit's queued functions. */
 ```
+
+## History: track 10, debt-world
+
+sSpecialDays is declared with its 42 entries and the loop runs to `(u32)i < ARRAY_COUNT(sSpecialDays)`. The (u32) stays: ARRAY_COUNT is s32 in common.h, and without the cast the compare is signed (51/52).

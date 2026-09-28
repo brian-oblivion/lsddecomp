@@ -391,7 +391,7 @@ void ObjM__ObjM(ObjM *self, BasicClass *sound, struct WBgm *bgm, TimImage *etcTi
                 struct LinkResource *dreamerTmd, s32 stage) {
     GetTimedTaskMethods()->ctor((TimedTask *)self, 0, sound);
     self->methods = GetObjMMethods();
-    self->unk64 = 0;
+    self->loadsComplete = 0;
     self->inSession = 0;
     self->timBlockPending = 1;
     self->bgm = bgm;
@@ -498,7 +498,7 @@ extern CellBounds sStage0Bounds;
 #define DEFAULT_GRID_SPAN 40960
 
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
-void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 arg3) {
+void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 initOption) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
     FilePathRecord *record;
     s32 day;
@@ -524,7 +524,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
         self->styleConfig = style;
     }
 
-    self->unk4C = arg3;
+    self->initOption = initOption;
     if (self->stage != 0) {
         s32 stage;
         s32 three;
@@ -611,7 +611,7 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
     }
     if (self->timBlockPending == 0) {
         if (((StageMap *)self->lightRig)->pendingLoadCount == 0 && self->inSession == 0) {
-            self->unk64 = 1;
+            self->loadsComplete = 1;
             self->methods->enterStyleSession(self);
         }
     }
@@ -915,11 +915,6 @@ void ObjM__EnterLinkWall(ObjM *self) {
  * established; the names describe mechanics.
  */
 
-/* StageMap__SplitChunkIndex's output: the chunk's column and row. */
-typedef struct ChunkCoord {
-    u8 column;
-    u8 row;
-} ChunkCoord;
 
 /* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"
  * text, the TextRow's position (attachToParent) and its colour (setColor). */
@@ -1002,10 +997,10 @@ void ObjM__OnStageMapNotify(ObjM *self, BasicClass *sender, s32 event) {
  * with the slot's chunk coordinates and the day; the block is released
  * unless that returns an object, which the slot keeps as heldObj. */
 s32 ObjM__CheckAuxTrigger(ObjM *self) {
-    ChunkCoord coord;
+    struct MapChunk coord; /* SplitChunkIndex writes the column, then the row */
     s32 held;
     ChunkSlot *slot = ((StageMap *)self->lightRig)
-                          ->methods->getLastEventSlotChunk((StageMap *)self->lightRig, &coord.column);
+                          ->methods->getLastEventSlotChunk((StageMap *)self->lightRig, &coord.col);
     s32 day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     held = TryDreamAuxTrigger((s32)slot->loader->dataBuffer, (s16 *)&coord, day); /* the coord is the trigger key */
     slot->heldObj = (BasicClass *)held;
@@ -1325,22 +1320,17 @@ extern s32 sStyleDecorSizeW;
 extern s32 sStyleDecorSizeH;
 extern BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
 
-/* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs.
+/* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs, a
+ * BoxFillPos and a BoxFillSize.
  * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
  * drop cached memory values; scalar copies lose retail's reloads). */
-typedef struct PairXY PairXY;
-
-struct PairXY {
-    s32 x; /* +0x000 */
-    s32 y; /* +0x004 */
-};
 
 /* Builds the bands: band 0 in sStyleDecorColors' first colour, bands 1..17
  * attached under it, each 3 pixels lower and 7 shorter than the one before;
  * band 0 then goes under the viewport's fade box. */
 void StyleBuildDecorSet(void) {
-    PairXY pos;
-    PairXY size;
+    BoxFillPos pos;
+    BoxFillSize size;
     s32 i;
     BoxFill *band;
     Viewport *viewport;
@@ -1349,25 +1339,25 @@ void StyleBuildDecorSet(void) {
     if (sStyleDecorVariant == 0) {
         return;
     }
-    pos = *(PairXY *)&sStyleDecorPosX;
+    pos = *(BoxFillPos *)&sStyleDecorPosX;
     if (sStyleDecorVariant == 2) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
-    size = *(PairXY *)&sStyleDecorSizeW;
+    size = *(BoxFillSize *)&sStyleDecorSizeW;
     sStyleDecorSlots[0] = New_BoxFill(&size, (void *)sStyleDecorColors, STYLE_DECOR_PRI);
     for (i = 1; i < STYLE_DECOR_BANDS; i++) {
         band = New_BoxFill(&size, (void *)(sStyleDecorColors + i * 3), STYLE_DECOR_PRI);
         sStyleDecorSlots[i] = band;
         ((BoxFillAttachToParentFn)band->methods->attachToParent)(
-            band, (SceneNode *)sStyleDecorSlots[0], (BoxFillPos *)&pos);
+            band, (SceneNode *)sStyleDecorSlots[0], &pos);
         pos.y += 3;
-        size.y -= 7;
+        size.h -= 7;
     }
 
     viewport = ((StyleSceneRefs *)sStyleSceneRefs)->viewport;
     parent = viewport->methods->getFadeBox(viewport);
-    ((BoxFillAttachToParentFn)sStyleDecorSlots[0]->methods->attachToParent)(
-        sStyleDecorSlots[0], parent, (BoxFillPos *)&pos);
+    ((BoxFillAttachToParentFn)sStyleDecorSlots[0]->methods->attachToParent)(sStyleDecorSlots[0],
+                                                                            parent, &pos);
 }
 
 void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta);
@@ -1381,7 +1371,7 @@ void StyleUpdateDecorSet(void) {
     s32 height;
     s32 fade;
     u8 rgb[8]; /* MATCHING: 8, not 3 (the frame keeps pos at sp+0x18) */
-    PairXY pos;
+    BoxFillPos pos;
     s32 colorOfs;
     s32 i;
     BoxFill **slot;
@@ -1396,7 +1386,7 @@ void StyleUpdateDecorSet(void) {
     if (fade <= 0) {
         return;
     }
-    pos = *(PairXY *)&sStyleDecorPosX;
+    pos = *(BoxFillPos *)&sStyleDecorPosX;
     i = 0;
     if (sStyleDecorVariant == 2) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
@@ -1411,7 +1401,7 @@ void StyleUpdateDecorSet(void) {
         band = *slot;
         i++;
         colorOfs += 3;
-        band->methods->setPosition(band, (BoxFillPos *)&pos);
+        band->methods->setPosition(band, &pos);
         pos.y += 3;
         slot++;
     } while (i < STYLE_DECOR_BANDS);
@@ -1495,23 +1485,25 @@ void StyleReleaseEffectSlots(void) {
     }
 }
 
-/* A cue record's view here: `cue` is its cue index (the sStyleCueCallbacks
- * and sStyleCueDistanceTable row, InitSoundCueSet's tag), negated while a
- * slot holds the record. EntrySlot, below, is the whole 8-byte record. */
-typedef struct StyleCueEntryView StyleCueEntryView;
-
-struct StyleCueEntryView {
-    u8 pad0[0x6];
-    s8 cue; /* +0x006 */
-};
+/* One 8-byte record of a stage's cue list (sStyleCueRecordLists): the cell
+ * it sits in, its in-cell offset (a sStyleCueOffsets index) and `cue`, its
+ * cue index (the sStyleCueCallbacks and sStyleCueDistanceTable row,
+ * InitSoundCueSet's tag), negated while a slot holds the record. */
+typedef struct StyleCueRecord {
+    CellKey key;    /* +0x0 */
+    u8 offsetIndex; /* +0x4 */
+    u8 pad5;        /* +0x5 */
+    s8 cue;         /* +0x6 */
+    u8 pad7;        /* +0x7 */
+} StyleCueRecord;
 
 /* One of the two positional cues: the record it holds, the record's world
  * position, the last distance to the target, and its sound cue. */
 struct StyleCueSlot {
-    StyleCueEntryView *entry; /* +0x000 */
-    LongVec3 pos;             /* +0x004 */
-    s32 lastDist;             /* +0x010 */
-    SoundCueSet cueSet;       /* +0x014 */
+    StyleCueRecord *entry; /* +0x000 */
+    LongVec3 pos;          /* +0x004 */
+    s32 lastDist;          /* +0x010 */
+    SoundCueSet cueSet;    /* +0x014 */
 }; /* 0x68 bytes */
 
 extern StyleCueSlot *FlushStyleCue(StyleCueSlot *slot);
@@ -1725,15 +1717,15 @@ void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     sStyleSpawnModelLayout = rand() % 5;
 }
 
-extern void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target);
+extern StyleCueRecord *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target);
 extern SoundCueCallbackFn sStyleCueCallbacks[];
 
 /* Claims the next record in range for `slot` and starts its cue. A started
  * cue equal to *lastCue is reported back negated. Returns the slot, or NULL. */
 StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *target, void *unused) {
-    StyleCueEntryView *entry;
+    StyleCueRecord *entry;
 
-    entry = (StyleCueEntryView *)FindNextStyleCueInRange(&slot->pos, &slot->lastDist, target);
+    entry = FindNextStyleCueInRange(&slot->pos, &slot->lastDist, target);
     if (entry != 0) {
         slot->entry = entry;
         InitSoundCueSet(((StyleSceneRefs *)sStyleSceneRefs)->sound, &slot->cueSet, entry->cue, slot,
@@ -1752,52 +1744,19 @@ extern u8 *sStyleCueRecordLists[];
 extern u8 sStyleCueRecordCounts[];
 extern s32 sStyleCueDistanceTable[];
 
-/* The cell-key halves: a record's four cell bytes and sStyleCueOffsets' s16
- * x/y/z, copied whole into a 10-byte cell key (StageMap's Descriptor10
- * shape) for computeCellOffsets. */
-typedef struct Pos4 Pos4;
-
-struct Pos4 {
-    s16 hi;
-    s16 lo;
-};
-
-typedef struct TabEntry TabEntry;
-
-struct TabEntry {
-    Pos4 head;
-    s16 tail;
-};
-
-extern TabEntry sStyleCueOffsets[];
-
-typedef struct EntrySlot EntrySlot;
-
-struct EntrySlot {
-    Pos4 pos;       /* +0x0 */
-    u8 offsetIndex; /* +0x4 */
-    u8 pad5;        /* +0x5 */
-    s8 cue;         /* +0x6 */
-    u8 pad7;        /* +0x7 */
-};
-
-typedef struct LocalBuf LocalBuf;
-
-struct LocalBuf {
-    Pos4 pos;
-    TabEntry tab;
-};
+/* sStyleCueOffsets: the in-cell offsets a record's offsetIndex picks. */
+extern CellOffset sStyleCueOffsets[];
 
 /* From sStyleCueRecordIndex on, the first free record of the stage's list
  * whose X+Z distance from the target is under its cue's distance; each
  * record looked at advances the index, so the next slot's search this tick
  * goes on from there.
  * Writes the record's world position and distance. */
-void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
+StyleCueRecord *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
     s32 j, remaining;
     u8 *records;
-    EntrySlot *entry;
-    LocalBuf buf;
+    StyleCueRecord *entry;
+    CellKeyDesc buf;
     s32 dx, dz, dist;
     StageMap *grid;
 
@@ -1806,12 +1765,12 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
     }
     records = sStyleCueRecordLists[sStyleStage];
     remaining = sStyleCueRecordCounts[sStyleStage] - sStyleCueRecordIndex;
-    entry = (EntrySlot *)(sStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
+    entry = (StyleCueRecord *)(sStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
     for (j = 0; j < remaining; j++, entry++) {
         sStyleCueRecordIndex++;
         if (entry->cue > 0) {
-            buf.pos = entry->pos;
-            buf.tab = sStyleCueOffsets[entry->offsetIndex];
+            buf.key = entry->key;
+            buf.offset = sStyleCueOffsets[entry->offsetIndex];
             grid = (StageMap *)sStyleGrid;
             grid->methods->computeCellOffsets(grid, pos, &buf);
             dx = pos->x - target->x;
@@ -1978,32 +1937,14 @@ void StyleScrollVramStrips(void) {
  * helper ComputeStyleCueFalloff they all call first.
  * ------------------------------------------------------------------ */
 
-/* The owner every StyleCueNN callback receives: one of the style layer's
- * style-cue slots (its `StyleCueSlot`, above, of which this is a local view).
+/* The owner every StyleCueNN callback receives is its StyleCueSlot:
  * TryStartStyleCue passes the slot as InitSoundCueSet's owner and its
  * embedded `cueSet` as the set, so a callback's `set` is `&ctx->cueSet`. */
-typedef struct StyleCueParam StyleCueParam;
-
-/* The cue-table record the slot claimed (`StyleCueEntryView`, above). */
-typedef struct StyleCueParamMethods {
-    u8 pad0[0x6];
-    s8 cue; /* +0x006, the record's cue index (its sStyleCueCallbacks row
-             * and InitSoundCueSet tag), negated while a slot has it
-             * claimed; ComputeStyleCueFalloff indexes sStyleCueDistanceTable
-             * with its negative. */
-} StyleCueParamMethods;
-
-struct StyleCueParam {
-    StyleCueParamMethods *entry; /* +0x000 */
-    u8 pad4[0x10 - 0x4];
-    s32 lastDist;       /* +0x010, IsStyleCueNear's distance to the target */
-    SoundCueSet cueSet; /* +0x014 */
-};
 
 /* Every callback calls this first; it is defined after them, in ROM order. */
-s32 ComputeStyleCueFalloff(StyleCueParam *ctx);
+s32 ComputeStyleCueFalloff(StyleCueSlot *ctx);
 
-void StyleCue00(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue00(StyleCueSlot *ctx, SoundCueSet *set) {
     s32 tick;
 
     set->attenuation = ComputeStyleCueFalloff(ctx);
@@ -2022,7 +1963,7 @@ void StyleCue00(StyleCueParam *ctx, SoundCueSet *set) {
     }
 }
 
-void StyleCue01(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue01(StyleCueSlot *ctx, SoundCueSet *set) {
     s32 tick;
 
     set->attenuation = ComputeStyleCueFalloff(ctx);
@@ -2035,7 +1976,7 @@ void StyleCue01(StyleCueParam *ctx, SoundCueSet *set) {
     }
 }
 
-void StyleCue02(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue02(StyleCueSlot *ctx, SoundCueSet *set) {
     s32 tick;
 
     set->attenuation = ComputeStyleCueFalloff(ctx);
@@ -2048,7 +1989,7 @@ void StyleCue02(StyleCueParam *ctx, SoundCueSet *set) {
     }
 }
 
-void StyleCue03(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue03(StyleCueSlot *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick % 20 == 0) {
         set->slots[0].program = 30;
@@ -2066,7 +2007,7 @@ void StyleCue03(StyleCueParam *ctx, SoundCueSet *set) {
     set->slots[2].endVol = 10;
 }
 
-void StyleCue04(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue04(StyleCueSlot *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick % 3 == 0) {
         set->slots[0].program = 30;
@@ -2088,7 +2029,7 @@ void StyleCue04(StyleCueParam *ctx, SoundCueSet *set) {
     set->slots[2].endVol = 10;
 }
 
-void StyleCue05(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue05(StyleCueSlot *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick == 0) {
         set->slots[0].program = 30;
@@ -2106,7 +2047,7 @@ void StyleCue05(StyleCueParam *ctx, SoundCueSet *set) {
     }
 }
 
-void StyleCue06(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue06(StyleCueSlot *ctx, SoundCueSet *set) {
     s32 tick;
 
     set->attenuation = ComputeStyleCueFalloff(ctx);
@@ -2119,7 +2060,7 @@ void StyleCue06(StyleCueParam *ctx, SoundCueSet *set) {
     }
 }
 
-void StyleCue07(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue07(StyleCueSlot *ctx, SoundCueSet *set) {
     s32 tick;
 
     set->attenuation = ComputeStyleCueFalloff(ctx);
@@ -2137,7 +2078,7 @@ void StyleCue07(StyleCueParam *ctx, SoundCueSet *set) {
     }
 }
 
-void StyleCue08(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue08(StyleCueSlot *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick % 20 == 0) {
         set->slots[0].program = 9;
@@ -2147,7 +2088,7 @@ void StyleCue08(StyleCueParam *ctx, SoundCueSet *set) {
     }
 }
 
-void StyleCue09(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue09(StyleCueSlot *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick % 20 == 0) {
         set->slots[0].program = 9;
@@ -2155,7 +2096,7 @@ void StyleCue09(StyleCueParam *ctx, SoundCueSet *set) {
     }
 }
 
-void StyleCue10(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue10(StyleCueSlot *ctx, SoundCueSet *set) {
     s32 rem;
 
     set->attenuation = ComputeStyleCueFalloff(ctx);
@@ -2169,7 +2110,7 @@ void StyleCue10(StyleCueParam *ctx, SoundCueSet *set) {
     }
 }
 
-void StyleCue11(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue11(StyleCueSlot *ctx, SoundCueSet *set) {
     s32 rem;
 
     StyleCue10(ctx, set);
@@ -2186,7 +2127,7 @@ void StyleCue11(StyleCueParam *ctx, SoundCueSet *set) {
     }
 }
 
-void StyleCue12(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue12(StyleCueSlot *ctx, SoundCueSet *set) {
     s32 tick;
 
     set->attenuation = ComputeStyleCueFalloff(ctx);
@@ -2209,7 +2150,7 @@ void StyleCue12(StyleCueParam *ctx, SoundCueSet *set) {
     }
 }
 
-void StyleCue13(StyleCueParam *ctx, SoundCueSet *set) {
+void StyleCue13(StyleCueSlot *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick == 0) {
         set->slots[0].program = 24;
@@ -2221,7 +2162,7 @@ void StyleCue13(StyleCueParam *ctx, SoundCueSet *set) {
  * negative of `cue` while a slot has the record claimed. IsStyleCueNear
  * tests the slot's distance against the same row. */
 
-s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
+s32 ComputeStyleCueFalloff(StyleCueSlot *ctx) {
     s32 range = sStyleCueDistanceTable[-ctx->entry->cue];
     s32 stepDist = range / ctx->cueSet.attenuationSteps;
 

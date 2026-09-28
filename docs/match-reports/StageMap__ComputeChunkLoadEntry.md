@@ -628,3 +628,10 @@ The comment that stood above the function in `src/world/DayTaskStageMap.c`, move
  * The `do {} while (0);` below is LOAD-BEARING: removing it drifts the
  * image. It was inherited with the near-miss body and is verified here. */
 ```
+
+## History: the raw +4 word (track 10, debt-world)
+
+`*(s32 *)((u8 *)out + 4)` became `out->chunkIndex.word`: ChunkLoadEntry's
++0x4 is now a `union { s32 word; s16 index; }`, since this function writes
+and reads the whole word and ApplyChunkLoads the low half. Byte-identical
+(`./build-and-verify.sh` OK).

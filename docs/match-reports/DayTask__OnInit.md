@@ -173,3 +173,10 @@ and 0x8008665C.
 - `setUnk44(vp, 1200)`: decimal; Viewport.h says unk44 x unk48 is each
   buffer's packet area (default 2000) without settling which is the count, so
   the value keeps no name.
+
+## History: SubObjE (track 10, debt-world)
+
+The call-site view `SubObjE` (a method table padded to +0x07C getDims) was
+merged into DrawSystem: the init args' drawSystem is cast to `DrawSystem *`
+and its getDims result, a ScreenDims, to the `ViewportSize *` setScreenSize
+takes (both `{s32, s32}`). Byte-identical (`./build-and-verify.sh` OK).

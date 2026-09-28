@@ -136,8 +136,8 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     initArgs->lightRig = (BasicClass *)New_StageMap(NULL, 1);
     self->dreamSys = dreamSys;
     self->methods->addChild(self, (BasicClass *)dreamSys);
-    dreamSys->methods->setSoundObj(dreamSys, (s32)self->sound);
-    dreamSys->methods->setEtcTim(dreamSys, (s32)self->etcTim);
+    dreamSys->methods->setSoundObj(dreamSys, (VabStreamObj *)self->sound);
+    dreamSys->methods->setEtcTim(dreamSys, self->etcTim);
     self->methods->resetCounters(self);
 }
 
@@ -194,14 +194,15 @@ void DayTask__Deinit(DayTask *self) {
 }
 
 void DayTask__OnInit(DayTask *self) {
-    SubObjE *drawSystem;
+    DrawSystem *drawSystem;
     Viewport *vp;
     SceneNode *fadeBox;
     ViewportSize *size;
 
-    drawSystem = (SubObjE *)self->initArgs->drawSystem;
+    drawSystem = (DrawSystem *)self->initArgs->drawSystem;
     vp = (Viewport *)self->viewport;
-    size = drawSystem->methods->getDims(drawSystem, 0);
+    /* ScreenDims and ViewportSize are both {s32 width, s32 height}. */
+    size = (ViewportSize *)drawSystem->methods->getDims(drawSystem, NULL);
     vp->methods->setScreenSize(vp, size);
     fadeBox = vp->methods->getFadeBox(vp);
     fadeBox->methods->setDisplay(fadeBox, 1);
@@ -1097,8 +1098,7 @@ s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 chunk, s32 oddRow) {
 /* Fills `out` for the slot taking neighbour key `neighbour` of centreChunk:
  * the neighbour's chunk index and the chunk's file record from the
  * callback, or a NULL file when that neighbour lies off the grid. Returns 1
- * for a file, 0 for none. chunkIndex is written as a whole word (see
- * ChunkLoadEntry). MATCHING: one `step` local carries every addend. */
+ * for a file, 0 for none. MATCHING: one `step` local carries every addend. */
 s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 columns, s32 oddRow,
                                     s32 centreChunk, s32 onGridMask, s32 neighbour) {
     s32 bit = sNeighbourBits[neighbour];
@@ -1125,12 +1125,12 @@ s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 col
             }
         }
         chunk = centreChunk + step;
-        *(s32 *)((u8 *)out + 4) = chunk;
+        out->chunkIndex.word = chunk;
     } else {
-        *(s32 *)((u8 *)out + 4) = centreChunk + neighbour;
+        out->chunkIndex.word = centreChunk + neighbour;
     }
 
-    out->file = self->chunkFileFn(self->chunkFileCtx, *(s32 *)((u8 *)out + 4), 0, 0);
+    out->file = self->chunkFileFn(self->chunkFileCtx, out->chunkIndex.word, 0, 0);
     do { /* MATCHING: removing it drifts the image */
     } while (0);
     result = 1;

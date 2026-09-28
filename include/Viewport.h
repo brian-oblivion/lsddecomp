@@ -78,7 +78,7 @@ typedef ColorRgb ViewportRgb;
  * takes. Kept local rather than Sony's GsRVIEW2 because the game uses vp and
  * vr as whole vectors: setViewPoint/setViewRef copy each as one LongVec3
  * (three field stores do not match), and DreamSys hands &vp/&vr to
- * InterpolateKeyframeValue as its two points. Sony's flat vpx..vrz would put
+ * InterpolateYAtZ as its two points. Sony's flat vpx..vrz would put
  * a LongVec3 cast at each copy to save the two at GsSetRefView2. */
 struct ViewportRefView {
     LongVec3 vp;          /* +0x000, viewpoint: setViewPoint */

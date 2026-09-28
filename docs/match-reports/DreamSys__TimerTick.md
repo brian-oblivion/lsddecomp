@@ -206,3 +206,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
              * `this->tick = 0` + return tail; without it GCC cross-jumps that
              * branch to the identical tail after the notifyParents(0xA) call. */
 ```
+
+## History: track 10, debt-world
+
+`event != 2` is `event != FRAMECLOCK_EVENT_RUNNING`: this is the update slot, which SceneNode__OnNotify calls for a FrameClock sender. Byte-identical.

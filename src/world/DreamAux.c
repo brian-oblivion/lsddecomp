@@ -41,10 +41,6 @@
 
 extern DreamAuxSlot sDreamAuxSlots[1];
 
-/* sDreamAuxSlots one word in, so each element's `model` is that slot's
- * entity: ReleaseDreamAuxEntities walks it. */
-extern DreamAuxSlot sDreamAuxSlots2[1];
-
 extern s8 sDreamAuxTriggerCounts[DREAM_AUX_STAGE_COUNT];
 extern DreamAuxTriggerEntry *sDreamAuxTriggerEntries[DREAM_AUX_STAGE_COUNT];
 
@@ -132,23 +128,14 @@ void SetTeleportsEnabled(s32 stage) {
 
 /* Mood rows 11, 56, 78 and 93 turn the instant teleporters on. */
 void EnableTeleportsForKind(s32 moodIndex) {
-    if (moodIndex == 78) {
-        goto call;
+    switch (moodIndex) {
+        case 11:
+        case 56:
+        case 78:
+        case 93:
+            SetInstantTeleportersEnabled(1);
+            break;
     }
-    if (moodIndex < 79) {
-        if (moodIndex == 11) {
-            goto call;
-        }
-        if (moodIndex == 56) {
-            goto call;
-        }
-        return;
-    }
-    if (moodIndex != 93) {
-        return;
-    }
-call:
-    SetInstantTeleportersEnabled(1);
 }
 
 void ReleaseDreamAuxEntities(void) {
@@ -157,13 +144,13 @@ void ReleaseDreamAuxEntities(void) {
 
     /* MATCHING: assignments, not initializers, order the two spills */
     i = 0;
-    slot = sDreamAuxSlots2;
+    slot = sDreamAuxSlots;
 
-    for (; i < ARRAY_COUNT(sDreamAuxSlots2); i++) {
-        Entity *entity = (Entity *)slot->model; /* one word in: the entity */
+    for (; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
+        Entity *entity = slot->entity;
 
         if (entity != NULL) {
-            slot->model = entity->methods->release(entity);
+            slot->entity = entity->methods->release(entity);
         }
         slot++;
     }
@@ -422,18 +409,7 @@ typedef struct {
 
 extern DreamAuxSpawnInfo sDreamAuxSpawnInfo[];
 
-/* MATCHING: x and y are one struct so the copy is one lwl/lwr pair */
-typedef struct {
-    s16 x;
-    s16 y;
-} DreamAuxPosXY;
-
-typedef struct {
-    DreamAuxPosXY xy;
-    s16 z;
-} DreamAuxPos6;
-
-extern DreamAuxPos6 sDreamAuxPosTable[];
+extern CellOffset sDreamAuxPosTable[];
 
 /* Ratio16 degree triples: yaw 0, -90, +90 and 180. */
 extern Ratio16 sDreamAuxSpawnRotations[][3];
@@ -446,17 +422,13 @@ bool SpawnDreamAuxTriggerEntity(s32 moodIndex, void *desc, DreamAuxTriggerEntry 
     if (entity != NULL) {
         DreamAuxSpawnInfo *spawn;
 
-        struct { /* StageMap.h's Descriptor10, as computeCellOffsets reads it */
-            u16 chunk;
-            u16 cell;
-            DreamAuxPos6 offset;
-        } cellDesc;
+        CellKeyDesc cellDesc;
 
         s32 worldPos[4];
 
-        cellDesc.chunk = trigger->key;
+        cellDesc.key.chunk = trigger->key;
         spawn = &sDreamAuxSpawnInfo[spawnIndex];
-        cellDesc.cell = spawn->cell;
+        cellDesc.key.cell = spawn->cell;
         cellDesc.offset = sDreamAuxPosTable[spawn->offsetIndex];
 
         sDreamAuxStageMap->methods->computeCellOffsets(sDreamAuxStageMap, worldPos, &cellDesc);

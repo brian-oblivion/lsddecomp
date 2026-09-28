@@ -191,7 +191,7 @@ Types renamed with it:
 
 Kept: `GameApplicationConfig::unk04` (DayTask's ctor passes `unk04 == 0` to
 SetActiveDataSourceDriverMode; the driver mode's meaning is not established)
-and `unk14` (handed to DreamSys__func_5ba20, which stores a value >= 0 at the
+and `unk14` (handed to DreamSys__GetSetConfigOption, which stores a value >= 0 at the
 still-unnamed DreamSys +0x924). No Sony type applies: the class's fields are a
 config pointer, a flag and a DreamSys pointer.
 

@@ -47,3 +47,7 @@ even a clear at construction -- so nothing names it.
 Re-checked round 92 (runner delta, track 7): still no reader of `unk_0x7C`
 anywhere in src/, and the slot has no caller that names its argument, so the
 tier-C placeholder stays.
+
+## Name (track 10, debt-world): kept tier C
+
+The body clears one word (+0x7C, `unk7C`) and nothing else. No code calls the slot (slot124), and no other code touches the word at all. The accessors show a cleared flag and nothing about what it flags, so the placeholder stays; the field went from `unk_0x7C` to the `unk7C` spelling.

@@ -154,6 +154,30 @@ typedef struct Descriptor10 {
     s16 h8;
 } Descriptor10;
 
+/* A Descriptor10 as DreamAux and the style layer build it for
+ * computeCellOffsets, from two halves each copied whole: `key` (the chunk's
+ * column/row bytes as one u16, then the cell's) and `offset`, the s16 x/y/z
+ * inside the cell. MATCHING: x and y are one struct, so each copy is one
+ * lwl/lwr pair (plus the z halfword). */
+typedef struct CellKey {
+    u16 chunk;
+    u16 cell;
+} CellKey;
+
+typedef struct CellOffset {
+    struct {
+        s16 x;
+        s16 y;
+    } xy;
+
+    s16 z;
+} CellOffset;
+
+typedef struct CellKeyDesc {
+    CellKey key;
+    CellOffset offset;
+} CellKeyDesc;
+
 /* computeFootprintDescriptor's output, 0x2C bytes. `targetCell` holds one. */
 typedef struct Descriptor10Ext {
     Descriptor10 base; /* +0x000 */
@@ -247,11 +271,16 @@ enum ChunkNeighbour {
 /* applyChunkLoads' 0xC-byte entries, one per slot to (re)load: the file
  * record chunkFileFn returned for the chunk (NULL: cancel the slot's load), the
  * chunk's index in the stage grid and the neighbour key of the slot that
- * takes it. ComputeChunkLoadEntry writes chunkIndex as a whole word. */
+ * takes it. ComputeChunkLoadEntry writes and reads chunkIndex as a whole
+ * word; ApplyChunkLoads reads its low half. */
 typedef struct ChunkLoadEntry {
-    void *file;     /* +0x0 */
-    s16 chunkIndex; /* +0x4 */
-    u8 pad6[0x8 - 0x6];
+    void *file; /* +0x0 */
+
+    union {
+        s32 word;
+        s16 index;
+    } chunkIndex; /* +0x4 */
+
     s32 neighbour; /* +0x8 */
 } ChunkLoadEntry;
 
@@ -310,8 +339,10 @@ struct ChunkSlot {
 };
 
 /* The ctor's callback pair (setCallback): ComputeChunkLoadEntry calls
- * chunkFileFn(chunkFileCtx, value, 0, 0) and keeps the result as the entry's file record. */
-typedef void *(*ChunkFileFn)(void *ctx, s32 value, s32 arg2, s32 arg3);
+ * chunkFileFn(chunkFileCtx, chunk, 0, 0) and keeps the result as the entry's
+ * file record. ObjM__GetGridRecord, the one callback, takes the chunk by x/y
+ * when `chunk` is negative. */
+typedef void *(*ChunkFileFn)(void *ctx, s32 chunk, s32 x, s32 y);
 
 /* LightRig's slots, then this class's own. */
 struct StageMapMethods {
@@ -323,7 +354,7 @@ struct StageMapMethods {
     /* +0x0CC */ void (*setAcceptedTags)(StageMap *self, s32 *tags); /* StageMap__SetAcceptedTags */
     /* +0x0D0 */ void (*forwardAcceptedCommand)(StageMap *self, void *sender,
                                                 s32 command); /* StageMap__ForwardAcceptedCommand */
-    /* +0x0D4 */ Descriptor10 *(*getCurrentCellKey)(StageMap *self, void *arg1); /* StageMap__GetCurrentCellKey (reads only self; see the banner) */
+    /* +0x0D4 */ Descriptor10 *(*getCurrentCellKey)(StageMap *self, void *sender); /* StageMap__GetCurrentCellKey (reads only self; see the banner) */
     /* +0x0D8 */ void (*slotD8)(void); /* StageMap__NoOpSlotD8, empty; never called */
     /* +0x0DC */ void (*setGridSpan)(StageMap *self, s32 span); /* StageMap__SetGridSpan */
     /* +0x0E0 */ void (*setConfig)(StageMap *self, StageGridDimensions *config); /* StageMap__SetConfig */
@@ -433,26 +464,27 @@ void StageMap__SetGridSpan(StageMap *self, s32 span);
 void StageMap__SetConfig(StageMap *self, StageGridDimensions *config);
 s32 StageMap__SetTargetAndLoadChunks(StageMap *self, void *outPos, SceneNode *target, Descriptor10 *cell);
 s32 StageMap__ComputeCellOffsets(StageMap *self, void *outPos, void *cell);
-s32 ComputeCellWorldOffsets(s32 *outPos, s32 *outBuf, StageGridDimensions *config, LongVec3 *origin,
+s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dims, LongVec3 *origin,
                             Descriptor10 *cell);
 void StageMap__Enable(StageMap *self);
 void StageMap__Disable(StageMap *self);
 s32 StageMap__UpdateFootprintTracking(StageMap *self);
-void StageMap__LoadChunksAround(StageMap *self, s32 val, LongVec3 *pos, ChunkSlotSpec *specs);
-s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag);
-s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *entry, s32 divisor, s32 flag,
-                                    s32 val, s32 savedResult,
-                                    s32 key); /* 0 or 1; LoadChunksAround discards it */
-void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entries, s32 count);
+void StageMap__LoadChunksAround(StageMap *self, s32 centreChunk, LongVec3 *centrePos,
+                                ChunkSlotSpec *specs);
+s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 chunk, s32 oddRow);
+s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 columns, s32 oddRow,
+                                    s32 centreChunk, s32 onGridMask,
+                                    s32 neighbour); /* 0 or 1; LoadChunksAround discards it */
+void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entry, s32 count);
 s32 StageMap__CountPendingLoads(StageMap *self);
-void StageMap__OnDrawSystemEvent(StageMap *self, void *sender, s32 mode);
+void StageMap__OnDrawSystemEvent(StageMap *self, void *sender, s32 command);
 void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot);
 void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *slot);
-Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *out, void **outPos);
+Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *desc, void **outPos);
 s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, SplitLongVec3 *pos);
-void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 val);
+void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 chunkIndex);
 ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, u8 *out);
-ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 key);
+ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 neighbour);
 ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos);
 s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key);
 s32 StageMap__FindSlotIndexByChunk(StageMap *self, s32 chunkIndex);

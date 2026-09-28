@@ -209,3 +209,7 @@ The comments, as they stood:
  * struct at alignment 2 compiles a whole-struct copy to lwl/lwr), plus a
  * separate z half-word. Indexed by DreamAuxSpawnInfo.posIndex. */
 ```
+
+## History: track 10, debt-world
+
+The local cell descriptor struct and DreamAuxPos6/DreamAuxPosXY are StageMap.h's CellKeyDesc and CellOffset (the same halves the style layer builds). Byte-identical.

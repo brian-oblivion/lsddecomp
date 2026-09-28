@@ -140,3 +140,7 @@ SceneNode__OnPadEvent. The body is exactly a pad handler: `mode` is the event co
 mapped to move/turn/look commands. Nothing in it touches a link;
 Entity__MoodCue123 drives the player the same way, sending (0, 2) and
 (0, 7) through the slot.
+
+## History: track 10, debt-world
+
+`switch (event - 2)` with cases 0..47 became `switch (event)` over Pad.h's codes (`PAD_EVENT_HELD + PAD_BUTTON_LUP` ...); cc1 subtracts the lowest case itself (funcdiff 79/79). The empty `PAD_EVENT_RELEASED + PAD_BUTTON_START` case is needed: without it the whole-image build goes red, so it carries a MATCHING line.

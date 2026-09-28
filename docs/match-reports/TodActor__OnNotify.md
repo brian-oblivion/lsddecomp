@@ -62,3 +62,7 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 ## Track 7 (round 99, bravo)
 
 `sender`, `event`; event 1 is `BASICCLASS_EVENT_FINALIZED` (include/BasicClass.h: the sender is finalizing), so a borrowed ModelData going away releases this object. Byte-identical.
+
+## History: track 10, debt-world
+
+The sender views TaggedObj/TagCheckArg were merged into BasicClass: `(u16)sender->methods->header` compiles to retail's lhu (funcdiff 40/40, whole image OK).

@@ -55,7 +55,7 @@ division with magic-number multiplication (`lui`/`ori` loading
 `0x2AAAAAAB`, `mult`, `sra`, `mfhi`, two `subu`s) -- a completely different,
 LONGER instruction sequence than a real `div`. Retail uses a genuine
 `div`/`mfhi` pair with the standard divide-by-zero/`INT_MIN`-overflow
-`break` guards (the same idiom already confirmed for `InterpolateKeyframeValue` and
+`break` guards (the same idiom already confirmed for `InterpolateYAtZ` and
 every other runtime-divisor division in this unit), meaning the ORIGINAL
 source's divisor was NOT visible to the compiler as a literal at that
 point.

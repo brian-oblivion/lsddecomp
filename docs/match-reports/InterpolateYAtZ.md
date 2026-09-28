@@ -1,4 +1,6 @@
-# InterpolateKeyframeValue — MATCHED 33/33
+# InterpolateYAtZ — MATCHED 33/33
+
+> Renamed from `InterpolateKeyframeValue` on 2026-09-28 (tools/rename.py). Address 0x8005950c.
 
 > Renamed from `func_8005950C` on 2026-09-22 (tools/rename.py). Address 0x8005950c.
 
@@ -23,12 +25,12 @@ each with a `value` at `+0x4` and a `position` at `+0x8`), scaled by `arg2`:
 `(b->value - a->value) * (arg2 / 0x400) / dt + a->value`, where `dt =
 (b->position - a->position) / 0x400`, floored at `1` if it rounds to `0`.
 Called by still-`INCLUDE_ASM` `DreamSys__ProjectPointAtDistance` as
-`InterpolateKeyframeValue(&this->unk_0x5C->unknown_values_0x0[0x14], ...)`.
+`InterpolateYAtZ(&this->unk_0x5C->unknown_values_0x0[0x14], ...)`.
 
 ## Round 42's rebuild: 30/33, register-identity residue
 
 ```c
-s32 InterpolateKeyframeValue(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 arg2)
+s32 InterpolateYAtZ(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 arg2)
 {
 	s32 scaledArg2;
 	s32 dt;
@@ -60,13 +62,13 @@ or "needs different order" in isolation.
 
 ## Fix: permuter-found split assignment (33/33)
 
-A bounded permuter search (`tools/setup-permuter.sh InterpolateKeyframeValue
+A bounded permuter search (`tools/setup-permuter.sh InterpolateYAtZ
 <seed>.c`, `-j 4 --stop-on-zero --best-only`, ~20000 iterations under load)
 found a non-obvious two-statement split at score 200 (down from the 410
 baseline, though not the permuter's own zero):
 
 ```c
-s32 InterpolateKeyframeValue(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 arg2)
+s32 InterpolateYAtZ(DreamSysInterpPoint *a, DreamSysInterpPoint *b, s32 arg2)
 {
 	s32 scaledArg2;
 	s32 dt;
@@ -107,7 +109,7 @@ structural change is not automatically a safer one).
 ## Verification
 
 `./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
-`tools/funcdiff.py InterpolateKeyframeValue` -> `33/33 words match`.
+`tools/funcdiff.py InterpolateYAtZ` -> `33/33 words match`.
 
 ## Provenance
 
@@ -119,3 +121,9 @@ MATCHED 33/33.
 ## Naming
 
 - **Tier A.** Pure leaf: linear interpolation between two value/position keyframes with a divide-by-zero guard (dt forced to 1 when the two positions coincide). Mechanics are the whole story.
+
+## Name (track 10, debt-world)
+
+Tier A by its body: the linear interpolation of y between two LongVec3s at
+z = `at`, with the z distance taken in units of 1024. Its argument view
+DreamSysInterpPoint (`{pad, value, position}`) was merged into LongVec3.

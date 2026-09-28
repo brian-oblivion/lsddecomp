@@ -32,7 +32,7 @@
  *
  * Two cross-unit identifications carry the names below: updateRotation
  * (+0x044) is the rotation setter, so every constant passed to it is three
- * degree ratios (RotationRatios below); and soundObj is a VabStreamObj,
+ * degree ratios (Ratio16[3], include/SceneNode.h); and soundObj is a VabStreamObj,
  * whose +0x080/+0x084/+0x09C (playTone/stopVoice/setPitchOffset) name
  * voiceSelect and voiceIndex.
  *
@@ -43,6 +43,7 @@
 
 #include "common.h"
 #include "Actor.h"
+#include "GameFiles.h"
 /* For StageChunk / GetMoodFromStageChunk, used by DreamSys__LogChunkMood. */
 #include "StageGrid.h"
 #include "SoundCueSet.h"
@@ -131,30 +132,12 @@ enum DreamSysMoveOverride {
 extern s8 (*gpNavChallengesComplete)[NAV_CHALLENGE_COUNT];
 extern s32 *gpDinamicLinkPenalty;
 
-/* A single {numerator, denominator} degree ratio. SceneNode__UpdateRotation
-   (vtable slot +0x044, the inherited rotation setter) reads three of these
-   from its `data` argument, one per axis, converts each with
-   RatioToFixed12 and divides by 360, then either STORES them into the
-   object's rotation vector (flag != 0) or ADDS them modulo a full turn
-   (flag == 0). Every constant this unit hands that slot is three of these:
-   see sRotationYaw180 / _PLUS45 / _MINUS45 below and sCardinalRotations
-   (src/world/DreamSys.c). */
-typedef struct RotationRatio {
-    s16 numerator;
-    s16 denominator;
-} RotationRatio;
-
-/* The x/y/z triple SceneNode__UpdateRotation actually consumes. */
-typedef struct RotationRatios {
-    RotationRatio x;
-    RotationRatio y;
-    RotationRatio z;
-} RotationRatios;
-
-typedef struct CinematicCall {
-    s16 bank;
-    s16 entry;
-} CinematicCall;
+/* SceneNode__UpdateRotation (vtable slot +0x044, the inherited rotation
+   setter) takes three Ratio16s, degrees as {num, den}, one per axis x, y, z,
+   and either STORES them into the object's rotation vector (flag != 0) or
+   ADDS them modulo a full turn (flag == 0). Every constant this unit hands
+   that slot is a Ratio16[3]: see sRotationYaw180 / Plus45 / Minus45 and
+   sCardinalRotations (src/world/DreamSys.c). */
 
 typedef struct {
     MoodGraphPoint lastMood;
@@ -213,9 +196,10 @@ typedef struct {
     PlayerSpawnPoint position;
     FlashbackRotation rotation;
     s16 timeLimit;
-    /* s16: DreamSys__AddFlashback stores it with `sh`. Two bytes of
-       alignment padding follow, before `day`. */
-    s16 unknown_value_0x1c;
+    /* AddFlashback's fifth argument, stored with `sh` (FlashbackSaving always
+       passes 0); nothing reads it. Two bytes of alignment padding follow,
+       before `day`. */
+    s16 unk1C;
     s32 day;
 } FlashbackEntry;
 
@@ -229,14 +213,16 @@ typedef struct {
    setClearColor (+0x064). */
 struct Viewport;
 
-/* DreamSys::soundObj is a VabStreamObj (include/VabStreamObj.h): DreamSys.c
-   casts it there. StartVoice / ExecuteLink call playTone (+0x080; the voice
+/* DreamSys::soundObj is a VabStreamObj (include/VabStreamObj.h; tag only
+   here, DreamSys.c includes the header). StartVoice / ExecuteLink call playTone (+0x080; the voice
    it returns goes to voiceIndex), StopVoice calls stopVoice (+0x084), and
    StartVoice calls setPitchOffset (+0x09C). */
 
 struct LinkResource;
+struct VabStreamObj;
+struct TimImage;
 
-/* DreamSys__DreamSys's `arg1` is a LinkResource (include/LinkResource.h;
+/* DreamSys__DreamSys's `modelSource` is a LinkResource (include/LinkResource.h;
    GameApplication__GameApplication passes New_LinkResource("ETC\DREAME5.TMD")): the
    ctor keeps it in modelSource and adds its getModel(0), a TmdModel, as a
    child. */
@@ -247,51 +233,23 @@ struct LinkResource;
 /* DreamSys's base class is Actor (include/Actor.h): DreamSys's own methods
    reach the base implementations through GetActorMethods() and upcast. */
 
-/* DreamSys__InstanceEffectsOnJournal's view of the Entity (include/Entity.h,
-   class 0x1F234) that sent it an instance effect: the four Entity slots it
-   calls, named as Entity.h names them. A local view because a unit including
-   both this header and Entity.h sees conflicting SoundCueSet prototypes. */
-typedef struct DreamSysEntityMethods {
-    u8 pad00[0x14C];
-    MoodGraphPoint *(*getMoodEffect)(void *self); /* Entity +0x14C */
-    s32 (*getUnlockEffect)(void *self);           /* Entity +0x150 */
-    s32 (*getLinkStage)(void *self);              /* Entity +0x154 */
-    s32 (*getEventVideo)(void *self);             /* Entity +0x158 */
-} DreamSysEntityMethods;
-
-typedef struct DreamSysEntityObj {
-    DreamSysEntityMethods *methods;
-} DreamSysEntityObj;
-
-/* Argument shape for InterpolateKeyframeValue: two "keyframe" points, each with a
-   value (+0x4) and a position/time (+0x8); +0x0 is not read.
-   DreamSys__ProjectPointAtDistance calls it as
-   InterpolateKeyframeValue(&viewport->refView.vp, &viewport->refView.vr, dist):
-   the viewpoint and the reference point, read as {x, y = value, z = position}. */
-typedef struct DreamSysInterpPoint {
-    s8 unknown_values_0x0[4];
-    s32 value;
-    s32 position;
-} DreamSysInterpPoint;
-
 /* The object. Actor's fields (include/Actor.h) run to +0x058; DreamSys's
  * own start there. New_DreamSys allocates 0x928 bytes. */
 struct DreamSys {
     ACTOR_FIELDS(DreamSysMethods);
     /* +0x058 onward: DreamSys's own */
-    /* Set by DreamSys__SetSoundObj(self, value): a VabStreamObj, cast to
-           one where it is called through (include/VabStreamObj.h). */
-    s32 soundObj;
-    /* The camera: set by DreamSys__SetViewport (and the ctor's arg3); see
+    /* Set by the ctor and DreamSys__SetSoundObj (see `soundObj` above). */
+    struct VabStreamObj *soundObj;
+    /* The camera: set by DreamSys__SetViewport (and the ctor's `viewport`); see
            `struct Viewport` above for the refView fields this class moves. */
     struct Viewport *viewport;
-    /* Set by the ctor to its `arg1`: the LinkResource its model 0 came
+    /* Set by the ctor to its `modelSource`: the LinkResource its model 0 came
        from. Not read elsewhere. */
     struct LinkResource *modelSource;
     /* The TimImage DayTask__DayTask hands over through
        DreamSys__SetEtcTim (vtable +0x114); cleared by the ctor, never
        dereferenced by the DreamSys. */
-    s32 etcTim;
+    struct TimImage *etcTim;
 
     bool isFlashbackSession;
     /* A DreamSysMoveOverride: which movement DreamSys__TickMove runs. */
@@ -303,15 +261,16 @@ struct DreamSys {
     /* Cleared to 0, then set to (tick % tickPeriod == 0) by
            DreamSys__UpdateTickState. */
     s32 linkCommandFlag;
-    /* Cleared to 0 by DreamSys__func_59598; no other observed use. */
-    s32 unk_0x78;
-    /* Cleared to 0 by DreamSys__func_59590; no other observed use. */
-    s32 unk_0x7C;
-    /* Set by DreamSys__SelectLookCallback(self, arg1): NULL when arg1==0, otherwise one of
-           three vtable-slot function pointers selected by arg1 (1/2/3). Called
+    /* Cleared by DreamSys__func_59598 (slot128), ResetSessionState and
+       ResetLinkState; nothing sets it nonzero or reads it. */
+    s32 unk78;
+    /* Cleared by DreamSys__func_59590 (slot124); nothing else touches it. */
+    s32 unk7C;
+    /* Set by DreamSys__SelectLookCallback(self, mode): NULL when mode==0, otherwise one of
+           three vtable-slot function pointers selected by mode (1/2/3). Called
            with (self) by DreamSys__RunTickCallbacks, if non-NULL. */
     void (*lookCallback)(struct DreamSys *self);
-    /* Set unconditionally to arg1 by DreamSys__SelectLookCallback(self, arg1);
+    /* Set unconditionally to mode by DreamSys__SelectLookCallback(self, mode);
        no other observed use. */
     s32 lookCallbackMode;
     /* Index into the (sLookOffsetSteps, sLookOffsetLimits) delta/threshold table pair,
@@ -326,19 +285,19 @@ struct DreamSys {
     s32 lookYawCommand;
     /* Running delta accumulator paired with lookYawCommand; see DreamSys__StepLookYaw. */
     s32 lookYaw;
-    /* Set by DreamSys__SelectMoveCallback(self, arg1) as lookCallback is by
+    /* Set by DreamSys__SelectMoveCallback(self, mode) as lookCallback is by
        SelectLookCallback, from a different trio of vtable slots. Called with
        (self) by DreamSys__RunTickCallbacks, if non-NULL. */
     void (*moveCallback)(struct DreamSys *self);
-    /* "Mode" field read/written by DreamSys__SelectMoveCallback(self, arg1): when ==2 on
+    /* "Mode" field read/written by DreamSys__SelectMoveCallback(self, mode): when ==2 on
        entry, self->methods->stopDrift(self, 0) fires first; then it is set
-       unconditionally to arg1. */
+       unconditionally to mode. */
     s32 moveCallbackMode;
     /* (self->moveCommand ^ 1) < 1u, i.e. (moveCommand == 1), written by
        DreamSys__StepLookYaw; also toggled/incremented by DreamSys__FlipMoveCommand and forced
        to 1 by DreamSys__TickMoveForced. */
     s32 moveCommand;
-    /* Index into the 12-byte-stride sTurnRotations table; consumed and reset
+    /* Index into the sTurnRotations table (one Ratio16[3] per entry); consumed and reset
        to 0 by DreamSys__ApplyPendingTurn. */
     s32 turnCommand;
     /* (moveCommand == 1) as computed by DreamSys__StepLookYaw; unconditionally cleared
@@ -360,7 +319,7 @@ struct DreamSys {
     s32 moveCycleTick;
     /* Derived from `linkTarget->flags36` masked to 0x7F, or forced to
        0 (if >= 0x18) or 2 (if `state == 15` and this is still 0)
-       by DreamSys__NotifyLinkAttempt's `arg1 == -1` path. Also an index:
+       by DreamSys__NotifyLinkAttempt's `event == -1` path. Also an index:
        DreamSys__StartVoice does nothing when this is 0, else
        uses it to index sVoiceBySelect/sVoicePitchBySelect (see those externs), compares
        it against 0x16 (22) to decide whether to keep or discard
@@ -371,11 +330,11 @@ struct DreamSys {
        soundObj's stopVoice (+0x084), then resets this to -1) only while this is
        >= 0. */
     s32 voiceIndex;
-    s8 unknown_values_0xC0[4];
-    /* Set to 1 by DreamSys__SelectMoveCallback's arg1==2 case, alongside cueServiceActive and
+    u8 padC0[4];
+    /* Set to 1 by DreamSys__SelectMoveCallback's mode 2 case, alongside cueServiceActive and
        moveCallback. */
     s32 driftActive;
-    /* Set to 1 by DreamSys__SelectMoveCallback's arg1==2 case, alongside driftActive. */
+    /* Set to 1 by DreamSys__SelectMoveCallback's mode 2 case, alongside driftActive. */
     s32 cueServiceActive;
     /* The sound cue drifting runs: SelectMoveCallback mode 2 starts it with
      * soundCueCallback, TickDrift services it, ClearTickCallbacks flushes it. */
@@ -385,15 +344,13 @@ struct DreamSys {
     s32 tickPeriod;
     /* Result of DreamSys__UpdateTickState's (tick % tickPeriod == 0) check. */
     s32 tickBoundary;
-    /* tickBoundary/0x128/0x12C/0x130 are also bounds-checked-set as a group of
-       four by DreamSys__SetGateFlags (vtable +0x18C): each is overwritten with the
-       corresponding argument only when that argument is >= 0. */
-    s32 unk_0x128;
-    s32 unk_0x12C;
-    s32 unk_0x130;
+    /* tickBoundary and these three are set as a group of four by
+       DreamSys__SetGateFlags (vtable +0x18C), each only when its argument is
+       >= 0; ResetLinkState sets these three to 1. No code reads them. */
+    s32 gateFlags[3];
 
     s32 dreamTimeLimit;
-    s8 unknown_values_0x138[12];
+    u8 pad138[12];
 
     MoodGraphContributor areaMoods;
     MoodGraphContributor entityMoods;
@@ -412,17 +369,23 @@ struct DreamSys {
     s32 amountFlashbacksAvailable;
     FlashbackEntry storedFlashbacks[10];
 
-    s8 unknown_values_0x5d8[8];
+    /* InitNewGame clears it; nothing reads it. */
+    s8 unk5D8;
+    u8 pad5D9[6];
+    /* DreamSaveBlock's graphScored: GraphRoom__ScoreDayLog sets it; InitNewGame clears it. */
+    s8 graphScored;
 
     s8 navChallengesArray[NAV_CHALLENGE_COUNT];
     /* 2 bytes unused */
     s32 amountDynamicLinksDone;
-    s8 unknown_values_0x604[116];
+    u8 pad604[116];
 
     bool screenShakeOn;
-    s32 unknown_word_0x67c;
-    s32 unknown_word_0x680;
-    s8 unknown_values_0x684[500];
+    /* InitNewGame clears these three; nothing else touches them. They are
+       inside the save block (saveMagic up to newGamePending). */
+    s32 unk67C;
+    s32 unk680;
+    s8 unk684[500];
 
     s32 newGamePending;
     s32 currentFlashbackIndex;
@@ -465,8 +428,10 @@ struct DreamSys {
     /* A `struct RelativePos`, address-taken and passed to DreamSys__ApplyRelativeOffset as
        its `b` argument (DreamSys__TickStaircaseYawPlus45). */
     struct RelativePos staircaseOrigin;
-    s8 unknown_values_0x922[2];
-    s32 unk_0x924;
+    u8 pad922[2];
+    /* GameApplication's config word +0x14, through DreamSys__GetSetConfigOption
+       (slot228); ResetSessionState clears it. Nothing reads it. */
+    s32 configOption;
 };
 
 /* The bytes DreamSys__GetSaveBlock hands out, from saveMagic up to
@@ -477,7 +442,7 @@ struct DreamSys {
  * there: each field is the DreamSys field above at its DreamSys offset less
  * saveMagic's +0x178. UpdateFlashbackLock (TitleMenu) reads the flashback
  * pair; GraphRoom reads the year, the day and the mood ring, and sets
- * graphScored, DreamSys +0x5DF, the last byte of unknown_values_0x5d8[8]. */
+ * graphScored, DreamSys +0x5DF. */
 typedef struct DreamSaveBlock {
     u8 pad00[0x4];
     /* +0x004 */ s32 currentYear; /* DreamSys +0x17C; nonzero: the ring is full, plot all 100 days */
@@ -528,7 +493,8 @@ typedef enum DreamColors {
  *    no offset; ObjM__SetupSceneStyle calls it through
  *    DreamSysAttachToParentFn. */
 struct DreamSysMethods {
-    ACTOR_SLOTS(DreamSys, (DreamSys * self, struct LinkResource *arg1, s32 arg2, s32 arg3));
+    ACTOR_SLOTS(DreamSys, (DreamSys * self, struct LinkResource *modelSource,
+                           struct VabStreamObj *soundObj, struct Viewport *viewport));
     /* +0x0F0 */ s32 (*getSetFlashbackSession)(DreamSys *self, DreamColors *out,
                                                s32 value); /* DreamSys__GetSetFlashbackSession: value < 0 writes the day's colour to *out */
     /* +0x0F4 */ void (*setMoveOverride)(DreamSys *self, s32 value); /* DreamSys__SetMoveOverride */
@@ -537,37 +503,37 @@ struct DreamSysMethods {
     /* +0x100 */ s32 (*getLinkCommandFlag)(DreamSys *self); /* DreamSys__GetLinkCommandFlag */
     /* +0x104 */ s32 (*getSetDreamTimeLimit)(DreamSys *self, s32 time); /* DreamSys__GetSetDreamTimeLimit */
     /* +0x108 */ s32 (*getDreamTimerScaled)(DreamSys *self); /* DreamSys__GetDreamTimerScaled: tick / 15 */
-    /* +0x10C */ void (*setSoundObj)(DreamSys *self, s32 value); /* DreamSys__SetSoundObj */
+    /* +0x10C */ void (*setSoundObj)(DreamSys *self, struct VabStreamObj *value); /* DreamSys__SetSoundObj */
     /* +0x110 */ void (*setViewport)(DreamSys *self, struct Viewport *value); /* DreamSys__SetViewport */
-    /* +0x114 */ void (*setEtcTim)(DreamSys *self, s32 value); /* DreamSys__SetEtcTim: etcTim = value */
-    /* +0x118 */ void (*updateTickState)(DreamSys *self);      /* DreamSys__UpdateTickState */
-    /* +0x11C */ void (*runTickCallbacks)(DreamSys *self);     /* DreamSys__RunTickCallbacks */
+    /* +0x114 */ void (*setEtcTim)(DreamSys *self, struct TimImage *value); /* DreamSys__SetEtcTim: etcTim = value */
+    /* +0x118 */ void (*updateTickState)(DreamSys *self);  /* DreamSys__UpdateTickState */
+    /* +0x11C */ void (*runTickCallbacks)(DreamSys *self); /* DreamSys__RunTickCallbacks */
     /* +0x120 */ s32 (*projectPointAtDistance)(DreamSys *self, s32 *out, s32 dist, s32 *reference,
                                                s32 tolerance); /* DreamSys__ProjectPointAtDistance */
-    /* +0x124 */ void (*slot124)(DreamSys *self); /* DreamSys__func_59590: unk_0x7C = 0 */
-    /* +0x128 */ void (*slot128)(DreamSys *self); /* DreamSys__func_59598: unk_0x78 = 0 */
+    /* +0x124 */ void (*slot124)(DreamSys *self); /* DreamSys__func_59590: unk7C = 0; never called */
+    /* +0x128 */ void (*slot128)(DreamSys *self); /* DreamSys__func_59598: unk78 = 0; never called */
     /* +0x12C */ s32 (*slot12C)(DreamSys *self);  /* DreamSys__NoOpSlot12C */
-    /* +0x130 */ void (*clearTickCallbacks)(DreamSys *self, bool arg1); /* DreamSys__ClearTickCallbacks */
-    /* +0x134 */ void (*setTickCallbacks)(DreamSys *self, s32 arg1,
-                                          s32 arg2); /* DreamSys__SetTickCallbacks: selectMoveCallback(arg1), selectLookCallback(arg2) */
-    /* +0x138 */ void (*selectLookCallback)(DreamSys *self, s32 arg1); /* DreamSys__SelectLookCallback */
-    /* +0x13C */ void (*selectMoveCallback)(DreamSys *self, s32 arg1); /* DreamSys__SelectMoveCallback */
+    /* +0x130 */ void (*clearTickCallbacks)(DreamSys *self, bool clearLook); /* DreamSys__ClearTickCallbacks */
+    /* +0x134 */ void (*setTickCallbacks)(DreamSys *self, s32 moveMode,
+                                          s32 lookMode); /* DreamSys__SetTickCallbacks: selectMoveCallback(moveMode), selectLookCallback(lookMode) */
+    /* +0x138 */ void (*selectLookCallback)(DreamSys *self, s32 mode); /* DreamSys__SelectLookCallback */
+    /* +0x13C */ void (*selectMoveCallback)(DreamSys *self, s32 mode); /* DreamSys__SelectMoveCallback */
     /* +0x140 */ void (*stepLook)(DreamSys *self);                     /* DreamSys__StepLook */
     /* +0x144 */ void (*stepLookOffset)(DreamSys *self); /* DreamSys__StepLookOffset */
     /* +0x148 */ void (*stepLookYaw)(DreamSys *self);    /* DreamSys__StepLookYaw */
     /* +0x14C */ void (*slot14C)(DreamSys *self); /* DreamSys__NoOpSlot14C, empty; a lookCallback choice */
     /* +0x150 */ void (*slot150)(DreamSys *self); /* DreamSys__NoOpSlot150, empty; a lookCallback choice */
-    /* +0x154 */ s32 (*tickMove)(DreamSys *self);                   /* DreamSys__TickMove */
-    /* +0x158 */ s32 (*tickMoveFree)(DreamSys *self);               /* DreamSys__TickMoveFree */
-    /* +0x15C */ s32 (*tickMoveForced)(DreamSys *self);             /* DreamSys__TickMoveForced */
-    /* +0x160 */ s32 (*tickMoveHeld)(DreamSys *self);               /* DreamSys__TickMoveHeld */
-    /* +0x164 */ s32 (*advanceMoveCycle)(DreamSys *self, s32 arg1); /* DreamSys__AdvanceMoveCycle */
-    /* +0x168 */ void (*startVoice)(DreamSys *self);                /* DreamSys__StartVoice */
-    /* +0x16C */ void (*stopVoice)(DreamSys *self);                 /* DreamSys__StopVoice */
-    /* +0x170 */ s32 (*applyMoveCommand)(DreamSys *self, s32 arg1); /* DreamSys__ApplyMoveCommand */
+    /* +0x154 */ s32 (*tickMove)(DreamSys *self);                  /* DreamSys__TickMove */
+    /* +0x158 */ s32 (*tickMoveFree)(DreamSys *self);              /* DreamSys__TickMoveFree */
+    /* +0x15C */ s32 (*tickMoveForced)(DreamSys *self);            /* DreamSys__TickMoveForced */
+    /* +0x160 */ s32 (*tickMoveHeld)(DreamSys *self);              /* DreamSys__TickMoveHeld */
+    /* +0x164 */ s32 (*advanceMoveCycle)(DreamSys *self, s32 bob); /* DreamSys__AdvanceMoveCycle */
+    /* +0x168 */ void (*startVoice)(DreamSys *self);               /* DreamSys__StartVoice */
+    /* +0x16C */ void (*stopVoice)(DreamSys *self);                /* DreamSys__StopVoice */
+    /* +0x170 */ s32 (*applyMoveCommand)(DreamSys *self, s32 command); /* DreamSys__ApplyMoveCommand */
     /* +0x174 */ void (*applyPendingTurn)(DreamSys *self);          /* DreamSys__ApplyPendingTurn */
     /* +0x178 */ void (*tickDrift)(DreamSys *self);                 /* DreamSys__TickDrift */
-    /* +0x17C */ void (*stopDrift)(DreamSys *self, s32 arg1);       /* DreamSys__StopDrift */
+    /* +0x17C */ void (*stopDrift)(DreamSys *self, s32 keepCues);   /* DreamSys__StopDrift */
     /* +0x180 */ s32 (*getSetMoveMode)(DreamSys *self, s32 value);  /* DreamSys__GetSetMoveMode */
     /* +0x184 */ void (*changeMoveMode)(DreamSys *self, s32 value); /* DreamSys__ChangeMoveMode */
     /* +0x188 */ void (*restorePreviousMoveMode)(DreamSys *self); /* DreamSys__RestorePreviousMoveMode */
@@ -582,12 +548,12 @@ struct DreamSysMethods {
     /* +0x1AC */ s32 (*getNewGameFlag)(DreamSys *self);    /* DreamSys__GetNewGameFlag */
     /* +0x1B0 */ s32 *(*getSaveBlock)(DreamSys *self, s32 *outSize); /* DreamSys__GetSaveBlock: &saveMagic; *outSize = 0x700 */
     /* +0x1B4 */ s32 (*startDay)(DreamSys *self);               /* DreamSys__StartDay */
-    /* +0x1B8 */ s32 (*endDay)(DreamSys *self, s32 arg1);       /* DreamSys__EndDay */
+    /* +0x1B8 */ s32 (*endDay)(DreamSys *self, s32 outcome);    /* DreamSys__EndDay */
     /* +0x1BC */ CinematicCall (*getCinematic)(DreamSys *self); /* DreamSys__GetCinematic */
     /* +0x1C0 */ void (*initSpawnLoc)(DreamSys *self);          /* DreamSys__InitSpawnLoc */
     /* +0x1C4 */ void (*dynamicLink)(DreamSys *self);           /* DreamSys__DynamicLink */
     /* +0x1C8 */ bool (*staticWallLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__StaticWallLink */
-    /* +0x1CC */ bool (*loadNextFlashback)(DreamSys *self, bool unknown); /* DreamSys__LoadNextFlashback */
+    /* +0x1CC */ bool (*loadNextFlashback)(DreamSys *self, bool quiet); /* DreamSys__LoadNextFlashback */
     /* +0x1D0 */ bool (*tryTunnelLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__TryTunnelLink */
     /* +0x1D4 */ bool (*tryStageTimerLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__TryStageTimerLink */
     /* +0x1D8 */ bool (*tryInstantTeleportLink)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__TryInstantTeleportLink */
@@ -598,7 +564,7 @@ struct DreamSysMethods {
     /* +0x1E8 */ void (*instanceEffectsOnJournal)(DreamSys *self, void *entity,
                                                   s32 effect); /* DreamSys__InstanceEffectsOnJournal: onActorLinkCommand's Entity (0x1F234) case */
     /* +0x1EC */ void (*getPreviousDayMood)(DreamSys *self, MoodGraphPoint *target,
-                                            bool unknown); /* DreamSys__GetPreviousDayMood */
+                                            bool lastDayOnly); /* DreamSys__GetPreviousDayMood */
     /* +0x1F0 */ void (*initMoodContributors)(DreamSys *self, MoodGraphPoint *special); /* DreamSys__InitMoodContributors */
     /* +0x1F4 */ void (*logChunkMood)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__LogChunkMood */
     /* +0x1F8 */ void (*logInstanceMood)(DreamSys *self, MoodGraphPoint *source); /* DreamSys__LogInstanceMood */
@@ -612,11 +578,11 @@ struct DreamSysMethods {
     /* +0x210 */ void (*calcUnlockScore)(DreamSys *self);     /* DreamSys__CalcUnlockScore */
     /* +0x214 */ void (*addFlashback)(DreamSys *self, s32 stage, PlayerSpawnPoint *pos, s32 *angles,
                                       s32 unknown, s32 time, s32 day); /* DreamSys__AddFlashback */
-    /* +0x218 */ void (*flashbackSaving)(DreamSys *self, s32 arg1, s32 arg2); /* DreamSys__FlashbackSaving */
+    /* +0x218 */ void (*flashbackSaving)(DreamSys *self, s32 unknown, s32 timeLimit); /* DreamSys__FlashbackSaving */
     /* +0x21C */ void (*resetFlashbackList)(DreamSys *self); /* DreamSys__ResetFlashbackList */
     /* +0x220 */ void (*saveLinkSnapshot)(DreamSys *self); /* DreamSys__SaveLinkSnapshot: coord2 and its param into the snapshot fields */
     /* +0x224 */ void (*restoreLinkSnapshot)(DreamSys *self); /* DreamSys__RestoreLinkSnapshot */
-    /* +0x228 */ s32 (*slot228)(DreamSys *self, s32 value); /* DreamSys__func_5ba20: get/set; GameApplication__GameApplication calls it */
+    /* +0x228 */ s32 (*slot228)(DreamSys *self, s32 value); /* DreamSys__GetSetConfigOption: get/set; GameApplication__GameApplication calls it */
 }; /* 139 slots, 0x22C bytes */
 
 /* reset (+0x040) as DreamSys__DreamSys calls it (see above). */
@@ -674,17 +640,17 @@ extern s32 GetStageLinkAngle(void);
 /* Called by DreamSys__TryTunnelLink as (&self->exitRotation, &self->enterRotation, &local) --
    the `local` buffer SceneNode__GetRotationDegrees fills; result a truth
    value (`beqz`). Defined after its caller. */
-extern s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2);
+extern s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation);
 
 /* Called by DreamSys__TryStaircaseLink as (&self->linkCoordinates,
    currentPos, self->currentStage) -- same forwarding shape as
    TestForTunnelLinks/TestForStaticLink above. Defined after its caller. */
-extern s32 TestForStaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2);
+extern s32 TestForStaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
 
 /* Called by DreamSys__TryStaircaseLink as (&self->exitRotation, &self->enterRotation, &local) --
    identical call shape to DreamSys__CheckTunnelHeading above (same `local` buffer, same two
    `self` fields), so the same signature. Defined after its caller. */
-extern s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2);
+extern s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation);
 
 /* Same (target, currentPos, stage) forwarding shape as TestForTunnelLinks
    above -- called by DreamSys__TryInstantTeleportLink as
@@ -699,7 +665,7 @@ extern s32 GetTeleportTimeBonus(void);
 
 /* This function might be called when the player hits a wall?
 It tries to do an static link first, then a dynamic one */
-void DreamSys__WallLink(DreamSys *self, void *unk_class_86aa0, int arg2);
+void DreamSys__WallLink(DreamSys *self, void *sender, int event);
 
 /* @brief Sets the overall time limit for the dream and returns its previous value. */
 /* @param value The new time limit, in seconds. Negative values are stored as-is. */
@@ -723,7 +689,7 @@ s32 DreamSys__AdvanceDay(DreamSys *self);
 s32 DreamSys__StartDay(DreamSys *self);
 
 /* @brief Executes various end-of-dream actions. */
-s32 DreamSys__EndDay(DreamSys *self, s32 arg1);
+s32 DreamSys__EndDay(DreamSys *self, s32 outcome);
 
 /* @brief Gets the indices of the Cinematic to be played next, if any. */
 /* @return CinematicCall with the currently stored indices. An Entry value of -1 means no cinematic. */
@@ -742,10 +708,10 @@ bool DreamSys__StaticWallLink(DreamSys *self, PlayerSpawnPoint *currentPos);
 
 /* @brief Loads the next flashback on a flashback session */
 /* @return False if it is the end of the flashback session, True otherwise */
-bool DreamSys__LoadNextFlashback(DreamSys *self, bool unknown);
+bool DreamSys__LoadNextFlashback(DreamSys *self, bool quiet);
 
 /* Called during some links, but no idea what it actually does */
-bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2);
+bool ExecuteLink(DreamSys *system, s32 stage, s32 linkType, s32 playSound);
 
 /* DreamSys__ProcessChunkChange(DreamSys *self,); */
 
@@ -754,7 +720,7 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2);
 /* @param effect Index of the effect to handle. */
 void DreamSys__InstanceEffectsOnJournal(DreamSys *self, void *entity, s32 effect);
 
-void DreamSys__GetPreviousDayMood(DreamSys *self, MoodGraphPoint *target, bool unknown);
+void DreamSys__GetPreviousDayMood(DreamSys *self, MoodGraphPoint *target, bool lastDayOnly);
 
 /* @brief (Re)initializes both Mood Contributors in preparation for the start of the day. */
 /* @param special If not NULL, both graphs will be initialized with this point logged in. */
@@ -824,7 +790,8 @@ void DreamSys__ResetFlashbackList(DreamSys *self);
 DreamSysMethods *GetDreamSysMethods(void);
 
 /* @brief Allocates and constructs a DreamSys instance. */
-DreamSys *New_DreamSys(struct LinkResource *arg0, s32 arg1, s32 arg2);
+DreamSys *New_DreamSys(struct LinkResource *modelSource, struct VabStreamObj *soundObj,
+                       struct Viewport *viewport);
 
 /* @brief Initializes the values that will be used by CalcNavigationScore. */
 /* @param arrayMem Pointer to the array of challenges completed */
@@ -836,21 +803,21 @@ void InitNavChallengesArray(s8 (*arrayMem)[30], s32 *linkCounter);
 s32 CalcNavigationScore(void);
 
 /* @brief Gets the stage, spawn point, and time limit of a given point in the graph. */
-/* @param target Pointer where the spawnpoint found will be written */
+/* @param dest Pointer where the spawnpoint found will be written */
 /* @param timeLimit Pointer where the time limit will be written to */
 /* @param mood The mood that will be used for the calculation */
 /* @param day Unused? */
 /* @return The stage index of the initial spawn. */
-s32 GenerateInitialSpawn(PlayerSpawnPoint *target, s32 *timeLimit, MoodGraphPoint *mood, s32 day);
+s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint *mood, s32 day);
 
 /* @brief Obtains a random Spawnpoint on, or away from, a given stage. */
 /* @param target Pointer where the new spawn will be written to */
-/* @param stg The current stage (or target stage, if negative) */
+/* @param fromStage The current stage (or target stage, if negative) */
 /* @return Stage the spawn belongs to */
-s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 stg, s32 unused);
-/* This function has two modes of operation, depending on the signage of stg.
-   If stg is positive or zero, it behaves as a fully dynamic link *away* from a given stage.
-   If stg is negative, it behaves as a "semi-static" link *on* a given stage. (This is the kind of link normally used by instances)
+s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 fromStage, s32 unused);
+/* This function has two modes of operation, depending on the sign of fromStage.
+   If fromStage is positive or zero, it behaves as a fully dynamic link *away* from a given stage.
+   If fromStage is negative, it behaves as a "semi-static" link *on* a given stage. (This is the kind of link normally used by instances)
    Regardless of mode, this spawn will count towards the "Dynamic link penalty" of the flashback unlock score.*/
 
 /* @brief Checks whether a given day is Special, and loads a random cinematic if it is. */
@@ -860,15 +827,16 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 stg, s32 unused);
 MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day);
 
 /* The occupants of gDreamSysMethods not declared above, in slot order. */
-DreamSys *DreamSys__DreamSys(DreamSys *self, struct LinkResource *arg1, s32 arg2, s32 arg3);
+DreamSys *DreamSys__DreamSys(DreamSys *self, struct LinkResource *modelSource,
+                             struct VabStreamObj *soundObj, struct Viewport *viewport);
 void DreamSys__ResetSessionState(DreamSys *self);
-void DreamSys__SpawnAtLink(DreamSys *self, struct StageMap *arg1);
+void DreamSys__SpawnAtLink(DreamSys *self, struct StageMap *grid);
 void DreamSys__DetachFromParent(DreamSys *self);
-void DreamSys__NotifyLinkAttempt(DreamSys *self, s32 arg1);
-void DreamSys__OnPadEvent(DreamSys *self, s32 arg1, s32 mode);
-void DreamSys__TimerTick(DreamSys *self, s32 arg1, s32 arg2);
-void DreamSys__DispatchChunkChange(DreamSys *self, void *arg1, s32 arg2);
-void DreamSys__DispatchInstanceEffect(DreamSys *self, void *arg1, s32 arg2);
+void DreamSys__NotifyLinkAttempt(DreamSys *self, s32 event);
+void DreamSys__OnPadEvent(DreamSys *self, s32 sender, s32 event);
+void DreamSys__TimerTick(DreamSys *self, s32 sender, s32 event);
+void DreamSys__DispatchChunkChange(DreamSys *self, void *sender, s32 event);
+void DreamSys__DispatchInstanceEffect(DreamSys *self, void *sender, s32 effect);
 void DreamSys__NoOpSlotE8Default(void);
 s32 DreamSys__GetSetFlashbackSession(DreamSys *self, DreamColors *out, s32 value);
 void DreamSys__SetMoveOverride(DreamSys *self, s32 value);
@@ -883,8 +851,8 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *self, s32 *out, s32 dist, s32 *re
 void DreamSys__func_59590(DreamSys *self);
 void DreamSys__func_59598(DreamSys *self);
 s32 DreamSys__NoOpSlot12C(DreamSys *self);
-void DreamSys__ClearTickCallbacks(DreamSys *self, bool arg1);
-void DreamSys__SetTickCallbacks(DreamSys *self, s32 arg1, s32 arg2);
+void DreamSys__ClearTickCallbacks(DreamSys *self, bool clearLook);
+void DreamSys__SetTickCallbacks(DreamSys *self, s32 moveMode, s32 lookMode);
 void DreamSys__StepLook(DreamSys *self);
 void DreamSys__StepLookOffset(DreamSys *self);
 void DreamSys__StepLookYaw(DreamSys *self);
@@ -894,32 +862,32 @@ s32 DreamSys__TickMove(DreamSys *self);
 s32 DreamSys__TickMoveFree(DreamSys *self);
 s32 DreamSys__TickMoveForced(DreamSys *self);
 s32 DreamSys__TickMoveHeld(DreamSys *self);
-s32 DreamSys__AdvanceMoveCycle(DreamSys *self, s32 arg1);
+s32 DreamSys__AdvanceMoveCycle(DreamSys *self, s32 bob);
 void DreamSys__StartVoice(DreamSys *self);
 void DreamSys__StopVoice(DreamSys *self);
-s32 DreamSys__ApplyMoveCommand(DreamSys *self, s32 arg1);
+s32 DreamSys__ApplyMoveCommand(DreamSys *self, s32 command);
 void DreamSys__ApplyPendingTurn(DreamSys *self);
 void DreamSys__TickDrift(DreamSys *self);
-void DreamSys__StopDrift(DreamSys *self, s32 arg1);
+void DreamSys__StopDrift(DreamSys *self, s32 keepCues);
 s32 DreamSys__GetSetMoveMode(DreamSys *self, s32 value);
 void DreamSys__ChangeMoveMode(DreamSys *self, s32 value);
 void DreamSys__RestorePreviousMoveMode(DreamSys *self);
 void DreamSys__SetGateFlags(DreamSys *self, s32 a, s32 b, s32 c, s32 d);
 void DreamSys__SetTickPeriod(DreamSys *self, s32 value);
 void DreamSys__SoundCueCallback(void *owner, SoundCueSet *set);
-s32 DreamSys__GetCurrentDayAndYear(DreamSys *self, s32 *arg1);
+s32 DreamSys__GetCurrentDayAndYear(DreamSys *self, s32 *outYear);
 void DreamSys__ClearNewGameFlag(DreamSys *self);
 s32 DreamSys__GetNewGameFlag(DreamSys *self);
-s32 *DreamSys__GetSaveBlock(DreamSys *self, s32 *arg1);
+s32 *DreamSys__GetSaveBlock(DreamSys *self, s32 *outSize);
 bool DreamSys__TryTunnelLink(DreamSys *self, PlayerSpawnPoint *currentPos);
 bool DreamSys__TryStageTimerLink(DreamSys *self, PlayerSpawnPoint *currentPos);
 bool DreamSys__TryInstantTeleportLink(DreamSys *self, PlayerSpawnPoint *currentPos);
 bool DreamSys__TryStaircaseLink(DreamSys *self, PlayerSpawnPoint *currentPos);
 s32 DreamSys__GetCurrentStage(DreamSys *self);
-void DreamSys__FlashbackSaving(DreamSys *self, s32 arg1, s32 arg2);
+void DreamSys__FlashbackSaving(DreamSys *self, s32 unknown, s32 timeLimit);
 void DreamSys__SaveLinkSnapshot(DreamSys *self);
 void DreamSys__RestoreLinkSnapshot(DreamSys *self);
-s32 DreamSys__func_5ba20(DreamSys *self, s32 value);
+s32 DreamSys__GetSetConfigOption(DreamSys *self, s32 value);
 
 /* A non-slot helper the staircase ticks call before its definition:
    addTranslation of (a - b) with y forced to 0. */

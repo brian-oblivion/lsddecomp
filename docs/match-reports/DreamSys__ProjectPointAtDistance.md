@@ -12,7 +12,7 @@ first.
 
 ```c
 extern void SceneNode__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
-extern s32 InterpolateKeyframeValue(void *a, void *b, s32 day);
+extern s32 InterpolateYAtZ(void *a, void *b, s32 day);
 extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 
 s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
@@ -26,7 +26,7 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *ref
 	*p = day;
 	SceneNode__LocalOffsetToWorldPos(this, local, p - 2, 0);
 
-	ret = InterpolateKeyframeValue((void *)((u8 *)this->unk_0x5C + 0x14),
+	ret = InterpolateYAtZ((void *)((u8 *)this->unk_0x5C + 0x14),
 	                     (void *)((u8 *)this->unk_0x5C + 0x20), day);
 
 	vec = this->unk_0xC != 0 ? (s32 *)((u8 *)this->unk_0x14 + 0x38) : 0;
@@ -149,7 +149,7 @@ closed the remaining 3-word overshoot (`objdump` word count 59 -> 56,
 matching retail exactly) and, since the whole-image drift this caused had
 been shifting even the LATER, unrelated `sProjectOffsetZ` global's own resolved
 address (data placed after this code in the single contiguous PS-X image)
-and `InterpolateKeyframeValue`'s call target, fixing this one bug cleared every other
+and `InterpolateYAtZ`'s call target, fixing this one bug cleared every other
 remaining diff in the same build.
 
 ## Method note: the "20/56 in-range, 140723 bytes outside" number was read correctly, and it was still not diagnostic of the eventual fix
@@ -204,7 +204,7 @@ OUTSIDE the range**.
 #if 0
 extern s32 sProjectOffsetZ;
 extern s32 SceneNode__LocalOffsetToWorldPos();
-extern s32 InterpolateKeyframeValue();
+extern s32 InterpolateYAtZ();
 extern s32 IsVec3WithinRange();
 
 s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *reference, s32 tolerance)
@@ -215,7 +215,7 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *ref
 	sProjectOffsetZ = day;
 	SceneNode__LocalOffsetToWorldPos(this, local, &sProjectOffsetZ - 2, 0);
 
-	v0 = InterpolateKeyframeValue((void *)((u8 *)this->unk_0x5C + 0x14),
+	v0 = InterpolateYAtZ((void *)((u8 *)this->unk_0x5C + 0x14),
 	                    (void *)((u8 *)this->unk_0x5C + 0x20), day);
 
 	if (this->unk_0xC)
@@ -256,7 +256,7 @@ Renamed from `func_8005942C`.
 Writes `dist` into the z word of the three-word global scratch
 offset vector, converts that LOCAL offset to a world position through
 `SceneNode__LocalOffsetToWorldPos` (SceneNode, matched), replaces the result's Y
-with `InterpolateKeyframeValue(heightCurve+0x14, heightCurve+0x20, dist)` plus the
+with `InterpolateYAtZ(heightCurve+0x14, heightCurve+0x20, dist)` plus the
 object's own world-base Y, optionally copies the point out, and optionally returns
 whether it lies within `tolerance` of `reference`.
 The same evidence corrects the third parameter's name: it was `day`, an artefact of
@@ -271,7 +271,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
 
 ```c
 /* Local prototypes, own local view (SceneNode__LocalOffsetToWorldPos is a different unit's
- * already-matched function taking an unrelated class as arg0; InterpolateKeyframeValue
+ * already-matched function taking an unrelated class as arg0; InterpolateYAtZ
  * is this unit's own next-in-queue function, forward-declared per
  * CLAUDE.md's convention for calling into a not-yet-preceding definition).
  * SceneNode__LocalOffsetToWorldPos's unused 4th parameter IS set (to 0) by
@@ -283,7 +283,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
    caller-less m2c signature and is wrong: it is written into the z word of
    the global scratch vector that SceneNode__LocalOffsetToWorldPos converts
    from a LOCAL OFFSET to a world position, and it is also the abscissa
-   InterpolateKeyframeValue evaluates the viewport's two refView points at -- whose
+   InterpolateYAtZ evaluates the viewport's two refView points at -- whose
    own `position` fields are what it is compared against. It is a distance
    along the local axis, not a day index. */
 ```
