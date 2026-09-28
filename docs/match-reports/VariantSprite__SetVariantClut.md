@@ -53,21 +53,21 @@ struct D_800879C4Obj_q {
     s32 unkA0;                  /* +0x0A0 */
 };
 
-extern const s16 gVariantSpriteClutX[];
+extern const s16 sVariantSpriteClutX[];
 extern const s16 gVariantSpriteClutY[];
 
 void VariantSprite__SetVariantClut(D_800879C4Obj_q *self, s32 arg1) {
     self->unkA0 = arg1;
-    self->unk74 = gVariantSpriteClutX[arg1 * 2];
+    self->unk74 = sVariantSpriteClutX[arg1 * 2];
     self->unk76 = gVariantSpriteClutY[arg1 * 2];
 }
 ```
 
 ## The rodata shape
 
-`gVariantSpriteClutX` and `gVariantSpriteClutY` are splat's own dlabels in
+`sVariantSpriteClutX` and `gVariantSpriteClutY` are splat's own dlabels in
 `asm/data/76DC8.data.s`, 2 bytes and 6 bytes long respectively, sitting
-back to back (`gVariantSpriteClutX` at `0x80087AA4`, `gVariantSpriteClutY` immediately
+back to back (`sVariantSpriteClutX` at `0x80087AA4`, `gVariantSpriteClutY` immediately
 after at `0x80087AA6`) -- conceptually one 8-byte array of two
 `{s16 a; s16 b;}` entries, but retail takes TWO SEPARATE `%hi`/`%lo`
 bases (one lui/addiu pair per table) rather than a single struct-array
@@ -77,7 +77,7 @@ parallel `s16[]` externs, each indexed at `arg1 * 2` (i.e. `arg1 * 4`
 bytes -- retail computes the shift once, `sll $a1, $a1, 2`, and reuses it
 for both address calculations, which the two-array C form reproduces
 without any extra hoisting). Values, read at the real stride:
-`gVariantSpriteClutX = {0x03D0, 0x03E0}`, `gVariantSpriteClutY = {0x01FF, 0x01FF}`.
+`sVariantSpriteClutX = {0x03D0, 0x03E0}`, `gVariantSpriteClutY = {0x01FF, 0x01FF}`.
 
 ## Verification
 
@@ -88,7 +88,7 @@ preserved).
 ### Proposed learning
 
 Two splat dlabels that are contiguous in memory and individually shorter
-than the addressing stride the code actually uses (`gVariantSpriteClutX` is 2
+than the addressing stride the code actually uses (`sVariantSpriteClutX` is 2
 bytes but addressed at a 4-byte stride) are not necessarily one struct
 array that a single C declaration should unify -- check whether the
 disassembly takes ONE relocation or TWO before merging them. Here it's
@@ -105,7 +105,7 @@ below, byte-identical.
 | --- | --- | --- |
 | `VariantSprite__SetVariantClut` (was `func_80057DBC`) | A | Pure leaf whose mechanics are its purpose: stores its argument at `+0xA0` and loads `+0x74`/`+0x76` from a two-entry table indexed by it. `+0x64` is an embedded GsSPRITE: the base class's init `InitGsSprite` (asm/psyq_322b4.s) writes attribute `+0`, w/h `+8`/`+A`, tpage `+C` (from `GetTPage`), u/v `+E`/`+F`, cx/cy `+0x10`/`+0x12` (from the image), r,g,b = 0x80 at `+0x14..0x16`, mx/my = w/2,h/2 at `+0x18`/`+0x1A`, scalex/scaley = 0x1000 at `+0x1C`/`+0x1E`, rotate = 0 at `+0x20`, all at GsSPRITE offsets relative to `+0x64`; `Viewport__DrawNode` (asm/psyq_2864.s) passes `self+0x64` to `GsSortSprite` for tag-0x44 objects (header 0x1F44). So `+0x74`/`+0x76` are GsSPRITE.cx/cy. The values {0x3D0, 0x1FF} and {0x3E0, 0x1FF} are 16-aligned VRAM x on the bottom line, which is where CLUTs go. "Variant": the same argument is the ctor's arg1 (`VariantSprite__VariantSprite`), which also selects the texture cell `&sVariantSpriteCells[arg1]` (u,v = (0x00,0x20) or (0x10,0x20), 16x16) handed to the base ctor. Slot `+0x040` per `tools/classtable.py gVariantSpriteMethods`. |
 | class prefix `D800879C4` | -- | The prefix the tree already uses for this table's class (`VariantSprite__VariantSprite`, `New_VariantSprite`, ObjMStyleActor.c's `D800879C4Obj`/`D800879C4Methods`); `classtable.py` resolves slots `+0x040` and `+0x048` of `gVariantSpriteMethods` to these two functions. No evidence yet for a game-level class name. |
-| `gVariantSpriteClutX` / `gVariantSpriteClutY` (were `D_80087AA4` / `D_80087AA6`) | A | Read only here, into GsSPRITE.cx / .cy. Really one `{s16 x, y}[2]` array; retail takes two relocations, so it stays two externs (see "The rodata shape"). |
+| `sVariantSpriteClutX` / `gVariantSpriteClutY` (were `D_80087AA4` / `D_80087AA6`) | A | Read only here, into GsSPRITE.cx / .cy. Really one `{s16 x, y}[2]` array; retail takes two relocations, so it stays two externs (see "The rodata shape"). |
 | field `spriteClutX` / `spriteClutY` (`+0x74`/`+0x76`) | A | GsSPRITE.cx/cy, above. Unit-local struct: renamed in place. |
 | field `variant` (`+0xA0`) | B | Mechanics certain (the index that picks the CLUT and, in the ctor, the texture cell); no reader of `+0xA0` on this class found (`Viewport__DrawNode` reads `+0xA0` only on tag 0x144 objects, a different class). |
 
@@ -134,7 +134,7 @@ The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
 (`sVariantSpriteCells`) and the CLUT row the reset slot sets
-(`gVariantSpriteClutX/Y`). What the sprites are in the game is not
+(`sVariantSpriteClutX/Y`). What the sprites are in the game is not
 established (their only builder is StyleEffect, kinds 2 and 3, and every
 path passes variant 0), which is why it is not tier A. The table, getter,
 allocator, methods and the three data tables followed the class name.
@@ -161,7 +161,7 @@ nothing, which the header now says.
 
 | name | tier | evidence |
 | --- | --- | --- |
-| `VARIANT_CLUT_STRIDE` (the literal `2` in `variant * 2`), unit-local in src/world/ObjMStyleActor.c | A | asm/data/76DC8.data.s holds one interleaved `{x, y}` table, `{0x3D0, 0x1FF}, {0x3E0, 0x1FF}`, which splat split into the 2-byte `gVariantSpriteClutX` and 6-byte `gVariantSpriteClutY`; both lookups step over one whole entry, 2 s16s, per variant ("The rodata shape" above). |
+| `VARIANT_CLUT_STRIDE` (the literal `2` in `variant * 2`), unit-local in src/world/ObjMStyleActor.c | A | asm/data/76DC8.data.s holds one interleaved `{x, y}` table, `{0x3D0, 0x1FF}, {0x3E0, 0x1FF}`, which splat split into the 2-byte `sVariantSpriteClutX` and 6-byte `gVariantSpriteClutY`; both lookups step over one whole entry, 2 s16s, per variant ("The rodata shape" above). |
 
 The locals and parameter names here were already roles (`self`, `variant`).
 

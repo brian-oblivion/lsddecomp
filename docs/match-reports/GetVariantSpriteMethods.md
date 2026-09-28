@@ -50,7 +50,7 @@ The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
 (`sVariantSpriteCells`) and the CLUT row the reset slot sets
-(`gVariantSpriteClutX/Y`). What the sprites are in the game is not
+(`sVariantSpriteClutX/Y`). What the sprites are in the game is not
 established (their only builder is StyleEffect, kinds 2 and 3, and every
 path passes variant 0), which is why it is not tier A. The table, getter,
 allocator, methods and the three data tables followed the class name.

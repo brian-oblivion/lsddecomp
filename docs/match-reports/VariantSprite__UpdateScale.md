@@ -95,7 +95,7 @@ executable by 4 (found because `build-and-verify.sh` still went green
 with `INCLUDE_ASM` at this point in the debugging session, but a manual
 per-function `funcdiff.py` run on the wrong intermediate C showed a
 145-KB "outside range" drift and a `build/lsdde.map` symbol,
-`gVariantSpriteClutX`, landing 4 bytes off its documented address). Hoisting the
+`sVariantSpriteClutX`, landing 4 bytes off its documented address). Hoisting the
 truncation to right after each ratio's computation reproduces the extra
 `move` and closes the drift to zero.
 
@@ -152,7 +152,7 @@ The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
 (`sVariantSpriteCells`) and the CLUT row the reset slot sets
-(`gVariantSpriteClutX/Y`). What the sprites are in the game is not
+(`sVariantSpriteClutX/Y`). What the sprites are in the game is not
 established (their only builder is StyleEffect, kinds 2 and 3, and every
 path passes variant 0), which is why it is not tier A. The table, getter,
 allocator, methods and the three data tables followed the class name.
