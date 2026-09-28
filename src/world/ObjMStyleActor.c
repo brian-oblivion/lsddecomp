@@ -1992,7 +1992,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
 extern s32 sStyleStage;
 extern void RotateVramRectRight(DrawRect *rect, s32 count, DrawRect *scratch);
 extern DrawRect sStyleStripRectA;
-extern DrawRect gStyleStripScratchA;
+extern DrawRect sStyleStripScratchA;
 extern DrawRect sStyleStripRectB;
 extern DrawRect gStyleStripScratchB;
 
@@ -2004,7 +2004,7 @@ void StyleScrollVramStrips(void) {
 
     if (sStyleStage == 2) {
         rect = &sStyleStripRectA;
-        scratch = &gStyleStripScratchA;
+        scratch = &sStyleStripScratchA;
         count = 1; /* MATCHING: a local set in each branch, not a literal argument */
     } else if ((u32)(sStyleStage - 3) < 3) {
         count = 1;
