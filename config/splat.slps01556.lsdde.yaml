@@ -89,8 +89,8 @@ segments:
       - [0xBD4, rodata]   # 0xEBC..0xF25 is libetc/intr's .rdata, SHADOWED (see the manifest)
       - [0xF28, o, libetc/intr_dma, .rdata]   # "DMA bus error" strings
       - [0xF54, o, libetc/vsync, .rdata]      # "VSync: timeout"
-      - [0xF64, rodata]   # 16-word bit table; owner not placed yet (libetc intr?)
-      - [0xFA4, rodata]   # code_1677c
+      - [0xF64, rodata]   # Pad's sDefaultButtonMasks (src/Pad.c): the only object between vsync and 0xFA4 that can own rodata
+      - [0xFA4, rodata]   # GameApplicationFileResource
       # 0xFD8 slot, SPLIT at 0x1010 by ownership (round 47 carve of
       # code_179d8_s).  The two strings belong to OTHER units --
       # D_800107D8 is %hi-taken by code_179d8_q, D_800107F4 by
@@ -434,7 +434,8 @@ segments:
       # `jr $ra; nop` leaf. Blocker census over the slice: zero gp_rel,
       # zero addiu-$at, zero `jlabel`, zero `jr $t2` -- so no rodata slot
       # to attach and no hasm/.word disposition.
-      - [0xD294, c, SceneNode]
+      - [0xD294, c, SceneNode]     # 0xD294..0xF770: code_d294, _b and _c, merged round 101 (track 8)
+      # (carve history; merged into SceneNode above, round 101)
       # code_d294_b: second 20-function slice, 0xDC24..0xED8C.
       # 0xED8C (func_8001E58C) is a real boundary -- func_8001E57C is a
       # 4-word leaf that returns `&D_8006B5CC` and ends `jr $ra; nop`, and
@@ -446,6 +447,7 @@ segments:
       # `jr $ra`. Zero `jlabel`, zero `jr $t2`, so no rodata slot to
       # attach and no hasm/.word disposition. Blocker census over the
       # slice: 1 of 20 gp_rel-blocked (func_8001DDF4), zero addiu-$at.
+      # (carve history; merged into SceneNode above, round 101)
       # code_d294_c: third and FINAL slice of the code_d294 block,
       # 0xED8C..0xF770 (psyq_GsLinkObject4 follows), 15 functions.
       # Carved round 13. Gate 2 checks, all run before the carve and all
