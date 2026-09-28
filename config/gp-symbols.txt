@@ -123,6 +123,8 @@ gMdecInitialized
 gMovieClearColor
 gMoviePollCounter
 gNameCharTable
+gNullDriverMode
+gNullDriverModeArg
 gObjMProjectionBias
 gOpenVabCount
 gPendingVabBuffer
@@ -165,8 +167,6 @@ gTimBlockClutShift
 gTimClutRowShift
 gTmdModelBoundsCount
 gVabBodySuffix
-gVabDriverMode
-gVabDriverModeArg
 gVabHeaderSuffix
 gVabSizeTableInited
 gVabStreamInited

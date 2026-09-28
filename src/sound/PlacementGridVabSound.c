@@ -1,6 +1,6 @@
 /*
  * PlacementGridVabSound -- two subjects in one file: PlacementGrid, then the
- * VAB sound backend (VabDriver, VabStreamObj and the SoundCueSet's init,
+ * VAB sound backend (NullDriver, VabStreamObj and the SoundCueSet's init,
  * flush and per-tick service), with ReturnZero between them.
  *
  * PlacementGrid (include/PlacementGrid.h), New_PlacementGrid to
@@ -18,7 +18,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "VabDriver.h"
+#include "NullDriver.h"
 #include "PlacementGrid.h"
 #include "LinkResource.h"
 #include "StageMap.h"
@@ -26,7 +26,7 @@
 #include "VabStreamObj.h"
 #include "SoundCueSet.h"
 
-/* FileResource's, GameApplicationFileResource.c: the active driver's table (gVabDriverMethods
+/* FileResource's, GameApplicationFileResource.c: the active driver's table (gNullDriverMethods
  * or gCdDriverMethods, both FileResource tables), through which
  * PlacementGrid's and VabStreamObj's ctors and finalizes, and PlacementGrid's
  * onRequestDone, reach their parent's. */
@@ -129,37 +129,37 @@ s32 ReturnZero(void) {
     return 0;
 }
 
-void VabDriver__VabDriver(void) {}
+void NullDriver__NullDriver(void) {}
 
-void VabDriver__Destroy(void) {}
+void NullDriver__Destroy(void) {}
 
-void VabDriver__NoOpSlot40(void) {
+void NullDriver__NoOpSlot40(void) {
     /* MATCHING: retail reserves a 64-byte frame it never touches. */
     char unused[64];
 }
 
-void VabDriver__Open(void) {
+void NullDriver__Open(void) {
     /* MATCHING: the same unused 64-byte frame. */
     char unused[64];
 }
 
-void VabDriver__Close(void) {}
+void NullDriver__Close(void) {}
 
-void VabDriver__Seek(void) {}
+void NullDriver__Seek(void) {}
 
-void VabDriver__NoOpSlot50(void) {}
+void NullDriver__NoOpSlot50(void) {}
 
 /*
- * The VAB sound backend: the rest of the VabDriver data source's empty slots and mode
+ * The VAB sound backend: the rest of the NullDriver data source's empty slots and mode
  * accessors, the VabStreamObj class (one sound bank, loaded through the
  * active data source and played through libsnd), and the SoundCueSet
  * start/flush pair.
  *
- * VabDriver (include/VabDriver.h, class id 0x23 = DATASOURCE_SPU) is the
+ * NullDriver (include/NullDriver.h, class id 0x23 = DATASOURCE_SPU) is the
  * data source GameApplicationFileResource.c selects when it is not reading the CD; the CD
  * driver (include/CdDriver.h, 0x13) is the other. Its Read, LoadFile,
  * RunRequestQueue, RequestLoadFile, StopService and CancelRequests slots do
- * nothing. GetVabDriverMode, SetVabDriverMode and GetVabUseVSyncCallback
+ * nothing. GetNullDriverMode, SetNullDriverMode and GetVabUseVSyncCallback
  * answer the queries GameApplicationFileResource.c's GetActiveDataSource* functions forward
  * to the CD driver's GetCdDriverMode, SetCdDriverMode and
  * GetCdUseVSyncCallback: they keep the two mode words and report no VSync
@@ -189,9 +189,9 @@ extern s32 IsWBgmActive(void);
 extern const char gVabHeaderSuffix[];
 extern const char gVabBodySuffix[];
 
-/* SetVabDriverMode's two words, read back by GetVabDriverMode. */
-extern s32 gVabDriverMode;
-extern s32 gVabDriverModeArg;
+/* SetNullDriverMode's two words, read back by GetNullDriverMode. */
+extern s32 gNullDriverMode;
+extern s32 gNullDriverModeArg;
 
 /* libsnd set-up, done once and undone when the last bank closes: SsInit and
  * the size table; the tick mode; SsStart and the master volume. */
@@ -204,34 +204,34 @@ extern s32 gSsTicksPerSecond; /* the SsSetTickMode rate, for callers timing in t
  * back as the object's buffer. */
 extern void *gPendingVabBuffer;
 
-s32 VabDriver__Read(void) {
+s32 NullDriver__Read(void) {
     return 0;
 }
 
-void VabDriver__LoadFile(void) {}
+void NullDriver__LoadFile(void) {}
 
-void VabDriver__RunRequestQueue(void) {}
+void NullDriver__RunRequestQueue(void) {}
 
-void VabDriver__RequestLoadFile(void) {}
+void NullDriver__RequestLoadFile(void) {}
 
-void VabDriver__StopService(void) {}
+void NullDriver__StopService(void) {}
 
-void VabDriver__CancelRequests(void) {}
+void NullDriver__CancelRequests(void) {}
 
-VabDriverMethods *GetVabDriverMethods(void) {
-    return &gVabDriverMethods;
+NullDriverMethods *GetNullDriverMethods(void) {
+    return &gNullDriverMethods;
 }
 
-s32 GetVabDriverMode(s32 *outMode2) {
+s32 GetNullDriverMode(s32 *outMode2) {
     if (outMode2 != NULL) {
-        *outMode2 = gVabDriverModeArg;
+        *outMode2 = gNullDriverModeArg;
     }
-    return gVabDriverMode;
+    return gNullDriverMode;
 }
 
-s32 SetVabDriverMode(s32 async, s32 mode2) {
-    gVabDriverMode = async;
-    gVabDriverModeArg = mode2;
+s32 SetNullDriverMode(s32 async, s32 mode2) {
+    gNullDriverMode = async;
+    gNullDriverModeArg = mode2;
     return 1;
 }
 

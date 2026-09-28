@@ -43,7 +43,7 @@ the local-view convention `PlacementGridVabSound.c` / `_e.c` already use.
   Slot +0x008, dispatched by `New_TimImage`/the table getter as `ctor`.
 - **`gTimImageMethods`** (was `D_8006E558`), tier A: `g<Class>Methods`
   convention for the class's static method table, matching
-  `gVabDriverMethods`/`gTitleMenuMethods`/etc. project-wide.
+  `gNullDriverMethods`/`gTitleMenuMethods`/etc. project-wide.
 
 ## Track 4 (2026-09-26, round 88)
 

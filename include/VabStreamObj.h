@@ -7,7 +7,7 @@
  * VabStreamObj -- one VAB sound bank, loaded from disc through the active
  * data source and played through Sony's libsnd (class id 0xA03, method table
  * gVabStreamObjMethods). It is a FileResource subclass and a sibling of the
- * drivers (VabDriver 0x23, the CD driver 0x13), not derived from either. Like
+ * drivers (NullDriver 0x23, the CD driver 0x13), not derived from either. Like
  * every data source, its ctor and finalize chain to the ACTIVE driver's
  * (GetActiveDataSourceMethods). Methods in src/sound/PlacementGridVabSound.c.
  *

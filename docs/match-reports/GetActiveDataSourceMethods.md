@@ -25,7 +25,7 @@ beq   $v1, $v0, .L80026CD0     # gActiveDataSource == 0x23 -> the "then" arm
   jal GetCdDriverMethods             # fallthrough (not equal) -- called first in ROM order
   j .L80026CD8
 .L80026CD0:
-  jal GetVabDriverMethods             # equal-to-0x23 arm
+  jal GetNullDriverMethods             # equal-to-0x23 arm
 .L80026CD8:
   <epilogue, returns whatever $v0 holds>
 ```
@@ -35,8 +35,8 @@ direct reading `if (cond) A(); else B();` is the right mapping (not the
 inverted-condition idiom GCC sometimes uses) -- confirmed by matching, first
 try, with the straightforward `if`/`else` written in source order.
 
-`GetVabDriverMethods` is confirmed elsewhere in the repo
-(`src/sound/PlacementGridVabSound.c`: `TableD9BC *GetVabDriverMethods(void) { return &gVabDriverMethods; }`)
+`GetNullDriverMethods` is confirmed elsewhere in the repo
+(`src/sound/PlacementGridVabSound.c`: `TableD9BC *GetNullDriverMethods(void) { return &gNullDriverMethods; }`)
 to return a pointer, not void -- direct positive evidence this whole function
 is non-void per CLAUDE.md's tail-call caution. `GetCdDriverMethods` is still
 uncarved (`asm/code_179d8.s`) but is declared elsewhere in the repo
@@ -48,12 +48,12 @@ each unit's own independent local type -- this report follows the same
 
 ```c
 extern s32 gActiveDataSource;
-extern void *GetVabDriverMethods(void);
+extern void *GetNullDriverMethods(void);
 extern void *GetCdDriverMethods(void);
 
 void *GetActiveDataSourceMethods(void) {
     if (gActiveDataSource == 0x23) {
-        return GetVabDriverMethods();
+        return GetNullDriverMethods();
     } else {
         return GetCdDriverMethods();
     }
@@ -83,7 +83,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `GetActiveDataSourceMethods` | `GetActiveDataSourceMethods` | B |
 
-**Evidence.** `if (gActiveDataSource == DATASOURCE_SPU) return GetVabDriverMethods();
+**Evidence.** `if (gActiveDataSource == DATASOURCE_SPU) return GetNullDriverMethods();
 else return GetCdDriverMethods();` -- returns whichever of the two sibling
 data-source classes' vtables is currently active. Part of the family of
 `ActiveDataSource`-named wrappers this round derived from `gActiveDataSource`

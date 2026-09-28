@@ -1,4 +1,6 @@
-# GetVabDriverMethods -- MATCHED (4/4 words)
+# GetNullDriverMethods -- MATCHED (4/4 words)
+
+> Renamed from `GetVabDriverMethods` on 2026-09-28 (tools/rename.py). Address 0x8002c438.
 
 > Renamed from `func_8002C438` on 2026-09-18 (tools/rename.py). Address 0x8002c438.
 
@@ -7,34 +9,34 @@ Unit: `PlacementGridVabSound`. Runner: echo, round 17.
 ## Result
 
 ```c
-VabDriverMethods *GetVabDriverMethods(void) {
-    return &gVabDriverMethods;
+NullDriverMethods *GetNullDriverMethods(void) {
+    return &gNullDriverMethods;
 }
 ```
 
 (`TableD9BC` was this type's name before round 52's hand rename to
-`VabDriverMethods` -- a local typedef, not a symbol, so `tools/rename.py`
+`NullDriverMethods` -- a local typedef, not a symbol, so `tools/rename.py`
 doesn't touch it; updated here to match.)
 
-Byte-exact, 4/4 words (`lui`/`addiu` computing `&gVabDriverMethods`, then `jr`/`nop`).
+Byte-exact, 4/4 words (`lui`/`addiu` computing `&gNullDriverMethods`, then `jr`/`nop`).
 
 ## Notes
 
-The "get methods table" accessor for the `gVabDriverMethods` class -- same idiom as
+The "get methods table" accessor for the `gNullDriverMethods` class -- same idiom as
 `GetVabStreamObjMethods` (this unit) returning `&gVabStreamObjMethods`, and `GetPlacementGridMethods` in
 the sibling `PlacementGridVabSound.c` returning `&gPlacementGridMethods`. Confirmed void-argument
 by checking its two call sites (`GameApplicationFileResource/func_80026CAC.s`,
-`GameApplicationFileResource/func_80026FE8.s`): both `jal GetVabDriverMethods` with no argument
+`GameApplicationFileResource/func_80026FE8.s`): both `jal GetNullDriverMethods` with no argument
 register set up beforehand.
 
-`VabDriverMethods` is declared in this unit's own top-of-file scaffolding
-(added alongside `VabDriver__Read`'s match, same commit chain) -- see that
+`NullDriverMethods` is declared in this unit's own top-of-file scaffolding
+(added alongside `NullDriver__Read`'s match, same commit chain) -- see that
 struct definition for the class-framework correction this round made to the
 unit's header comment.
 
 ## Naming
 
-Renamed `func_8002C438` -> `GetVabDriverMethods`, tier A. Pure getter --
+Renamed `func_8002C438` -> `GetNullDriverMethods`, tier A. Pure getter --
 mechanics ARE its purpose (CLAUDE.md/FINISHING-PLAN's own tier-A rule for a
 leaf getter). Matches the naming already in use for its sibling accessor
 `GetVabStreamObjMethods` and the same-round precedent `GetCdDriverMethods`

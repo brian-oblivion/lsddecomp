@@ -1,4 +1,6 @@
-# GetVabDriverMode -- MATCHED 8/8 (round 43)
+# GetNullDriverMode -- MATCHED 8/8 (round 43)
+
+> Renamed from `GetVabDriverMode` on 2026-09-28 (tools/rename.py). Address 0x8002c448.
 
 > Renamed from `func_8002C448` on 2026-09-18 (tools/rename.py). Address 0x8002c448.
 
@@ -13,34 +15,34 @@ Retail:
 ```
 beqz  $a0, .L8002C45C
 nop
-lw    $v0, %gp_rel(gVabDriverModeArg)($gp)
+lw    $v0, %gp_rel(gNullDriverModeArg)($gp)
 nop
 sw    $v0, 0x0($a0)
 .L8002C45C:
-lw    $v0, %gp_rel(gVabDriverMode)($gp)
+lw    $v0, %gp_rel(gNullDriverMode)($gp)
 jr    $ra
 nop
 ```
 
-If the argument pointer is non-NULL, store `gVabDriverModeArg` through it; either
-way, return `gVabDriverMode`. Same two globals `SetVabDriverMode` (already matched,
+If the argument pointer is non-NULL, store `gNullDriverModeArg` through it; either
+way, return `gNullDriverMode`. Same two globals `SetNullDriverMode` (already matched,
 just below in ROM order) writes through plain assignment -- this is the
 paired reader. Written as an ordinary conditional store plus return:
 
 ```c
-extern s32 gVabDriverMode;
-extern s32 gVabDriverModeArg;
+extern s32 gNullDriverMode;
+extern s32 gNullDriverModeArg;
 
-s32 GetVabDriverMode(s32 *arg0) {
+s32 GetNullDriverMode(s32 *arg0) {
     if (arg0 != NULL) {
-        *arg0 = gVabDriverModeArg;
+        *arg0 = gNullDriverModeArg;
     }
-    return gVabDriverMode;
+    return gNullDriverMode;
 }
 ```
 
 The `extern` declarations were moved up from just after this function (where
-they served only `SetVabDriverMode`) to just before it, since this function now
+they served only `SetNullDriverMode`) to just before it, since this function now
 needs them too and C requires the declaration precede use.
 
 ## Result
@@ -48,7 +50,7 @@ needs them too and C requires the declaration precede use.
 First build, byte-exact:
 
 ```
-GetVabDriverMode: 8/8 words match (file 0x1CC48-0x1CC68)
+GetNullDriverMode: 8/8 words match (file 0x1CC48-0x1CC68)
 ```
 
 Whole-image `./build-and-verify.sh` also green (`OK: build matches retail
@@ -63,13 +65,13 @@ place.
 
 ## Naming
 
-Renamed `func_8002C448` -> `GetVabDriverMode`, tier B. Evidence:
+Renamed `func_8002C448` -> `GetNullDriverMode`, tier B. Evidence:
 `GameApplicationFileResource.c`'s own `func_80026FAC` calls `GetCdDriverMode()` when
 `gActiveDataSource == 0x13`, else calls this function -- a direct,
 call-site-level substitution for a named Sony "get driver mode" accessor,
-confirming this backend's own `gVabDriverMode`/`gVabDriverModeArg` pair
+confirming this backend's own `gNullDriverMode`/`gNullDriverModeArg` pair
 serves the same role for the SPU/VAB data source. Not tier A: the exact
-in-game reason `gVabDriverModeArg` exists (a second word alongside the mode
+in-game reason `gNullDriverModeArg` exists (a second word alongside the mode
 itself) is not established, only that it's read/written alongside the mode.
 
 ## Extern arity (round 59)
@@ -79,7 +81,7 @@ Identical in shape to `GetCdDriverMode`, its sibling on the previous line.
 
 **Callee evidence** (`0x8002C448`): the first instruction is `beqz a0,...`, so
 `$a0` is read before it is written. The definition in `src/sound/PlacementGridVabSound.c`
-(`s32 GetVabDriverMode(s32 *arg0)`) is right: one real argument, an optional
+(`s32 GetNullDriverMode(s32 *arg0)`) is right: one real argument, an optional
 out-pointer written only when non-NULL.
 
 **Why the `(void)` extern is right anyway.** Its only carved caller,
@@ -87,7 +89,7 @@ out-pointer written only when non-NULL.
 own and sets none:
 
 ```
-80026fc0:  jal   8002c448 <GetVabDriverMode>
+80026fc0:  jal   8002c448 <GetNullDriverMode>
 80026fc4:  nop                            <- no $a0 setup, in retail
 ```
 

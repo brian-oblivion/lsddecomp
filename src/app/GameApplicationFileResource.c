@@ -40,7 +40,7 @@
 #include "TitleMenu.h"
 #include "DayTask.h"
 #include "GameApplicationFileResource.h"
-#include "VabDriver.h"
+#include "NullDriver.h"
 #include "CdDriver.h"
 
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
@@ -368,7 +368,7 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
  * (FileResource__LoadFile reads a whole named file into it, FreeBuffer
  * releases it) and declaring the file-I/O interface that the CD driver
  * (gCdDriverMethods, include/CdDriver.h) and the SPU/VAB driver
- * (gVabDriverMethods, include/VabDriver.h) implement.
+ * (gNullDriverMethods, include/NullDriver.h) implement.
  *
  * gActiveDataSource selects one of those two drivers. SetActiveDataSource
  * installs one and copies its interface slots into FileResource's table and
@@ -388,7 +388,7 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
 
 /* gActiveDataSource's two observed values are the header words of the two
  * sibling classes it selects between: gCdDriverMethods (the CD-ROM read driver,
- * CdDriver.c) and gVabDriverMethods (VabDriver, the SPU/VAB driver, include/VabDriver.h). */
+ * CdDriver.c) and gNullDriverMethods (NullDriver, the SPU/VAB driver, include/NullDriver.h). */
 #define DATASOURCE_CD 0x13
 #define DATASOURCE_SPU 0x23
 
@@ -472,7 +472,7 @@ extern s32 gActiveDataSource;
 
 void *GetActiveDataSourceMethods(void) {
     if (gActiveDataSource == DATASOURCE_SPU) {
-        return GetVabDriverMethods();
+        return GetNullDriverMethods();
     } else {
         return GetCdDriverMethods();
     }
@@ -499,7 +499,7 @@ void SetActiveDataSource(s32 source) {
     if (source == DATASOURCE_CD) {
         src = (FileResourceMethods *)GetCdDriverMethods();
     } else {
-        src = (FileResourceMethods *)GetVabDriverMethods();
+        src = (FileResourceMethods *)GetNullDriverMethods();
     }
     methods = GetFileResourceMethods();
     /* MATCHING: a while/for loop compiles top-tested; retail jumps into a bottom test. */
@@ -585,17 +585,17 @@ s32 GetActiveDataSourceState(void) {
 }
 
 typedef s32 (*DataSourceSetDriverModeFn)(s32, s32, s32);
-/* SetVabDriverMode takes two arguments and SetCdDriverMode three. Both are
+/* SetNullDriverMode takes two arguments and SetCdDriverMode three. Both are
  * called through the three-argument type, and the VAB driver ignores the
- * third. Assigning SetVabDriverMode to `fn` warns about incompatible pointer
+ * third. Assigning SetNullDriverMode to `fn` warns about incompatible pointer
  * types, and that is harmless. */
-extern s32 SetVabDriverMode(s32 async, s32 mode2);
+extern s32 SetNullDriverMode(s32 async, s32 mode2);
 extern s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
 
 void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     DataSourceSetDriverModeFn fn;
 
-    fn = SetVabDriverMode;
+    fn = SetNullDriverMode;
     if (gActiveDataSource == DATASOURCE_CD) {
         fn = SetCdDriverMode;
     }
@@ -605,13 +605,13 @@ void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
 }
 
 extern s32 GetCdDriverMode(void); /* arity-ok: the definition takes (s32 *outMode2); retail's tail call passes nothing */
-extern s32 GetVabDriverMode(void); /* arity-ok: the definition takes (s32 *outMode2); retail's tail call passes nothing */
+extern s32 GetNullDriverMode(void); /* arity-ok: the definition takes (s32 *outMode2); retail's tail call passes nothing */
 
 s32 GetActiveDataSourceDriverMode(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
         return GetCdDriverMode();
     } else {
-        return GetVabDriverMode();
+        return GetNullDriverMode();
     }
 }
 

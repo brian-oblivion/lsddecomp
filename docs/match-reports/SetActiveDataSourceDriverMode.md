@@ -19,7 +19,7 @@ iteration (`$s1`/`$s2`/`$s3` hold the original `a0`/`a1`/`a2` for the whole
 function; they never change):
 
 ```
-lui $s0,%hi(SetVabDriverMode); addiu $s0,$s0,%lo(SetVabDriverMode)   # default fn
+lui $s0,%hi(SetNullDriverMode); addiu $s0,$s0,%lo(SetNullDriverMode)   # default fn
 lw $v1,%gp_rel(gActiveDataSource)($gp); ori $v0,0x13
 bne $v1,$v0,.L80026F74
   lui $s0,%hi(SetCdDriverMode); addiu $s0,$s0,%lo(SetCdDriverMode) # override fn
@@ -34,8 +34,8 @@ the loop body, confirming a `do { } while (cond)` (not a pre-tested `while`),
 matching CLAUDE.md's `SetActiveDataSourceDriverMode` prediction area for this unit's
 accessor-family shape.
 
-`SetVabDriverMode` is independently defined elsewhere
-(`src/sound/PlacementGridVabSound.c`: `s32 SetVabDriverMode(s32 a, s32 b) { gVabDriverMode=a; gVabDriverModeArg=b; return 1; }`)
+`SetNullDriverMode` is independently defined elsewhere
+(`src/sound/PlacementGridVabSound.c`: `s32 SetNullDriverMode(s32 a, s32 b) { gNullDriverMode=a; gNullDriverModeArg=b; return 1; }`)
 taking only **2** parameters, not 3. This unit's own local extern declares it
 with 3 (matching the call site's actual register usage: `a0`,`a1`,`a2` are
 all loaded before the `jalr`, since the alternate target `SetCdDriverMode` may
@@ -47,13 +47,13 @@ register, and the linker only checks the symbol name, not the prototype.
 
 ```c
 typedef s32 (*DataSourceSetDriverModeFn)(s32, s32, s32);
-extern s32 SetVabDriverMode(s32 arg0, s32 arg1, s32 arg2);
+extern s32 SetNullDriverMode(s32 arg0, s32 arg1, s32 arg2);
 extern s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2);
 
 void SetActiveDataSourceDriverMode(s32 arg0, s32 arg1, s32 arg2) {
     DataSourceSetDriverModeFn fn;
 
-    fn = SetVabDriverMode;
+    fn = SetNullDriverMode;
     if (gActiveDataSource == 0x13) {
         fn = SetCdDriverMode;
     }
@@ -81,7 +81,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `SetActiveDataSourceDriverMode` | `SetActiveDataSourceDriverMode` | B |
 
-**Evidence.** Picks `SetCdDriverMode` or the SPU-side `SetVabDriverMode` by
+**Evidence.** Picks `SetCdDriverMode` or the SPU-side `SetNullDriverMode` by
 active source, then spins (`do { } while (fn(...) == 0)`) until the call
 reports success. Same family as the Lock/Unlock/Is* wrappers, generalised to
 a 3-argument setter with a retry loop.
@@ -95,7 +95,7 @@ a 3-argument setter with a retry loop.
 **Evidence.** The typedef's only use is this function's local `fn`, and it
 has exactly two occupants, one per branch of `gActiveDataSource ==
 DATASOURCE_CD`: `SetCdDriverMode` (CD driver, `CdDriver.c`, 3 args) and
-`SetVabDriverMode` (SPU/VAB driver, `PlacementGridVabSound.c`, 2 args, ignores the
+`SetNullDriverMode` (SPU/VAB driver, `PlacementGridVabSound.c`, 2 args, ignores the
 third). Both occupants agree on what they do -- set the selected data
 source's driver mode, returning 0 while not yet accepted, which the caller
 polls. The name says that and nothing about why; the placeholder was the

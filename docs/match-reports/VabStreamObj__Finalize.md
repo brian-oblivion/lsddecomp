@@ -97,7 +97,7 @@ return value. The unit's `DriverBaseMethods` view still declares that slot
 as s32. That is FileResource's view, left as it was.
 
 Track 4, 2026-09-26 (round 88, CdDriver). `DriverBaseMethods` is gone:
-`GetActiveDataSourceMethods` returns gCdDriverMethods or gVabDriverMethods,
+`GetActiveDataSourceMethods` returns gCdDriverMethods or gNullDriverMethods,
 both FILERESOURCE_SLOTS tables, so PlacementGridVabSound.c declares it
 `FileResourceMethods *` like every other caller, and the chained call is
 `GetActiveDataSourceMethods()->finalize((FileResource *)self)` (void, as the

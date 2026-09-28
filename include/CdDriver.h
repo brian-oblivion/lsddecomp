@@ -5,8 +5,8 @@
 
 /*
  * CdDriver -- the CD-ROM data-source driver (class id 0x13 = DATASOURCE_CD,
- * method table gCdDriverMethods), a FileResource subclass and VabDriver's
- * (gVabDriverMethods, 0x23) sibling; and, below the class, the request
+ * method table gCdDriverMethods), a FileResource subclass and NullDriver's
+ * (gNullDriverMethods, 0x23) sibling; and, below the class, the request
  * queue, the file table and the module state its units share.
  *
  *   src/cd/CdDriver.c      the whole class, in five parts:

@@ -50,7 +50,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence for the function.** It is the read half of `SetCdDriverMode`:
 it returns `gCdAsyncEnabled` and, through an optional out-parameter, the
 second value that function stored. `GameApplicationFileResource.c`'s `GetActiveDataSourceDriverMode` routes to
-it for the CD source and to `GetVabDriverMode` for the sound source -- and that
+it for the CD source and to `GetNullDriverMode` for the sound source -- and that
 function is the same shape over that source's own two globals, which
 independently confirms "read back the two mode values" rather than anything
 specific to the CD. Tier B: the pairing is certain, the second value is not.
@@ -93,7 +93,7 @@ own and sets none:
 `$a0` at that point is whatever `GetActiveDataSourceDriverMode`'s own caller
 left there, and the callee's NULL test consumes it. Giving the extern its real
 parameter would force this call site to materialise an argument retail does
-not have. Same shape as `GetVabDriverMode` two lines down.
+not have. Same shape as `GetNullDriverMode` two lines down.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/app/GameApplicationFileResource.c:230`. Oracle green.

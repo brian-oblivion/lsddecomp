@@ -23,7 +23,7 @@
  * done. FileResource itself is never created on its own.
  *
  * Two subclasses are not assets but the device drivers that implement the
- * file-I/O slots: CdDriver (0x13, the CD-ROM) and VabDriver (0x23). The
+ * file-I/O slots: CdDriver (0x13, the CD-ROM) and NullDriver (0x23). The
  * interface is bound at run time: slots +0x040..+0x058 and +0x068..+0x074
  * are NULL or placeholders in the static tables, and SetActiveDataSource
  * copies the active driver's eleven interface slots (CopyDataSourceSlots)

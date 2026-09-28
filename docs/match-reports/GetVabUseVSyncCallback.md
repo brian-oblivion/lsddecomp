@@ -13,11 +13,11 @@ s32 GetVabUseVSyncCallback(void) {
 ```
 
 Byte-exact, 2/2 words (`jr $ra; addu $v0,$zero,$zero`) -- identical body to
-`VabDriver__Read` but a different, unrelated function.
+`NullDriver__Read` but a different, unrelated function.
 
 ## Notes
 
-Not a slot in either `gVabDriverMethods` or `gVabStreamObjMethods` (checked
+Not a slot in either `gNullDriverMethods` or `gVabStreamObjMethods` (checked
 `tools/classtable.py --scan` output for both tables -- absent from each).
 Its only caller is `GameApplicationFileResource/GetActiveDataSourceUseVSyncCallback.s`, which `jal`s it with no
 argument register set up, and its return value flows straight through as
@@ -30,24 +30,24 @@ call), but the explicit `addu $v0,$zero,$zero` is the same evidence: a
 **Round-52 correction:** the line above used to read "a fallback arm in
 what looks like a per-class-ID constructor dispatcher, alongside
 `func_8002C438` for a different ID" -- `tools/rename.py` textually carried
-that name through its later rename to `GetVabDriverMethods`, but the
+that name through its later rename to `GetNullDriverMethods`, but the
 CLAIM itself was never right. `GameApplicationFileResource.c`'s actual source (read in full
 this round, not just the one `.s` file) shows `func_80026FE8`'s caller
 context is: `if (gActiveDataSource == 0x13) return GetCdUseVSyncCallback(); else
 return GetVabUseVSyncCallback();` -- this function is the `else` arm alongside
-`GetCdUseVSyncCallback` (still unnamed), not `func_8002C438`/`GetVabDriverMethods`
+`GetCdUseVSyncCallback` (still unnamed), not `func_8002C438`/`GetNullDriverMethods`
 (that one is `func_80026CAC`'s own accessor pair, a different dispatcher
-entirely). See the unit header comment and this unit's `GetVabDriverMode`/
-`SetVabDriverMode` reports for the real family this function belongs to.
+entirely). See the unit header comment and this unit's `GetNullDriverMode`/
+`SetNullDriverMode` reports for the real family this function belongs to.
 
 ## Naming
 
 Kept `GetVabUseVSyncCallback`, tier C. It's the same generic driver-mode-interface
-family as `GetVabDriverMode`/`SetVabDriverMode` (this backend's own
+family as `GetNullDriverMode`/`SetNullDriverMode` (this backend's own
 implementation of whatever `func_80026FE8` needs when
 `gActiveDataSource != 0x13`), but its own counterpart `GetCdUseVSyncCallback` is
 still unnamed, so there's no established purpose to name this AS a
-stand-in for -- naming it "GetVabDriverState" or similar would assert
+stand-in for -- naming it "GetNullDriverState" or similar would assert
 purpose from a body that's just `return 0;`.
 
 ### Round 98 (charlie, track 7): `func_8002C478` -> `GetVabUseVSyncCallback`, tier A
@@ -59,5 +59,5 @@ holds: the counterpart is `GetCdUseVSyncCallback` (CdDriver.c, returns
 DATASOURCE_CD and this function otherwise. This is the VAB driver's answer
 to the same query, and the answer is a constant 0: the VAB backend never
 uses a VSync callback. Named on the `GetVab*`/`GetCd*` pattern
-`GetVabDriverMode`/`GetCdDriverMode` already follow; a leaf returning a
+`GetNullDriverMode`/`GetCdDriverMode` already follow; a leaf returning a
 constant, tier A.

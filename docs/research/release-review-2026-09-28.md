@@ -112,7 +112,7 @@ rather than API.
     `onState2`/`onState3` are the DrawSystem event and start/stop hooks, and
     Task.c uses literal 2/3 where `INTERMEDIATEBASE_STATE_START/STOP` exist.
   - `SelectCallback80/98`, `LOOK_CALLBACK_SLOT14C/150` (named for offsets).
-  - `StageMap__GetUnk1CC`; VabDriver/`DATASOURCE_SPU` for a driver whose
+  - `StageMap__GetUnk1CC`; NullDriver/`DATASOURCE_SPU` for a driver whose
     methods are all empty; `withSound` typed `void *` in TaskCore's functions
     and `s32` in its slots.
   - Code-suffixed method families: ObjM `EnterState4..A`,
@@ -194,7 +194,7 @@ rather than API.
 - Stale names inside header prose: StageMap.h's `buildRateEntries`
   (`loadChunksAround`), `ChunkSlotSpec::key`, `LbdFile::ownerKey`; Entity.h's
   merged-unit names ("(Entity, then Entity)"); IntermediateBase.h's
-  `args->unk0..unkC`; VabDriver.h and Task.h name one file twice; CdDriver.h
+  `args->unk0..unkC`; NullDriver.h and Task.h name one file twice; CdDriver.h
   "that unit still spells them as literals"; BasicClass.h "all 59 method
   tables" (60).
 - Unit-private headers (DayTaskStageMap.h, GameApplicationFileResource.h,

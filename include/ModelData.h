@@ -27,7 +27,7 @@
  * layout. That parent ctor is chosen at RUN TIME: the CD driver's
  * (CdDriver__CdDriver, which chains to FileResource__FileResource; its
  * object is 0x2C bytes, New_CdDriver) or, while gActiveDataSource is
- * DATASOURCE_SPU, the VAB driver's (VabDriver__VabDriver, an empty body).
+ * DATASOURCE_SPU, the VAB driver's (NullDriver__NullDriver, an empty body).
  * The fields below assume FileResource's own 0x2C-byte layout, which is the
  * CD driver's whole object: ModelData's own fields start at +0x02C.
  *
