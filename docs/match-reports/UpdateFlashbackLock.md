@@ -195,3 +195,11 @@ The old name described a flag, not what the flag is.
 Constants: `FLASHBACK_UNLOCK_SCORE` (9999999, unit-local `#define`; no
 other code has the literal) and `TITLEMENU_FLASHBACK` (include/title_menu.h's
 enum, already defined) for the slot index 1.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/title_menu.c`:
+
+> "`dreamSys` is unread: TitleMenu__RefreshMenu passes self->dreamSys, and
+> retail loads it into $a2 for the call." Now a description plus a one-line
+> MATCHING comment.

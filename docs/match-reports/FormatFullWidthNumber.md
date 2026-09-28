@@ -589,3 +589,12 @@ unit's comments were cut to what the code needs:
 ## Track 7 (round 99, bravo)
 
 The first value parameter `a1` is now `value`. The `(u8 *)` and `(unsigned char *)` casts that readability.py counts as rawoff are not offset arithmetic: they convert the `char` buffers to EncodeFullWidthSjis's `u8 *` and to Sony's `memset` prototype, and stay.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/screen_widgets.c`:
+
+> "Writes `value` in decimal, as full-width Shift-JIS, into `dst`: padded on
+> the left with '0' to `width` digits, or as it is when `unpadded` is set.
+> MATCHING: the declaration order text/fill/padded and `fill` computed in two
+> statements give retail's register assignment."

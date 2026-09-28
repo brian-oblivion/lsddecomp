@@ -1,23 +1,16 @@
 /*
- * input_dialogs.c -- two classes, in ROM order: TextEntry whole, then the
- * first half of ItemList (its allocator to detachTarget). ItemList's list
- * methods and its getter follow in dream_scene.c.
+ * input_dialogs.c -- the two pad-driven widgets of the memory-card screens,
+ * in ROM order: TextEntry whole (include/text_entry.h), the editor for the
+ * save title, then the first half of ItemList (include/item_list.h), the
+ * list the player picks a save file from. ItemList's list methods and its
+ * getter follow in dream_scene.c.
  *
- * A TextEntry (include/text_entry.h) edits a caller-owned string on screen.
- * setText keeps the caller's buffer and copies it into its own `editBuf`
- * (decoding full-width SJIS in TEXTENTRY_MODE_FULLWIDTH). loadCardResources
- * makes the panel (CARD\COMINPUT.TIM), the text row and the '_' cursor
- * (CARD\FONTICON.TIM). attachTarget adds a Pad and a FrameClock as children
- * and keeps a VabStreamObj to play sounds on. onNotify sends the Pad's button
- * events to handleCommand: left/right move the cursor, up/down step the
- * character under it, L1/L2 reset it/every character, Select switches
- * between acting on presses and on held buttons, circle writes the edit back
- * and closes ACCEPTED, cross closes CANCELLED. It sends the FrameClock's
- * ticks to tickState, which reports the result to the parents on the second
- * tick after the close. GetTextEntryMethods ends the class.
- *
- * ItemList (include/item_list.h), the list of strings the player picks one
- * from: see the section banner below.
+ * Both keep a Pad and a FrameClock child by class, draw through a
+ * ScreenSprite panel and TextRows built from CARD\ TIMs, and do nothing
+ * until their resources are loaded. A TextEntry's onNotify sends the Pad's
+ * button events to handleCommand and the FrameClock's ticks to tickState,
+ * which reports the result to the parents on the second tick after the
+ * close.
  */
 #include "common.h"
 #include <libgte.h>
@@ -132,6 +125,7 @@ void TextEntry__OnNotify(TextEntry *self, void *sender, s32 event) {
     if (kind == PAD_CLASS_ID) {
         self->methods->handleCommand(self, sender, event);
     } else if (kind == FRAMECLOCK_CLASS_ID) {
+        /* MATCHING: passes (sender, event) as handleCommand's call does; the two calls share code. */
         self->methods->tickState(self, sender, event);
     }
 }
@@ -256,9 +250,8 @@ void TextEntry__TickState(TextEntry *self) {
 }
 
 /* With actOnHeld clear the arrows act on presses, with it set on held
- * buttons. MATCHING: the arms are in retail's code order, default first,
- * and the down press jumps into the held down's call rather than making
- * its own. */
+ * buttons. */
+/* MATCHING: arms in this order, default first; the down press jumps into the held down's call. */
 void TextEntry__HandleCommand(TextEntry *self, void *sender, s32 command) {
     switch (command) {
         default:

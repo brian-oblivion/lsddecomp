@@ -224,3 +224,18 @@ stays in the unit):
 ## Track 7 (round 99, bravo)
 
 The fourth parameter `arg3` is now `attachArg` (here, in box_fill.h's prototype and in the +0x0C4 slot; names only). The `q = self` copy is gone: the body uses `self` directly, byte-exact. The do/while(0) stays: removed, the build differs at 0x80040860 (`sw $ra` / `sw $s1` swapped, retail `1800bfaf`, built `1400b1af`), measured this round; it now carries a one-line `MATCHING:` comment. The field it writes, `unk4C`, is also written by BoxFill__Reset in screen_widgets, so its name is proposed, not applied: `attachArg` (the fourth argument stored; no reader anywhere, and both call sites, in GraphRoom (dream_scene), pass 0).
+
+## History (source comments moved in track 12, round 106)
+
+From `include/box_fill.h`:
+
+> The class banner: "BoxFill__AttachAbsolute calls it [+0x04C attachToParent]
+> with FOUR arguments through an unprototyped pointer (see its match report)."
+
+From `src/ui/screen_widgets.c`:
+
+> "+0x04C is called with FOUR arguments through an unprototyped pointer: its
+> occupant reads three, and the fourth is this function's own a3, already in
+> $a3 (box_fill.h's banner)."
+> 
+> "MATCHING: without the do/while(0), GCC swaps the prologue's $ra/$s1 stores."

@@ -625,3 +625,13 @@ unit's comments were cut to what the code needs:
 ## Track 7 (round 99, bravo)
 
 The literals are unit-local `SJIS_*` defines (SJIS_TRAIL_SPACE 0x40, SJIS_TRAIL_GAP 0x7F, SJIS_TRAIL_OFFSET 0x1F); `c < 0x80` is spelled `c <= SJIS_TRAIL_GAP`, byte-exact.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/screen_widgets.c`:
+
+> "Full-width Shift-JIS back to ASCII: drops each lead byte and maps the trail
+> back. Returns the address of the NUL it writes. MATCHING: `special` holds
+> SJIS_TRAIL_SPACE so the constant is loaded before `d` is copied from `dst`;
+> `d` and `dst` are two cursors over one buffer." The description is now the
+> prototype's doc in include/full_width_sjis.h.

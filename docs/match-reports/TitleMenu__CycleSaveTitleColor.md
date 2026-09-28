@@ -321,3 +321,13 @@ Comment moved here from the unit: "MATCHED round 75 (was STALL round
 $s1), `buf = *color` is one struct copy (ColorRgb is three `s8`: three
 `lb`, then three `sb`), and each arm indexes `base[D_8008AA28]` directly."
 The unit keeps a one-line MATCHING note.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/title_menu.c`:
+
+> sSaveTitleColorChannel's comment: "The storage is a word; every access is a
+> byte (lbu/sb)."
+> 
+> "MATCHING: `channels` is taken before the first call (it lives in $s1) and
+> `rgb = *color` is one struct copy." Now one line without the register.

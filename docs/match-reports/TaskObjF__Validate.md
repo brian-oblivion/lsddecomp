@@ -72,3 +72,10 @@ opMode). The `formatted != 0` branch is unreachable (the early return took
 that case) and leaves `state` unset; it stays, with a MATCHING line, as the
 goto that lever 2 above measured. typeviews' baseline warning for it now
 names `state`. Zero bytes.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/title_menu.c`:
+
+> "MATCHING: the unreachable `formatted` branch and the one setState call
+> reached by goto keep retail's branch layout." Now one line.

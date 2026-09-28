@@ -187,3 +187,10 @@ Comments moved out of the source (verbatim):
 - on `sCardIconPos`: "opaque block, the fresh `cardIcon`'s own `slot4C`
   arg2, address-only here." (slot +0x04C is attachToParent; ScreenSprite's
   override hands it to setPosition.)
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/title_menu.c`:
+
+> "MATCHING: `path` and `icon` keep the buffer and the sprite in saved
+> registers across the calls." Now one line.

@@ -526,3 +526,11 @@ unit's comments were cut to what the code needs:
 ## Track 7 (round 99, bravo)
 
 The literals are unit-local `SJIS_*` defines (SJIS_LEAD_SYMBOL 0x81, SJIS_LEAD_ALNUM 0x82, SJIS_TRAIL_OFFSET 0x1F, SJIS_TRAIL_GAP 0x7F) and character constants (`'0'`, `' '`). `trail < 0x60` must be spelled `trail < SJIS_TRAIL_GAP - SJIS_TRAIL_OFFSET`: `trail + SJIS_TRAIL_OFFSET < SJIS_TRAIL_GAP`, the same test in arithmetic, is not folded by GCC 2.6.3 and differs at the second word (measured).
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/screen_widgets.c`:
+
+> "ASCII to full-width Shift-JIS, two bytes a character. Returns the address of
+> the NUL it writes. MATCHING: the `d = dst; dst++;` cursor pairs and the
+> `trail` copy of `c` give retail's register assignment."

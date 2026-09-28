@@ -229,3 +229,12 @@ are one type, and the image is byte-identical. The null `sound` argument,
 the `saveCtrl` clear and getCurrentDayAndYear's `outYear` are `NULL`;
 setPitchOffset(-1) is commented (octave -1: pitchOffset = -1 * 12 - 24 =
 -36 semitones, vab_stream_obj.h).
+
+## History (source comments moved in track 12, round 106)
+
+From `include/title_menu.h`:
+
+> TitleMenuResetCallFn's comment: "The ctor's resetCounters call, as the
+> retail bytes make it: the slot is (self), the call also passes dreamSys (see
+> the banner). No code." The MATCHING line now sits at the call in
+> title_menu.c.

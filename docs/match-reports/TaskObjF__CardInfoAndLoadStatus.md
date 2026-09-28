@@ -63,3 +63,10 @@ None new.
 The source declares it `s32` (as task_objf.h does) with the body still
 falling off the end, and a MATCHING line says why: it returns whatever the
 last call left in `$v0`, and an explicit return adds two words.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/title_menu.c`:
+
+> "Returns whatever the last call left in $v0: CardInfoStatus's 0, or
+> CardLoadStatus's status. MATCHING: an explicit return adds two words."

@@ -418,3 +418,10 @@ both green with the wrapped form in place.
 
 The retry count 10 is `MEMCARD_RETRIES` (include/task_objf.h, "Attempts
 after the first before a card operation gives up"). Zero bytes changed.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/title_menu.c`:
+
+> "MATCHING: the retry count is tested after the call; testing it first
+> cross-jumps the two calls into one." Now one line.

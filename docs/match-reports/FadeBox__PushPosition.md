@@ -562,3 +562,15 @@ halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
 became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
 BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
 its caller in task passes an `s32 size[2]`).
+
+## History (source comments moved in track 12, round 106)
+
+From `include/box_fill.h`:
+
+> BOXFILL_FIELDS' boxW comment: "Reset and setSize (FadeBox reads it lhu)".
+
+From `src/ui/screen_widgets.c`:
+
+> "MATCHING: both position pairs are copied as whole structs; the block copy
+> is what moves `self` and `size` out of their incoming registers." Now one
+> line.
