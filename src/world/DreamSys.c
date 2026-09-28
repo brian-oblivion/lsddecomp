@@ -38,6 +38,7 @@
 #include "DreamSys.h"
 #include "Entity.h"
 #include "Pad.h"
+#include "FrameClock.h"
 #include "LinkResource.h"
 #include "StageMap.h"
 #include "LbdFile.h"
@@ -364,7 +365,7 @@ void DreamSys__OnPadEvent(DreamSys *self, s32 sender, s32 event) {
 void DreamSys__TimerTick(DreamSys *self, s32 sender, s32 event) {
     s32 old;
 
-    if (event != 2)
+    if (event != FRAMECLOCK_EVENT_RUNNING)
         return;
 
     old = self->tick;
