@@ -40,7 +40,7 @@ typedef struct DreamAuxTriggerEntry {
     s8 recordIndices[3];
 } DreamAuxTriggerEntry;
 
-extern s8 gDreamAuxTriggerCounts[DREAM_AUX_STAGE_COUNT];
+extern s8 sDreamAuxTriggerCounts[DREAM_AUX_STAGE_COUNT];
 extern DreamAuxTriggerEntry *gDreamAuxTriggerEntries[DREAM_AUX_STAGE_COUNT];
 
 /* The two ModelData files InitDreamAux can load. With one slot, only

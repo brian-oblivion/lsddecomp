@@ -25,13 +25,13 @@ typedef struct DreamAuxTriggerEntry {
     u8 unk2[4];
 } DreamAuxTriggerEntry;
 
-extern s8 gDreamAuxTriggerCounts[];
+extern s8 sDreamAuxTriggerCounts[];
 extern DreamAuxTriggerEntry *gDreamAuxTriggerEntries[];
 
 s32 LookupDreamAuxTrigger(s16 *a0)
 {
     s32 idx = sDreamAuxStage;
-    s32 count = gDreamAuxTriggerCounts[idx];
+    s32 count = sDreamAuxTriggerCounts[idx];
     DreamAuxTriggerEntry *entry = gDreamAuxTriggerEntries[idx];
     s32 i;
 
@@ -45,7 +45,7 @@ s32 LookupDreamAuxTrigger(s16 *a0)
 }
 ```
 
-`gDreamAuxTriggerCounts`/`gDreamAuxTriggerEntries` is a second "count + pointer-to-array" parallel
+`sDreamAuxTriggerCounts`/`gDreamAuxTriggerEntries` is a second "count + pointer-to-array" parallel
 family in this unit, structurally identical to the already-documented
 `sDreamAuxGroupCounts`/`sDreamAuxGroupRecords` (`InitDreamAux`) but a different stride (6 bytes,
 not 8) and a different index space (`sDreamAuxStage`, not a loop counter). The
@@ -58,11 +58,11 @@ trigger-dispatch cluster (`ProcessDreamAuxTriggerRecord`/`CheckDreamAuxTriggerCo
 One attempt short of byte-exact, one fix:
 
 - **First pass (10/33, 129492 bytes of drift, one word too long):**
-  `s8 count = gDreamAuxTriggerCounts[idx];` produced a `lb` into `$v0` followed by a
+  `s8 count = sDreamAuxTriggerCounts[idx];` produced a `lb` into `$v0` followed by a
   separate `move $a2, $v0` to get the value into the register the loop bound
   needs to live in across the whole function. Retail's `lb $a2, 0x0($at)`
   loads the byte DIRECTLY into `$a2` with no intermediate register at all.
-  Widening the local from `s8` to `s32` (`s32 count = gDreamAuxTriggerCounts[idx];`)
+  Widening the local from `s8` to `s32` (`s32 count = sDreamAuxTriggerCounts[idx];`)
   removed the extra `move` and matched retail's direct-into-`$a2` load.
   Byte-exact immediately after.
 
@@ -108,7 +108,7 @@ The header comment, as it stood:
 /* A second parallel-group family, same "count + pointer to array" shape as
  * DreamAuxGroupRecord above but a different stride and a different index
  * space: 14 (0xE) groups selected by `sDreamAuxStage` (not a loop index),
- * gDreamAuxTriggerCounts[i] a signed count, gDreamAuxTriggerEntries[i] a pointer to an array of
+ * sDreamAuxTriggerCounts[i] a signed count, gDreamAuxTriggerEntries[i] a pointer to an array of
  * count 6-byte records whose first 2 bytes (`key`, read with `lh`) are the
  * only field LookupDreamAuxTrigger accesses. The remaining 4 bytes are undiscovered
  * from this unit alone. */
