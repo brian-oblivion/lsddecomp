@@ -403,7 +403,8 @@
     },
     "12": {
       "checklist": {
-        "apidoc-setup": true
+        "apidoc-setup": true,
+        "area-graphics-core": true
       },
       "reason": "",
       "status": "auto"
