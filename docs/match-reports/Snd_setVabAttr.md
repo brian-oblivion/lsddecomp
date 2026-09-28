@@ -724,3 +724,11 @@ Snd_setVabAttr is live C and the image is byte-exact; the stale STALL comment ab
 > directions of "hoist through a fresh local" (channel, round 35; arg5,
 > round 39) are confirmed inert against it. See the match report for the
 > full derivation and the preserved near-miss body.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_seqread.c`:
+
+> The function comment said it is "reached only from ContDataEntry via a
+> double jump-table dispatch this unit owns (jtbl_80010ED8 outer,
+> jtbl_80010F38 inner)."

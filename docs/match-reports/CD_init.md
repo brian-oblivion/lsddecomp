@@ -681,3 +681,12 @@ The comment above this function's NON_MATCHING body in src/libcd_bios.c read:
 > retail splits CD_cw(1,0,0,0)'s argument materialization from its
 > own a3/jal by ~90 bytes; neither call position tried reproduces the split
 > (docs/match-reports/CD_init.md). Hand-derived.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libcd_bios.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: 171/196 words, length
+> exact. Residue: list scheduling: retail splits CD_cw(1,0,0,0)'s argument
+> set-up from its own a3/jal by about 90 bytes, and neither call position
+> tried reproduces it (docs/match-reports/CD_init.md)."

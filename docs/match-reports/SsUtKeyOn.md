@@ -1153,3 +1153,11 @@ The comment above this function's NON_MATCHING body in src/libsnd_vm_vol_ut_key_
 > busy-lock guard's branch polarity, with the rest not re-characterised
 > since `--nop-at-expansion` closed the old length gap
 > (docs/match-reports/SsUtKeyOn.md). Hand-derived.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: 252/252 words, length
+> exact. Residue: the busy-lock guard's branch polarity, and more not yet
+> characterised (docs/match-reports/SsUtKeyOn.md)."

@@ -539,3 +539,22 @@ The declarations above _SsSetControlChange carried:
 > argument (the one spilling to the stack at 0x10($sp)) alongside the usual
 > "packed (slot<<8)|channel" first argument this file's siblings already
 > use.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_seqread.c`:
+
+> The function comment: "... through a dense 0..121 switch that GCC lowers to
+> the jump table this unit owns (jtbl_80010CF0). The controller numbers with
+> dedicated handling below are exactly the standard MIDI CC assignments (...),
+> which is a strong confirmation this really is a MIDI CC handler and not a
+> project-invented numbering. Every arm except 6/65/98/99/100/101/121 falls
+> through into the shared tail that re-arms the next scheduling delta via
+> ReadDeltaValue; those seven `return` immediately instead.
+>
+> MATCHING, two choices below: SpuVmSetVol's first parameter is a full
+> `s32` (its own body masks it with 0xFF/0xFF00), so `packed` is not
+> narrowed and the widened a0/a1 stay live across the call for the final
+> ReadDeltaValue; and each case copies `offset` into a case-local `u16`,
+> which keeps the switch-wide byte in a caller-saved register and gives
+> each case its own callee-saved copy." The MATCHING note is now one line.

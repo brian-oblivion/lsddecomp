@@ -53,3 +53,14 @@ The file's banner carried its edge evidence:
 > libsnd_seqread.c, where tuboundary.py reads "start edge possible" -- the
 > rodata is silent -- and the edge is kept because play and seqread are
 > separate objects in every libsnd build.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_play.c`:
+
+> "Every byte here is Sony's: libsnd/play.o is 0x2C of .text, one function,
+> byte-identical on the 3.0, 3.3 and 3.5 discs (3.5 calls it _SsSndPlay), and
+> this unit is exactly 0x2C. It is carried as C rather than linked because
+> `psyq_sdk.py match` finds that body at four places in retail (AMBIGUOUS x4);
+> the Snd_play symbol is pinned here by the libsnd object that calls it by
+> relocation."

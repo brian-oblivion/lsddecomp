@@ -1,43 +1,28 @@
 /*
- * libsnd_seqread -- Sony libsnd `seqread`: the SEQ event interpreter.
+ * libsnd_seqread -- Sony libsnd `seqread`: the SEQ event interpreter, the
+ * whole module, its 18 functions in seqread.o's order. Every function here
+ * is Sony's and keeps Sony's name: the game links libsnd 3.3's seqread with
+ * one function changed (_SsSetControlChange), so the object cannot be
+ * linked and the module is carried as C.
  *
- * Every function here is Sony's. Retail links libsnd 3.3's seqread with one
- * function changed (_SsSetControlChange), so the object never placed and the
- * module is carried as C. progress.py counts all of it as library by address
- * (config/sdk-in-game.txt, and the `identified` symbols entry for
- * _SsSetControlChange). The functions keep Sony's names and are never retyped
- * as game code.
- *
- * The file is the whole module: its 18 functions are seqread.o's, in
- * seqread.o's order.
- *
- * Each sequence's play state is an SsScore (include/ss_score.h), reached as
+ * Each sequence's play state is an SsScore (ss_score.h), reached as
  * _ss_score[access][seq]; the (a0, a1) pair the event handlers take is that
  * (access, seq) pair. Per-channel state (pan, program, volume) is indexed by
- * the event's MIDI channel, channel. SeqPlay is the per-tick scheduler. GetSeqData
- * decodes one event from the byte stream at rec->readPos and dispatches it to:
- *   - NoteOn / SetProgramChange / SetPitchBend, the channel-voice events;
- *   - _SsSetControlChange, the MIDI CC dispatcher, which routes to the Cont*
- *     handlers: data entry, portamento, NRPN/RPN, reset-all-controllers;
- *   - GetMetaEvent, for End of Track (repeat or stop) and Set Tempo.
- * ReadDeltaValue reads the delta time that follows every event and schedules
- * the next one.
- *
- * The controller handlers edit the VAB in place through Sony's SsUtGet/Set
- * ProgAtr/VagAtr calls. Snd_setVabAttr is ContDataEntry's per-NRPN VagAtr
- * editor, and it unpacks the ADSR registers into an AdsrFields to do so.
- * ContModulation and ContPortaTime have no caller in this executable.
- *
- * This unit owns three switch jump tables in rodata: jtbl_80010CF0
- * (_SsSetControlChange), and jtbl_80010ED8 and jtbl_80010F38
- * (Snd_setVabAttr's nested switch).
+ * the event's MIDI channel, channel. SeqPlay is the per-tick scheduler.
+ * GetSeqData decodes one event from the byte stream at rec->readPos and
+ * dispatches it to NoteOn, SetProgramChange and SetPitchBend (the
+ * channel-voice events), _SsSetControlChange (the MIDI CC dispatcher, which
+ * routes to the Cont* handlers) and GetMetaEvent (End of Track and Set
+ * Tempo). ReadDeltaValue reads the delta time that follows every event and
+ * schedules the next one. The controller handlers edit the VAB in place
+ * through Sony's SsUtGet/Set ProgAtr/VagAtr calls.
  */
 #include "common.h"
 #include "libsnd_internal.h"
 
-/* libsnd/vmanager. MATCHING: the arguments as SetPitchBend passes them; with
- * the definition's (s16, s16, s16, u16) the call narrows its first
- * argument, two words retail does not have. */
+/* libsnd/vmanager's pitch bend of every matching voice, declared with the
+ * arguments as SetPitchBend passes them. */
+/* MATCHING: the definition's (s16, s16, s16, u16) narrows the first argument, two extra words. */
 s32 SpuVmPitchBend(s32 packed, s16 a1, u8 vol, u8 bend);
 
 /* Shared delta-time decoder: reads a MIDI variable-length value (7 bits
@@ -120,10 +105,6 @@ extern void GetMetaEvent(s16 a0, s16 a1, u8 a2);
  *
  */
 #ifdef NON_MATCHING
-/* NON_MATCHING: 122/172 words, length exact. Residue: register identity
- * (retail's widened "channel" lives in $s4 and its per-case data byte in
- * $s3; this C compiles the same roles the other way around)
- * (docs/match-reports/GetSeqData.md). */
 void GetSeqData(s16 a0, s16 a1) {
     SsScore *rec = &_ss_score[a0][a1];
     u8 *p;
@@ -205,11 +186,9 @@ void GetSeqData(s16 a0, s16 a1) {
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_seqread", GetSeqData);
 #endif
 
+/* Note On: keys the note on at the velocity scaled by the channel volume,
+ * or off for velocity 0; ignored while the sequence's left volume is 0. */
 #ifdef NON_MATCHING
-/* NON_MATCHING: length exact (70 words), 59 equal at the same index.
- * Residue: register identity for the a0 copy kept live across the calls
- * and the masked velocity copy, not a logic or CFG difference
- * (docs/match-reports/NoteOn.md). */
 void NoteOn(s16 a0, s16 a1, s32 note, s32 vel) {
     SsScore *rec = &_ss_score[a0][a1];
     u8 channel = rec->channel;
@@ -256,24 +235,15 @@ extern void ContRpn2(s16 a0, s16 a1, u8 a2);
 extern void ContResetAll(s16 a0, s16 a1);
 
 /* Control-Change dispatcher: reads one data byte from the event stream
- * (the CC value) and routes on `a2`, the CC NUMBER, through a dense 0..121
- * switch that GCC lowers to the jump table this unit owns
- * (jtbl_80010CF0). The controller numbers with dedicated handling below are
- * exactly the standard MIDI CC assignments (0 bank-select MSB, 6 data-entry
- * MSB, 7 volume, 10 pan, 11 expression, 64 sustain, 65 portamento, 91 reverb
- * depth, 98/99 NRPN, 100/101 RPN, 121 reset-all-controllers), which is a
- * strong confirmation this really is a MIDI CC handler and not a
- * project-invented numbering. Every arm except 6/65/98/99/100/101/121 falls
- * through into the shared tail that re-arms the next scheduling delta via
- * ReadDeltaValue; those seven `return` immediately instead.
- *
- * MATCHING, two choices below: SpuVmSetVol's first parameter is a full
- * `s32` (its own body masks it with 0xFF/0xFF00), so `packed` is not
- * narrowed and the widened a0/a1 stay live across the call for the final
- * ReadDeltaValue; and each case copies `offset` into a case-local `u16`,
- * which keeps the switch-wide byte in a caller-saved register and gives
- * each case its own callee-saved copy.
+ * (the CC value) and routes on `a2`, the CC number, through a dense 0..121
+ * switch. The controllers with dedicated handling are the standard MIDI
+ * assignments: 0 bank-select MSB, 6 data-entry MSB, 7 volume, 10 pan, 11
+ * expression, 64 sustain, 65 portamento, 91 reverb depth, 98/99 NRPN,
+ * 100/101 RPN, 121 reset-all-controllers. Every arm except
+ * 6/65/98/99/100/101/121 reads the next delta time (ReadDeltaValue); those
+ * seven leave it to the handler they call.
  */
+/* MATCHING: `packed` stays s32 (SpuVmSetVol masks it), and each case copies `offset` to its own u16. */
 void _SsSetControlChange(s16 a0, s16 a1, u8 a2) {
     SsScore *rec = &_ss_score[a0][a1];
     u8 *p = rec->readPos;
@@ -357,8 +327,8 @@ void _SsSetControlChange(s16 a0, s16 a1, u8 a2) {
 /* The three per-controller VagAtr editors below share one shape: fetch the
  * channel's program with SsUtGetProgAtr, then for each of its `tones` read
  * the tone's VagAtr, overwrite one field from the controller value and
- * write it back. `tones` is re-read from memory on every iteration because
- * the compiler cannot prove the SsUt calls leave the ProgAtr alone.
+ * write it back. `tones` is re-read on every iteration, since the SsUt
+ * calls may change the ProgAtr.
  *
  * ContModulation: the value becomes every tone's vibrato depth (vibW).
  * Neither it nor ContPortaTime has a caller in this executable. */
@@ -547,10 +517,10 @@ typedef struct {
     s16 sustainDir;   /* ADSR2 bit 14 */
 } AdsrFields;
 
-/* SsUtGetProgAtr's fill at function entry. From +0x10 the SAME memory is
+/* SsUtGetProgAtr's fill at function entry. From +0x10 the same memory is
  * both the VagAtr buffer the rpnBytes==2 loops hand to SsUtGet/SetVagAtr
- * (retail addresses it at sp+0x58 = list+0x10) and, with the 18 bytes
- * after it, the two by-value arguments of Snd_setVabAttr. */
+ * and, with the 18 bytes after it, the two by-value arguments of
+ * Snd_setVabAttr. */
 typedef struct {
     ProgAtr prog; /* +0x00: SsUtGetProgAtr's fill */
 
@@ -564,15 +534,12 @@ typedef struct {
 extern void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, AdsrFields resolved,
                            s16 arg5, u8 arg6);
 
+/* CC6 (data entry MSB). After a loop start the value is the loop count;
+ * outside the loop NRPNs it is stored as nrpnLsb and counted. Otherwise,
+ * once both RPN bytes are in, RPN 0 sets every tone's pitch-bend range
+ * (RPN 1 and 2 rewrite each tone unchanged); once both NRPN bytes are in,
+ * Snd_setVabAttr applies it to tone nrpnMsb (every tone for 0x10). */
 #ifdef NON_MATCHING
-/* NON_MATCHING: 380/376 words, 4 long; frame exact (-0x108). Residue:
- * retail keeps the two dead `unused` values in a callee-saved register
- * ($s5, set and never read) where this body needs `volatile` stack slots,
- * and with $s5 free this build hoists the loop-invariant `a2 & 0x7F` out of
- * the first loop, which renumbers $s3-$s5 through the loops
- * (docs/match-reports/ContDataEntry.md). Written for the reader: the
- * byte-shaped body's `dead[16]` frame pad and `volatile` on the two
- * `unused` locals are omitted here and kept in the report. */
 void ContDataEntry(s16 a0, s16 a1, u8 a2) {
     s16 ch = a0;
     s16 slot = a1;
@@ -605,7 +572,7 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
             }
         }
         if (rec->rpnLsb == 1 && rec->rpnMsb == 0) {
-            s32 unused; /* computed and never read, as in retail */
+            s32 unused; /* computed and never read */
             if ((u8)(a2 - 0x41) < 0x3F) {
                 if (((a2 & 0xFF) * 100) >= 0) {
                     unused = ((a2 & 0xFF) * 100) & 0xE000;
@@ -622,7 +589,7 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
             }
         }
         if (rec->rpnLsb == 2 && rec->rpnMsb == 0) {
-            s32 unused; /* computed and never read, as in retail */
+            s32 unused; /* computed and never read */
             if ((u8)(a2 - 0x40) < 0x40) {
                 unused = ((a2 & 0xFF) * 25) << 8;
             } else {
@@ -664,9 +631,8 @@ extern void _SsUtResolveADSR(s32 a0, s32 a1, AdsrFields *out);
 extern void _SsUtBuildADSR(AdsrFields *in, u16 *adsr1, u16 *adsr2);
 
 /* MIDI CC91 (Reverb Depth)/98/99/100/101 (NRPN/RPN LSB/MSB) and friends'
- * per-parameter handler, reached only from ContDataEntry via a double
- * jump-table dispatch this unit owns (jtbl_80010ED8 outer, jtbl_80010F38
- * inner). `kind` selects which VagAtr (per program-tone) is
+ * per-parameter handler, reached only from ContDataEntry, through a nested
+ * switch. `kind` selects which VagAtr (per program-tone) is
  * fetched/stored; `arg5` is the outer parameter selector (0..22), `arg6`
  * the value byte nearly every arm uses.
  * `scratch` and `resolved` arrive by value and serve only as local buffers:
@@ -819,34 +785,24 @@ void SetPitchBend(s16 a0, s16 a1) {
 /* libsnd/next. */
 extern void _SsSndNextSep(s32 a0, s32 a1);
 
-/* Meta-event handler, reached from GetSeqData's 0xFF ("running status
- * for a 0xF0 event") and new-status 0xF0 dispatch arms with `a2` = the
- * meta-event TYPE byte. Only two types are understood; everything else is
- * silently ignored:
+/* Meta-event handler, reached from GetSeqData's 0xFF and 0xF0 arms with
+ * `a2` = the meta-event type byte. Only two types are understood; the rest
+ * are ignored.
  *
- * 0x2F (End of Track): bumps the repeat counter (playsDone). playCount == 0 means
- * "loop forever" -- rewind readPos to the saved track start (trackStart) and keep
- * going. Otherwise, while the counter is still under the limit (playCount),
- * rewind BOTH readPos and loopPos. Once the limit is reached, clear the
- * playback-state flags (flags), rewind loopPos one more time, and run the
- * stop-sequence callbacks (_SsSndNextSep gated on nextSepAccess != 0xFF, then an
- * unconditional SpuVmSeqKeyOff notify) before priming deltaLeft from ticksPerCall for
- * the next tick.
+ * 0x2F (End of Track): counts playsDone up. playCount == 0 loops forever:
+ * readPos goes back to trackStart. Below the limit, readPos and loopPos
+ * both rewind. At the limit the sequence stops: the playback flags change,
+ * loopPos rewinds, _SsSndNextSep starts the next sequence (unless
+ * nextSepAccess is 0xFF), SpuVmSeqKeyOff releases its voices, and
+ * deltaLeft is primed from ticksPerCall.
  *
  * 0x51 (Set Tempo): reads a 3-byte big-endian microseconds-per-quarter-note
- * value, converts it to a BPM-like rate (60000000 / value -- the standard
- * MIDI tempo formula) into tempo, then recomputes the scheduling
- * threshold (callsPerTick/ticksPerCall) against ticksPerBeat and the global tick-rate constant
- * VBLANK_MINUS, in whichever of two regimes avoids losing precision to
- * integer truncation (the `else` regime also derives a rounding bit from
- * the division's remainder). callsPerTick doubles as a mode flag: -1 means
- * "ticksPerCall holds the reciprocal-regime value", any other value means
- * "ticksPerCall holds the same value callsPerTick does". */
+ * value into tempo as 60000000 / value (beats per minute), then recomputes
+ * callsPerTick/ticksPerCall from ticksPerBeat and VBLANK_MINUS in whichever
+ * of two regimes keeps the precision (the second rounds by the division's
+ * remainder). callsPerTick -1 means ticksPerCall holds the ticks per call;
+ * any other value means ticksPerCall holds the same value as callsPerTick. */
 #ifdef NON_MATCHING
-/* NON_MATCHING: 211/213 words, length 2 short. Residue: register identity:
- * retail's second divu re-reads rec->ticksPerBeat with a plain `lh`, and this body
- * keeps the first read live in a register (docs/match-reports/GetMetaEvent.md).
- * The volatile on the word-sized tempo, below, defeats GCC's div/mod fusion. */
 void GetMetaEvent(s16 a0, s16 a1, u8 a2) {
     SsScore *rec = &_ss_score[a0][a1];
 
@@ -876,9 +832,6 @@ void GetMetaEvent(s16 a0, s16 a1, u8 a2) {
                 rec->callsPerTick = (VBLANK_MINUS * 600) / (rec->ticksPerBeat * rec->tempo);
                 rec->ticksPerCall = rec->callsPerTick;
             } else {
-                /* NON_MATCHING: only the word-sized field is volatile; that
-                 * defeats GCC's div/mod fusion and leaves the plain `lh` for
-                 * ticksPerBeat alone. */
                 volatile s32 *pbpm = &rec->tempo;
                 s32 q = (rec->ticksPerBeat * *pbpm * 10) / divisor;
                 s32 r = (rec->ticksPerBeat * *pbpm * 10) % divisor;
@@ -929,10 +882,7 @@ void GetMetaEvent(s16 a0, s16 a1, u8 a2) {
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_seqread", GetMetaEvent);
 #endif
 
-/* MATCHING: the `goto combine` keeps the single-byte and loop-exit `val`
- * writes as distinct arms reaching one merge point, the jump arm written
- * explicitly and the fall-through arm last, which gives both retail's
- * register. */
+/* MATCHING: the `goto combine` keeps the two `val` writes as distinct arms into one merge point. */
 s32 ReadDeltaValue(s16 a0, s16 a1) {
     SsScore *rec = &_ss_score[a0][a1];
     u8 *cursor = rec->readPos;

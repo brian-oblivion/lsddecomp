@@ -848,3 +848,15 @@ The declaration of _svm_sreg above SpuVmInit carried:
 
 > Declared without volatile, the spelling this unit's matched bodies were
 > derived against.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vmanager.c`:
+
+> On the unit's declarations above SpuVmInit: D_8008DEB0 was "Sony's
+> _ss_spu_vm_rec + 8 (libsnd/vmanager.o bss; symbols file)" and _svm_rattr
+> "pinned in config/psyq-objects.ld (libsnd/vm_g.o)".
+>
+> At the order-only barrier in the voice loop: "Keeps the D_8008EA26 store and
+> its reload below the six _svm_sreg halfword stores; without it GCC hoists
+> them above." Now a one-line MATCHING note.

@@ -1,32 +1,19 @@
 /*
  * libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop -- eight of Sony's libsnd
  * per-voice utility calls, carried as C because no SDK disc carries the
- * build retail linked. tools/progress.py counts every function here as
- * library, so each keeps Sony's name and <libsnd.h>'s prototype.
+ * game's build of them. Each keeps Sony's name and <libsnd.h>'s prototype.
  *
- * Which objects (nm over sdk/work/<disc>/elf/libsnd): on the 3.0, 3.3 and
- * 3.5 discs all eight sit in one object, vmanager.o; on the 3.6 disc they
- * are five, in retail's order: ut_cp.o (SsUtChangePitch), ut_cadsr.o
- * (SsUtChangeADSR), ut_vvol.o (SsUtGetDetVVol, SsUtSetDetVVol, SsUtGetVVol,
- * SsUtSetVVol), ut_autov.o (SsUtAutoVol) and ut_autop.o (SsUtAutoPan). The
- * file is named for those five because retail's libsnd is the split build:
- * the 3.6-only libsnd/ut_pb object is linked right before it. None of the
- * five is retail's build (3.6's text is 0x140, 0xD8, 0x1DC, 0x64 and 0x64
- * bytes against retail's 0x160, 0xF4, 0x1FC, 0x54 and 0x54), so none can
- * be linked.
- *
- *   - SsUtChangePitch: re-pitches a keyed-on voice (still assembly).
- *   - SsUtChangeADSR: if the voice still plays the given vab/program/note,
- *     writes the two ADSR words into its shadow registers and marks them dirty.
- *   - SsUtGetDetVVol / SsUtSetDetVVol: read the voice's left/right volume
- *     from the SPU registers / write it to the shadow registers, unscaled.
- *   - SsUtGetVVol / SsUtSetVVol: the same in 0..127 units (x or / 129).
- *   - SsUtAutoVol / SsUtAutoPan: start a volume or pan slide (SeAutoVol,
- *     SeAutoPan).
+ * On the 3.0, 3.3 and 3.5 discs all eight sit in one object, vmanager.o; on
+ * the 3.6 disc they are five, in this order: ut_cp.o (SsUtChangePitch),
+ * ut_cadsr.o (SsUtChangeADSR), ut_vvol.o (SsUtGetDetVVol, SsUtSetDetVVol,
+ * SsUtGetVVol, SsUtSetVVol), ut_autov.o (SsUtAutoVol) and ut_autop.o
+ * (SsUtAutoPan). The file is named for those five because the game's libsnd
+ * is the split build: the 3.6-only libsnd/ut_pb object is linked right
+ * before it.
  *
  * Every call takes a voice number 0..23 and returns -1 for anything else.
- * The shadow registers are include/svm_data.h's _svm_sreg_buf, flushed to
- * the SPU by SpuVmFlush; _svm_sreg points at the SPU register block itself
+ * The shadow registers are svm_data.h's _svm_sreg_buf, flushed to the SPU
+ * by SpuVmFlush; _svm_sreg points at the SPU register block itself
  * (svm_data.h's SpuRegs).
  */
 
@@ -35,9 +22,11 @@
 
 extern SpuRegs *_svm_sreg;
 
-/* STALL -- docs/match-reports/SsUtChangePitch.md (84/88 words). */
+/* Re-pitches a keyed-on voice. */
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop", SsUtChangePitch);
 
+/* If the voice still plays the given VAB, program and note, writes the two
+ * ADSR words into its shadow registers and marks them dirty. */
 /* MATCHING: `dead` only makes GCC reserve retail's unused 8-byte frame,
  * which puts the stack arguments at 0x18/0x1C($sp); nothing else may be added. */
 s16 SsUtChangeADSR(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
@@ -64,6 +53,7 @@ s16 SsUtChangeADSR(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
     return -1;
 }
 
+/* Reads the voice's left and right volume from its SPU registers, unscaled. */
 s16 SsUtGetDetVVol(s16 idx, s16 *out1, s16 *out2) {
     if ((u16)idx < 0x18) {
         /* MATCHING: `_svm_sreg->voice[idx]` swaps the addu's operands. */
@@ -74,6 +64,8 @@ s16 SsUtGetDetVVol(s16 idx, s16 *out1, s16 *out2) {
     return -1;
 }
 
+/* Writes the voice's left and right volume to its shadow registers,
+ * unscaled. */
 s16 SsUtSetDetVVol(s16 idx, s16 p1, s16 p2) {
     /* MATCHING: an unused 8-byte array reproduces retail's untouched frame. */
     s32 unused[2];
@@ -87,6 +79,7 @@ s16 SsUtSetDetVVol(s16 idx, s16 p1, s16 p2) {
     return -1;
 }
 
+/* SsUtGetDetVVol in 0..127 units (the register value / 129). */
 s16 SsUtGetVVol(s16 idx, s16 *out1, s16 *out2) {
     SpuVoiceRegs *e;
     s16 f0, f2;
@@ -102,6 +95,7 @@ s16 SsUtGetVVol(s16 idx, s16 *out1, s16 *out2) {
     return -1;
 }
 
+/* SsUtSetDetVVol in 0..127 units (times 129). */
 s16 SsUtSetVVol(s16 idx, s16 p1, s16 p2) {
     /* MATCHING: as in SsUtSetDetVVol. */
     s32 unused[2];
@@ -118,6 +112,7 @@ s16 SsUtSetVVol(s16 idx, s16 p1, s16 p2) {
     return -1;
 }
 
+/* Starts a volume slide on the voice (SeAutoVol). */
 s16 SsUtAutoVol(s16 p0, s16 p1, s16 p2, s16 p3) {
     if ((u16)p0 < 0x18) {
         SeAutoVol(p0, p1, p2, p3);
@@ -126,6 +121,7 @@ s16 SsUtAutoVol(s16 p0, s16 p1, s16 p2, s16 p3) {
     return -1;
 }
 
+/* Starts a pan slide on the voice (SeAutoPan). */
 s16 SsUtAutoPan(s16 p0, s16 p1, s16 p2, s16 p3) {
     if ((u16)p0 < 0x18) {
         SeAutoPan(p0, p1, p2, p3);

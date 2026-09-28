@@ -159,3 +159,12 @@ The comment above the three D_8006D8F0 stores read:
 > apart. A bare `__asm__("")` after case1's store, once part of that
 > recipe, was retired in round 89: removing it left the object
 > byte-identical.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libcd_bios.c`:
+
+> "MATCHING: the goto layout and the local `volatile s32 *` pointers keep the
+> three D_8006D8F0 stores as separate blocks, each with its own address
+> computation; an if/else chain or a switch lets GCC merge them into one
+> store." Now one line.

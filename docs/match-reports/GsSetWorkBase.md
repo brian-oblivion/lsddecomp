@@ -78,3 +78,10 @@ The file's banner carried its edge evidence:
 > Edges: both are placed Sony objects (libgs/gs_123 before, libgs/gs_111
 > after), so this file cannot merge with a neighbour; its extent is the
 > gs_124 slot of the archive's link order.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libgs_gs_124.c`:
+
+> The banner said the function "is compiled here instead"; the wording is now
+> "written here instead".

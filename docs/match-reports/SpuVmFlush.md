@@ -884,3 +884,18 @@ The comment above this function's NON_MATCHING body in src/libsnd_vmanager.c rea
 > applied; a permuter search (round 37) plateaued at 1578/2276 with no
 > candidate reaching zero (docs/match-reports/SpuVmFlush.md).
 > Hand-derived.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vmanager.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: 236/241 words, 5 words
+> short. Residue: retail's unconditional `move a2,v0`/`li t0,1`/`move a3,a0`
+> do-while-style setup before the count>0 loop, which this C's `for` does not
+> reproduce, plus s0/s1 register swaps in phases 2-6
+> (docs/match-reports/SpuVmFlush.md)."
+>
+> On SvmVoiceEnvx: "A u16 at a 0x34 stride: SpuVmFlush walks _svm_voice's envx
+> field with a pointer of this type (store, then re-check the SAME field via
+> `lhu`). Kept as the walk's own element type so the pointer steps one record
+> at a time from &_svm_voice[0].envx."

@@ -752,3 +752,11 @@ The comment above this function's NON_MATCHING body in src/libcd_bios.c read:
 > NON_MATCHING: 30/56 words, length 1 short. Residue: instruction-selection
 > (retail computes &D_8006D8D8 unfolded inside the loop; this folds it)
 > (docs/match-reports/callback.md). Hand-derived.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libcd_bios.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: 30/56 words, length 1
+> short. Residue: instruction selection (retail computes &D_8006D8D8 unfolded
+> inside the loop; this folds it) (docs/match-reports/callback.md)."

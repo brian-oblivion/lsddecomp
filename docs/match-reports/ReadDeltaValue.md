@@ -159,3 +159,12 @@ The comment above ReadDeltaValue read:
 > exact shape (jump-arm written explicitly, fallthrough-arm last in
 > source order) is what makes GCC 2.6.3 choose retail's own register for
 > both. See the round-25 head broadcast on if/else arm ordering.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_seqread.c`:
+
+> "MATCHING: the `goto combine` keeps the single-byte and loop-exit `val`
+> writes as distinct arms reaching one merge point, the jump arm written
+> explicitly and the fall-through arm last, which gives both retail's
+> register." Now one line.

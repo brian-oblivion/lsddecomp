@@ -605,3 +605,12 @@ The comment above this function's NON_MATCHING body in src/libsnd_seqread.c read
 > reviewed round 66; its winning mutation (`return;` as
 > `do { return; } while (0);`) is in the report, not here: this body is
 > for the reader and the verified build never compiles it.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_seqread.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: length exact (70
+> words), 59 equal at the same index. Residue: register identity for the a0
+> copy kept live across the calls and the masked velocity copy, not a logic or
+> CFG difference (docs/match-reports/NoteOn.md)."

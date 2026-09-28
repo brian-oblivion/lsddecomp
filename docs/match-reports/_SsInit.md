@@ -519,3 +519,36 @@ The function comment above _SsInit before it was cut to one MATCHING line:
 >  * `i = 0;` before each loop is a statement in its own right, not a `for`
 >  * init clause: retail zeroes the counter BEFORE loading the source base.
 >  */
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_ssinit.c`:
+
+> The file banner (its function summary is now _SsInit's own comment):
+>
+> "libsnd_ssinit -- the head of Sony's libsnd/ssinit module, carried as C
+> because no SDK disc carries the build retail linked.
+>
+> _SsInit is the sound-system init: it resets the interrupt callbacks,
+> brings up the SPU cold (SpuInit) or hot (SpuInitHot), writes the
+> templates D_8006DC5C (into all 24 voice register blocks) and D_8006DC6C
+> (into the control block), starts the voice manager for 24 voices
+> (SpuVmInit), clears the mark-callback table and resets libsnd's globals. SsInit and
+> SsInitHot are its two one-line entry points, _SsInit(0) and _SsInit(1).
+>
+> The rest of libsnd/ssinit is the first half of
+> libsnd_ssinit_libapi_counter.c: retail links Sony's sstable object
+> (SsSetTableSize) between the two.
+>
+> Data: _snd_openflag and _snd_ev_flag are pinned by name in
+> config/psyq-objects.ld. D_8006DC5C/D_8006DC6C are read only by _SsInit,
+> a Sony function, so they keep their placeholder names. _ss_MarkCallback is
+> libsnd's mark-callback table (SsMarkCallbackProc [32][16], <libsnd.h>'s
+> type), which SsSetMarkCallback fills and ContNrpn1 calls through.
+>
+> The jump table at rodata 0x14D8 is SsSetTickMode's and is attached to
+> libsnd_ssinit_libapi_counter in the yaml, not to this unit."
+>
+> The function comment's MATCHING note: "MATCHING: two counters shared by all
+> three loops, i outer and j inner until loop 3 swaps them, each zeroed by its
+> own statement before the loop." Now one line.

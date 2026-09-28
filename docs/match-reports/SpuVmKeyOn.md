@@ -756,3 +756,14 @@ The comment above this function's NON_MATCHING body in src/libsnd_vmanager.c rea
 > renamed-to-SpuVmVSetUp call (was func_80032148) and D_8008EA0D, which
 > has no linker symbol of its own and is read through the already-linked
 > D_8008EA24 base pointer instead.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vmanager.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: 414 built words vs 387.
+> Residue: an early-materialization scheduling point and a mid-loop
+> addressing-cost difference for D_8008EA26 and its neighbours
+> (docs/match-reports/SpuVmKeyOn.md). D_8008EA0D has no linker symbol of its
+> own and is read through the D_8008EA24 base pointer." The last sentence is
+> now a comment at that read.

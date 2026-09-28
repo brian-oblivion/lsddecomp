@@ -482,3 +482,13 @@ The comment above CD_cw's preserved `#if 0` body read:
 > 98/282) even as length became exact -- see the match report's honest
 > discussion of why LENGTH is still the right thing to have adopted here.
 > Restored to INCLUDE_ASM per project rule.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libcd_bios.c`:
+
+> On the per-command tables: "CD_cw reads D_8006D840 both directly and as
+> D_8006D740[cmd + 0x40] (docs/match-reports/CD_cw.md)."
+>
+> The NON_MATCHING body's score comment: "NON_MATCHING: 284 words against
+> retail's 282, 97 equal at the same index (docs/match-reports/CD_cw.md)."

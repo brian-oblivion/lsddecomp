@@ -576,3 +576,12 @@ The comment above this function's NON_MATCHING body in src/libsnd_vmanager.c rea
 > note2pitch2 argument -- a banned-to-fix register-identity case, per
 > a permuter search that plateaued at 485/770 with no candidate reaching
 > zero (docs/match-reports/SpuVmPBVoice.md). Hand-derived.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vmanager.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: 77/138 words, length
+> exact. Residue: register-class renumbering plus one deferred `& 0xFFFF` mask
+> on the second note2pitch2 argument, a register-identity case
+> (docs/match-reports/SpuVmPBVoice.md)."

@@ -328,3 +328,10 @@ The comment above CD_ready's preserved `#if 0` body read:
 > choosing the load's destination register directly). Restored to
 > INCLUDE_ASM per project rule -- no score short of byte-exact stays in
 > src/.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libcd_bios.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: 178 words against
+> retail's 180 (docs/match-reports/CD_ready.md)."

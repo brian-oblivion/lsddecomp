@@ -1,31 +1,24 @@
 /*
- * libsnd_decre -- Sony's libsnd/decre module, carried as disassembly
- * because no SDK disc carries the build retail linked.
+ * libsnd_decre -- Sony's libsnd/decre module, carried as disassembly:
+ * Snd_decrescendo, libsnd's per-tick volume fade-out for one sequence, the
+ * mirror of Snd_crescendo (libsnd_cres.c). The linked libsnd objects call
+ * it by this name; its record is Sony's _ss_score entry (ss_score.h).
  *
- * Snd_decrescendo is libsnd's per-tick volume fade-out for one sequence,
- * the mirror of Snd_crescendo (libsnd_cres.c): the linked libsnd objects
- * call it by this name (config/psyq-objects.ld). Its record is Sony's
- * _ss_score entry, include/ss_score.h.
- *
- * Which object (nm over sdk/work/<disc>/elf/libsnd): decre.o on 3.0, 3.3
- * and 3.5, decres.o on 3.6, with this one function as its only text
- * symbol -- Snd_decrescendo on 3.0 and 3.3, renamed _SsSndDecrescendo on
- * 3.5 and 3.6. None is retail's build: its text is 0x474 (3.0), 0x4B0
- * (3.3) and 0x2AC (3.5, 3.6) bytes against retail's 0x328, so it cannot be
- * linked.
+ * decre.o on 3.0, 3.3 and 3.5 and decres.o on 3.6 hold this one function
+ * (Snd_decrescendo on 3.0 and 3.3, renamed _SsSndDecrescendo on 3.5 and
+ * 3.6), each at a different length from the game's, so no disc's object
+ * can be linked in its place.
  */
 
 #include "common.h"
 #include "libsnd_internal.h"
 
 /* One tick of the fade Snd_SetDecres (libsnd/vol) started on
- * _ss_score[a0][a1]: every fadeRate ticks (or fadeRate's magnitude per tick, when
- * negative) the sequence volume falls, until the steps or ticks run out or
- * the volume reaches 0, which clears the record's flag 0x20. */
+ * _ss_score[a0][a1] (access, sequence): every fadeRate ticks (or fadeRate's
+ * magnitude per tick, when negative) the sequence volume falls, until the
+ * steps or ticks run out or the volume reaches 0, which clears the record's
+ * flag 0x20. */
 #ifdef NON_MATCHING
-/* NON_MATCHING: 200 words against retail's 202; register and stack
- * allocation, retail's frame 0x40 against this body's 0x38
- * (docs/match-reports/Snd_decrescendo.md). */
 void Snd_decrescendo(s16 a0, s16 a1) {
     SsScore **row = &_ss_score[a0];
     s32 off = a1 * sizeof(SsScore);

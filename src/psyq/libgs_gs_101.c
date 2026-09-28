@@ -9,8 +9,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 
-/* libgs's bss global, pinned in config/psyq-objects.ld; <libgs.h> does not
- * declare it. */
+/* libgs's near clipping distance, a bss global <libgs.h> does not declare. */
 extern long GsCLIP3near;
 
 void GsSetNearClip(long clip_near) {

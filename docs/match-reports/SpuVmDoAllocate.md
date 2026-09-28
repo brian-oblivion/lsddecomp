@@ -634,3 +634,10 @@ This function is still `INCLUDE_ASM` and its C was not touched, but the per-fiel
 ## Types (round 98, alpha)
 
 This unit's `D8008E978Entry` is now `<libsnd.h>`'s `VagAtr` and `ObjE970` is `VabHdr` (unk4 -> `center`, unk5 -> `shift`, unk12 -> `pbmin`, unk13 -> `pbmax`, ObjE970.unk18 -> `mvol`); preserved bodies above keep the old spellings. See SpuVmAlloc.md, "Unit banner history".
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vmanager.c`:
+
+> Above the function's INCLUDE_ASM: "Not yet C: the best body (142/143 words)
+> is in docs/match-reports/SpuVmDoAllocate.md."

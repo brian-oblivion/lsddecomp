@@ -1,26 +1,13 @@
 /*
  * libsnd_ssinit -- the head of Sony's libsnd/ssinit module, carried as C
- * because no SDK disc carries the build retail linked.
- *
- * _SsInit is the sound-system init: it resets the interrupt callbacks,
- * brings up the SPU cold (SpuInit) or hot (SpuInitHot), writes the
- * templates D_8006DC5C (into all 24 voice register blocks) and D_8006DC6C
- * (into the control block), starts the voice manager for 24 voices
- * (SpuVmInit), clears the mark-callback table and resets libsnd's globals. SsInit and
- * SsInitHot are its two one-line entry points, _SsInit(0) and _SsInit(1).
+ * because no SDK disc carries the game's build of it: _SsInit, the
+ * sound-system init, and its two entry points SsInit and SsInitHot.
  *
  * The rest of libsnd/ssinit is the first half of
- * libsnd_ssinit_libapi_counter.c: retail links Sony's sstable object
- * (SsSetTableSize) between the two.
- *
- * Data: _snd_openflag and _snd_ev_flag are pinned by name in
- * config/psyq-objects.ld. D_8006DC5C/D_8006DC6C are read only by _SsInit,
- * a Sony function, so they keep their placeholder names. _ss_MarkCallback is
- * libsnd's mark-callback table (SsMarkCallbackProc [32][16], <libsnd.h>'s
- * type), which SsSetMarkCallback fills and ContNrpn1 calls through.
- *
- * The jump table at rodata 0x14D8 is SsSetTickMode's and is attached to
- * libsnd_ssinit_libapi_counter in the yaml, not to this unit.
+ * libsnd_ssinit_libapi_counter.c: Sony's sstable object (SsSetTableSize)
+ * is linked between the two. _ss_MarkCallback is libsnd's mark-callback
+ * table (SsMarkCallbackProc [32][16], <libsnd.h>'s type), which
+ * SsSetMarkCallback fills and ContNrpn1 calls through.
  */
 #include "common.h"
 #include "libsnd_internal.h"
@@ -37,12 +24,14 @@ extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
 
 /*
- * Sound-system init.  Reached only through SsInit (arg0 = 0) and
- * SsInitHot (arg0 = 1) below.
- *
- * MATCHING: two counters shared by all three loops, i outer and j inner
- * until loop 3 swaps them, each zeroed by its own statement before the loop.
+ * The sound-system init, reached only through SsInit (arg0 = 0) and
+ * SsInitHot (arg0 = 1) below: resets the interrupt callbacks, brings up
+ * the SPU cold (SpuInit) or hot (SpuInitHot), writes the voice template
+ * into all 24 voice register blocks and the control template into the
+ * control block, starts the voice manager for 24 voices (SpuVmInit),
+ * clears the mark-callback table and resets libsnd's globals.
  */
+/* MATCHING: i and j are shared by all three loops (swapped in the third), each zeroed before its loop. */
 void _SsInit(s32 arg0) {
     s32 i, j;
     u16 *base;

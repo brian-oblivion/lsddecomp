@@ -5,41 +5,20 @@
  * vmanager.o; on the 3.6 disc they are three, vm_vol.o (SpuVmSetVol),
  * ut_key.o (SsUtKeyOn, SsUtKeyOff) and ut_keyv.o (SsUtKeyOnV, SsUtKeyOffV),
  * in this order, and the file is named for those three because its
- * neighbours are 3.6-only split modules. Retail's build of them is on no
- * SDK disc, so they never placed as objects; progress.py counts these
- * functions as library by address, and they keep Sony's names and
+ * neighbours are 3.6-only split modules. The game's build of them is on no
+ * SDK disc, so they are not linked; they keep Sony's names and
  * <libsnd.h>'s prototypes.
  *
- *   SpuVmSetVol  rescales every voice one sequence plays on a given VAB and
- *                program: voice level x the VAB's, the program's and the
- *                tone's volumes x the sequence's L/R volume (SsScore),
- *                panned by the tone, the program and the caller, into the
- *                voices' shadow volume registers (_svm_sreg_buf), marked
- *                dirty.
- *   SsUtKeyOn    Sony's utility key-on: stages the program's and tone's
- *                attributes (_svm_pg, _svm_tn) in the vmanager's scratch
- *                globals, allocates a voice, fills its _svm_voice record and
- *                keys it on (vmNoiseOn for a noise tone, vag 0xFF).
- *   SsUtKeyOff   keys off the voice SsUtKeyOn returned, if the voice still
- *                holds the same VAB/program/tone/note: a noise voice clears
- *                the SPU's noise-mode enable, any other sets its bit in the
- *                pending key-off mask and drops the pending key-offs from
- *                the key-on mask.
- *   SsUtKeyOnV   SsUtKeyOn on a caller-chosen voice.
- *   SsUtKeyOffV  keys off a voice unconditionally.
- *
  * The four SsUt functions take the _snd_ev_flag lock and return -1 while
- * it is held. SpuVmSetVol, SsUtKeyOn and SsUtKeyOnV are carried as INCLUDE_ASM
- * with their best readable body under NON_MATCHING.
+ * it is held.
  */
 
 #include "common.h"
 #include "libsnd_internal.h"
 
 /* The SPU register block, 0x1F801C00, indexed in halfwords as
- * libsnd_ut_ako.c's SsUtAllKeyOff indexes it.
- * MATCHING: not volatile here; volatile moves SsUtKeyOff's second store out
- * of its branch delay slot. */
+ * libsnd_ut_ako.c's SsUtAllKeyOff indexes it. */
+/* MATCHING: not volatile here; volatile moves SsUtKeyOff's second store out of its branch delay slot. */
 extern u16 *_svm_sreg;
 
 /* The SPU's noise-mode enable register pair (NON, 0x1F801D94/0x1F801D96:
@@ -49,14 +28,15 @@ extern u16 *_svm_sreg;
 #define SPU_NOISE_ON_HI (0x196 / 2)
 
 /* _svm_cur + 0x0C, the tone within the program (the rest of _svm_cur is in
- * libsnd_internal.h). MATCHING: volatile here; plain changes SsUtKeyOnV's
- * NON_MATCHING body by a word. */
+ * libsnd_internal.h). */
+/* MATCHING: volatile here; plain changes SsUtKeyOnV's preserved body by a word. */
 extern volatile u8 D_8008EA18;
 
+/* Rescales every voice one sequence plays on a given VAB and program: voice
+ * level x the VAB's, the program's and the tone's volumes x the sequence's
+ * L/R volume (SsScore), panned by the tone, the program and the caller,
+ * into the voices' shadow volume registers (_svm_sreg_buf), marked dirty. */
 #ifdef NON_MATCHING
-/* NON_MATCHING: 315/324 words, 9 words short. Residue: one GCC CSE
- * decision on the `_svm_tn[_svm_voice[i].tone]` address plus two
- * loop-invariant hoists (docs/match-reports/SpuVmSetVol.md). */
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     SsScore *e;
     u8 i;
@@ -152,10 +132,11 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
 #else
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vm_vol_ut_key_ut_keyv", SpuVmSetVol);
 #endif
+/* Sony's utility key-on: stages the program's and tone's attributes
+ * (_svm_pg, _svm_tn) in _svm_cur, allocates a voice, fills its _svm_voice
+ * record and keys it on (vmNoiseOn for a noise tone, vag 0xFF). Returns the
+ * voice, or -1. */
 #ifdef NON_MATCHING
-/* NON_MATCHING: 252/252 words, length exact. Residue: the busy-lock
- * guard's branch polarity, and more not yet characterised
- * (docs/match-reports/SsUtKeyOn.md). */
 s16 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
     ProgAtr *slot;
     VagAtr *rec;
@@ -249,6 +230,10 @@ fail_nolock:
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vm_vol_ut_key_ut_keyv", SsUtKeyOn);
 #endif
 
+/* Keys off the voice SsUtKeyOn returned, if the voice still holds the same
+ * VAB, program, tone and note: a noise voice clears the SPU's noise-mode
+ * enable, any other sets its bit in the pending key-off mask and drops the
+ * pending key-offs from the key-on mask. */
 s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
     u16 chan;
     u32 mask0;
@@ -297,10 +282,8 @@ fail_nolock:
     return -1;
 }
 
+/* SsUtKeyOn on a caller-chosen voice. */
 #ifdef NON_MATCHING
-/* NON_MATCHING: 248/253 words, 5 words short. Residue: the busy-lock
- * guard's branch polarity and a second guard flip
- * (docs/match-reports/SsUtKeyOnV.md). */
 s16 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
     VagAtr *rec;
     u16 note;
@@ -388,12 +371,11 @@ fail:
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vm_vol_ut_key_ut_keyv", SsUtKeyOnV);
 #endif
 
-/* The "release channel" twin of SsUtKeyOff's else-branch above: same
- * _snd_ev_flag lock, same (mask0, mask1) split of a 0..0x17 channel across two
- * 16-bit mask words, same three per-channel field clears, same mask update.
- * MATCHING: written in that sibling's idiom, direct global expressions with
- * no cached locals. Unlike the sibling it releases the lock before the mask
- * block rather than after it. */
+/* Keys off a voice unconditionally: the twin of SsUtKeyOff's else-branch
+ * above, with the same lock, the same split of a 0..0x17 voice across the
+ * two 16-bit masks, the same three field clears and the same mask update.
+ * Unlike SsUtKeyOff it releases the lock before the mask update. */
+/* MATCHING: written in SsUtKeyOff's idiom, direct global expressions with no cached locals. */
 s16 SsUtKeyOffV(s16 idx) {
     u16 chan;
     u32 mask0;
