@@ -122,3 +122,12 @@ each function's report `## Naming` for tier and evidence.
 Round 87 (bravo, track 4): the class is unified. Its one definition is
 include/DrawSystem.h (object, table, both value types); the SDK types and
 prototypes it uses come from Sony's <libgpu.h>, <libgs.h> and <libetc.h>.
+
+## History (moved from src/DrawSystem.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> Edges: Sony objects on both sides, libgte/msc01 before and libgpu/sys
+> (from ResetGraph, still asm) after, so the file is exactly this unit.
+> tuboundary.py finds no rodata inside it; its "a forced boundary lies in
+> this stretch" note is satisfied by those Sony edges. Named for its class.
