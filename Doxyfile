@@ -12,7 +12,7 @@ OUTPUT_DIRECTORY       = build/doxygen
 INPUT                  = include src
 FILE_PATTERNS          = *.h *.c
 RECURSIVE              = YES
-EXCLUDE                = include/psyq
+EXCLUDE                = include/psyq include/include_asm.h
 EXCLUDE_PATTERNS       = */include/psyq/*
 
 OPTIMIZE_OUTPUT_FOR_C  = YES

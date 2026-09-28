@@ -90,8 +90,13 @@ GROUPING = re.compile(r"@(?:file|\{|\}|defgroup|name|addtogroup|ingroup)\b")
 PAD = re.compile(r"^_?pad\w*$|^unused\w*$", re.I)
 
 
+# splat rewrites include_asm.h on every `make extract` (generate_asm_macros_files),
+# so documentation written into it cannot survive; it is generated, not API.
+GENERATED = {"include_asm.h"}
+
+
 def game_headers():
-    return sorted(p for p in (REPO / "include").glob("*.h"))
+    return sorted(p for p in (REPO / "include").glob("*.h") if p.name not in GENERATED)
 
 
 def game_sources():
