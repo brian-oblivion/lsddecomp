@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001E58C` on 2026-09-17 (tools/rename.py). Address 0x8001e58c.
 
-Unit: `code_d294_c` (round 14). Calls a new `SceneNodeMethods` slot
+Unit: `code_d294` (round 14). Calls a new `SceneNodeMethods` slot
 (`+0x084`) to fill a 0x20-byte stack buffer, copies a 3-element `s16`
 source into `dst`'s leading three `SceneNodeSub44` fields, then forwards
 the buffer's leading 0xC bytes into `ApplyMatrixToLVArray` (this unit, also
@@ -86,7 +86,7 @@ larger, partially-opaque) extent.
   bare 3-word local (`Vec3O buf`). The old typing matched by offset
   coincidence with `GsCOORD2PARAM.scale`. Byte-identical after the retype.
 
-## Round 98 (echo): track 7, moved from src/code_d294_c.c
+## Round 98 (echo): track 7, moved from src/code_d294.c
 
 The `u8 buf[0x20]` rotation buffer is now `MATRIX rot` (0x20 bytes, the type getRotMatrix fills): byte-identical.
 

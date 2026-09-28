@@ -94,7 +94,7 @@ project).
 (tier B). Slot `+0x084` occupant (`tools/classtable.py gSceneNodeMethods`),
 dispatched as `slot84(self, out, flag)` from both this unit's own
 `SceneNode__ComposeAndApplyRotation` (`self` as receiver) and
-`code_d294_c.c`'s `SceneNode__RotateLocalVector` (a different
+`code_d294.c`'s `SceneNode__RotateLocalVector` (a different
 SceneNodeObj instance) -- so the SIGNATURE this file declares
 (`SceneNode__GetRotMatrix(SceneNodeObj *self, s32 a1, s32 a2)`) is really
 `(self, MATRIX *out, s32 negate)`: builds this object's own rotation
@@ -107,7 +107,7 @@ rotation matrix, optionally mirrored); tier B because the negate flag's
 in-game meaning (which callers want the mirrored form, and why) is not
 established from this function's own body. Held back from an actual
 rename because this symbol is referenced (in a comment) from
-`src/code_d294_c.c:27` -- a different unit -- discussing exactly the
+`src/code_d294.c:27` -- a different unit -- discussing exactly the
 slot-84 relationship above. Posted to the broadcast.
 
 ## Round 95 (bravo): Sony's declarations

@@ -1,7 +1,7 @@
 /*
  * TmdModel.c -- the TmdModel class (include/TmdModel.h; method table
  * gTmdModelMethods, class tag 9): one object of a TMD file (the "model"
- * SceneNode__LinkModel, src/code_d294_c.c, links into a GsDOBJ2). Its
+ * SceneNode__LinkModel, src/code_d294.c, links into a GsDOBJ2). Its
  * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
  * primitives one packet at a time (TmdModel__NextPrimitive, which reads
  * each packet through Sony's own <libgs.h> layouts: GPU_COM_* mode codes,
@@ -10,7 +10,7 @@
  * shared buffer of gTmdModelBoundsCount boxes, TmdModel__UpdateBoundsBuffer /
  * TmdModel__GetBoundsBuffer / TmdModel__GetBoundsCount), and ray-cast a
  * segment against every face (TmdModel__RaycastFaces) for SceneNode's own
- * collision helpers in code_d294.c/code_d294_c.c.
+ * collision helpers in code_d294.c/code_d294.c.
  *
  * RotateAndOffsetHullList is a free function over a TmdHull (a counted list
  * of box corners, the buffer Actor__NotifyMove fills through getModelHull):

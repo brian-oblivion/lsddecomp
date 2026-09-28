@@ -5,7 +5,7 @@
 #include "SceneNode.h"
 
 /* The private header of SceneNode's three method units, code_d294.c,
- * code_d294.c and code_d294_c.c. The class itself (object, method table,
+ * code_d294.c and code_d294.c. The class itself (object, method table,
  * method prototypes) is include/SceneNode.h, and the model's types (TmdVec3,
  * TmdBox, TmdHull) are include/TmdModel.h. This holds the free helpers those
  * units define or call by symbol: the rotation and scale inputs, the

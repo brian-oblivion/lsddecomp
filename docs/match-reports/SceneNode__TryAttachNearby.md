@@ -282,7 +282,7 @@ appears to need" — worth a shared idiom entry if a third instance turns up.
 ## Head note, round 13: `pos` was renamed to `unk38`
 
 `SceneNodeSub14`'s +0x038 field is no longer called `pos`. Runner bravo,
-matching `SceneNode__LocalOffsetToWorldPos` and `SceneNode__FaceTarget` in `code_d294_c` in the same
+matching `SceneNode__LocalOffsetToWorldPos` and `SceneNode__FaceTarget` in `code_d294` in the same
 round, measured the SAME 12 bytes and needed them as an INDEXABLE
 `s32 unk38[3]` — it takes the field's address and walks `[i]` for `i` in
 0..2, adding each word into a caller-supplied vector as a per-axis delta.
@@ -668,7 +668,7 @@ the broadcast.
 This function's own dispatch chain touches four vtable slots that are
 still named generically by offset (`slotA0`/`slotA4`/`slotA8`/`slotAC`)
 in `include/code_d294.h`'s `SceneNodeMethods` struct. That struct is
-shared: `slotA4` is also dispatched from `code_d294_c.c` (a different
+shared: `slotA4` is also dispatched from `code_d294.c` (a different
 unit, `self->methods->slotA4(self, 0, buf18, delta, 1)`), so per
 FINISHING-PLAN track 3's field-ownership rule this is PROPOSED, not
 renamed directly. Proposed slot names, backed by this round's function

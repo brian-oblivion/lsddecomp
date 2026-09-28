@@ -170,7 +170,7 @@ The header's banner was rewritten as documentation in round 95; the comments it 
  * methods -- TmdModel__GetHull, TmdModel__GetBoundsCount,
  * TmdModel__UpdateBoundsBuffer/GetBoundsBuffer, TmdModel__RaycastFaces --
  * are declared once, in include/TmdModel.h, which code_d294.c and
- * code_d294_c.c include themselves (track 4, round 87). */
+ * code_d294.c include themselves (track 4, round 87). */
 ```
 
 ## Round 97 (alpha): Sony's types substituted

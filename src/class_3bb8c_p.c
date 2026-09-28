@@ -261,7 +261,7 @@ void *Actor__ScanGridWindow(Actor *self, void *offset, void *pos, GridQuery *que
     return NULL;
 }
 
-/* code_d294_c.c: casts a vertical ray from `pos` against the node's model,
+/* code_d294.c: casts a vertical ray from `pos` against the node's model,
  * one way and then the other; on a hit writes the hit less the ray's start
  * to `offset` and returns 1. */
 extern s32 SceneNode__RaycastVertical(void *self, void *offset, void *pos);

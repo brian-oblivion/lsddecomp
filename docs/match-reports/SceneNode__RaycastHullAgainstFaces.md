@@ -181,7 +181,7 @@ extern s32 TmdModel__RaycastFaces(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32
 extern s32 gHitHeightGate;
 ```
 
-**Note the signature conflicts with `code_d294_c.c`'s own existing local
+**Note the signature conflicts with `code_d294.c`'s own existing local
 extern** (`s32 arg3` there, literal `0` at its only call site) -- THIS
 function's own call site passes `&outWord`, a genuine pointer, in that
 position. Both externs are legitimate, independent local views (per this
@@ -366,7 +366,7 @@ the measured mechanics (a plane-membership/clip test, not a specific
 game concept); which planes `self->unk20` holds is not established
 beyond "the same planes `SceneNode__CheckBoundsOverlap` reads." Held
 back from an actual rename because this symbol is referenced (in a
-comment) from `src/code_d294_c.c:414` -- a different unit. Posted to
+comment) from `src/code_d294.c:414` -- a different unit. Posted to
 the broadcast.
 
 ## Round 55 (charlie): REVISITED (round 55) -- register-identity framing

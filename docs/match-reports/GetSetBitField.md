@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001EDAC` on 2026-09-17 (tools/rename.py). Address 0x8001edac.
 
-Unit: `code_d294_c` (round 14). The generic packed-bitfield accessor
+Unit: `code_d294` (round 14). The generic packed-bitfield accessor
 already MEASURED and documented (before this carve existed) in
 `include/code_d294.h`'s standing comment: clears `width` bits at bit
 offset `shift` in `*word`, ORs in `value << shift`, and returns the
@@ -36,7 +36,7 @@ u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value) {
 ```
 
 Preserved inline per project convention (`#if 0`, positioned where it
-would compile back into `src/code_d294_c.c` in place of the current
+would compile back into `src/code_d294.c` in place of the current
 `INCLUDE_ASM`):
 
 ```c
@@ -154,7 +154,7 @@ identical and (per the six prior manual attempts) statement order,
 operand order, and intermediate-naming alone hadn't found this specific
 split.
 
-**Translated to `src/code_d294_c.c` verbatim and reverified with the real
+**Translated to `src/code_d294.c` verbatim and reverified with the real
 oracle** (not just the permuter's own scorer):
 
 ```
@@ -223,7 +223,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * register and these five functions are its per-field setters. */
 ```
 
-## Round 98 (echo): track 7, moved from src/code_d294_c.c
+## Round 98 (echo): track 7, moved from src/code_d294.c
 
 The mask loop keeps a one-line `MATCHING:` note in the source.
 

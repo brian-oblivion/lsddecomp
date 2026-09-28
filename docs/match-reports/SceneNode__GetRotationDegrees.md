@@ -69,7 +69,7 @@ and the axis is absent from it: the omission is what made it invisible.
 Its measurement of the residue is exact and is what made the fix findable.
 Only the verdict is superseded.
 
-Unit: `code_d294_c` (round 14). Converts `self->unk14->unk44`'s three
+Unit: `code_d294` (round 14). Converts `self->unk14->unk44`'s three
 4096-per-circle angle fields (`SceneNodeSub44::unk10/unk12/unk14`) into a
 3-entry `Ratio16` table: `whole = field * 45 >> 9` (== `field *
 360/4096`, i.e. angle units to degrees) and a constant `frac = 1` for
@@ -98,7 +98,7 @@ void SceneNode__GetRotationDegrees(SceneNodeObj *self, Ratio16 *out) {
 ```
 
 Preserved inline (`#if 0`, positioned where it would compile back into
-`src/code_d294_c.c` in place of the current `INCLUDE_ASM`):
+`src/code_d294.c` in place of the current `INCLUDE_ASM`):
 
 ```c
 #if 0
@@ -274,7 +274,7 @@ the head cited.
 ## Round 19 (echo): claim re-verified, one more axis tried and closed negative
 
 Re-confirmed this report's own baseline claim before doing anything
-else: `INCLUDE_ASM` was still in place in `src/code_d294_c.c`, a fresh
+else: `INCLUDE_ASM` was still in place in `src/code_d294.c`, a fresh
 full build was green (`build exit=0`), and `funcdiff.py` reported the
 expected retail-vs-retail full-match warning (meaningless, confirms
 harness sanity only).
@@ -341,7 +341,7 @@ identity vs. pair-swap) before reaching for an axis that closed a
 
 GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/SceneNode.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.
 
-## Round 98 (echo): track 7, moved from src/code_d294_c.c
+## Round 98 (echo): track 7, moved from src/code_d294.c
 
 The old comment's `unk14->unk44->vec` is `coord2->param->rotate` (GsCOORD2PARAM.rotate, SVECTOR). The num-before-den order keeps a one-line `MATCHING:` note in the source; the derivation stays in this report.
 

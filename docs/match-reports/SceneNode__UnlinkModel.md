@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001E7B0` on 2026-09-17 (tools/rename.py). Address 0x8001e7b0.
 
-Unit: `code_d294_c` (round 14, first slice-3 carve). Called by
+Unit: `code_d294` (round 14, first slice-3 carve). Called by
 `SceneNode__RemoveAllChildren` (`code_d294.c`) as its forward target for
 `SceneNodeMethods::slot18`. `void SceneNode__UnlinkModel(SceneNodeObj *self)`.
 
@@ -22,7 +22,7 @@ void SceneNode__UnlinkModel(SceneNodeObj *self) {
 Already MEASURED and documented verbatim in `include/code_d294.h`'s own
 standing comment before this carve existed ("SceneNode__UnlinkModel's whole body is
 `self->unk18 = 0; self->unk20 = 0;`") -- this round only had to move the
-body from documentation into `src/code_d294_c.c` and confirm it still
+body from documentation into `src/code_d294.c` and confirm it still
 matches now that the function has its own real address. No residue.
 Comment in the header updated (round 14) to say "now carved" instead of
 "still uncarved" since the function moved out of `asm/` into this unit;
@@ -43,7 +43,7 @@ No new struct or vtable-slot knowledge.
   `SceneNode__AddChild` -- the +0x010 slot -- is what forwards into
   `SceneNode__LinkModel`.
 
-## Round 98 (echo): track 7, moved from src/code_d294_c.c
+## Round 98 (echo): track 7, moved from src/code_d294.c
 
 The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
 

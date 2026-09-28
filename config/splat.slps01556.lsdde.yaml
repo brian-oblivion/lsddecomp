@@ -461,7 +461,6 @@ segments:
       # Note func_8001EACC lives here: the function whose first two
       # arguments are symmetric with `$a3` selecting direction (see
       # DECOMPILATION_LEARNINGS and docs/match-reports/func_80061778.md).
-      - [0xED8C, c, code_d294_c]
       # 0xF770..0xF8C8: head of the old psyq_GsLinkObject4, no placed object.
       - [0xF770, asm, psyq_GsLinkObject4]
       - [0xF8C8, o, libgte/ratan]       # ratan2, ratan (Psy-Q 3.3). .data at 0x5BE9C

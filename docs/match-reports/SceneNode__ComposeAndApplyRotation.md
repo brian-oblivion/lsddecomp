@@ -147,7 +147,7 @@ whether `self->unkC` is a parent-hierarchy chain in the game sense is a
 reasonable reading, not an independently confirmed one. Purely local to
 this unit + its header for the FUNCTION rename; the underlying vtable
 FIELD name (`slotA4`) is proposed, not renamed -- see below, it is also
-dispatched from `code_d294_c.c` (a different unit).
+dispatched from `code_d294.c` (a different unit).
 
 ## Round 95 (bravo): Sony's declarations
 

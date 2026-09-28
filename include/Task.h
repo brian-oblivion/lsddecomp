@@ -32,7 +32,7 @@ extern void *BMemPMgrFree(void *ptr);
 extern void ReleaseBasicClassArray(void *array, void *count);
 
 /* The packed-bitfield accessor SceneNode's attribute setters use
- * (code_d294_c.c), reached here by BoxFill's over `&self->boxAttribute`. */
+ * (code_d294.c), reached here by BoxFill's over `&self->boxAttribute`. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
 /* LIBGPU.H's `int ResetGraph(int)`, declared with the project's types;

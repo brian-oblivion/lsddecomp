@@ -256,4 +256,4 @@ Naming, all zero bytes:
 - `arg3` / `unk4C` kept: stored, never read, and IntermediateBase__Init
   passes 0, so nothing names it.
 - `flag` kept: it goes to GetSetHitHeightGate, whose global's meaning is not
-  established (code_d294_c.c's tier-C note).
+  established (code_d294.c's tier-C note).

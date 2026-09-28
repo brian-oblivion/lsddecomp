@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001EF14` on 2026-09-17 (tools/rename.py). Address 0x8001ef14.
 
-Unit: `code_d294_c` (round 14). A standalone leaf, not yet reached by any
+Unit: `code_d294` (round 14). A standalone leaf, not yet reached by any
 caller in this round's queue -- a 3-element range check: returns 1 if
 every `b[i]` is within `[a[i]-range, a[i]+range]`, 0 as soon as one isn't.
 `s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b)`.
@@ -73,7 +73,7 @@ retail's literal shape over the "cleaner" idiomatic form.
   the code does not have. The explicit pointer walks in the `for`
   increment clause are load-bearing (see the derivation above) and unchanged.
 
-## Round 98 (echo): track 7, moved from src/code_d294_c.c
+## Round 98 (echo): track 7, moved from src/code_d294.c
 
 The pointer-bump placement keeps a one-line `MATCHING:` note in the source.
 

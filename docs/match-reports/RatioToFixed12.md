@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001EC84` on 2026-09-17 (tools/rename.py). Address 0x8001ec84.
 
-Unit `code_d294_c`, carved round 13. Reopened round 42 as `nop_mflo_mfhi`-blocked
+Unit `code_d294`, carved round 13. Reopened round 42 as `nop_mflo_mfhi`-blocked
 (the blocker is RESOLVED, see CLAUDE.md); the stub above was never actually
 attempted until now.
 
@@ -88,7 +88,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * the pair themselves. */
 ```
 
-## Round 98 (echo): track 7, moved from src/code_d294_c.c
+## Round 98 (echo): track 7, moved from src/code_d294.c
 
 Locals `q1`/`r1`/`q2` -> `whole`/`rem`/`frac`, and `<< 12` -> `* ONE` (GCC emits the same `sll`): byte-identical.
 

@@ -50,7 +50,7 @@ loose `void *`/`*a1` reads into real fields.
   cleared again right after -- reads like a "currently processing" scratch
   slot, not a durable one. (`unk28` was already added by `SceneNode__DispatchLinkCommand`,
   matched earlier this round; this function only adds `unk2C`/`unk30`.)
-- **`ApplyMatrixToSVArray`** (extern, `asm/code_d294_c.s`, the next slice, still
+- **`ApplyMatrixToSVArray`** (extern, `asm/code_d294.s`, the next slice, still
   uncarved): declared `(void *src, void *dest, s32 count, void *out)`,
   typed only to this call site's own shape.
 

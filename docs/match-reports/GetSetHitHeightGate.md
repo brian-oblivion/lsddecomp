@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001EF60` on 2026-09-27 (tools/rename.py). Address 0x8001ef60.
 
-Unit `code_d294_c`, carved round 13. Reopened round 42 as `gp_rel`-blocked
+Unit `code_d294`, carved round 13. Reopened round 42 as `gp_rel`-blocked
 (the blocker is RESOLVED, see CLAUDE.md); the stub above was never actually
 attempted until now.
 
@@ -66,7 +66,7 @@ pattern held for a 3rd, unrelated unit.
 
 - **`func_8001EF60` -> `GetSetHitHeightGate`, `D_8008A838` -> `gHitHeightGate`. Tier B.** Round 50 kept both as placeholders because `TmdModel__RaycastFaces` was then unidentified, so what the gate accepted was unknown. It is now matched and documented (src/TmdModel.c): its 4th argument receives `hit.y - box.min.y`, the hit point's height above the face box's minimum y. So in `SceneNode__RaycastHullAgainstFaces` the global, when non-zero, makes the segment pass accept a hit only when that height is `>= 0x201`, the test the corner-edge pass applies unconditionally. That is the mechanism the name states; why stages 0, 3, 5 and 6 want it (the only writer, `ObjM__InitStyleAndWorld`) is not established, hence tier B. The `GetSet...` form is the project's for read-old-store-new-return-old (`GetSetBitField`, `DreamSys__GetSetScreenShake`).
 
-## Round 98 (echo): track 7, moved from src/code_d294_c.c
+## Round 98 (echo): track 7, moved from src/code_d294.c
 
 The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
 

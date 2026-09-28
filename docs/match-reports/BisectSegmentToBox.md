@@ -149,8 +149,8 @@ typedef struct BoundsBox_d294 {
 
 Locals `buf0`/`buf1`/`flags` -> `insideBuf`/`outsideBuf`/`outcode`. The six
 bit values -> `OUTCODE_*`, added to include/code_d294.h token-identical to
-code_d294_c.c's copy (CalcBoxOutcode's bits); proposed that the head delete
-code_d294_c.c's copy.
+code_d294.c's copy (CalcBoxOutcode's bits); proposed that the head delete
+code_d294.c's copy.
 
 ### History: the comments in src/code_d294_b.c before this pass, verbatim
 

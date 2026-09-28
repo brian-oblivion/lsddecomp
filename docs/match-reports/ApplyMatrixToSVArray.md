@@ -11,7 +11,7 @@ struct with a native `s32` member), not of the alignment idiom itself.
 
 **Historical status (kept for context): STALL (unaligned-load instruction-selection residue, 15/37 words best)
 
-Unit: `code_d294_c` (round 14). A sibling to `ApplyMatrixToLVArray` (matched this
+Unit: `code_d294` (round 14). A sibling to `ApplyMatrixToLVArray` (matched this
 round): `count` iterations, 6 bytes/element, copying each element through
 a stack-local buffer before forwarding it to `func_80015D58`. `void
 ApplyMatrixToSVArray(void *src, void *dest, s32 count, void *fixed)`.
@@ -174,7 +174,7 @@ just the trailing increment statements' order (29/37, no change) --
 neither touches WHICH value the loop bound itself is computed from,
 which is what actually mattered.
 
-Final source (verbatim, now in `src/code_d294_c.c` in place of the
+Final source (verbatim, now in `src/code_d294.c` in place of the
 `INCLUDE_ASM`):
 
 ```c
@@ -267,7 +267,7 @@ swap between a function's own parameters.
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 
 ```c
-/* ApplyMatrixToSVArray (src/code_d294_c.c; MATCHED round 19, echo -- see
+/* ApplyMatrixToSVArray (src/code_d294.c; MATCHED round 19, echo -- see
  * docs/match-reports/ApplyMatrixToSVArray.md): `dst[i] = m * src[i]` for
  * `count` elements of 6 bytes each. Each iteration copies one element out
  * of `src` into an all-s16 stack local (alignment 2, which is what makes
@@ -281,7 +281,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * shape its callers need. */
 ```
 
-## Round 98 (echo): track 7, moved from src/code_d294_c.c
+## Round 98 (echo): track 7, moved from src/code_d294.c
 
 The definition and its prototype in include/code_d294.h now take `(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m)` and walk by element (`dst + count`, `src++`), replacing the `(u8 *)p + 6` byte walks; the local `ApplyMatrixSV` extern takes Sony's signature `SVECTOR *(MATRIX *, SVECTOR *, SVECTOR *)` (this SDK's libgte.h omits it). Byte-identical. Measured on the way: keeping `void *` parameters and copying them into typed locals (`out = dst; in = src;`) scores 31/37, because the new pseudos reorder the callee-saved register saves in the prologue; typing the parameters themselves does not.
 

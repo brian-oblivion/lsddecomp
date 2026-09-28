@@ -354,7 +354,7 @@ extern LongVec3 DRIFT_STEP;
      exactly 24 bytes (`0x80087EC8`-`0x80087EDF`) -- the 8 trailing zero
      bytes splat lumped into its dlabel (`0x80087EE0`-`0x80087EE7`) are
      never reached by that indexed access and belong to something else.
-   - `SceneNode__LocalOffsetToWorldPos` (code_d294_c, already matched) forwards its own `src`
+   - `SceneNode__LocalOffsetToWorldPos` (code_d294, already matched) forwards its own `src`
      parameter to `ApplyMatrixToLVArray(dst, src, 1, buf)`, and `ApplyMatrixToLVArray`'s
      own doc comment (include/code_d294.h) confirms it treats both
      pointers as 0xC-byte (3-word) elements. `DreamSys__ProjectPointAtDistance` passes
