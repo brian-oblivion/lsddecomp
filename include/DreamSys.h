@@ -937,7 +937,7 @@ extern s32 GetTeleportTimeBonus(void);
 /* Table triple for Test4TunnelLinks (round 2026-08-30-d), same roles as the
    STAGE_PERMALINK_* triple above but for tunnel links specifically. */
 extern s8 sTunnelTriggersCount[];
-extern StaticLinkTrigger *TUNNEL_TRIGGERS[];
+extern StaticLinkTrigger *sTunnelTriggers[];
 extern StageSpawn *TUNNEL_SPAWNS[];
 
 /* Table triple for Test4StaircaseNodes (round 2026-08-30-d). */

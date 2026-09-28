@@ -1562,7 +1562,7 @@ s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s3
 }
 
 s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
-    return GetStaticSpawn(target, currentPos, stage, sTunnelTriggersCount, TUNNEL_TRIGGERS,
+    return GetStaticSpawn(target, currentPos, stage, sTunnelTriggersCount, sTunnelTriggers,
                           TUNNEL_SPAWNS, 1);
 }
 
