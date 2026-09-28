@@ -92,7 +92,7 @@ missed condition or wrong constant anywhere):
 3. Re-arm the ports (write 1/7/7 to `D_8006D8C0`/`CC`/`C8`).
 4. Unless cause==3 with a false `D_8006D7C0[D_8006D61D]` lookup (a per-mode
    flag table, same selector family as `D_8006D620`/`D_6006D6A0`), update
-   an error counter (`D_8006D614`) when a flag bit turns on across the
+   an error counter (`CD_nopen`) when a flag bit turns on across the
    read, latch the two response bytes into `CD_status`/`CD_status1`, and
    compute a `flags` value (`resp[0] & 0x1D`) used by cases 1-3 below.
    (Round 70: the counter increments when bit 0x10 turns ON, i.e. the old

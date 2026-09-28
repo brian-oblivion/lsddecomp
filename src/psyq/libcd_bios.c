@@ -27,7 +27,7 @@
  * linked as an object -- docs/research/psyq-sdk-objects.md) and is matched
  * as C instead.  Declarations are this unit's own view. */
 extern s32 CD_status1;
-extern s32 D_8006D614;
+extern s32 CD_nopen;
 extern u8 D_8006D61D;
 extern s32 D_8006D6C0[]; /* 0/1 flag table, selector 0..0x1B, same index family as D_8006D620 */
 extern s32 D_8006D7C0[]; /* 0/1 flag table, selector 0..0x1B */
@@ -100,7 +100,7 @@ s32 getintr(void) {
 
     if (cause != 3 || D_8006D7C0[D_8006D61D] != 0) {
         if (!(CD_status & 0x10) && (resp[0] & 0x10)) {
-            D_8006D614++;
+            CD_nopen++;
         }
         /* The volatile read keeps resp[0] a QImode value, so its
          * zero-extension survives as retail's `andi v0,v0,0xff`; flags is
@@ -491,7 +491,7 @@ extern s32 CD_cbready;
 extern s32 CD_cbread;
 extern s32 CD_status;
 extern s32 CD_status1;
-extern s32 D_8006D614;
+extern s32 CD_nopen;
 extern u8 D_8006D618;
 extern u8 D_8006D619;
 extern u8 D_8006D61A;
@@ -582,7 +582,7 @@ void CD_shell(void) {
     s32 saved;
     s32 counter = 0;
 
-    if (D_8006D904 < D_8006D614) {
+    if (D_8006D904 < CD_nopen) {
         saved = CD_cbsync;
         CD_cbsync = 0;
 
@@ -600,7 +600,7 @@ void CD_shell(void) {
         }
 
         CD_cbsync = saved;
-        D_8006D904 = D_8006D614;
+        D_8006D904 = CD_nopen;
     }
 }
 
@@ -722,7 +722,7 @@ s32 CD_init(void) {
         CD_cw(1, 0, 0, 0);
     }
 
-    if (D_8006D904 < D_8006D614) {
+    if (D_8006D904 < CD_nopen) {
         saved = CD_cbsync;
         CD_cbsync = 0;
 
@@ -740,7 +740,7 @@ s32 CD_init(void) {
         }
 
         CD_cbsync = saved;
-        D_8006D904 = D_8006D614;
+        D_8006D904 = CD_nopen;
     }
 
     if (CD_cw(0xA, 0, 0, 0) != 0) {
@@ -787,7 +787,7 @@ s32 cd_read_retry(void) {
                 puts(D_80010AAC);
                 printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
 
-                if (D_8006D904 < D_8006D614) {
+                if (D_8006D904 < CD_nopen) {
                     saved = CD_cbsync;
                     CD_cbsync = 0;
 
@@ -805,7 +805,7 @@ s32 cd_read_retry(void) {
                     }
 
                     CD_cbsync = saved;
-                    D_8006D904 = D_8006D614;
+                    D_8006D904 = CD_nopen;
                 }
 
                 if (CD_cw(9, 0, 0, 0) != 0) {

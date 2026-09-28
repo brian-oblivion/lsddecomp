@@ -36,7 +36,7 @@ of three ALREADY-MATCHED siblings in this unit, plus one new tail:
 3. The link-wait loop + "close port" tail from `CD_flush`, followed by
    one extra `CD_cw(1, 0, 0, 0)` call this function adds on top.
 4. A conditional `CD_cw(1, 0, 0, 0)` guarded by `CD_status & 0x10`.
-5. The ENTIRE body of `CD_shell` (the `D_8006D904 < D_8006D614`
+5. The ENTIRE body of `CD_shell` (the `D_8006D904 < CD_nopen`
    catch-up block), byte-for-byte.
 6. A new tail: two `CD_cw` retry checks (codes `0xA`, `0xC`, each
    returning -1 on failure) then
@@ -95,7 +95,7 @@ s32 CD_init(void)
         CD_cw(1, 0, 0, 0);
     }
 
-    if (D_8006D904 < D_8006D614) {
+    if (D_8006D904 < CD_nopen) {
         saved = CD_cbsync;
         CD_cbsync = 0;
 
@@ -113,7 +113,7 @@ s32 CD_init(void)
         }
 
         CD_cbsync = saved;
-        D_8006D904 = D_8006D614;
+        D_8006D904 = CD_nopen;
     }
 
     if (CD_cw(0xA, 0, 0, 0) == 0) {
@@ -556,7 +556,7 @@ s32 CD_init(void)
         CD_cw(1, 0, 0, 0);
     }
 
-    if (D_8006D904 < D_8006D614) {
+    if (D_8006D904 < CD_nopen) {
         saved = CD_cbsync;
         CD_cbsync = 0;
 
@@ -574,7 +574,7 @@ s32 CD_init(void)
         }
 
         CD_cbsync = saved;
-        D_8006D904 = D_8006D614;
+        D_8006D904 = CD_nopen;
     }
 
     if (CD_cw(0xA, 0, 0, 0) != 0) {

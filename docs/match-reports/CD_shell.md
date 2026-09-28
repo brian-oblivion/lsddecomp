@@ -6,12 +6,12 @@
 
 ## What it does
 
-If `D_8006D904 < D_8006D614` (a periodic-service counter is behind), saves
+If `D_8006D904 < CD_nopen` (a periodic-service counter is behind), saves
 and clears the `CD_cbsync` callback, prints a one-shot "waiting" message
 while `CD_status & 0x10` stays set (calling `CD_cw(1,0,0,0)` each
 iteration), then retries `CD_cw(0x16, D_8006D908, 0, 0)` printing a
 "still waiting" message until it succeeds, restores `CD_cbsync`, and
-catches `D_8006D904` up to `D_8006D614`.
+catches `D_8006D904` up to `CD_nopen`.
 
 ## The C
 
@@ -21,7 +21,7 @@ void CD_shell(void)
     s32 saved;
     s32 counter = 0;
 
-    if (D_8006D904 < D_8006D614) {
+    if (D_8006D904 < CD_nopen) {
         saved = CD_cbsync;
         CD_cbsync = 0;
 
@@ -39,7 +39,7 @@ void CD_shell(void)
         }
 
         CD_cbsync = saved;
-        D_8006D904 = D_8006D614;
+        D_8006D904 = CD_nopen;
     }
 }
 ```

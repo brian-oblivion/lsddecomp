@@ -74,7 +74,7 @@ s32 cd_read_retry(void)
                 puts(D_80010AAC);
                 printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
 
-                if (D_8006D904 < D_8006D614) {
+                if (D_8006D904 < CD_nopen) {
                     saved = CD_cbsync;
                     CD_cbsync = 0;
 
@@ -92,7 +92,7 @@ s32 cd_read_retry(void)
                     }
 
                     CD_cbsync = saved;
-                    D_8006D904 = D_8006D614;
+                    D_8006D904 = CD_nopen;
                 }
 
                 if (CD_cw(9, 0, 0, 0) != 0) {
@@ -378,7 +378,7 @@ s32 cd_read_retry(void)
                 puts(D_80010AAC);
                 printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
 
-                if (D_8006D904 < D_8006D614) {
+                if (D_8006D904 < CD_nopen) {
                     saved = CD_cbsync;
                     CD_cbsync = 0;
 
@@ -396,7 +396,7 @@ s32 cd_read_retry(void)
                     }
 
                     CD_cbsync = saved;
-                    D_8006D904 = D_8006D614;
+                    D_8006D904 = CD_nopen;
                 }
 
                 if (CD_cw(9, 0, 0, 0) != 0) {
@@ -808,7 +808,7 @@ s32 cd_read_retry(void)
                 puts(D_80010AAC);
                 printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
 
-                if (D_8006D904 < D_8006D614) {
+                if (D_8006D904 < CD_nopen) {
                     saved = CD_cbsync;
                     CD_cbsync = 0;
 
@@ -826,7 +826,7 @@ s32 cd_read_retry(void)
                     }
 
                     CD_cbsync = saved;
-                    D_8006D904 = D_8006D614;
+                    D_8006D904 = CD_nopen;
                 }
 
                 if (CD_cw(9, 0, 0, 0) != 0) {
@@ -1149,7 +1149,7 @@ s32 cd_read_retry(void)
                 puts(D_80010AAC);
                 printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
 
-                if (D_8006D904 < D_8006D614) {
+                if (D_8006D904 < CD_nopen) {
                     saved = CD_cbsync;
                     CD_cbsync = 0;
 
@@ -1167,7 +1167,7 @@ s32 cd_read_retry(void)
                     }
 
                     CD_cbsync = saved;
-                    D_8006D904 = D_8006D614;
+                    D_8006D904 = CD_nopen;
                 }
 
                 if (CD_cw(9, 0, 0, 0) != 0) {
