@@ -183,3 +183,23 @@ names" below.
 The six `12`s (`<< 12` three times per axis, `>> 12` on the product) are
 `FIX12_SHIFT` (include/common.h, 20.12 fixed point), as `Sprite.c`'s
 `Sprite__UpdateRotation` spells the same split division.
+
+### Comment history (moved from src/class_3bb8c_q.c, round 101)
+
+The function comment cited `tools/classtable.py gVariantSpriteMethods --vs
+gSceneNodeMethods` for the override (in "Naming" above) and read `ratios`
+"as a raw `s16 *` per the RatioToFixed12 precedent", which the retype to
+`Ratio16 *` retired. The hoisted truncation's derivation (the size drift
+it caused, found through `build/lsdde.map`) stays in "Derivation" above;
+the source keeps one `MATCHING:` line on `xScale`.
+
+## Proposed field names
+
+- Sprite (include/Sprite.h, `SPRITE_FIELDS`) `unk58` (`+0x058`) ->
+  `accumulateScale`, tier B. Accessors: `Sprite__Reset` (src/Sprite.c)
+  zeroes it; this method reads it and, while it is non-zero, multiplies
+  `accumScaleX/Y` by the ratios instead of writing `sprite.scalex/scaley`.
+  No writer of a non-zero value found. Not applied: `Sprite__Reset` is
+  outside this job. The rename touches `self->unk58` in src/Sprite.c and
+  src/class_3bb8c_q.c, plus the comments on the two fields after it and
+  VariantSprite.h's banner line that names it.

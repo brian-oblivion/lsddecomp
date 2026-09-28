@@ -164,3 +164,11 @@ nothing, which the header now says.
 | `VARIANT_CLUT_STRIDE` (the literal `2` in `variant * 2`), unit-local in src/class_3bb8c_q.c | A | asm/data/76DC8.data.s holds one interleaved `{x, y}` table, `{0x3D0, 0x1FF}, {0x3E0, 0x1FF}`, which splat split into the 2-byte `gVariantSpriteClutX` and 6-byte `gVariantSpriteClutY`; both lookups step over one whole entry, 2 s16s, per variant ("The rodata shape" above). |
 
 The locals and parameter names here were already roles (`self`, `variant`).
+
+### Comment history (moved from src/class_3bb8c_q.c, round 101)
+
+The source comment on `gVariantSpriteClutX/Y` carried the derivation
+("stride 4 bytes ... even though each holds only a 2-byte element",
+"confirmed against asm/data/76DC8.data.s"); both are in "The rodata shape"
+above. The source now says what the table holds, `{976, 511}` and
+`{992, 511}` in VRAM, and keeps one `MATCHING:` line for the two externs.
