@@ -121,3 +121,9 @@ MATCHED 33/33.
 ## Naming
 
 - **Tier A.** Pure leaf: linear interpolation between two value/position keyframes with a divide-by-zero guard (dt forced to 1 when the two positions coincide). Mechanics are the whole story.
+
+## Name (track 10, debt-world)
+
+Tier A by its body: the linear interpolation of y between two LongVec3s at
+z = `at`, with the z distance taken in units of 1024. Its argument view
+DreamSysInterpPoint (`{pad, value, position}`) was merged into LongVec3.

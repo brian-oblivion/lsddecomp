@@ -88,3 +88,11 @@ names its argument no better, so there is nothing to name it after.
 Re-checked round 92 (runner delta, track 7): still no reader of `unk_0x924`
 anywhere in src/, and the slot has no caller that names its argument, so the
 tier-C placeholder stays.
+
+## Name (track 10, debt-world)
+
+Tier B. A pure get/set leaf: `value >= 0` stores it, and the old value is
+returned either way. The field it keeps, `configOption` (+0x924), is
+GameApplicationConfig's word +0x14, which GameApplication__GameApplication
+hands to slot228 once; ResetSessionState clears it and nothing reads it, so
+its purpose in the game is not established.
