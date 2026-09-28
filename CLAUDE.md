@@ -52,7 +52,7 @@ byte-for-byte to the retail `SLPS_015.56` executable.
    COP2 registers, which are a numbering disjoint from the GPRs, and there
    is no C that emits them. Handing such a block a pointer with
    `: : "r" (dst) : "memory"` is not register pinning, it is the only way to
-   reference the pointer. `src/TmdRenderer.c` has carried eight such
+   reference the pointer. `src/graphics/TmdRenderer.c` has carried eight such
    constraints, byte-verified, since before this rule was written down —
    `StoreSxyPolyF3` and its five siblings — and round 13 matched three more
    functions the same way. Those constraints now live inside the `gte_*`

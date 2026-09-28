@@ -42,7 +42,7 @@ stood at `c677d8f4e5df` (2024-09-13):**
 
 **Not taken:** their C source (`src/lsdde/DreamSys.c`, `src/lsdde/StageGrid.c`)
 and their tooling (`tools/m2ctx.py` here is a separate script). Our
-`src/DreamSys.c` and `src/StageGrid.c` began as splat-generated `INCLUDE_ASM`
+`src/world/DreamSys.c` and `src/world/StageGrid.c` began as splat-generated `INCLUDE_ASM`
 stubs, 118 and 2 of them; every function in both has since been re-derived
 from the disassembly in this repo and neither file has an `INCLUDE_ASM` left.
 That is a provenance choice rather than a criticism — lsddecomp carries no
