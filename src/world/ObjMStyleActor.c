@@ -1103,7 +1103,7 @@ extern s32 sStyleTickCount;
 extern s32 sStyleDay;
 extern s32 sStyleUnreadArg;
 extern s32 sStyleSceneRefs; /* a StyleSceneRefs * (below) */
-extern s32 gStyleVariant;
+extern s32 sStyleVariant;
 /* StyleCueSlot is defined with the cue functions below; this only clears the slots. */
 typedef struct StyleCueSlot StyleCueSlot;
 extern StyleCueSlot *sStyleCueSlots[2];
@@ -1120,7 +1120,7 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
         sStyleGrid = grid;
         sStyleStage = stage;
         sStyleSceneRefs = sceneRefs;
-        gStyleVariant = -1;
+        sStyleVariant = -1;
         sStyleDay = day;
         sStyleUnreadArg = unreadArg;
         sStyleTickCount = 0;
@@ -1226,7 +1226,7 @@ void ApplyStyleDecorationIfSet(void) {
  * scene's StageMap), sStyleStage (ObjM's stage), sStyleSceneRefs (ObjM's
  * sound, resources and viewport; StyleSceneRefs below) and sStyleDay (the
  * DreamSys day). ApplyStyleConfig then takes the stage's fixed config or,
- * with none, PickStyleFallbackConfig's: a variant (gStyleVariant, 0..3) and
+ * with none, PickStyleFallbackConfig's: a variant (sStyleVariant, 0..3) and
  * a config record picked from day + stage.
  *
  * What TickStyle keeps, each built on the first tick:
@@ -1294,7 +1294,7 @@ void StyleFlushDecoration(void) {
 extern s32 sStyleDay;
 extern s32 sStyleStage;
 extern s8 gStyleVariantPicks[];
-extern s32 gStyleVariant;
+extern s32 sStyleVariant;
 extern s8 gStyleVariantConfigCounts[];
 extern s32 sStyleConfigIndex;
 extern s8 *gStyleVariantConfigs[];
@@ -1321,7 +1321,7 @@ void *PickStyleFallbackConfig(void) {
 
     seed = sStyleDay + sStyleStage;
     variant = gStyleVariantPicks[seed & 0xF];
-    gStyleVariant = variant;
+    sStyleVariant = variant;
     count = gStyleVariantConfigCounts[variant];
     index = seed % count;
     sStyleConfigIndex = index;
@@ -1464,7 +1464,7 @@ void StyleReleaseDecorSet(void) {
     }
 }
 
-extern s32 gStyleVariant;
+extern s32 sStyleVariant;
 extern s32 sStyleSceneRefs;
 extern s32 rand(void);
 extern s8 sStyleKind0Counts[];
@@ -1485,20 +1485,20 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
     s32 kind1Count;
     StyleEffect **next;
 
-    if (gStyleVariant < 0) {
+    if (sStyleVariant < 0) {
         return;
     }
     refs = (StyleSceneRefs *)sStyleSceneRefs;
-    SetStyleEffectSources(gStyleVariant, (Actor *)refs->dreamerTmd, (s32)refs->etcTim,
+    SetStyleEffectSources(sStyleVariant, (Actor *)refs->dreamerTmd, (s32)refs->etcTim,
                           (s32)refs->viewport);
     kind0Count = sStyleKind0Counts[rand() & 3];
-    kind1Count = (gStyleVariant == 2) ? STYLE_VARIANT2_EFFECTS - kind0Count : 0;
+    kind1Count = (sStyleVariant == 2) ? STYLE_VARIANT2_EFFECTS - kind0Count : 0;
     sStyleEffectSlotCount = kind0Count + kind1Count;
     next = StyleFillEffectKind0(sStyleEffectSlots, kind0Count, pos);
     next = StyleFillEffectKind1(next, kind1Count, pos);
-    if (gStyleVariant == 0) {
+    if (sStyleVariant == 0) {
         StyleFillEffectKind3(next, pos);
-    } else if (gStyleVariant == 2) {
+    } else if (sStyleVariant == 2) {
         StyleFillEffectKind2(next, pos);
     } else {
         return;
@@ -1506,7 +1506,7 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
     sStyleEffectSlotCount = sStyleEffectSlotCount + 1;
 }
 
-extern s32 gStyleVariant;
+extern s32 sStyleVariant;
 extern s32 sStyleEffectSlotCount;
 
 /* Each slot's +0x0EC is StyleEffect__Update, called with the position
@@ -1515,7 +1515,7 @@ void StyleUpdateEffectSlots(LongVec3 *pos) {
     s32 i;
     StyleEffect *slot;
 
-    if (gStyleVariant < 0) {
+    if (sStyleVariant < 0) {
         return;
     }
     for (i = 0; i < sStyleEffectSlotCount; i++) {
@@ -1524,12 +1524,12 @@ void StyleUpdateEffectSlots(LongVec3 *pos) {
     }
 }
 
-extern s32 gStyleVariant;
+extern s32 sStyleVariant;
 extern s32 sStyleEffectSlotCount;
 
 /* Releases the effect slots, if StyleBuildEffectSlots ran. */
 void StyleReleaseEffectSlots(void) {
-    if (gStyleVariant >= 0) {
+    if (sStyleVariant >= 0) {
         ReleaseBasicClassArray((void **)sStyleEffectSlots, sStyleEffectSlotCount);
     }
 }
@@ -2031,7 +2031,7 @@ void StyleScrollVramStrips(void) {
  *    requests VAB programs on the three voices; most restart the pattern by
  *    setting `tick` to -1 once it passes a limit.
  *  - IsStyleVariantEven: whether the variant PickStyleFallbackConfig chose
- *    (gStyleVariant) is even.
+ *    (sStyleVariant) is even.
  *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style layer
  *    keeps at an offset from its target: its ctor, finalize, reset
  *    (StyleEffect__SetParams) and update slot occupants, and the
@@ -2295,10 +2295,10 @@ s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
     return ctx->lastDist / stepDist;
 }
 
-extern s32 gStyleVariant;
+extern s32 sStyleVariant;
 
 s32 IsStyleVariantEven(void) {
-    return (gStyleVariant & 1) ^ 1;
+    return (sStyleVariant & 1) ^ 1;
 }
 
 /* ------------------------------------------------------------------ *

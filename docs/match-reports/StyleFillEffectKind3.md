@@ -429,7 +429,7 @@ means the real difference is upstream of the schedule.
 
 **`StyleFillEffectKind3`, tier B.**
 
-Called only when `gStyleVariant == 0`, from `StyleBuildEffectSlots`, as
+Called only when `sStyleVariant == 0`, from `StyleBuildEffectSlots`, as
 the kind-0-exclusive finishing fill. Passes a literal kind argument of `3`
 to `New_StyleEffect` and appends exactly one slot (`*arg0 = ...; arg0++;
 return arg0;`). STALL, 79/81 words (length exact), register-identity

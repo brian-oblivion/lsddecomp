@@ -92,7 +92,7 @@ change; second attempt: hoisted to a local before the loop, byte-exact).
 
 Sibling of `StyleFillEffectKind0`: fills `arg1` slots of `sStyleEffectSlots`
 via the same `New_StyleEffect` allocator, this time with a literal kind
-argument of `1`. Called unconditionally (every `gStyleVariant`) from
+argument of `1`. Called unconditionally (every `sStyleVariant`) from
 `StyleBuildEffectSlots`, right after `StyleFillEffectKind0`. MATCHED,
 42/42, second build (one lever: hoist the read of `sStyleSpawnYChoice2` out of the
 loop).

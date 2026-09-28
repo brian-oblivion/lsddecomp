@@ -491,7 +491,7 @@ record of what someone did, not a proof of what does not work.
 
 **`StyleFillEffectKind2`, tier B.**
 
-Called only when `gStyleVariant == 2`, from `StyleBuildEffectSlots`, as
+Called only when `sStyleVariant == 2`, from `StyleBuildEffectSlots`, as
 the kind-2-exclusive finishing fill (the sibling of `StyleFillEffectKind3`,
 mirrored for the other variant). Passes a literal kind argument of `2` to
 `New_StyleEffect`. STALL, 49/79 words (length exact), residue at ins 3/del 3

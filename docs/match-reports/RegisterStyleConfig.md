@@ -21,7 +21,7 @@ extern s32 sStyleTickCount;
 extern s32 sStyleDay;
 extern s32 sStyleUnreadArg;
 extern s32 sStyleSceneRefs;
-extern s32 gStyleVariant;
+extern s32 sStyleVariant;
 extern s32 D_8008ACA0;
 
 extern s32 ApplyStyleConfig(void);
@@ -36,7 +36,7 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
         sStyleGrid = a0;
         sStyleStage = a1;
         sStyleSceneRefs = a2;
-        gStyleVariant = -1;
+        sStyleVariant = -1;
         sStyleDay = a3;
         sStyleUnreadArg = arg4;
         sStyleTickCount = 0;

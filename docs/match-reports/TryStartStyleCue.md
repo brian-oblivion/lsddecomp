@@ -55,7 +55,7 @@ the looser local signatures `Entity.c` and `DreamSys.c` already use for the
 same cross-unit call, per the multiple-independent-local-views convention).
 `sStyleSceneRefs` is redeclared fresh here (not reusing the copy later in this
 file for `FlushStyleCue`/`ServiceStyleCueIfNear`) because this function's ROM
-address is earlier -- same pattern as `StyleUpdateEffectSlots`'s fresh `gStyleVariant`
+address is earlier -- same pattern as `StyleUpdateEffectSlots`'s fresh `sStyleVariant`
 copy. `sStyleCueCallbacks` is `ObjMStyleActor.c`'s already-identified 14-function
 table (its own `ParamMethods` slot list); here it is read as a raw `s32`
 bit pattern (a function pointer forwarded opaquely as `InitSoundCueSet`'s 5th

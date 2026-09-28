@@ -312,7 +312,7 @@ stopped on it. The discriminator here costs one build.
 
 **`StyleBuildDecorSet`, tier B.**
 
-Guarded by `sStyleDecorVariant` (set only for `gStyleVariant == 0` by
+Guarded by `sStyleDecorVariant` (set only for `sStyleVariant == 0` by
 `PickStyleFallbackConfig`). Allocates 18 `New_BoxFill` instances into
 `sStyleDecorSlots`, walking two position pairs (`paramA`/`paramB`) that step
 by a fixed per-iteration delta. Released by `StyleReleaseDecorSet`,

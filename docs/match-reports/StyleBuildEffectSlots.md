@@ -26,7 +26,7 @@ extern void StyleFillEffectKind2(void *arg0, void *arg1);                   /* f
 `SetStyleEffectSources` is `ObjMStyleActor.c`'s already-matched
 `void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3)`; this
 call site only needs the ABI shape (`s32,void*,s32,s32`), matching the
-project's convention of a looser cross-unit local signature. `gStyleVariant`,
+project's convention of a looser cross-unit local signature. `sStyleVariant`,
 `sStyleSceneRefs`, `sStyleEffectSlotCount` and `sStyleEffectSlots` are fresh copies of externs
 already declared later in this file, needed here because this function's
 ROM address is earlier (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`).
@@ -40,19 +40,19 @@ void StyleBuildEffectSlots(void *arg0) {
     s32 count;
     void **filled;
 
-    if (gStyleVariant < 0) {
+    if (sStyleVariant < 0) {
         return;
     }
     base = sStyleSceneRefs;
-    SetStyleEffectSources(gStyleVariant, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
+    SetStyleEffectSources(sStyleVariant, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
     val = sStyleKind0Counts[rand() & 3];
-    count = (gStyleVariant == 2) ? 0x10 - val : 0;
+    count = (sStyleVariant == 2) ? 0x10 - val : 0;
     sStyleEffectSlotCount = val + count;
     filled = (void **) StyleFillEffectKind0(sStyleEffectSlots, val, arg0);
     filled = StyleFillEffectKind1(filled, count, arg0);
-    if (gStyleVariant == 0) {
+    if (sStyleVariant == 0) {
         StyleFillEffectKind3(filled, arg0);
-    } else if (gStyleVariant == 2) {
+    } else if (sStyleVariant == 2) {
         StyleFillEffectKind2(filled, arg0);
     } else {
         return;
@@ -69,11 +69,11 @@ load in a register and reuses it for all three offset reads, matching
 retail's `lw v0, sStyleSceneRefs; lw a1,4(v0); lw a2,8(v0); lw a3,0xC(v0)`
 without needing to fight CSE.
 
-The trailing `if (gStyleVariant == 0) {...} else if (gStyleVariant == 2) {...}
+The trailing `if (sStyleVariant == 0) {...} else if (sStyleVariant == 2) {...}
 else { return; }` (rather than three independent `if`s) is what reproduces
 retail's shared "both branches converge, third one skips straight past" tail
 exactly: the `sStyleEffectSlotCount = sStyleEffectSlotCount + 1;` increment is genuinely SKIPPED
-when `gStyleVariant` is neither 0 nor 2 (retail's third path jumps directly to
+when `sStyleVariant` is neither 0 nor 2 (retail's third path jumps directly to
 the epilogue, bypassing the increment block entirely) -- an early `return`
 in the `else` reproduces that skip.
 
@@ -85,7 +85,7 @@ in the `else` reproduces that skip.
 
 **`StyleBuildEffectSlots`, tier B.**
 
-Dispatches on `gStyleVariant` (`PickStyleFallbackConfig`'s "kind") to
+Dispatches on `sStyleVariant` (`PickStyleFallbackConfig`'s "kind") to
 `SetStyleEffectSources`, then fills `sStyleEffectSlots` via
 `StyleFillEffectKind0`/`StyleFillEffectKind1`, then finishes via
 `StyleFillEffectKind3` (variant 0) or `StyleFillEffectKind2` (variant 2).

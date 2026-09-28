@@ -37,7 +37,7 @@ local-views convention applies, and this is the only place in the executable
 that dispatches slot `+0xEC` on this array's elements (no other caller found
 via `grep -rn 80054C74`).
 
-`gStyleVariant`/`sStyleEffectSlotCount`/`sStyleEffectSlots` are declared `extern` a second time,
+`sStyleVariant`/`sStyleEffectSlotCount`/`sStyleEffectSlots` are declared `extern` a second time,
 verbatim, ahead of this function -- ROM order puts `StyleUpdateEffectSlots` textually
 *before* `StyleReleaseEffectSlots`'s own copy of the same three externs, so a fresh set
 was added here rather than hoisting the existing ones (repeated identical
@@ -51,7 +51,7 @@ void StyleUpdateEffectSlots(void *arg0) {
     s32 i;
     ObjE0C8 *obj;
 
-    if (gStyleVariant < 0) {
+    if (sStyleVariant < 0) {
         return;
     }
     for (i = 0; i < sStyleEffectSlotCount; i++) {
