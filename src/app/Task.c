@@ -1140,7 +1140,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
 /* Section 3. IntermediateBase's methods, the start of Viewport's, and
  * three accessors ahead of them.
  *
- * TaskCore__GetActiveSlotCount, GetTaskCoreMethods and
+ * TaskCore__GetActiveItemCursor, GetTaskCoreMethods and
  * GetDefaultMovieFrame come first: one TaskCore method and two plain
  * accessors for data used far more widely (Task.c, ObjMStyleActor.c).
  *
@@ -1157,7 +1157,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
  * of Viewport's table.
  */
 
-s32 TaskCore__GetActiveSlotCount(TaskCore *self) {
+s32 TaskCore__GetActiveItemCursor(TaskCore *self) {
     return self->slotCounts[self->activeSlot];
 }
 

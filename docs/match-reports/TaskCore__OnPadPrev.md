@@ -54,15 +54,15 @@ merge retail is doing that the C fails to express.
 - `Obj86B60Methods::slotEC` (+0x0EC, external `TaskCore__FindPrevFreeSlot`) and
   `::slot118` (+0x118, external `TaskCore__RetreatSlotCursor`) -- both `void (*)(Obj86B60*)`.
 
-  **CORRECTED, round 12.** This line originally named `TaskCore__GetActiveSlotCount` as the
-  occupant of `+0x118`. It is not; `TaskCore__GetActiveSlotCount` sits at `+0x120`. Resolved
+  **CORRECTED, round 12.** This line originally named `TaskCore__GetActiveItemCursor` as the
+  occupant of `+0x118`. It is not; `TaskCore__GetActiveItemCursor` sits at `+0x120`. Resolved
   against the table bytes in the executable, twice independently (runner alpha
-  while matching `TaskCore__GetActiveSlotCount`, then the head):
+  while matching `TaskCore__GetActiveItemCursor`, then the head):
 
   ```sh
   python3 tools/classtable.py gTitleMenuMethods
   #   +0x118  0x8003DE30 TaskCore__RetreatSlotCursor
-  #   +0x120  0x8003DFA0 TaskCore__GetActiveSlotCount
+  #   +0x120  0x8003DFA0 TaskCore__GetActiveItemCursor
   ```
 
   `slotEC`'s attribution in the same line re-checked and is correct.

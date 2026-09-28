@@ -1,4 +1,6 @@
-# TaskCore__GetActiveSlotCount — MATCH (7/7 words)
+# TaskCore__GetActiveItemCursor — MATCH (7/7 words)
+
+> Renamed from `TaskCore__GetActiveSlotCount` on 2026-09-28 (tools/rename.py). Address 0x8003dfa0.
 
 > Renamed from `Obj86B60__GetActiveSlotCount` on 2026-09-25 (tools/rename.py). Address 0x8003dfa0.
 
@@ -16,7 +18,7 @@ running count: `self->unk60[self->unk58]`.
 ## The C
 
 ```c
-s32 TaskCore__GetActiveSlotCount(Obj86B60 *self)
+s32 TaskCore__GetActiveItemCursor(Obj86B60 *self)
 {
     return self->unk60[self->unk58];
 }
@@ -25,22 +27,22 @@ s32 TaskCore__GetActiveSlotCount(Obj86B60 *self)
 ## Struct knowledge established / corrected
 
 `include/Task.h`'s `Obj86B60Methods` already had a `slot118` field
-whose comment attributed it to `TaskCore__GetActiveSlotCount` (citing `TaskCore__OnPadPrev.md`'s
+whose comment attributed it to `TaskCore__GetActiveItemCursor` (citing `TaskCore__OnPadPrev.md`'s
 "Struct knowledge established" section as the source). **That attribution
 was wrong.** Reading the retail table bytes directly:
 
 ```
-gTitleMenuMethods+0x118 = 0x8003DE30  (TaskCore__RetreatSlotCursor, NOT TaskCore__GetActiveSlotCount)
-gTitleMenuMethods+0x120 = 0x8003DFA0  (TaskCore__GetActiveSlotCount's real slot)
+gTitleMenuMethods+0x118 = 0x8003DE30  (TaskCore__RetreatSlotCursor, NOT TaskCore__GetActiveItemCursor)
+gTitleMenuMethods+0x120 = 0x8003DFA0  (TaskCore__GetActiveItemCursor's real slot)
 ```
 
 The byte OFFSET `TaskCore__OnPadPrev` compiled against (0x118) was and is
 correct -- that function still matches -- but the function pointer VALUE
-stored there at runtime is `TaskCore__RetreatSlotCursor`, not `TaskCore__GetActiveSlotCount`. The old
+stored there at runtime is `TaskCore__RetreatSlotCursor`, not `TaskCore__GetActiveItemCursor`. The old
 report's error: a discarded/void-typed call site is not evidence of which
 function occupies a slot, only of the slot's own signature. I corrected
 `slot118`'s comment and added the (previously missing) `slot120` field for
-`TaskCore__GetActiveSlotCount` itself, both in `include/Task.h`. See this unit's
+`TaskCore__GetActiveItemCursor` itself, both in `include/Task.h`. See this unit's
 final summary for the flagged existing-declaration change.
 
 ### Proposed learning

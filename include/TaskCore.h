@@ -183,7 +183,7 @@ struct TaskCoreTarget {
     /* +0x114 */ void (*advanceSlotCursor)(Self *self);          /* TaskCore__AdvanceSlotCursor */ \
     /* +0x118 */ void (*retreatSlotCursor)(Self *self);          /* TaskCore__RetreatSlotCursor */ \
     /* +0x11C */ void (*setSlotCursor)(Self *self, s32 cursor, s32 withSound); /* TaskCore__SetSlotCursor */ \
-    /* +0x120 */ s32 (*getActiveSlotCount)(Self *self)           /* TaskCore__GetActiveSlotCount */
+    /* +0x120 */ s32 (*getActiveSlotCount)(Self *self)           /* TaskCore__GetActiveItemCursor */
 /* clang-format on */
 
 /* clang-format off */
@@ -282,6 +282,6 @@ void TaskCore__CancelElementScroll(TaskCore *self);
 void TaskCore__AdvanceSlotCursor(TaskCore *self);
 void TaskCore__RetreatSlotCursor(TaskCore *self);
 void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound);
-s32 TaskCore__GetActiveSlotCount(TaskCore *self);
+s32 TaskCore__GetActiveItemCursor(TaskCore *self);
 
 #endif
