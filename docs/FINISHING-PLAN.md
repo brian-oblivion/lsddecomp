@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 41 (2026-09-28, premium session after round 102: phase 3,
-tracks 10 to 13, from a six-area review; tracks 6 to 9 archived).
+Plan revision: 42 (2026-09-28, premium session: phase 4, track 14, the C
+made portable for a Linux port in its own repo; revision 41 phase 3).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -53,6 +53,11 @@ file sees what a game's source looks like, not a decompiler's:
 publish: one declaration per name and one convention (10), snake_case file
 names (11), every header documented as API with no process text left in
 any comment (12), and a README and lint a stranger can use (13).
+
+**Phase 4 (track 14; operator, 2026-09-28):** the same C builds for Linux,
+so a PC port can be written on top of it. The port itself, with its platform
+layer, renderer, audio and packaging, is a separate repository that pins this
+one, as sm64's and oot's ports are. This repo only keeps its C portable.
 
 `plan.py` prints each as a track status; `tools/readability.py` measures the
 debt behind 6 to 8.
@@ -238,6 +243,18 @@ build and verify, how to change code and keep it matching); a lint that
 needs no disc (`make format`, `apidoc.py`, `readability.py`) runnable as CI;
 the licence and the fate of the process docs (`docs/`, CLAUDE.md, one-off
 tools) are the operator's decisions, recorded in PROGRESS.md.
+
+**Track 14: PC port groundwork** (phase 4). The premium `port-design` item
+writes `docs/research/pc-port-design.md`. It weighs psyz (the Psy-Q
+reimplementation sotn-decomp's in-repo PC build links) against a platform
+layer of our own, covering the renderer, audio, disc access from the user's
+image, pointer width (32-bit first or 64-bit clean), the build and licence
+compatibility. It says what stays in this repo and what goes to the port
+repo, and the operator approves it (`port-approach`). Then `make pc-check`
+compiles every game `.c` with the host compiler under `-DPLATFORM_PC`,
+listing the unresolved Sony symbols that are the port's surface, while the
+matching build stays byte-identical. After that, no pointer is held in an
+integer type, and layout assumptions carry static asserts.
 
 ## 4. Prompts
 

@@ -6,6 +6,32 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-28 — premium session: plan revision 42, phase 4 (a Linux port, in its own repo)
+
+The operator asked for a PC port, Linux first, and whether it belongs in
+this repo. Of the local reference decomps, sotn-decomp builds its PC
+version in-repo (`src/pc/`, CMake, and psyz as a submodule, the same
+author's Psy-Q SDK reimplementation for PC). sm64's ports (sm64-port,
+sm64ex) and oot's and mm's (Ship of Harkinian) are separate repositories
+over the decomp; none of the local sm64, oot or mm clones holds port code.
+
+Chosen: a hybrid. This repo makes its C portable (track 14: `port-design`
+premium, `port-approach` for the operator, `make pc-check`, `portability`).
+The port, with its platform layer for about 290 Sony calls, renderer,
+audio, disc-image reader and packaging, is its own repo pinning a commit
+of this one. Reasons:
+
+- A port needs freedom this repo's HARD RULES forbid: bug fixes, 64-bit,
+  widescreen.
+- Sony's 178 linked objects are MIPS, so the port replaces the whole SDK,
+  which is a different project from matching it.
+- Its licence (psyz's among others) should not decide this repo's.
+
+It is the last phase: phase 3 renames every file and rewrites every
+header first.
+
+---
+
 ## 2026-09-28 — premium session: plan revision 41, phase 3 (the tree is ready to publish)
 
 Operator: every track is done, but measured debt has no track, the file

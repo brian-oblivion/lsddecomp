@@ -119,7 +119,8 @@ TRACK9_ITEMS = {
     "docs-budget": "every doc within its word budget",
     "nonmatching-clean": "tools/check-nonmatching.sh green",
 }
-# Phase 3 (plan revision 41, 2026-09-28): the tree is ready to publish.
+# Phases 3 and 4 (plan revisions 41 and 42, 2026-09-28): the tree is ready to
+# publish, then its C is ready for a Linux port (the port is its own repo).
 # Each track is an ordered checklist; an item is (done-when, model, after).
 # model: "opus"/"sonnet" is a runner job, "premium" a head setup item, None
 # an operator decision the head records. An item is ready once every item in
@@ -170,6 +171,23 @@ PHASE3 = {
         "licence": ("the operator's licence decision, recorded in PROGRESS.md", None, ()),
         "process-docs": ("the operator's decision on docs/, CLAUDE.md and one-off tools, applied", None,
                          ("readme",)),
+    }),
+    # Phase 4 (plan revision 42): portability groundwork HERE; the port itself
+    # (platform layer, renderer, audio, packaging) lives in its own repo that
+    # pins this one, as sm64's and oot's ports do (operator, 2026-09-28).
+    "14": ("PC port groundwork", {
+        "port-design": ("docs/research/pc-port-design.md: the port repo's platform layer (psyz, sotn-decomp's "
+                        "Psy-Q on PC, against our own), renderer, audio, pointer width, disc access, build, "
+                        "licence compatibility, and what stays in this repo; a recommendation", "premium", ()),
+        "port-approach": ("the operator's approval of port-design, recorded in PROGRESS.md", None,
+                          ("port-design",)),
+        "pc-build": ("`make pc-check` compiles every game .c with the host compiler (-DPLATFORM_PC) with zero "
+                     "errors and lists the Sony symbols left unresolved (the port's surface); the matching "
+                     "build byte-identical, platform #ifs only where C cannot be shared", "opus",
+                     ("port-approach",)),
+        "portability": ("no pointer held in an integer type and layout assumptions guarded by static asserts, "
+                        "so the shared C is correct at the pointer width port-design chose", "opus",
+                        ("pc-build",)),
     }),
 }
 PHASE3_ITEMS = {k: {i: v[0] for i, v in items.items()} for k, (_, items) in PHASE3.items()}
@@ -1572,8 +1590,10 @@ def print_status(d, n, st):
     c9 = t9["checklist"]
     print(f"  9      {t9['status'].split(' (')[0]:<10} close-out: {sum(c9.values())}/{len(c9)} items ticked; "
           f"{t9['history']} history mention(s) left in comments")
-    print("  -- phase 3: the tree is ready to publish (revision 41)")
     for k in PHASE3:
+        if k in ("10", "14"):
+            print("  -- phase 3: the tree is ready to publish (revision 41)" if k == "10"
+                  else "  -- phase 4: portable C for a Linux port in its own repo (revision 42)")
         ck = t[k]["checklist"]
         left = [i for i, v in ck.items() if not v]
         ops = [i for i in left if PHASE3[k][1][i][1] is None]
