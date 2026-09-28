@@ -8,7 +8,7 @@
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
 > `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
 > the whole image is byte-exact with the flags on, and this function was one of
-> the live tests -- two stores to `gNullDriverMode`/`gNullDriverModeArg` and `return 1`. The C is in `src/sound/PlacementGridVabSound.c`. Everything below is the
+> the live tests -- two stores to `sNullDriverMode`/`gNullDriverModeArg` and `return 1`. The C is in `src/sound/PlacementGridVabSound.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
 > **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was
@@ -33,7 +33,7 @@ grep -n 'gp_rel' asm/nonmatchings/PlacementGridVabSound/SetNullDriverMode.s
 Hit:
 
 ```
-sw $a0, %gp_rel(gNullDriverMode)($gp)
+sw $a0, %gp_rel(sNullDriverMode)($gp)
 ```
 
 Retail reaches this small-data global in ONE instruction off `$gp`. The

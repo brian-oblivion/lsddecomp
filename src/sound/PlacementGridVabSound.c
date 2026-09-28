@@ -190,7 +190,7 @@ extern const char gVabHeaderSuffix[];
 extern const char gVabBodySuffix[];
 
 /* SetNullDriverMode's two words, read back by GetNullDriverMode. */
-extern s32 gNullDriverMode;
+extern s32 sNullDriverMode;
 extern s32 gNullDriverModeArg;
 
 /* libsnd set-up, done once and undone when the last bank closes: SsInit and
@@ -226,11 +226,11 @@ s32 GetNullDriverMode(s32 *outMode2) {
     if (outMode2 != NULL) {
         *outMode2 = gNullDriverModeArg;
     }
-    return gNullDriverMode;
+    return sNullDriverMode;
 }
 
 s32 SetNullDriverMode(s32 async, s32 mode2) {
-    gNullDriverMode = async;
+    sNullDriverMode = async;
     gNullDriverModeArg = mode2;
     return 1;
 }
