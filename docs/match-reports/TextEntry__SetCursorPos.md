@@ -112,6 +112,6 @@ reference.
 ## Track 7 (round 100, charlie)
 
 Locals `local`/`obj` renamed `screenPos`/`cursor`. The `* 7` is
-TEXTROW_DEFAULT_PITCH (include/TextRow.h): sTextEntryCursorPos.x (-62)
+TEXTROW_DEFAULT_PITCH (include/text_row.h): sTextEntryCursorPos.x (-62)
 equals sTextEntryTextPos.x (-62, input_dialogs), so the cursor steps across
 the text row's cells at the row's own default pitch. Zero bytes changed.

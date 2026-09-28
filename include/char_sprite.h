@@ -22,7 +22,7 @@
  *
  * The ctor chains to ScreenSprite's first (GetScreenSpriteMethods()->ctor
  * with cell 0x20's rect and 0), so the id tree (0x144 -> 0x1144) is the ctor
- * chain. One class derives from it: TextRow (0x11144, include/TextRow.h),
+ * chain. One class derives from it: TextRow (0x11144, include/text_row.h),
  * which expands these macros.
  *
  * reset (+0x040) is overridden with a parameter list SceneNode's slot does

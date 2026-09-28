@@ -107,7 +107,7 @@ struct TextEntry {
     /* +0x038 */ void *tickSource; /* ... of class FRAMECLOCK_CLASS_ID (a FrameClock); onNotify sends its events to tickState */
     /* +0x03C */ struct VabStreamObj *target; /* attachTarget; TextEntry__PlaySound plays a tone on it (playTone, volume 96, 96) */
     /* +0x040 */ CharSprite *cursorSprite; /* loadCardResources: New_CharSprite(FONTICON, '_'); setCursorPos moves it to x = pos * 7 */
-    /* +0x044 */ struct TextRow *textRow; /* a TextRow (include/TextRow.h): loadCardResources: New_TextRow(FONTICON, textLen, editBuf); setCharAt sets a cell (+0x0C4) */
+    /* +0x044 */ struct TextRow *textRow; /* a TextRow (include/text_row.h): loadCardResources: New_TextRow(FONTICON, textLen, editBuf); setCharAt sets a cell (+0x0C4) */
     /* +0x048 */ ScreenSprite *panelSprite; /* loadCardResources: New_ScreenSprite(COMINPUT, 224x120); non-NULL gates every editing method */
 };
 

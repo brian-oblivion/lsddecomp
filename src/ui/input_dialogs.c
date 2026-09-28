@@ -26,7 +26,7 @@
 #include <strings.h>
 #include "text_entry.h"
 #include "char_sprite.h"
-#include "TextRow.h"
+#include "text_row.h"
 #include "tim_image.h"
 #include "VabStreamObj.h"
 #include "pad.h"

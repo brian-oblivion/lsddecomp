@@ -24,7 +24,7 @@
  * id tree (0x44 -> 0x144 -> 0x1144) is the ctor chain. Two classes derive
  * from it (`typeviews.py --tree`): CharSprite (0x1144, one 8x8 font
  * character, include/char_sprite.h, own fields from +0x0A8), which expands
- * these macros, and TextRow (0x11144, below CharSprite, include/TextRow.h),
+ * these macros, and TextRow (0x11144, below CharSprite, include/text_row.h),
  * which expands CharSprite's.
  *
  * Not settled here: the ctor occupant returns nothing where the slot, from

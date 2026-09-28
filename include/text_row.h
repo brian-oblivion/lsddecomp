@@ -1,5 +1,5 @@
-#ifndef TEXTROW_H
-#define TEXTROW_H
+#ifndef TEXT_ROW_H
+#define TEXT_ROW_H
 
 #include "char_sprite.h"
 

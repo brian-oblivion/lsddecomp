@@ -43,7 +43,7 @@
 #include "grid_cell.h"
 #include "TitleMenu.h"
 #include "VabStreamObj.h"
-#include "TextRow.h"
+#include "text_row.h"
 #include "tim_image.h"
 #include "task_objf.h"
 #include <kernel.h>
@@ -93,7 +93,7 @@ extern DrawRect sDisplayBufferRects[2];
 
 /* TitleMenu__AttachSaveTitle's position for the save title's attachToParent
  * (-4, -23: percent of half the screen from the centre). A TextRow's
- * position is a ScreenSpritePos (include/TextRow.h), passed through
+ * position is a ScreenSpritePos (include/text_row.h), passed through
  * SceneNode's LongVec3 slot. */
 extern struct ScreenSpritePos sSaveTitleOffset;
 

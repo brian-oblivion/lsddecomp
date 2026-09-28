@@ -12,7 +12,7 @@
  * flat-coloured GsBOXF screen rectangle's allocator, ctor, Reset, attach,
  * attribute bits, colour, position, size, priority and mask.
  *
- * TextRow (include/TextRow.h), New_TextRow to GetTextRowMethods: a row of
+ * TextRow (include/text_row.h), New_TextRow to GetTextRowMethods: a row of
  * CharSprite character cells showing a string. It derives from CharSprite,
  * not from BoxFill; the two classes only sit next to each other.
  * TextRow__NoOpGetCell and TextRow__NoOpSlotD0 are empty method-table
@@ -28,7 +28,7 @@
 #include <libgs.h>
 #include "frame_clock.h"
 #include "task.h"
-#include "TextRow.h"
+#include "text_row.h"
 #include "bmem_pmgr.h"
 #include "full_width_sjis.h"
 #include <strings.h>

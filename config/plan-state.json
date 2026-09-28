@@ -1070,7 +1070,7 @@
         "gTextRowMethods": {
           "class": "TextRow",
           "date": "2026-09-26",
-          "header": "include/TextRow.h"
+          "header": "include/text_row.h"
         },
         "gTileAtlasMethods": {
           "class": "TileAtlas",

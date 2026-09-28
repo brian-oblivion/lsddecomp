@@ -58,5 +58,5 @@ TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus
 Naming: `D_8008A9B4` -> `sSaveTitleOffset` (tier A: the position
 attachToParent places the save title at, -4, -23). Retyped `s32` ->
 `struct ScreenSpritePos` in include/class_3bb8c.h: a TextRow's position
-is a ScreenSpritePos (include/TextRow.h's banner) passed through
+is a ScreenSpritePos (include/text_row.h's banner) passed through
 SceneNode's LongVec3 slot, so the `(LongVec3 *)` cast stays.

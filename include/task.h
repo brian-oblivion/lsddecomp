@@ -12,13 +12,13 @@
 #include "Viewport.h"
 #include "movie_player.h"
 #include "draw_system.h"
-#include "TextRow.h"
+#include "text_row.h"
 
 /*
  * Declarations shared by src/app/task.c and the unit after it,
  * screen_widgets.c (FadeBox, BoxFill, TextRow): the data and outside callees
  * they reach that no class header owns. The classes are in their own headers: stream_task.h,
- * task_core.h, intermediate_base.h, Viewport.h, box_fill.h, fade_box.h, TextRow.h.
+ * task_core.h, intermediate_base.h, Viewport.h, box_fill.h, fade_box.h, text_row.h.
  */
 
 /* Defined in task.c: &sDefaultMovieFrame. */
