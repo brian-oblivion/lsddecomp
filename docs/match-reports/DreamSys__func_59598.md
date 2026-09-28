@@ -48,3 +48,7 @@ agree it is state to clear and none says what state.
 Re-checked round 92 (runner delta, track 7): still no reader of `unk_0x78`
 anywhere in src/, and the slot has no caller that names its argument, so the
 tier-C placeholder stays.
+
+## Name (track 10, debt-world): kept tier C
+
+The body clears one word (+0x78, `unk78`) and nothing else. No code calls the slot (slot128), and no code reads the word or sets it nonzero: ResetSessionState and ResetLinkState clear +0x78 too, and those are its only other accessors. The accessors show a cleared flag and nothing about what it flags, so the placeholder stays; the field went from `unk_0x78` to the `unk78` spelling.
