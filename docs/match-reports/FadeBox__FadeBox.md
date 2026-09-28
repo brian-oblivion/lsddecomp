@@ -14,7 +14,7 @@ void FadeBox__FadeBox(FadeBoxObj *self, void *a1, s32 a2, s32 a3) {
 
     base = GetBoxFillMethods();
     if (a2 != 0) {
-        tableEntry = &gFadeBoxMaskColors[a2 * 3];
+        tableEntry = &sFadeBoxMaskColors[a2 * 3];
     } else {
         tableEntry = sFadeBoxBlackColors;
     }
@@ -81,7 +81,7 @@ this report's earlier history too (known, pending an operator decision).
 
 ### Naming
 
-- **`gFadeBoxMaskColors`** (was `D_8006EA90`) -- tier A. Eight 3-byte RGB
+- **`sFadeBoxMaskColors`** (was `D_8006EA90`) -- tier A. Eight 3-byte RGB
   entries indexed by a FadeBox channel mask at a 3-byte stride (this ctor,
   StartFadeDown, GetColor). Retail's bytes are the mask's own channels at
   0xFF: entry 1 `00 00 FF` (b), 2 `00 FF 00` (g), 3 `00 FF FF`, 4 `FF 00 00`
