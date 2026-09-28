@@ -411,6 +411,7 @@
         "area-dream-sys": true,
         "area-graphics-core": true,
         "area-graphics-res": true,
+        "area-psyq-shared": true,
         "area-ui": true
       },
       "reason": "",
