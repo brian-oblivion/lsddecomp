@@ -35,6 +35,61 @@
 #include "StageMap.h"
 #include "Viewport.h"
 
+/* The motion templates (.data, in address order):
+ * the constant triples the MoodCue handlers in src/world/Entity.c pass to
+ * updateRotation (+0x044) and updateScale (+0x048) -- three Ratio16s
+ * (include/SceneNode.h), degrees or scale factors, {x, y, z} -- and to
+ * addTranslation (+0x0BC), three s32 deltas. Named by value. The slots take
+ * the table untyped, so the element type is the reader's (SceneNode__Update-
+ * Rotation/UpdateScale), not the callers'. sTranslateYMinus64's label also
+ * holds a second triple, (0, -0x20, 0); sScaleX3's z den is Entity.c's
+ * sScaleTemplateZDenom. */
+extern Ratio16 sRotationXPlusEighth[];
+extern Ratio16 sRotationYawPlus9[];
+extern Ratio16 sRotationYawMinus9[];
+extern Ratio16 sRotationYawPlus180[];
+extern Ratio16 sRotationYawPlus90[];
+extern Ratio16 sRotationYawMinus90[];
+extern Ratio16 sRotationYawPlus2[];
+extern Ratio16 sRotationYawMinusThird[];
+extern Ratio16 sRotationYawMinusHalf[];
+extern Ratio16 sRotationZPlus9[];
+extern Ratio16 sRotationZPlus1[];
+extern Ratio16 sRotationZMinus9[];
+extern Ratio16 sRotationYawMinus120[];
+extern Ratio16 sRotationX50YMinus120Z30[];
+extern Ratio16 sRotationYawPlus4[];
+extern Ratio16 sRotationXPlus90[];
+extern Ratio16 sRotationYawPlus1[];
+extern Ratio16 sRotationZMinus90[];
+extern LongVec3 sTranslateYPlus256[];
+extern LongVec3 sTranslateYMinus4096[];
+extern LongVec3 sTranslateYMinus512[];
+extern LongVec3 sTranslateYPlus64[];
+extern LongVec3 sTranslateYPlus8[];
+extern LongVec3 sTranslateYMinus64[];
+extern LongVec3 sTranslateYMinus256[];
+extern LongVec3 sTranslateXMinus64[];
+extern LongVec3 sTranslateYPlus64ZMinus64[];
+extern LongVec3 sTranslateYMinus1500ZPlus1024[];
+extern LongVec3 sTranslateZMinus256[];
+extern Ratio16 sScaleQuarter[];
+extern Ratio16 sScaleHalf[];
+extern Ratio16 sScaleXFourFifthsYSixFifths[]; /* {4/5, 6/5, 5/5} */
+extern Ratio16 sScaleDouble[];
+extern Ratio16 sScaleMinusSixtyFourth[];
+extern Ratio16 sScaleEightSevenths[];
+extern Ratio16 sScaleUnit[]; /* {1/1, 1/1, 1/1}, a .data copy of SceneNode.h's sSceneNodeScaleOne */
+extern Ratio16 sScaleEighth[];
+extern Ratio16 sScaleXEighthY2ZEighth[];
+extern Ratio16 sScaleSix[];
+extern Ratio16 sScaleTwoFifths[];
+extern Ratio16 sScaleY2[];
+extern Ratio16 sScaleY4[];
+extern Ratio16 sScaleTriple[];
+extern Ratio16 sScaleThirtySecond[];
+extern Ratio16 sScaleX3[];
+
 Entity *New_Entity(s32 moodIndex, void *desc, void *sound) {
     Entity *obj;
 

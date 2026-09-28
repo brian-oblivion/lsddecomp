@@ -38,6 +38,8 @@
 #include "DreamSys.h"
 #include "StageMap.h"
 
+extern s8 sSpecialColors[];
+
 const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
 const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM";
 

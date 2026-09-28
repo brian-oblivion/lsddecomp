@@ -42,6 +42,124 @@
 #include "VabStreamObj.h"
 #include "Viewport.h"
 
+/* Delta/threshold table pairs consumed by DreamSys__StepLookOffset (sLookOffsetSteps /
+   sLookOffsetLimits, indexed by DreamSys::lookOffsetCommand) and DreamSys__StepLookYaw (sLookYawSteps /
+   sLookYawLimits, indexed by DreamSys::lookYawCommand). Index 0 is unused/zero in both
+   pairs; indices 1 and 2 are the negative/positive delta and its matching
+   threshold. */
+extern s32 sLookOffsetSteps[3];
+extern s32 sLookOffsetLimits[3];
+extern s32 sLookYawSteps[3];
+extern s32 sLookYawLimits[3];
+
+/* Consumed by DreamSys__ApplyMoveCommand, both indexed by that
+   function's own `arg1` (a mood/day-type selector, range implied by the
+   table sizes below): `sMoveCommandSigns[arg1] * sMoveModeSpeeds[this->moveMode]` forms
+   a signed delta, then `sMoveCommandDispatch[arg1]` is called with it. Index 0 is
+   unused/null in sMoveCommandDispatch (arg1 == 0 returns before reaching any of
+   these, per that function's own guard) -- consistent with sMoveCommandSigns[0]
+   being 0 too. sMoveModeSpeeds is indexed separately by DreamSys::moveMode (its
+   own "Current" value, see that field), not by arg1. */
+extern s32 sMoveModeSpeeds[5];
+extern s8 sMoveCommandSigns[8];
+
+/* One 12-byte-stride RotationRatios table under two labels:
+   DreamSys__StepLookYaw references its SECOND word (entry 0's yaw
+   numerator, which it overwrites with its own per-tick delta) while
+   DreamSys__ApplyPendingTurn address-takes whole entries. Entry 0 is
+   (0 deg, 45 deg, 0 deg), the 45 being the +-0x2D DreamSys__StepLookYaw
+   writes; entries 1, (0, -6, 0), and 2, (0, +6, 0), are
+   DreamSys::turnCommand's values 1 and 2. */
+extern RotationRatio sTurnRotationYaw[]; /* == &sTurnRotations[0].y */
+extern RotationRatios sTurnRotations[];
+
+/* (0 deg, 180 deg, 0 deg). Address-of only, forwarded as SceneNode__UpdateRotation's
+   arg2 with flag 1 (absolute) by DreamSys__ResetSessionState. */
+extern RotationRatios sRotationYaw180;
+
+/* DreamSys__TickDrift's per-tick addTranslation (+0x0BC) step. */
+extern LongVec3 sDriftStep;
+
+/* A `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a` argument
+   by DreamSys__TickStaircaseYawPlus45. */
+extern struct RelativePos sStaircaseOffset2;
+
+/* The same, for DreamSys__TickStaircaseYawPlus90. */
+extern struct RelativePos sStaircaseOffset0;
+
+/* The same, for DreamSys__TickStaircaseYawMinus135. */
+extern struct RelativePos sStaircaseOffset1;
+
+/* The same, for DreamSys__TickStaircaseYawMinus90. */
+extern struct RelativePos sStaircaseOffset3;
+
+/* (0 deg, +45 deg, 0 deg), forwarded as vtable slot +0x044's (SceneNode__UpdateRotation)
+   arg2 with flag 0 (relative) by DreamSys__TickStaircaseYawPlus90 and
+   DreamSys__TickStaircaseYawPlus45. Its three {numerator, denominator} words
+   are {0,1} {0x2D,1} {0,1}, the same form as sRotationYaw180 and every
+   sCardinalRotations entry. */
+extern RotationRatios sRotationYawPlus45;
+
+/* (0 deg, -45 deg, 0 deg) -- the mirror of sRotationYawPlus45 above
+   ({0,1} {0xFFD3,1} {0,1}), used the same way by
+   DreamSys__TickStaircaseYawMinus135 and DreamSys__TickStaircaseYawMinus90. */
+extern RotationRatios sRotationYawMinus45;
+
+/* 3x3 lookup table indexed by [dynamicClass][upperClass], each axis
+   classified into {0,1,2} by CalcDreamColor first. */
+extern s8 sDreamColorTable[9];
+
+/* Byte tables indexed by DreamSys::voiceSelect (bounded to [0,0x18) at
+   the write site -- see that field's own comment). DreamSys__StartVoice
+   reads both: sVoiceBySelect[voiceSelect] (values 0..0x1E) feeds
+   VabStreamObj playTone's `index` argument (program << 4, tone 0);
+   sVoicePitchBySelect[voiceSelect] (values include -2..2, hence `s8` not `u8`) feeds
+   setPitchOffset's `octave` argument directly. sVoicePitchBySelect is these
+   24 bytes; the zero bytes after it are the gProjectOffsetZ vector above. */
+extern const s8 sVoiceBySelect[0x18];
+extern const s8 sVoicePitchBySelect[0x18];
+
+/* Dispatch table indexed by DreamSys__ApplyMoveCommand's `arg1`; see that table's own
+   comment near sMoveModeSpeeds/sMoveCommandSigns above. Same element signature as
+   Actor__MoveLocalZOrFindLink/Actor__MoveLocalXOrFindLink (Actor +0x0D0/+0x0D4). */
+extern void (*sMoveCommandDispatch[5])(DreamSys *this, s32 val, void *extra);
+
+/* 4-entry table of `s32 (DreamSys *this)` functions (DreamSys__TickStaircaseYawPlus90,
+   DreamSys__TickStaircaseYawMinus135, DreamSys__TickStaircaseYawPlus45, DreamSys__TickStaircaseYawMinus90),
+   indexed by GetLastSpawnExtra()'s return value and
+   stashed into DreamSys::staircaseTickFn by DreamSys__TryStaircaseLink. */
+extern s32 (*sStaircaseTickFns[4])(DreamSys *this);
+
+extern s16 sStageTimeLimits[];
+
+extern struct RelativePos sSpawnPosAdjust[];
+
+extern StageSpawn *sStageSpawnPoints[];
+
+/* MATCHING: u8; as s8, GenerateInitialSpawn's loop guard gains a `blez` retail does not have. */
+extern u8 sStageSpawnPointsCount[];
+
+extern StageSpawn *sStagePermalinkSpawns[];
+extern StaticLinkTrigger *sStagePermalinkTriggers[];
+extern s8 sStagePermalinkTriggersCount[];
+
+extern s16 sSpecialDays[];
+
+/* The fixed "special day" mood, returned by IsDaySpecial on a match;
+   only its address is used. */
+extern MoodGraphPoint sSpecialDayMood;
+
+/* Table triple for TestForTunnelLinks, same roles as the
+   STAGE_PERMALINK_* triple above but for tunnel links specifically. */
+extern s8 sTunnelTriggersCount[];
+extern StaticLinkTrigger *sTunnelTriggers[];
+extern StageSpawn *sTunnelSpawns[];
+
+/* Table triple for TestForStaircaseNodes. */
+extern s8 sStaircaseTriggersCount[];
+extern StaticLinkTrigger *sStaircaseTriggers[];
+extern StageSpawn *sStaircaseSpawns[];
+
 /* With no look command pending, StepLookOffset springs the view height back
  * towards 0 by this much a tick (the size of one sLookOffsetSteps step), and
  * StepLookYaw turns back by this many degrees (one sLookYawSteps step). */
