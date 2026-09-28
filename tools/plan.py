@@ -113,6 +113,8 @@ TRACK9_ITEMS = {
     "layout": "src/ grouped into subsystem directories; README's code map says which directory holds what",
     "readme": "README.md describes the code by its final names and layout, no counts",
     "comments": "no project history in src/include comments (readability.py history 0, headers too)",
+    "globals": "no game global named UPPER_SNAKE (readability.py --globals empty): `rename.py` each to "
+               "gName, or sName when one file references it",
     "style": "`make format` leaves no diff",
     "docs-budget": "every doc within its word budget",
     "nonmatching-clean": "tools/check-nonmatching.sh green",
@@ -1321,7 +1323,9 @@ def jobs(d, n):
                 flush()
         flush()
     if t["9"]["status"] == "open":
-        q9 = [("9", f"{k}: {TRACK9_ITEMS[k]}", "opus") for k, done in t["9"]["checklist"].items() if not done]
+        # globals is a mechanical rename list: Sonnet (revision 39)
+        q9 = [("9", f"{k}: {TRACK9_ITEMS[k]}", "sonnet" if k == "globals" else "opus")
+              for k, done in t["9"]["checklist"].items() if not done]
     queues = [q_fresh, q_naming, q_stall, q_sdk, q_revisit, q_promote, q_types, q_close, q6, q7, q8, q9]
     order = []
     while any(queues):

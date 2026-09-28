@@ -212,6 +212,27 @@ def history(raw):
     return sum(len(HISTORY_RE.findall(c)) for c in re.findall(r"/\*.*?\*/", raw, re.S))
 
 
+SYMLINE = re.compile(r"^([A-Za-z_]\w*)\s*=\s*(0x[0-9A-Fa-f]+)\s*;(.*)$")
+UPPER_GLOBAL = re.compile(r"^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$|^[A-Z]{2,}[0-9]*$")
+
+
+def upper_globals():
+    """Game DATA symbols named like a constant (STAGE_TIME_LIMITS): the
+    conventions say globals `gName`, unit-static data `sName`, UPPER_SNAKE
+    only for macros and enum members (FINISHING-PLAN §3). Sony data keeps
+    Sony's names (VBLANK_MINUS) and is excluded. Round 101: StageGrid
+    measured zero debt while holding 16 of them."""
+    import rename
+    out = []
+    for line in rename.SYMBOLS.read_text().splitlines():
+        m = SYMLINE.match(line.strip())
+        if not m or "type:func" in m.group(3) or rename.PLACEHOLDER.match(m.group(1)):
+            continue
+        if UPPER_GLOBAL.match(m.group(1)) and not rename.sony_data_owner(int(m.group(2), 16)):
+            out.append(m.group(1))
+    return out
+
+
 def ph_prefix(name):
     stem = name[4:] if name.startswith("New_") else name.split("__")[0] if "__" in name else None
     return bool(stem and placeholder_type_reason(stem))
@@ -233,7 +254,9 @@ def collect(info=None, detail_unit=None):
     totals["placeholder_types"] = len(types)
     totals["header_history"] = sum(header_history.values())
     totals["ph_prefix"] = sum(u["ph_prefix"] for u in units.values())
-    return {"units": units, "types": types, "placeholder_headers": headers,
+    uppers = upper_globals()
+    totals["upper_globals"] = len(uppers)
+    return {"units": units, "types": types, "placeholder_headers": headers, "upper_globals": uppers,
             "header_history": header_history,
             "totals": totals, "elf_present": bool(info)}
 
@@ -242,6 +265,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--units", action="store_true")
     ap.add_argument("--types", action="store_true")
+    ap.add_argument("--globals", action="store_true", help="list game globals named UPPER_SNAKE")
     ap.add_argument("--unit")
     ap.add_argument("-v", action="store_true")
     ap.add_argument("--json", action="store_true")
@@ -259,7 +283,12 @@ def main():
           f"still named code_/class_<hex>")
     print(f"  types: {t['placeholder_types']} placeholder type name(s); {t['ph_prefix']} definition(s) "
           f"under a placeholder class prefix; {t['header_history']} history mention(s) in headers")
+    print(f"  names: {t['upper_globals']} game global(s) named UPPER_SNAKE (--globals lists them)")
     print("  code : " + ", ".join(f"{t[k]} {k}" for k in DEBT_KEYS))
+    if a.globals:
+        print()
+        for n in d["upper_globals"]:
+            print(f"  {n}")
     if a.types:
         print()
         for n, (why, files) in sorted(d["types"].items(), key=lambda kv: (kv[1][1][0], kv[0])):

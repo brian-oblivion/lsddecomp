@@ -6,6 +6,45 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-28 — premium session: plan revision 39 (round 101's and round 100's escalations)
+
+- **UPPER_SNAKE globals: accepted, as track 9 item `globals` (Sonnet).**
+  `readability.py` now counts game data symbols named like constants, with
+  Sony data excluded (VBLANK_MINUS). It finds 108; the head's 132 counted
+  differently. Most are Entity's named-by-value templates (`SCALE_UNIT`,
+  `ROTATION_YAW_PLUS180`), a local habit the §3 convention never allowed:
+  globals are `gName`, unit-static `sName`. Round 101 had already moved
+  StageGrid's 16, so the tree was mixed. A mechanical rename list is one
+  Sonnet job, not a per-unit route. `readability.py --globals` lists it.
+- **Edge evidence in banners is history.** A real game's banner does not
+  say why the file has its edges, and §3 already lists retail addresses as
+  history, which is what `readability.py` counts. Track 8's sentence now
+  sends the evidence to the file's first function's report; the `comments`
+  item moves the existing ones.
+- **unitfile.py, three fixes, each tested in a scratch worktree:**
+  - A directory move keeps the stem, so it rewrites only `src/OLD.c` paths
+    and no longer refuses a type-named file. 16 of the 45 files are
+    type-named, so track 9's `layout` would have been refused 16 times. Its
+    header `git mv` onto itself was a second bug, found by the test.
+    `rename Entity world/Entity` is byte-identical.
+  - `merge A B --as-b` keeps B's name when B is the class the file is named
+    for. When only B owns rodata, B's `.rodata` line becomes the merged
+    file's, which ends round 100's refusal that needed a head. Run from
+    `adef373e^`, `merge code_179d8_o CdDriver --as-b` gave round 101's hand
+    merge byte-for-byte: yaml and ledger identical, apart from the head's
+    one added comment.
+  - `unitfile.token_rx` leaves `OLD.h` alone while include/OLD.h exists.
+    replay uses it for unit commands, which ends the `class_3bb8c.h`
+    include hazard. replay also carries `--as-b` and path-only directory
+    moves.
+- **Size-named types: no pattern.** Eight candidates remain (`Block64`,
+  `Descriptor10`, `Pos4`, `PtrBoxK3`, `S32BoxK2`, `DreamAuxPos6`,
+  `FullWidthChars3`/`6`), and a regex also flags real names (`Ratio16`).
+  A head samples them with `renametype.py --any-stem` if they read wrong.
+- **The merged-header fold stays runner work;** it worked.
+
+---
+
 ## 2026-09-28 — round 101: tracks 7 and 8 done, 75 units become 45 files, track 9 opens (premium head, plan revision 38)
 
 Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 19

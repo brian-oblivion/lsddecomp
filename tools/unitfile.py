@@ -2,7 +2,7 @@
 """Rename or merge source units (files), keeping every reference in step.
 
     python3 tools/unitfile.py rename OLD NEW [--dry-run] [--no-build]
-    python3 tools/unitfile.py merge A B [--dry-run] [--no-build]    # B's functions join A
+    python3 tools/unitfile.py merge A B [--as-b] [--dry-run] [--no-build]    # B's functions join A
 
 A unit's NAME lives in the splat yaml (`- [0xD294, c, code_d294]` and its
 `.rodata` line), in its file names (src/OLD.c, the same-stem header
@@ -20,13 +20,19 @@ exists), whole-token rewrite of OLD / OLD_H guard in code and docs (not
 PROGRESS.md or the archive, nor a report's history sections, nor a prose
 line already naming NEW, as rename.py), the ledger and the warnings
 baseline; deletes build/src/OLD.c.o; `make extract`; `./build-and-verify.sh`.
+A move into a directory (`rename Entity world/Entity`) keeps the stem, so it
+rewrites only `src/OLD.c` paths and is allowed for a type-named file. `OLD.h`
+is never rewritten while include/OLD.h exists.
 
 merge: B must be the text subsegment IMMEDIATELY after A in the yaml, and if
 both own a `.rodata` line, B's must immediately follow A's (else the merged
 file's rodata would have to absorb what lies between: the tool refuses and
 names it). B's `#include`s join A's; B's body is appended after A's last
 line under a `/* ---- merged from B ---- */` marker; B's yaml lines go; B's
-file (and header, whose declarations you move by hand) go. The build usually
+file (and header, whose declarations you move by hand) go. With --as-b the
+merged file takes B's name instead, and A's is the one rewritten (a file named
+for a class that starts second). When only B owns rodata, its `.rodata` line
+becomes the merged file's. The build usually
 goes RED on the first try: two units' local views of the same thing now meet
 in one file (`redefinition of`, `conflicting types`). Those are the job: keep
 one declaration, delete the other, rebuild, until the oracle is byte-identical.
@@ -75,9 +81,17 @@ def find_unit(rows, unit):
     return (c[0] if c else None), ro
 
 
+def token_rx(old):
+    """OLD as a whole token, except in `OLD.h` while include/OLD.h exists: a
+    unit stem that is also a live header's stem (a merge keeps B's header;
+    round 101: replay rewrote `#include "class_3bb8c.h"`, six lines)."""
+    keep_h = r"(?!\.h\b)" if (ROOT / f"include/{old}.h").exists() else ""
+    return re.compile(rf"(?<![A-Za-z0-9_/.]){re.escape(old)}(?![A-Za-z0-9_]){keep_h}"
+                      if "/" in old else rf"(?<![A-Za-z0-9_]){re.escape(old)}(?![A-Za-z0-9_]){keep_h}")
+
+
 def rewrite_tokens(mapping, skip=()):
-    rxs = [(re.compile(rf"(?<![A-Za-z0-9_]){re.escape(o)}(?![A-Za-z0-9_])"), n)
-           for o, n in sorted(mapping.items(), key=lambda kv: -len(kv[0]))]
+    rxs = [(token_rx(o), n) for o, n in sorted(mapping.items(), key=lambda kv: -len(kv[0]))]
     touched = []
     for p in [q for q in rename.text_files() if q.exists()] + [WARNINGS]:
         if p in skip:
@@ -129,18 +143,21 @@ def cmd_rename(a):
     c, ro = find_unit(rows, old)
     if c is None:
         sys.exit(f"FATAL: no `c` subsegment named {old} in the yaml")
-    hit = code_identifier(old)
+    # A move into a directory keeps the stem, so no token changes: only the
+    # file's path does (track 9 `layout`; 16 of 45 files are named for a type).
+    hit = code_identifier(old) if new != old else None
     if hit:
         sys.exit(f"FATAL: {old} is also an identifier in code ({hit}); a token rewrite would rename it "
                  f"too. Rename the file by hand (yaml line, git mv, INCLUDE_ASM paths).")
     src_old = srcpath.unit_src(old)
+    old_path = src_old.relative_to(ROOT / "src").with_suffix("").as_posix()
     src_new = ROOT / "src" / f"{new_path}.c"
     hdr_old, hdr_new = ROOT / f"include/{old}.h", ROOT / f"include/{new}.h"
     if hdr_new.exists() and hdr_old.exists() and new != old:
         sys.exit(f"FATAL: include/{new}.h already exists")
     print(f"unitfile rename {old} -> {new_path}")
     print(f"  yaml: {1 + len(ro)} line(s); src: {src_old.relative_to(ROOT)} -> {src_new.relative_to(ROOT)}")
-    if hdr_old.exists():
+    if hdr_old.exists() and new != old:
         print(f"  header: include/{old}.h -> include/{new}.h")
     if a.dry_run:
         return 0
@@ -150,15 +167,19 @@ def cmd_rename(a):
     YAML.write_text("\n".join(lines))
     src_new.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(["git", "mv", str(src_old), str(src_new)], check=True)
-    if hdr_old.exists():
+    if hdr_old.exists() and new != old:
         subprocess.run(["git", "mv", str(hdr_old), str(hdr_new)], check=True)
     text = src_new.read_text()
-    text = text.replace(f'"asm/nonmatchings/{old}"', f'"asm/nonmatchings/{new_path}"')
+    text = text.replace(f'"asm/nonmatchings/{old_path}"', f'"asm/nonmatchings/{new_path}"')
     src_new.write_text(text)
-    touched = rewrite_tokens({old: new, f"{old.upper()}_H": f"{new.upper()}_H"})
+    mapping = {f"src/{old_path}.c": f"src/{new_path}.c"}
+    if new != old:
+        mapping.update({old: new, f"{old.upper()}_H": f"{new.upper()}_H"})
+    touched = rewrite_tokens(mapping)
     import plan
-    plan.ledger_rename({old: new})
-    obj = ROOT / "build/src" / f"{old}.c.o"
+    if new != old:
+        plan.ledger_rename({old: new})
+    obj = ROOT / "build/src" / f"{old_path}.c.o"
     if obj.exists():
         obj.unlink()
     print(f"  rewrote {len(touched)} file(s)")
@@ -167,6 +188,9 @@ def cmd_rename(a):
 
 def cmd_merge(a):
     ua, ub = a.a, a.b
+    # the merged file keeps A's name, or with --as-b B's (A comes first in ROM,
+    # but B is the class the file is named for: round 101, code_179d8_o+CdDriver)
+    gone, keep = (ua, ub) if a.as_b else (ub, ua)
     lines = yaml_lines()
     rows = seg_rows(lines)
     ca, roa = find_unit(rows, ua)
@@ -180,43 +204,59 @@ def cmd_merge(a):
                  f"(next is {nxt[3] if nxt else 'nothing'}); only adjacent units merge")
     if len(roa) > 1 or len(rob) > 1:
         sys.exit("FATAL: a unit with more than one .rodata line; merge by hand")
-    if rob:
-        if not roa:
-            sys.exit(f"FATAL: {ub} owns rodata and {ua} does not; the merged file's rodata would start "
-                     f"at {ub}'s line. Rename {ub}'s .rodata line to {ua} by hand if nothing lies between.")
+    if roa and rob:
         between = [r for r in rows if roa[0][1] < r[1] < rob[0][1] and r[2] not in TEXT_TYPES]
         if between:
             sys.exit(f"FATAL: rodata between {ua}'s and {ub}'s .rodata lines "
                      f"({', '.join(f'{r[2]} 0x{r[1]:X}' for r in between)}); the merged file would have to "
                      f"own it. Decide that by hand (FINISHING-PLAN track 8).")
-    hit = code_identifier(ub)
+    hit = code_identifier(gone)
     if hit:
-        sys.exit(f"FATAL: {ub} is also an identifier in code ({hit}); merge it the other way round "
-                 f"or by hand")
+        sys.exit(f"FATAL: {gone} is also an identifier in code ({hit}); a token rewrite would rename it. "
+                 + ("Merge by hand." if a.as_b else f"Keep its name instead: merge {ua} {ub} --as-b"))
     sa, sb = srcpath.unit_src(ua), srcpath.unit_src(ub)
-    print(f"unitfile merge {ub} into {ua}: yaml lines {cb[0] + 1}" + (f", {rob[0][0] + 1}" if rob else "")
-          + f" removed; {sb.relative_to(ROOT)} appended to {sa.relative_to(ROOT)}")
-    hb = ROOT / f"include/{ub}.h"
-    if hb.exists():
-        print(f"  include/{ub}.h stays: move what it declares into the surviving header by hand, then delete it")
+    dest = sb if a.as_b else sa
+    print(f"unitfile merge {ua} + {ub} as {keep}: {sb.relative_to(ROOT)} appended to "
+          f"{sa.relative_to(ROOT)}, written to {dest.relative_to(ROOT)}")
+    # The merged file's rodata is the first unit's line (the second's, when
+    # the first owns none: rounds 100 and 101 renamed it by hand), named KEEP.
+    ro_keep = (roa or rob)[0][0] if (roa or rob) else None
+    if rob and not roa:
+        print(f"  {ua} owns no rodata: {ub}'s .rodata line becomes the merged file's")
+    hg = ROOT / f"include/{gone}.h"
+    if hg.exists():
+        print(f"  include/{gone}.h stays: move what it declares into the surviving header by hand, then delete it")
     if a.dry_run:
         return 0
-    drop = {cb[0]} | ({rob[0][0]} if rob else set())
-    YAML.write_text("\n".join(l for i, l in enumerate(lines) if i not in drop))
+    # the surviving text line is A's (it holds the start address); the
+    # surviving .rodata line is ro_keep; both are named KEEP
+    drop = {cb[0]} | {r[0] for r in roa + rob if r[0] != ro_keep}
+    keep_path = dest.relative_to(ROOT / "src").with_suffix("").as_posix()
+    out = []
+    for i, l in enumerate(lines):
+        if i in drop:
+            continue
+        if i in (ca[0], ro_keep):
+            m = SEG.match(l)
+            l = m.group(1) + m.group(3) + m.group(4) + keep_path + m.group(6)
+        out.append(l)
+    YAML.write_text("\n".join(out))
     ta, tb = sa.read_text(), sb.read_text()
     inc_a = set(re.findall(r'^#include\s+["<][^">]+[">]', ta, re.M))
     new_inc = [i for i in re.findall(r'^#include\s+["<][^">]+[">]', tb, re.M) if i not in inc_a]
     tb = re.sub(r'^#include\s+["<][^">]+[">][ \t]*\n', "", tb, flags=re.M)
-    tb = tb.replace(f'"asm/nonmatchings/{ub}"', f'"asm/nonmatchings/{ua}"')
     if new_inc:
         last = list(re.finditer(r'^#include\s+["<][^">]+[">][ \t]*\n', ta, re.M))
         pos = last[-1].end() if last else 0
         ta = ta[:pos] + "".join(i + "\n" for i in new_inc) + ta[pos:]
-    sa.write_text(ta.rstrip("\n") + f"\n\n/* ---- merged from {ub} ---- */\n\n" + tb.lstrip("\n"))
-    subprocess.run(["git", "rm", "-qf", str(sb)], check=True)
-    rewrite_tokens({ub: ua}, skip={sa})
+    body = ta.rstrip("\n") + f"\n\n/* ---- merged from {ub} ---- */\n\n" + tb.lstrip("\n")
+    body = body.replace(f'"asm/nonmatchings/{gone}"', f'"asm/nonmatchings/{keep}"')
+    dest.write_text(body)
+    subprocess.run(["git", "rm", "-qf", str(sb if dest == sa else sa)], check=True)
+    subprocess.run(["git", "add", str(dest)], check=True)
+    rewrite_tokens({gone: keep}, skip={dest})
     import plan
-    plan.ledger_rename({ub: ua}, drop_duplicates=True)
+    plan.ledger_rename({gone: keep}, drop_duplicates=True)
     for u in (ua, ub):
         obj = ROOT / "build/src" / f"{u}.c.o"
         if obj.exists():
@@ -237,6 +277,7 @@ def main():
     m = sub.add_parser("merge")
     m.add_argument("a")
     m.add_argument("b")
+    m.add_argument("--as-b", action="store_true", help="the merged file takes B's name (A's is rewritten)")
     for p in (r, m):
         p.add_argument("--dry-run", action="store_true")
         p.add_argument("--no-build", action="store_true")

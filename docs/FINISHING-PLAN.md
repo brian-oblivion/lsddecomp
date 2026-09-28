@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 38 (2026-09-28, round 101's premium head: a files job
-never glues a region onto a batch it would take past its unit limit).
+Plan revision: 39 (2026-09-28, premium session after round 101: track 9
+`globals`; edge evidence is history; unitfile moves type-named files).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -60,7 +60,7 @@ debt behind 6 to 8.
 | **types runner** (track 6) | Opus | never lower: a class name propagates into every unit that sees it |
 | **polish runner** (track 7) | Opus | never lower: Sonnet passes were accepted 1 of 5 (rounds 92, 94), Opus 16 of 16, and each one sent back cost an Opus redo (revision 33) |
 | **files runner** (track 8) | Opus | never lower |
-| **close-out runner** (track 9) | Opus | |
+| **close-out runner** (track 9) | Opus | Sonnet for `globals`, a mechanical rename list |
 | **mechanical runner** (track 6 table renames, reopened track 2 or 1b, report hygiene) | Sonnet | never higher |
 
 Tracks 1, 3 and 4 have their own rows in the archives (§3) if they reopen.
@@ -310,8 +310,8 @@ never merge across a forced boundary.
 lists the duplicate declarations, keep the owning header's); rename with
 `unitfile.py rename OLD NEW`, which also moves a same-stem header; name a file
 for its class (`SceneNode.c`) or subsystem, and Sony code carried as C for
-its Sony object (`libsnd_vmanager.c`). The banner says what the file holds and
-what decided its edges. A files runner may edit its region's yaml lines,
+its Sony object (`libsnd_vmanager.c`). The banner says what the file holds; what
+decided its edges is history, for its first function's report. A files runner may edit its region's yaml lines,
 through `unitfile.py` only (the one exception to PARALLEL-RUNS §2's yaml
 rule). **Head at merge:** `make extract`, then delete `build/src` and rebuild,
 because unit names changed. **Park rule:** a region the evidence and content
@@ -323,10 +323,12 @@ keeps its carve edges, content-named, with the reason in each banner.
 Opens when tracks 6 to 8 are done. Items, ticked with `plan.py check --item`:
 `layout` (subsystem directories under `src/`, chosen from what the files hold:
 `unitfile.py rename <unit> <dir>/<unit>`; README's code map says what lives
-where), `readme`, `comments` (readability history 0, headers too), `style`
-(`make format` leaves no diff), `docs-budget`, `nonmatching-clean`. An item
-already true when measured is ticked by the head with the measurement in
-PROGRESS.md; the rest are Opus runner jobs, prompt §4.7, one item each.
+where), `readme`, `comments` (readability history 0, headers too; a
+banner's edge evidence is history), `globals` (no game global named
+UPPER_SNAKE: `readability.py --globals`), `style` (`make format` leaves no
+diff), `docs-budget`, `nonmatching-clean`. An item already true when
+measured is ticked by the head with the measurement in PROGRESS.md; the
+rest are runner jobs (§2), prompt §4.7, one item each.
 
 ## 4. Prompts
 

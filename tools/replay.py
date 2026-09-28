@@ -48,15 +48,16 @@ def commands(rng):
     out = []
     for subj in git("log", "--reverse", "--format=%s", rng).splitlines():
         w = shlex.split(subj) if subj.startswith("python3 tools/") else []
+        flags = tuple(x for x in w if x.startswith("--"))
         w = [x for x in w if not x.startswith("--")]
         if len(w) == 4 and w[1] in ("tools/rename.py", "tools/renametype.py"):
-            out.append((w[1][6:-3], w[2], w[3]))
+            out.append((w[1][6:-3], w[2], w[3], flags))
         elif len(w) == 5 and w[1] == "tools/unitfile.py" and w[2] in ("rename", "merge"):
-            out.append((f"unitfile {w[2]}", w[3], w[4]))
+            out.append((f"unitfile {w[2]}", w[3], w[4], flags))
     return out
 
 
-def mapping(kind, a, b):
+def mapping(kind, a, b, flags=()):
     """The token map of one command, from what is LEFT."""
     if kind == "rename":
         return {a: b}
@@ -66,7 +67,12 @@ def mapping(kind, a, b):
                 for t in found}
     if kind == "unitfile rename":
         new = unitfile.unit_stem(b)
-        return {a: new, f"{a.upper()}_H": f"{new.upper()}_H"}
+        m = {f"src/{a}.c": f"src/{b}.c"}
+        if new != a:
+            m.update({a: new, f"{a.upper()}_H": f"{new.upper()}_H"})
+        return m
+    if "--as-b" in flags:
+        return {a: b}
     return {b: a}              # unitfile merge A B: B's name became A
 
 
@@ -90,14 +96,16 @@ def own_lines(tip, p):
     return _TIP_LINES[key]
 
 
-def rewrite(m, tip, dry):
+def rewrite(m, tip, dry, unit=False):
     """Re-apply one command's token map as its own tool would: code whole,
     prose by rename.sub_prose (a report's history sections and a line
     already naming NEW stay as written), and never a line the side that ran
     the command left as it is (own_lines). Returns [(path, line)] changed,
     writing unless dry."""
-    rxs = [(re.compile(rf"(?<![A-Za-z0-9_]){re.escape(o)}(?![A-Za-z0-9_])"), n)
-           for o, n in sorted(m.items(), key=lambda kv: -len(kv[0]))]
+    # a unit name uses unitfile's match, which leaves `OLD.h` alone while that
+    # header exists (round 101: class_3bb8c.h's includes, six lines)
+    rx = unitfile.token_rx if unit else (lambda o: re.compile(rf"(?<![A-Za-z0-9_]){re.escape(o)}(?![A-Za-z0-9_])"))
+    rxs = [(rx(o), n) for o, n in sorted(m.items(), key=lambda kv: -len(kv[0]))]
     hits = []
     for p in [q for q in rename.text_files() if q.exists()] + [unitfile.WARNINGS]:
         text = p.read_text(errors="replace")
@@ -179,12 +187,12 @@ def main():
     cmds = [(c, r.split("..")[-1]) for r in rngs for c in commands(r)]
     print(f"replay {' '.join(rngs)}: {len(cmds)} rename command(s)")
     total, touched = 0, set()
-    for (kind, x, y), tip in cmds:
-        m = mapping(kind, x, y)
-        hits = rewrite(m, tip, a.dry_run) if m else []
+    for (kind, x, y, flags), tip in cmds:
+        m = mapping(kind, x, y, flags)
+        hits = rewrite(m, tip, a.dry_run, unit=kind.startswith("unitfile")) if m else []
         total += len(hits)
         touched |= {h for h, _ in hits}
-        print(f"  {kind} {x} {y}: {len(hits)} leftover(s)" + "".join(f"\n      {h}:{n}" for h, n in hits[:12]))
+        print(f"  {kind} {x} {y}{''.join(' ' + f for f in flags)}: {len(hits)} leftover(s)" + "".join(f"\n      {h}:{n}" for h, n in hits[:12]))
         if m and not a.dry_run:
             plan.ledger_rename(m, drop_duplicates=kind == "unitfile merge")
     if not a.dry_run:
