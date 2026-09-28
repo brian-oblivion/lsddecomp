@@ -6,6 +6,61 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-28 — round 105: track 11 done, file names (premium head, plan revision 44)
+
+The premium head did the setup item `files-setup` itself. Then one Opus item
+runner (alpha) did `file-names`. Track 11 is 2/2. Track 12 opens, and its
+first item, `apidoc-setup`, is a premium setup item.
+
+- **files-setup (head):**
+  - `unitfile.py rename` no longer refuses a type-named unit (`Entity`). It
+    moves paths only: `src/<dir>/OLD.c`, `asm/nonmatchings/<dir>/OLD`,
+    `OLD.c`, `OLD.h`, the guard, the ledger's `units_done` keys and header
+    paths, and the warnings baseline's `OLD:` prefix. Prose naming the type
+    stays.
+  - New subcommands: `unitfile.py header` (a header no unit owns) and
+    `unitfile.py check`, which is track 11's count on `plan.py`'s line.
+  - `plan.class_header` finds a class's header now that the stem no longer
+    spells the class; `mark-class` takes `--header`.
+  - Proven byte-identical on `Entity` -> `world/entity` and on
+    `BasicClass.h` -> `basic_class.h`. A throwaway worktree merged a side
+    branch holding old-name text; replay restored every main-side rewrite
+    and renamed the side's.
+- **Two defects found while proving it:**
+  - Prose was rewritten one key at a time. rename.py's "line already names
+    NEW" rule then protected the line from the next key, and a bare
+    `Entity.c` survived next to `src/world/entity.c`. The fix is
+    `sub_prose_all`: judge each line once, then apply every key.
+  - replay.py's unitfile key was `src/{unit}.c`, stale since track 9 made
+    subsystem directories. It now reads the moves off the command's commit,
+    or failing that off the tree.
+- **A head slip, caught before push:** the tool stages its own `git mv`, and
+  `git add tools/... && git commit` committed the staged moves into the
+  tools commit. Replay then found no moves in the rename commit. The head
+  rebuilt the three commits. The runner brief says: commit a tool run with
+  `git add -A`, never a subset while its moves are staged.
+- **alpha (78 commits):**
+  - 75 unitfile.py runs and 94 files: 28 units, 21 headers moved with
+    their unit, 45 moved with `header`. Every run was byte-identical and
+    each commit carries its own moves.
+  - Concatenations were renamed for their subsystem: `game_shell.c` with
+    `data_source.h`, `title_menu.c`, `input_dialogs.c`, `dream_day.c`,
+    `dream_scene.c`, `vab_sound.c`.
+  - One-letter parts join a neighbour: `bmem_pmgr`, `wbgm`, `objm`,
+    `task_objf`.
+  - Hand edits: 46 comments and banners that a whole-token rewrite had left
+    naming a bare stem; the README code map, plus a stale `VabDriver`.
+- **The head at merge:**
+  - Every check was clean: `unitfile.py check` 0, typeviews 0 new,
+    nonmatching green, `make format` clean, declcheck 0 implicit, and no
+    earlier track reopened.
+  - Updated the rule docs the tools list but never rewrite: CLAUDE.md's
+    `tmd_renderer.c`, and FINISHING-PLAN's `file_resource.h` and
+    `basic_class.h`.
+- **Next:** `apidoc-setup` (premium), then track 12's eight Opus items.
+
+---
+
 ## 2026-09-28 — round 104: track 10 done, its four debt passes (premium head)
 
 Four Opus item runners, one per area: alpha `debt-app-cd`, bravo
