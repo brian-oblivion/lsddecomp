@@ -196,7 +196,7 @@ typedef struct RotationRatios {
    (0 deg, 45 deg, 0 deg) with the 45 being exactly the +-0x2D
    DreamSys__StepLookYaw writes, entry 1 is (0, -6, 0) and entry 2 is
    (0, +6, 0), which are DreamSys::turnCommand's two values 1 and 2. */
-extern RotationRatio TURN_ROTATION_YAW[]; /* == &sTurnRotations[0].y */
+extern RotationRatio sTurnRotationYaw[]; /* == &sTurnRotations[0].y */
 extern RotationRatios sTurnRotations[];
 
 /* (0 deg, 180 deg, 0 deg). Address-of only, forwarded as SceneNode__UpdateRotation's

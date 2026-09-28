@@ -40,7 +40,7 @@ extern D_80087E80Entry sTurnRotations[];
 ## Note: `sTurnRotations` is splat's auto-generated name for TWO seemingly
 different things
 
-An earlier round's comment on `TURN_ROTATION_YAW` says `&TURN_ROTATION_YAW[-1] (==
+An earlier round's comment on `sTurnRotationYaw` says `&sTurnRotationYaw[-1] (==
 &sTurnRotations, a distinct label immediately before it)`, describing a
 4-byte-stride array (`DreamSys__StepLookYaw`, `D_80087E84Entry` = `{s16, s16}`).
 This function's own `lui`/`addiu %hi/%lo(sTurnRotations)` uses a 12-byte stride

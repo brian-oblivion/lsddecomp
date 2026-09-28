@@ -25,7 +25,7 @@ The first attempt (plain symbol references, shown above) scored 16/17 with
 a `WARNING: the build differs OUTSIDE this range too` -- textbook
 size-drift shape. Checking `build/lsdde.map` for the three new symbols
 showed them ALL 4 bytes past their own name (`TUNNEL_TRIGGERS` linked at
-`0x80088984`), matching the exact `TURN_ROTATION_YAW[-1] == sTurnRotations` pattern
+`0x80088984`), matching the exact `sTurnRotationYaw[-1] == sTurnRotations` pattern
 already documented for a different data slot. That pattern looked like a
 strong match, so the natural fix was `&TUNNEL_TRIGGERS[-1]` etc. -- which made
 the score WORSE (14/17, wrong direction). The `.map` being consulted was

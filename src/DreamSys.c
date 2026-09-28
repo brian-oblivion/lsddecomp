@@ -585,8 +585,8 @@ void DreamSys__StepLookYaw(DreamSys *this) {
         threshold = sLookYawLimits[idx];
         sum = delta + this->lookYaw;
         if ((sum >= 0) ? (sum < threshold) : ((~sum + 1) < threshold)) {
-            TURN_ROTATION_YAW[0].numerator = delta;
-            this->methods->updateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
+            sTurnRotationYaw[0].numerator = delta;
+            this->methods->updateRotation(this, 0, &sTurnRotationYaw[-1]);
             this->lookYaw = sum;
         }
         this->lookYawCommand = 0;
@@ -595,8 +595,8 @@ void DreamSys__StepLookYaw(DreamSys *this) {
         delta = -LOOK_YAW_RETURN_STEP;
         if (this->lookYaw < 0)
             delta = LOOK_YAW_RETURN_STEP;
-        TURN_ROTATION_YAW[0].numerator = delta;
-        this->methods->updateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
+        sTurnRotationYaw[0].numerator = delta;
+        this->methods->updateRotation(this, 0, &sTurnRotationYaw[-1]);
         this->lookYaw += delta;
         flipTarget = this;
     } else {
