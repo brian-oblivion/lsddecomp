@@ -56,3 +56,15 @@ Class unified in `include/tile_atlas.h` (gTileAtlasMethods, 0x303, a FileResourc
 ## Round 93 polish (charlie, track 7)
 
 MATCHING lines on `s32 unused[8]` (retail's 0x38-byte frame) and on the BuildCells call (no argument).
+
+## History (source comments moved in track 12, round 106)
+
+From the TileAtlas class banner in include/tile_atlas.h (SLOTS, +0x064):
+
+> TileAtlas__Load: unless loadState is set, +0x078 and loaded = 1. It calls
+> +0x078 with NO argument ($a0 is never set up, as in TileMap__Load),
+> through TileAtlasBuildCellsFn;
+
+Track 12 checked the built object: `self` arrives in $a0 and Load only
+copies it (`move s0,a0`), so BuildCells in practice receives the atlas. The
+header now says so without the register.

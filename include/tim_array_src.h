@@ -1,77 +1,104 @@
+/**
+ * @file tim_array_src.h
+ * @brief TimArraySrc, the FileResource that turns one block of TIM images
+ *        into TimImage objects, and its method table.
+ */
 #ifndef TIM_ARRAY_SRC_H
 #define TIM_ARRAY_SRC_H
 
 #include "file_resource.h"
 
-/*
- * TimArraySrc -- a FileResource data source (class id 0xC03, method table
- * gTimArraySrcMethods) whose buffer holds one block of TIM images -- a count, then
- * that many byte offsets from the block's start -- and which turns it into
- * an array of TimImage objects (include/tim_image.h). Methods in
- * src/graphics/graphics_resources.c. No classes derive from it (`typeviews.py --tree`), so
- * there are no FIELDS/SLOTS macros.
- *
- * The ctor chain agrees with the id: TimArraySrc__TimArraySrc's first call
- * is GetActiveDataSourceMethods()->ctor, and finalize forwards to the
- * active driver's, as TimBlockSrc, TimImage and TileAtlas do.
- *
- * BuildImages makes one New_TimImage(NULL) per offset, each adopting its
- * TIM in place.
- *
- * How it is used, at the one New_TimArraySrc call site
- * (TimBlockSrc__AdvanceLoadState, include/tim_block_src.h): New_TimArraySrc(0)
- * per block, then the block's sector buffer as `buffer` (size 0, so the
- * TimArraySrc never owns it), `clutBase` = the address of the TimBlockSrc's
- * four CLUT fade ramps, then onRequestDone (+0x064, BuildImages) and +0x078
- * (UploadImages); the TimBlockSrc keeps it in `blocks` and releases it.
- *
- * SLOTS (`classtable.py gTimArraySrcMethods --vs gFileResourceMethods`, 30 against 30; the
- * words from +0x07C on are sDataSourceClientGetters, not this table):
- *  - +0x008 ctor, TimArraySrc__TimArraySrc(self, name): the active
- *    driver's ctor, this table, count/images/ready cleared, and
- *    requestLoadFile(name) when name is not NULL (the one caller passes 0);
- *  - +0x00C finalize, TimArraySrc__Finalize: ReleaseBasicClassArray the
- *    images, free the array, then the active driver's finalize;
- *  - +0x058 loadFile is NULL in this table;
- *  - +0x064 onRequestDone, TimArraySrc__BuildImages (named for what it does; the
- *    driver runs onRequestDone when a read completes, and TimBlockSrc calls it
- *    directly);
- *  - +0x078 is FileResource's `processBuffer` (NULL there); this table's
- *    occupant is TimArraySrc__UploadImages, called through
- *    TimArraySrcUploadFn (no code). No own slots past it.
- *
- * FIELDS: the object is 0x3C bytes (New_TimArraySrc).
- */
-
 typedef struct TimArraySrc TimArraySrc;
 typedef struct TimArraySrcMethods TimArraySrcMethods;
 struct TimImage;
 
+/**
+ * @brief TimArraySrc's method table, gTimArraySrcMethods: FileResource's
+ *        slots, with no new ones.
+ *
+ * It overrides +0x008 ctor (TimArraySrc__TimArraySrc), +0x00C finalize
+ * (TimArraySrc__Finalize) and +0x064 onRequestDone (TimArraySrc__BuildImages);
+ * +0x058 loadFile is NULL. The inherited +0x078 processBuffer holds
+ * TimArraySrc__UploadImages, called through TimArraySrcUploadFn.
+ */
 struct TimArraySrcMethods {
     FILERESOURCE_SLOTS(TimArraySrc, (TimArraySrc * self, char *name));
-    /* +0x078 is FileResource's processBuffer; this table's occupant is
-     * TimArraySrc__UploadImages (TimArraySrcUploadFn). */
-}; /* 30 slots, 0x7C bytes */
+};
 
+/**
+ * @brief One block of TIM images (class id 0xC03): a buffer holding an image
+ *        count and each image's byte offset from the block's start, turned
+ *        into one TimImage per image.
+ *
+ * Parent FileResource, through the active data-source driver; no subclasses.
+ * Methods in src/graphics/graphics_resources.c. The object is 0x3C bytes
+ * (New_TimArraySrc).
+ *
+ * Its one builder is TimBlockSrc__AdvanceLoadState: per block it makes one
+ * with New_TimArraySrc(NULL), points `buffer` at the block it read (size 0,
+ * so the TimArraySrc never frees it) and `clutBase` at its own fade ramps,
+ * then runs onRequestDone (BuildImages) and processBuffer (UploadImages). The
+ * TimBlockSrc keeps it in `blocks` and releases it.
+ */
 struct TimArraySrc {
-    FILERESOURCE_FIELDS(TimArraySrcMethods); /* buffer: the block (count, then offsets) */
-    /* +0x02C */ s32 count;                  /* images built: the block's first word */
-    /* +0x030 */ struct TimImage **images; /* BMemPMgrAlloc(count * 4), one New_TimImage(NULL) each */
-    /* +0x034 */ s32 clutBase; /* address of TimBlockSrc's entries[]; BuildImages adds 16 per CLUT row to it for each TimImage's clutBase */
-    /* +0x038 */ s32 ready;    /* 0 from the ctor, 1 once BuildImages built the array */
-}; /* 0x3C bytes: New_TimArraySrc */
+    FILERESOURCE_FIELDS(TimArraySrcMethods); /**< buffer: the block (count, then offsets) */
+    /* +0x02C */ s32 count;                  /**< images built: the block's first word */
+    /* +0x030 */ struct TimImage **images; /**< one TimImage per image, each over its TIM in the block */
+    /* +0x034 */ s32 clutBase; /**< the address of the TimBlockSrc's fade ramps (TimBlockSrcEntry[4]); each image's clutBase is the ramp its CLUT row falls in */
+    /* +0x038 */ s32 ready;    /**< 0 from the ctor, 1 once BuildImages built the array */
+};
 
-/* TimArraySrc__UploadImages as TimBlockSrc__AdvanceLoadState calls it
- * through processBuffer. */
+/** @brief TimArraySrc__UploadImages as TimBlockSrc__AdvanceLoadState calls it
+ *         through the void-typed processBuffer slot. */
 typedef void (*TimArraySrcUploadFn)(TimArraySrc *self);
 
+/** TimArraySrc's method table. */
 extern TimArraySrcMethods gTimArraySrcMethods;
-extern TimArraySrcMethods *GetTimArraySrcMethods(void); /* returns &gTimArraySrcMethods */
 
-TimArraySrc *New_TimArraySrc(char *name); /* BMemPMgrAlloc(0x3C), then ctor */
+/**
+ * @brief Returns TimArraySrc's method table.
+ * @return &gTimArraySrcMethods.
+ */
+extern TimArraySrcMethods *GetTimArraySrcMethods(void);
+
+/**
+ * @brief Allocates a TimArraySrc from the pool and constructs it.
+ * @param name A file to request, or NULL for a buffer the caller sets.
+ * @return The new object, or NULL when the pool is exhausted.
+ */
+TimArraySrc *New_TimArraySrc(char *name);
+
+/**
+ * @brief Constructor (slot +0x008): the active driver's, with no images yet,
+ *        then requests `name` when there is one.
+ * @param self The object to construct.
+ * @param name A file to request, or NULL.
+ */
 void TimArraySrc__TimArraySrc(TimArraySrc *self, char *name);
+
+/**
+ * @brief Finalizer (slot +0x00C): releases the images and frees the array,
+ *        then the active driver's finalizer.
+ * @param self The object being destroyed.
+ */
 void TimArraySrc__Finalize(TimArraySrc *self);
+
+/**
+ * @brief Slot +0x064 (onRequestDone): once the buffer is in, builds one
+ *        TimImage over each of its images, in place.
+ *
+ * Each image's clutBase is set to the fade ramp its CLUT row falls in. On
+ * success it sets `ready` and runs the driver's onRequestDone; when the array
+ * cannot be allocated nothing is built.
+ * @param self The object.
+ */
 void TimArraySrc__BuildImages(TimArraySrc *self);
+
+/**
+ * @brief Slot +0x078 (processBuffer): uploads every image to VRAM
+ *        (TimImage__Upload on each).
+ * @param self The object, its images built.
+ */
 void TimArraySrc__UploadImages(TimArraySrc *self);
 
 #endif

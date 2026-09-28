@@ -98,3 +98,11 @@ Class unified in `include/movie_player.h` (id 0x70, table `gMoviePlayerMethods`,
 | --- | --- | --- | --- |
 | `0x80` | `MOVIE_SYNC_HEIGHT` (128) | A | a frame shorter than this DrawSyncs before DecDCTout (here and in DecodeFrame) |
 | DrawSync/DecDCTout prototypes | <libgpu.h>, <libpress.h> | A | local copies deleted |
+
+## History (source comments moved in track 12, round 106)
+
+From MoviePlayer::stripRect's field comment in include/movie_player.h:
+
+> Its s32 w is read as a halfword there (lhu +0x030: cc1 narrows the load,
+> byte-verified). Its h (+0x034) is the frame height, which drawStrip and
+> decodeFrame test against 0x80 before a DrawSync

@@ -1,3 +1,8 @@
+/**
+ * @file tim_image.h
+ * @brief TimImage, the FileResource over one TIM image that uploads it to
+ *        VRAM, its method table, and one free VRAM helper.
+ */
 #ifndef TIM_IMAGE_H
 #define TIM_IMAGE_H
 
@@ -6,95 +11,153 @@
 #include <libgpu.h>
 #include <libgs.h>
 
-/*
- * TimImage -- a FileResource data source (class id 0x103, method table
- * gTimImageMethods) whose buffer holds one TIM image. Methods in
- * src/graphics/tim_image.c. No classes derive from it (`typeviews.py --tree`), so
- * there are no FIELDS/SLOTS macros.
- *
- * The ctor chain agrees with the id: TimImage__TimImage's first call is
- * GetActiveDataSourceMethods()->ctor, and finalize forwards to the active
- * driver's, as TimBlockSrc and LbdFile do.
- *
- * What its own methods do: getTimInfo (+0x09C, TimImage__GetTimInfo)
- * describes the TIM in `buffer` (past its id word) into a GsIMAGE with
- * Sony's GsGetTimInfo; TimImage__Upload, at +0x078, describes it into `tim`
- * and uploads the pixel block and, when pmode bit 3 says there is one, the
- * CLUT through the draw singleton's loadImage (include/draw_system.h).
- *
- * How it is used, at every New_TimImage call site: New_TimImage(path) with
- * a ".TIM" path (the ctor requests the file), then +0x078 (upload), then
- * usually freeBuffer (+0x05C) or release (+0x004) once the sprites made
- * from it hold what they need. A Sprite's `texture` is a TimImage: its
- * reset keeps &texture->tim (include/sprite.h). TimArraySrc (gTimArraySrcMethods,
- * src/graphics/graphics_resources.c) makes them with New_TimImage(NULL), points `buffer`
- * into its own block and sets `clutBase`.
- *
- * +0x078 is FileResource's `processBuffer` (NULL there); this table's occupant
- * is TimImage__Upload, called through TimImageUploadFn (no code).
- *
- * `tim` is <libgs.h>'s GsIMAGE.
- */
-
 typedef struct TimImage TimImage;
 typedef struct TimImageMethods TimImageMethods;
 
+/**
+ * @brief TimImage's method table, gTimImageMethods: FileResource's slots,
+ *        then nine of its own.
+ *
+ * It overrides +0x008 ctor (TimImage__TimImage) and +0x00C finalize
+ * (TimImage__Finalize). The inherited +0x078 processBuffer holds
+ * TimImage__Upload, called through TimImageUploadFn.
+ */
 struct TimImageMethods {
     FILERESOURCE_SLOTS(TimImage, (TimImage * self, char *name));
-    /* +0x078 is FileResource's processBuffer; this table's occupant is
-     * TimImage__Upload (TimImageUploadFn). */
-    /* +0x07C..+0x094: empty bodies (TimImage__NoOpSlot7C..TimImage__NoOpSlot94); no C
-     * caller names them. */
-    /* +0x07C */ void (*slot7C)(void);
-    /* +0x080 */ void (*slot80)(void);
-    /* +0x084 */ void (*slot84)(void);
-    /* +0x088 */ void (*slot88)(void);
-    /* +0x08C */ void (*slot8C)(void);
-    /* +0x090 */ void (*slot90)(void);
-    /* +0x094 */ void (*slot94)(void);
-    /* +0x098 */ void (*setFlag)(TimImage *self);                  /* TimImage__SetFlag: flag = 1 */
-    /* +0x09C */ void (*getTimInfo)(TimImage *self, GsIMAGE *tim); /* TimImage__GetTimInfo */
-}; /* 39 slots, 0xA0 bytes */
+    /* +0x07C */ void (*slot7C)(void);                             /**< @see TimImage__NoOpSlot7C */
+    /* +0x080 */ void (*slot80)(void);                             /**< @see TimImage__NoOpSlot80 */
+    /* +0x084 */ void (*slot84)(void);                             /**< @see TimImage__NoOpSlot84 */
+    /* +0x088 */ void (*slot88)(void);                             /**< @see TimImage__NoOpSlot88 */
+    /* +0x08C */ void (*slot8C)(void);                             /**< @see TimImage__NoOpSlot8C */
+    /* +0x090 */ void (*slot90)(void);                             /**< @see TimImage__NoOpSlot90 */
+    /* +0x094 */ void (*slot94)(void);                             /**< @see TimImage__NoOpSlot94 */
+    /* +0x098 */ void (*setFlag)(TimImage *self);                  /**< @see TimImage__SetFlag */
+    /* +0x09C */ void (*getTimInfo)(TimImage *self, GsIMAGE *tim); /**< @see TimImage__GetTimInfo */
+};
 
+/**
+ * @brief One TIM image (class id 0x103): a FileResource whose buffer holds a
+ *        TIM file, described into a GsIMAGE and uploaded to VRAM.
+ *
+ * Parent FileResource, through the active data-source driver; no subclasses.
+ * Methods in src/graphics/tim_image.c. The object is 0x50 bytes
+ * (New_TimImage).
+ *
+ * Most callers build a ".TIM" path and call New_TimImage(path), which requests
+ * the file, then processBuffer (upload), then usually freeBuffer or release
+ * once the sprites made from it hold what they need; a Sprite's `texture` is
+ * a TimImage, and its reset keeps &texture->tim. TimArraySrc instead makes
+ * them with New_TimImage(NULL), points `buffer` into its own block and sets
+ * `clutBase`.
+ */
 struct TimImage {
-    FILERESOURCE_FIELDS(TimImageMethods); /* buffer: the TIM file */
-    /* +0x02C */ GsIMAGE tim; /* TimImage__Upload describes the TIM here; a Sprite's reset keeps its address */
-    /* +0x048 */ s32 flag; /* 0 from the ctor, 1 from setFlag; nothing reads it */
-    /* +0x04C */ s32 clutBase; /* 0 from the ctor; TimArraySrc__BuildImages: from the CLUT row GsGetTimInfo reports */
-}; /* 0x50 bytes: New_TimImage */
+    FILERESOURCE_FIELDS(TimImageMethods); /**< buffer: the TIM file */
+    /* +0x02C */ GsIMAGE tim; /**< the TIM as TimImage__Upload describes it; a Sprite's reset keeps its address */
+    /* +0x048 */ s32 flag;     /**< 0 from the ctor, 1 from setFlag; nothing reads it */
+    /* +0x04C */ s32 clutBase; /**< 0 from the ctor; TimArraySrc sets it to the address of the fade ramp the image's CLUT row falls in */
+};
 
+/** @brief TimImage__Upload as its callers reach it through the void-typed
+ *         processBuffer slot. */
 typedef void (*TimImageUploadFn)(TimImage *self);
 
-/* GsIMAGE.pmode is the TIM file's flag word: the low bits the pixel mode, bit 3
- * (CF) set when the file carries a CLUT (TimImage__Upload uploads it then). */
+/** GsIMAGE.pmode is the TIM file's flag word: the low bits the pixel mode,
+ * this bit (CF) set when the file carries a CLUT, which TimImage__Upload then
+ * uploads too. */
 #define TIM_PMODE_CLUT_BIT 3
 
+/** TimImage's method table. */
 extern TimImageMethods gTimImageMethods;
+
+/**
+ * @brief Returns TimImage's method table.
+ * @return &gTimImageMethods.
+ */
 extern TimImageMethods *GetTimImageMethods(void);
 
+/**
+ * @brief Allocates a TimImage from the pool and constructs it.
+ * @param name A ".TIM" file to request, or NULL for a buffer the caller sets.
+ * @return The new object, or NULL when the pool is exhausted.
+ */
 TimImage *New_TimImage(char *name);
+
+/**
+ * @brief Constructor (slot +0x008): the active driver's, flag and clutBase
+ *        cleared, then requests `name` when there is one.
+ * @param self The object to construct.
+ * @param name A file to request, or NULL.
+ */
 void TimImage__TimImage(TimImage *self, char *name);
+
+/**
+ * @brief Finalizer (slot +0x00C): the active driver's, nothing of its own.
+ * @param self The object being destroyed.
+ */
 void TimImage__Finalize(TimImage *self);
+
+/**
+ * @brief Slot +0x078 (processBuffer): describes the TIM into `tim`, then
+ *        uploads its pixel block and, when it carries one, its CLUT through
+ *        the draw system's loadImage. Does nothing without a buffer.
+ * @param self The image.
+ */
 void TimImage__Upload(TimImage *self);
+
+/** @brief Slot +0x07C: does nothing. */
 void TimImage__NoOpSlot7C(void);
+
+/** @brief Slot +0x080: does nothing. */
 void TimImage__NoOpSlot80(void);
+
+/** @brief Slot +0x084: does nothing. */
 void TimImage__NoOpSlot84(void);
+
+/** @brief Slot +0x088: does nothing. */
 void TimImage__NoOpSlot88(void);
+
+/** @brief Slot +0x08C: does nothing. */
 void TimImage__NoOpSlot8C(void);
+
+/** @brief Slot +0x090: does nothing. */
 void TimImage__NoOpSlot90(void);
+
+/** @brief Slot +0x094: does nothing. */
 void TimImage__NoOpSlot94(void);
+
+/**
+ * @brief Slot +0x098: sets `flag`, which nothing reads.
+ * @param self The image.
+ */
 void TimImage__SetFlag(TimImage *self);
+
+/**
+ * @brief Slot +0x09C: describes the TIM in the buffer (past its id word) with
+ *        libgs's GsGetTimInfo.
+ * @param self The image, its buffer holding a TIM file.
+ * @param tim  Receives the image's pixel and CLUT positions, sizes and
+ *             addresses.
+ */
 void TimImage__GetTimInfo(TimImage *self, GsIMAGE *tim);
 
-/* An s16 VRAM point. */
+/** @brief A VRAM point in s16 coordinates. */
 typedef struct DrawPoint {
-    /* +0x00 */ s16 x;
-    /* +0x02 */ s16 y;
+    /* +0x00 */ s16 x; /**< VRAM x */
+    /* +0x02 */ s16 y; /**< VRAM y */
 } DrawPoint;
 
-/* Rotates the VRAM rectangle `area` one column to the right, count times,
- * through the one-column scratch area at `scratch`. Not a TimImage method. */
 struct DrawRect; /* include/draw_system.h */
+
+/**
+ * @brief Rotates a VRAM rectangle one column to the right, `count` times.
+ *
+ * Each step moves the last column to `scratch`, the rest right by one, and
+ * the scratch column back as column 0, through the draw system's moveImage.
+ * Not a TimImage method; dream_scene.c's StyleScrollVramStrips calls it.
+ * @param area    The rectangle to rotate.
+ * @param count   How many columns to rotate it by; 0 does nothing.
+ * @param scratch The top of a free one-column VRAM area as tall as `area`.
+ */
 void RotateVramRectRight(struct DrawRect *area, s32 count, DrawPoint *scratch);
 
 #endif

@@ -57,3 +57,15 @@ Class unified in `include/tile_map.h`. `self` is `TileMap *` (was `Obj6F498`); +
 ## Round 93 polish (charlie, track 7)
 
 MATCHING line on the BuildMap call: retail passes it no argument.
+
+## History (source comments moved in track 12, round 106)
+
+From the TileMap class banner in include/tile_map.h (SLOTS, +0x064):
+
+> TileMap__Load: unless loadState is set, +0x078 and loaded = 1. It calls
+> +0x078 with NO argument ($a0 is never set up; TileMap__Load's report),
+> through TileMapBuildMapFn;
+
+Track 12 checked the built object: `self` arrives in $a0 and Load only
+copies it (`move s0,a0`) before the `jalr`, so BuildMap in practice receives
+the map. The header now says so without the register.

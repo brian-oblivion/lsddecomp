@@ -68,3 +68,11 @@ pure computation whose mechanics are its purpose. Called by
 
 A `MATCHING:` line on the five hoisted field pointers (builds 3 and 7 above:
 without them the function changes size). Comment only.
+
+## History (source comments moved in track 12, round 106)
+
+From TmdVec3's comment in include/tmd_model.h:
+
+> A 6-byte all-s16 vector (alignment 2: whole-value copies are lwl/lwr).
+
+ComputeBounds' `box->max = box->min` is one such copy.

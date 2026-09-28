@@ -1,62 +1,94 @@
+/**
+ * @file tod_set.h
+ * @brief TodSet, the Tod over a buffer of several TOD animations, and its
+ *        method table.
+ */
 #ifndef TOD_SET_H
 #define TOD_SET_H
 
 #include "tod.h"
-
-/*
- * TodSet -- a Tod subclass (class id 0x14F03, method table gTodSetMethods) over
- * a buffer holding several TOD animations: a counted offset table, one Tod
- * per entry, then the packet data. Methods in src/graphics/graphics_resources.c; no
- * subclasses. Its parent is its id parent: TodSet__TodSet's first call is
- * GetTodMethods()->ctor.
- *
- * What its own methods do: TodSet__BuildTods (its
- * +0x064) makes one Tod per entry of the buffer's counted offset table
- * (New_Tod over buffer + entries[i]) and stores each back into the table's
- * own word; TodSet__Finalize releases that array (ReleaseBasicClassArray);
- * TodSet__ScanPackets (+0x078) runs Tod's +0x07C scanner over the data past
- * the counted array. ModelData builds one over its buffer past +0x0C
- * (ModelData__BuildResources: New_TodSet) and forwards its TOD packet scans
- * to it (ModelData.todSet, still declared `FileResource *` in
- * include/model_data.h).
- *
- * NO OWN SLOTS: the table is Tod's 0x84 bytes, with +0x008, +0x00C, +0x064
- * and +0x078 overridden (`classtable.py gTodSetMethods --vs gTodMethods`).
- * +0x064 keeps the inherited name `onRequestDone` and its void type; the occupant
- * TodSet__BuildTods returns s32 (0 when every Tod was built), and the ctor
- * casts the call, as ModelData__ModelData casts its own. +0x078 is
- * FileResource's processBuffer (NULL there); TodSet__ScanPackets occupies it, as
- * Tod__ScanPackets does in Tod's table.
- *
- * NO OWN FIELDS: the object is 0x2C bytes (New_TodSet), Tod's size.
- *
- * The ctor returns self or NULL (New_TodSet tests it), but TOD_SLOTS
- * declares +0x008 returning void, as Tod's own ctor does; the allocator
- * reaches it through graphics_resources.c's unprototyped UnprototypedCtorTable view, as every
- * allocator in that unit does. The descriptor is include/file_resource.h's
- * ResourceSource.
- */
 
 struct ResourceSource;
 
 typedef struct TodSet TodSet;
 typedef struct TodSetMethods TodSetMethods;
 
+/**
+ * @brief TodSet's method table, gTodSetMethods: Tod's slots, with no new ones.
+ *
+ * It overrides +0x008 ctor (TodSet__TodSet), +0x00C finalize
+ * (TodSet__Finalize), +0x064 onRequestDone (TodSet__BuildTods, which returns
+ * s32; the ctor casts the call) and +0x078 processBuffer
+ * (TodSet__ScanPackets).
+ */
 struct TodSetMethods {
     TOD_SLOTS(TodSet, (TodSet * self, struct ResourceSource *src));
 };
 
+/**
+ * @brief A set of TOD animations (class id 0x14F03): one buffer holding a
+ *        counted table of offsets, one Tod per entry, then the packet data.
+ *
+ * Building it replaces each table entry with the Tod made over it. Parent Tod
+ * (its ctor chains to Tod's first); no subclasses, and no fields of its own:
+ * the object is 0x2C bytes (New_TodSet). Methods in
+ * src/graphics/graphics_resources.c. ModelData__BuildResources builds one over
+ * a MOM file's TODs, and ModelData forwards its packet scans to it.
+ */
 struct TodSet {
     TOD_FIELDS(TodSetMethods);
 };
 
+/** TodSet's method table. */
 extern TodSetMethods gTodSetMethods;
+
+/**
+ * @brief Returns TodSet's method table.
+ * @return &gTodSetMethods.
+ */
 extern TodSetMethods *GetTodSetMethods(void);
 
+/**
+ * @brief Allocates a TodSet from the pool and constructs it.
+ * @param src The descriptor: a buffer to adopt, else a file name to request.
+ * @return The new object, or NULL when the pool is exhausted or an adopted
+ *         buffer's Tods cannot be built (the object is then freed).
+ */
 TodSet *New_TodSet(struct ResourceSource *src);
+
+/**
+ * @brief Constructor (slot +0x008): Tod's, then, with an adopted buffer,
+ *        builds its Tods at once.
+ * @param self The object to construct.
+ * @param src  The descriptor.
+ * @return self, or NULL when building the Tods fails.
+ */
 void *TodSet__TodSet(TodSet *self, struct ResourceSource *src);
+
+/**
+ * @brief Finalizer (slot +0x00C): releases the Tods in the buffer's table,
+ *        then Tod's finalizer.
+ * @param self The object being destroyed.
+ */
 void TodSet__Finalize(TodSet *self);
+
+/**
+ * @brief Slot +0x064 (onRequestDone): builds a Tod over each of the buffer's
+ *        sub-blocks, storing it in place of that entry's offset.
+ * @param self The object, its buffer loaded.
+ * @return 0 when every Tod was built; 1 when one fails, those built so far
+ *         then released.
+ */
 s32 TodSet__BuildTods(TodSet *self);
-u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel);
+
+/**
+ * @brief Slot +0x078: scanTodPackets over the first frame of the TOD that
+ *        follows the counted table.
+ * @param self  The object.
+ * @param out   As ScanTodPackets'.
+ * @param tmdId As ScanTodPackets'.
+ * @return The number of object-create packets in that frame.
+ */
+u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *tmdId);
 
 #endif
