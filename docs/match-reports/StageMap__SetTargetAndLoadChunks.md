@@ -128,3 +128,10 @@ This function: `StageMap__SetTargetAndBuildRates` -> `StageMap__SetTargetAndLoad
 ## Track 7 (2026-09-27, round 95, charlie)
 
 Parameters and locals, tier A from the body and the slot declaration (`setTargetAndLoadChunks(self, outPos, target, cell)`): `arg1` -> `outPos` (ComputeCellWorldOffsets writes the cell point there), `arg2` -> `target` (stored in `self->target`), `arg3` -> `cell` (the Descriptor10 copied into `targetCell.base`), `stackBuf` -> `chunkCentre` (ComputeCellWorldOffsets leaves the chunk centre in it; passed to loadChunksAround as its centre position), `ret` -> `chunkIndex` (ComputeCellWorldOffsets' return value).
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+include/stage_map.h, on Descriptor10: "A grid-cell descriptor, 10 bytes, alignment 2 (every member s8/s16, so a
+whole copy is lwl/lwr + swl/swr + sh: SetTargetAndLoadChunks)." 

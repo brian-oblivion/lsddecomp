@@ -146,3 +146,12 @@ This function: `StageMap__OnElementEvent` -> `StageMap__OnSlotEvent` (`python3 t
 ## Track 7 (2026-09-27, round 98, charlie)
 
 Events `6`/`7` -> `STAGEMAP_EVENT_SLOT_RELEASE`/`STAGEMAP_EVENT_SLOT_DATA_READY` (include/stage_map.h); labels `handle6`/`merge` -> `release`/`record`; parameter `elem` -> `slot` (the header prototype's name). The `if`+`goto` shape carries a `MATCHING:` line (Residue 2 above). Zero bytes.
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+    /* MATCHING: two literal if+goto tests; an if/else-if chain inverts the
+     * branches. */
+```

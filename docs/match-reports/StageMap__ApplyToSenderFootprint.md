@@ -199,3 +199,10 @@ SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX
 ## Track 7 (2026-09-27, round 98, charlie)
 
 Locals `buf` -> `desc`, `saved` -> `savedRects`. Zero bytes.
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+include/stage_map.h, on CellRectSet: "`rects` as a whole, so ApplyToSenderFootprint can save and restore it
+with a plain `=` (a batched 4-word block move; an indexed loop does not compile to it)." 

@@ -987,3 +987,28 @@ unchanged (`req.src...` writes, `&req.src` to New_LinkResource). A plain
 8 and move every callee-save slot, and an unused pad local is dropped by
 cc1, so ResourceRequest is the smallest existing type that keeps the frame.
 Byte-exact. Table and details: ResourceRequest__Set.md, round 97 second job.
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+    /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
+     * frame by 8. */
+    ResourceRequest req;
+
+```
+
+```c
+/* Links a loaded chunk into its slot: points the slot's PlacementGrid at the
+ * header's placement records, replaces its LinkResource with one over the
+ * header's model block, then resolves record after record until the grid
+ * returns 0. A record with no model (-1) hides its lattice cell; one with a
+ * model links it into the next lattice cell (a chained record: the next
+ * overflow cell), sets the cell's position, y rotation and flags, and hides
+ * it until the drawn window shows it. While a record has `next` set, the
+ * cell's nextInCell is the overflow cell the following record takes.
+ * MATCHING: `header` and `header2` are two locals (one changes the
+ * allocation), and the cells are walked by byte offset (an index changes the
+ * code). */
+```

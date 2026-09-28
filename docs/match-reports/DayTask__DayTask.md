@@ -389,3 +389,14 @@ what the code is.
 ```c
 /* arity-ok: the definition takes no parameter and reads no argument register, but this dead argument IS byte-load-bearing -- retail emits `move a0,zero` at 0x800496A8 ahead of the jal at 0x800496B0 */
 ```
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+    /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
+     * frame by 8. */
+    ResourceRequest req;
+    char *vabPath;
+```

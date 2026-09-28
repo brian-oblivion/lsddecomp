@@ -742,3 +742,18 @@ Kept as a one-line `MATCHING:` note under a new descriptive comment.
 - `0x14` -> `STAGE_CHUNK_CELLS`; `>= 0x15` -> `> STAGE_CHUNK_CELLS` (same
   code); `0xA` -> `STAGE_CHUNK_HALF_CELLS`, new in stage_map.h (additive,
   `STAGE_CHUNK_CELLS / 2`, the odd-row stagger).
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+/* Splits the window (footprintCol/Row, footprintWidth/Height) into
+ * `rects`: a window that starts left of the centre chunk or above it starts
+ * in that neighbour's slot, with its column and row moved into that chunk
+ * (rows above are staggered by half a chunk); a part past the right edge
+ * goes to the slot of key + 1, and SplitFootprintRect splits off the part
+ * past the bottom edge. MATCHING: one `rect` pointer reused for the second
+ * rectangle, `over` its own local, and `count += 1` in each arm and again at
+ * the join. */
+```

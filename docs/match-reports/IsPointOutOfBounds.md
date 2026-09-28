@@ -835,3 +835,13 @@ source comment no longer carries; the code keeps one `MATCHING:` line):
 ```
 
 Replaced by what the function returns and a `MATCHING:` line.
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+/* 1 when there are no bounds or the point (cell column, row) lies outside
+ * them, else 0. MATCHING: the in-range test returns 0 and `return 1`
+ * follows it; the other order allocates differently. */
+```
