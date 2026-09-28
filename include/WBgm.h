@@ -11,18 +11,19 @@
  * BasicClass subclass (its ctor calls Get_vtable_BasicClass()->ctor first;
  * `classtable.py gWBgmMethods --vs gBasicClassMethods` overrides the ctor, finalize
  * and onNotify and adds nine slots). Methods in src/code_2a0e0.c. No class
- * derives from it. Name from rodata D_80010FEC, "Seq Open error in
+ * derives from it. Name from rodata sSeqOpenErrorMsg, "Seq Open error in
  * WBgmHandleMonitorEvent", printed by WBgm__HandleMonitorEvent's own body.
  *
  * A background-music player: one libsnd SEQ played on one VAB bank. The
  * bank is a VabStreamObj (`vab`), the SEQ file a RequestedFile (`seqData`);
  * both load asynchronously, so the SEQ is SsSeqOpen'd (HandleMonitorEvent)
  * only once `vab->attrsReady` and `seqData->loaded` are both set, and
- * played at once if `autoPlay`. Until then `openState` is 1 and the
- * DrawSystem retries: the ctor adds the DrawSystem as a child, so the
- * DrawSystem's per-VSync notifyParents(self, 2) (include/DrawSystem.h)
- * reaches onNotify, which forwards a DrawSystem sender (class id nibble 1)
- * to +0x040 update, which retries on event 2.
+ * played at once if `autoPlay`. Until then `openState` is WBGM_OPEN_WAITING
+ * and the DrawSystem retries: the ctor adds the DrawSystem as a child, so
+ * the DrawSystem's per-VSync notifyParents(self, DRAWSYSTEM_EVENT_VSYNC)
+ * (include/DrawSystem.h) reaches onNotify, which forwards a DrawSystem
+ * sender (DRAWSYSTEM_CLASS_ID) to +0x040 update, which retries on that
+ * event.
  *
  * Its one construction: DayTask__DayTask (src/class_39e08.c),
  * New_WBgm(PickSoundBank(0), NULL, 1): the VAB path is one of the seven
@@ -50,10 +51,17 @@ struct WBgmMethods {
     /* +0x048 */ void (*stop)(WBgm *self);   /* WBgm__Stop: SsSeqStop + SsSeqClose */
     /* +0x04C */ void (*pause)(WBgm *self);  /* WBgm__Pause */
     /* +0x050 */ void (*resume)(WBgm *self); /* WBgm__Resume */
-    /* +0x054 */ void (*setVol)(WBgm *self, s16 left, s16 right);   /* WBgm__SetVol */
-    /* +0x058 */ void (*crescendo)(WBgm *self, s16 vol, s32 scale); /* WBgm__Crescendo */
+    /* +0x054 */ void (*setVol)(WBgm *self, s16 left, s16 right);     /* WBgm__SetVol */
+    /* +0x058 */ void (*crescendo)(WBgm *self, s16 vol, s32 seconds); /* WBgm__Crescendo */
     /* +0x05C */ void (*setSeq)(WBgm *self, char *seqPath); /* WBgm__SetSeq; NULL only drops the old one */
     /* +0x060 */ void (*setVab)(WBgm *self, char *vabPath); /* WBgm__SetVab; NULL only drops the old one */
+};
+
+/* WBgm::openState: how far the SEQ is from being SsSeqOpen'd. */
+enum WBgmOpenState {
+    WBGM_OPEN_IDLE = 0,    /* set by the ctor and by stop: nothing waiting to open */
+    WBGM_OPEN_WAITING = 1, /* a path was set before both loads finished: the VSync update retries */
+    WBGM_OPEN_DONE = 2     /* HandleMonitorEvent called SsSeqOpen (seqId -1 if it failed) */
 };
 
 struct WBgm {
@@ -62,7 +70,7 @@ struct WBgm {
     /* +0x010 */ RequestedFile *seqData; /* New_RequestedFile(setSeq's path): the SEQ file, SsSeqOpen'd from its buffer once loaded */
     /* +0x014 */ s16 seqId;             /* SsSeqOpen's result; every SsSeq* call's access number */
     /* +0x016 */ u8 pad16[0x1A - 0x16]; /* no accessor in the class's methods */
-    /* +0x01A */ u16 openState; /* 0 idle, 1 waiting for both loads, 2 opened (HandleMonitorEvent); stop resets it to 0 */
+    /* +0x01A */ u16 openState;         /* enum WBgmOpenState */
     /* +0x01C */ u16 paused;
     /* +0x01E */ u16 playing;
     /* +0x020 */ s32 autoPlay; /* the ctor's argument: play as soon as the SEQ opens */
@@ -85,7 +93,7 @@ void WBgm__Stop(WBgm *self);
 void WBgm__Pause(WBgm *self);
 void WBgm__Resume(WBgm *self);
 void WBgm__SetVol(WBgm *self, s16 left, s16 right);
-void WBgm__Crescendo(WBgm *self, s16 vol, s32 scale);
+void WBgm__Crescendo(WBgm *self, s16 vol, s32 seconds);
 void WBgm__SetSeq(WBgm *self, char *seqPath);
 void WBgm__SetVab(WBgm *self, char *vabPath);
 s32 IsWBgmActive(void); /* returns gWBgmActive */

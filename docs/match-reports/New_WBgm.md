@@ -109,7 +109,7 @@ extern BasicClass *GetDrawSystem(void);
 extern SeqData *New_RequestedFile(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
-extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
+extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 WBgmMethods *Get_vtable_WBgm(void);
 
 extern s32 GetSsTicksPerSecond(void);
@@ -135,3 +135,30 @@ For the owners of those classes (NOT applied: they are other classes' views):
 ## Track 4 (2026-09-26, round 88, DayTask)
 
 Applied: the proposed `Obj865C8::unk40` -> `bgm`, `struct WBgm *` is DayTask::bgm in include/DayTask.h.
+
+## History: the unit banner of src/code_2a0e0.c (moved here round 101, track 7)
+
+The banner of `src/code_2a0e0.c` carried this history until round 101, when
+track 7 rewrote it as documentation. Verbatim:
+
+```c
+/*
+ * code_2a0e0 -- GAME code carved from psyq_2a0e0 on 2026-09-25 (FINISHING-PLAN
+ * revision 18). 0x2A0E0..0x2A878 (vram 0x800398E0..0x8003A078). It was counted
+ * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
+ * into game code, a method-table entry beside game methods, or contiguity with
+ * those, and no Sony fingerprint). What it holds: WBgm, a background-music
+ * SEQ player built on New_VabStreamObj; the yaml had called this gap "the
+ * game's own libspu build".
+ *
+ * All 17 functions matched in round 81 (runners echo and delta); named round
+ * 82 (runner bravo, FINISHING-PLAN track 3). Class named WBgm from rodata
+ * sSeqOpenErrorMsg ("Seq Open error in WBgmHandleMonitorEvent"): the string is part
+ * of WBgm__HandleMonitorEvent's own matched body (the printf sits right where
+ * it is read), so it is body evidence for that function's name and, via its
+ * "WBgm" prefix, a lead for the class -- weighed as evidence, not proof.
+ *
+ * Track 4 (round 88): the class is declared once, in include/WBgm.h (table
+ * gWBgmMethods); this unit keeps no view of it.
+ */
+```

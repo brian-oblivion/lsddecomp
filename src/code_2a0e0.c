@@ -1,49 +1,35 @@
 /*
- * code_2a0e0 -- GAME code carved from psyq_2a0e0 on 2026-09-25 (FINISHING-PLAN
- * revision 18). 0x2A0E0..0x2A878 (vram 0x800398E0..0x8003A078). It was counted
- * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
- * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). What it holds: WBgm, a background-music
- * SEQ player built on New_VabStreamObj; the yaml had called this gap "the
- * game's own libspu build".
- *
- * All 17 functions matched in round 81 (runners echo and delta); named round
- * 82 (runner bravo, FINISHING-PLAN track 3). Class named WBgm from rodata
- * D_80010FEC ("Seq Open error in WBgmHandleMonitorEvent"): the string is part
- * of WBgm__HandleMonitorEvent's own matched body (the printf sits right where
- * it is read), so it is body evidence for that function's name and, via its
- * "WBgm" prefix, a lead for the class -- weighed as evidence, not proof.
- *
- * Track 4 (round 88): the class is declared once, in include/WBgm.h (table
- * gWBgmMethods); this unit keeps no view of it.
+ * WBgm, the background-music player: one libsnd SEQ played on one VAB bank
+ * (the class is documented in include/WBgm.h). The file holds its allocator,
+ * constructor and methods in table order, with the non-slot helper
+ * WBgm__HandleMonitorEvent (it SsSeqOpens the SEQ once both files have
+ * loaded) after update; then the table getter; IsWBgmActive, which
+ * VabStreamObj__Finalize checks before it shuts libsnd down; and
+ * GetSsSizeTableBuf, the buffer PlacementGridVabSound.c passes to
+ * SsSetTableSize.
  */
 #include "common.h"
+#include <libsnd.h>
 #include "BasicClass.h"
 #include "DrawSystem.h"
 #include "WBgm.h"
 
-/* libsnd (LIBSND.H) */
-extern void SsSeqPlay(short, char, short);
-extern void SsSeqPause(short);
-extern void SsSeqReplay(short);
-extern void SsSeqStop(short);
-extern void SsSeqSetVol(short, short, short);
-extern void SsSeqSetCrescendo(short, short, long);
-extern void SsSeqClose(short);
-extern short SsSeqOpen(unsigned long *addr, short vab_id);
-
 extern void *BMemPMgrAlloc(s32 size);
 extern void printf(const char *fmt);
-extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
+extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 
 extern s32 GetSsTicksPerSecond(void);
 
 extern u8 gSsSizeTableBuf[];
 
+/* The volume, left and right, a SEQ gets when it opens and again on every
+ * play (libsnd's range is 0 to 127). */
+#define WBGM_PLAY_VOL 52
+
 WBgm *New_WBgm(char *vabPath, char *seqPath, s32 autoPlay) {
     WBgm *self;
 
-    self = BMemPMgrAlloc(0x24);
+    self = BMemPMgrAlloc(sizeof(WBgm));
     if (self != NULL) {
         Get_vtable_WBgm()->ctor(self, vabPath, seqPath, autoPlay);
         return self;
@@ -57,7 +43,7 @@ void WBgm__WBgm(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay) {
     self->vab = NULL;
     self->seqData = NULL;
     self->seqId = 0;
-    self->openState = 0;
+    self->openState = WBGM_OPEN_IDLE;
     self->paused = 0;
     self->playing = 0;
     self->autoPlay = autoPlay;
@@ -83,13 +69,14 @@ void WBgm__Finalize(WBgm *self) {
 
 void WBgm__OnNotify(WBgm *self, void *sender, s32 event) {
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
-    if ((((BasicClass *)sender)->methods->header & 0xF) == 1) {
+    if ((((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK) == DRAWSYSTEM_CLASS_ID) {
         self->methods->update(self, (DrawSystem *)sender, event);
     }
 }
 
 void WBgm__Update(WBgm *self, DrawSystem *sender, s32 event) {
-    if (event == 2 && self->openState == 1 && WBgm__HandleMonitorEvent(self) && self->autoPlay != 0) {
+    if (event == DRAWSYSTEM_EVENT_VSYNC && self->openState == WBGM_OPEN_WAITING &&
+        WBgm__HandleMonitorEvent(self) && self->autoPlay != 0) {
         self->methods->play(self);
     }
 }
@@ -114,17 +101,17 @@ s32 WBgm__HandleMonitorEvent(WBgm *self) {
     }
     self->seqId = SsSeqOpen(seq->buffer, vab->vabId);
     if (self->seqId == -1) {
-        printf(D_80010FEC);
+        printf(sSeqOpenErrorMsg);
     }
-    SsSeqSetVol(self->seqId, 0x34, 0x34);
-    self->openState = 2;
+    SsSeqSetVol(self->seqId, WBGM_PLAY_VOL, WBGM_PLAY_VOL);
+    self->openState = WBGM_OPEN_DONE;
     return 1;
 }
 
 void WBgm__Play(WBgm *self) {
     if (self->playing == 0) {
-        SsSeqSetVol(self->seqId, 0x34, 0x34);
-        SsSeqPlay(self->seqId, 1, 0);
+        SsSeqSetVol(self->seqId, WBGM_PLAY_VOL, WBGM_PLAY_VOL);
+        SsSeqPlay(self->seqId, SSPLAY_PLAY, SSPLAY_INFINITY);
         self->playing = 1;
     }
 }
@@ -134,7 +121,7 @@ void WBgm__Stop(WBgm *self) {
         SsSeqStop(self->seqId);
         SsSeqClose(self->seqId);
         self->playing = 0;
-        self->openState = 0;
+        self->openState = WBGM_OPEN_IDLE;
     }
 }
 
@@ -156,8 +143,8 @@ void WBgm__SetVol(WBgm *self, s16 left, s16 right) {
     SsSeqSetVol(self->seqId, left, right);
 }
 
-void WBgm__Crescendo(WBgm *self, s16 vol, s32 scale) {
-    SsSeqSetCrescendo(self->seqId, vol, GetSsTicksPerSecond() * scale);
+void WBgm__Crescendo(WBgm *self, s16 vol, s32 seconds) {
+    SsSeqSetCrescendo(self->seqId, vol, GetSsTicksPerSecond() * seconds);
 }
 
 void WBgm__SetSeq(WBgm *self, char *seqPath) {
@@ -174,8 +161,8 @@ void WBgm__SetSeq(WBgm *self, char *seqPath) {
             if (self->autoPlay != 0) {
                 self->methods->play(self);
             }
-        } else if (self->openState == 0) {
-            self->openState = 1;
+        } else if (self->openState == WBGM_OPEN_IDLE) {
+            self->openState = WBGM_OPEN_WAITING;
         }
     }
 }
@@ -194,8 +181,8 @@ void WBgm__SetVab(WBgm *self, char *vabPath) {
             if (self->autoPlay != 0) {
                 self->methods->play(self);
             }
-        } else if (self->openState == 0) {
-            self->openState = 1;
+        } else if (self->openState == WBGM_OPEN_IDLE) {
+            self->openState = WBGM_OPEN_WAITING;
         }
     }
 }
