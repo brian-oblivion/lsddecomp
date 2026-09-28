@@ -137,7 +137,7 @@ typedef struct BoxFillRgb {
     /* +0x05E */ s16 boxY;         /* GsBOXF.y */                                                  \
     /* +0x060 */ u16 boxW;         /* GsBOXF.w: Reset and setSize (FadeBox reads it lhu) */    \
     /* +0x062 */ u16 boxH;         /* GsBOXF.h */                                                  \
-    /* +0x064 */ u8 color[3];      /* GsBOXF.r, g, b: setColor (Reset's default gBoxFillDefaultColor) */     \
+    /* +0x064 */ u8 color[3];      /* GsBOXF.r, g, b: setColor (Reset's default sBoxFillDefaultColor) */     \
     /* +0x067 */ u8 pad67;                                                                         \
     /* +0x068 */ s32 mask          /* setMask. The object is 0x6C bytes (New_BoxFill) */
 /* clang-format on */

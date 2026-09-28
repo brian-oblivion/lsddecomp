@@ -266,7 +266,7 @@ void BoxFill__Reset(BoxFill *self, BoxFillSize *size, void *color, s32 pri) {
     self->boxH = size->h;
     methods = self->methods;
     if (color == NULL) {
-        color = gBoxFillDefaultColor;
+        color = sBoxFillDefaultColor;
     }
     methods->setColor(self, 1, color);
     self->methods->setMask(self, 13);
