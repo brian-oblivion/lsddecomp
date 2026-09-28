@@ -26,7 +26,7 @@ void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
         r2 = rand();
         table = sRotationYawPlus9;
         if ((r2 & 3) != 0) {
-            table = ROTATION_YAW_MINUS9;
+            table = sRotationYawMinus9;
         }
         this->methods->slot44(this, 0, table);
     }
@@ -48,13 +48,13 @@ void Entity__MoodCue43(Entity *this, EntityMoodHandlerArg *out) {
   (unused by the callee, harmless). Typing the callee from its own body,
   not from what happens to be sitting in the caller's registers, avoided a
   wrong two-argument signature here.
-- **The `sRotationYawPlus9`/`ROTATION_YAW_MINUS9` table selection is the "default value,
+- **The `sRotationYawPlus9`/`sRotationYawMinus9` table selection is the "default value,
   then conditionally overwritten" idiom** from
   `docs/DECOMPILATION_LEARNINGS.md`, not a ternary: retail loads
   `sRotationYawPlus9` unconditionally right after the second `rand()` call, then
-  overwrites it with `ROTATION_YAW_MINUS9` only if `rand() & 3 != 0`. Write it as
-  `table = sRotationYawPlus9; if (cond) table = ROTATION_YAW_MINUS9;`, not
-  `table = cond ? ROTATION_YAW_MINUS9 : sRotationYawPlus9;` -- the ternary form did not
+  overwrites it with `sRotationYawMinus9` only if `rand() & 3 != 0`. Write it as
+  `table = sRotationYawPlus9; if (cond) table = sRotationYawMinus9;`, not
+  `table = cond ? sRotationYawMinus9 : sRotationYawPlus9;` -- the ternary form did not
   reproduce the load-then-conditionally-overwrite instruction shape when
   tried first.
 - **The default assignment (`table = sRotationYawPlus9;`) must come AFTER the

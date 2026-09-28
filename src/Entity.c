@@ -1051,9 +1051,9 @@ void Entity__MoodCue34(Entity *this) {
     if ((u32)(this->moodTimer - 400) < 10) {
         this->methods->updateRotation(this, 0, sRotationYawPlus9);
     } else if ((u32)(this->moodTimer - 700) < 10) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS9);
+        this->methods->updateRotation(this, 0, sRotationYawMinus9);
     } else if ((u32)(this->moodTimer - 830) < 4) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS9);
+        this->methods->updateRotation(this, 0, sRotationYawMinus9);
     } else if (this->moodTimer >= 851) {
         this->methods->deactivate(this);
     }
@@ -1283,7 +1283,7 @@ void Entity__MoodCue43(Entity *this, SoundCueSet *out) {
         rotPick = rand();
         table = sRotationYawPlus9;
         if ((rotPick & 3) != 0) {
-            table = ROTATION_YAW_MINUS9;
+            table = sRotationYawMinus9;
         }
         this->methods->updateRotation(this, 0, table);
     }
@@ -1303,7 +1303,7 @@ void Entity__MoodCue44(Entity *this, SoundCueSet *out) {
     if (this->moodTimer >= 300 && this->moodTimer < 320) {
         this->methods->moveLocalZ(this, -60, 0);
     } else if (this->moodTimer >= 321 && this->moodTimer < 340) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS9);
+        this->methods->updateRotation(this, 0, sRotationYawMinus9);
     } else if (this->moodTimer >= 321) {
         dxPick = rand();
         dx = -128;
@@ -1314,7 +1314,7 @@ void Entity__MoodCue44(Entity *this, SoundCueSet *out) {
         rotPick = rand();
         table = sRotationYawPlus9;
         if ((rotPick & 3) != 0) {
-            table = ROTATION_YAW_MINUS9;
+            table = sRotationYawMinus9;
         }
         this->methods->updateRotation(this, 0, table);
     }
@@ -2825,7 +2825,7 @@ void Entity__MoodCue114(Entity *this, SoundCueSet *out) {
     if (rand() % 3 != 0) {
         rotation = sRotationYawPlus9;
     } else {
-        rotation = ROTATION_YAW_MINUS9;
+        rotation = sRotationYawMinus9;
     }
     this->methods->updateRotation(this, 0, rotation);
 }
