@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gLinkTriggerIndex
 gMcDevicePath0
 gMcDevicePath1
 gMdecInitialized
@@ -185,6 +184,7 @@ sLinkAngle180
 sLinkDstStage
 sLinkSpawnIndex
 sLinkSrcStage
+sLinkTriggerIndex
 sListViewColor
 sListViewSize
 sMcTempFileSuffix

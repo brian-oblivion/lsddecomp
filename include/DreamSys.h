@@ -131,7 +131,7 @@ enum DreamSysMoveOverride {
 extern s8 (*gpNavChallengesComplete)[NAV_CHALLENGE_COUNT];
 extern s32 *gpDinamicLinkPenalty;
 extern s32 sLinkSrcStage;
-extern s32 gLinkTriggerIndex;
+extern s32 sLinkTriggerIndex;
 extern s32 sLinkDstStage;
 extern s32 sLinkSpawnIndex;
 

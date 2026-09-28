@@ -96,7 +96,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
 			continue;
 
 		sLinkSrcStage = stage;
-		gLinkTriggerIndex = i;
+		sLinkTriggerIndex = i;
 		triggerStage = trig->stage;
 		sLinkDstStage = triggerStage;
 		spawnIndex = *(u8 *)&trig->spawnpointIndex;
@@ -119,7 +119,7 @@ special handling needed, consistent with the already-documented
 "alignment-2 struct assignment compiles to `lwl`/`lwr`+`swl`/`swr`" pattern
 (CLAUDE.md).
 
-`gLinkTriggerIndex` was already declared in `include/DreamSys.h` from earlier
+`sLinkTriggerIndex` was already declared in `include/DreamSys.h` from earlier
 rounds' call-site analysis; no header changes needed.
 
 ## Verification

@@ -14,7 +14,7 @@ assigned queue).
 
 ## What it does
 
-Looks up a "heading" byte from `sTunnelEnterHeadings[sLinkSrcStage][gLinkTriggerIndex]`,
+Looks up a "heading" byte from `sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex]`,
 validates it against `currentPos`'s stored heading via the already-matched
 `IsHeadingAligned` (a cardinal-direction proximity test), and on success
 writes one or two computed pointers (into a `DirectionTableEntry`-strided
@@ -26,7 +26,7 @@ table, `sCardinalRotations`) through its two optional output parameters. Called 
 
 `sTunnelEnterHeadings` and `sTunnelExitHeadings` are per-stage tables of pointers to byte
 arrays (4-byte stride, indexed by `sLinkSrcStage`/`sLinkDstStage` respectively,
-each further indexed by `gLinkTriggerIndex`/`sLinkSpawnIndex` to read a single `u8`):
+each further indexed by `sLinkTriggerIndex`/`sLinkSpawnIndex` to read a single `u8`):
 
 ```c
 extern u8 *sTunnelEnterHeadings[];
@@ -67,7 +67,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	u8 heading;
 	s32 idx;
 
-	heading = sTunnelEnterHeadings[sLinkSrcStage][gLinkTriggerIndex];
+	heading = sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
 	if (!IsHeadingAligned((DirectionCheckArg *)arg2, heading))
 		return 0;
 
@@ -101,7 +101,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = sTunnelEnterHeadings[sLinkSrcStage][gLinkTriggerIndex];
+	heading = sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
 			*arg1 = (s32)&sCardinalRotations[heading];
@@ -159,7 +159,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
 
 ```c
 /* sTunnelEnterHeadings: a per-stage table of pointers to byte arrays (4-byte stride,
-   indexed by sLinkSrcStage), each further indexed by gLinkTriggerIndex to read the
+   indexed by sLinkSrcStage), each further indexed by sLinkTriggerIndex to read the
    "heading" byte passed to IsHeadingAligned. sTunnelExitHeadings is the analogous
    table for sLinkDstStage/sLinkSpawnIndex. Neither array's own element type is
    dereferenced beyond a single `u8` here. */

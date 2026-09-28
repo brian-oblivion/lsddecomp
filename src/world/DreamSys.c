@@ -1697,7 +1697,7 @@ extern DirectionTableEntry sCardinalAngles[];
 extern s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading);
 
 /* Cardinal-direction indices, per stage: the player must face
-   sTunnelEnterHeadings[sLinkSrcStage][gLinkTriggerIndex] to take the
+   sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex] to take the
    tunnel GetStaticSpawn matched, and leaves facing
    sTunnelExitHeadings[sLinkDstStage][sLinkSpawnIndex]. */
 extern u8 *sTunnelEnterHeadings[];
@@ -1715,7 +1715,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     s32 idx;
     s32 result;
 
-    heading = sTunnelEnterHeadings[sLinkSrcStage][gLinkTriggerIndex];
+    heading = sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
     if (IsHeadingAligned((DirectionCheckArg *)rotation, heading)) {
         if (outEnter != NULL)
             *outEnter = (s32)&sCardinalRotations[heading];
@@ -1845,7 +1845,7 @@ s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation)
     s32 idx;
     s32 result;
 
-    heading = sStaircaseEnterHeadings[sLinkSrcStage][gLinkTriggerIndex];
+    heading = sStaircaseEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
     if (IsHeadingAligned((DirectionCheckArg *)rotation, heading)) {
         if (outEnter != NULL)
             *outEnter = (s32)&sCardinalRotations[heading];
@@ -1886,7 +1886,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
             continue;
 
         sLinkSrcStage = stage;
-        gLinkTriggerIndex = i;
+        sLinkTriggerIndex = i;
         triggerStage = trig->stage;
         sLinkDstStage = triggerStage;
         spawnIndex = (u8)trig->spawnpointIndex;
