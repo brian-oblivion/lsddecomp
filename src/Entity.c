@@ -1162,7 +1162,7 @@ void Entity__MoodCue38(Entity *this, SoundCueSet *out) {
  */
 
 /* The z den of a scale template, three Ratio16s {1/1, 1/1, 1/zDenom} that
- * end here (the range splat labels SCALE_X3 runs on into its first ten
+ * end here (the range splat labels sScaleX3 runs on into its first ten
  * bytes). Entity__MoodCue41 writes the den and passes the template. */
 extern s16 sScaleTemplateZDenom;
 
@@ -1241,7 +1241,7 @@ void Entity__MoodCue41(Entity *this, SoundCueSet *out) {
             zDenom = &sScaleTemplateZDenom;
             *zDenom = roll % 32 + 1;
             /* Back from the den to the start of its template. MATCHING:
-             * retail relocates against sScaleTemplateZDenom, not SCALE_X3. */
+             * retail relocates against sScaleTemplateZDenom, not sScaleX3. */
             this->methods->updateScale(this, 1, (Ratio16 *)(zDenom + 1) - 3);
         }
     }
@@ -1321,7 +1321,7 @@ void Entity__MoodCue44(Entity *this, SoundCueSet *out) {
 }
 
 /* At the cue's start, rolls 0..9: 8 or 9 stretches the entity by
- * SCALE_X3, 5 to 7 arms a drift (state 10) that adds TRANSLATE_Z_MINUS256
+ * sScaleX3, 5 to 7 arms a drift (state 10) that adds TRANSLATE_Z_MINUS256
  * every tick from tick 201 on. */
 void Entity__RollScaleOrDelayedDrift(Entity *this) {
     s32 roll;
@@ -1329,7 +1329,7 @@ void Entity__RollScaleOrDelayedDrift(Entity *this) {
     if (this->moodTimer == 0) {
         roll = rand() % 10;
         if (roll >= 8) {
-            this->methods->updateScale(this, 1, SCALE_X3);
+            this->methods->updateScale(this, 1, sScaleX3);
         } else if (roll >= 5) {
             this->state = 10;
         }

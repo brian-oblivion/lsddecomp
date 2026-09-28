@@ -178,7 +178,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 | local `a2` | `scale` (now `Ratio16 *`, was `void *`) | -- | the `updateScale` argument; byte-exact |
 
 The "left unnamed" section above predates the precedent: round 94's
-`ROTATION_XPLUS_EIGHTH` (x = 1/8 degree) and `SCALE_X3`/`SCALE_Y2` are the
+`ROTATION_XPLUS_EIGHTH` (x = 1/8 degree) and `sScaleX3`/`SCALE_Y2` are the
 fractional-degree and non-uniform-scale precedents it asked for.
 
 ### `state = 1` at `moodTimer >= 2000` is `ENTITY_STATE_DONE`

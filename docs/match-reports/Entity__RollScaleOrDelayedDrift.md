@@ -18,7 +18,7 @@ void Entity__RollScaleOrDelayedDrift(Entity *this) {
     if (this->unkFC == 0) {
         r = rand() % 10;
         if (r >= 8) {
-            this->methods->slot48(this, 1, SCALE_X3);
+            this->methods->slot48(this, 1, sScaleX3);
         } else if (r >= 5) {
             this->unk44 = 0xA;
         }
@@ -56,7 +56,7 @@ void Entity__RollScaleOrDelayedDrift(Entity *this) {
   simultaneous, severe, EVEN-NUMBERED-of-total mismatches with the drift
   warning firing at a five/six-figure byte count, suspect ONE upstream
   function's word count before doubting several unrelated ones.**
-- The two data-table arguments (`SCALE_X3` to `slot48`, `TRANSLATE_Z_MINUS256` to
+- The two data-table arguments (`sScaleX3` to `slot48`, `TRANSLATE_Z_MINUS256` to
   `slotBC`) are plain `extern u8 SYM[];` externs passed directly, no offset
   arithmetic needed (contrast `Entity__MoodCue41`'s `sScaleTemplateZDenom`, which does
   need one).
@@ -89,7 +89,7 @@ call in its body going through `this->methods->...`. NOT itself a
 0x80060710) -- it is a private helper `Entity__MoodCue43`/`Entity__MoodCue44`
 both call directly by name (`jal`), never through a vtable or the mood
 table. Mechanics: at moodTimer 0, an 80/20-ish dice roll either bumps scale
-via `SCALE_X3` or arms a delayed effect (`unk44 = 0xA`); once armed and
+via `sScaleX3` or arms a delayed effect (`unk44 = 0xA`); once armed and
 moodTimer reaches 0xC9, calls `addVec14(TRANSLATE_Z_MINUS256)`. No second
 caller or additional context to say WHY MoodCue43/44 share this specific
 startup quirk, so the tier-C placeholder form is kept rather than guessing
@@ -107,7 +107,7 @@ Every literal in the live body is in its base: decimal for moodTimer ticks, dist
 
 `Entity__func_80060710` -> `Entity__RollScaleOrDelayedDrift` -- **tier B**.
 What the body does: on the cue's first tick (`moodTimer == 0`) it rolls
-`rand() % 10`; 8 or 9 sets the scale to `SCALE_X3` ({3/1, 1/1, 1/1}), 5 to 7
+`rand() % 10`; 8 or 9 sets the scale to `sScaleX3` ({3/1, 1/1, 1/1}), 5 to 7
 sets `state` to 10; while `state` is 10 and `moodTimer >= 201` it calls
 addTranslation with `TRANSLATE_Z_MINUS256` every tick. "Roll", "scale" and
 "delayed drift" are those mechanics. Its callers are Entity__MoodCue43 and

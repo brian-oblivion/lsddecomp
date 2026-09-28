@@ -254,7 +254,7 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 
  * addTranslation (+0x0BC), three s32 deltas. Named by value. The slots take
  * the table untyped, so the element type is the reader's (SceneNode__Update-
  * Rotation/UpdateScale), not the callers'. sTranslateYMinus64's label also
- * holds a second triple, (0, -0x20, 0); SCALE_X3's z den is Entity.c's
+ * holds a second triple, (0, -0x20, 0); sScaleX3's z den is Entity.c's
  * sScaleTemplateZDenom. */
 extern Ratio16 ROTATION_XPLUS_EIGHTH[];
 extern Ratio16 sRotationYawPlus9[];
@@ -300,7 +300,7 @@ extern Ratio16 SCALE_Y2[];
 extern Ratio16 SCALE_Y4[];
 extern Ratio16 SCALE_TRIPLE[];
 extern Ratio16 SCALE_THIRTY_SECOND[];
-extern Ratio16 SCALE_X3[];
+extern Ratio16 sScaleX3[];
 
 /* Functions of other units Entity calls directly. The SoundCueSet functions
  * are defined in PlacementGridVabSound/l as (VabStreamObj *, SoundCueSet *); these

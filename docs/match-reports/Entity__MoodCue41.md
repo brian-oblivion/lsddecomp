@@ -60,7 +60,7 @@ void Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out) {
   family as "cache a vtable pointer before an intervening call" but the
   observation runs the other way: compute the ADDRESS after the call it
   would otherwise have to survive.
-- `sScaleTemplateZDenom - 0xA` (byte-pointer arithmetic) resolves to `SCALE_X3 + 0xC`
+- `sScaleTemplateZDenom - 0xA` (byte-pointer arithmetic) resolves to `sScaleX3 + 0xC`
   numerically (`asm/data/79528.data.s`), but retail's relocation is against
   `sScaleTemplateZDenom` specifically (own `lui`/`addiu` pair), so the C must reference
   that symbol with a negative offset, not the neighbouring array with a
@@ -102,4 +102,4 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 7 (round 93, bravo)
 
-Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). The call's template address is spelled `(Ratio16 *)(zDenom + 1) - 3` (the Ratio16[3] that ends at the den) instead of `(u8 *)tablePtr - 0xA`: the same -10, byte-identical. Locals `rv`/`tablePtr` are `roll`/`zDenom`. The old in-body comment said the template reached back into SCALE_X3's tail; the retail words show it is its own {1/1, 1/1, 1/den} directly after SCALE_X3's twelve bytes, inside the range splat labels SCALE_X3. Byte-identical (whole image green).
+Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). The call's template address is spelled `(Ratio16 *)(zDenom + 1) - 3` (the Ratio16[3] that ends at the den) instead of `(u8 *)tablePtr - 0xA`: the same -10, byte-identical. Locals `rv`/`tablePtr` are `roll`/`zDenom`. The old in-body comment said the template reached back into sScaleX3's tail; the retail words show it is its own {1/1, 1/1, 1/den} directly after sScaleX3's twelve bytes, inside the range splat labels sScaleX3. Byte-identical (whole image green).
