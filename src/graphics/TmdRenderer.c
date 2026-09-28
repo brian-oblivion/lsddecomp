@@ -21,8 +21,9 @@
  * records, and the ndiv override setter. All GTE work goes through
  * include/gte.h's gte_* macros (Sony's names; never <inline.h>).
  *
- * The BasicClass part, which ends at GetBMemPMgrBusy, belongs with
- * BMemPMgr.c; the renderer begins at SortTmdObject.
+ * The BasicClass part ends at GetBMemPMgrBusy and the renderer begins at
+ * SortTmdObject. In ROM the BasicClass part follows the end of BMemPMgr.c,
+ * which holds the rest of BasicClass.
  */
 
 #include "common.h"
@@ -35,8 +36,8 @@
 #include "TmdRenderer.h"
 
 /* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
- * work and back to 0 after (setter and getter in TmdRenderer.c). Nothing in
- * either waits on it. */
+ * work and back to 0 after (SetBMemPMgrBusy, GetBMemPMgrBusy below). Nothing
+ * in either waits on it. */
 extern s32 sBMemPMgrBusy;
 
 void FreeBasicClassList(BasicClassListNode **head) {
