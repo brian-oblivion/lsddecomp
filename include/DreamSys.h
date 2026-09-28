@@ -376,7 +376,7 @@ extern struct RelativePos sStaircaseOffset0;
 /* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
    argument by DreamSys__TickStaircaseCase1 -- same call shape as sStaircaseOffset0/STAIRCASE_OFFSET_2
    above, just a different constant (round 2026-09-02). */
-extern struct RelativePos STAIRCASE_OFFSET_1;
+extern struct RelativePos sStaircaseOffset1;
 
 /* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
    argument by DreamSys__TickStaircaseCase3 -- same call shape as STAIRCASE_OFFSET_2/sStaircaseOffset0

@@ -27,7 +27,7 @@ Both blocker screens are clean: no `gp_rel` hit and no
 
 ## New knowledge
 
-- `STAIRCASE_OFFSET_1` (`struct RelativePos`) — this function's own per-instance
+- `sStaircaseOffset1` (`struct RelativePos`) — this function's own per-instance
   constant passed to `DreamSys__ApplyRelativeOffset`, sibling to the already-named
   `sStaircaseOffset0`/`STAIRCASE_OFFSET_2`/`STAIRCASE_OFFSET_3`.
 
@@ -44,7 +44,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 	s32 flag;
 
 	if (this->unk_0x914 == 0) {
-		DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_1, &this->unk_0x91C);
+		DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset1, &this->unk_0x91C);
 	}
 	if (this->unk_0xAC != 4) {
 		if (this->unk_0x914 >= 0x95)
@@ -103,4 +103,4 @@ matched code for a template.
 
 ## Naming
 
-- **Tier B.** Table index 1 of the same sStaircaseTickFns family as DreamSys__TickStaircaseCase0, against STAIRCASE_OFFSET_1; same evidence and same caveat.
+- **Tier B.** Table index 1 of the same sStaircaseTickFns family as DreamSys__TickStaircaseCase0, against sStaircaseOffset1; same evidence and same caveat.
