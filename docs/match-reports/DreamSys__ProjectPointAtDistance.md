@@ -69,7 +69,7 @@ is a `config/` change and out of scope this round.
 
 1. `DreamSys__NotifyLinkAttempt` (this unit, already matched) clamps `this->unk_0xB8 =
    (this->unk_0x28->unk_0x36 & 0x7F); if (unk_0xB8 >= 0x18) unk_0xB8 = 0;`
-   -- i.e. `unk_0xB8` is bounded to `[0, 0x18)`. Both `VOICE_BY_SELECT` and
+   -- i.e. `unk_0xB8` is bounded to `[0, 0x18)`. Both `sVoiceBySelect` and
    `VOICE_PITCH_BY_SELECT` (each already-named 24+-byte byte tables) are indexed by
    this SAME bounded value in `DreamSys__StartVoice` (`VOICE_PITCH_BY_SELECT[unk_0xB8]`), so
    `VOICE_PITCH_BY_SELECT`'s real, ever-read extent is exactly 24 bytes

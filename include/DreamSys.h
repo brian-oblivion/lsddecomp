@@ -348,7 +348,7 @@ extern LongVec3 sDriftStep;
    - `DreamSys__NotifyLinkAttempt` (this unit, already matched) clamps
      `this->voiceSelect = (this->linkTarget->flags36 & 0x7F); if (voiceSelect >=
      0x18) voiceSelect = 0;` -- i.e. `voiceSelect` is bounded to [0, 0x18). Both
-     `VOICE_BY_SELECT` and `VOICE_PITCH_BY_SELECT` (each already-named 24+-byte byte
+     `sVoiceBySelect` and `VOICE_PITCH_BY_SELECT` (each already-named 24+-byte byte
      tables) are indexed by this SAME bounded value in `DreamSys__StartVoice`
      (`VOICE_PITCH_BY_SELECT[voiceSelect]`), so `VOICE_PITCH_BY_SELECT`'s real, ever-read extent is
      exactly 24 bytes (`0x80087EC8`-`0x80087EDF`) -- the 8 trailing zero
@@ -413,13 +413,13 @@ extern s8 sDreamColorTable[9];
 
 /* Byte tables indexed by DreamSys::voiceSelect (already bounded to [0,0x18) at
    the write site -- see that field's own comment). DreamSys__StartVoice
-   (round 2026-09-06) reads both: VOICE_BY_SELECT[voiceSelect] (values 0..0x1E) feeds
+   (round 2026-09-06) reads both: sVoiceBySelect[voiceSelect] (values 0..0x1E) feeds
    VabStreamObj playTone's `index` argument (program << 4, tone 0);
    VOICE_PITCH_BY_SELECT[voiceSelect] (values include -2..2, hence `s8` not `u8`) feeds
    setPitchOffset's `octave` argument directly. VOICE_PITCH_BY_SELECT's real extent is exactly
    these 24 bytes -- the trailing zero bytes splat lumped into its dlabel
    belong to the gProjectOffsetZ vector documented above, not to this table. */
-extern const s8 VOICE_BY_SELECT[0x18];
+extern const s8 sVoiceBySelect[0x18];
 extern const s8 VOICE_PITCH_BY_SELECT[0x18];
 
 /* BasicClass-family allocator; see GameApplicationFileResource.h / TodActor.c / Entity.h /
@@ -517,7 +517,7 @@ struct DreamSys {
 	   0 (if >= 0x18) or 2 (if `state == 15` and this is still 0)
 	   by DreamSys__NotifyLinkAttempt's `arg1 == -1` path (round 2026-09-02). Also an index:
 	   DreamSys__StartVoice (round 2026-09-06) does nothing when this is 0, else
-	   uses it to index VOICE_BY_SELECT/VOICE_PITCH_BY_SELECT (see those externs), compares
+	   uses it to index sVoiceBySelect/VOICE_PITCH_BY_SELECT (see those externs), compares
 	   it against 0x16 (22) to decide whether to keep or discard
 	   voiceIndex's new value, and against 0xB (11) to gate two extra vtable
 	   calls. */

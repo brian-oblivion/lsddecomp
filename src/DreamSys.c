@@ -165,7 +165,7 @@ void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 event) {
 
     voice = this->linkTarget->flags36 & 0x7F;
     this->voiceSelect = voice;
-    if (voice >= ARRAY_COUNT(VOICE_BY_SELECT))
+    if (voice >= ARRAY_COUNT(sVoiceBySelect))
         this->voiceSelect = 0;
 
     if (this->state == DREAMSYS_LINK_TUNNEL && this->voiceSelect == 0)
@@ -703,7 +703,7 @@ void DreamSys__StartVoice(DreamSys *this) {
         return;
     }
 
-    scratch = VOICE_BY_SELECT[idx];
+    scratch = sVoiceBySelect[idx];
     heading = scratch << 4;
     headingArg = heading;
     vt->setPitchOffset(obj, VOICE_PITCH_BY_SELECT[idx]);
