@@ -67,7 +67,9 @@ rather than API.
   read, write, lseek, close, delete, format; `EnterCriticalSection` used before
   its `extern void` at :1065. The comments at :501, 647, 870, 1046 claim
   kernel.h declares them; it has no prototypes. Bring libapi.h from the SDK
-  disc into include/psyq.
+  disc into include/psyq. **Wrong (round 103):** no disc ships a libapi.h;
+  kernel.h does declare them, and plain `grep` missed it because the file's
+  SJIS bytes make grep treat it as binary (`grep -a` finds them).
 - **Duplicate types.** `RotationRatio(s)` (DreamSys.h:172) is `Ratio16`;
   `SubObjE` (DayTaskStageMap.h:18) is a DrawSystem view; `SlotEntry`/`SrcDesc`
   (Task.c:658, 670) are one record; `CdStreamFile` (CdStream.h:44) is
@@ -171,6 +173,38 @@ rather than API.
   ScreenWidgets.c:103, 145 local `mask` is the channel set; GridCell `unk34`,
   CellPlacement `unk1`/`unk2C`; SsScore.h (39) and SvmData.h (32) `unkNN`
   fields are each described well enough to name.
+
+### Left after round 103 (the debt items carry these too)
+
+Round 103 did `prototypes`, `conventions` and `sony-code`; what they left,
+by the debt item that owns it. A duplicate type is a MERGE, not a rename:
+`renametype.py` refuses a target that exists, and the field names differ,
+so merge by hand, one commit per type, the accessors from the compiler.
+
+- **app/cd:** `SlotEntry`/`SrcDesc` (Task.c) into one record;
+  `CdStreamFile` (CdStream.h) into `CdlFILE`; TaskCore's `withSound` is
+  `void *` in its functions and `s32` in its slots; `SetTickCallbacks`'
+  header prototype still names its parameters `arg1`/`arg2`.
+- **graphics:** the six signed 3-byte colour types (`BgLayerRgb`,
+  `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `SpriteRgb`,
+  `ViewportRgb`) into one, in a graphics header (BoxFill.h is ui's, and
+  this item may edit it for that).
+- **world:** `RotationRatio(s)` (DreamSys.h) into `Ratio16`; `SubObjE`
+  (DayTaskStageMap.h) into its DrawSystem type; DreamSys.h's
+  `CinematicCall` and GameFiles.c's `RecPick` into one packed pair (this
+  item may edit GameFiles.c/h for it; `GetSpecialDayOrEventRecord` stays
+  unprototyped, see its MATCHING line); IntermediateBase's `frameClock` /
+  `lightRig` are still `BasicClass *`, so about 20 casts in
+  ObjMStyleActor.c remain.
+- **ui/sound/psyq:** src/psyq/libsnd_ssinit_libapi_counter.c defines the
+  root counters (`SetRCnt`, `GetRCnt`, `StartRCnt`, `StopRCnt`,
+  `ResetRCnt`) with types that conflict with kernel.h, so it cannot include
+  kernel.h for `Enter/ExitCriticalSection`; align them if the bytes allow.
+  bios.o's own names for libcd_bios's statics (`Result`, `Alarm`) apply to
+  groups of three words each, and so stay as `D_` placeholders unless a
+  struct or array view covers the whole group. CD_cw's report title says
+  282 words and length-exact, but its preserved body builds to 284: make
+  the title say what the body builds to.
 
 ## Track 12: what the documentation pass needs
 

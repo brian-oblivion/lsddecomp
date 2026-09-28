@@ -6,6 +6,77 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-28 — round 103: track 10's three first items (premium head, plan revision 43)
+
+Three Opus item runners: alpha `prototypes`, bravo `conventions`, charlie
+`sony-code`. All three ticked; track 10 is 4/8, and its four debt passes
+are the ready list.
+
+- **Head, before spawning:** `ServiceSoundCueSet`, the one game function in
+  src/psyq/libsnd_vmanager.c, moved to the end of PlacementGridVabSound.c
+  beside its Init/Flush siblings. That was one yaml boundary (0x1D508 to
+  0x1D718, where SpuVmAlloc starts), byte-identical, done first so that
+  alpha and charlie did not both edit it.
+- **charlie (22 commits):** libcd's twelve `CD_*` globals, checked against
+  3.5 bios.o's .data layout (the head re-checked the offsets with objdump),
+  plus `_SpuInit` and `_ss_MarkCallback`. A new include/libsnd_internal.h
+  holds the SpuVm* prototypes, and SeqPlay's definition matches its
+  callers. Four `#if 0` bodies are in NON_MATCHING form (19 bodies became
+  23), the `#if 1` wrappers are gone, and the derivation essays moved to
+  their reports.
+- **alpha (10 commits):** each declaration now sits in its definer's
+  header. That includes a new GameFiles.h, FullWidthSjis.h and
+  TmdRenderer.h, BMemPMgr.h as the allocator's only declaration, Sony's
+  headers for the libc and libgpu names, and self-contained headers. alpha
+  wrote a pycparser census over the pinned cpp: 70 MULTI and 147 LOCAL at
+  the start, 0 and 0 at the end. It is now `tools/declcheck.py`.
+- **bravo (309 commits, 286 of them `rename.py`):** the getters, `self`,
+  guards, typos and the review's misleading names (full table in its
+  report). The review had counted 24 `s` externs in headers and 8
+  single-unit `g` globals. bravo measured 108 and 221, and fixed all of
+  them.
+
+**Two of the review's findings were wrong, and runners caught both.**
+
+- **libapi.h.** No SDK disc ships one. kernel.h declares every BIOS and
+  card call, and the review read it as having no prototypes because plain
+  `grep` treats its SJIS bytes as binary. Revision 41 built a done-when
+  clause on that. alpha's IMPLICIT count was 0 before it changed anything.
+- **The duplicate types.** They are merges, not renames: `renametype.py`
+  refuses a target that already exists, and the field names differ. They
+  moved to the debt items.
+
+**The bravo merge conflicted in 25 files, 66 hunks**, nearly all against
+alpha's declaration edits. `git checkout --ours` was refused by the session's
+auto-mode classifier as destructive (nothing was at risk: every commit
+stayed on runner/bravo). The head resolved each hunk to main's side with a
+script that keeps each hunk's first section, ran `replay.py` (300
+commands), then redid bravo's non-tool edits:
+
+- the four `this` to `self` perl commands, replayed from their commit
+  subjects as intended;
+- one perl rename (`DATASOURCE_SPU`), found by the compiler;
+- nine `s` externs bravo had moved into a unit, lost where its insertion
+  conflicted with alpha's `#include` edit;
+- 75 header copies of externs that main's side kept.
+
+`declcheck.py` found the last two groups by itself, as MULTI 74. So an edit
+that MOVES a declaration replays like content, not like a rename: its
+header half merges cleanly and its unit half conflicts. A per-merge census
+is what catches that. It ended byte-identical with the census at 0/0/0/0,
+no `this`, no header `s` extern, typeviews 0 new, check-nonmatching green.
+
+**Plan revision 43:**
+
+- `prototypes`' done-when names kernel.h and `tools/declcheck.py`.
+- The debt items carry each area's duplicate-type merges and the runners'
+  leftovers, listed in the review under "Left after round 103".
+- debt-ui-sound covers src/psyq: the root-counter definitions conflict with
+  kernel.h, which an attempted head fix measured.
+- §3's conventions name `self` and `Get<Class>Methods`.
+
+---
+
 ## 2026-09-28 — premium session: plan revision 42, phase 4 (a Linux port, in its own repo)
 
 The operator asked for a PC port, Linux first, and whether it belongs in

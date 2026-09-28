@@ -126,14 +126,17 @@ TRACK9_ITEMS = {
 # an operator decision the head records. An item is ready once every item in
 # `after` is ticked; a track opens when the one before it is done.
 _DEBT = ("second pass on readability.py debt in {}: unk/slot/rawoff/m2c/func_/D_ named where the "
-         "accessors show what they are, literals named only when they mean more than their value")
+         "accessors show what they are, literals named only when they mean more than their value; the "
+         "area's duplicate types merged into one and its leftovers done (release review, debt passes); "
+         "tools/declcheck.py still clean")
 _DOCS = "every header {} documented per track 12 (apidoc.py clean for them), no process text"
 _SRC = "{}: .c comments per track 12, long banners split into class and function docs, no process text"
 PHASE3 = {
     "10": ("declarations and conventions", {
         "prototypes": ("every function and global declared once, in the defining file's header or Sony's "
-                       "(add include/psyq/libapi.h from the SDK disc for the BIOS and card calls), with the "
-                       "definition's types; no unit re-declares a header's name", "opus", ()),
+                       "(kernel.h for the BIOS and card calls: no disc ships a libapi.h), with the "
+                       "definition's types; no unit re-declares a header's name (tools/declcheck.py clean)",
+                       "opus", ()),
         "conventions": ("Get<Class>Methods not Get_vtable_, self not this, guards <NAME>_H, no s-prefixed "
                         "extern in a header, the review's misleading names and typos renamed", "opus", ()),
         "sony-code": ("src/psyq/ on Sony's names (libcd's CD_* globals, _SpuInit, _ss_MarkCallback) and "
@@ -143,7 +146,7 @@ PHASE3 = {
         "debt-app-cd": (_DEBT.format("src/app and src/cd"), "opus", ("prototypes", "conventions")),
         "debt-graphics": (_DEBT.format("src/graphics"), "opus", ("prototypes", "conventions")),
         "debt-world": (_DEBT.format("src/world"), "opus", ("prototypes", "conventions")),
-        "debt-ui-sound": (_DEBT.format("src/ui and src/sound"), "opus", ("prototypes", "conventions")),
+        "debt-ui-sound": (_DEBT.format("src/ui, src/sound and src/psyq"), "opus", ("prototypes", "conventions")),
     }),
     "11": ("file names", {
         "files-setup": ("unitfile.py renames a type-named file's stem (paths only, no token rewrite) and a "
@@ -1592,7 +1595,7 @@ def print_status(d, n, st):
           f"{t9['history']} history mention(s) left in comments")
     for k in PHASE3:
         if k in ("10", "14"):
-            print("  -- phase 3: the tree is ready to publish (revision 41)" if k == "10"
+            print("  -- phase 3: the tree is ready to publish (revisions 41, 43)" if k == "10"
                   else "  -- phase 4: portable C for a Linux port in its own repo (revision 42)")
         ck = t[k]["checklist"]
         left = [i for i, v in ck.items() if not v]

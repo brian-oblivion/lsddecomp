@@ -19,8 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 42 (2026-09-28, premium session: phase 4, track 14, the C
-made portable for a Linux port in its own repo; revision 41 phase 3).
+Plan revision: 43 (2026-09-28, round 103's premium head: track 10's
+declaration census is `tools/declcheck.py`, duplicate types go to the debt
+passes; revision 42 phase 4, 41 phase 3).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -123,8 +124,9 @@ body lives only in an `#ifdef NON_MATCHING` block (CLAUDE.md).
   placeholder. A tier-B name is expected to be sharpened later; renames are
   cheap.
 - **Conventions:** methods `Class__Method`, where `Class` is the struct's type
-  name; free functions `VerbNoun`; constructors `New_Class` and
-  `Class__Class`; method tables `g<Class>Methods`; types `PascalCase`; fields
+  name, receiver `self`; free functions `VerbNoun`; constructors `New_Class`
+  and `Class__Class`; method tables `g<Class>Methods`, getters
+  `Get<Class>Methods`; types `PascalCase`; fields
   `camelCase`; globals `gName`; unit-static data `sName`; constants and enum
   members `UPPER_SNAKE`; vtable slots named like the method they dispatch to;
   files named for the class or subsystem they hold. Do not invent a new style.
@@ -205,7 +207,8 @@ item's section there, and verifies each finding before acting on it.
 
 **Track 10: one declaration, one convention.** A function or global is
 declared once, in the header of the file that defines it (Sony's name from
-Sony's header), with the definition's types; no unit re-declares it. The
+Sony's header), with the definition's types; no unit re-declares it
+(`tools/declcheck.py`; a view kept for its bytes carries a `MATCHING:` line). The
 conventions of §3 hold everywhere: `Get<Class>Methods` (not `Get_vtable_`),
 `self` (not `this`), guards `<NAME>_H`, `s` data never exported from a
 header, no tab outside the `.inc` files. Names the review found misleading
@@ -213,7 +216,8 @@ are renamed. Sony code carried as
 C takes Sony's names and headers, and its preserved bodies use the
 `NON_MATCHING` form. Then the debt left after track 7 gets a second pass per
 area: `unk`, `slot`, raw offsets, m2c locals and placeholders are named where
-their accessors show what they are. A literal is named only when it means
+their accessors show what they are, and each area's duplicate types are
+merged into one by hand (a merge, not a rename). A literal is named only when it means
 more than its value (a Sony constant, a state, a bit, a size two places
 share); a cue's frame numbers and timings stay literal, so `magic` is not a
 target.

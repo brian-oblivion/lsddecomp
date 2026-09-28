@@ -353,6 +353,18 @@
         "tabs": true
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-28",
+          "matches": 3,
+          "model": "opus",
+          "note": "item runners: prototypes (alpha), conventions (bravo), sony-code (charlie), all ticked; libapi.h was a false premise (kernel.h declares the calls); duplicate types moved to the debt items (revision 43)",
+          "round": 103,
+          "runners": 3
+        }
+      ],
       "status": "auto"
     },
     "11": {
