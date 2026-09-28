@@ -833,7 +833,7 @@ void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code) {
     }
 }
 
-void ObjM__EnterState4(ObjM *self) {
+void ObjM__EnterTimeUp(ObjM *self) {
     DreamColors color;
     s32 phase;
     s32 t;

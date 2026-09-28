@@ -100,7 +100,7 @@ before its full definition is in scope, no typedef required.
 
 `self->unk3C->methods->slotF0(self->unk3C, &local10, -1)` here matches the
 existing declaration exactly (`s32(void*, s32*, s32)`, established -- if
-unmatched -- by the `ObjM__EnterState4` stall this same round). But this
+unmatched -- by the `ObjM__EnterTimeUp` stall this same round). But this
 function ALSO dispatches `slotF0` a second time, on a *different* instance
 (`newObj`, the `slotAC` return value): `newObj->methods->slotF0(newObj,
 (s32*)ret, (ret != 0) ? 3 : 0)`, where the 2nd argument is a plain `s32`

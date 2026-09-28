@@ -81,7 +81,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- | --- |
 | `func_80053BE8` | `ObjM__EnterState5` | B | see below |
 
-**Evidence.** vtable slot +0x098. Sets `self->phase = 5`; same evidence as `ObjM__EnterState4`.
+**Evidence.** vtable slot +0x098. Sets `self->phase = 5`; same evidence as `ObjM__EnterTimeUp`.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

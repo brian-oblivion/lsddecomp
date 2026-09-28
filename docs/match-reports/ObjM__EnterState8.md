@@ -43,7 +43,7 @@ The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_800870
 ## Track 7 (2026-09-27, round 98, delta)
 
 `OBJM_STATE_LINK_TUNNEL` for 8, `DREAM_COLOR_BLACK` for the zero channel
-mask (FadeBox's mask 0; ObjM__EnterState4 already spells it this way),
+mask (FadeBox's mask 0; ObjM__EnterTimeUp already spells it this way),
 `MOVE_OVERRIDE_FORCED` for setMoveOverride's 1 (enum DreamSysMoveOverride,
 include/DreamSys.h, added this round from DreamSys__TickMove: 0 runs
 tickMoveFree, 1 tickMoveForced, 2 tickMoveHeld). Zero bytes.

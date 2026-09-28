@@ -125,7 +125,7 @@ struct ObjMMethods {
     /* +0x08C */ void (*tickStyle)(ObjM *self); /* ObjM__TickStyle: update, no pause overlay */
     /* +0x090 */ void (*onDreamSysNotify)(ObjM *self, BasicClass *sender,
                                           s32 event); /* ObjM__OnDreamSysNotify: onNotify's 0x1F34 sender */
-    /* +0x094 */ void (*enterState4)(ObjM *self); /* ObjM__EnterState4: OnDreamSysNotify's code 0xA */
+    /* +0x094 */ void (*enterState4)(ObjM *self); /* ObjM__EnterTimeUp: OnDreamSysNotify's code 0xA */
     /* +0x098 */ void (*enterState5)(ObjM *self); /* ObjM__EnterState5: code 0xC */
     /* +0x09C */ void (*enterState6)(ObjM *self); /* ObjM__EnterState6: code 0xD; EnterState5 before a stage */
     /* +0x0A0 */ void (*enterState7)(ObjM *self);        /* ObjM__EnterState7: code 0xE */
@@ -197,7 +197,7 @@ void ObjM__ExitSceneStyle(ObjM *self);
 void ObjM__EnterStyleSession(ObjM *self);
 void ObjM__TickStyle(ObjM *self);
 void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code);
-void ObjM__EnterState4(ObjM *self);
+void ObjM__EnterTimeUp(ObjM *self);
 void ObjM__EnterState5(ObjM *self);
 void ObjM__EnterState6(ObjM *self);
 void ObjM__EnterState7(ObjM *self);

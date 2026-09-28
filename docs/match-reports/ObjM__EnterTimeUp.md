@@ -1,4 +1,6 @@
-# ObjM__EnterState4 -- MATCHED 71/71, round 19 (bravo)
+# ObjM__EnterTimeUp -- MATCHED 71/71, round 19 (bravo)
+
+> Renamed from `ObjM__EnterState4` on 2026-09-28 (tools/rename.py). Address 0x80053acc.
 
 > Renamed from `func_80053ACC` on 2026-09-24 (tools/rename.py). Address 0x80053acc.
 
@@ -11,7 +13,7 @@ different unit).
 
 ## Round 19 close: the permuter found it, one variable rename made it real
 
-Set up `tools/setup-permuter.sh ObjM__EnterState4` from the preserved body
+Set up `tools/setup-permuter.sh ObjM__EnterTimeUp` from the preserved body
 below. `--debug --stack-diffs` confirmed the base score (165: 1 register
 diff, 1 reordering, 1 deletion, 0 insertions, 0 stack diffs) matched the
 report's own characterization exactly before spending any search budget.
@@ -78,14 +80,14 @@ Unit: `src/world/ObjMStyleActor.c`. Runner: echo, round 16. `INCLUDE_ASM` restor
 ## Signature
 
 ```c
-void ObjM__EnterState4(Obj87034_3bb8c_l *self);
+void ObjM__EnterTimeUp(Obj87034_3bb8c_l *self);
 ```
 
 ## What is established (high confidence -- derived directly from the
 disassembly, not guessed)
 
 ```c
-void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
+void ObjM__EnterTimeUp(Obj87034_3bb8c_l *self) {
     s32 local18;
     s32 t;
     s32 arg3;
@@ -182,7 +184,7 @@ not force from any source variant tried.
    version above) -- 70/71 total length (1 word SHORT), and reproduces
    retail's per-path call-setup duplication exactly. This is the closest
    variant and the one preserved in `#if 0` in the source. Confirmed via
-   `tools/asm-differ/diff.py ObjM__EnterState4` that from the `case 1` target
+   `tools/asm-differ/diff.py ObjM__EnterTimeUp` that from the `case 1` target
    label onward (roughly the back half of the function) every single word
    matches retail; the only structural gap is the one delay-slot
    instruction described above and its downstream `beq a0,v0` vs
@@ -244,7 +246,7 @@ before consolidating. Three corrections, in increasing order of importance.
 with its own guard:
 
 ```
-ObjM__EnterState4: 28/71 words match (file 0x442CC-0x443E8)
+ObjM__EnterTimeUp: 28/71 words match (file 0x442CC-0x443E8)
 WARNING: the build differs OUTSIDE this range too (159121 bytes) - a size change may have
          shifted linked addresses, so this per-function read is NOT trustworthy.
 ```
@@ -300,7 +302,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier | evidence |
 | --- | --- | --- | --- |
-| `func_80053ACC` | `ObjM__EnterState4` | B | see below |
+| `func_80053ACC` | `ObjM__EnterTimeUp` | B | see below |
 
 **Evidence.** vtable slot +0x094. Sets `self->phase = 4`. The state-code numbering is confirmed, not guessed: sibling unit ObjMStyleActor already established `ObjM__EnterState7`/`ObjM__EnterState8`/`ObjM__EnterStateA` for the SAME field on the SAME class, and this unit's own `ObjM__OnDreamSysNotify` dispatches codes 0xA..0x11 onto exactly the same run of vtable slots (+0x094..+0x0AC) that these three functions occupy, so 4/5/6 continue that one numbering.
 
