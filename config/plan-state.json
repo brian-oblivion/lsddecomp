@@ -1628,6 +1628,16 @@
           "note": "Six files jobs, eleven regions, 48 units to 18 files (src/ 75 to 45 units), track 8 done: GameApplicationFileResource (code_1677c+code_171e0, the getter-follows-class rule), TimImage, FlatLightObj, SceneNode (three slices, code_d294.h folded in), DrawSystem, Pad, WBgm, CdDriver (five slices; rodata joins s|q|r|h; the head hand-merged o since CdDriver is also a type name), Application, StageGrid unchanged, DayTaskStageMap and TitleMenuTaskObjF (the head moved the 0x1D7C rodata line and merged _g), TextEntryItemList, ObjMStyleActor (ten slices), DreamSys unchanged, DreamAux, Entity (seven slices), TodActor. Parked: b|c and j|k carve edges that content would split.",
           "round": 101,
           "runners": 6
+        },
+        {
+          "attempts": 1,
+          "calibration": true,
+          "date": "2026-09-28",
+          "matches": 1,
+          "model": "opus",
+          "note": "Reopened by plan revision 40 (orphaned placeholder header): class_3bb8c.h re-homed into StageMap.h, BMemPMgr.h, TitleMenu.h, TaskObjF.h, ObjM.h, two unit-local blocks into ObjMStyleActor.c, strcat from Sony's <strings.h>; header deleted. Track 8 done again.",
+          "round": 102,
+          "runners": 1
         }
       ],
       "status": "auto"
