@@ -83,7 +83,7 @@ void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
             self->methods->loadFile(self, name);
 
             if (self->pendingRequests == 0) {
-                self->flags |= 4;
+                self->flags |= CD_FLAG_NONE_PENDING;
             }
         }
     }
@@ -145,7 +145,7 @@ void InitCdDrive(void) {
 
     CdSetDebug(0);
     mode = CdlModeSpeed;
-    while (CdControlB(CdlSetmode, &mode, 0) == 0) {
+    while (CdControlB(CdlSetmode, &mode, NULL) == 0) {
     }
     sCdDriveInited = 1;
 }
@@ -191,7 +191,7 @@ s32 SetCdDriverMode(s32 async, s32 syncQueueMode, s32 useVSyncCallback) {
                 }
             } else {
                 if (async == 0) {
-                    drawSystem->methods->setCallback(drawSystem, 0);
+                    drawSystem->methods->setCallback(drawSystem, NULL);
                 }
             }
         }
@@ -220,7 +220,7 @@ s32 GetFileTableCount(void) {
 
 s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
     CdFileEntry *end;
-    char path[0x40];
+    char path[CD_PATH_SIZE];
     CdlFILE info;
     s32 tries;
 
@@ -271,12 +271,12 @@ s32 ServiceCdDriver(void) {
     }
 
     if (gCdUseVSyncCallback != 0) {
-        VSyncCallback(0);
+        VSyncCallback(NULL);
     }
 
-    if (gCdTickStep == 1) {
+    if (gCdTickStep == CD_TICK_STATE_MACHINE) {
         TickCdStateMachine();
-    } else if (gCdTickStep == 2) {
+    } else if (gCdTickStep == CD_TICK_LOAD_FILE) {
         TickCdLoadFileStateMachine();
     }
 
@@ -308,9 +308,9 @@ void StartCdService(void) {
 void StopCdServiceIfIdle(void) {
     LockCd();
 
-    if (gCdTickStep == 0 && sCdCallbackInstalled != 0) {
+    if (gCdTickStep == CD_TICK_NONE && sCdCallbackInstalled != 0) {
         if (gCdUseVSyncCallback != 0) {
-            VSyncCallback(0);
+            VSyncCallback(NULL);
         }
         sCdCallbackInstalled = 0;
         sCdQueueEnabled = 0;
