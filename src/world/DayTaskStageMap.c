@@ -453,7 +453,7 @@ StageMap *New_StageMap(LongVec3 *origin, s32 autoLoad) {
     return NULL;
 }
 
-extern LongVec3 gDefaultOrigin;
+extern LongVec3 sDefaultOrigin;
 
 void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
     s32 i;
@@ -470,7 +470,7 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
     if (origin != NULL) {
         self->origin = *origin;
     } else {
-        self->origin = gDefaultOrigin;
+        self->origin = sDefaultOrigin;
     }
 
     self->loadsPending = 0;

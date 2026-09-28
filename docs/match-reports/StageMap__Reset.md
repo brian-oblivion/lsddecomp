@@ -44,7 +44,7 @@ void StageMap__Reset(StageMap *self)
   `grep -rl sDefaultGridSpan asm/`). It sits in an unnamed top-level `sdata`
   segment, not owned by any carved unit, so it is declared `extern s32`
   directly in `src/world/DayTaskStageMap.c` -- same pattern already used for
-  `gDefaultOrigin` in this same file. `%gp_rel(sDefaultGridSpan)($gp)` loads its
+  `sDefaultOrigin` in this same file. `%gp_rel(sDefaultGridSpan)($gp)` loads its
   *value*, not its address, so the call argument is a plain `s32`, not a
   pointer.
 - `self->unk0` (the vtable pointer) is read early in retail's own

@@ -363,7 +363,7 @@ struct StageMapMethods {
 
 struct StageMap {
     LIGHTRIG_FIELDS(StageMapMethods);
-    /* +0x054 */ LongVec3 origin; /* the ctor: its argument, or gDefaultOrigin; the cellParents attach here */
+    /* +0x054 */ LongVec3 origin; /* the ctor: its argument, or sDefaultOrigin; the cellParents attach here */
     /* +0x060 */ ChunkFileFn chunkFileFn; /* setCallback */
     /* +0x064 */ void *chunkFileCtx;      /* setCallback */
     /* +0x068 */ StageGridDimensions *config; /* setConfig (ObjM: GetStageGridDimensions(stage)); NULL after Reset */

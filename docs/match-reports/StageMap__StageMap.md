@@ -25,7 +25,7 @@ extern UnkSlotChildObj_3ac78 *New_LbdFile(void);
 extern UnkSlotListObj_3ac78 *New_PlacementGrid(s32 arg1);
 extern GenericObject *New_GridCell(void);
 extern s32 GetDrawSystem(void);
-extern Vec3_3ac78 gDefaultOrigin;
+extern Vec3_3ac78 sDefaultOrigin;
 
 void StageMap__StageMap(StageMap *self, Vec3_3ac78 *arg1, s32 arg2)
 {
@@ -43,7 +43,7 @@ void StageMap__StageMap(StageMap *self, Vec3_3ac78 *arg1, s32 arg2)
     if (arg1 != NULL) {
         self->unk54 = *arg1;
     } else {
-        self->unk54 = gDefaultOrigin;
+        self->unk54 = sDefaultOrigin;
     }
 
     self->unk1B0 = 0;
@@ -152,7 +152,7 @@ here since this function only DISPATCHES to it, never inlines its body).
    instructions are three loads THEN three stores (batched) -- the same
    "whole-struct `=` compiles to a batched block move" idiom as
    `HistoryBlock_3ac78` (documented elsewhere in this header). Writing
-   `self->unk54 = *arg1;` / `self->unk54 = gDefaultOrigin;` instead of
+   `self->unk54 = *arg1;` / `self->unk54 = sDefaultOrigin;` instead of
    field-by-field fixed a register-swap-and-shift residue immediately
    (23/163 -> 70/163 in one change).
 2. **`New_PlacementGrid` takes an argument, not zero.** Retail sets
@@ -214,14 +214,14 @@ Round 67 (track 3, naming pass).
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
 | `func_8004A534` | `StageMap__StageMap` | A | Occupant of vtable slot `+0x008`, which `include/code_8220.h` establishes as `BasicClassMethods::ctor`, and which `New_StageMap` dispatches right after allocating. `Class__Class` is the constructor convention in FINISHING-PLAN.md track 3. |
-| `D_8008682C` | `gDefaultOrigin` | A | Its only use is this ctor's fallback when `arg1 == NULL`: `self->origin = gDefaultOrigin`. `asm/data/76DC8.data.s` shows the three words are all zero, so it is literally the default origin. |
+| `D_8008682C` | `sDefaultOrigin` | A | Its only use is this ctor's fallback when `arg1 == NULL`: `self->origin = sDefaultOrigin`. `asm/data/76DC8.data.s` shows the three words are all zero, so it is literally the default origin. |
 
 Field names this function established (all unit-local -- the compiler listed
 no accessor outside `src/world/DayTaskStageMap.c`):
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `StageMap+0x054` | `origin` | B | A 3-word block, copied here from `arg1` or `gDefaultOrigin`, then passed as the THIRD argument of `cellParent->methods->slot4C(cellParent, self, &self->origin)`. The same parameter position in the sibling call one loop deeper receives `buf = {x, 0, z}`, a literal world position on the 0x800 lattice -- so the slot takes a position and this field is one. |
+| `StageMap+0x054` | `origin` | B | A 3-word block, copied here from `arg1` or `sDefaultOrigin`, then passed as the THIRD argument of `cellParent->methods->slot4C(cellParent, self, &self->origin)`. The same parameter position in the sibling call one loop deeper receives `buf = {x, 0, z}`, a literal world position on the 0x800 lattice -- so the slot takes a position and this field is one. |
 | `StageMap+0x0EC` | `elems[7]` | A | Seven 0x1C-byte records, walked 0..6 here, in `StageMap__Finalize` and in `StageMap__UnloadAllSlots`; `DayTaskStageMap` reaches the same array from four more functions and calls it `arr[7]`. |
 | `UnkSlotEntry+0x000` | `flag` | B | Zeroed here and in `StageMap__UnloadAllSlots`; `DayTaskStageMap`'s independent view names the same halfword `Elem::flag`. |
 | `UnkSlotEntry+0x002` | `key` | B | Set to the loop index here and copied on into `target->key`; `DayTaskStageMap`'s `StageMap__LoadChunksAround` copies a caller-supplied key byte into the same field. |
