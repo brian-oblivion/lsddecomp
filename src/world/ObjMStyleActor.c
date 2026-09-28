@@ -2702,7 +2702,7 @@ extern void ReleaseBasicClassArray(void **array, s32 count);
 /* Six scale tables, each three Ratio16s (x, y, z), for the jittering
  * sprites: a thin streak along y or along x, {1/16, 7/1}, {7/1, 1/16}, then
  * the same with 3 and 2; z is 1/1. VariantSprite__UpdateScale reads x and y. */
-extern Ratio16 gStyleEffectJitterScales[6][3];
+extern Ratio16 sStyleEffectJitterScales[6][3];
 
 /* Kind 2's release; ReleaseJitterSprites, kind 3's, is the same body. */
 void StyleEffect__ReleaseSprites(StyleEffect *self) {
@@ -2724,7 +2724,7 @@ void StyleEffect__RandomizeSprites(StyleEffect *self) {
         u32 pick = rand();
 
         (*sprite)->methods->updateScale(
-            *sprite, 1, gStyleEffectJitterScales[pick % ARRAY_COUNT(gStyleEffectJitterScales)]);
+            *sprite, 1, sStyleEffectJitterScales[pick % ARRAY_COUNT(sStyleEffectJitterScales)]);
         (*sprite)->sprite.rotate = (rand() % 360) * ONE; /* 4096ths of a degree */
     }
 }
