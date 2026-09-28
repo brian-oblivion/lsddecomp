@@ -18,19 +18,10 @@
  * gWBgmMethods); this unit keeps no view of it.
  */
 #include "common.h"
+#include <libsnd.h>
 #include "BasicClass.h"
 #include "DrawSystem.h"
 #include "WBgm.h"
-
-/* libsnd (LIBSND.H) */
-extern void SsSeqPlay(short, char, short);
-extern void SsSeqPause(short);
-extern void SsSeqReplay(short);
-extern void SsSeqStop(short);
-extern void SsSeqSetVol(short, short, short);
-extern void SsSeqSetCrescendo(short, short, long);
-extern void SsSeqClose(short);
-extern short SsSeqOpen(unsigned long *addr, short vab_id);
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void printf(const char *fmt);
