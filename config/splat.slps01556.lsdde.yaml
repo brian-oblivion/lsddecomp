@@ -1685,7 +1685,6 @@ segments:
       # Sizes run 13w..111w with no trivial leaves -- every one is a real
       # body.  Expect this slice to span more than one class; identify each
       # with `tools/classtable.py` rather than assuming the unit has one.
-      - [0x44F14, c, class_3bb8c_n]
       # class_3bb8c_r: functions 23..43 of that remainder, 0x46288..0x46D20
       # (21 functions).  Carved MID-round 17 to re-staff a runner whose own
       # unit was exhausted.  Census 2026-09-04, three-grep screen per

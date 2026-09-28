@@ -108,7 +108,7 @@ Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
 `extern s32 gStyleStage, gStyleCueRecordIndex, gStyleGrid, gStyleCueDistanceTable[];`,
 `extern u8 *gStyleCueRecordLists[], gStyleCueRecordCounts[], gStyleCueOffsets[];` (all already
-declared in `src/class_3bb8c_n.c` ahead of this function).
+declared in `src/class_3bb8c_k.c` ahead of this function).
 
 ### Proposed learning
 
@@ -337,7 +337,7 @@ MATCHED, 111/111.
 
 The `+0x0E8` local view on `gStyleGrid` is StageMap's computeCellOffsets. Locals: `pos`, `outDist`, `target`, `remaining`, `records`, `dx`, `dz`, `grid`.
 
-### Comments moved here from src/class_3bb8c_n.c
+### Comments moved here from src/class_3bb8c_k.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

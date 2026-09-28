@@ -1,4 +1,4 @@
-# StyleUpdateEffectSlots -- MATCHED (34/34 words), class_3bb8c_n
+# StyleUpdateEffectSlots -- MATCHED (34/34 words), class_3bb8c_k
 
 > Renamed from `func_80054C74` on 2026-09-23 (tools/rename.py). Address 0x80054c74.
 

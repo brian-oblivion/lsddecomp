@@ -50,7 +50,7 @@ arm deleted); ternary `!= 0 ? D : 0` and `== 0 ? 0 : D` (rewritten);
 `switch` with `case 0` first (zero-first order) and `default` first
 (rewritten); sharing `r` for both `rand()` results (41 differing lines).
 
-Whole image green, `tools/check-nonmatching.sh` green. `class_3bb8c_n.c`
+Whole image green, `tools/check-nonmatching.sh` green. `class_3bb8c_k.c`
 now has no `INCLUDE_ASM`.
 
 ```c
@@ -376,7 +376,7 @@ state to hand over under this project's rule that length-exactness comes
 first, and because a body one word short re-poisons every later function's
 window.
 
-## Preserved near-miss body (49/79, length exact, `#if 0` in src/class_3bb8c_n.c)
+## Preserved near-miss body (49/79, length exact, `#if 0` in src/class_3bb8c_k.c)
 
 ```c
 extern s32 gStyleDay;
@@ -512,7 +512,7 @@ per the round-64 revisit.
 
 Locals: `slots`, `pos`, `r`, `color`, `altColor`, `rotation`.
 
-### Comments moved here from src/class_3bb8c_n.c
+### Comments moved here from src/class_3bb8c_k.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

@@ -80,7 +80,7 @@ s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
 
 ## Naming
 
-**Tier B.** Free function (called with `ctx`, not a `self` of its own type in the class-method sense), so no `Class__` prefix. The name reflects the mechanism, not the game meaning: `gStyleCueDistanceTable` (the same table `IsStyleCueNear`/`FindNextStyleCueInRange`, code_8220_b.c/class_3bb8c_n.c, index with `dist < table[...]` -- confirming it holds distance thresholds) is read at a NEGATIVE tag index, divided down, and used as the divisor for `ctx->falloff`'s own value; `falloff` is used by every `StyleCueNN` occupant that calls this helper first. What the resulting scaled quantity represents in the running game (a cue repeat count? a duration?) is not established.
+**Tier B.** Free function (called with `ctx`, not a `self` of its own type in the class-method sense), so no `Class__` prefix. The name reflects the mechanism, not the game meaning: `gStyleCueDistanceTable` (the same table `IsStyleCueNear`/`FindNextStyleCueInRange`, code_8220_b.c/class_3bb8c_k.c, index with `dist < table[...]` -- confirming it holds distance thresholds) is read at a NEGATIVE tag index, divided down, and used as the divisor for `ctx->falloff`'s own value; `falloff` is used by every `StyleCueNN` occupant that calls this helper first. What the resulting scaled quantity represents in the running game (a cue repeat count? a duration?) is not established.
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 
@@ -97,11 +97,11 @@ the two now have different types:
   `attenuation`, and +0x1C..+0x50 (was `unk1C`..`unk50`) are
   `slots[0..2].program/octave/vol/endVol`. The callbacks' `-1` store to
   +0x04 is the same restart the Entity__MoodCueNN handlers do.
-- The first parameter (`ctx`) is the owner, class_3bb8c_n.c's
+- The first parameter (`ctx`) is the owner, class_3bb8c_k.c's
   `StyleCueSlot`: TryStartStyleCue passes the slot as InitSoundCueSet's
   owner and `&slot->cueSet` (+0x14) as the set. So `StyleCueParam` is now a
   local view of StyleCueSlot: `methods` (+0x00) is the claimed record,
-  renamed `entry`, whose +0x06 `tag` is class_3bb8c_n's `countSign`;
+  renamed `entry`, whose +0x06 `tag` is class_3bb8c_k's `countSign`;
   `falloff` (+0x10) is `lastDist`; and `unk28` (+0x28) is
   `cueSet.attenuationSteps` (+0x14 + 0x14). ComputeStyleCueFalloff therefore
   scales the slot's last distance into 0..attenuationSteps against the cue's
@@ -135,6 +135,6 @@ Derivation above) and now read as documentation. What they said, verbatim:
 ```
 
 The unit-local record view's +0x006 field is `cue`, not `countSign`: the
-name class_3bb8c_n.c's own view (`StyleCueEntryView::cue`) already gives the
+name class_3bb8c_k.c's own view (`StyleCueEntryView::cue`) already gives the
 same byte, which IsStyleCueNear reads as `gStyleCueDistanceTable[-cue]`
 exactly as this function does. It is a cue index, not a count. Zero bytes.

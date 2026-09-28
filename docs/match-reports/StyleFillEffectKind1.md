@@ -1,4 +1,4 @@
-# StyleFillEffectKind1 -- MATCHED (42/42 words), class_3bb8c_n
+# StyleFillEffectKind1 -- MATCHED (42/42 words), class_3bb8c_k
 
 > Renamed from `func_80054F30` on 2026-09-23 (tools/rename.py). Address 0x80054f30.
 

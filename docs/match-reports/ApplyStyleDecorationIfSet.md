@@ -145,11 +145,11 @@ RegisterStyleConfig's third argument, which ObjM__InitStyleAndWorld
 +0x06C..+0x07B block (include/ObjM.h's banner). The holder's +0x00C is
 therefore ObjM::cachedViewport, a NodeGuardedViewport, and +0x0AC of its
 table is Viewport's `getFadeBox` (include/Viewport.h, `SceneNode *(*)(Self *)`)
--- ObjM.h's banner already said so. class_3bb8c_n.c had the same block as
+-- ObjM.h's banner already said so. class_3bb8c_k.c had the same block as
 `StyleSceneRefs {sound, dreamerTmd, etcTim, Viewport *viewport}`; this unit
 now carries the identical view (`typeviews.py --merge StyleSceneRefs`: 2
 views, 0x10, 0 conflicts). Tier A for the type (it names what the pointer
-is, established from the one writer); the name is class_3bb8c_n's, not new.
+is, established from the one writer); the name is class_3bb8c_k's, not new.
 
 Not applied (outside the edit set): hoisting `StyleSceneRefs` into one
 shared header (ObjM.h, beside the block it views) and dropping both unit

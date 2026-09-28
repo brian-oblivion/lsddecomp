@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054B1C` on 2026-09-23 (tools/rename.py). Address 0x80054b1c.
 
-Unit `class_3bb8c_n`. **13/13 words, byte-exact.** First build.
+Unit `class_3bb8c_k`. **13/13 words, byte-exact.** First build.
 
 ## What it was
 

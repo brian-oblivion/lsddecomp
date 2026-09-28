@@ -18,7 +18,7 @@ result plus `&gStyleEffectClutPos` (a 1-word `.sdata` constant, address-only, ne
 loaded) to library function `TmdModel__SetFirstPrimClut` (still `psyq_fa50.s`, unrenamed
 Psy-Q object; called with an unused return value). `arg0` (the function's
 first parameter) is never read anywhere in the body -- it is discarded, the
-same as its caller (`StyleBuildEffectSlots`, unaddressed `class_3bb8c_n.s`) passes
+same as its caller (`StyleBuildEffectSlots`, unaddressed `class_3bb8c_k.s`) passes
 its own unrelated `self` there without any indication of shared meaning.
 
 ```c

@@ -1,4 +1,4 @@
-# TickStyle -- MATCHED (77/77 words), class_3bb8c_n
+# TickStyle -- MATCHED (77/77 words), class_3bb8c_k
 
 > Renamed from `func_800558F0` on 2026-09-23 (tools/rename.py). Address 0x800558f0.
 
@@ -40,7 +40,7 @@ inside the `if (gStyleCueSlots[i] != 0) { ... }` arm (after the
 perturbs GCC 2.6.3's register allocator enough to swap `ctx`/`i` back into
 retail's colours -- with zero net effect on either variable's value at any
 point downstream (`i` is immediately re-read by the `for`'s own increment
-clause, and the pair cancels exactly). Applied to the real `src/class_3bb8c_n.c`
+clause, and the pair cancels exactly). Applied to the real `src/class_3bb8c_k.c`
 body (not the scaffold) and rebuilt through `./build-and-verify.sh`:
 **77/77 words, whole-image SHA1 verifies.**
 
@@ -265,13 +265,13 @@ swap).
 
 Round 93: parameters `(Descriptor10 *cell, void *unused, s32 lastCue)` -- ObjM__TickStyle passes the grid's getTargetDescriptor result, 0, 0; `cell` goes through StageMap's computeCellOffsets into `targetPos` (a LongVec3; was `u8 buf[0x10]`, same bytes). The pool is `StyleCueSlot gStyleCueSlotPool[]` (0x68-byte slots, now that `cueSet` is a SoundCueSet).
 
-### Comments moved here from src/class_3bb8c_n.c
+### Comments moved here from src/class_3bb8c_k.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 
 ```c
 /*
- * class_3bb8c_n -- functions 0..22 of the old 113-function class_3bb8c
+ * class_3bb8c_k -- functions 0..22 of the old 113-function class_3bb8c
  * remainder, 0x44F14..0x46288.  23 functions (19 matched, 4 STALL), 1245
  * words.  Carved round 45 (2026-09-15); staffed round 46.
  *

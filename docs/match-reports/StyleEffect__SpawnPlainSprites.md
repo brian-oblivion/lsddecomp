@@ -32,7 +32,7 @@ jal   StyleEffect__SpawnSprites
 Nothing touches `$a0` before the call, so the caller's own first argument
 is forwarded unchanged -- `StyleEffect__SpawnSprites(this, 0, 0, 0)`.
 `StyleEffect__SpawnSprites` is OUTSIDE this unit's carved range (part of the still-
-uncarved `class_3bb8c_n` monolithic segment immediately in front of this
+uncarved `class_3bb8c_k` monolithic segment immediately in front of this
 slice), so no prototype for it exists anywhere yet; declared locally here
 per the established "calling into a function in another/uncarved unit is
 fine" convention (`DECOMPILATION_LEARNINGS.md`). `$v0` is never read at

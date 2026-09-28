@@ -145,7 +145,7 @@ StyleEffect__PlaceModelChildren(self, 0), 2 -> StyleEffect__BuildRandomSprites,
 
 The class: every function here runs on a gStyleEffectMethods instance.
 `New_StyleEffect` allocates 0x98 bytes (where `sprites[5]` ends) and passes a
-kind 0..3 as its first argument (class_3bb8c_n.c passes 0, 1, 2, 3 at its
+kind 0..3 as its first argument (class_3bb8c_k.c passes 0, 1, 2, 3 at its
 four call sites); `StyleEffect__StyleEffect` (table +0x008, the ctor) stores it at
 +0x054. `StyleEffect` is the table-address class name, the
 `SceneNode`/`TodActor` convention.
@@ -167,7 +167,7 @@ method signatures; zero bytes changed.
 | +0x014 | unk14 | coord2 | B | code_d294.h maps SceneNodeObj +0x14 to GsDOBJ2.coord2; `*coord2 = 0` is its flg |
 | +0x020 | unk20 | model | A | SceneNode__LinkModel stores its 2nd argument here; PlaceModelChildren hands it to each child |
 | +0x024 | unk24 | tick | B | StyleEffect__SetParams zeroes it, StyleEffect__Update (slot +0x0EC) increments it before every update |
-| +0x054 | unk54 | kind | B | ctor stores New's first argument, 0..3 at the four class_3bb8c_n.c call sites; three switches on it |
+| +0x054 | unk54 | kind | B | ctor stores New's first argument, 0..3 at the four class_3bb8c_k.c call sites; three switches on it |
 | +0x058 | unk58 | offset | B | added to the caller's position in Init and Update |
 | +0x064 | unk64 | rotation | B | passed as updateRotation's data |
 | +0x068 | unk68 | scale | B | passed as updateScale's data |
@@ -268,7 +268,7 @@ Viewport's `refView.vp.y`, see below.)
 
 - `*(s32 *)((u8 *)gStyleEffectViewport + 0x18)` is
   `((Viewport *)gStyleEffectViewport)->refView.vp.y`: the pointer is
-  StyleSceneRefs::viewport, a `Viewport *` (class_3bb8c_n.c passes it to
+  StyleSceneRefs::viewport, a `Viewport *` (class_3bb8c_k.c passes it to
   SetStyleEffectSources), and +0x018 is `refView` (+0x014) `.vp.y` (+0x004)
   in include/Viewport.h. The extern stays `void *` because class_3bb8c_o.c
   declares it so (proposed to the head: retype both).

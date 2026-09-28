@@ -14,7 +14,7 @@ void ObjM__TickStyle(Obj87034_3bb8c_l *self) {
 ```
 
 Matched on the first attempt. `TickStyle` is still uncarved ground
-(`asm/class_3bb8c_n.s`), declared locally as
+(`asm/class_3bb8c_k.s`), declared locally as
 `extern void TickStyle(void *arg0, void *arg1, s32 arg2);` from this
 call site's own register usage.
 

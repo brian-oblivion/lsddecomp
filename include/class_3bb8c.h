@@ -250,10 +250,7 @@ typedef struct StyleConfig {
 extern s32 GetStageMapChunkRecord(s32 index, s32 sub);
 extern void GetStageMapChunkRecordXY(s32 index, s32 x, s32 y);
 
-/* ObjM__TickStyle's helper (src/class_3bb8c_n.c), typed from that call. */
-extern void TickStyle(void *arg0, void *arg1, s32 arg2);
-
-/* ObjM__TeardownStyle's helpers (src/code_4cd08.c, src/class_3bb8c_n.c). */
+/* ObjM__TeardownStyle's helpers (src/code_4cd08.c, src/class_3bb8c_k.c). */
 extern void ReleaseDreamAuxEntities(void);
 extern void StyleTeardown(void);
 

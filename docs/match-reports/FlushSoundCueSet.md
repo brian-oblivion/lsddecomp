@@ -33,7 +33,7 @@ Byte-exact, 33/33 words.
 
 `gVabStreamObjMethods`'s vtable slot +0x084 is NOT this function -- `FlushSoundCueSet`
 itself is called directly (its only caller,
-`asm/class_3bb8c_n.s:FlushStyleCue`, passes `(*gStyleSceneRefs, &param0->unk14)`
+`asm/class_3bb8c_k.s:FlushStyleCue`, passes `(*gStyleSceneRefs, &param0->unk14)`
 with no vtable indirection), while `FlushSoundCueSet`'s OWN body dispatches
 THROUGH `self`'s vtable to slot `+0x084` (`VabStreamObj__StopVoice`, this unit,
 matched separately). `set` is the same `SoundCueSet` struct
@@ -130,7 +130,7 @@ a pitch offset (that is what setPitchOffset computes from it). `tick` and
 `callback` is typed `SoundCueCallbackFn`, `void (*)(void *owner,
 SoundCueSet *set)`; InitSoundCueSet's parameter takes that type and its
 first parameter is `sound` (it is unused). The three functions have no
-shared prototype: Entity.h, DreamSys.c and class_3bb8c_n.c declare them
+shared prototype: Entity.h, DreamSys.c and class_3bb8c_k.c declare them
 with their own type for the sound object (TodActor's `arg2` is a
 `struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
 would warn in each.

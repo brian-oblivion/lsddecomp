@@ -5,7 +5,7 @@
 #include "VariantSprite.h"
 
 /*
- * StyleEffect -- an Actor the style layer (src/class_3bb8c_n.c) places at an
+ * StyleEffect -- an Actor the style layer (src/class_3bb8c_k.c) places at an
  * offset from the target position and keeps there: every frame it moves to
  * pos + offset, plus however far the viewport's viewpoint has risen or
  * fallen since it was built. Its `kind` picks what it carries (enum

@@ -260,7 +260,7 @@ Note: the offset-y pick is `rand() % 5`, and 0 means "let SetupStyleSpawnParamsA
 
 Locals: `slots`, `count`, `pos`, `offsetY`, `setup`.
 
-### Comments moved here from src/class_3bb8c_n.c
+### Comments moved here from src/class_3bb8c_k.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

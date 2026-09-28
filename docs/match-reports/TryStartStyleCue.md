@@ -1,4 +1,4 @@
-# TryStartStyleCue -- MATCHED (45/45 words), class_3bb8c_n
+# TryStartStyleCue -- MATCHED (45/45 words), class_3bb8c_k
 
 > Renamed from `func_8005556C` on 2026-09-23 (tools/rename.py). Address 0x8005556c.
 

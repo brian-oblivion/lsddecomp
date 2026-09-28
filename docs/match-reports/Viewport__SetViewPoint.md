@@ -69,7 +69,7 @@ all three words before storing; the field form interleaves). The whole-struct
 copy through `*(LongVec3 *)&self->refView.vpx = *vp;` is byte-identical, as is
 the whole image with that spelling, an `(GsCOORDINATE2 *)` cast on
 AddChild's `super` store (SceneNode's coord2 is still the parked
-SceneNodeSub14 view) and DreamSys/class_3bb8c_n reading `vpy`/`vry`. That is
+SceneNodeSub14 view) and DreamSys/class_3bb8c_k reading `vpy`/`vry`. That is
 three casts to save the two at GsSetRefView2, so ViewportRefView stays: Sony's
 layout, with vp and vr as the LongVec3s the game copies and interpolates.
 Revisit when SceneNodeSub14 becomes GsCOORDINATE2 (then it is two for two).

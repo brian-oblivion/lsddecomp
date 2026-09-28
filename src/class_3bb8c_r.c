@@ -4,7 +4,7 @@
  *
  *  - StyleCue00..StyleCue13, the 14 rows of gStyleCueCallbacks, and their
  *    helper ComputeStyleCueFalloff. Each is a SoundCueSet callback
- *    (include/SoundCueSet.h): TryStartStyleCue (class_3bb8c_n.c) starts a
+ *    (include/SoundCueSet.h): TryStartStyleCue (class_3bb8c_k.c) starts a
  *    style-cue slot's embedded set with the claimed cue record's index as the
  *    tag and that row of the table as the callback, as Entity does with its
  *    Entity__MoodCueNN handlers. Every tick a callback sets the set's
@@ -13,7 +13,7 @@
  *    requests VAB programs on the three voices; most restart the pattern by
  *    setting `tick` to -1 once it passes a limit.
  *  - IsStyleVariantEven: whether the variant PickStyleFallbackConfig chose
- *    (gStyleVariant, class_3bb8c_n.c) is even.
+ *    (gStyleVariant, class_3bb8c_k.c) is even.
  *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style layer
  *    keeps at an offset from its target: its ctor, finalize, reset
  *    (StyleEffect__SetParams) and update slot occupants, and the
@@ -33,13 +33,13 @@
  * helper ComputeStyleCueFalloff they all call first.
  * ------------------------------------------------------------------ */
 
-/* The owner every StyleCueNN callback receives: one of class_3bb8c_n.c's
+/* The owner every StyleCueNN callback receives: one of class_3bb8c_k.c's
  * style-cue slots (its `StyleCueSlot`, of which this is a local view).
  * TryStartStyleCue passes the slot as InitSoundCueSet's owner and its
  * embedded `cueSet` as the set, so a callback's `set` is `&ctx->cueSet`. */
 typedef struct StyleCueParam StyleCueParam;
 
-/* The cue-table record the slot claimed (class_3bb8c_n.c's
+/* The cue-table record the slot claimed (class_3bb8c_k.c's
  * `StyleCueEntryView`). */
 typedef struct StyleCueParamMethods {
     u8 pad0[0x6];

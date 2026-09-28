@@ -27,7 +27,7 @@ until now.
 round's assignment in the sibling unit). Declared locally in this unit as
 `extern s32 gStyleVariant;` -- it is not owned by either of my units, so it
 stays a local extern rather than going in `class_3bb8c.h` (the third owner,
-`class_3bb8c_n`, is still an uncarved monolith and would just as legitimately
+`class_3bb8c_k`, is still an uncarved monolith and would just as legitimately
 carry its own local view later).
 
 ```c

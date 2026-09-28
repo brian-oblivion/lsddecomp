@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054D30` on 2026-09-23 (tools/rename.py). Address 0x80054d30.
 
-Unit `class_3bb8c_n`. **29/29 words, byte-exact.** First build.
+Unit `class_3bb8c_k`. **29/29 words, byte-exact.** First build.
 
 ## What it was
 
@@ -117,7 +117,7 @@ per-frame reset. MATCHED, 29/29, first build.
 
 ## Round 93 polish (delta, track 7)
 
-### Comments moved here from src/class_3bb8c_n.c
+### Comments moved here from src/class_3bb8c_k.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

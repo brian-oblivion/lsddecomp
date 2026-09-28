@@ -104,6 +104,6 @@ The config pointer is a unit-local `StyleStageConfig` (four `s8`:
 colorMode, fogLevel, farColorIndex, clearColorIndex -- what
 FillStyleFromConfig stores each byte as). Zero bytes.
 
-Proposal: `gStyleKind2AltColor` (0x80087430, class_3bb8c_n) is
+Proposal: `gStyleKind2AltColor` (0x80087430, class_3bb8c_k) is
 `sStyleConfig + 0x00C`, i.e. `sStyleConfig.clearColor`: its "alternate
 colour" is the current config's clear colour.

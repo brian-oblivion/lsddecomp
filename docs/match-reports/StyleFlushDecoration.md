@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054714` on 2026-09-23 (tools/rename.py). Address 0x80054714.
 
-Unit `class_3bb8c_n`. **17/17 words, byte-exact.** Second build (one-word
+Unit `class_3bb8c_k`. **17/17 words, byte-exact.** Second build (one-word
 struct-offset miss on the first).
 
 ## What it was
@@ -96,7 +96,7 @@ gStyleDecorObj is a BoxFill (include/BoxFill.h); the deleted `ObjAB54` view's +0
 
 ## Round 93 polish (delta, track 7)
 
-### Comments moved here from src/class_3bb8c_n.c
+### Comments moved here from src/class_3bb8c_k.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80055A24` on 2026-09-23 (tools/rename.py). Address 0x80055a24.
 
-Unit `class_3bb8c_n`. **25/25 words, byte-exact.** Second build (one lever).
+Unit `class_3bb8c_k`. **25/25 words, byte-exact.** Second build (one lever).
 
 ## What it was
 
