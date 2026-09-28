@@ -24,7 +24,7 @@ The CD-ROM "command" dispatcher: `arg0` is a command byte (`0`..`0x1B`ish, looke
 6. Records the command byte itself into `D_8006D61D` (used by the OTHER two functions' printf as the "current wait's name" selector) and `*D_8006D8C4`.
 7. If `arg3 != 0` (fire-and-forget), returns `0` immediately.
 8. Otherwise runs the SAME timeout/print/flush-loop idiom as `CD_sync`/`CD_ready` (see those reports), polling `D_8006D8D8[0]` until nonzero, printing `"CD_cw"` on timeout.
-9. Once `D_8006D8D8[0]` is nonzero: if it is exactly `2` AND `cmd == 0xE`, snapshots `*(u8*)arg1` into `D_8006D61C`; unconditionally (if `arg2 != 0`) copies the 8-byte `D_8008B3CC` snapshot into `arg2`; returns `-1` if the final state is `5`, else `0`.
+9. Once `D_8006D8D8[0]` is nonzero: if it is exactly `2` AND `cmd == 0xE`, snapshots `*(u8*)arg1` into `CD_mode`; unconditionally (if `arg2 != 0`) copies the 8-byte `D_8008B3CC` snapshot into `arg2`; returns `-1` if the final state is `5`, else `0`.
 
 ## A real, measured finding about `D_8006D840`/`D_6D740` addressing (documented so nobody re-derives it)
 
@@ -47,7 +47,7 @@ One real structural fix IS folded into the body and is worth keeping on record: 
 ```c
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80024E64 -> CheckCallback, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
 extern s32 CD_debug;
-extern u8 D_8006D61C;
+extern u8 CD_mode;
 extern u8 D_8006D61D;
 extern const char *D_8006D620[];
 extern const char *D_8006D6A0[];
@@ -196,7 +196,7 @@ skip_timeout3:
     }
 
     if (D_8006D8D8[0] == 2 && (arg0 & 0xFF) == 0xE) {
-        D_8006D61C = *(u8 *)arg1;
+        CD_mode = *(u8 *)arg1;
     }
 
     dst = (u8 *)arg2;

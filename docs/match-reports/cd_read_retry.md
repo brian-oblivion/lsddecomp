@@ -112,7 +112,7 @@ s32 cd_read_retry(void)
 
             D_8006D8DA = 0;
             q = &D_8006D8D9;
-            D_8006D61C = 0;
+            CD_mode = 0;
             *q = D_8006D8DA;
             D_8006D8D8[0] = 2;
             *D_8006D8C0 = 0;
@@ -120,7 +120,7 @@ s32 cd_read_retry(void)
             *D_8006D8D0 = 0x1325;
 
             buf = (u8)p2[0];
-            if (buf != D_8006D61C) {
+            if (buf != CD_mode) {
                 if (CD_cw(0xE, (s32)&buf, 0, 0) != 0) {
                     goto tail;
                 }
@@ -242,7 +242,7 @@ than what this round's own build actually produced -- see below).
 
 ### Fix 1: `buf`'s stack round-trip (119 -> 149/223)
 
-The round-19 body's `buf = (u8)p2[0]; if (buf != D_8006D61C) { ...
+The round-19 body's `buf = (u8)p2[0]; if (buf != CD_mode) { ...
 &buf ... }` compiled with a genuine RELOAD from the stack slot for the
 comparison (`sb v0,0x18(sp); lbu v1,0x18(sp); lui v0,...; lbu v0,...;
 andi v0,0xff` -- 8 instructions), where retail keeps the loaded value in
@@ -255,7 +255,7 @@ closed this exactly:
 {
     s32 v0 = p2[0];
     buf = (u8)v0;
-    if ((u8)v0 != D_8006D61C) {
+    if ((u8)v0 != CD_mode) {
         if (CD_cw(0xE, (s32)&buf, 0, 0) != 0) {
             goto tail;
         }
@@ -273,7 +273,7 @@ because the aggregate score doesn't immediately improve.
 ### Fix 2: missing `__asm__("")` barrier before the reused CD_flush tail block (149 -> 171/223)
 
 The round-19/round-17 salvaged body's copy of the driver-reset tail
-(`D_8006D8DA = 0; q = &D_8006D8D9; D_8006D61C = 0; *q = D_8006D8DA;
+(`D_8006D8DA = 0; q = &D_8006D8D9; CD_mode = 0; *q = D_8006D8DA;
 D_8006D8D8[0] = 2; ...`) was MISSING the `__asm__("");` barrier that the
 canonical `CD_flush` version of this exact block carries between
 `*q = D_8006D8DA;` and `D_8006D8D8[0] = 2;`. Adding it back (this
@@ -416,7 +416,7 @@ s32 cd_read_retry(void)
 
             D_8006D8DA = 0;
             q = &D_8006D8D9;
-            D_8006D61C = 0;
+            CD_mode = 0;
             *q = D_8006D8DA;
             __asm__("");
             D_8006D8D8[0] = 2;
@@ -427,7 +427,7 @@ s32 cd_read_retry(void)
             {
                 s32 v0 = p2[0];
                 buf = (u8)v0;
-                if ((u8)v0 != D_8006D61C) {
+                if ((u8)v0 != CD_mode) {
                     if (CD_cw(0xE, (s32)&buf, 0, 0) != 0) {
                         goto tail;
                     }
@@ -846,7 +846,7 @@ s32 cd_read_retry(void)
 
             D_8006D8DA = 0;
             q = &D_8006D8D9;
-            D_8006D61C = 0;
+            CD_mode = 0;
             *q = D_8006D8DA;
             __asm__("");
             D_8006D8D8[0] = 2;
@@ -857,7 +857,7 @@ s32 cd_read_retry(void)
             {
                 s32 v0 = p2[0];
                 buf = (u8)v0;
-                if ((u8)v0 != D_8006D61C) {
+                if ((u8)v0 != CD_mode) {
                     if (CD_cw(0xE, (s32)&buf, 0, 0) != 0) {
                         goto tail;
                     }
@@ -1046,7 +1046,7 @@ exact program point for a completely different purpose, in the same
 ```c
 s32 v0 = p2[0];
 buf = (u8)v0;
-n = ((u8)v0 != D_8006D61C);      /* was: if ((u8)v0 != D_8006D61C) */
+n = ((u8)v0 != CD_mode);      /* was: if ((u8)v0 != CD_mode) */
 if (n) {
     saved = (s32)&buf;            /* was: CD_cw(0xE, (s32)&buf, 0, 0) */
     if (CD_cw(0xE, saved, 0, 0) != 0) {
@@ -1187,7 +1187,7 @@ s32 cd_read_retry(void)
 
             D_8006D8DA = 0;
             q = &D_8006D8D9;
-            D_8006D61C = 0;
+            CD_mode = 0;
             *q = D_8006D8DA;
             __asm__("");
             D_8006D8D8[0] = 2;
@@ -1198,7 +1198,7 @@ s32 cd_read_retry(void)
             {
                 s32 v0 = p2[0];
                 buf = (u8)v0;
-                n = ((u8)v0 != D_8006D61C);
+                n = ((u8)v0 != CD_mode);
                 if (n) {
                     saved = (s32)&buf;
                     if (CD_cw(0xE, saved, 0, 0) != 0) {

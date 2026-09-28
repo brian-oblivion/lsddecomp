@@ -43,7 +43,7 @@ Two block-order fixes DID matter and are already folded into the body below (doc
 ```c
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80024E64 -> CheckCallback, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
 extern s32 CD_debug;                 /* verbosity level; libcd_bios.c's func_80028CE0 accessor */
-extern u8 D_8006D61C;
+extern u8 CD_mode;
 extern u8 D_8006D61D;                  /* selector into D_8006D620 for the "name" of the current wait */
 extern const char *D_8006D620[];       /* string table, selector 0..0x1B -- shared reading, libcd_bios.c */
 extern const char *D_8006D6A0[];       /* string table, selector 0..0x6 -- shared reading, libcd_bios.c */

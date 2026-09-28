@@ -10,7 +10,7 @@ Drains the link driver's status byte (`*D_8006D8CC & 7`) by repeatedly
 poking mode byte 1 and status 7 into the staging pointers until it clears,
 then runs the same "close port" tail seen in `CD_init`'s middle and
 `cd_read_retry`'s tail: clear `D_8006D8DA`, mirror it into `D_8006D8D9`,
-clear `D_8006D61C`, set `D_8006D8D8 = 2`, zero `*D_8006D8C0`/`*D_8006D8CC`,
+clear `CD_mode`, set `D_8006D8D8 = 2`, zero `*D_8006D8C0`/`*D_8006D8CC`,
 and program `*D_8006D8D0 = 0x1325`.
 
 ## The C
@@ -29,7 +29,7 @@ void CD_flush(void)
 
     D_8006D8DA = 0;
     q = &D_8006D8D9;
-    D_8006D61C = 0;
+    CD_mode = 0;
     *q = D_8006D8DA;
     __asm__("");
     D_8006D8D8 = 2;
@@ -91,7 +91,7 @@ deleting it alone (35 bytes of the image differ; `funcdiff` cannot score this
 function because its symbol is absolute, so the evidence is `objdump -d -r` of
 `build/src/libcd_bios.c.o` with and without it): without the barrier the
 `lw` of the `D_8006D8C0` pointer and the `li 2` / `sb` to `D_8006D8D8` are
-hoisted above the `sb zero` to `D_8006D61C` and the `sb` through `q` to
+hoisted above the `sb zero` to `CD_mode` and the `sb` through `q` to
 `D_8006D8D9`; retail performs those two stores first. As knock-on effects the
 pointer lands in `a0` instead of `v1` and the loop's `li v1,0x7` / `li a0,0x1`
 pair swaps order. The primary change is instruction order.

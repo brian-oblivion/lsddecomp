@@ -318,7 +318,7 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_ready);
  * (docs/match-reports/CD_cw.md). */
 #if 0
 extern s32 CD_debug;
-extern u8 D_8006D61C;
+extern u8 CD_mode;
 extern u8 D_8006D61D;
 extern const char *D_8006D620[];
 extern const char *D_8006D6A0[];
@@ -465,7 +465,7 @@ skip_timeout3:
     }
 
     if (D_8006D8D8[0] == 2 && (arg0 & 0xFF) == 0xE) {
-        D_8006D61C = *(u8 *)arg1;
+        CD_mode = *(u8 *)arg1;
     }
 
     dst = (u8 *)arg2;
@@ -495,7 +495,7 @@ extern s32 CD_nopen;
 extern u8 CD_pos;
 extern u8 D_8006D619;
 extern u8 D_8006D61A;
-extern u8 D_8006D61C;
+extern u8 CD_mode;
 extern u8 D_8006D61D;
 extern s32 D_8006D6A0[]; /* lookup table, indexed by a byte field << 2 */
 
@@ -616,10 +616,10 @@ void CD_flush(void) {
 
     D_8006D8DA = 0;
     q = &D_8006D8D9;
-    D_8006D61C = 0;
+    CD_mode = 0;
     *q = D_8006D8DA;
     /* Keeps the D_8006D8C0 pointer load and the D_8006D8D8[0] = 2 store
-     * below the D_8006D61C / D_8006D8D9 stores; without it GCC hoists them above. */
+     * below the CD_mode / D_8006D8D9 stores; without it GCC hoists them above. */
     __asm__("");
     D_8006D8D8[0] = 2;
     *D_8006D8C0 = 0;
@@ -685,7 +685,7 @@ s32 CD_init(void) {
     printf(D_80010AA0, D_8006D90C);
 
     D_8006D61D = 0;
-    D_8006D61C = 0;
+    CD_mode = 0;
     CD_cbready = 0;
     CD_cbsync = 0;
     CD_status1 = 0;
@@ -709,7 +709,7 @@ s32 CD_init(void) {
 
     D_8006D8DA = 0;
     q = &D_8006D8D9;
-    D_8006D61C = 0;
+    CD_mode = 0;
     *q = D_8006D8DA;
     __asm__("");
     D_8006D8D8[0] = 2;
@@ -825,7 +825,7 @@ s32 cd_read_retry(void) {
 
             D_8006D8DA = 0;
             q = &D_8006D8D9;
-            D_8006D61C = 0;
+            CD_mode = 0;
             *q = D_8006D8DA;
             __asm__("");
             D_8006D8D8[0] = 2;
@@ -836,7 +836,7 @@ s32 cd_read_retry(void) {
             {
                 s32 v0 = p2[0];
                 buf = (u8)v0;
-                n = ((u8)v0 != D_8006D61C);
+                n = ((u8)v0 != CD_mode);
                 if (n) {
                     saved = (s32)&buf;
                     if (CD_cw(0xE, saved, 0, 0) != 0) {
