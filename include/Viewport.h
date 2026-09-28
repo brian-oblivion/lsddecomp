@@ -119,8 +119,8 @@ struct ViewportRefView {
     /* +0x088 */ void (*slot88)(void);                             /* Viewport__NoOpSlot88, empty */        \
     /* +0x08C */ void (*initOt)(Self *self);                       /* Viewport__InitOt */            \
     /* +0x090 */ void (*deinitOt)(Self *self);                     /* Viewport__DeinitOt */          \
-    /* +0x094 */ void (*onNotifyTag5)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnFrameClockEvent: onNotify's class-5 (FrameClock) case */ \
-    /* +0x098 */ void (*onNotifyTag1)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnDrawSystemEvent: onNotify's DrawSystem (1) case */ \
+    /* +0x094 */ void (*onFrameClockEvent)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnFrameClockEvent: onNotify's class-5 (FrameClock) case */ \
+    /* +0x098 */ void (*onDrawSystemEvent)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnDrawSystemEvent: onNotify's DrawSystem (1) case */ \
     /* +0x09C */ void (*update)(Self *self);                       /* Viewport__Update; NodeGuardedViewport__Update */ \
     /* +0x0A0 */ void (*drawNode)(Self *self, SceneNode *node);   /* Viewport__DrawNode (ViewportDraw) */ \
     /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
@@ -154,7 +154,7 @@ struct ViewportRefView {
     /* +0x078 */ GsOT *ot[2];             /* InitOt's two GsOT headers */                          \
     /* +0x080 */ GsOT_TAG *otTags[2];     /* each header's org: its tag array */                   \
     /* +0x088 */ PACKET *workBase[2];     /* each half's packet area: GsSetWorkBase */             \
-    /* +0x090 */ s32 clockEventCount;     /* counts FrameClock notifications (OnNotifyTag5) */     \
+    /* +0x090 */ s32 clockEventCount;     /* counts FrameClock notifications (OnFrameClockEvent) */     \
     /* +0x094 */ u8 pad094[0x098 - 0x094];                                                         \
     /* +0x098 */ s32 zDiv;                /* Update: the depth per OT tag; drawNode's sprite z */  \
     /* +0x09C */ u8 pad09C[0x0AC - 0x09C];                                                         \

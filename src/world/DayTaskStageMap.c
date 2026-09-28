@@ -178,13 +178,13 @@ void DayTask__OnDeinit(DayTask *self) {
     vp->methods->detachViewChild(vp);
 }
 
-/* onTag1Notify: on each DrawSystem VSync, starts the day's first ObjM
+/* onDrawSystemEvent: on each DrawSystem VSync, starts the day's first ObjM
  * (READY) or replaces the ObjM a link state ended (REPLACE_OBJM). A day
  * startDay refuses ends at once. */
 void DayTask__AdvancePhase(DayTask *self, BasicClass *sender, s32 event) {
     s32 result;
 
-    GetTimedTaskMethods()->onTag1Notify((TimedTask *)self, sender, event);
+    GetTimedTaskMethods()->onDrawSystemEvent((TimedTask *)self, sender, event);
     if (event == DRAWSYSTEM_EVENT_VSYNC && self->phase != DAYTASK_PHASE_RUNNING) {
         switch (self->phase) {
             case DAYTASK_PHASE_READY:
@@ -366,7 +366,7 @@ void TimedTask__SetState(TimedTask *self, s32 state) {
     GetIntermediateBaseMethods()->setState((IntermediateBase *)self, state);
     if (state == TIMEDTASK_STATE_TIMED_OUT) {
         self->result = TIMEDTASK_RESULT_TIMED_OUT;
-        self->methods->onState4(self);
+        self->methods->onTimedOut(self);
     }
 }
 
@@ -552,12 +552,12 @@ void StageMap__Finalize(StageMap *self) {
     GetLightRigMethods()->finalize((LightRig *)self);
 }
 
-/* A sender of DrawSystem's class (id nibble 0x1) goes on to onNotifyTag1. */
+/* A sender of DrawSystem's class (id nibble 0x1) goes on to onDrawSystemEvent. */
 void StageMap__OnNotify(StageMap *self, BasicClass *sender, s32 command) {
     GetSceneNodeMethods()->onNotify((SceneNode *)self, sender, command);
 
     if ((sender->methods->header & CLASS_ID_ROOT_MASK) == DRAWSYSTEM_CLASS_ID) {
-        self->methods->onNotifyTag1(self, sender, command);
+        self->methods->onDrawSystemEvent(self, sender, command);
     }
 }
 
@@ -847,7 +847,7 @@ void StageMap__SetConfig(StageMap *self, StageGridDimensions *config) {
  *  - LoadChunksAround, ComputeNeighbourMask, ComputeChunkLoadEntry,
  *    ApplyChunkLoads, CountPendingLoads: moving the slots around a centre
  *    chunk and starting (or cancelling) each slot's LbdFile load.
- *  - OnNotifyTag1: on the DrawSystem's per-VSync notification, finishing
+ *  - OnDrawSystemEvent: on the DrawSystem's per-VSync notification, finishing
  *    the loads that have completed.
  *  - PopulateSlotCells / ClearSlotCells: linking a loaded chunk's
  *    placements and models into its slot's cells, and clearing them.

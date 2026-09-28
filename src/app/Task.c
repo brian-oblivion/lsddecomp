@@ -1185,7 +1185,7 @@ void IntermediateBase__OnNotify(IntermediateBase *self, BasicClass *sender, s32 
     GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
     rootClass = sender->methods->header & CLASS_ID_ROOT_MASK;
     if (rootClass == DRAWSYSTEM_CLASS_ID) {
-        self->methods->onTag1Notify(self, sender, event);
+        self->methods->onDrawSystemEvent(self, sender, event);
     } else if (rootClass == PAD_CLASS_ID) {
         self->methods->onPadEvent(self, sender, event);
     } else if (rootClass == FRAMECLOCK_CLASS_ID) {
@@ -1229,7 +1229,7 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
         viewport->methods->addChild(viewport, args->drawSystem);
         viewport->methods->addChild(viewport, self->frameClock);
         self->lightRig->methods->addChild(self->lightRig, self->frameClock);
-        methods->setState(self, 2);
+        methods->setState(self, INTERMEDIATEBASE_STATE_START);
         methods->deinit(self);
     }
 }
@@ -1284,10 +1284,10 @@ void IntermediateBase__SetState(IntermediateBase *self, s32 state) {
     methods = self->methods;
     self->state = state;
     methods->notifyParents(self, state);
-    if (state == 2) {
-        fn = methods->onState2;
-    } else if (state == 3) {
-        fn = methods->onState3;
+    if (state == INTERMEDIATEBASE_STATE_START) {
+        fn = methods->onStart;
+    } else if (state == INTERMEDIATEBASE_STATE_STOP) {
+        fn = methods->onStop;
     } else {
         return;
     }
@@ -1412,7 +1412,7 @@ void Viewport__RemoveAllChildren(Viewport *self) {
  */
 
 /* Forwards to the base onNotify, then dispatches on the sender's class-id
- * nibble: a FrameClock to onNotifyTag5, the DrawSystem to onNotifyTag1,
+ * nibble: a FrameClock to onFrameClockEvent, the DrawSystem to onDrawSystemEvent,
  * anything else nowhere. */
 void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
     s32 tag;
@@ -1421,9 +1421,9 @@ void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
 
     tag = sender->methods->header & CLASS_ID_ROOT_MASK;
     if (tag == FRAMECLOCK_CLASS_ID) {
-        self->methods->onNotifyTag5(self, sender, event);
+        self->methods->onFrameClockEvent(self, sender, event);
     } else if (tag == DRAWSYSTEM_CLASS_ID) {
-        self->methods->onNotifyTag1(self, sender, event);
+        self->methods->onDrawSystemEvent(self, sender, event);
     }
 }
 

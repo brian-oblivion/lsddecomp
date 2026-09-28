@@ -24,7 +24,7 @@
  *    onInit (ObjM__InitStyleAndWorld) builds `timBlockSrc`
  *    (New_TimBlockSrc of the day's variant) and `styleConfig`
  *    (RegisterStyleConfig);
- *  - onTag1Notify's event 2 (ObjM__PollTimBlockLoad) waits for the
+ *  - onDrawSystemEvent's event 2 (ObjM__PollTimBlockLoad) waits for the
  *    TimBlockSrc: loaded, it fades its CLUT rows to a styleConfig colour;
  *    either way releases it and runs setupSceneStyle, then, once the
  *    StageMap has nothing pending, enterStyleSession (`inSession`);
@@ -46,7 +46,7 @@
  *    DayTask__StartObjM passes the DreamSys as the slot's s32 `mode`.
  *  - +0x04C onInit: ObjM__InitStyleAndWorld takes (gridSpan, style
  *    override, unk4C); IntermediateBase__Init calls it with (0, 0, 0).
- *  - +0x054 onTag1Notify, +0x058 onPadEvent: the occupants take `void *`
+ *  - +0x054 onDrawSystemEvent, +0x058 onPadEvent: the occupants take `void *`
  *    for the unused sender.
  *
  * The +0x06C..+0x07B words are read as one block from outside:
@@ -114,8 +114,8 @@ enum ObjMState {
 
 /* Overridden: ctor, finalize, onNotify, resetCounters (NoOpSlot40), init
  * (AttachTarget), deinit (DetachTarget), onInit (InitStyleAndWorld),
- * onDeinit (TeardownStyle), onTag1Notify, onPadEvent (DispatchPadEvent),
- * update, togglePause (TogglePause) and onState4 (NoOpSlot7C). */
+ * onDeinit (TeardownStyle), onDrawSystemEvent, onPadEvent (DispatchPadEvent),
+ * update, togglePause (TogglePause) and onTimedOut (NoOpSlot7C). */
 struct ObjMMethods {
     TIMEDTASK_SLOTS(ObjM, (ObjM * self, BasicClass *sound, struct WBgm *bgm,
                            struct TimImage *etcTim, struct LinkResource *dreamerTmd, s32 stage));

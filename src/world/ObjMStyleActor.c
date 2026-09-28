@@ -429,7 +429,7 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
  *    stage's BGM sequence and the day's TIM block, register the stage's
  *    StyleConfig, set the viewport's view and the StageMap's bounds; stop
  *    it all again.
- *  - onTag1Notify's event 2 runs PollTimBlockLoad: once the TIM block has
+ *  - onDrawSystemEvent's event 2 runs PollTimBlockLoad: once the TIM block has
  *    loaded (or failed) the scene is set up, and once the StageMap has
  *    nothing pending the style session starts.
  *  - onPadEvent (DispatchPadEvent) maps Start, Select and triangle onto the

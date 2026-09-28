@@ -29,7 +29,7 @@
  * runs fadeInCallback, TickFadeIn, until it reports done) -> 5 (active:
  * the target's slot unk8 selected, inputMode 1) ... 7 (fade out:
  * tickFadeOutCallback, TickFadeOut) -> 8 -> 3 (IntermediateBase's
- * onState3). While inputMode is nonzero, frameCounter passing frameBound
+ * onStop). While inputMode is nonzero, frameCounter passing frameBound
  * is setState(6): result = 1, then exit, which calls
  * exitCallback and goes to 7. States 9..0x11 set state 5 and reset the
  * frame counter; 0xB runs confirmSlot, 0xF commitElementScroll, 0x11

@@ -262,10 +262,10 @@ void TitleMenu__OnDeinit(TitleMenu *self) {
 
 void TitleMenu__SetState(TitleMenu *self, s32 state) {
     GetTaskCoreMethods()->setState((TaskCore *)self, state);
-    if (state == 5) {
+    if (state == TASKCORE_STATE_ACTIVE) {
         self->methods->refreshMenu(self, 0);
     }
-    if (state == 0xA) {
+    if (state == TASKCORE_STATE_START_PRESSED) {
         self->methods->onPadCancel(self);
         self->methods->setActiveSlot(self, self->target->unk8, 1);
         self->methods->onPadConfirm(self);
