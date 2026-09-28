@@ -65,9 +65,9 @@ typedef struct GameApplicationConfig {
                                      * PlayCinematic's movie branch, PlayEndingMovie */
     /* +0x0C */ s32 showIntroLogos; /* gates ShowIntroLogos */
     /* +0x10 */ s32 pollGraphRoom;  /* gates RunTitleMenu (0: it returns 2 at once) */
-    /* +0x14 */ s32 dreamSysConfigOption; /* the ctor passes it to the DreamSys's slot228 (DreamSys__GetSetConfigOption),
-                            * which stores a value >= 0 at DreamSys +0x924. The DreamSys ctor
-                            * zeroes that word and no code reads it back, so what it selects is
+    /* +0x14 */ s32 dreamSysConfigOption; /* the ctor passes it to the DreamSys's getSetConfigOption (DreamSys__GetSetConfigOption),
+                            * which stores a value >= 0 in DreamSys::configOption. DreamSys__ResetSessionState
+                            * zeroes that field and no code but the get/set reads it, so what it selects is
                             * not established (sGameApplicationConfig passes 1). */
 } GameApplicationConfig;
 

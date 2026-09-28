@@ -92,7 +92,7 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
     req.src.name = sModelPathDreamE5;
     self->dreamSys = New_DreamSys(New_LinkResource(&req.src), 0, 0);
     self->skipGraphRoomPoll = 0;
-    self->dreamSys->methods->slot228(self->dreamSys, config->dreamSysConfigOption);
+    self->dreamSys->methods->getSetConfigOption(self->dreamSys, config->dreamSysConfigOption);
     ((GameApplicationSeedRandomFn)self->methods->setScreenDims)(self);
 }
 
