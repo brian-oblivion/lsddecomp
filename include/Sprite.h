@@ -41,7 +41,6 @@
 
 typedef struct Sprite Sprite;
 typedef struct SpriteMethods SpriteMethods;
-typedef struct ColorRgb ColorRgb;
 typedef struct SpriteRect SpriteRect;
 typedef struct SpriteGs SpriteGs;
 
@@ -50,13 +49,6 @@ typedef struct SpriteGs SpriteGs;
  * every subclass too: ScreenSprite (0x144) and VariantSprite (0x1F44)
  * (Viewport__DrawNode). */
 #define SPRITE_CLASS_ID 0x44
-
-/* A 3-byte colour. All-s8 members give it alignment 1, which is what makes
- * Sprite__SetColor's whole-struct copy compile to lb,lb,lb then sb,sb,sb
- * (DECOMPILATION_LEARNINGS, the 3-byte all-s8 struct idiom). */
-struct ColorRgb {
-    s8 r, g, b;
-};
 
 /* A texture cell: 16-bit origin in the texture page, 32-bit extent. The
  * ctor's `rect`, copied to `rect` by reset; sVariantSpriteCells (VariantSprite's two

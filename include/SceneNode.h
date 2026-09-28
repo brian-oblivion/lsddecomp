@@ -7,6 +7,7 @@
 #include <libgs.h>
 #include "BasicClass.h"
 #include "TmdModel.h"
+#include "DrawSystem.h"
 
 /*
  * SceneNode -- a node in libgs's transform hierarchy, and the base of every
