@@ -563,7 +563,7 @@ void Entity__MoodCue00(Entity *this, SoundCueSet *out) {
         out->slots[0].program = SOUND_CUE_STOP;
     } else if (this->moodTimer >= 261 && this->moodTimer < 568) {
         this->methods->moveLocalZ(this, -50, 0);
-        this->methods->updateRotation(this, 1, ROTATION_YAW_MINUS120);
+        this->methods->updateRotation(this, 1, sRotationYawMinus120);
     } else if (this->moodTimer >= 569) {
         this->methods->updateRotation(this, 1, ROTATION_X50_YMINUS120_Z30);
     }

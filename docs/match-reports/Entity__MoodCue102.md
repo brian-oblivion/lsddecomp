@@ -138,7 +138,7 @@ arms in this function's `moodTimer`-threshold chain, decoded directly from
   unit-fraction-word convention as `SCALE_HALF` (1/2).
 - `SCALE_QUARTER`: `(1,4, 1,4, 1,4, 1,2)` -- uniform X=Y=Z=1/4, W=1/2
   (ignored per the established `SCALE_HALF`/`SCALE_SIX`/
-  `ROTATION_YAW_MINUS120` precedent that the 4th pair is never reflected
+  `sRotationYawMinus120` precedent that the 4th pair is never reflected
   in the name).
 
 Also used by `Entity__MoodCue104`/`Entity__MoodCue121` (`SCALE_QUARTER`)

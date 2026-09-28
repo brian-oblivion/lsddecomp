@@ -63,7 +63,7 @@ names sort in table order.
 inside its `moodState == 0xA` branch, decoded from `disk/SLPS_015.56` as
 four s16 `{num,den}` pairs: `(0,1, 4,1, 0,1, 90,1)` -- only Z is a whole
 degree (4/1), X=Y=0; W=90/1 is ignored per the established precedent that
-the 4th pair is never reflected in the name (`ROTATION_YAW_MINUS120` at
+the 4th pair is never reflected in the name (`sRotationYawMinus120` at
 0x80089CE8 has an equally nonzero, equally unnamed W=50/1). Matches the
 existing `ROTATION_ZPLUS9` naming shape exactly, just a different Z
 amount.
