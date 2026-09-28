@@ -1780,8 +1780,6 @@ void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY) {
 extern s32 gStyleSceneRefs;
 extern void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target);
 extern SoundCueCallbackFn gStyleCueCallbacks[];
-extern s32 InitSoundCueSet(void *sound, SoundCueSet *set, s32 tag, void *owner,
-                           SoundCueCallbackFn callback);
 
 /* Claims the next record in range for `slot` and starts its cue. A started
  * cue equal to *lastCue is reported back negated. Returns the slot, or NULL. */
@@ -1891,7 +1889,6 @@ fail:
 }
 
 extern s32 gStyleSceneRefs;
-extern void FlushSoundCueSet(void *sound, SoundCueSet *set);
 
 /* Stops the slot's cue and frees its record. Returns NULL for the slot. */
 StyleCueSlot *FlushStyleCue(StyleCueSlot *slot) {
@@ -1901,7 +1898,6 @@ StyleCueSlot *FlushStyleCue(StyleCueSlot *slot) {
 }
 
 extern s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target);
-extern void ServiceSoundCueSet(void *sound, SoundCueSet *set);
 
 /* One service pass of the slot's cue while the target is in range; 0 otherwise. */
 s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused) {

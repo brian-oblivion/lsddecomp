@@ -296,10 +296,6 @@ void Entity__SetTargetReached(Entity *this, s32 reached) {
     this->targetReached = reached;
 }
 
-/* PlacementGridVabSound.c's; SoundCueSet.h does not declare it. */
-extern s32 InitSoundCueSet(struct VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
-                           SoundCueCallbackFn callback);
-
 void Entity__StartSoundCue(Entity *this) {
     InitSoundCueSet(this->sound, &this->soundCueSet, this->moodIndex + 1, this,
                     gEntityMoodTable[this->moodIndex].handler);

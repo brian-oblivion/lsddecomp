@@ -301,12 +301,7 @@ extern Ratio16 sScaleTriple[];
 extern Ratio16 sScaleThirtySecond[];
 extern Ratio16 sScaleX3[];
 
-/* Functions of other units Entity calls directly. The SoundCueSet functions
- * are defined in PlacementGridVabSound/l as (VabStreamObj *, SoundCueSet *); these
- * declarations take TodActor's `arg2` untyped, and their results are
- * unused. */
-extern void ServiceSoundCueSet(void *sound, SoundCueSet *set);
-extern void FlushSoundCueSet(void *sound, SoundCueSet *set);
+/* Functions of other units Entity calls directly. */
 extern s32 rand(void);
 
 #endif

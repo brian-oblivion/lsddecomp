@@ -11,7 +11,7 @@
  *    running (tag != 0): it stores the owner's tag, owner and callback,
  *    frees every slot's voice (-1), zeroes the tick and sets
  *    attenuationSteps to 10. Returns 1 when it started the cue.
- *  - ServiceSoundCueSet (libsnd_vmanager.c), once per tick while tag > 0:
+ *  - ServiceSoundCueSet (PlacementGridVabSound.c), once per tick while tag > 0:
  *    resets every slot's request (program -1, octave 0, vol 0x7F,
  *    endVol 0x40) and attenuation, calls callback(owner, set), and then,
  *    unless the callback left attenuation negative, keys the requests: for
@@ -73,5 +73,14 @@ struct SoundCueSet {
     /* +0x14 */ s32 attenuationSteps; /* 10, set by InitSoundCueSet */
     /* +0x18 */ SoundCueSlot slots[3];
 }; /* 0x54 bytes */
+
+struct VabStreamObj; /* include/VabStreamObj.h */
+
+/* The three functions on a cue, all in src/sound/PlacementGridVabSound.c;
+ * `sound` is the VabStreamObj whose voices the cue plays. */
+extern s32 InitSoundCueSet(struct VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
+                           SoundCueCallbackFn callback);
+extern void FlushSoundCueSet(struct VabStreamObj *sound, SoundCueSet *set);
+extern void ServiceSoundCueSet(struct VabStreamObj *sound, SoundCueSet *set);
 
 #endif

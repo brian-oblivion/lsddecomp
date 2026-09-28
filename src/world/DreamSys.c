@@ -66,13 +66,6 @@
 #define UNLOCK_SCORE_MAX 50000000
 #define DYNAMIC_LINK_PENALTY 11024
 
-/* The SoundCueSet service pair (FlushSoundCueSet in PlacementGridVabSound.c,
-   ServiceSoundCueSet in libsnd_vmanager.c), as TickDrift and StopDrift call
-   them: (soundObj, soundCueSet). Local, because Entity.h declares the same
-   two functions with other parameter types. */
-extern void FlushSoundCueSet(s32 arg0, void *arg1);
-extern void ServiceSoundCueSet(s32 arg0, void *arg1);
-
 /* Defined further down, in ROM order, and called before that. */
 s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
 s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
@@ -495,8 +488,6 @@ void DreamSys__SelectCallback80(DreamSys *this, s32 mode) {
     }
 }
 
-extern void InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, DreamSys *arg3, void *arg4);
-
 void DreamSys__SelectCallback98(DreamSys *this, s32 mode) {
     DreamSysMethods *vt = this->methods;
 
@@ -514,7 +505,8 @@ void DreamSys__SelectCallback98(DreamSys *this, s32 mode) {
             this->moveCallback = vt->tickDrift;
             this->driftActive = 1;
             this->cueServiceActive = 1;
-            InitSoundCueSet(this->soundObj, &this->soundCueSet, 1, this, this->methods->soundCueCallback);
+            InitSoundCueSet((VabStreamObj *)this->soundObj, &this->soundCueSet, 1, this,
+                            this->methods->soundCueCallback);
             break;
     }
 }
@@ -760,14 +752,14 @@ void DreamSys__TickDrift(DreamSys *this) {
         this->viewport->refView.vr.y -= 600;
     }
     if (this->cueServiceActive != 0)
-        ServiceSoundCueSet(this->soundObj, &this->soundCueSet);
+        ServiceSoundCueSet((VabStreamObj *)this->soundObj, &this->soundCueSet);
 }
 
 void DreamSys__StopDrift(DreamSys *this, s32 keepCues) {
     this->driftActive = 0;
     this->cueServiceActive = keepCues;
     if (keepCues != 0)
-        FlushSoundCueSet(this->soundObj, &this->soundCueSet);
+        FlushSoundCueSet((VabStreamObj *)this->soundObj, &this->soundCueSet);
 }
 
 s32 DreamSys__GetSetMoveMode(DreamSys *this, s32 value) {
