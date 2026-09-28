@@ -1,5 +1,5 @@
-#ifndef BGLAYER_H
-#define BGLAYER_H
+#ifndef BG_LAYER_H
+#define BG_LAYER_H
 
 #include "scene_node.h"
 

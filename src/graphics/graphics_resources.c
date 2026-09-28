@@ -51,7 +51,7 @@
 #include "TriggerWorld.h"
 #include "tim_image.h"
 #include "TimArraySrc.h"
-#include "BgLayer.h"
+#include "bg_layer.h"
 #include "TileMap.h"
 #include "TileAtlas.h"
 #include "tmd_model.h"

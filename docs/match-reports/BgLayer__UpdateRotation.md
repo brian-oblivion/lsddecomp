@@ -60,7 +60,7 @@ First build. `/` and `%` of the same operands share one div (mflo then mfhi). Th
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Renamed from `BgLayer__SetRotation` for the slot it overrides: gBgLayerMethods +0x044 is SceneNode's `updateRotation` (SceneNode__UpdateRotation), and the body does what that slot does, set (flag nonzero) or add, from the same three-entry `Ratio16` {num, den} ratio table SceneNode's version reads through RatioToFixed12 (entries at +0/+4/+8). A GsBG has one rotation, so this override reads only entry [2], the z angle: the `Ratio44380` view's +0x08/+0x0A. That view is gone; the live body takes `Ratio16 *table` and reads `table[2].whole` / `table[2].frac`, `self` is `BgLayer *` (include/BgLayer.h) and +0x064 is `rotate` (GsBG.rotate; was unk64). Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BgLayer__SetRotation` for the slot it overrides: gBgLayerMethods +0x044 is SceneNode's `updateRotation` (SceneNode__UpdateRotation), and the body does what that slot does, set (flag nonzero) or add, from the same three-entry `Ratio16` {num, den} ratio table SceneNode's version reads through RatioToFixed12 (entries at +0/+4/+8). A GsBG has one rotation, so this override reads only entry [2], the z angle: the `Ratio44380` view's +0x08/+0x0A. That view is gone; the live body takes `Ratio16 *table` and reads `table[2].whole` / `table[2].frac`, `self` is `BgLayer *` (include/bg_layer.h) and +0x064 is `rotate` (GsBG.rotate; was unk64). Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Round 93 polish (charlie, track 7)
 

@@ -880,7 +880,7 @@
         "gBgLayerMethods": {
           "class": "BgLayer",
           "date": "2026-09-26",
-          "header": "include/BgLayer.h"
+          "header": "include/bg_layer.h"
         },
         "gBoxFillMethods": {
           "class": "BoxFill",

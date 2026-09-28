@@ -133,7 +133,7 @@ Renamed from Obj86B60__SetColors (tools/rename.py): the class prefix. Occupant o
 ## Track 6 (2026-09-27, round 98, delta)
 
 The local copy type `RGB8003CB68` (named for this function's address, not a
-global) is retired for `BgLayerRgb` (`include/BgLayer.h`, already included by
+global) is retired for `BgLayerRgb` (`include/bg_layer.h`, already included by
 the unit). Evidence: the copy compiles to `lb`/`sb` per byte, so the record is
 a signed 3-byte `s8` triple -- not Sony's `CVECTOR` (4 bytes, `u_char`); and
 `baseColor`, the first of the three, is what `TaskCore__OnInit`

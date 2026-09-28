@@ -21,7 +21,7 @@
  * ncellw = 20, ncellh = 15 (a 320 x 240 screen of 16 x 16 cells),
  * allocates the ncellw * ncellh u16 index table and fills it 0..n-1, and
  * takes `base` from its atlas's cells; BgLayer__Reset
- * (include/BgLayer.h) points a GsBG's map at &map and sizes the layer from
+ * (include/bg_layer.h) points a GsBG's map at &map and sizes the layer from
  * cellw * ncellw by cellh * ncellh.
  *
  * How it is used, at the one New_TileMap call site (TaskCore__TaskCore,

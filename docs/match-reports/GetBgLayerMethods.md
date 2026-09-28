@@ -34,4 +34,4 @@ void *GetBgLayerMethods(void) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/BgLayer.h`: returns `BgLayerMethods *` (`&gBgLayerMethods`, declared `extern BgLayerMethods gBgLayerMethods;` there). The local `extern s32 gBgLayerMethods[];` and `void *` prototype in graphics_resources.c are gone. Byte-identical.
+Class unified in `include/bg_layer.h`: returns `BgLayerMethods *` (`&gBgLayerMethods`, declared `extern BgLayerMethods gBgLayerMethods;` there). The local `extern s32 gBgLayerMethods[];` and `void *` prototype in graphics_resources.c are gone. Byte-identical.

@@ -41,7 +41,7 @@
 #include "basic_class.h"
 #include "scene_node.h"
 #include "GridCell.h"
-#include "BgLayer.h"
+#include "bg_layer.h"
 #include "BoxFill.h"
 #include "sprite.h"
 #include "ScreenSprite.h"

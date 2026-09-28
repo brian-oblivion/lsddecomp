@@ -90,7 +90,7 @@ Renamed from Obj86B60__TickFadeColor (tools/rename.py): the class prefix. Occupa
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-bgLayer is a `BgLayer *` (include/BgLayer.h): the `Unk78Obj` view is gone and +0x0B8 is called as `setColor(bgLayer, 1, (BgLayerRgb *)buf)`. Byte-identical.
+bgLayer is a `BgLayer *` (include/bg_layer.h): the `Unk78Obj` view is gone and +0x0B8 is called as `setColor(bgLayer, 1, (BgLayerRgb *)buf)`. Byte-identical.
 
 ## Track 7 (2026-09-27, round 98, bravo)
 

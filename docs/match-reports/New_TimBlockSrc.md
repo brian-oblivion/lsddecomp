@@ -101,7 +101,7 @@ Verbatim as it stood before the round-93 comment pass; the new banner says what 
  *
  *   - BgLayer (gBgLayerMethods): a SceneNode subclass wrapping one GsBG
  *     scrolling background layer (its own fields are GsBG's own layout;
- *     include/BgLayer.h, track 4, round 88).
+ *     include/bg_layer.h, track 4, round 88).
  *   - MoviePlayer (gMoviePlayerMethods): a BasicClass subclass driving CD-streamed,
  *     MDEC-decoded FMV playback (open a CD stream, decode/upload strips,
  *     play/stop/tick controls); called from task.c

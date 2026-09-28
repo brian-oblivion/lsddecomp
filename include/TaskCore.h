@@ -63,8 +63,8 @@
  * has; a unit that calls one past BasicClass's slots casts to its own view
  * of it. The viewport (IntermediateBase's field) is a Viewport
  * (include/Viewport.h); its callers cast to that type. bgLayer is a
- * `struct BgLayer *` (include/BgLayer.h), by tag, so a unit that calls it
- * includes BgLayer.h. tileMap likewise is a `struct TileMap *`
+ * `struct BgLayer *` (include/bg_layer.h), by tag, so a unit that calls it
+ * includes bg_layer.h. tileMap likewise is a `struct TileMap *`
  * (include/TileMap.h), and tileAtlas a `struct TileAtlas *`
  * (include/TileAtlas.h).
  */
@@ -210,7 +210,7 @@ struct TaskCoreTarget {
     /* +0x06C */ u8 pad06C[4];                                                                     \
     /* +0x070 */ const char *subHandlePath; /* setSubHandle's path; nonzero: the handle is owned */ \
     /* +0x074 */ BasicClass *subHandle; /* New_TimImage(subHandlePath), or the caller's; NULL: onInit also passes baseColor with sDefaultMovieFrame */ \
-    /* +0x078 */ struct BgLayer *bgLayer; /* New_BgLayer(tileMap, 1); include/BgLayer.h (tag only here) */ \
+    /* +0x078 */ struct BgLayer *bgLayer; /* New_BgLayer(tileMap, 1); include/bg_layer.h (tag only here) */ \
     /* +0x07C */ struct TileMap *tileMap; /* New_TileMap(0, tileAtlas); include/TileMap.h (tag only here) */ \
     /* +0x080 */ struct TileAtlas *tileAtlas; /* New_TileAtlas(0); include/TileAtlas.h (tag only here) */ \
     /* +0x084 */ s32 fadeRate;          /* setFadeRate; reset: 9 */                                \

@@ -109,7 +109,7 @@ Second build. The first build matched everything but the clamp in the `set` arm 
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Renamed from `BgLayer__SetScale` for the slot it overrides: gBgLayerMethods +0x048 is SceneNode's `updateScale` (SceneNode__UpdateScale), set or add from the same `Ratio16` {num, den} ratio table; this override reads entries [0] and [1] (x, y), which were the `Scale4441C` view's xnum/xden/ynum/yden. That view is gone: the live body takes `Ratio16 *src` and reads `src[0].whole`, `src[0].frac`, `src[1].whole`, `src[1].frac`; `self` is `BgLayer *` (include/BgLayer.h). The clamp to 30000 is this override's own, the slot name still says what it does. Byte-identical.
+Renamed from `BgLayer__SetScale` for the slot it overrides: gBgLayerMethods +0x048 is SceneNode's `updateScale` (SceneNode__UpdateScale), set or add from the same `Ratio16` {num, den} ratio table; this override reads entries [0] and [1] (x, y), which were the `Scale4441C` view's xnum/xden/ynum/yden. That view is gone: the live body takes `Ratio16 *src` and reads `src[0].whole`, `src[0].frac`, `src[1].whole`, `src[1].frac`; `self` is `BgLayer *` (include/bg_layer.h). The clamp to 30000 is this override's own, the slot name still says what it does. Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

@@ -32,4 +32,4 @@ void BgLayer__NoOp(void) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/BgLayer.h`: its own slot +0x0BC, named `slotBC` there (empty, no known caller), so the function keeps its name. Byte-identical.
+Class unified in `include/bg_layer.h`: its own slot +0x0BC, named `slotBC` there (empty, no known caller), so the function keeps its name. Byte-identical.

@@ -113,7 +113,7 @@ The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of t
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj cast is gone and +0x050 is called as `detachFromParent` (SceneNode's; returns SceneNode *, discarded, where the view said void). Byte-identical.
+bgLayer is a `BgLayer *` (include/bg_layer.h): the StreamTaskUnk78Obj cast is gone and +0x050 is called as `detachFromParent` (SceneNode's; returns SceneNode *, discarded, where the view said void). Byte-identical.
 
 ## Track 7 (2026-09-27, round 99, alpha)
 
