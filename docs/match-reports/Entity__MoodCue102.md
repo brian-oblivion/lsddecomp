@@ -156,7 +156,7 @@ elsewhere in this unit -- same symbol, not redecoded per call site.
 - `SCALE_UNIT` (`updateScale` arg, `moodTimer >= 0x790` arm): decoded
   `(1,1, 1,1, 1,1, 1,8)` -- uniform X=Y=Z=1/1, i.e. the same VALUE as the
   existing (structurally distinct, different address, 0xC-byte/3-entry)
-  `SCALE_ONE` used by `SceneNode__UpdateScale`. Not renamed to `SCALE_ONE`
+  `sSceneNodeScaleOne` used by `SceneNode__UpdateScale`. Not renamed to `sSceneNodeScaleOne`
   or a variant: two differently-addressed, differently-shaped symbols
   sharing one implied meaning is confusing, not clarifying.
 - `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` (`updateScale` arg, `moodTimer >= 0x78B` arm): decoded

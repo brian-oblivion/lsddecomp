@@ -1449,7 +1449,7 @@ SceneNode__SetLighting = 0x8001D3CC; // type:func
 SceneNode__SetLightMode = 0x8001D3F8; // type:func
 gSceneNodeMethods = 0x8006B5CC;
 sRotationZero = 0x8006B684;
-SCALE_ONE = 0x8006B690;
+sSceneNodeScaleOne = 0x8006B690;
 // libcd/bios getintr, identified: shape 0.92 vs the 3.5/3.6 bios.o getintr (masked
 // 0.00, a build no disc carries); position right after libcd/sys and before the
 // pinned CD_sync, bios.o's own order; libcd's CDROM/DiskError strings (report).
