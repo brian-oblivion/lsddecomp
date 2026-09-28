@@ -33,7 +33,7 @@ needed once it exists**: neither survives into the committed body. That
 lever's "self/prim register swap sub-residue" was the same missing-`$v0`
 artefact seen from a different angle.
 
-**Callers checked:** `SortTmdObject` in `src/TmdRenderer.c` (two call sites,
+**Callers checked:** `SortTmdObject` in `src/graphics/TmdRenderer.c` (two call sites,
 `prim = (u8 *)SubmitPolyG3(prim, ctx);`), declared there as
 `extern void *SubmitPolyG3(void *prim, void *ctx);`. The return type agrees.
 `RCpolyG3` stays declared `void` in `include/code_8220.h` and is called
@@ -118,7 +118,7 @@ if (*(s32 *)(prim + 0x78) == 0) {
     ...
 ```
 
-Applied to `src/TmdRenderer.c` in place of `INCLUDE_ASM`, full oracle:
+Applied to `src/graphics/TmdRenderer.c` in place of `INCLUDE_ASM`, full oracle:
 `build exit=2`, zero compile-error hits, **76/84 words match, NO drift
 warning**. This is a genuine, verified improvement of **28 words** — it
 closes this function's OWN self/prim-swap residue outright. The remaining
@@ -164,7 +164,7 @@ overlaps retail bytes without being a real candidate).
 No zero reached. **Not permuter-exhausted — not closed in 156329
 iterations under load (rc=124).** But this search is NOT a pure negative:
 it produced a real, oracle-verified 28-word improvement, now the standing
-best body in `src/TmdRenderer.c`'s `#if 0` block and below. The remaining
+best body in `src/graphics/TmdRenderer.c`'s `#if 0` block and below. The remaining
 residue is the family-shared one — see `SubmitPolyGT4.md`'s round 48
 entry for that residue class's own exhaustive characterization (6/6
 siblings searched this round, no fix found; treat this function's
@@ -248,7 +248,7 @@ value hoisting).
 ## ROUND 40 (alpha): Job 1 rebuild-verify, third independent reproduction — 48/84, byte-identical
 
 Re-ran the Job-1 rebuild independently of round 36 and round 39 (bravo): the
-LIVE `#if 0` body in `src/TmdRenderer.c` (round-36 symbol-corrected,
+LIVE `#if 0` body in `src/graphics/TmdRenderer.c` (round-36 symbol-corrected,
 `RCpolyG3` not `func_8001AD54`) toggled over `INCLUDE_ASM`, full oracle in
 isolation, reverted. `build exit=2`, zero compile-error/`undefined
 reference` hits.
@@ -291,7 +291,7 @@ shared position.
 
 Round 34's SDK-object conversion renamed this function's Psy-Q callee
 `func_8001AD54` -> `RCpolyG3` (a real `libgte` symbol, in
-`config/symbols.slps01556.lsdde.txt`). `src/TmdRenderer.c`'s own preserved
+`config/symbols.slps01556.lsdde.txt`). `src/graphics/TmdRenderer.c`'s own preserved
 `#if 0` snapshot was updated to the new name as part of that same commit
 (`50fd52c`), but the body was never swapped back in and rebuilt — so the
 `48/84` figure below was carried forward UNVERIFIED against the renamed
@@ -307,7 +307,7 @@ The rename did not disturb the residue in any way — it only made the
 existing figure trustworthy instead of assumed.
 
 The corrected, LINKABLE snapshot (identical to what's live in
-`src/TmdRenderer.c` right now, wrapped back in `#if 0`/`INCLUDE_ASM` per the
+`src/graphics/TmdRenderer.c` right now, wrapped back in `#if 0`/`INCLUDE_ASM` per the
 match-report convention):
 
 ```c
@@ -364,7 +364,7 @@ INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyG3);
 (`OtTag`, `PolyVtx`, `PolyUV4` and `RCpolyG3`'s prototype come from
 `include/code_8220.h`, already included by the unit.)
 
-Unit: `src/TmdRenderer.c`. Third sibling of `SubmitPolyF3`/`SubmitPolyF4`
+Unit: `src/graphics/TmdRenderer.c`. Third sibling of `SubmitPolyF3`/`SubmitPolyF4`
 (this unit, both stalled) — same `prim->0x78`-gated OT-splice-or-calls
 shape, this time with MORE post-call work: after
 `FillDivPolygonHeader`(gp_rel-blocked)/`FillRVectors3` (matched), it copies a byte
@@ -648,7 +648,7 @@ residue, not a second hidden instance of the ADDIU/ORI blind spot.
 ## Naming (round 77, alpha)
 
 `func_8001989C` -> `SubmitPolyG3`, parameters (`arg0`, `arg1`) -> (`prim`, `ctx`). **Tier
-A.** TmdRenderer's own comment (`src/TmdRenderer.c`, the "eight submit
+A.** TmdRenderer's own comment (`src/graphics/TmdRenderer.c`, the "eight submit
 wrappers" block) already names this whole family collectively: each is a
 tail call to Sony's `RCpolyG3` (unrenamed, RCpoly* polygon-subdivision
 family, `libgte`) or a direct OT splice, matching every sibling's shape.

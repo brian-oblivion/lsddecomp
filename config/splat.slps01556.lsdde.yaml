@@ -397,7 +397,7 @@ segments:
       # ONE OUTLIER TO KNOW ABOUT: func_80018464 is 954 words, by far the
       # largest function in any carved unit. It is not blocked, but it is
       # not cold-runner ground either -- budget it separately.
-      - [0x8A88, c, TmdRenderer]
+      - [0x8A88, c, graphics/TmdRenderer]
       # code_8220_c: third and FINAL slice of the code_8220 block,
       # 0x9F74..0xAD64 (the next segment is psyq_rcpolyf3), 16 functions.
       # Carved round 13. Gate 2 checks, all run before the carve and all

@@ -29,7 +29,7 @@ Plain global-pointer setter, same shape as `func_8003FB0C`:
 naming rule: "a pure leaf whose mechanics ARE its purpose ... is tier A by
 definition"). `GsOUT_PACKET_P` is the target -- Sony's own name, recovered by
 `tools/rename.py` when it refused a game name for it (pinned in
-`config/psyq-objects.ld`) -- and `SortTmdObject` (`src/TmdRenderer.c`)
+`config/psyq-objects.ld`) -- and `SortTmdObject` (`src/graphics/TmdRenderer.c`)
 confirms the mechanics from the reader side: its own comment calls this same
 global "the packet-buffer write cursor, reloaded ... at the top of every
 group and advanced by each submit wrapper's return value"

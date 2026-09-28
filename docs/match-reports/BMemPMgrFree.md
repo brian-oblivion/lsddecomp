@@ -37,7 +37,7 @@ they were tested separately before either was trusted:**
 1. Retyping the shared `extern void SetBMemPMgrBusy(s32 val);` declaration in
    this file's copy to `extern volatile unsigned long long SetBMemPMgrBusy(s32
    val);` — a fabricated, incompatible prototype against the function's real
-   definition (`void SetBMemPMgrBusy(s32 val)` in `src/TmdRenderer.c`). This
+   definition (`void SetBMemPMgrBusy(s32 val)` in `src/graphics/TmdRenderer.c`). This
    is exactly the class of scorer exploitation this round's instructions say
    to reject, so it was **not adopted and not even needed** — see below.
 2. In the second (coalesce-with-next) free-list unlink block, replacing

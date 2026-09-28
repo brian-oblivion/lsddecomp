@@ -4,7 +4,7 @@
 #include "common.h"
 
 /* The BMemPMgr pool allocator, src/app/BMemPMgr.c (its busy-flag accessors are
- * in src/TmdRenderer.c). BasicClass, whose child and parent lists are
+ * in src/graphics/TmdRenderer.c). BasicClass, whose child and parent lists are
  * allocated from the pool, is include/BasicClass.h; both files that include
  * this header use it. */
 #include "BasicClass.h"

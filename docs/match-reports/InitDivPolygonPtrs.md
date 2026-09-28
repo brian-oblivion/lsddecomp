@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001A224` on 2026-09-24 (tools/rename.py). Address 0x8001a224.
 
-Unit: `src/TmdRenderer.c`. Immediately precedes `FlagLargePolyForDivide` in ROM
+Unit: `src/graphics/TmdRenderer.c`. Immediately precedes `FlagLargePolyForDivide` in ROM
 order — likely a helper it calls, though `FlagLargePolyForDivide` itself is not yet
 matched (queued next). `kind` is the same "primitive kind" code seen
 already in `TmdRenderer` (`ProjectTriFace`/`ProjectQuadFace` pass `3`

@@ -2,7 +2,7 @@
 
 > Renamed from `func_800183DC` on 2026-09-17 (tools/rename.py). Address 0x800183dc.
 
-Unit: `src/TmdRenderer.c`. `void ReleaseBasicClassArray(BasicClass **array, s32 count)`
+Unit: `src/graphics/TmdRenderer.c`. `void ReleaseBasicClassArray(BasicClass **array, s32 count)`
 — releases every element of a `BasicClass*` array (calling each element's
 vtable slot `+0x004`, `release`, and storing the result back into the slot)
 and advances a pointer walk over `count` elements.

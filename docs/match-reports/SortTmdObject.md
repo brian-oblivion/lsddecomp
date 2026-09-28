@@ -4,7 +4,7 @@
 
 REVISITED, round 76: MATCHED 954/954, whole image OK, 0 permuter iterations (about 45 cc1/whole-image builds); names/types not relevant
 
-The plain C is live in `src/TmdRenderer.c` (no `#ifdef`, no `INCLUDE_ASM`).
+The plain C is live in `src/graphics/TmdRenderer.c` (no `#ifdef`, no `INCLUDE_ASM`).
 `./build-and-verify.sh` says `OK: build matches retail SLPS_015.56`, and
 `tools/check-nonmatching.sh` is green.
 
@@ -1290,7 +1290,7 @@ against the current tree (with the `gte_llir`/`gte_ncds`/`gte_dpcs`/`gte_dpct`
 macros added to `include/gte.h` this round) and needs the forward
 declarations included below (they are NOT installed in the tree — only the
 `include/gte.h` macro additions are committed this round). Building on this
-means placing it back as the body of `SortTmdObject` in `src/TmdRenderer.c`,
+means placing it back as the body of `SortTmdObject` in `src/graphics/TmdRenderer.c`,
 in the same ROM-order position, and continuing from "one extra saved
 register" above.
 
@@ -1964,7 +1964,7 @@ file, which is out of this round's scope.
 ## Naming (round 51, bravo) — NAME DELIBERATELY NOT CHANGED, and one of the two reasons is a head decision
 
 The track-3 naming pass renamed all 19 other definitions in
-`src/TmdRenderer.c`. This one kept `SortTmdObject`. Two reasons, in order
+`src/graphics/TmdRenderer.c`. This one kept `SortTmdObject`. Two reasons, in order
 of weight.
 
 ### 1. Its only caller sits in an SDK segment, and that is a head call

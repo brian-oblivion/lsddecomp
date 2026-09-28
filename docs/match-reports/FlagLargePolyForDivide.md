@@ -66,7 +66,7 @@ NON_MATCHING body promoted, round 65.
 ## ROUND 65 (charlie): NON_MATCHING body promoted
 
 Track 1b mechanical promotion. This function had no standing `#if 0` block
-in `src/TmdRenderer.c` (noted in rounds 39/44 — it was only ever flipped in
+in `src/graphics/TmdRenderer.c` (noted in rounds 39/44 — it was only ever flipped in
 live temporarily for reproduction). Took the "Best body reached (53/70
 words)" snapshot below verbatim and placed it, wrapped in
 `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif`, in the unit at its
@@ -144,7 +144,7 @@ before spending the 900s on it.
 
 Inserted this report's own "Best body reached" snapshot live (over
 `INCLUDE_ASM`, since this function has no standing `#if 0` block in
-`src/TmdRenderer.c`), ran the full oracle in isolation, reverted: `build
+`src/graphics/TmdRenderer.c`), ran the full oracle in isolation, reverted: `build
 exit=2`, zero compile-error hits, **53/70 words, identical diff to every
 prior round** (first diff word 16, `retail=22004010 built=2b10c500`).
 `git status --porcelain` empty after revert. (`funcdiff.py` printed its
@@ -163,7 +163,7 @@ this round at their recorded figures (see `SubmitPolyF3.md` and siblings).
 
 Rebuilt this function's preserved body (the report's own "Best body reached"
 snapshot, inserted live over `INCLUDE_ASM` since this function has no
-standing `#if 0` block in `src/TmdRenderer.c` — it was never left live
+standing `#if 0` block in `src/graphics/TmdRenderer.c` — it was never left live
 there) and ran the full oracle in isolation: `build exit=2`, zero
 compile-error/`undefined reference` hits.
 
@@ -229,7 +229,7 @@ adjustment itself (moved into a branch's delay slot), not a register
 identity choice and not a missing/misordered pair of VALUE computations —
 see "Residue" below, unchanged this round. No new attempt made.
 
-Unit: `src/TmdRenderer.c`. `void FlagLargePolyForDivide(void *arg0, s32 count)` —
+Unit: `src/graphics/TmdRenderer.c`. `void FlagLargePolyForDivide(void *arg0, s32 count)` —
 computes `arg0`'s 2D bounding box over `count` vertices: seeds min/max
 (fields `+0x70`/`+0x72`/`+0x74`/`+0x76`, X/Y min/max as `s16`) from a
 2-`s16` value at `+0x60`, walks `count` vertices starting at `+0x64`
@@ -393,7 +393,7 @@ identical diff both times) across the two search runs, reproducible, not a
 fluke on the permuter's own metric.
 
 **Oracle-verified, and it is FALSE.** Swapped the rewritten `end` expression
-into `src/TmdRenderer.c` in place of the preserved body, ran the real
+into `src/graphics/TmdRenderer.c` in place of the preserved body, ran the real
 oracle: `build-and-verify.sh` reports `build exit=2` (the whole-image
 verification step fails -- SHA1 does not match), and `funcdiff.py
 FlagLargePolyForDivide` reports **52/70**, one word WORSE than this report's

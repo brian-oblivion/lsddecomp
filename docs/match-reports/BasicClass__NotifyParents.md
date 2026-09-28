@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_182cc` on 2026-09-17 (tools/rename.py). Address 0x800182cc.
 
-Unit: `src/TmdRenderer.c`. This is `BasicClassMethods` vtable slot `+0x030`,
+Unit: `src/graphics/TmdRenderer.c`. This is `BasicClassMethods` vtable slot `+0x030`,
 `notifyParents(self, s32 flag)` (already documented in
 `include/code_8220.h`'s struct comment). Walks `self->parentRefs` and, for
 each parent, calls that parent's own `slot38` (`BasicClass__OnNotify`,
