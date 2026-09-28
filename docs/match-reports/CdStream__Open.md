@@ -92,7 +92,7 @@ Renamed from CdStreamObj__Open (tools/rename.py), the class rename only.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_8008A954` | `sCdStreamVersionSuffix` | A | sdata `.asciz ";1"`, strcat'd after the name to make the ISO9660 path CdSearchFile looks up; same role as `sCdFileVersionSuffix` (CdDriver.c), a separate copy |
+| `D_8008A954` | `sCdStreamVersionSuffix` | A | sdata `.asciz ";1"`, strcat'd after the name to make the ISO9660 path CdSearchFile looks up; same role as `sCdFileVersionSuffix` (cd_driver.c), a separate copy |
 | `D_8008A94C` | `sCdStreamAudioMixSet` | B | written only here, with SetupCdStreamAudio's return (always 1) after the SPU CD mix is set; read nowhere in the executable (only reference in asm/ is its sdata definition) |
 
 Constants: the path buffer is `CDSTREAM_PATH_SIZE` (32, unit-local; the CD
@@ -102,4 +102,4 @@ because CdStream.h spells Sony's CdlFILE as its own `CdStreamFile`
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-CdStream.h's own `CdStreamFile` is gone: `CdStream::file` is Sony's `CdlFILE` (CdStream.h includes <libcd.h>; every unit that sees the header builds with it), and the seek slot takes `CdlLOC *`. CdSearchFile no longer needs a cast; CdControl/CdControlF take the location as `u_char *`, Sony's parameter type, as in CdDriver.c. Byte-identical.
+CdStream.h's own `CdStreamFile` is gone: `CdStream::file` is Sony's `CdlFILE` (CdStream.h includes <libcd.h>; every unit that sees the header builds with it), and the seek slot takes `CdlLOC *`. CdSearchFile no longer needs a cast; CdControl/CdControlF take the location as `u_char *`, Sony's parameter type, as in cd_driver.c. Byte-identical.

@@ -55,7 +55,7 @@ purpose from a body that's just `return 0;`.
 ### Round 98 (charlie, track 7): `func_8002C478` -> `GetNullDriverUseVSyncCallback`, tier A
 
 The objection above ("its own counterpart is still unnamed") no longer
-holds: the counterpart is `GetCdUseVSyncCallback` (CdDriver.c, returns
+holds: the counterpart is `GetCdUseVSyncCallback` (cd_driver.c, returns
 `sCdUseVSyncCallback`), and the one caller, GameApplicationFileResource.c's
 `GetActiveDataSourceUseVSyncCallback`, calls it when `sActiveDataSource` is
 DATASOURCE_CD and this function otherwise. This is the VAB driver's answer

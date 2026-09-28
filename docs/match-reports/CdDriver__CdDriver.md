@@ -51,7 +51,7 @@ Round 79 (delta).
   (`unk28 = 0`), then `InitCdDrive()` (CdDriver: one-shot
   `CdSetDebug(0)` + set double-speed mode). `New_CdDriver` dispatches it.
 - The two externs' notes that `GetCdDriverMethods` and `InitCdDrive` are
-  "still INCLUDE_ASM" were stale (both are matched C in CdDriver.c) and
+  "still INCLUDE_ASM" were stale (both are matched C in cd_driver.c) and
   are corrected in the unit.
 - `unk28` (+0x28, s16) is kept: cleared here and by FileResource's own ctor,
   read nowhere in this unit, so nothing establishes a meaning.
@@ -59,12 +59,12 @@ Round 79 (delta).
   (it IS gFileResourceMethods seen down to +0x008).
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Class6D4E8` -> `CdDriver__CdDriver` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/cd_driver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Class6D4E8` -> `CdDriver__CdDriver` by rename.py.
 
 Track 7, round 101 (charlie). The `unk28` bullet above is out of date: the
 field at +0x028 is FileResource's `inQueueDispatch` (u16), which
 CdDriver__RunRequestQueue sets around its dispatch back into a request method
-(CdDriver.c), and the ctor's store is `self->inQueueDispatch = 0`. No
+(cd_driver.c), and the ctor's store is `self->inQueueDispatch = 0`. No
 source change for this function in round 101 beyond the unit banner.
 
 ## History (moved from include/CdDriver.h, round 102)

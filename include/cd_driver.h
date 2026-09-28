@@ -1,5 +1,5 @@
-#ifndef CDDRIVER_H
-#define CDDRIVER_H
+#ifndef CD_DRIVER_H
+#define CD_DRIVER_H
 
 #include "FileResource.h"
 
@@ -9,7 +9,7 @@
  * (gNullDriverMethods, 0x23) sibling; and, below the class, the request
  * queue, the file table and the module state its units share.
  *
- *   src/cd/CdDriver.c      the whole class, in five parts:
+ *   src/cd/cd_driver.c      the whole class, in five parts:
  *                       1. New_CdDriver, the ctor (FileResource's ctor, then
  *                       InitCdDrive), Finalize, NoOpSlot40
  *                       2. Open, Close, Seek, NoOpSlot50, Read, LoadFile,
@@ -111,7 +111,7 @@ typedef struct CdRequestNode {
 #define CD_OP_READ 5
 #define CD_OP_LOAD_FILE 7
 
-/* sCdTickStep: which of CdDriver.c's two state machines ServiceCdDriver
+/* sCdTickStep: which of cd_driver.c's two state machines ServiceCdDriver
  * ticks. */
 #define CD_TICK_NONE 0          /* neither: ResetCdStateMachine's value */
 #define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
@@ -120,7 +120,7 @@ typedef struct CdRequestNode {
 /* sCdOperation: which method's request the state machine is running,
  * StartCdOperation's first argument and GetCdOperation's (and so
  * GetActiveDataSourceOperation's) result. Each value is passed by exactly one
- * of CdDriver.c's methods. 0 is also what ResetCdStateMachine leaves
+ * of cd_driver.c's methods. 0 is also what ResetCdStateMachine leaves
  * when nothing runs: Close resets straight after starting. */
 #define CD_OPERATION_CLOSE 0
 #define CD_OPERATION_OPEN 1
@@ -129,7 +129,7 @@ typedef struct CdRequestNode {
 #define CD_OPERATION_LOAD_FILE 4
 
 /* sCdState: the state machines' phase, StartCdOperation's second argument
- * (the state machines, CdDriver.c part 4). */
+ * (the state machines, cd_driver.c part 4). */
 #define CD_STATE_IDLE 0        /* ResetCdStateMachine's value */
 #define CD_STATE_SETLOC 1      /* issue CdControl(CdlSetloc) */
 #define CD_STATE_SETLOC_WAIT 2 /* poll CdSync for it */
@@ -150,7 +150,7 @@ typedef struct CdRequestNode {
  * "File not found" and give up (OpenCdFile, ResolveFileEntries). */
 #define CD_SEARCH_ATTEMPTS 101
 
-/* The driver's free functions, in CdDriver.c's order. */
+/* The driver's free functions, in cd_driver.c's order. */
 
 /* The drive and its state, as GameApplicationFileResource.c's data-source
  * wrappers read it. */
@@ -202,4 +202,4 @@ extern s32 GetCdFileSize(CdDriver *self);
 extern s32 ReadCdFile(CdDriver *self, void *buf, s32 size);
 extern s32 GetCdUseVSyncCallback(void);
 
-#endif /* CDDRIVER_H */
+#endif /* CD_DRIVER_H */

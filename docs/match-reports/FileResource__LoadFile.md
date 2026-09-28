@@ -160,14 +160,14 @@ at the base-class level is not (the subclass provides that via the hooks).
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/cd/CdDriver.c:143`
+mis-hit had to be resolved by receiver type: `src/cd/cd_driver.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
-`FileResource` (`include/GameApplicationFileResource.h`) is included by `src/cd/CdDriver.c`
-and `src/cd/CdDriver.c` too, and `code_179d8_h.c`'s `FileResource__InstallCdReadDriver`
+`FileResource` (`include/GameApplicationFileResource.h`) is included by `src/cd/cd_driver.c`
+and `src/cd/cd_driver.c` too, and `code_179d8_h.c`'s `FileResource__InstallCdReadDriver`
 genuinely reads/writes `self->unk0C` on this exact type (not a same-named
 field on a different struct), so per track 3's ownership rule these are
 PROPOSED, not renamed:
@@ -185,7 +185,7 @@ per FINISHING-PLAN track 3's merge procedure).
 
 `FileResourceMethods`'s slots this function dispatches through are
 null at `gFileResourceMethods`'s own level (subclass-provided), and the same
-cross-unit exposure applies (`CdDriver.c` types objects against this
+cross-unit exposure applies (`cd_driver.c` types objects against this
 table too). Proposed, not renamed:
 
 | slot | proposed name | tier | evidence |
@@ -202,7 +202,7 @@ broadcast.
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/cd/CdDriver.c`'s `(void)` declaration stays.
+**Verdict: arity-ok idiom.** `src/cd/cd_driver.c`'s `(void)` declaration stays.
 
 **Callee evidence** (`0x80026B08`, and the matched definition in
 `src/app/GameApplicationFileResource.c`): the body reads BOTH argument registers before writing
@@ -229,4 +229,4 @@ register allocation, which is precisely why the declaration must not be
 "corrected" to two parameters and the call site must not grow arguments.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/cd/CdDriver.c:273`. Oracle green.
+added to `src/cd/cd_driver.c:273`. Oracle green.

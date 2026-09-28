@@ -39,13 +39,13 @@ Closed on the first attempt.
 
 **Tier A.** Sibling of `FindCdFileEntry` over the same table, returning the
 matching record's index (`-1` if none), consumed as `fileIndex` by
-CdDriver.c's `EnqueueCdRequest` and as `func_800284C4`'s own
+cd_driver.c's `EnqueueCdRequest` and as `func_800284C4`'s own
 pre-existing comment there put it: "CdDriver: name -> table index".
 
 ## Track 4b (2026-09-25, round 85)
 
 The CD driver's shared globals and records are now declared once, in
-`include/CdDriver.h`, and this body uses that one reading: the walk is `CdFileEntry *cur; cur++` over `cur->name` (was `char *` stepped by 0x1C). The
+`include/cd_driver.h`, and this body uses that one reading: the walk is `CdFileEntry *cur; cur++` over `cur->name` (was `char *` stepped by 0x1C). The
 global's type comes from its accessors (`sFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.

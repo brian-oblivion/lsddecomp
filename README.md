@@ -178,7 +178,7 @@ Read each named class's header first; its banner points to the units.
   list (`src/ui/TextEntryItemList.c` and `src/world/ObjMStyleActor.c`).
 - **CD and data sources.** `FileResource` is the base of every class loaded
   from a file; its file interface is bound at run time to the active driver: `CdDriver`
-  (`src/cd/CdDriver.c`: blocking file access, the CD request queue, its state
+  (`src/cd/cd_driver.c`: blocking file access, the CD request queue, its state
   machines and the file table)
   or `VabDriver`. `TimImage` (`src/graphics/TimImage.c`), `TimArraySrc`, `TimBlockSrc`, `TileMap` and
   `TileAtlas` load and build textures.

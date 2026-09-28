@@ -1,5 +1,5 @@
 /*
- * CdDriver.c -- the CD driver (class CdDriver, include/CdDriver.h). Five
+ * cd_driver.c -- the CD driver (class CdDriver, include/cd_driver.h). Five
  * parts, in ROM order:
  *   1. the lifecycle: the allocator, the constructor, the finalizer and the
  *      empty slot +0x040;
@@ -41,7 +41,7 @@
  */
 #include "common.h"
 #include <libcd.h>
-#include "CdDriver.h"
+#include "cd_driver.h"
 #include <libetc.h>
 #include "DrawSystem.h"
 #include <strings.h>
@@ -406,7 +406,7 @@ void CdDriver__RunRequestQueue(void) {
  * per-request (requestLoadFile, stopService, cancelRequests), the queue's
  * front end, the driver mode, the file table and the service tick. The
  * class, the queue's types and the shared module state are
- * include/CdDriver.h's; the constructor is in part 1, the other
+ * include/cd_driver.h's; the constructor is in part 1, the other
  * request methods in part 2, the state machines and the queue's nodes in
  * part 4, the blocking file calls in part 5.
  *
@@ -724,7 +724,7 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
 /*
  * The CD driver's read state machine, its request-queue nodes and its
  * file-table lookups (the class, the queue and the table are
- * include/CdDriver.h's).
+ * include/cd_driver.h's).
  *
  * The state machine takes one step each time ServiceCdDriver
  * (part 3, a VSync callback) runs: it calls TickCdStateMachine or
@@ -1009,7 +1009,7 @@ void SetCdState(s32 state) {
  * OpenCdFile, CloseCdFile, GetCdFileSize and ReadCdFile are what CdDriver's
  * open, close, seek and read slots (part 2) call when the driver is
  * not in async mode. Like those slots they run on whichever FileResource
- * object called them (CdDriver.h's banner) and use only its isOpen, pos and
+ * object called them (cd_driver.h's banner) and use only its isOpen, pos and
  * size. OpenCdFile looks the name up with CdSearchFile under the path
  * BuildCdFilePath makes ("\\<data directory><name>;1") and records where
  * the file starts and how long it is; ReadCdFile seeks to that start and

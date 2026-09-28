@@ -59,7 +59,7 @@ Pure leaf, mechanics are its purpose.
 ## Proposed type names
 
 Not renamed (types aren't `rename.py` symbols, and `FileResource`/
-`FileResourceMethods` are used by `CdDriver.c` too -- same
+`FileResourceMethods` are used by `cd_driver.c` too -- same
 cross-unit exposure as the fields below), but proposed for the head to
 apply as a whole-tree replace, since a `ClassNNNN__Method` function prefix
 (this round gave the class's own functions `FileResource__` names) reading
@@ -91,7 +91,7 @@ No argument register is read. The definition is
 `void *GetFileResourceMethods(void)`.
 
 **The extra argument is not byte-load-bearing.** `CdDriver__CdDriver`
-(src/cd/CdDriver.c) calls it as `GetFileResourceMethods(self)->ctor(self)`:
+(src/cd/cd_driver.c) calls it as `GetFileResourceMethods(self)->ctor(self)`:
 
 ```
 80027234:  jal   80026c9c <GetFileResourceMethods>
@@ -102,7 +102,7 @@ No argument register is read. The definition is
 `$a0` still holds `CdDriver__CdDriver`'s incoming `self` at the `jal` either way, so
 the declaration's parameter list is free and must agree with the definition.
 
-**Declaration site changed:** `src/cd/CdDriver.c:99` —
+**Declaration site changed:** `src/cd/cd_driver.c:99` —
 `extern BaseCtorTable6D4E8 *GetFileResourceMethods(void *self);` ->
 `extern BaseCtorTable6D4E8 *GetFileResourceMethods();`. Return type untouched
 (this unit's own local view of the table, used for `->ctor` at +0x008); the

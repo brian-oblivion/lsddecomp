@@ -172,9 +172,9 @@ arm and both compiled to the same (wrong) encoding; hoisting it above the
 
 **Tier B.** The state machine's other tick function, selected by
 `ServiceCdDriver` when `sCdTickStep == 2`. Grepping every `sCdTickStep = 2`
-assignment in CdDriver.c finds exactly one: `CdDriver__LoadFile`, which
+assignment in cd_driver.c finds exactly one: `CdDriver__LoadFile`, which
 `docs/match-reports` for the class's method table (`GetCdDriverMethods`'s
-own comment, CdDriver.c) identifies via `tools/classtable.py` as the
+own comment, cd_driver.c) identifies via `tools/classtable.py` as the
 `loadFile` slot (+0x58) of class `D_6D4E8` -- i.e. the
 `CdDriver__RequestLoadFile` worker. The two mechanical differences from
 `TickCdStateMachine` both make sense for that one operation: on the

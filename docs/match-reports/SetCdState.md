@@ -29,5 +29,5 @@ Closed on the first attempt.
 **Tier A.** Sets `sCdState` to a new phase and clears `sCdTimeoutCounter` --
 the shared "advance to phase N" primitive both tick functions route every
 transition through (`goto L_set; ... SetCdState(newstate);`). Named to
-parallel `GetCdState` (CdDriver.c's already-established accessor for
+parallel `GetCdState` (cd_driver.c's already-established accessor for
 the same global).

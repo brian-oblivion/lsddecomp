@@ -49,7 +49,7 @@ Note for track 4: the symbol is still declared `s32` here and `char *` in
 ## Track 4b (2026-09-25, round 85)
 
 The CD driver's shared globals and records are now declared once, in
-`include/CdDriver.h`, and this body uses that one reading: the parameter is `CdFileEntry *` (was `s32`). The
+`include/cd_driver.h`, and this body uses that one reading: the parameter is `CdFileEntry *` (was `s32`). The
 global's type comes from its accessors (`sFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.

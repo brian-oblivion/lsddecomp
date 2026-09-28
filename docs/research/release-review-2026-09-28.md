@@ -54,7 +54,7 @@ rather than API.
   `void **` spellings); `GetActiveDataSourceMethods` local in 4 files;
   `GetSetBitField` duplicated (Sprite.c:41, Task.h:36 vs scene_node.h:216);
   `ApplyMatrixToLVArray` extern at ViewportDraw.c:62 though scene_node.h is
-  included; `sHitHeightGate` declared twice in scene_node.c. CdDriver.c
+  included; `sHitHeightGate` declared twice in scene_node.c. cd_driver.c
   re-declares its own functions two or three times (55/60/794/795, 58/463/907,
   ...): keep one forward block.
 - **Sony names re-declared.** `ResetGraph` (Task.h:40), `rand`, `strlen`,
@@ -237,7 +237,7 @@ reads them, so nothing names them).
 - Stale names inside header prose: StageMap.h's `buildRateEntries`
   (`loadChunksAround`), `ChunkSlotSpec::key`, `LbdFile::ownerKey`; entity.h's
   merged-unit names ("(Entity, then Entity)"); IntermediateBase.h's
-  `args->unk0..unkC`; NullDriver.h and Task.h name one file twice; CdDriver.h
+  `args->unk0..unkC`; NullDriver.h and Task.h name one file twice; cd_driver.h
   "that unit still spells them as literals"; basic_class.h "all 59 method
   tables" (60).
 - Unit-private headers (DayTaskStageMap.h, GameApplicationFileResource.h,

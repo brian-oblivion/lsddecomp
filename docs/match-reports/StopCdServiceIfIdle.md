@@ -2,7 +2,7 @@
 
 > Renamed from `func_80028218` on 2026-09-17 (tools/rename.py). Address 0x80028218.
 
-Round 45, runner echo (second sitting), `src/cd/CdDriver.c`.
+Round 45, runner echo (second sitting), `src/cd/cd_driver.c`.
 
 ## Result
 
@@ -74,6 +74,6 @@ that unit's reset, so it belongs to whichever unit's naming pass takes
 
 ## Track 7 (round 101, echo): comments moved here, and names
 
-`sCdTickStep == 0` is spelled `CD_TICK_NONE`, added to include/CdDriver.h
+`sCdTickStep == 0` is spelled `CD_TICK_NONE`, added to include/cd_driver.h
 next to CD_TICK_STATE_MACHINE / CD_TICK_LOAD_FILE: no state machine is
 ticking (ResetCdStateMachine's value).

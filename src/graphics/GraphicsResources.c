@@ -61,7 +61,7 @@
 #include "MoviePlayer.h"
 #include "bmem_pmgr.h"
 #include "GameApplicationFileResource.h"
-#include "CdDriver.h"
+#include "cd_driver.h"
 
 extern MoviePlayer *sActiveMoviePlayer; /* the playing movie, or NULL (play sets it, pollActive clears it) */
 extern s32 sMdecInitialized;            /* set by the first ctor, which DecDCTReset(0)s the MDEC */

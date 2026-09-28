@@ -4,7 +4,7 @@
 /*
  * The getters over the game's table of file names, src/cd/GameFiles.c (the
  * LbdFile class it also holds is include/LbdFile.h). A record is one
- * sRecordTable entry, a CdFileEntry (include/CdDriver.h) whose name is a
+ * sRecordTable entry, a CdFileEntry (include/cd_driver.h) whose name is a
  * zero-padded path: RegisterRecordTableFiles hands the table to the CD
  * driver as its file table, which fills in each entry's position and size.
  * The file's banner lists the table's layout. The movie getters also write a movie id through movieIdOut, which
@@ -12,7 +12,7 @@
  */
 
 #include "common.h"
-#include "CdDriver.h"
+#include "cd_driver.h"
 
 /* Each special day's six records, of which a CinematicCall's entry picks
  * one: FILM\SPDAYnnA/B.STR (its two movies), then IMG1\SPDAYnnC..F.TIM.

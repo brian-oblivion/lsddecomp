@@ -51,7 +51,7 @@ buffer (re)alloc"), and `self->size` falls inside that struct's
 Extending the shared header would require splitting that padding without
 shifting anything after it, which is mechanically safe -- but
 `GameApplicationFileResource.h` is OUT OF UNIT (shared with `GameApplicationFileResource.c` and
-`CdDriver.c`, neither this unit) and the rule is explicit that nothing
+`cd_driver.c`, neither this unit) and the rule is explicit that nothing
 outside the assigned unit + its reports gets edited. Kept as this unit's own
 narrower local reading instead, per the project's multiple-independent-
 local-views convention. Worth flagging for the head: if this coincidence
@@ -107,7 +107,7 @@ reasoning.
 
 ## Naming (round 64, runner alpha)
 
-- `func_80028A50` -> `GetCdFileSize`, tier B. `src/cd/CdDriver.c`'s
+- `func_80028A50` -> `GetCdFileSize`, tier B. `src/cd/cd_driver.c`'s
   `CdDriver__Seek` calls this function directly (ignoring its own `arg1`,
   `arg2`) when CD-async mode is off; its async path, when asked to just
   query size (`arg2 != 0`), does the IDENTICAL `self->unk1C` rounding as a
@@ -115,7 +115,7 @@ reasoning.
   `CloseCdFile`/`ReadCdFile` (also this unit) as an Open/Close/Size/Read
   quad.
 - `ObjA34_179D8H::unk0C` -> `isOpen`, `unk1C` -> `size` (tier B, both).
-  Evidence is cross-unit: `src/cd/CdDriver.c`'s `Obj80027480` is an
+  Evidence is cross-unit: `src/cd/cd_driver.c`'s `Obj80027480` is an
   independent local view of what is very likely the SAME object (see the
   coincidence note above and `CloseCdFile.md`), and its own
   `CdDriver__Open`/`CdDriver__Close`/`CdDriver__Seek` async bodies set/clear
@@ -136,7 +136,7 @@ reasoning.
 
 ## Naming (round 99, echo, track 7)
 
-`>> 11`/`<< 11` -> `CD_SECTOR_SHIFT` (`include/CdDriver.h`, 2048-byte
+`>> 11`/`<< 11` -> `CD_SECTOR_SHIFT` (`include/cd_driver.h`, 2048-byte
 sectors). The result is always one sector more than the whole sectors in
 `size`, even when `size` is already a multiple of 2048; `CdDriver__Seek`'s
 async path rounds up only when `size & 0x7FF` is nonzero. The source says so

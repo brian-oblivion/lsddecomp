@@ -16,7 +16,7 @@
 #include <libspu.h>
 #include "basic_class.h"
 #include "CdStream.h"
-#include "CdDriver.h" /* CD_SECTOR_SHIFT */
+#include "cd_driver.h" /* CD_SECTOR_SHIFT */
 #include "bmem_pmgr.h"
 #include <strings.h>
 #include "GameApplicationFileResource.h"

@@ -67,7 +67,7 @@ typedef struct FileResourceMethods FileResourceMethods;
     /* +0x010 */ void *buffer;        /* LoadFile's allocation, NULL when none */                  \
     /* +0x014 */ s32 bufferSize;                                                                   \
     /* +0x018 */ CdlLOC pos;      /* the open file's disc position: the CD driver's Open sets it, */ \
-    /* +0x01C */ u32 size;         /* its byte size; Seek and ReadCdFile seek from pos (CdDriver.h) */ \
+    /* +0x01C */ u32 size;         /* its byte size; Seek and ReadCdFile seek from pos (cd_driver.h) */ \
     /* +0x020 */ u16 freeGuard;       /* nonzero: FreeBuffer keeps the buffer */                   \
     /* +0x022 */ u16 pendingRequests;                                                              \
     /* +0x024 */ s32 flags;           /* bit 0 set by SetFlag */                                   \
@@ -111,7 +111,7 @@ void FileResource__FileResource(FileResource *self);
 void FileResource__Finalize(FileResource *self);
 void FileResource__LoadFile(FileResource *self, char *name);
 void FileResource__FreeBuffer(FileResource *self);
-/* Bits CdDriver__RunRequestQueue (CdDriver.c) ORs into a client's
+/* Bits CdDriver__RunRequestQueue (cd_driver.c) ORs into a client's
  * `flags` when one of its requests completes; the clients poll them. Bit 0 (1) is left a literal: it is also FileResource__OnRequestDone's bit,
  * and the queue node field that sets it (`unk4`) has no established meaning. */
 #define CD_FLAG_DONE 0x002         /* some request completed */

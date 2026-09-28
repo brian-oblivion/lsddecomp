@@ -54,14 +54,14 @@ this unit.
 table, `strstr`-matching `name` against each 0x1C-byte record; returns the
 matching record pointer or `NULL`. Distinguished from `GetCdFileEntry`
 (direct index-to-pointer, no search) by the Find/Get convention. Caller
-`CdDriver__LoadFile` (CdDriver.c, the `CdDriver__RequestLoadFile` worker)
+`CdDriver__LoadFile` (cd_driver.c, the `CdDriver__RequestLoadFile` worker)
 uses the returned record's `pos`/`size` fields to seek to and size the read,
 confirming "find the file's table entry by name" as the purpose.
 
 ## Track 4b (2026-09-25, round 85)
 
 The CD driver's shared globals and records are now declared once, in
-`include/CdDriver.h`, and this body uses that one reading: the walk is `CdFileEntry *cur; cur++` over `cur->name` (was `char *` stepped by 0x1C). The
+`include/cd_driver.h`, and this body uses that one reading: the walk is `CdFileEntry *cur; cur++` over `cur->name` (was `char *` stepped by 0x1C). The
 global's type comes from its accessors (`sFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.

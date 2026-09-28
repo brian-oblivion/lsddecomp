@@ -1,5 +1,5 @@
-CdDriver: warning: `unassigned' might be used uninitialized in this function
-CdDriver: warning: unused variable `scratch'
+cd_driver: warning: `unassigned' might be used uninitialized in this function
+cd_driver: warning: unused variable `scratch'
 DayTaskStageMap: warning: `junk' might be used uninitialized in this function
 DayTaskStageMap: warning: `lateral' might be used uninitialized in this function
 DayTaskStageMap: warning: `shiftCol' might be used uninitialized in this function

@@ -103,5 +103,5 @@ added to `src/app/GameApplicationFileResource.c:231`. Oracle green.
 ## Round 98 (charlie, track 7): parameter
 
 `arg0` -> `outMode2`, after the CD driver's `GetCdDriverMode(s32 *outMode2)`
-(CdDriver.c): GameApplicationFileResource.c's `GetActiveDataSourceDriverMode` forwards to
+(cd_driver.c): GameApplicationFileResource.c's `GetActiveDataSourceDriverMode` forwards to
 one or the other, so they answer the same query.

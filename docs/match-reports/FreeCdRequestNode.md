@@ -44,5 +44,5 @@ Closed on the first attempt (uses the `Node8008A894` struct from
 
 **Tier A.** The remove/free counterpart to `AllocCdRequestNode`: unlinks a
 node from `sCdRequestQueue` and frees it via `BMemPMgrFree`. Corroborated
-by CdDriver.c's own comment (pre-rename): "func_800283C4 unlinks and
+by cd_driver.c's own comment (pre-rename): "func_800283C4 unlinks and
 frees".

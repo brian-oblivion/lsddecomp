@@ -3,7 +3,7 @@
 
 /* The data-source layer of src/app/GameApplicationFileResource.c: the free
  * functions that route FileResource's I/O to the active driver, the CD
- * (DATASOURCE_CD, include/CdDriver.h) or the SPU/VAB one (DATASOURCE_NULL,
+ * (DATASOURCE_CD, include/cd_driver.h) or the SPU/VAB one (DATASOURCE_NULL,
  * include/NullDriver.h), and the data directory file names are built in.
  * The classes the file defines are declared by their own headers:
  * GameApplication in include/GameApplication.h, FileResource and
@@ -12,7 +12,7 @@
 #include "common.h"
 #include "FileResource.h"
 
-struct CdFileEntry; /* include/CdDriver.h */
+struct CdFileEntry; /* include/cd_driver.h */
 
 /* The active driver's method table, and switching drivers: SetActiveDataSource
  * copies the new driver's interface slots into FileResource's table and every

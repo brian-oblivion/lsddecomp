@@ -2,7 +2,7 @@
 
 > Renamed from `func_800280EC` on 2026-09-17 (tools/rename.py). Address 0x800280ec.
 
-Round 45, runner echo (second sitting), `src/cd/CdDriver.c`. Its address is
+Round 45, runner echo (second sitting), `src/cd/cd_driver.c`. Its address is
 taken 3x elsewhere in the slice (this function itself, twice as a
 `VSyncCallback` argument, once by `StartCdService`) — a function pointer.
 
@@ -92,7 +92,7 @@ of getting a fallthrough instruction of its own.
 Body: an optional `VSyncCallback(0)` (`sCdUseVSyncCallback`), a two-way dispatch on
 `sCdTickStep` (1 -> `TickCdStateMachine`, 2 -> `TickCdLoadFileStateMachine`, both in the
 sibling `CdDriver` unit — declared extern here per the
-per-call-site-typed convention `CdDriver.c` already established for
+per-call-site-typed convention `cd_driver.c` already established for
 cross-unit libcd calls, now confirmed to apply to cross-unit game-code calls
 too), an optional virtual dispatch through `gCdDriverMethods`'s own table slot
 +0x68 (guarded by `sCdQueueEnabled`), and finally an optional
@@ -146,4 +146,4 @@ method `classtable.py` resolves it to, per track 3's vtable-slot rule.
 ## Track 7 (round 101, echo): comments moved here, and names
 
 `sCdTickStep`'s `1`/`2` are spelled `CD_TICK_STATE_MACHINE` /
-`CD_TICK_LOAD_FILE` (CdDriver.h); `VSyncCallback(0)` is `VSyncCallback(NULL)`.
+`CD_TICK_LOAD_FILE` (cd_driver.h); `VSyncCallback(0)` is `VSyncCallback(NULL)`.

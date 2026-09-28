@@ -2,7 +2,7 @@
 
 > Renamed from `func_800282AC` on 2026-09-17 (tools/rename.py). Address 0x800282ac.
 
-Round 45, runner echo (second sitting), `src/cd/CdDriver.c`.
+Round 45, runner echo (second sitting), `src/cd/cd_driver.c`.
 
 ## Result
 
@@ -68,7 +68,7 @@ Five-argument function (four in registers, a fifth on the caller's stack at
 standard o32 stack-arg slot). Allocates/links a list node via
 `AllocCdRequestNode` (foxtrot's `CdDriver`, still `INCLUDE_ASM` there —
 declared `extern` here per the cross-unit convention already established by
-`CdDriver.c` and `ServiceCdDriver`'s report) and fills five of its
+`cd_driver.c` and `ServiceCdDriver`'s report) and fills five of its
 fields with the incoming parameters. The store order to the new entry
 (`+0x08, +0x14, +0x0C, +0x10, +0x18`) is NOT ascending-offset — it's
 `arg2, arg3, arg0, arg1, arg4` in that literal order — and reproducing it
@@ -129,7 +129,7 @@ call site and false of three.
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/cd/CdDriver.c:143`
+mis-hit had to be resolved by receiver type: `src/cd/cd_driver.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
@@ -146,7 +146,7 @@ which is the procedure working in the direction where it can work.
 ## Round 96 (track 6, echo): `CdRequest_282AC` is `CdRequestNode`
 
 The unit-local placeholder `CdRequest_282AC` (op/owner/fileIndex/param0/param1
-at +0x08..+0x18, padded) was a writing-side view of include/CdDriver.h's
+at +0x08..+0x18, padded) was a writing-side view of include/cd_driver.h's
 `CdRequestNode`, the same 0x24-byte node AllocCdRequestNode (CdDriver)
 returns: same offsets, same allocator. The view is deleted and `entry` is a
 `CdRequestNode *`; `owner` is that struct's `CdDriver *`, so the `(s32)` cast

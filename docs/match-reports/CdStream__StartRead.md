@@ -67,4 +67,4 @@ bits from `<libcd.h>`; command 2 is `CdlSetloc`.
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-CdStream.h's own `CdStreamFile` is gone: `CdStream::file` is Sony's `CdlFILE` (CdStream.h includes <libcd.h>; every unit that sees the header builds with it), and the seek slot takes `CdlLOC *`. CdSearchFile no longer needs a cast; CdControl/CdControlF take the location as `u_char *`, Sony's parameter type, as in CdDriver.c. Byte-identical.
+CdStream.h's own `CdStreamFile` is gone: `CdStream::file` is Sony's `CdlFILE` (CdStream.h includes <libcd.h>; every unit that sees the header builds with it), and the seek slot takes `CdlLOC *`. CdSearchFile no longer needs a cast; CdControl/CdControlF take the location as `u_char *`, Sony's parameter type, as in cd_driver.c. Byte-identical.
