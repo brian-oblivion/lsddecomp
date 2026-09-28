@@ -64,7 +64,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | `func_80026FE8` | `GetActiveDataSourceUseVSyncCallback` | B |
 
 **Evidence.** Forwards to `GetCdUseVSyncCallback` (itself just `return
-gCdUseVSyncCallback;`, an already-named global) when the CD driver is
+sCdUseVSyncCallback;`, an already-named global) when the CD driver is
 active, else `GetNullDriverUseVSyncCallback` (always `0`). The "VSync callback" framing
 comes directly from that already-established global's name, generalised to
 whichever source is active.

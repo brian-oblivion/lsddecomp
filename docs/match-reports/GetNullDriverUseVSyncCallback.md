@@ -56,7 +56,7 @@ purpose from a body that's just `return 0;`.
 
 The objection above ("its own counterpart is still unnamed") no longer
 holds: the counterpart is `GetCdUseVSyncCallback` (CdDriver.c, returns
-`gCdUseVSyncCallback`), and the one caller, GameApplicationFileResource.c's
+`sCdUseVSyncCallback`), and the one caller, GameApplicationFileResource.c's
 `GetActiveDataSourceUseVSyncCallback`, calls it when `sActiveDataSource` is
 DATASOURCE_CD and this function otherwise. This is the VAB driver's answer
 to the same query, and the answer is a constant 0: the VAB backend never

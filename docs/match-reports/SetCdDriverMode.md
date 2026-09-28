@@ -20,7 +20,7 @@ extern s32 ServiceCdDriver(void);
 extern s32 sCdBusy;
 extern s32 sCdAsyncEnabled;
 extern s32 sCdSyncQueueMode;
-extern s32 gCdUseVSyncCallback;
+extern s32 sCdUseVSyncCallback;
 
 /* The singleton GetDrawSystem returns; only the slot this call site
  * dispatches (+0x84 of its method table) is typed here. That slot is handed
@@ -57,7 +57,7 @@ s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
             }
         }
 
-        gCdUseVSyncCallback = useVSyncCallback;
+        sCdUseVSyncCallback = useVSyncCallback;
         sCdAsyncEnabled = async;
         sCdSyncQueueMode = mode2;
 
@@ -120,10 +120,10 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | was | now | tier |
 | --- | --- | --- |
 | `func_80027F18` | `SetCdDriverMode` | B |
-| `D_8008A8A4` | `gCdUseVSyncCallback` | A |
+| `D_8008A8A4` | `sCdUseVSyncCallback` | A |
 
 **Evidence for the function.** It refuses (returns 0) while `sCdBusy`, and
-otherwise stores its three arguments into `gCdUseVSyncCallback`,
+otherwise stores its three arguments into `sCdUseVSyncCallback`,
 `sCdAsyncEnabled` and `sCdSyncQueueMode` and returns 1 -- the write half of the
 pair `GetCdDriverMode` reads back. `GameApplicationFileResource.c`'s `SetActiveDataSourceDriverMode` calls it
 in a `do {} while (fn(...) == 0)` loop, i.e. "retry until the driver accepts
@@ -132,8 +132,8 @@ Parameters are now named `async`, `mode2`, `useVSyncCallback`. Tier B: the
 second argument is unidentified (see `GetCdDriverMode.md`), so the function's
 full contract is not established.
 
-**Evidence for `gCdUseVSyncCallback`.** Every one of its five readers is
-`if (gCdUseVSyncCallback != 0) VSyncCallback(...)` -- register or clear the
+**Evidence for `sCdUseVSyncCallback`.** Every one of its five readers is
+`if (sCdUseVSyncCallback != 0) VSyncCallback(...)` -- register or clear the
 tick. And this function only installs the ALTERNATIVE delivery path (the
 `+0x84` slot of the singleton `GetDrawSystem` returns, handed
 `ServiceCdDriver` or 0) when the argument is zero. So the flag chooses which

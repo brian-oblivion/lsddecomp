@@ -424,7 +424,7 @@ void CdDriver__RunRequestQueue(void) {
  *
  *   - The driver mode. SetCdDriverMode sets sCdAsyncEnabled (requests are
  *     queued and run in the background), sCdSyncQueueMode (queued, but each
- *     run as a blocking spin) and gCdUseVSyncCallback (ServiceCdDriver is
+ *     run as a blocking spin) and sCdUseVSyncCallback (ServiceCdDriver is
  *     installed with VSyncCallback; otherwise it becomes the DrawSystem
  *     singleton's callback). It refuses while sCdBusy. InitCdDrive puts the
  *     drive in double speed once; the Is/Get functions read the state
@@ -609,7 +609,7 @@ s32 SetCdDriverMode(s32 async, s32 syncQueueMode, s32 useVSyncCallback) {
             }
         }
 
-        gCdUseVSyncCallback = useVSyncCallback;
+        sCdUseVSyncCallback = useVSyncCallback;
         sCdAsyncEnabled = async;
         sCdSyncQueueMode = syncQueueMode;
 
@@ -683,7 +683,7 @@ s32 ServiceCdDriver(void) {
         return 0;
     }
 
-    if (gCdUseVSyncCallback != 0) {
+    if (sCdUseVSyncCallback != 0) {
         VSyncCallback(NULL);
     }
 
@@ -697,7 +697,7 @@ s32 ServiceCdDriver(void) {
         GetCdDriverMethods()->runRequestQueue();
     }
 
-    if (gCdUseVSyncCallback != 0) {
+    if (sCdUseVSyncCallback != 0) {
         VSyncCallback((void (*)(void))ServiceCdDriver);
     }
 
@@ -708,7 +708,7 @@ void StartCdService(void) {
     LockCd();
 
     if (sCdCallbackInstalled == 0) {
-        if (gCdUseVSyncCallback != 0) {
+        if (sCdUseVSyncCallback != 0) {
             VSyncCallback((void (*)(void))ServiceCdDriver);
         }
         sCdCallbackInstalled = 1;
@@ -722,7 +722,7 @@ void StopCdServiceIfIdle(void) {
     LockCd();
 
     if (sCdTickStep == CD_TICK_NONE && sCdCallbackInstalled != 0) {
-        if (gCdUseVSyncCallback != 0) {
+        if (sCdUseVSyncCallback != 0) {
             VSyncCallback(NULL);
         }
         sCdCallbackInstalled = 0;
@@ -1197,5 +1197,5 @@ s32 ReadCdFile(CdDriver *self, void *buf, s32 size) {
 void NoOp4(void) {}
 
 s32 GetCdUseVSyncCallback(void) {
-    return gCdUseVSyncCallback;
+    return sCdUseVSyncCallback;
 }

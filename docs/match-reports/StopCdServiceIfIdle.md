@@ -11,7 +11,7 @@ Byte-exact on the first attempt.
 ```c
 extern s32 sCdTickStep;
 extern s32 sCdCallbackInstalled;
-extern s32 gCdUseVSyncCallback;
+extern s32 sCdUseVSyncCallback;
 extern s32 sCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
@@ -20,7 +20,7 @@ void StopCdServiceIfIdle(void)
     LockCd();
 
     if (sCdTickStep == 0 && sCdCallbackInstalled != 0) {
-        if (gCdUseVSyncCallback != 0) {
+        if (sCdUseVSyncCallback != 0) {
             VSyncCallback(0);
         }
         sCdCallbackInstalled = 0;
@@ -36,7 +36,7 @@ void StopCdServiceIfIdle(void)
 Straight read: sets the `sCdLock` latch (`LockCd`), then a guarded
 block only entered when `sCdTickStep == 0` AND `sCdCallbackInstalled != 0` (the two
 `beqz`/`bnez` gp_rel loads collapse into one `&&`), inside which an optional
-`VSyncCallback(0)` fires when `gCdUseVSyncCallback != 0`, then both `sCdCallbackInstalled` and
+`VSyncCallback(0)` fires when `sCdUseVSyncCallback != 0`, then both `sCdCallbackInstalled` and
 `sCdQueueEnabled` are cleared; falls through either way to clear the latch
 (`UnlockCd`). The `VSyncCallback(0)` idiom (`extern void
 VSyncCallback(void (*cb)(void));` then call with a literal `0`) is not new —

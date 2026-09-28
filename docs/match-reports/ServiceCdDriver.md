@@ -18,7 +18,7 @@ carries the evidence for each one.
 
 ```c
 extern s32 GetBMemPMgrBusy(void); /* TmdRenderer */
-extern s32 gCdUseVSyncCallback;
+extern s32 sCdUseVSyncCallback;
 extern s32 sCdTickStep;
 extern void TickCdStateMachine(void); /* CdDriver: state-machine step 1 */
 extern void TickCdLoadFileStateMachine(void); /* CdDriver: state-machine step 2 */
@@ -48,7 +48,7 @@ s32 ServiceCdDriver(void)
         return 0;
     }
 
-    if (gCdUseVSyncCallback != 0) {
+    if (sCdUseVSyncCallback != 0) {
         VSyncCallback(0);
     }
 
@@ -62,7 +62,7 @@ s32 ServiceCdDriver(void)
         ((Methods6D4E8_80EC *)GetCdDriverMethods())->runRequestQueue();
     }
 
-    if (gCdUseVSyncCallback != 0) {
+    if (sCdUseVSyncCallback != 0) {
         VSyncCallback((void (*)(void))ServiceCdDriver);
     }
 
@@ -89,7 +89,7 @@ evidence of anything conditional — it is the same "if (cond) return 0;"
 idiom as the first guard, just with the zeroing sharing a delay slot instead
 of getting a fallthrough instruction of its own.
 
-Body: an optional `VSyncCallback(0)` (`gCdUseVSyncCallback`), a two-way dispatch on
+Body: an optional `VSyncCallback(0)` (`sCdUseVSyncCallback`), a two-way dispatch on
 `sCdTickStep` (1 -> `TickCdStateMachine`, 2 -> `TickCdLoadFileStateMachine`, both in the
 sibling `CdDriver` unit — declared extern here per the
 per-call-site-typed convention `CdDriver.c` already established for

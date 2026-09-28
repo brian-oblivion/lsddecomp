@@ -165,6 +165,6 @@ extern void *sCdReadBuffer;            /* CdRead target buffer */
 extern CdFileEntry *sCdSavedSeekParam; /* LoadFile's saved sCdSeekParam */
 extern CdRequestNode *sCdRequestQueue; /* list head */
 extern s32 sCdTickStep;                /* CD_TICK_* */
-extern s32 gCdUseVSyncCallback;
+extern s32 sCdUseVSyncCallback;
 
 #endif /* CDDRIVER_H */
