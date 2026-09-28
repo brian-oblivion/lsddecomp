@@ -9,7 +9,7 @@ below cc1 and no source shape reaches it).**
 
 > **Unit corrected:** this report's original header said `libsnd_vmanager`.
 > That unit was re-carved in round 34 and this function now lives in
-> **`src/libsnd_vm_vol_ut_key_ut_keyv.c`**. The `asm/nonmatchings/` path is
+> **`src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`**. The `asm/nonmatchings/` path is
 > `libsnd_vm_vol_ut_key_ut_keyv/SsUtKeyOn.s`.
 
 Size: 252 words (0x3F0 bytes), file offset `0x21690`, vram `0x80030E90`.
@@ -199,7 +199,7 @@ would have sunk a correct escalation.
 
 # SsUtKeyOn -- STALL (11 words short as of round 36: 241 built / 252 retail, a best-effort reproduction of round 31's 240/252; raw word-match 36/252; the three round-26 residues -- busy-lock branch polarity, missing field-copy nops, `result`'s register handling -- persist, and are treated as exhausted this round -- see round-36 addendum)
 
-Unit `src/libsnd_vm_vol_ut_key_ut_keyv.c` (CORRECTED round 62 -- this line said
+Unit `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c` (CORRECTED round 62 -- this line said
 `libsnd_vmanager`, the pre-round-34 unit name), round 26 (2026-09-09). Not a class method. A "start
 channel" setup routine: validates `(p0,p1)` via `func_80032148`, computes a
 volume pan pair (same formula as this unit's already-matched
@@ -718,7 +718,7 @@ body needs:
   and a deleted function were its only readers in this family -- **false**
   for this file's own two remaining stalls, which both WRITE it
   (`D_8008EA22 = 0x21;`). The file's own header comment made this claim;
-  it is corrected in this round's edit (see `src/libsnd_vm_vol_ut_key_ut_keyv.c`'s header).
+  it is corrected in this round's edit (see `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`'s header).
 - The `SlotE968` typedef and `_svm_pg` extern, which round 34 removed
   from the OLD `libsnd_vmanager.c` (now the front unit) because that unit's own
   four functions using it had all become Sony's `libsnd/vm_prog.o` -- but
@@ -728,7 +728,7 @@ body needs:
 So this report's preserved body was doubly stale: the callee's name AND
 three of its own supporting declarations were gone from the current tree,
 not just the one rename the stale-symbol screen flags. Recreated all
-three in `src/libsnd_vm_vol_ut_key_ut_keyv.c` (the `SlotE968` typedef reconstructed from
+three in `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c` (the `SlotE968` typedef reconstructed from
 `func_80030864.md`'s -- a MATCHED sibling, now Sony's object -- own
 typedef, extended with the `unk0` field this report's own "Struct/global
 additions" section says this function added).
@@ -759,7 +759,7 @@ STALL.
 ### The corrected, linkable body (241/252 words, this round's measurement)
 
 Positioned where it would compile: replacing the `INCLUDE_ASM` for
-`SsUtKeyOn` in `src/libsnd_vm_vol_ut_key_ut_keyv.c`, after `SpuVmSetVol`'s own
+`SsUtKeyOn` in `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`, after `SpuVmSetVol`'s own
 `INCLUDE_ASM` line. Requires (all now present in that file, added this
 round): `extern u16 D_8008EA22;` and the `SlotE968`/`_svm_pg`
 declarations shown below, alongside the file's existing `RecordE978`,
@@ -1064,7 +1064,7 @@ residues (busy-lock polarity, missing field-copy nops, `result` register
 identity), now confirmed exhausted under a real permuter search as well as
 hand reshaping.
 
-Also added the `SpuVmVSetUp` extern to `src/libsnd_vm_vol_ut_key_ut_keyv.c`: the round-36
+Also added the `SpuVmVSetUp` extern to `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`: the round-36
 addendum (and the head's recovery entry above) both describe it as
 restored, but it was not actually present in the committed file -- this
 function's preserved body cannot compile without it, and the round-36
@@ -1112,7 +1112,7 @@ nop placement elsewhere in the function's own body. That reshuffle is not
 investigated here -- this is a measurement, not a matching attempt.
 
 **Disposition: promoted to `#ifdef NON_MATCHING ... #else INCLUDE_ASM
-... #endif`** in `src/libsnd_vm_vol_ut_key_ut_keyv.c`, comment updated to the current
+... #endif`** in `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`, comment updated to the current
 score, verified build unchanged (`./build-and-verify.sh` green,
 `tools/check-nonmatching.sh` green). The title line at the top of this file
 is now STALE (still says "TOOLCHAIN-BLOCKED" with the pre-round-63

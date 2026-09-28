@@ -7,7 +7,7 @@ from the MATCHED sibling `SsUtKeyOff`'s idiom, and the local names
 (`chan`, `mask0`, `mask1`) are that sibling's own, reused deliberately rather
 than re-invented.**
 
-Unit: `src/libsnd_vm_vol_ut_key_ut_keyv.c`. 73 words (0x124 bytes), file offset `0x22090`,
+Unit: `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`. 73 words (0x124 bytes), file offset `0x22090`,
 vram `0x80031890`.
 
 ## The closing body
@@ -202,7 +202,7 @@ Two corollaries, both paid for here:
 
 ## Disposition
 
-**MATCHED.** C committed in `src/libsnd_vm_vol_ut_key_ut_keyv.c` in ROM-address order (last
+**MATCHED.** C committed in `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c` in ROM-address order (last
 function in the unit), with a comment pointing at the sibling relationship so
 the next reader does not have to re-derive it. `./build-and-verify.sh` green,
 `git status --porcelain` empty. The round-23 `volatile D_8008EA26` and

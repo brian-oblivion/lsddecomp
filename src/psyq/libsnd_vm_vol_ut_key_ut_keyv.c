@@ -231,7 +231,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     return result;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv", SpuVmSetVol);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vm_vol_ut_key_ut_keyv", SpuVmSetVol);
 #endif
 #ifdef NON_MATCHING
 /* NON_MATCHING: 252/252 words, length exact; raw word-match 65/252,
@@ -329,7 +329,7 @@ fail_nolock:
     return -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv", SsUtKeyOn);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vm_vol_ut_key_ut_keyv", SsUtKeyOn);
 #endif
 
 s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
@@ -470,7 +470,7 @@ fail:
     return -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv", SsUtKeyOnV);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vm_vol_ut_key_ut_keyv", SsUtKeyOnV);
 #endif
 
 /* The "release channel" twin of SsUtKeyOff's else-branch above: same

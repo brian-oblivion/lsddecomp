@@ -30,7 +30,7 @@ uses was already in the unit).**
 > cannot be the shape that produced retail's bytes, whatever its total word
 > count says.
 
-Unit: `src/libsnd_vm_vol_ut_key_ut_keyv.c`. Size: 324 words (0x510 bytes), file offset
+Unit: `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`. Size: 324 words (0x510 bytes), file offset
 `0x21180`, vram `0x80030980`.
 
 ## Step (a): the inherited body, rebuilt before anything was changed
@@ -172,7 +172,7 @@ it is *downstream* of the shape difference above, not the thing to attack.
 
 ## Best-derived body (315/324 words, 10/324 raw, ins 76 / del 76; preserved for the next attempt)
 
-Declarations used, all of them already present in `src/libsnd_vm_vol_ut_key_ut_keyv.c`
+Declarations used, all of them already present in `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`
 before this round (`Rec34D994`, `SlotE968`, `RecordE978`, `SsScore`,
 `ObjE970`, `spuVmMaxVoice`, `D_8008EA22`, `_svm_stereo_mono`, `_svm_sreg_buf`,
 `_svm_sreg_dirty`, `SpuVmVSetUp`).
@@ -357,7 +357,7 @@ reading.
 > cascade round 45 already characterised (residue 1, below), now isolated
 > with a clean, driftless measurement instead of a drift-affected one.
 
-Unit: `src/libsnd_vm_vol_ut_key_ut_keyv.c`. Size: 324 words (0x510 bytes), file offset
+Unit: `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`. Size: 324 words (0x510 bytes), file offset
 `0x21180`, vram `0x80030980`.
 
 ## What it computes
@@ -738,7 +738,7 @@ than either prior attempt had.
 > residue is a whole-function-scale register-allocation-cascade difference,
 > not a missing construct.
 
-Unit: `src/libsnd_vm_vol_ut_key_ut_keyv.c`. Size: 324 words (0x510 bytes), file offset
+Unit: `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`. Size: 324 words (0x510 bytes), file offset
 `0x21180`, vram `0x80030980`.
 
 ## What it computes
@@ -807,7 +807,7 @@ loop-plus-nested-branches function, not in any individual construct.
 
 All of `Rec34D994`, `SlotE968`, `RecordE978`, `spuVmMaxVoice`, `D_8008EA22`,
 `_svm_okof1`/`64`, `_svm_okon1`/`22C` were ALREADY declared in this unit
-(`src/libsnd_vm_vol_ut_key_ut_keyv.c`) before this round, for `SsUtKeyOn`'s existing
+(`src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`) before this round, for `SsUtKeyOn`'s existing
 stall. Added this round, following `vmNoiseOn`/`SpuVmKeyOnNow`'s
 already-proven declarations verbatim:
 
@@ -1101,7 +1101,7 @@ still current -- no correction needed here, unlike this unit's other two
 stalls.
 
 **Disposition: promoted to `#ifdef NON_MATCHING ... #else INCLUDE_ASM
-... #endif`** in `src/libsnd_vm_vol_ut_key_ut_keyv.c`, using round 62's body (not round
+... #endif`** in `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`, using round 62's body (not round
 50's -- round 50's 324/324 "length-exact" body is FALSIFIED at ins101/del101,
 a worse structural match despite the matching word count; see round 62's
 "Step (a)" above). Comment names the current score, verified build

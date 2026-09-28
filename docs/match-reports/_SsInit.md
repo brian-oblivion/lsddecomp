@@ -470,7 +470,7 @@ Sony sound-init C sandwiched between the placed `libsnd/vm_vsu` and
 Data this function touches: `_snd_openflag`/`_snd_ev_flag` are Sony-pinned in
 `config/psyq-objects.ld` as `_snd_openflag`/`_snd_ev_flag` (same
 addresses) -- proposed to the head for `rename.py` rather than applied
-directly, since `_snd_ev_flag` also appears in `src/libsnd_vm_vol_ut_key_ut_keyv.c`,
+directly, since `_snd_ev_flag` also appears in `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`,
 outside this unit (collision rules, PARALLEL-RUNS §2.1/§2.3). Tier: not
 applicable (identification, not a game name).
 

@@ -784,12 +784,12 @@ only because the call has an argument. Reducing the declaration to `(void)`
 would be a `too many arguments` error and dropping the argument would delete
 `li a0,0xff`.
 
-**`src/libsnd_vm_vol_ut_key_ut_keyv.c`'s `(void)` declaration also stays**, and is correct
+**`src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`'s `(void)` declaration also stays**, and is correct
 about what the body reads.
 
 ### Call-site / declaration disagreement, reported not fixed
 
-`src/libsnd_vm_vol_ut_key_ut_keyv.c:155`'s `extern s32 SpuVmAlloc(void);` has **no live
+`src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c:155`'s `extern s32 SpuVmAlloc(void);` has **no live
 call site in that file** — the only other mention is prose in `SsUtKeyOn`'s
 banner, and `SsUtKeyOn` is itself still `INCLUDE_ASM`. It is a declaration
 kept for a call that exists only in assembly. It is harmless (it agrees with
