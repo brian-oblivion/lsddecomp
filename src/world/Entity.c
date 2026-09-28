@@ -517,13 +517,13 @@ s32 Entity__UpdateSoundCueStart(Entity *this) {
     return this->soundCueActive;
 }
 
-/* For a row with no link stage (a negative gEntityLinkStageTable entry) and
+/* For a row with no link stage (a negative sEntityLinkStageTable entry) and
  * an event video, sends ENTITY_EFFECT_LINK_STAGE while the player is within
  * the video entry times 512 world units (Entity__IsTargetInRange). `unused`
  * is Entity.h's declared second parameter; the one caller,
  * Entity__UpdateDeactivationState, passes 0. */
 void Entity__NotifyIfTargetInRange(Entity *this, s32 unused) {
-    if (gEntityLinkStageTable[this->moodIndex * 16] < 0 &&
+    if (sEntityLinkStageTable[this->moodIndex * 16] < 0 &&
         sEntityEventVideoTable[this->moodIndex * 16] != 0 &&
         Entity__IsTargetInRange(this, sEntityEventVideoTable[this->moodIndex * 16] << 9)) {
         this->methods->notifyParents(this, ENTITY_EFFECT_LINK_STAGE);

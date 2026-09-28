@@ -90,7 +90,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 - Step 2: The flat mood-row "tables" this body read are columns of gEntityMoodTable's
 16-byte row (their symbols are the row base 0x80089EA4 plus the column
-offset: gEntityUnlockKindTable +0x02, gEntityLinkStageTable +0x07,
+offset: gEntityUnlockKindTable +0x02, sEntityLinkStageTable +0x07,
 sEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
 gEntityMoodHandlerTable +0x0C), now EntityMoodRow fields; byte-identical.
 Entity.h's old claim that they were "SEPARATE global arrays (own base

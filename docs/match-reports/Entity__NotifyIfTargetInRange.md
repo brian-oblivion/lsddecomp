@@ -11,7 +11,7 @@ Unit: `Entity` · Size: 36 words · Round 23 (2026-09-07), head. Fresh ground
 /* arg1 is unused here; the canonical declaration in include/Entity.h has it
  * and func_8005DABC passes 0. Do not drop it -- `conflicting types`. */
 void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1) {
-    if (gEntityLinkStageTable[this->moodIndex * 0x10] < 0 &&
+    if (sEntityLinkStageTable[this->moodIndex * 0x10] < 0 &&
         sEntityEventVideoTable[this->moodIndex * 0x10] != 0 &&
         Entity__IsTargetInRange(this, sEntityEventVideoTable[this->moodIndex * 0x10] << 9)) {
         this->methods->slot30(this, 0xA);
@@ -75,7 +75,7 @@ silently without it.
 
 `Entity__NotifyIfTargetInRange` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005DF9C`.
 
-Called by `Entity__UpdateDeactivationState` (Entity.c) every active tick, with arg1 = 0 (unused). If the row's `gEntityLinkStageTable` byte is negative and its `sEntityEventVideoTable` byte is non-zero, and `Entity__IsTargetInRange(this, eventVideo << 9)` holds, it calls `notifyParents(this, 0xA)`. Tier B: the mechanics are clear. What event 0xA means is not, and both table names are inherited hypotheses (`Entity__GetEventVideo`/`GetLinkStage`), so the name deliberately does not lean on them.
+Called by `Entity__UpdateDeactivationState` (Entity.c) every active tick, with arg1 = 0 (unused). If the row's `sEntityLinkStageTable` byte is negative and its `sEntityEventVideoTable` byte is non-zero, and `Entity__IsTargetInRange(this, eventVideo << 9)` holds, it calls `notifyParents(this, 0xA)`. Tier B: the mechanics are clear. What event 0xA means is not, and both table names are inherited hypotheses (`Entity__GetEventVideo`/`GetLinkStage`), so the name deliberately does not lean on them.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
