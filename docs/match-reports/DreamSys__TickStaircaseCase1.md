@@ -19,7 +19,7 @@ half-open `[lo, lo+len)` band tests on `this->unk_0x914` to conditionally
 set a flag/fire a call; finish by conditionally setting `this->unk_0x88`,
 unconditionally setting `this->unk_0xA0 = 1;`, bumping `this->unk_0x914`,
 and returning 0). This one has THREE bands per arm (its siblings have two),
-and reuses `ROTATION_YAW_MINUS45` (already named, by `DreamSys__TickStaircaseCase3`) for its
+and reuses `sRotationYawMinus45` (already named, by `DreamSys__TickStaircaseCase3`) for its
 `SceneNode__UpdateRotation` call in the `unk_0xAC == 4` arm.
 
 Both blocker screens are clean: no `gp_rel` hit and no
@@ -57,7 +57,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 		if (this->unk_0x914 >= 0x19)
 			return 1;
 		if ((u32)(this->unk_0x914 - 6) < 2 || (u32)(this->unk_0x914 - 0xB) < 2 || (u32)(this->unk_0x914 - 0x14) < 2) {
-			this->vt->SceneNode__UpdateRotation(this, 0, &ROTATION_YAW_MINUS45);
+			this->vt->SceneNode__UpdateRotation(this, 0, &sRotationYawMinus45);
 		}
 		flag = (u32)(this->unk_0x914 - 3) < 0xE;
 	}

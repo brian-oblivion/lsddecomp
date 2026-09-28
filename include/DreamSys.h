@@ -393,7 +393,7 @@ extern RotationRatios sRotationYawPlus45;
 /* (0 deg, -45 deg, 0 deg) -- the mirror of sRotationYawPlus45 above
    ({0,1} {0xFFD3,1} {0,1}), used the same way by
    DreamSys__TickStaircaseCase1 and DreamSys__TickStaircaseCase3. */
-extern RotationRatios ROTATION_YAW_MINUS45;
+extern RotationRatios sRotationYawMinus45;
 
 /* Argument shape for InterpolateKeyframeValue: two "keyframe" points, each with a
    value (+0x4) and a position/time (+0x8); offset +0x0 unconfirmed
