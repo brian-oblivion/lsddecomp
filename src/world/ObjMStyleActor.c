@@ -1298,7 +1298,7 @@ extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];
 extern s32 gStyleConfigIndex;
 extern s8 *gStyleVariantConfigs[];
-extern const u8 *gStyleClearColor;
+extern const u8 *sStyleClearColor;
 extern u8 gStyleDecorColorsB[];
 extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColors;
@@ -1328,7 +1328,7 @@ void *PickStyleFallbackConfig(void) {
     config = gStyleVariantConfigs[variant] + index * 4;
     if (variant == 0) {
         clearIndex = config[3];
-        gStyleClearColor = gStylePalette[clearIndex];
+        sStyleClearColor = gStylePalette[clearIndex];
         decorIndex = config[2];
         decorColors = gStyleDecorColorsB;
         if (decorIndex != STYLE_DECOR_B_PALETTE_INDEX) {
@@ -1441,7 +1441,7 @@ void StyleUpdateDecorSet(void) {
         pos.y += 3;
         slot++;
     } while (i < STYLE_DECOR_BANDS);
-    AdjustRgbByDelta(rgb, (u8 *)gStyleClearColor, fade);
+    AdjustRgbByDelta(rgb, (u8 *)sStyleClearColor, fade);
     viewport->methods->setClearColor(viewport, (ViewportRgb *)rgb);
 }
 
