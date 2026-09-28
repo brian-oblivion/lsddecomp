@@ -1,4 +1,6 @@
-# ObjM__NotifyParentsCodeB
+# ObjM__NotifyLinkTeleport
+
+> Renamed from `ObjM__NotifyParentsCodeB` on 2026-09-28 (tools/rename.py). Address 0x80053e84.
 
 > Renamed from `func_80053E84` on 2026-09-23 (tools/rename.py). Address 0x80053e84.
 
@@ -13,7 +15,7 @@ directly throughout rather than being saved to `$s0`.
 ## The C
 
 ```c
-void ObjM__NotifyParentsCodeB(ObjM *self) {
+void ObjM__NotifyLinkTeleport(ObjM *self) {
     self->methods->slot30(self, 0xB);
 }
 ```
@@ -32,7 +34,7 @@ round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Naming
 
-**ObjM__NotifyParentsCodeB** -- tier A. Pure one-line dispatch: `self->methods->notifyParents(self, 0xB)`. `notifyParents` is CONFIRMED as `BasicClass__NotifyParents` via `tools/classtable.py 0x80087034` (+0x030), so every byte of this function's behaviour is known even though the game-level meaning of event code 0xB is not -- a pure leaf whose mechanics ARE its purpose, tier A by the FINISHING-PLAN definition.
+**ObjM__NotifyLinkTeleport** -- tier A. Pure one-line dispatch: `self->methods->notifyParents(self, 0xB)`. `notifyParents` is CONFIRMED as `BasicClass__NotifyParents` via `tools/classtable.py 0x80087034` (+0x030), so every byte of this function's behaviour is known even though the game-level meaning of event code 0xB is not -- a pure leaf whose mechanics ARE its purpose, tier A by the FINISHING-PLAN definition.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

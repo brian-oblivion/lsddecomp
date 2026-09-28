@@ -963,7 +963,7 @@ void ObjM__EnterLinkStageTimer(ObjM *self) {
     self->dreamSys->methods->setMoveOverride(self->dreamSys, MOVE_OVERRIDE_HELD);
 }
 
-void ObjM__NotifyParentsCodeB(ObjM *self) {
+void ObjM__NotifyLinkTeleport(ObjM *self) {
     self->methods->notifyParents(self, OBJM_NOTIFY_LINK_TELEPORT);
 }
 
