@@ -118,8 +118,8 @@ L_busy:
     goto L_set;
 
 L_count:
-    gCdTimeoutCounter++;
-    if (gCdTimeoutCounter < 0x259)
+    sCdTimeoutCounter++;
+    if (sCdTimeoutCounter < 0x259)
         goto L_end;
     newstate = 1;
     goto L_set;

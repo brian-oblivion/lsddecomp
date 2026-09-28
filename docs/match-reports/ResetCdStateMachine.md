@@ -21,7 +21,7 @@ void ResetCdStateMachine(void)
     sCdState = 0;
     sCdTickStep = 0;
     sCdIdle = 1;
-    gCdTimeoutCounter = 0;
+    sCdTimeoutCounter = 0;
     sCdBusy = 0;
 }
 ```

@@ -806,7 +806,7 @@ extern void UnlockCd(void);
 extern void *BMemPMgrAlloc(s32 size);
 /* BMemPMgrFree is GameApplicationFileResource.h's, included above. */
 
-extern s32 gCdTimeoutCounter; /* CD_STATE_SETLOC_WAIT's polls; SetCdState clears it */
+extern s32 sCdTimeoutCounter; /* CD_STATE_SETLOC_WAIT's polls; SetCdState clears it */
 
 CdRequestNode *AllocCdRequestNode(void) {
     CdRequestNode *node;
@@ -929,8 +929,8 @@ void TickCdStateMachine(void) {
                     ResetCdStateMachine();
                     goto unlock;
                 case CdlNoIntr:
-                    gCdTimeoutCounter++;
-                    if (gCdTimeoutCounter < CD_WAIT_TIMEOUT) {
+                    sCdTimeoutCounter++;
+                    if (sCdTimeoutCounter < CD_WAIT_TIMEOUT) {
                         goto unlock;
                     }
                     newState = CD_STATE_SETLOC;
@@ -982,8 +982,8 @@ void TickCdLoadFileStateMachine(void) {
                     newState = CD_STATE_READ;
                     break;
                 case CdlNoIntr:
-                    gCdTimeoutCounter++;
-                    if (gCdTimeoutCounter < CD_WAIT_TIMEOUT) {
+                    sCdTimeoutCounter++;
+                    if (sCdTimeoutCounter < CD_WAIT_TIMEOUT) {
                         goto unlock;
                     }
                     newState = CD_STATE_SETLOC;
@@ -1037,13 +1037,13 @@ void ResetCdStateMachine(void) {
     sCdState = CD_STATE_IDLE;
     sCdTickStep = CD_TICK_NONE;
     sCdIdle = 1;
-    gCdTimeoutCounter = 0;
+    sCdTimeoutCounter = 0;
     sCdBusy = 0;
 }
 
 void SetCdState(s32 state) {
     sCdState = state;
-    gCdTimeoutCounter = 0;
+    sCdTimeoutCounter = 0;
 }
 
 /* ---- part 5: the blocking file calls ---- */

@@ -771,7 +771,7 @@ sCdReadSectorCount = 0x8008A880;
 sCdReadBuffer = 0x8008A884;
 sCdSavedSeekParam = 0x8008A888;
 sCdTickStep = 0x8008A898;
-gCdTimeoutCounter = 0x8008A8A0;
+sCdTimeoutCounter = 0x8008A8A0;
 // identified: fingerprint 1.00 (EXACT) vs libgpu/sys.o (discs 3.3,3.5,3.6),
 // header LIBGPU.H `extern int DrawSync(int mode);` agrees with the call
 // site's arg shape. Round 53 (track 2), not yet linked from an SDK object.
