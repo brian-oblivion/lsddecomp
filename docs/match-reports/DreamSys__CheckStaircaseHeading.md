@@ -16,7 +16,7 @@ assigned queue).
 
 Byte-for-byte the SAME shape as `DreamSys__CheckTunnelHeading` (matched earlier this
 round) -- literally identical instruction sequence, just against two
-DIFFERENT per-stage tables (`STAIRCASE_ENTER_HEADINGS`/`STAIRCASE_EXIT_HEADINGS` instead of
+DIFFERENT per-stage tables (`sStaircaseEnterHeadings`/`STAIRCASE_EXIT_HEADINGS` instead of
 `sTunnelEnterHeadings`/`sTunnelExitHeadings`), and used by a different caller. Called by
 `DreamSys__TryStaircaseLink` (still `INCLUDE_ASM`) as `DreamSys__CheckStaircaseHeading(&this->unk_0x888,
 &this->unk_0x884, local)` -- the header's own comment already flagged this
@@ -26,7 +26,7 @@ two `this` fields)").
 ## Final body (59/59 on the first attempt)
 
 ```c
-extern u8 *STAIRCASE_ENTER_HEADINGS[];
+extern u8 *sStaircaseEnterHeadings[];
 extern u8 *STAIRCASE_EXIT_HEADINGS[];
 
 s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2)
@@ -35,7 +35,7 @@ s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = STAIRCASE_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
+	heading = sStaircaseEnterHeadings[gLinkSrcStage][gLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
 			*arg1 = (s32)&sCardinalRotations[heading];
@@ -71,4 +71,4 @@ queue).
 
 ## Naming
 
-- **Tier B.** Near-identical body to DreamSys__CheckTunnelHeading, differing only in which per-stage heading table it indexes (STAIRCASE_ENTER_HEADINGS/STAIRCASE_EXIT_HEADINGS here); called from DreamSys__TryStaircaseLink.
+- **Tier B.** Near-identical body to DreamSys__CheckTunnelHeading, differing only in which per-stage heading table it indexes (sStaircaseEnterHeadings/STAIRCASE_EXIT_HEADINGS here); called from DreamSys__TryStaircaseLink.
