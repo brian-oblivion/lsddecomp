@@ -137,3 +137,9 @@ macro statements stay separate, which is the shape this report's
 "independent statements" finding requires. `ctx` is the unit's
 `PolyDrawCtx`. The function comment lost the POLY_xx (len, code) table (it
 is in SortTmdObject's report) and the history.
+
+## History (source comments moved in track 12, round 106)
+
+From SetupPrimCode's comment in src/graphics/tmd_renderer.c: "MATCHING:
+two separate statements; one shared local costs the match." (kept in the
+source as a one-line MATCHING note).

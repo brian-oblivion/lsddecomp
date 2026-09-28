@@ -51,3 +51,9 @@ Specific to this one:
 Retail keeps them as two functions at two addresses and so does the source;
 they are not the same function under two names, they are one shape serving
 two primitive types.
+
+## History (source comments moved in track 12, round 106)
+
+From StoreSxyPolyFT3's comment in src/graphics/tmd_renderer.c: the
+function has the same offsets as StoreSxyPolyG3 "but a separate function
+in retail; the primitive at each call site says which is which".

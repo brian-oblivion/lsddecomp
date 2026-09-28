@@ -94,3 +94,9 @@ fourth vertex's result", not an on/off.
 
 `p` is now `short *xy3 = &((POLY_F4 *)dst)->x3`, still computed
 unconditionally at the top (byte-identical).
+
+## History (source comments moved in track 12, round 106)
+
+From StoreSxyPolyF4's comment in src/graphics/tmd_renderer.c:
+
+> MATCHING: `xy3` is computed unconditionally, not as an offset in the asm.

@@ -106,9 +106,8 @@ typedef struct TmdGroupHeader {
 #define OBJ_TMD(obj) ((struct TMD_STRUCT *)(obj)->tmd)
 
 /* Move a textured primitive's CLUT `rows` palette rows down (one row is
- * 1 << 6 in libgpu's getClut encoding). MATCHING: the do/while(0) gives back
- * the loop depth SortTmdObject's goto loops drop; without it local-alloc
- * swaps $v0/$v1 at all six sites. */
+ * 1 << 6 in libgpu's getClut encoding). */
+/* MATCHING: the do/while (0); without it all six uses allocate differently */
 /* clang-format off */
 #define ADD_CLUT_ROWS(p, rows) \
     do { \
@@ -175,12 +174,8 @@ void FlagLargePolyForDivide(void *ctx, s32 count);
  *
  * `packet` is the current TMD packet and `elem` walks beside it, parked on
  * one member; PKT names the packet as seen from `elem`, POLY the primitive.
- * MATCHING: retail keeps both pointers and addresses fields from each. The
- * loops are gotos because a do/while strength-reduces `elem` into a third
- * pointer (+28 words), `ctx` is assigned after the early return for
- * retail's a3 -> a1 -> s2 copy, and the RGB stores take `&POLY->r0` because
- * the addiu that forms it is retail's.
  */
+/* MATCHING: the two cursors, goto loops, late ctx and &POLY->r0 stores are load-bearing */
 void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     PolyDrawCtx *ctx;
     u8 *prim;
@@ -293,8 +288,8 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define POLY ((POLY_G3 *)prim)
 
                     /* TMD_P_F3G -> POLY_G3: flat-shaded with a colour per vertex (GRD),
-                     * each lit from the one face normal. MATCHING: r0 and r1
-                     * are read through `packet`, r2 through `elem`. */
+                     * each lit from the one face normal. */
+                    /* MATCHING: r0 and r1 are read through `packet`, r2 through `elem` */
                     setPolyG3(prim);
                     SetupPrimCode(prim, ctx);
                     elem = packet + offsetof(TMD_P_F3G, r2);
@@ -666,8 +661,8 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
  * (semi-transparency) bit from the run's packet type, the TGE (texture
  * shading off) bit from sSortLightOff, the object's GsLOFF bit.
  * TransformAndCullPoly re-stamps the cached length onto every primitive.
- * MATCHING: two separate statements; one shared local costs the match.
  */
+/* MATCHING: two separate statements; one shared local does not match */
 void SetupPrimCode(void *prim, PolyDrawCtx *ctx) {
     setSemiTrans(prim, ctx->semiTrans);
     setShadeTex(prim, sSortLightOff);
@@ -820,8 +815,8 @@ void StoreSxyPolyG3(void *dst) {
 }
 
 /* POLY_FT3: +0x8/+0x10/+0x18, the same offsets as POLY_G3 (a UV word where
- * POLY_G3 has an RGB word), but a separate function in retail; the
- * primitive at each call site says which is which. */
+ * POLY_G3 has an RGB word), but a function of its own; the primitive at
+ * each call site says which is which. */
 void StoreSxyPolyFT3(void *dst) {
     gte_stsxy3_ft3(dst);
 }
@@ -835,8 +830,8 @@ void StoreSxyPolyGT3(void *dst) {
  * POLY_F4: xy0/xy1/xy2 at +0x8/+0xC/+0x10, xy3 at +0x14. ProjectQuadFace
  * calls this twice -- storeFirst3 = 1 for the three vertices the shared
  * transform produced, then 0 for the fourth vertex's own rtps result.
- * MATCHING: `xy3` is computed unconditionally, not as an offset in the asm.
  */
+/* MATCHING: `xy3` is computed before the test, on both paths */
 void StoreSxyPolyF4(void *dst, s32 storeFirst3) {
     short *xy3 = &((POLY_F4 *)dst)->x3;
 
@@ -910,10 +905,8 @@ void StoreSxyPolyGT4(POLY_GT4 *prim, s32 storeFirst3) {
  * of the primitive goes into the RVECTORs besides model vertex and screen XY
  * (FillRVectors3/4): colour per vertex for Gouraud, UV per vertex and the
  * CLUT/TPAGE pair for textured.
- *
- * MATCHING: the divide arm must come first and return; with the addPrim arm
- * first the blocks swap.
  */
+/* MATCHING: the divide arm comes first and returns; with the addPrim arm first the blocks swap */
 void *SubmitPolyF3(POLY_F3 *prim, PolyDrawCtx *ctx) {
     if (ctx->divide != 0) {
         FillDivPolygonHeader(sDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
@@ -1094,7 +1087,7 @@ void InitDivPolygonPtrs(RVECTOR **vtxPtrs, void *divp, s32 nverts) {
  * Take the screen bounding box of the face's cached XYs into bboxMin/bboxMax
  * and set `divide` when it is wider or taller than MAX_UNDIVIDED_SPAN.
  * `count` is the vertex count, 3 or 4. The loop stops one vertex short:
- * the last vertex never enters the box (retail's behaviour).
+ * the last vertex never enters the box.
  */
 void FlagLargePolyForDivide(void *ctxIn, s32 count) {
     PolyDrawCtx *ctx = ctxIn;
@@ -1181,13 +1174,8 @@ void FillDivPolygonHeader(void *divpIn, PolyDrawCtx *ctx, CVECTOR *rgbc, s32 tex
     divp->ot = (u_long *)ctx->otSlot; /* DIVPOLYGON keeps it as a u_long * */
 }
 
-/*
- * Give three RVECTORs their model-space vertex and screen XY.
- *
- * MATCHING: whole-struct assignments. SVECTOR and DVECTOR have only short
- * members, so their alignment is 2 and GCC copies them with lwl/lwr,
- * swl/swr, as retail does.
- */
+/* Give three RVECTORs their model-space vertex and screen XY. */
+/* MATCHING: whole-struct assignments, not member copies */
 void FillRVectors3(RVECTOR **dst, SVECTOR **src, DVECTOR *sxy0, DVECTOR *sxy1, DVECTOR *sxy2) {
     dst[0]->v = *src[0];
     dst[1]->v = *src[1];

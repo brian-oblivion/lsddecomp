@@ -1,23 +1,12 @@
 /*
- * TmdModel (include/tmd_model.h; method table
- * gTmdModelMethods, class tag 9): one object of a TMD file (the "model"
- * SceneNode__LinkModel, src/graphics/scene_node.c, links into a GsDOBJ2). Its
- * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
- * primitives one packet at a time (TmdModel__NextPrimitive, which reads
- * each packet through Sony's own <libgs.h> layouts: GPU_COM_* mode codes,
- * TMD_P_* structs, GsTMDFlagGRD), compute an axis-aligned bounding box or
- * its eight corners (TmdModel__ComputeBounds, TmdModel__GetHull, and the
- * shared buffer of sTmdModelBoundsCount boxes, TmdModel__UpdateBoundsBuffer /
- * TmdModel__GetBoundsBuffer / TmdModel__GetBoundsCount), and ray-cast a
- * segment against every face (TmdModel__RaycastFaces) for SceneNode's own
- * collision helpers in scene_node.c.
- *
- * RotateAndOffsetHullList is a free function over a TmdHull (a counted list
- * of box corners, the buffer Actor__NotifyMove fills through getModelHull):
- * it turns each box a quarter turn and offsets one face. The last two,
- * TmdModel__AddFirstPrimClut and TmdModel__SetFirstPrimClut, move or set the
- * CLUT id of the model's first primitive (TMD_P_TF3's clut) from a VRAM
- * position; SetStyleEffectSources (dream_scene.c) calls the second.
+ * TmdModel, one object of a TMD file (include/tmd_model.h): its method
+ * table's occupants, then the direct methods SceneNode's collision code
+ * calls. They map the TMD for libgs, walk its primitives one packet at a
+ * time (reading each through Sony's own <libgs.h> TMD_P_* layouts), compute
+ * an axis-aligned box or its eight corners, keep a shared bounds buffer, and
+ * cast a segment against every face. Then one free function over a TmdHull,
+ * RotateAndOffsetHullList, and the two setters of the first primitive's
+ * CLUT id.
  */
 #include "common.h"
 #include <libgte.h>
