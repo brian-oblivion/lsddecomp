@@ -1,6 +1,10 @@
 #ifndef SCENENODE_H
 #define SCENENODE_H
 
+#include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "BasicClass.h"
 #include "TmdModel.h"
 

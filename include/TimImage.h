@@ -2,6 +2,9 @@
 #define TIMIMAGE_H
 
 #include "FileResource.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 
 /*
  * TimImage -- a FileResource data source (class id 0x103, method table
@@ -30,8 +33,7 @@
  * +0x078 is FileResource's `void *slot78` (NULL there); this table's occupant
  * is TimImage__Upload, called through TimImageUploadFn (no code).
  *
- * `tim` is <libgs.h>'s GsIMAGE, so an includer takes Sony's headers first
- * (`common.h`, <libgte.h>, <libgpu.h>, <libgs.h>).
+ * `tim` is <libgs.h>'s GsIMAGE.
  */
 
 typedef struct TimImage TimImage;

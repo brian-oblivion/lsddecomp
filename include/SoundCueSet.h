@@ -37,6 +37,8 @@
  * (vol % attenuationSteps).
  */
 
+#include "common.h"
+
 typedef struct SoundCueSet SoundCueSet;
 
 typedef void (*SoundCueCallbackFn)(void *owner, SoundCueSet *set);

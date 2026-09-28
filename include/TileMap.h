@@ -2,6 +2,9 @@
 #define TILEMAP_H
 
 #include "FileResource.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 
 /*
  * TileMap -- a FileResource data source (class id 0x203, method table

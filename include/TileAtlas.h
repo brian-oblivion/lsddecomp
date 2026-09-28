@@ -2,6 +2,9 @@
 #define TILEATLAS_H
 
 #include "FileResource.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 
 /*
  * TileAtlas -- a FileResource data source (class id 0x303, method table
