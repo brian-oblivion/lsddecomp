@@ -7,7 +7,7 @@
  * NullDriver -- the data-source driver whose every method is empty (class
  * id 0x23, method table gNullDriverMethods), a FileResource subclass and
  * the CD-ROM driver's (gCdDriverMethods, 0x13) sibling. The id is DATASOURCE_NULL: SetActiveDataSource
- * (src/app/GameApplicationFileResource.c) binds this table's driver-interface slots into
+ * (src/app/game_shell.c) binds this table's driver-interface slots into
  * FileResource's table and every client table whenever the active source is
  * not DATASOURCE_CD, and GetActiveDataSourceMethods returns it then.
  *
@@ -61,7 +61,7 @@ void NullDriver__RequestLoadFile(void); /* +0x06C requestLoadFile */
 void NullDriver__StopService(void);     /* +0x070 stopService */
 void NullDriver__CancelRequests(void);  /* +0x074 cancelRequests */
 
-/* The driver's mode, as GameApplicationFileResource.c's data-source wrappers
+/* The driver's mode, as game_shell.c's data-source wrappers
  * read and set it (the CD driver's counterparts take a third argument). */
 extern s32 GetNullDriverMode(s32 *outMode2);
 extern s32 SetNullDriverMode(s32 async, s32 mode2);

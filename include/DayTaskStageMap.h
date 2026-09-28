@@ -11,7 +11,7 @@
  * TimedTask themselves are include/DayTask.h and include/TimedTask.h.
  */
 
-/* Defined in src/world/DayTaskStageMap.c, after DayTask's methods; GameApplicationFileResource.c
+/* Defined in src/world/DayTaskStageMap.c, after DayTask's methods; game_shell.c
  * declares it too. */
 extern s32 RegisterRecordTableFiles(s32 all);
 

@@ -8,7 +8,7 @@
 /*
  * FileResource -- the base of every class the game loads from a file (class
  * id 0x3, method table gFileResourceMethods, parent BasicClass). Its own
- * methods are in src/app/GameApplicationFileResource.c.
+ * methods are in src/app/game_shell.c.
  *
  * The object owns one file buffer. FileResource__LoadFile opens a named
  * file, takes its size from seek(0, 2), allocates that much from the
@@ -91,7 +91,7 @@ typedef struct ResourceSource {
     /* +0x04 */ char *name;
 } ResourceSource;
 
-/* The descriptor ResourceRequest__Set fills (src/app/GameApplicationFileResource.c) and callers
+/* The descriptor ResourceRequest__Set fills (src/app/game_shell.c) and callers
  * pass on as its `src`. Every ResourceRequest__Set caller sets mode 1; the
  * callers that fill `src` by hand (StageMap__PopulateSlotCells, DayTask__DayTask,
  * GameApplication__GameApplication) leave it unset, and no ctor reads it. */
@@ -100,7 +100,7 @@ typedef struct ResourceRequest {
     /* +0x08 */ s32 mode;
 } ResourceRequest;
 
-/* Fill *req and return it (src/app/GameApplicationFileResource.c). */
+/* Fill *req and return it (src/app/game_shell.c). */
 ResourceRequest *ResourceRequest__Set(ResourceRequest *req, void *buffer, char *name, s32 mode);
 
 extern FileResourceMethods gFileResourceMethods;

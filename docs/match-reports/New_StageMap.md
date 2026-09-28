@@ -78,7 +78,7 @@ Five instances closed in one pass, all byte-exact:
 | `New_StreamTask` | task | 36/36 |
 | `New_TaskCore` | task | 31/31 |
 
-**It does NOT close `New_GameApplication`** (GameApplicationFileResource, 23/24), and that negative
+**It does NOT close `New_GameApplication`** (game_shell, 23/24), and that negative
 matters: the class has **two sub-shapes**, distinguished by what retail puts
 in the `beqz` delay slot.
 

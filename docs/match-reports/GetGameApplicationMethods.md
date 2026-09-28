@@ -4,7 +4,7 @@
 
 > Renamed from `func_800269E0` on 2026-09-18 (tools/rename.py). Address 0x800269e0.
 
-**Unit:** GameApplicationFileResource · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
+**Unit:** game_shell · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
 ## What it does
 
@@ -22,7 +22,7 @@ jr    $ra
 
 Just an address computation, no load — this is `&gGameApplicationMethods`, not
 `*gGameApplicationMethods`. Confirmed by its one caller, `New_GameApplication` in
-`asm/nonmatchings/GameApplicationFileResource/New_GameApplication.s`: it calls this function, then
+`asm/nonmatchings/game_shell/New_GameApplication.s`: it calls this function, then
 does `lw $v0, 0x8($v0)` on the result and `jalr`s that — fetching the
 constructor slot (`+0x008`, `GameApplication__GameApplication`) from the table this function
 returned, exactly the "allocate, get methods, call ctor slot" idiom from
@@ -57,7 +57,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | `func_800269E0` | `GetGameApplicationMethods` | A |
 
 **Evidence.** A two-instruction address-of returning `&gGameApplicationMethods`. `GameApplication`
-is already an established type name in `src/app/GameApplicationFileResource.c` (that unit's own
+is already an established type name in `src/app/game_shell.c` (that unit's own
 functions are typed against it), and the "return my own vtable" shape is
 already named twice in this project (`GetCdDriverMethods`,
 `GetFileResourceMethods`, this same round). Pure leaf whose mechanics are its

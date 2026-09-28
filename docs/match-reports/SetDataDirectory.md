@@ -6,7 +6,7 @@
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
 > `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
 > the whole image is byte-exact with the flags on, and this function was one of
-> the live tests -- `sDataDirectory = value;`, as this report predicted. The C is in `src/app/GameApplicationFileResource.c`. Everything below is the
+> the live tests -- `sDataDirectory = value;`, as this report predicted. The C is in `src/app/game_shell.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
 > **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was
@@ -20,7 +20,7 @@
 
 # SetDataDirectory
 
-**Unit:** GameApplicationFileResource · **Size:** 3 instructions · **Status:** STALLED, class TOOLCHAIN
+**Unit:** game_shell · **Size:** 3 instructions · **Status:** STALLED, class TOOLCHAIN
 
 ## What it does
 
@@ -105,7 +105,7 @@ state before these renames.
   pass the result to the CD file lookup. So the value is the directory
   part of an ISO9660 path, and it sits between the root `\` and the file
   name.
-- **Writer.** `GameApplication__GameApplication` (GameApplicationFileResource) calls
+- **Writer.** `GameApplication__GameApplication` (game_shell) calls
   `SetDataDirectory(GetDefaultDataDirectory())` once at startup. `GetDefaultDataDirectory`
   returns `sDefaultDataDirectory`, whose retail initialiser is `&D_8008A958`, the
   `.sdata` string `"CDI\\"`. That string ends in the separator, which is
@@ -119,6 +119,6 @@ state before these renames.
 
 The pair is a plain setter and getter, which is tier A by definition, and
 the readers agree on what the value is for. `char *` is the true type. The
-unit's own declarations say `char *` since round 99. GameApplicationFileResource still
+unit's own declarations say `char *` since round 99. game_shell still
 declares `SetDataDirectory(s32)` and cd_stream.c declares
 `void *GetDataDirectory(void)`. Both are left to their owners and proposed.

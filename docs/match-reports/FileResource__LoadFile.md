@@ -6,7 +6,7 @@
 
 > Renamed from `func_80026B08` on 2026-09-18 (tools/rename.py). Address 0x80026b08.
 
-**Unit:** GameApplicationFileResource · **Size:** 70 instructions · **Status:** MATCHED (70/70 words, whole-image build verified byte-exact)
+**Unit:** game_shell · **Size:** 70 instructions · **Status:** MATCHED (70/70 words, whole-image build verified byte-exact)
 
 ## What it does
 
@@ -96,7 +96,7 @@ emitted a **separate, non-delay-slot** `move a0,s2` plus a redundant
 an argument retail's call site never sets up at all.
 
 Cross-checked against `docs/match-reports/New_GameApplication.md` (a different
-unit, `GameApplicationFileResource`), which independently derived `BMemPMgrAlloc(0x2C)` — one
+unit, `game_shell`), which independently derived `BMemPMgrAlloc(0x2C)` — one
 argument — for the same function. **The two-argument signature in
 `include/pad.h` (`s32 size, s32 zone`) is wrong**; it was never
 exercised against a call site where the phantom second argument's register
@@ -134,7 +134,7 @@ See `docs/match-reports/BMemPMgrAlloc.md`, `## Extern arity (round 59)`.
 **`BMemPMgrAlloc` takes one argument (`size`), not two.**
 `include/pad.h:74`'s `extern void *BMemPMgrAlloc(s32 size, s32 zone);`
 should be corrected to `extern void *BMemPMgrAlloc(s32 size);` — confirmed
-independently in two units (`New_GameApplication` in `GameApplicationFileResource`, and this
+independently in two units (`New_GameApplication` in `game_shell`, and this
 function). Left unfixed for now since `pad.h` is outside this unit's
 scope; flagged for a spawned follow-up.
 
@@ -205,7 +205,7 @@ broadcast.
 **Verdict: arity-ok idiom.** `src/cd/cd_driver.c`'s `(void)` declaration stays.
 
 **Callee evidence** (`0x80026B08`, and the matched definition in
-`src/app/GameApplicationFileResource.c`): the body reads BOTH argument registers before writing
+`src/app/game_shell.c`): the body reads BOTH argument registers before writing
 them — `move s0,a0` at entry, and `$a1` is still the incoming `arg1` when it is
 forwarded to `this->methods->configureBuffer(this, arg1, 1, 0)` at `0x80026B48`
 (only `$a2`/`$a3` are re-set there, with `li a2,0x1` / `move a3,zero`). Two

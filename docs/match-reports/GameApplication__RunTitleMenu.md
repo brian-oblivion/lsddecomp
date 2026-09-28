@@ -6,7 +6,7 @@
 
 > Renamed from `func_80026410` on 2026-09-24 (tools/rename.py). Address 0x80026410.
 
-**Unit:** GameApplicationFileResource · **Size:** 66 instructions (0x108 bytes) · **Status:** MATCHED (66/66 words, whole-image SHA1 green). Took roughly a dozen iterations — the most attempt-expensive function of this round.
+**Unit:** game_shell · **Size:** 66 instructions (0x108 bytes) · **Status:** MATCHED (66/66 words, whole-image SHA1 green). Took roughly a dozen iterations — the most attempt-expensive function of this round.
 
 ## What it does
 

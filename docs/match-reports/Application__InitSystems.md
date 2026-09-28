@@ -43,7 +43,7 @@ gives; a local `aux` would have kept it in a register.
 
 The `source` object's class is unknown (its +0x044 takes a
 `ScreenDims *` and an s32); typed as the local `ApplicationSource`.
-GameApplicationFileResource calls this slot with a 4th argument `0` that this body never
+game_shell calls this slot with a 4th argument `0` that this body never
 reads.
 
 ## Naming

@@ -75,7 +75,7 @@ purpose, so tier A by the plan's own rule. The same accessor shape
 says why.** What the class IS, is now well evidenced: every method reachable
 from this table bottoms out in Psy-Q libcd (`CdSearchFile`, `CdRead`,
 `CdControlF`, `CdSync`, `CdFlush`, `CdPosToInt`/`CdIntToPos`), its objects
-cache a disc position and a byte size, and `GameApplicationFileResource.c` selects this
+cache a disc position and a byte size, and `game_shell.c` selects this
 class's module functions only when `sActiveDataSource == 0x13`, this table's own
 header word -- the other value that gate takes, `0x23`, is `gNullDriverMethods`, the
 SPU/VAB streamer in `PlacementGridVabSound.c`. So the two are interchangeable data

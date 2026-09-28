@@ -68,7 +68,7 @@ extern BMemPMgr *sStartupBMemPMgr;
 extern GameApplication *sGameApplication;
 extern GameApplicationConfig sGameApplicationConfig;
 
-/* Matched in GameApplicationFileResource.c; not yet declared in any header (no other carved
+/* Matched in game_shell.c; not yet declared in any header (no other carved
  * caller existed until now). */
 extern GameApplication *New_GameApplication(GameApplicationConfig *arg);
 

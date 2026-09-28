@@ -49,7 +49,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 
 **Evidence for the function.** It is the read half of `SetCdDriverMode`:
 it returns `sCdAsyncEnabled` and, through an optional out-parameter, the
-second value that function stored. `GameApplicationFileResource.c`'s `GetActiveDataSourceDriverMode` routes to
+second value that function stored. `game_shell.c`'s `GetActiveDataSourceDriverMode` routes to
 it for the CD source and to `GetNullDriverMode` for the sound source -- and that
 function is the same shape over that source's own two globals, which
 independently confirms "read back the two mode values" rather than anything
@@ -74,7 +74,7 @@ the `.c` now carries this paragraph as a comment instead.
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/app/GameApplicationFileResource.c`'s `(void)` declaration stays.
+**Verdict: arity-ok idiom.** `src/app/game_shell.c`'s `(void)` declaration stays.
 
 **Callee evidence** (`0x80027EF8`): the very first instruction is `beqz a0,...`
 — `$a0` is read before it is written, so the definition in
@@ -96,7 +96,7 @@ parameter would force this call site to materialise an argument retail does
 not have. Same shape as `GetNullDriverMode` two lines down.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/app/GameApplicationFileResource.c:230`. Oracle green.
+added to `src/app/game_shell.c:230`. Oracle green.
 
 ## Track 7 (round 101, echo): comments moved here, and names
 

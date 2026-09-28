@@ -4,7 +4,7 @@
 
 > Renamed from `func_80026CE8` on 2026-09-18 (tools/rename.py). Address 0x80026ce8.
 
-**Unit:** GameApplicationFileResource · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
+**Unit:** game_shell · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 ## What it does
 
@@ -91,7 +91,7 @@ Not `LongVec3` (the words are a pointer, a string and a flag) and not Sony's
 Several unit-local views of this same descriptor remain, under other names:
 `ResourceSource` and `ResourceSourceArgs` (graphics_resources.c),
 `DreamAuxLoadReq` (dream_aux.h), `LoadRequest` (DayTaskStageMap.h),
-`LoadModelRequest` (GameApplicationFileResource), `ResourceSourceRequest` (DayTaskStageMap.c). Some are
+`LoadModelRequest` (game_shell), `ResourceSourceRequest` (DayTaskStageMap.c). Some are
 0x10-byte locals, where the stack slot size may be what matches, so merging
 them is a head decision (proposed below), not a rename.
 

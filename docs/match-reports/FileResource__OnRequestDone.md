@@ -6,7 +6,7 @@
 
 > Renamed from `func_80026C88` on 2026-09-18 (tools/rename.py). Address 0x80026c88.
 
-**Unit:** GameApplicationFileResource · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
+**Unit:** game_shell · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 ## What it does
 
@@ -66,7 +66,7 @@ established, so named for the mechanic only.
 
 **Field renamed alongside it.** `unknown_value_0x24` -> `flags` (in
 `include/data_source.h`'s `FileResource`): `grep -rn -- '->unknown_value_0x24\b'
-src/` had zero hits outside `GameApplicationFileResource.c`, so unlike almost every other
+src/` had zero hits outside `game_shell.c`, so unlike almost every other
 field in this struct (see `## Proposed field names
 
 **APPLIED by the head at merge, round 52** -- all four fields, both types

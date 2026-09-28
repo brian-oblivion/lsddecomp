@@ -55,7 +55,7 @@ discovering this.
 ## Naming
 
 Renamed `func_8002C468` -> `SetNullDriverMode`, tier B. Same evidence as
-`GetNullDriverMode` (its report): `GameApplicationFileResource.c`'s `func_80026F34` assigns
+`GetNullDriverMode` (its report): `game_shell.c`'s `func_80026F34` assigns
 this function to a `DataSourceSetDriverModeFn` variable used exactly where it assigns
 Sony's `SetCdDriverMode` on the other branch of `sActiveDataSource == 0x13`
 -- a genuine drop-in substitute for a named "set driver mode" call, for
@@ -64,6 +64,6 @@ this backend's own state pair.
 ## Round 98 (charlie, track 7): parameters
 
 `(a, b)` -> `(async, mode2)`, after the CD driver's
-`SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)`: GameApplicationFileResource.c's
+`SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)`: game_shell.c's
 `SetActiveDataSourceDriverMode` calls one or the other with the same three
 words, and this one ignores the third.

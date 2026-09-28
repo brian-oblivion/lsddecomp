@@ -6,7 +6,7 @@
 
 > Renamed from `func_8002658C` on 2026-09-24 (tools/rename.py). Address 0x8002658c.
 
-**Unit:** GameApplicationFileResource · **Size:** 65 instructions (0x104 bytes) · **Status:** MATCHED (65/65 words, whole-image SHA1 green)
+**Unit:** game_shell · **Size:** 65 instructions (0x104 bytes) · **Status:** MATCHED (65/65 words, whole-image SHA1 green)
 
 ## What it does
 
@@ -144,7 +144,7 @@ extern s32 GetSpecialDayMovieSpan(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: w
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in GameApplicationFileResource.c are gone. Byte-identical.
+`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in game_shell.c are gone. Byte-identical.
 
 ## Track 10 (2026-09-28, round 104, echo)
 

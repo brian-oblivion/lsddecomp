@@ -25,7 +25,7 @@ s32 DreamSys__GetCurrentDayAndYear(DreamSys *this, s32 *arg1)
 
 The vtable field was previously typed `s32 (*DreamSys__GetCurrentDayAndYear)(DreamSys *this,
 s32 arg1);` from an earlier round's note about the one known external call
-site (`GameApplication`'s slot58, `src/app/GameApplicationFileResource.c`, calling
+site (`GameApplication`'s slot58, `src/app/game_shell.c`, calling
 `this->vt->DreamSys__GetCurrentDayAndYear(this, 0)`). That call passes a literal `0`, which
 is a valid null-pointer constant, so retyping to `s32 *` needed no change
 there. The function's OWN body makes clear `arg1` is an output pointer

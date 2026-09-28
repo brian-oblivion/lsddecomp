@@ -432,7 +432,7 @@ void CdDriver__RunRequestQueue(void) {
  *     CdFileEntry array; ResolveFileEntries fills each entry's disc position
  *     and size with CdSearchFile, CD_SEARCH_ATTEMPTS tries per name.
  *
- * The game reaches all of it through GameApplicationFileResource.c's
+ * The game reaches all of it through game_shell.c's
  * wrappers while the active data source is this class's id, DATASOURCE_CD
  * (0x13); the other source is the null driver, DATASOURCE_NULL (0x23).
  */
@@ -1020,7 +1020,7 @@ void SetCdState(s32 state) {
  * FileResource__InstallCdReadDriver runs FileResource's ctor, then gives the
  * object gCdDriverMethods and marks it closed; FileResource__DestroyCdReadDriver
  * runs FileResource's finalize. GetCdUseVSyncCallback is the CD half of
- * GameApplicationFileResource.c's GetActiveDataSourceUseVSyncCallback.
+ * game_shell.c's GetActiveDataSourceUseVSyncCallback.
  *
  * Nothing in the executable calls the install/destroy pair or NoOp2, NoOp3
  * and NoOp4 (no jal, stored pointer or built address reaches them).

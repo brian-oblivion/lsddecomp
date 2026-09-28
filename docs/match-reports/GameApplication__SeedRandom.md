@@ -6,7 +6,7 @@
 
 > Renamed from `func_800260A4` on 2026-09-24 (tools/rename.py). Address 0x800260a4.
 
-**Unit:** GameApplicationFileResource · **Size:** 25 instructions · **Status:** MATCHED (25/25 words)
+**Unit:** game_shell · **Size:** 25 instructions · **Status:** MATCHED (25/25 words)
 
 ## What it does
 
@@ -41,7 +41,7 @@ jal   SeedAndRandom
 
 `0x1F800000` is the PS-X scratchpad region (data cache used as fast RAM,
 not a hardware register) — some running counter lives there as a plain
-`s32`, read once per call. m2c (`tools/m2ctx.py GameApplicationFileResource --sig 'void
+`s32`, read once per call. m2c (`tools/m2ctx.py game_shell --sig 'void
 GameApplication__SeedRandom(void)' --run`) independently produced the same `% 365`
 reading, confirming the divisor and that GCC reproduces its own magic
 constant without any hand-tuning needed:
@@ -107,7 +107,7 @@ It fills Application's +0x040 (setScreenDims) with a self-only signature; the
 ctor calls it once through the cast type, after installing this class's table.
 Application's own ctor called the slot earlier under Application's table, so
 the default screen size is still set. The function comment above the body in
-GameApplicationFileResource.c still says "advances the day cursor": that is track 7's to fix.
+game_shell.c still says "advances the day cursor": that is track 7's to fix.
 
 ## Track 7 polish (round 100, echo)
 

@@ -24,7 +24,7 @@ Byte-exact, 26/26 words.
 ## Notes
 
 Builds a CD-ROM path string: a leading `\` (0x5C), the directory/disc-label
-string `GetDataDirectory()` returns (`GameApplicationFileResource.c`, still `func_`-named,
+string `GetDataDirectory()` returns (`game_shell.c`, still `func_`-named,
 carved), the caller-supplied filename `suffix`, and a fixed `";1"` suffix
 from `sCdFileVersionSuffix` -- the ISO9660 file-version-number convention
 (`FILE.EXT;1`), strong confirmation of this unit's CD-ROM theme alongside
@@ -57,5 +57,5 @@ pure string-building leaf whose mechanics are its whole purpose. Called by
 Parameter `suffix` -> `name`, tier A: both callers (`OpenCdFile`,
 `CdDriver__Open`/`ResolveFileEntries`) pass a file name, and the body builds
 `"\\" + <data directory> + name + ";1"`; the suffix is
-`sCdFileVersionSuffix`. `GetDataDirectory` (GameApplicationFileResource.c) is the data directory
+`sCdFileVersionSuffix`. `GetDataDirectory` (game_shell.c) is the data directory
 getter; its name is proposed, not applied (not this unit's function).

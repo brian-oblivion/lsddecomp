@@ -150,11 +150,11 @@ void NullDriver__NoOpSlot50(void) {}
  * start/flush pair.
  *
  * NullDriver (include/NullDriver.h, class id 0x23 = DATASOURCE_NULL) is the
- * data source GameApplicationFileResource.c selects when it is not reading the CD; the CD
+ * data source game_shell.c selects when it is not reading the CD; the CD
  * driver (include/cd_driver.h, 0x13) is the other. Its Read, LoadFile,
  * RunRequestQueue, RequestLoadFile, StopService and CancelRequests slots do
  * nothing. GetNullDriverMode, SetNullDriverMode and GetNullDriverUseVSyncCallback
- * answer the queries GameApplicationFileResource.c's GetActiveDataSource* functions forward
+ * answer the queries game_shell.c's GetActiveDataSource* functions forward
  * to the CD driver's GetCdDriverMode, SetCdDriverMode and
  * GetCdUseVSyncCallback: they keep the two mode words and report no VSync
  * callback.

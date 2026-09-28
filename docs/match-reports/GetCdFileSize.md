@@ -50,7 +50,7 @@ buffer (re)alloc"), and `self->size` falls inside that struct's
 `pad18[0x20-0x18]` gap (explicitly documented there as "unknown, 8 bytes").
 Extending the shared header would require splitting that padding without
 shifting anything after it, which is mechanically safe -- but
-`data_source.h` is OUT OF UNIT (shared with `GameApplicationFileResource.c` and
+`data_source.h` is OUT OF UNIT (shared with `game_shell.c` and
 `cd_driver.c`, neither this unit) and the rule is explicit that nothing
 outside the assigned unit + its reports gets edited. Kept as this unit's own
 narrower local reading instead, per the project's multiple-independent-

@@ -277,7 +277,7 @@ Rounds 18 and 19 tried only reorderings and statement splits of the
 ADDRESS values, never the handle's variable count. Arity was checked and is
 not relevant: every call writes exactly the argument registers its callee's
 declared parameter list names, and `BuildFileName`'s matched definition
-(`GameApplicationFileResource.c`) takes four.
+(`game_shell.c`) takes four.
 
 The names/types are carried into the committed C because they are the
 sibling's established reading. The rodata/sdata strings are referenced as

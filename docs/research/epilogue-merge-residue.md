@@ -103,7 +103,7 @@ source, which is not vendored here.
 
 Roughly 25 build-and-diff attempts across five functions and four units:
 
-- `New_GameApplication` (GameApplicationFileResource, 23/24) — 14+ attempts. `if`/`goto` reshaping
+- `New_GameApplication` (game_shell, 23/24) — 14+ attempts. `if`/`goto` reshaping
   both directions, `__asm__("")` in every position, `volatile`.
 - `Pad__DispatchEvents` (two broadcast instances).
 - `New_TimedTask` (class_39e08, 26/27) — runner: `__asm__("")` after the malloc;
@@ -169,7 +169,7 @@ Five instances, all byte-exact, all with `return NULL;` last:
 
 ### Still open: the `nop` sub-shape
 
-`New_GameApplication` (GameApplicationFileResource, 23/24) is **not** closed, and it is a different
+`New_GameApplication` (game_shell, 23/24) is **not** closed, and it is a different
 animal. Retail leaves the `beqz` delay slot as a bare `nop` and materializes
 nothing at all, relying on `$v0` still holding the allocator's own zero return.
 There is no second return expression to reorder. Both the rule above and a

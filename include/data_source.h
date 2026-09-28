@@ -1,7 +1,7 @@
 #ifndef DATA_SOURCE_H
 #define DATA_SOURCE_H
 
-/* The data-source layer of src/app/GameApplicationFileResource.c: the free
+/* The data-source layer of src/app/game_shell.c: the free
  * functions that route FileResource's I/O to the active driver, the CD
  * (DATASOURCE_CD, include/cd_driver.h) or the SPU/VAB one (DATASOURCE_NULL,
  * include/NullDriver.h), and the data directory file names are built in.

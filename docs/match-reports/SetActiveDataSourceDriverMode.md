@@ -2,7 +2,7 @@
 
 > Renamed from `SetActiveDataSourceDriverMode` on 2026-09-18 (tools/rename.py). Address 0x80026f34.
 
-**Unit:** GameApplicationFileResource · **Size:** 30 words · **Status:** MATCHED, round 43
+**Unit:** game_shell · **Size:** 30 words · **Status:** MATCHED, round 43
 (2026-09-15, runner bravo). 30/30 words, byte-exact whole-image build.
 
 ## History

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80026A50` on 2026-09-18 (tools/rename.py). Address 0x80026a50.
 
-**Unit:** GameApplicationFileResource · **Size:** 25 instructions · **Status:** MATCHED (25/25 words, whole-image build verified byte-exact)
+**Unit:** game_shell · **Size:** 25 instructions · **Status:** MATCHED (25/25 words, whole-image build verified byte-exact)
 
 ## What it does
 
@@ -182,5 +182,5 @@ that was true of this unit only. `unk22` and `unk28` have since been named
 (`pendingRequests`, `inQueueDispatch`); `unk2A` is the row just above.
 
 `FileResource__LoadFile`'s local `savedPendingGeneration` keeps `isOpen`
-across the load; its name predates the field's and is GameApplicationFileResource's polish
+across the load; its name predates the field's and is game_shell's polish
 work, not a type change.

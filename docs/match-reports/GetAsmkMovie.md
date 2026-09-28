@@ -8,7 +8,7 @@ Round 81, runner echo. Unit `src/cd/game_files.c` (carved from psyq_39094 in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
-- **Where:** not a slot; called from src/app/GameApplicationFileResource.c.
+- **Where:** not a slot; called from src/app/game_shell.c.
 - **What:** `if (typeCodeOut != NULL) *typeCodeOut = 0x31; return sAsmkMoviePath;` -- signature copied from `include/GameApplication.h` (`const char *`; rodata `sAsmkMoviePath` referenced as a symbol, no literal).
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.

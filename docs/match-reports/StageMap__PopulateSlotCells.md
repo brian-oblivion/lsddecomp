@@ -935,7 +935,7 @@ unread +0x04..+0x0F stays padding (no code reads or writes it).
 
 **Proposed (head, not applied: outside this job's edit set).** The same
 0x10-byte record is declared twice more, with ResourceSource's fields under
-other names: include/DayTaskStageMap.h `LoadRequest` and src/app/GameApplicationFileResource.c
+other names: include/DayTaskStageMap.h `LoadRequest` and src/app/game_shell.c
 `LoadModelRequest`, both `{ s32 type; const char *path; s32 unk08; s32
 unk0C; }`, whose callers write `type = 0` (ResourceSource's NULL `buffer`)
 and `path` (its `name`) before `New_LinkResource`. One
@@ -966,7 +966,7 @@ callers pass `&req.src` with no cast; measured byte-exact at all three call
 sites. This unit's local view retired onto it (the local is now `req`, the
 body writes `req.src.buffer`); the `MATCHING` line on the 0x10 size moved to
 the header's type. include/DayTaskStageMap.h `LoadRequest` (DayTask__DayTask)
-and src/app/GameApplicationFileResource.c `LoadModelRequest` (GameApplication__GameApplication)
+and src/app/game_shell.c `LoadModelRequest` (GameApplication__GameApplication)
 retired onto the same type; their `type`/`path` accessors became
 `src.buffer`/`src.name`, the only ones the compiler listed.
 

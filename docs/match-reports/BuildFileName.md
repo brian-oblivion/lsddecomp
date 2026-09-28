@@ -2,7 +2,7 @@
 
 > Renamed from `func_800270C4` on 2026-09-18 (tools/rename.py). Address 0x800270c4.
 
-**Unit:** GameApplicationFileResource · **Size:** 27 instructions · **Status:** MATCHED (27/27 words, whole-image build verified byte-exact)
+**Unit:** game_shell · **Size:** 27 instructions · **Status:** MATCHED (27/27 words, whole-image build verified byte-exact)
 
 ## What it does
 

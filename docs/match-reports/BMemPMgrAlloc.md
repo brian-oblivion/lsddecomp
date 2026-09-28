@@ -747,7 +747,7 @@ green.
 `BMemPMgrAlloc`, **tier A**: fully derived byte-exact free-list allocator
 (round 73), matching `SetupBMemPMgrFreeList`'s setup and `BMemPMgrFree`'s
 (this unit's `BMemPMgrFree`) release, same list, same `sizeAndFlags`
-encoding. Called from a wide cross-section of units (`GameApplicationFileResource`,
+encoding. Called from a wide cross-section of units (`game_shell`,
 `code_179d8_*`, `task`, `code_2cc8c_*`, `TodActor`, `SceneNode`,
 `main`, plus this unit's own `PushBasicClassListNode`) — confirming it is
 the game's general small-object pool allocator, not something narrower.

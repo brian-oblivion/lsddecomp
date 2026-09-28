@@ -30,7 +30,7 @@ Byte-exact, 18/18 words.
 
 The standard "chain to base ctor, then install the derived vtable" idiom:
 calls `gFileResourceMethods`'s own ctor slot (`GetFileResourceMethods()->ctor`, i.e.
-`FileResource__FileResource`, matched in `GameApplicationFileResource.c`) directly rather than through
+`FileResource__FileResource`, matched in `game_shell.c`) directly rather than through
 `self->methods` (since `self->methods` isn't set up yet), then overwrites
 `self->methods` with `GetCdDriverMethods()` -- a DIFFERENT class table
 (`gCdDriverMethods`, confirmed via `tools/classtable.py --scan`: 29 slots, header
@@ -41,7 +41,7 @@ leading slot layout, which is all the type is asked to express here.
 
 Needed an explicit cast (`(FileResourceMethods *)`) on
 `GetFileResourceMethods()`'s result: it returns plain `void *` (per its own
-established signature in `GameApplicationFileResource.c`), so `->ctor` on the bare call
+established signature in `game_shell.c`), so `->ctor` on the bare call
 doesn't compile without one -- first attempt failed with `request for
 member 'ctor' in something not a structure or union`.
 
@@ -49,12 +49,12 @@ member 'ctor' in something not a structure or union`.
 
 `data_source.h`'s `FileResource`/`FileResourceMethods` describe a
 class that OTHER units' functions construct/chain into, not just
-`GameApplicationFileResource.c`'s own methods -- worth checking this header before
+`game_shell.c`'s own methods -- worth checking this header before
 redefining a local struct whenever a function dispatches through
 `GetFileResourceMethods()` or receives a `self` whose fields line up with its
 offsets. `GetFileResourceMethods()` itself returns bare `void *`, so every external
 call site needs its own cast to the slot-bearing type; this is not
-`GameApplicationFileResource.c`'s problem to fix (its own call sites go through
+`game_shell.c`'s problem to fix (its own call sites go through
 `this->methods`, already correctly typed).
 
 ## Naming (round 64, runner alpha)

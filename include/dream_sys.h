@@ -7,7 +7,7 @@
  * (include/Actor.h); no class derives from it. The ctor calls Actor's first
  * (DreamSys__DreamSys: GetActorMethods()->ctor), so the id parent is the
  * ctor-chain parent. Every method is in src/world/dream_sys.c. One instance, made
- * by GameApplication__GameApplication (src/app/GameApplicationFileResource.c, New_DreamSys) and kept in
+ * by GameApplication__GameApplication (src/app/game_shell.c, New_DreamSys) and kept in
  * GameApplication::dreamSys; the same object is GraphRoom::dreamSys, the
  * `target` ObjMStyleActor hands SetDreamAuxWorld (dream_aux's
  * sDreamAuxWorld), and the `peer` every Entity links to.

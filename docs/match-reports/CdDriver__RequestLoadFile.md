@@ -154,7 +154,7 @@ allows.
   class `gFileResourceMethods` leaves as an unnamed pad in
   `include/data_source.h`'s `FileResourceMethods` ("FileResource__LoadFile's own
   slot, unused here"). Rather than editing that shared header — which
-  `cd_driver.c` and `GameApplicationFileResource.c` also include —
+  `cd_driver.c` and `game_shell.c` also include —
   this unit keeps its own local view (`Methods6D4E8_C80`/`Obj6D4E8_C80`), per the
   project's multiple-independent-local-views convention.
 

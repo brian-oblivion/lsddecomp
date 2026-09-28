@@ -38,7 +38,7 @@ rather than API.
   through $v0. `PickSoundBank` returns `s32` for a path (game_files.c:203),
   `PickStageBgm` likewise (ObjMStyleActor.c:525). `RecPick{group,sub}` and
   dream_sys.h's `CinematicCall{bank,entry}` are one packed pair, repacked by
-  hand at GameApplicationFileResource.c:80, 317. Add game_files.h.
+  hand at game_shell.c:80, 317. Add game_files.h.
 - **Full-width SJIS helpers.** `DecodeFullWidthSjis` is `u8 *(u8 *, u8 *)`
   (screen_widgets) but `void (void *, void *)` at TitleMenuTaskObjF.c:316 and
   `char *(char *, char *)` at TextEntryItemList.c:41, 511;
@@ -46,7 +46,7 @@ rather than API.
 - **Others without a header or disagreeing:** `BuildFileName`
   (TextEntryItemList.c:155, 629; PlacementGridVabSound.c:185, with `const`);
   `GetSsSizeTableBuf` (`void *` vs `char *`); `GetSsTicksPerSecond` (wbgm.c:21
-  only); `LockCd`/`UnlockCd` declared `s32` at GameApplicationFileResource.c:535,
+  only); `LockCd`/`UnlockCd` declared `s32` at game_shell.c:535,
   defined `void`; `SetActiveDataSourceDriverMode` `s32` in DayTaskStageMap.h:57
   vs `void` definition; `GetSoundEffectDir(s32)` vs `(void)`;
   `IsStyleVariantEven` `bool` vs `s32`; `ReleaseBasicClassArray` in task.h:32
@@ -87,7 +87,7 @@ rather than API.
   IntermediateBase, Pad, StreamTask, TaskCore, TmdModel, WBgm). Rename; add
   the form to §3's conventions.
 - **Receiver:** `this` in dream_sys.c (93 methods), entity.c (138), 7
-  FileResource methods in GameApplicationFileResource.c, dream_sys.h's
+  FileResource methods in game_shell.c, dream_sys.h's
   prototypes; `self` everywhere else.
 - **Guards:** dream_sys.h `CLASS_DREAMSYS`, stage_grid.h `STAGE_GRID`.
 - **`s` externs in headers:** 24 (StageMap.h:416-441, TitleMenu.h:147-170,

@@ -6,7 +6,7 @@
 
 > Renamed from `func_80026AB4` on 2026-09-18 (tools/rename.py). Address 0x80026ab4.
 
-**Unit:** GameApplicationFileResource · **Size:** 21 instructions · **Status:** MATCHED (21/21 words, whole-image build verified byte-exact)
+**Unit:** game_shell · **Size:** 21 instructions · **Status:** MATCHED (21/21 words, whole-image build verified byte-exact)
 
 ## What it does
 

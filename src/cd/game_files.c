@@ -20,7 +20,7 @@
  * the WBgm's setSeq, PickStageTexture's to New_TimBlockSrc, and a map
  * chunk's to an LbdFile. The movie getters also hand back a movie id, the
  * movie's index in sMovieFrameCounts, whose value GetMovieFrameCount gives
- * GameApplicationFileResource.c's StreamTasks as the MoviePlayer's frame count.
+ * game_shell.c's StreamTasks as the MoviePlayer's frame count.
  *
  * The random pickers draw through SeedAndRandom; SetPickOverrides forces
  * PickSoundBank's and PickStageBgm's choice (1-based, 0 for random).

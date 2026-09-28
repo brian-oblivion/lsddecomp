@@ -230,7 +230,7 @@ at slot `+0x058`. The prefix names the table, not the developers' class.
 ## Proposed field names
 
 For the head to apply by type scope (out of unit). `FileResource__LoadFile`
-(GameApplicationFileResource), the base method this function overrides and calls in sync
+(game_shell), the base method this function overrides and calls in sync
 mode, drives these slots in the order open, size query, alloc, rewind, read,
 close; the one class that fills them (`gCdDriverMethods`) fills them with the
 methods named here.
@@ -242,7 +242,7 @@ methods named here.
 | include/data_source.h | `FileResourceMethods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `CdDriver__Read` |
 | include/data_source.h | `FileResource` | `pendingGeneration` (+0x0C) | `isOpen` | B | same offset as `Class6D4E8::isOpen`; AllocBuffer zeroes it before calling `open` (which opens only when it is 0) and restores it after `close` |
 
-Also noted for whoever names GameApplicationFileResource again: `FileResource__LoadFile`
+Also noted for whoever names game_shell again: `FileResource__LoadFile`
 opens, sizes, allocates for, reads and closes a named file, i.e. it is the
 base-class LoadFile. Not renamed here (out of unit).
 

@@ -123,7 +123,7 @@ Rodata follows the code objects' order: `libetc/intr_dma` .rdata at 0xF28 and
 `libc2/puts` (no .rdata; its only data is 7 bytes of .sdata),
 `Pad`, `libetc/pad` (the linked 3.5 `pad.o`: .text and .bss only, no
 .rdata) and `libapi/a22`, and the next rodata slot, 0xFA4, is
-`GameApplicationFileResource`'s (the unit after them). The only object in
+`game_shell`'s (the unit after them). The only object in
 that stretch able to own 0x40 bytes of .rodata at 0xF64 is this unit. The yaml
 line for 0xF64 still says "owner not placed yet (libetc intr?)"; proposed to
 the head, not edited (runners do not edit the yaml).

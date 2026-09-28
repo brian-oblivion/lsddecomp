@@ -821,7 +821,6 @@
       "status": "open",
       "units_done": {
         "DayTaskStageMap": "2026-09-23",
-        "GameApplicationFileResource": "2026-09-24",
         "ObjMStyleActor": "2026-09-24",
         "PlacementGridVabSound": "2026-09-24",
         "TextEntryItemList": "2026-09-24",
@@ -836,6 +835,7 @@
         "entity": "2026-09-19",
         "flat_light_obj": "2026-09-25",
         "game_files": "2026-09-25",
+        "game_shell": "2026-09-24",
         "graphics_resources": "2026-09-25",
         "libcard_card": "2026-09-23",
         "libcd_bios": "2026-09-23",
@@ -1553,7 +1553,6 @@
       "status": "auto",
       "units_done": {
         "DayTaskStageMap": "2026-09-27",
-        "GameApplicationFileResource": "2026-09-27",
         "ObjMStyleActor": "2026-09-27",
         "PlacementGridVabSound": "2026-09-27",
         "TextEntryItemList": "2026-09-27",
@@ -1568,6 +1567,7 @@
         "entity": "2026-09-27",
         "flat_light_obj": "2026-09-28",
         "game_files": "2026-09-27",
+        "game_shell": "2026-09-27",
         "graphics_resources": "2026-09-26",
         "libsnd_vmanager": "2026-09-27",
         "main": "2026-09-28",

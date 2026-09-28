@@ -4,7 +4,7 @@
 
 > Renamed from `func_80026C9C` on 2026-09-18 (tools/rename.py). Address 0x80026c9c.
 
-**Unit:** GameApplicationFileResource · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
+**Unit:** game_shell · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
 ## What it does
 
@@ -34,7 +34,7 @@ are this unit's own `FileResource__Release`/`FileResource__FileResource`/`FileRe
 ctor-by-the-`+0x008`-convention / a third override), and `+0x058`.`+0x064`
 are `FileResource__LoadFile`..`FileResource__OnRequestDone`, also this unit. So this function is the
 "get my own class's methods" accessor for the class that owns roughly a third
-of `GameApplicationFileResource`'s remaining queue — worth knowing for whoever picks up
+of `game_shell`'s remaining queue — worth knowing for whoever picks up
 `FileResource__Release`, `FileResource__FileResource`, `FileResource__Finalize`, `FileResource__LoadFile`, or
 `FileResource__FreeBuffer` next: they all dispatch through this same table (see
 `include/data_source.h` for the full slot map, and the constructor-called-via
@@ -78,7 +78,7 @@ Posted to the broadcast.
 **Verdict: extern FIXED.** The second of the round's two genuinely wrong
 declarations; same shape and same discriminator as `GetSceneNodeMethods`.
 
-**Callee evidence** (`0x80026C9C`, and the definition in `src/app/GameApplicationFileResource.c`):
+**Callee evidence** (`0x80026C9C`, and the definition in `src/app/game_shell.c`):
 
 ```
 80026c9c:  lui   v0,0x8007
@@ -107,11 +107,11 @@ the declaration's parameter list is free and must agree with the definition.
 `extern BaseCtorTable6D4E8 *GetFileResourceMethods();`. Return type untouched
 (this unit's own local view of the table, used for `->ctor` at +0x008); the
 call site is untouched. The other two declarations
-(`src/app/GameApplicationFileResource.c`'s definition and `include/data_source.h`'s `(void)`) were
+(`src/app/game_shell.c`'s definition and `include/data_source.h`'s `(void)`) were
 already correct.
 
 **Stale comment corrected on the same line:** it read "still INCLUDE_ASM in the
 code_179d8 remainder". It is not — it has a matched definition in
-`src/app/GameApplicationFileResource.c`, which is what made this finding decidable at all.
+`src/app/game_shell.c`, which is what made this finding decidable at all.
 
 Oracle green (`build exit=0`, `OK: build matches retail`) after the edit.

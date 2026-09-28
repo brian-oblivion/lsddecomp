@@ -14,7 +14,7 @@
  *
  * RegisterRecordTableFiles: registers sRecordTable's file entries with the
  * CD driver in at most two batches (DayTask's ctor, and the loader-task
- * callback in GameApplicationFileResource.c).
+ * callback in game_shell.c).
  *
  * TimedTask (include/TimedTask.h), New_TimedTask through
  * GetTimedTaskMethods: an IntermediateBase with a frame timeout, a sound

@@ -6,7 +6,7 @@
 
 > Renamed from `func_80026900` on 2026-09-24 (tools/rename.py). Address 0x80026900.
 
-**Unit:** GameApplicationFileResource · **Size:** 56 instructions (0xE0 bytes) · **Status:** MATCHED (56/56 words, whole-image SHA1 green), first attempt
+**Unit:** game_shell · **Size:** 56 instructions (0xE0 bytes) · **Status:** MATCHED (56/56 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -112,7 +112,7 @@ extern s32 GetEndingMovie(s32 *out, s32 unused); /* arity-ok: the definition is 
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in GameApplicationFileResource.c are gone. Byte-identical.
+`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in game_shell.c are gone. Byte-identical.
 
 ## Track 10 (2026-09-28, round 104, echo)
 

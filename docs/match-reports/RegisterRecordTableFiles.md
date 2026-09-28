@@ -98,7 +98,7 @@ else.
 
 `RegisterRecordTableFiles` -- left unrenamed (round 73, alpha, track-3 pass). Called
 once from `DayTask__DayTask`'s ctor as `RegisterRecordTableFiles(1)` (return
-discarded) and once from `GameApplicationFileResource.c` as `RegisterRecordTableFiles(0)` (also
+discarded) and once from `game_shell.c` as `RegisterRecordTableFiles(0)` (also
 discarded). It is not a class method (no `self` parameter, not reachable
 through any vtable slot in either the 33-slot or 28-slot table this unit
 resolved), and its own body -- a two-call-deep counter over
@@ -121,7 +121,7 @@ now says so. (The derivation above quotes the old comment as it was.)
 `func_8004A070` -> `RegisterRecordTableFiles` (tier B). The body, read with
 its two callees: GetRecordTable returns sRecordTable (0x230 records of 0x1C
 bytes, each a file path first; game_files.c's banner) and its count;
-RegisterFileTableEntries (GameApplicationFileResource.c) appends `count` records to the CD
+RegisterFileTableEntries (game_shell.c) appends `count` records to the CD
 driver's file table and resolves them, returns 0 to be retried, and 1 when
 the CD driver is not the active source. So the function registers the record
 table's files with the CD driver: on its first call all of them when `all`

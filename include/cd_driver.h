@@ -26,7 +26,7 @@
  *                       the driver is not in async mode
  *
  * THE DRIVER RUNS ON OTHER CLASSES' OBJECTS. Nothing calls New_CdDriver.
- * SetActiveDataSource (src/app/GameApplicationFileResource.c) copies this table's eleven
+ * SetActiveDataSource (src/app/game_shell.c) copies this table's eleven
  * interface slots (+0x040..+0x058, +0x068..+0x074) into FileResource's table
  * and every client table, so `self` in Open/Read/... is whatever
  * FileResource object called its own `open`/`read` (a TimImage, a TodSet,
@@ -152,7 +152,7 @@ typedef struct CdRequestNode {
 
 /* The driver's free functions, in cd_driver.c's order. */
 
-/* The drive and its state, as GameApplicationFileResource.c's data-source
+/* The drive and its state, as game_shell.c's data-source
  * wrappers read it. */
 extern void InitCdDrive(void);
 extern s32 IsCdBusy(void);

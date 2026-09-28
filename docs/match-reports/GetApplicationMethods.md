@@ -24,7 +24,7 @@ include that header and declares its own local `ApplicationMethods` view,
 so the two never meet in one translation unit (the multiple-local-views
 convention). A track-4 unification of gApplicationMethods would merge the two views:
 MiddleClassMethods types +0x044 as `s32 (*)(void *, void *, void *, s32)`
-(4 args, from GameApplicationFileResource's call `slot44(self, a1, a2, 0)`), while the
+(4 args, from game_shell's call `slot44(self, a1, a2, 0)`), while the
 occupant Application__InitSystems reads only three (self, source, arg). A void
 body matches; the bytes cannot say whether callers use a return value.
 

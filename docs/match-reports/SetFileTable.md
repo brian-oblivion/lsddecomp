@@ -39,7 +39,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 0x1C stride doing `strstr(record, needle)` from offset 0, `GetCdFileEntry`
 indexes it as `base + index * 0x1C`, and `ResolveFileEntries` (this unit)
 fills each record's `+0x14`/`+0x18` from a `CdSearchFile` lookup on the name
-at offset 0. `GameApplicationFileResource.c`'s `RegisterFileTableEntries` sets the base, then the count,
+at offset 0. `game_shell.c`'s `RegisterFileTableEntries` sets the base, then the count,
 then resolves `base + idx * 0x1C` -- the three-call sequence that makes the
 array a file table. Setter of a base pointer: tier A.
 

@@ -154,7 +154,7 @@ polarity and never scheduling.
 
 ## Track 4 (2026-09-26, round 88)
 
-Obj865C8::unk38 is the game's DreamSys (GameApplicationFileResource passes
+Obj865C8::unk38 is the game's DreamSys (game_shell passes
 GameApplication::dreamSys to New_DayTask), so the SubObjD view is gone and its
 slots are DreamSys's: +0x1B8 endDay, +0x1BC getCinematic. The by-value
 return this body tests is therefore a CinematicCall {bank, entry}; the

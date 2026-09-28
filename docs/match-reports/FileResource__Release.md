@@ -6,7 +6,7 @@
 
 > Renamed from `func_800269F0` on 2026-09-18 (tools/rename.py). Address 0x800269f0.
 
-**Unit:** GameApplicationFileResource · **Size:** 24 instructions · **Status:** MATCHED (24/24 words, whole-image build verified byte-exact)
+**Unit:** game_shell · **Size:** 24 instructions · **Status:** MATCHED (24/24 words, whole-image build verified byte-exact)
 
 ## What it does
 
