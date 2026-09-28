@@ -27,7 +27,7 @@ void CdDriver__StopService(void)
 
 ## Derivation
 
-Pure three-call sequence, no branches, no locals: set the `gCdLock` latch,
+Pure three-call sequence, no branches, no locals: set the `sCdLock` latch,
 call `StopCdServiceIfIdle` (also matched this round, ROM-later so needed a forward
 declaration), clear the latch. `StopCdServiceIfIdle` in turn is defined later in
 this file since it sits at a higher ROM address, so `LockCd`,
@@ -37,7 +37,7 @@ ahead of this definition to satisfy strict ROM-address file ordering.
 ### Proposed learning
 
 None new — same "set latch / do work / clear latch" bracket pattern already
-seen around `gCdLock` in this unit (`CdDriver__RequestLoadFile`, `DisableCdQueue`, now
+seen around `sCdLock` in this unit (`CdDriver__RequestLoadFile`, `DisableCdQueue`, now
 this one), just with a different body in the middle.
 
 ## Naming
@@ -51,7 +51,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence.** Slot `+0x070` of `gCdDriverMethods`. The whole body is
 `LockCd(); StopCdServiceIfIdle(); UnlockCd();` -- the locked wrapper around
 this unit's `StopCdServiceIfIdle`, which unhooks the `VSyncCallback` and
-clears `gCdCallbackInstalled`/`gCdQueueEnabled` when the state machine has
+clears `sCdCallbackInstalled`/`sCdQueueEnabled` when the state machine has
 nothing pending. The name says exactly that: the class's "stop the CD
 service" slot.
 

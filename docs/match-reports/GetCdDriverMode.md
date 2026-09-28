@@ -26,7 +26,7 @@ s32 GetCdDriverMode(s32 *a0)
 Straight read of the disassembly: `beqz $a0, .L80027F0C` guards a store of
 `gCdSyncQueueMode` (gp_rel) into `*a0`; fallthrough loads `gCdAsyncEnabled` (gp_rel) into
 `$v0` and returns it unconditionally. Both globals are in the same
-`gCdAsyncEnabled..gCdQueueEnabled` sdata block this unit's other getter/setters touch
+`gCdAsyncEnabled..sCdQueueEnabled` sdata block this unit's other getter/setters touch
 (see `GetCdDriverMethods`'s header comment in the `.c` for the class map). No
 class/struct involvement — plain scalar globals, plain optional-out-param
 shape.
@@ -97,3 +97,7 @@ not have. Same shape as `GetVabDriverMode` two lines down.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/GameApplicationFileResource.c:230`. Oracle green.
+
+## Track 7 (round 101, echo): comments moved here, and names
+
+Parameter `outMode2` -> `outSyncQueueMode`: it receives `gCdSyncQueueMode`.

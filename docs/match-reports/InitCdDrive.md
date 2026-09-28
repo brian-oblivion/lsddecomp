@@ -101,3 +101,8 @@ next person. Measured this round across 12 sdata renames.
 The unit takes `<libcd.h>`: `CdSetDebug`/`CdControlB` are Sony's prototypes
 and the local `CD_CMD_SETMODE`/`CD_MODE_DOUBLE_SPEED` are Sony's own
 `CdlSetmode` (0x0E) and `CdlModeSpeed` (0x80). Byte-exact.
+
+## Track 7 (round 101, echo): comments moved here, and names
+
+CdControlB's result argument `0` is spelled `NULL` (libcd.h: `u_char
+*result`).

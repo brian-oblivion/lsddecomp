@@ -6,7 +6,7 @@
 
 ## What this function does
 
-Sets the scalar `s32` global `gCdLock` to `0`. No arguments, no return
+Sets the scalar `s32` global `sCdLock` to `0`. No arguments, no return
 value. The clear half of the 1/0 latch pair completed by `LockCd`
 (see that report) -- `CdDriver__RequestLoadFile` calls `LockCd` on entry and
 `UnlockCd` on every exit path; `DisableCdQueue` (queued, later in this
@@ -15,11 +15,11 @@ unit) also calls both, `LockCd` first then `UnlockCd`.
 ## The C
 
 ```c
-extern s32 gCdLock;
+extern s32 sCdLock;
 
 void UnlockCd(void)
 {
-    gCdLock = 0;
+    sCdLock = 0;
 }
 ```
 
@@ -37,6 +37,6 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_800280E0` | `UnlockCd` | A |
 
-**Evidence.** Clears `gCdLock`; the release half of the pair documented in
+**Evidence.** Clears `sCdLock`; the release half of the pair documented in
 `LockCd.md`, called on every exit path of every entry point that takes it.
 Tier A.

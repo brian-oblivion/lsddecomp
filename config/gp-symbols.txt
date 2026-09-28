@@ -68,13 +68,10 @@ gCardPathPrefix
 gCardPathSuffix
 gCdAsyncEnabled
 gCdBusy
-gCdCallbackInstalled
 gCdFileVersionSuffix
 gCdIdle
 gCdInitDone
-gCdLock
 gCdOperation
-gCdQueueEnabled
 gCdReadBuffer
 gCdReadSectorCount
 gCdRequestQueue
@@ -188,7 +185,10 @@ gpDinamicLinkPenalty
 gpNavChallengesComplete
 sCardFilePrefix
 sCardPathPrefix
+sCdCallbackInstalled
 sCdDriveInited
+sCdLock
+sCdQueueEnabled
 sDayDigits
 sDivClipHeight
 sDivClipWidth

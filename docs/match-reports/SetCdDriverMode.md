@@ -147,3 +147,10 @@ the type stays a per-call-site local view.
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (gDrawSystemMethods unified). Byte-identical.
+
+## Track 7 (round 101, echo): comments moved here, and names
+
+Parameter `mode2` -> `syncQueueMode` (it is stored in `gCdSyncQueueMode`),
+local `obj` -> `drawSystem` (GetDrawSystem's result); `setCallback(obj, 0)`
+is `setCallback(drawSystem, NULL)`. GetCdDriverMode's `outMode2` is
+`outSyncQueueMode` for the same reason.

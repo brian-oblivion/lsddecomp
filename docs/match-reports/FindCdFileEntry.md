@@ -69,6 +69,6 @@ global's type comes from its accessors (`gFileTable` is walked at the 0x1C
 ## Round 101 (track 7 polish)
 
 The source now says, over the function, that the not-found return skips
-UnlockCd, so ServiceCdDriver (which returns at once while gCdLock is set)
+UnlockCd, so ServiceCdDriver (which returns at once while sCdLock is set)
 stays off until the next UnlockCd anywhere. `strstr` comes from Sony's
 `<strings.h>`.

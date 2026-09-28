@@ -151,3 +151,17 @@ at +0x08..+0x18, padded) was a writing-side view of include/CdDriver.h's
 returns: same offsets, same allocator. The view is deleted and `entry` is a
 `CdRequestNode *`; `owner` is that struct's `CdDriver *`, so the `(s32)` cast
 on the store went too. Byte-exact.
+
+## Track 7 (round 101, echo): comments moved here, and names
+
+The comment on the definition was cut to a one-line `MATCHING:` on the
+first store; the full text was:
+
+```c
+/* Fills a node AllocCdRequestNode has already linked onto gCdRequestQueue,
+ * counts it against its owner and starts the service tick.
+ * MATCHING: the stores are in retail's order (+0x08, +0x14, +0x0C, +0x10,
+ * +0x18); this compiler keeps statement order. */
+```
+
+The local `entry` is now `node` (a CdRequestNode, AllocCdRequestNode's).

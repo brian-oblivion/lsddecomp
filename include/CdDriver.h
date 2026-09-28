@@ -114,6 +114,7 @@ typedef struct CdRequestNode {
 
 /* gCdTickStep: which of code_179d8_r.c's two state machines ServiceCdDriver
  * ticks. */
+#define CD_TICK_NONE 0          /* neither: ResetCdStateMachine's value */
 #define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
 #define CD_TICK_LOAD_FILE 2     /* TickCdLoadFileStateMachine */
 
