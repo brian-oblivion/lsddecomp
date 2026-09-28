@@ -50,7 +50,7 @@ documented end of this struct at 0x21c"). `tools/classtable.py
 gDreamSysMethods` resolves it this round to be DreamSys__func_5ba20's own slot,
 directly following `ResetFlashbackList`/`DreamSys__SaveLinkSnapshot`/`DreamSys__RestoreLinkSnapshot` --
 no gap, and no "past the end" special case. The field is NOT renamed,
-though: `src/GameApplicationFileResource.c` (a different unit, out of this runner's scope)
+though: `src/app/GameApplicationFileResource.c` (a different unit, out of this runner's scope)
 already calls it as `self->dreamSys->vt->func_228(self->dreamSys,
 arg->unk14)`, and renaming the C field would require an out-of-scope edit
 there. Retyped from `void (*)(DreamSys*, s32)` to `s32 (*)(DreamSys*, s32)`
@@ -78,7 +78,7 @@ Renamed from `func_8005BA20`.
 
 Tier-C placeholder. Known: the unit's get/set shape over
 `unk_0x924` (negative argument means query only), vtable slot +0x228, which
-src/GameApplicationFileResource.c reaches by the field name `func_228` -- GameApplication's constructor
+src/app/GameApplicationFileResource.c reaches by the field name `func_228` -- GameApplication's constructor
 calls it once with `arg->unk14` and discards the result. `unk_0x924` is cleared by
 `DreamSys__ResetSessionState` and read by nothing in carved code, and the one caller
 names its argument no better, so there is nothing to name it after.

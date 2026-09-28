@@ -78,7 +78,7 @@ Posted to the broadcast.
 **Verdict: extern FIXED.** The second of the round's two genuinely wrong
 declarations; same shape and same discriminator as `GetSceneNodeMethods`.
 
-**Callee evidence** (`0x80026C9C`, and the definition in `src/GameApplicationFileResource.c`):
+**Callee evidence** (`0x80026C9C`, and the definition in `src/app/GameApplicationFileResource.c`):
 
 ```
 80026c9c:  lui   v0,0x8007
@@ -107,11 +107,11 @@ the declaration's parameter list is free and must agree with the definition.
 `extern BaseCtorTable6D4E8 *GetFileResourceMethods();`. Return type untouched
 (this unit's own local view of the table, used for `->ctor` at +0x008); the
 call site is untouched. The other two declarations
-(`src/GameApplicationFileResource.c`'s definition and `include/GameApplicationFileResource.h`'s `(void)`) were
+(`src/app/GameApplicationFileResource.c`'s definition and `include/GameApplicationFileResource.h`'s `(void)`) were
 already correct.
 
 **Stale comment corrected on the same line:** it read "still INCLUDE_ASM in the
 code_179d8 remainder". It is not — it has a matched definition in
-`src/GameApplicationFileResource.c`, which is what made this finding decidable at all.
+`src/app/GameApplicationFileResource.c`, which is what made this finding decidable at all.
 
 Oracle green (`build exit=0`, `OK: build matches retail`) after the edit.

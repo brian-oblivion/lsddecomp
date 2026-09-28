@@ -205,7 +205,7 @@ broadcast.
 **Verdict: arity-ok idiom.** `src/CdDriver.c`'s `(void)` declaration stays.
 
 **Callee evidence** (`0x80026B08`, and the matched definition in
-`src/GameApplicationFileResource.c`): the body reads BOTH argument registers before writing
+`src/app/GameApplicationFileResource.c`): the body reads BOTH argument registers before writing
 them — `move s0,a0` at entry, and `$a1` is still the incoming `arg1` when it is
 forwarded to `this->methods->configureBuffer(this, arg1, 1, 0)` at `0x80026B48`
 (only `$a2`/`$a3` are re-set there, with `li a2,0x1` / `move a3,zero`). Two

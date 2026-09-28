@@ -1,7 +1,7 @@
 #ifndef GAMEAPPLICATIONFILERESOURCE_H
 #define GAMEAPPLICATIONFILERESOURCE_H
 
-/* src/GameApplicationFileResource.c's own view of what it calls. The
+/* src/app/GameApplicationFileResource.c's own view of what it calls. The
  * classes it defines are declared by their own headers: GameApplication in
  * include/GameApplication.h, FileResource and ResourceRequest in
  * include/FileResource.h (included here for CdDriver.c, which reaches

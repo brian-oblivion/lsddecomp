@@ -15,7 +15,7 @@
  * the DreamSys's 365-day mood ring. What it is in the game (the graph
  * screen) is that reading; the mechanics below are measured.
  *
- * Who makes one: GameApplication__RunTitleMenu (src/GameApplicationFileResource.c), through
+ * Who makes one: GameApplication__RunTitleMenu (src/app/GameApplicationFileResource.c), through
  * GameApplication__RunTask(New_GraphRoom, self->dreamSys, ...), so the ctor's
  * one argument, kept at +0x0A4, is the game's DreamSys. Its +0x1B0 is
  * DreamSys__GetSaveBlock, which returns &saveMagic; this unit reads that

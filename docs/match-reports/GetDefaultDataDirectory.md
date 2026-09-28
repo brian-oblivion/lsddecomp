@@ -6,7 +6,7 @@ Round 81, runner echo. Unit `src/GameFiles.c` (carved from psyq_39094 in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
-- **Where:** not a slot; called from src/GameApplicationFileResource.c.
+- **Where:** not a slot; called from src/app/GameApplicationFileResource.c.
 - **What:** returns the small-data word `gDefaultDataDirectory` (`%gp_rel` load; the gp_rel blocker is RESOLVED). Return type `s32` kept as `include/GameApplication.h` declares it, although retail stores a pointer (`&D_8008A958`) there.
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.

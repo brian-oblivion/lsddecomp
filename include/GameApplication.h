@@ -11,7 +11,7 @@
  * console up and owns the outer loop; this class fills the loop's six hooks with
  * the game's sequence and owns the game's DreamSys (include/DreamSys.h). Class id
  * 0x1F60, method table gGameApplicationMethods; the methods and the getter
- * GetGameApplicationMethods are in src/GameApplicationFileResource.c. No class
+ * GetGameApplicationMethods are in src/app/GameApplicationFileResource.c. No class
  * derives from it.
  *
  * Lifecycle.

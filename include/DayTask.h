@@ -12,7 +12,7 @@
  * src/DayTaskStageMap.c, New_DayTask through GetDayTaskMethods.
  *
  * Who creates it. Application__RunMainLoop (src/app/Application.c) calls
- * GameApplication__RunDayTask (src/GameApplicationFileResource.c) when the GraphRoom poll
+ * GameApplication__RunDayTask (src/app/GameApplicationFileResource.c) when the GraphRoom poll
  * returns 2, and that builds one with New_DayTask(the application's
  * IntermediateBaseInitArgs, its DreamSys, config->unk04), runs its init to
  * completion and releases it. init's return is TimedTask::result:

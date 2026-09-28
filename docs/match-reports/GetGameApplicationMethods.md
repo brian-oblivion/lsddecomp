@@ -57,7 +57,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | `func_800269E0` | `GetGameApplicationMethods` | A |
 
 **Evidence.** A two-instruction address-of returning `&gGameApplicationMethods`. `GameApplication`
-is already an established type name in `src/GameApplicationFileResource.c` (that unit's own
+is already an established type name in `src/app/GameApplicationFileResource.c` (that unit's own
 functions are typed against it), and the "return my own vtable" shape is
 already named twice in this project (`GetCdDriverMethods`,
 `GetFileResourceMethods`, this same round). Pure leaf whose mechanics are its

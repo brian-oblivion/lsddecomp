@@ -523,7 +523,7 @@ segments:
       - [0x1674C, o, libapi/a22]        # BIOS A-function stubs
       - [0x1675C, o, libapi/a20]
       - [0x1676C, o, libapi/a21]
-      - [0x1677c, c, GameApplicationFileResource]
+      - [0x1677c, c, app/GameApplicationFileResource]
       # ROUND 34: the unit's LAST function, `strcat` (0x80027130, 42w), is
       # Sony's -- libc2/strcat, Psy-Q 3.3, 0xA8 covering exactly it. It had
       # been matched as C since round 8 and counted as game code; linking the

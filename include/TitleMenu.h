@@ -12,7 +12,7 @@
  * src/TitleMenuTaskObjF.c holds the allocator and ctor, every other method
  * and the getter.
  *
- * Who makes one: GameApplication__RunTitleMenu (src/GameApplicationFileResource.c) runs
+ * Who makes one: GameApplication__RunTitleMenu (src/app/GameApplicationFileResource.c) runs
  * it with GameApplication__RunTask(New_TitleMenu, dreamSys, ...) after the
  * day's GraphRoom; while it returns 2 (GRAPH) it runs GraphRoom again and then
  * the menu again.

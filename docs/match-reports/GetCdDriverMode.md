@@ -74,7 +74,7 @@ the `.c` now carries this paragraph as a comment instead.
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/GameApplicationFileResource.c`'s `(void)` declaration stays.
+**Verdict: arity-ok idiom.** `src/app/GameApplicationFileResource.c`'s `(void)` declaration stays.
 
 **Callee evidence** (`0x80027EF8`): the very first instruction is `beqz a0,...`
 — `$a0` is read before it is written, so the definition in
@@ -96,7 +96,7 @@ parameter would force this call site to materialise an argument retail does
 not have. Same shape as `GetVabDriverMode` two lines down.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/GameApplicationFileResource.c:230`. Oracle green.
+added to `src/app/GameApplicationFileResource.c:230`. Oracle green.
 
 ## Track 7 (round 101, echo): comments moved here, and names
 
