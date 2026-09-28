@@ -1,36 +1,17 @@
 /*
- * code_10ee0 -- GAME code carved from the head of psyq_10ee0 on 2026-09-25
- * (FINISHING-PLAN revision 18). 0x10EE0..0x11474 (vram
- * 0x800206E0..0x80020C74). It was counted as Psy-Q SDK by segment name;
- * tools/gameinsdk.py measured it as game (a call into game code, a method-
- * table entry beside game methods, or contiguity with those, and no Sony
- * fingerprint). What it holds: the 19 methods of gDrawSystemMethods, the game's
- * screen/graphics singleton, matched as DrawSystem this round. `main.c`
- * builds the one instance (`New_DrawSystem`) and hands it into the game's
- * startup chain, which lands it in `code_2b78c.c`'s `Application__InitSystems`
- * as its `source` argument -- that unit dispatches `source`'s own +0x044
- * slot, the address this unit's table lists as `initGraph`
- * (`DrawSystem__InitGraph`, GsInitGraph setup), confirming the two units see
- * the same object. Three OTHER units independently called
- * `GetDrawSystem()`'s return "the draw singleton" in their own comments
- * before this rename, and two of them (`TimImage.c`, `code_179d8_q.c`)
- * independently chose the names `loadImage`/`moveImage` for the exact same
- * slots this unit matched as LoadImage/MoveImage -- three-way convergent
- * naming evidence, not a guess. libgpu/sys starts right after, at
- * ResetGraph (now psyq_11474).
+ * DrawSystem: the game's screen and graphics singleton (include/DrawSystem.h).
+ * This file holds all of its methods, the table getter, and the
+ * GetDrawSystem/SetDrawSystem accessors for the one instance.
  *
- * Round 81 (bravo) matched the ten small methods/accessors; round 81
- * (alpha) matched ten more (the allocator, ctor, init and the RECT/VRAM
- * helpers). Round 82 (alpha) matched the last four (DrawSystem__InitGraph,
- * DrawSystem__StoreImage, DrawSystem__RunLoop, DrawSystem__ClearImage); the
- * unit is complete. Round 82 (bravo): naming pass -- class named DrawSystem,
- * every function and both gp-variable accessors renamed via
- * tools/rename.py, method-table slots named for the methods they hold. See
- * each function's report `## Naming` for tier and evidence.
+ * main() builds it with New_DrawSystem; Application__InitSystems stores it
+ * with SetDrawSystem and sets the screen up through initGraph. Start runs
+ * runLoop, a VSync loop that calls the installed callback and notifies the
+ * parents every pass until stop clears `running`. The VRAM transfers
+ * (load/store/move/clear image) are thin wrappers over libgpu that narrow a
+ * DrawRect to libgpu's RECT (ConvertRect); while the loop runs they transfer
+ * only when syncMode is set, and then wait for DrawSync(0).
  *
- * Round 87 (bravo, track 4): the class is unified. Its one definition is
- * include/DrawSystem.h (object, table, both value types); the SDK types and
- * prototypes it uses come from Sony's <libgpu.h>, <libgs.h> and <libetc.h>.
+ * Sony's libgpu/sys follows this file in the image, starting at ResetGraph.
  */
 #include "common.h"
 #include <libgte.h>
