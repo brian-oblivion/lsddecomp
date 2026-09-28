@@ -6,6 +6,68 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-28 — round 102: track 9 done, every track done (premium head, plan revision 40)
+
+Premium head (Opus 5.5), cap 5: six jobs, five Opus and one Sonnet, none
+sent back, slots refilled as runners reported. Gate 0 green.
+
+- **Before spawning, head tool fixes (zero bytes, outputs identical on the
+  flat tree):** a scratch worktree with two real `unitfile.py` directory
+  moves showed eight tools under-counting a moved unit without a word:
+  typeviews, nearmiss, sdkstalls and sonydata globbed `src/*.c` or
+  `build/src/*.c.o`, nearmiss/sdkstalls built `asm/nonmatchings/<unit>` by
+  hand (12 functions dropped), stalesyms listed `src/` flat, and
+  check-nonmatching counted with `src/*.c`. All use `srcpath` or a recursive
+  walk now, and eleven more gave identical output on both trees.
+- **Track 9, five items done:**
+  - `layout` (alpha): `src/` is app/, cd/, graphics/, world/, sound/, ui/,
+    psyq/ and `main.c`, in 44 `unitfile.py` moves, all byte-identical, with
+    four tools diffed after each one. README's code map names each
+    directory. `lib/` was avoided because `.gitignore` ignores it unanchored.
+  - `comments`, split by the head along disjoint files: src/ (bravo, history
+    113 to 0) and include/ (charlie, 103 to 0). Everything moved verbatim to
+    124 reports under `## History (moved from ...)`. Along the way: stale
+    INCLUDE_ASM notes, a wrong `moveCallback` attribution, stale STALL notes
+    on live C.
+  - `globals` (delta, Sonnet): 108 UPPER_SNAKE game globals to `gName` or
+    `sName` by file count, through `rename.py`, none refused (`SCALE_ONE`
+    became `sSceneNodeScaleOne` because the name was taken).
+  - `readme` (bravo, after layout): 14 corrections, each against a command,
+    e.g. five classes have no `New_` allocator, and TmdModel is one object,
+    not a loader. The Class<hex> paragraph was removed.
+- **Plan revision 40 (premium):** `plan.py` read track 8 "done" while
+  `readability.py` counted `class_3bb8c.h`. The header's unit had merged
+  away in round 101, so it sat in no region. An orphaned placeholder header
+  is now its own files job. Track 9 stays open once an item is ticked, as
+  phase 2 does beside phase 1. The job (echo) re-homed each section into
+  StageMap.h, BMemPMgr.h, TitleMenu.h, TaskObjF.h and ObjM.h, and two
+  unit-local prototype blocks into ObjMStyleActor.c. `strcat` now comes from
+  Sony's `<strings.h>`: it is libc2's, not the game's. The header is deleted.
+- **Merges:** four of five conflicted, every hunk resolved by the rule
+  (main's side where the other side was rename- or path-only against the
+  merge base, measured per file, then `replay.py`). Three reports took
+  history from both comments runners, and both sections were kept. Two
+  rules are now in PARALLEL-RUNS §3.9:
+  - A rename lengthened a DreamSys.c line past the column limit, and the
+    rename tools never format, so `make format` runs at every merge.
+  - Appended report sections are unioned.
+- **Head fixes:** CLAUDE.md's and CREDITS.md's `src/` paths;
+  `psyq_sdk.py`'s 3.5 disc name (it lacked "(En,Ja)");
+  `plan.py amend-round --model`, for a round recorded once per model.
+- **Measured** (`plan.py`, `readability.py`, against round 101's entry):
+  history 113 to 0 and header history 103 to 0; UPPER_SNAKE globals 108 to 0;
+  placeholder headers 1 to 0. func_ 5, D_ 2, unk 120, slot 8, magic 884,
+  rawoff 58 and m2c 6 are unchanged: no track owns them after track 7's one
+  pass. Typeviews stayed at 44 warnings, 0 new, at every merge. Tracks 1 to 9
+  all read done, and the ready list is empty.
+- **Left, outside every item (for the operator):** six `#if 0` and `#if 1`
+  blocks in `src/psyq/` (Sony code, outside the NON_MATCHING rule's game
+  scope); two psyq units re-declaring a Sony name; mixed tabs inside
+  DreamSys.h's field comments; three header comments that point at process
+  docs to justify a construct (gte.h `mvmva`, LightRig.h, Sprite.h).
+
+---
+
 ## 2026-09-28 — premium session: plan revision 39 (round 101's and round 100's escalations)
 
 - **UPPER_SNAKE globals: accepted, as track 9 item `globals` (Sonnet).**
