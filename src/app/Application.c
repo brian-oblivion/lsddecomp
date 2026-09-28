@@ -9,7 +9,7 @@
 #include "common.h"
 #include "Application.h"
 
-extern s32 gCdInitDone;               /* CdInit has been called */
+extern s32 sCdInitDone;               /* CdInit has been called */
 extern ScreenDims gDefaultScreenDims; /* {320, 240} */
 
 /* Psy-Q LIBCD.H / LIBSND.H / LIBGS.H prototypes. */
@@ -23,9 +23,9 @@ extern void *BMemPMgrAlloc(s32 size);
 void Application__Application(Application *self, s32 dataSource) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetApplicationMethods();
-    if (gCdInitDone == 0) {
+    if (sCdInitDone == 0) {
         CdInit();
-        gCdInitDone = 1;
+        sCdInitDone = 1;
     }
     self->initialized = 0;
     SetActiveDataSource(dataSource);
