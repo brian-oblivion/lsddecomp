@@ -34,4 +34,4 @@ void *GetTriggerWorldMethods(void) {
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Now `TriggerWorldMethods *GetTriggerWorldMethods(void)` returning `&gTriggerWorldMethods` (include/TriggerWorld.h), replacing the unit-local `extern s32 gTriggerWorldMethods[]` and `void *` prototype. Bytes unchanged.
+Now `TriggerWorldMethods *GetTriggerWorldMethods(void)` returning `&gTriggerWorldMethods` (include/trigger_world.h), replacing the unit-local `extern s32 gTriggerWorldMethods[]` and `void *` prototype. Bytes unchanged.

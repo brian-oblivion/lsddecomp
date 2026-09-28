@@ -40,4 +40,4 @@ void TriggerWorld__Load(DataSrc33808 *self) {
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Now `void TriggerWorld__Load(TriggerWorld *self)` (include/TriggerWorld.h); the +0x078 call keeps its `s32 (*)()` cast (FileResource's slot78 is `void *`; the occupant is TriggerWorld__BuildResources). Bytes unchanged.
+Now `void TriggerWorld__Load(TriggerWorld *self)` (include/trigger_world.h); the +0x078 call keeps its `s32 (*)()` cast (FileResource's slot78 is `void *`; the occupant is TriggerWorld__BuildResources). Bytes unchanged.

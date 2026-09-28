@@ -48,7 +48,7 @@
 #include "model_data.h"
 #include "tod.h"
 #include "tod_set.h"
-#include "TriggerWorld.h"
+#include "trigger_world.h"
 #include "tim_image.h"
 #include "tim_array_src.h"
 #include "bg_layer.h"

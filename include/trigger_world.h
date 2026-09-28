@@ -1,5 +1,5 @@
-#ifndef TRIGGERWORLD_H
-#define TRIGGERWORLD_H
+#ifndef TRIGGER_WORLD_H
+#define TRIGGER_WORLD_H
 
 #include "model_data.h"
 

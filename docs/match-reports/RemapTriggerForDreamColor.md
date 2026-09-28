@@ -78,7 +78,7 @@ The view `*sDreamAuxWorld` is cast to is renamed `DreamAuxWorld` /
 `DreamAuxWorldFn80` in include/dream_aux.h (was `TriggerWorld` /
 `TriggerWorldFn80`, same `{ void **vtable; }` shape, so the call is
 unchanged). The name `TriggerWorld` now belongs to the class gTriggerWorldMethods
-(include/TriggerWorld.h), whose table is 0x8C bytes: this call loads byte
+(include/trigger_world.h), whose table is 0x8C bytes: this call loads byte
 +0x200 of its object's table (`lw v0,512(v0)`), so sDreamAuxWorld is not a
 TriggerWorld. Its real class is unresolved. Bytes unchanged.
 

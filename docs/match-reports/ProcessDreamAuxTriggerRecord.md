@@ -167,7 +167,7 @@ established from this unit alone.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-`world` is now the unified `TriggerWorld *` (include/TriggerWorld.h, class
+`world` is now the unified `TriggerWorld *` (include/trigger_world.h, class
 gTriggerWorldMethods), and the slot-0x22 pointer-array call is its own slot +0x088:
 `callResult = world->methods->getModelData(world, record->parity);`
 (TriggerWorld__GetModelData, `ModelData *(TriggerWorld *, u32)`; the s8 parity
@@ -215,7 +215,7 @@ The header comments, as they stood:
  * Everything else is undiscovered padding. */
 
 /* ProcessDreamAuxTriggerRecord's `world` is a TriggerWorld (gTriggerWorldMethods,
- * include/TriggerWorld.h; FireDreamAuxTriggerEntries gets it from
+ * include/trigger_world.h; FireDreamAuxTriggerEntries gets it from
  * New_TriggerWorld), unified in track 4 (round 88); dream_aux.c includes
  * that header. This file's former `TriggerWorld { void **vtable; }` view
  * is gone. */

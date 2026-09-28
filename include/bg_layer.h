@@ -46,7 +46,7 @@
  *
  * The map source is a TileMap (gTileMapMethods, include/tile_map.h),
  * whose GsMAP starts at +0x02C. Only its tag is named here, as
- * include/TriggerWorld.h does for its descriptor.
+ * include/trigger_world.h does for its descriptor.
  */
 
 struct TileMap;

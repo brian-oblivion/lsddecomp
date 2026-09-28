@@ -1130,7 +1130,7 @@
         "gTriggerWorldMethods": {
           "class": "TriggerWorld",
           "date": "2026-09-26",
-          "header": "include/TriggerWorld.h"
+          "header": "include/trigger_world.h"
         },
         "gVabStreamObjMethods": {
           "class": "VabStreamObj",

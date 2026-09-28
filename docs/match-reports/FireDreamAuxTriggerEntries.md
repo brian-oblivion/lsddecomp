@@ -132,7 +132,7 @@ established from this unit alone, hence B.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-`world` is now the unified `TriggerWorld *` (include/TriggerWorld.h, class
+`world` is now the unified `TriggerWorld *` (include/trigger_world.h, class
 gTriggerWorldMethods), which dream_aux.c includes; the unit's local
 `extern TriggerWorld *New_TriggerWorld(s32 *ctx)` is gone. New_TriggerWorld
 takes the ctor's descriptor (`struct ResourceSource *`: {buffer, name}), so the

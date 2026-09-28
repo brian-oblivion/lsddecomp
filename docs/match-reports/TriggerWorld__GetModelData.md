@@ -61,5 +61,5 @@ object from `New_TriggerWorld` (FireDreamAuxTriggerEntries), calls this slot
 (+0x00C), which `SpawnDreamAuxTriggerEntity` passes as `New_Entity`'s
 descriptor; Entity__Entity hands it to TodActor__TodActor, whose
 TodActor__AcquireModelData borrows the ModelData at the descriptor's
-+0x00C (TodActorDesc.modelData). Class unified in `include/TriggerWorld.h`
++0x00C (TodActorDesc.modelData). Class unified in `include/trigger_world.h`
 (slot +0x088 `getModelData`).
