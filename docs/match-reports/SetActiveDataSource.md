@@ -18,8 +18,8 @@ to each table entry.
 
 **Lever 1 -- the table entries take no argument.** Retail's `jalr $v0` has no
 `$a0` set up before it (`$a0` is whatever `CopyDataSourceSlots` left). The
-14 entries of `gDataSourceClientGetters` are `Get*Methods` getters (`GetVabStreamObjMethods`
-is one of them by name). Typing the table `void *(*gDataSourceClientGetters[])(void)` and
+14 entries of `sDataSourceClientGetters` are `Get*Methods` getters (`GetVabStreamObjMethods`
+is one of them by name). Typing the table `void *(*sDataSourceClientGetters[])(void)` and
 calling `fn()` removed `$s2` and both moves: every register then matched and
 the length became 35 (24/35 raw, insertions 4 / deletions 4). So the
 round-43 REGISTER-ALLOCATION class was an arity error: `val` needed its own

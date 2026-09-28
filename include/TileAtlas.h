@@ -25,7 +25,7 @@
  * New_BgLayer(tileMap, 1); TaskCore__Finalize releases the three (+0x004).
  *
  * SLOTS (`classtable.py gTileAtlasMethods --vs gFileResourceMethods`, 30 against 30; the
- * words from +0x07C on are gDataSourceClientGetters, not this table):
+ * words from +0x07C on are sDataSourceClientGetters, not this table):
  *  - +0x008 ctor, TileAtlas__TileAtlas(self, arg1): the active driver's
  *    ctor, this table, unk34 = 0, loaded = 0; with arg1 == 0,
  *    defaultCells = 1, unk2A = 0 and onRequestDone (+0x064). What a nonzero arg1

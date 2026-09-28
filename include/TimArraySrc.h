@@ -26,7 +26,7 @@
  * (UploadImages); the TimBlockSrc keeps it in `blocks` and releases it.
  *
  * SLOTS (`classtable.py gTimArraySrcMethods --vs gFileResourceMethods`, 30 against 30; the
- * words from +0x07C on are gDataSourceClientGetters, not this table):
+ * words from +0x07C on are sDataSourceClientGetters, not this table):
  *  - +0x008 ctor, TimArraySrc__TimArraySrc(self, name): the active
  *    driver's ctor, this table, count/images/ready cleared, and
  *    requestLoadFile(name) when name is not NULL (the one caller passes 0);

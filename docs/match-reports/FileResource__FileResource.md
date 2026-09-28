@@ -140,7 +140,7 @@ zeroed and otherwise untouched" from scratch.
   as New_<Sub>(name), slot +0x078, `freeBuffer` (`TaskCore__SetSubHandle`,
   `TitleMenuTaskObjF.c`). The name was chosen over `DataSource` because in this
   code's existing vocabulary (`SetActiveDataSource`,
-  `gDataSourceClientGetters`) the data SOURCE is the active driver and the
+  `sDataSourceClientGetters`) the data SOURCE is the active driver and the
   asset classes are its clients.
 - **History moved out of the header** (phase 2 comment rule): the open
   file's disc position and size (+0x018/+0x01C) were found to be base-class

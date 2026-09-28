@@ -2449,7 +2449,7 @@ gGameApplicationConfig = 0x80066828;
 // reproduces retail byte-for-byte. Was func_80011994. Round 79 (alpha's
 // lead in the main naming pass; head measured and applied).
 __main = 0x80011994; // type:func
-gDataSourceClientGetters = 0x8006D4AC;
+sDataSourceClientGetters = 0x8006D4AC;
 New_FlatLightObj = 0x8004291C; // type:func
 FlatLightObj__FlatLightObj = 0x8004297C; // type:func
 FlatLightObj__SetLightId = 0x800429E0; // type:func

@@ -28,7 +28,7 @@
  * are NULL or placeholders in the static tables, and SetActiveDataSource
  * copies the active driver's eleven interface slots (CopyDataSourceSlots)
  * into this class's table and into the table of every class
- * gDataSourceClientGetters lists, so `this->methods->read(...)` reaches
+ * sDataSourceClientGetters lists, so `this->methods->read(...)` reaches
  * whichever driver is active. The slot names are the CD driver's occupants.
  */
 
@@ -107,7 +107,7 @@ extern FileResourceMethods *GetFileResourceMethods(void);
 
 /* The table getters of every class SetActiveDataSource rebinds, NULL-
  * terminated; it sits right after gFileResourceMethods's last slot. */
-extern void *(*gDataSourceClientGetters[])(void);
+extern void *(*sDataSourceClientGetters[])(void);
 
 void *FileResource__Release(FileResource *self);
 void FileResource__FileResource(FileResource *self);

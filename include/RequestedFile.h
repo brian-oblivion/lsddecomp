@@ -22,7 +22,7 @@
  *
  * Like every FileResource client it runs on the active driver: the ctor and
  * finalize chain to GetActiveDataSourceMethods()'s first, and
- * GetRequestedFileMethods is in gDataSourceClientGetters, so
+ * GetRequestedFileMethods is in sDataSourceClientGetters, so
  * SetActiveDataSource rebinds this table's file-I/O slots.
  *
  * Its one user is WBgm (include/WBgm.h): WBgm__SetSeq makes one per SEQ

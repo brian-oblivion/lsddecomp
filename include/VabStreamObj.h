@@ -22,7 +22,7 @@
  * runs loadVagAttrs (+0x07C), which caches the bank's VagAtr records per
  * program. +0x058 and +0x06C are NULL in the static table.
  * SetActiveDataSource fills them from the active driver
- * (GetVabStreamObjMethods is in gDataSourceClientGetters).
+ * (GetVabStreamObjMethods is in sDataSourceClientGetters).
  *
  * Playing. playTone(index, vol, endVol) keys on program index >> 4, tone
  * index & 0xF, at the tone's centre note plus `pitchOffset`. It returns the

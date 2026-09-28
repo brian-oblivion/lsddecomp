@@ -31,7 +31,7 @@ void *GetLbdFileMethods(void) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `GetDataSrc39094Methods` -> `GetLbdFileMethods` with `rename.py`: the table getter, returns &gLbdFileMethods. It is gFileResourceMethods's gDataSourceClientGetters entry at +0x0A0, so SetActiveDataSource rebinds this class's interface slots. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `GetDataSrc39094Methods` -> `GetLbdFileMethods` with `rename.py`: the table getter, returns &gLbdFileMethods. It is gFileResourceMethods's sDataSourceClientGetters entry at +0x0A0, so SetActiveDataSource rebinds this class's interface slots. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)

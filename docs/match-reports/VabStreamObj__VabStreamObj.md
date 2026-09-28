@@ -161,7 +161,7 @@ slots this ctor calls now carry their inherited FileResource names:
 `char *path` (was `s32`). The slot table above calls +0x58 and +0x6C "null
 in retail". That is true of the static table only: SetActiveDataSource binds
 the active driver's `loadFile`/`requestLoadFile` there
-(`GetVabStreamObjMethods` is in `gDataSourceClientGetters`).
+(`GetVabStreamObjMethods` is in `sDataSourceClientGetters`).
 
 ## Round 98 (charlie, track 7)
 

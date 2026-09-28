@@ -119,7 +119,7 @@ TimBlockSrc's override of the same slot, `TimBlockSrc__AdvanceLoadState`.
 
 The report above says +0x058 and +0x06C are "null in retail". That is only
 true of the static table. `SetActiveDataSource` copies the active driver's
-interface slots into every table `gDataSourceClientGetters` lists
+interface slots into every table `sDataSourceClientGetters` lists
 (`include/FileResource.h`), and `GetVabStreamObjMethods` is on that list
 (gFileResourceMethods +0x098). At run time these calls reach the driver.
 

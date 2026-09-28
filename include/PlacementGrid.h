@@ -12,7 +12,7 @@
  * chains to GetActiveDataSourceMethods()->ctor, and Finalize and SetFlag
  * forward to the active driver's, as TimBlockSrc, Tod and ModelData do); no
  * subclasses. Methods in src/sound/PlacementGridVabSound.c. GetPlacementGridMethods is the
- * first entry of gDataSourceClientGetters, so SetActiveDataSource rebinds
+ * first entry of sDataSourceClientGetters, so SetActiveDataSource rebinds
  * its file-I/O slots like every client's.
  *
  * Lifecycle: the grid manager (StageMap) is its one user.

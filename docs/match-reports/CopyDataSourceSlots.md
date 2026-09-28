@@ -88,7 +88,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80026D88` | `CopyDataSourceSlots` | B |
 
-**Track 4 (2026-09-25, FileResource unification): renamed from `FileResource__CopyFields`, tier A.** Its callers pass METHOD TABLES, not objects (`SetActiveDataSource`: `GetFileResourceMethods()` and each `gDataSourceClientGetters` entry, from the CD or SPU driver's table), so the "fields" +0x40..+0x58 and +0x68..+0x74 are the eleven data-source interface slots of `FileResourceMethods`, and the "gap" +0x5C..+0x64 is the base's own freeBuffer/slot60/setFlag. Retyped `(FileResourceMethods *dst, FileResourceMethods *src)`, byte-identical; the FileResource object never had fields there (it is 0x2C bytes).
+**Track 4 (2026-09-25, FileResource unification): renamed from `FileResource__CopyFields`, tier A.** Its callers pass METHOD TABLES, not objects (`SetActiveDataSource`: `GetFileResourceMethods()` and each `sDataSourceClientGetters` entry, from the CD or SPU driver's table), so the "fields" +0x40..+0x58 and +0x68..+0x74 are the eleven data-source interface slots of `FileResourceMethods`, and the "gap" +0x5C..+0x64 is the base's own freeBuffer/slot60/setFlag. Retyped `(FileResourceMethods *dst, FileResourceMethods *src)`, byte-identical; the FileResource object never had fields there (it is 0x2C bytes).
 
 **Evidence.** A field-by-field copy of a fixed subset of one
 `FileResource` instance's fields into another (`+0x40..+0x58`,

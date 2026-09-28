@@ -494,7 +494,7 @@ void SetActiveDataSource(s32 source) {
     void *(*getMethods)(void);
     void *(**entry)(void);
 
-    entry = gDataSourceClientGetters;
+    entry = sDataSourceClientGetters;
     sActiveDataSource = source;
     if (source == DATASOURCE_CD) {
         src = (FileResourceMethods *)GetCdDriverMethods();

@@ -25,7 +25,7 @@
  *
  * Like every FileResource client it runs on the active driver: the ctor,
  * finalize, onRequestDone and cancelRequests chain to GetActiveDataSourceMethods()'s
- * first, and GetLbdFileMethods is in gDataSourceClientGetters, so
+ * first, and GetLbdFileMethods is in sDataSourceClientGetters, so
  * SetActiveDataSource rebinds this table's file-I/O slots.
  *
  * Its one user is the grid manager (StageMap), which makes one per grid
