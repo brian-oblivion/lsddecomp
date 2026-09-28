@@ -136,8 +136,8 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     initArgs->lightRig = (BasicClass *)New_StageMap(NULL, 1);
     self->dreamSys = dreamSys;
     self->methods->addChild(self, (BasicClass *)dreamSys);
-    dreamSys->methods->setSoundObj(dreamSys, (s32)self->sound);
-    dreamSys->methods->setEtcTim(dreamSys, (s32)self->etcTim);
+    dreamSys->methods->setSoundObj(dreamSys, (VabStreamObj *)self->sound);
+    dreamSys->methods->setEtcTim(dreamSys, self->etcTim);
     self->methods->resetCounters(self);
 }
 

@@ -211,7 +211,7 @@ s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s3
 s32 TestForTunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
 void DreamSys__FlipMoveCommand(DreamSys *self);
 
-DreamSys *New_DreamSys(LinkResource *modelSource, s32 soundObj, s32 viewport) {
+DreamSys *New_DreamSys(LinkResource *modelSource, VabStreamObj *soundObj, Viewport *viewport) {
     DreamSys *self;
 
     self = BMemPMgrAlloc(sizeof(DreamSys));
@@ -222,14 +222,15 @@ DreamSys *New_DreamSys(LinkResource *modelSource, s32 soundObj, s32 viewport) {
     return NULL;
 }
 
-DreamSys *DreamSys__DreamSys(DreamSys *self, LinkResource *modelSource, s32 soundObj, s32 viewport) {
+DreamSys *DreamSys__DreamSys(DreamSys *self, LinkResource *modelSource, VabStreamObj *soundObj,
+                             Viewport *viewport) {
     void *model;
 
     GetActorMethods()->ctor((Actor *)self);
     self->methods = GetDreamSysMethods();
     self->soundObj = soundObj;
-    self->viewport = (Viewport *)viewport;
-    self->etcTim = 0;
+    self->viewport = viewport;
+    self->etcTim = NULL;
     self->modelSource = modelSource;
     model = modelSource->methods->getModel(modelSource, 0);
     self->methods->addChild(self, model);
@@ -510,7 +511,7 @@ s32 DreamSys__GetDreamTimerScaled(DreamSys *self) {
     return (u32)self->tick / DREAM_TICKS_PER_SECOND;
 }
 
-void DreamSys__SetSoundObj(DreamSys *self, s32 value) {
+void DreamSys__SetSoundObj(DreamSys *self, VabStreamObj *value) {
     self->soundObj = value;
 }
 
@@ -518,7 +519,7 @@ void DreamSys__SetViewport(DreamSys *self, Viewport *value) {
     self->viewport = value;
 }
 
-void DreamSys__SetEtcTim(DreamSys *self, s32 value) {
+void DreamSys__SetEtcTim(DreamSys *self, struct TimImage *value) {
     self->etcTim = value;
 }
 
@@ -644,8 +645,7 @@ void DreamSys__SelectMoveCallback(DreamSys *self, s32 mode) {
             self->moveCallback = vt->tickDrift;
             self->driftActive = 1;
             self->cueServiceActive = 1;
-            InitSoundCueSet((VabStreamObj *)self->soundObj, &self->soundCueSet, 1, self,
-                            self->methods->soundCueCallback);
+            InitSoundCueSet(self->soundObj, &self->soundCueSet, 1, self, self->methods->soundCueCallback);
             break;
     }
 }
@@ -818,7 +818,7 @@ void DreamSys__StartVoice(DreamSys *self) {
     s32 headingArg;
     s32 scratch;
 
-    obj = (VabStreamObj *)self->soundObj;
+    obj = self->soundObj;
     vt = obj->methods;
     idx = self->voiceSelect;
     if (idx == 0) {
@@ -847,7 +847,7 @@ void DreamSys__StopVoice(DreamSys *self) {
     VabStreamObj *obj;
 
     if (self->voiceIndex >= 0) {
-        obj = (VabStreamObj *)self->soundObj;
+        obj = self->soundObj;
         obj->methods->stopVoice(obj, self->voiceIndex);
         self->voiceIndex = -1;
     }
@@ -891,14 +891,14 @@ void DreamSys__TickDrift(DreamSys *self) {
         self->viewport->refView.vr.y -= 600;
     }
     if (self->cueServiceActive != 0)
-        ServiceSoundCueSet((VabStreamObj *)self->soundObj, &self->soundCueSet);
+        ServiceSoundCueSet(self->soundObj, &self->soundCueSet);
 }
 
 void DreamSys__StopDrift(DreamSys *self, s32 keepCues) {
     self->driftActive = 0;
     self->cueServiceActive = keepCues;
     if (keepCues != 0)
-        FlushSoundCueSet((VabStreamObj *)self->soundObj, &self->soundCueSet);
+        FlushSoundCueSet(self->soundObj, &self->soundCueSet);
 }
 
 s32 DreamSys__GetSetMoveMode(DreamSys *self, s32 value) {
@@ -1172,7 +1172,7 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 linkType, s32 playSound) {
         system->tick = 0;
     }
     if (playSound != 0) {
-        obj = (VabStreamObj *)system->soundObj;
+        obj = system->soundObj;
         obj->methods->playTone(obj, 9 << 4, DREAMSYS_TONE_VOLUME, DREAMSYS_TONE_VOLUME);
     }
     return true;

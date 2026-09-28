@@ -213,12 +213,14 @@ typedef struct {
    setClearColor (+0x064). */
 struct Viewport;
 
-/* DreamSys::soundObj is a VabStreamObj (include/VabStreamObj.h): DreamSys.c
-   casts it there. StartVoice / ExecuteLink call playTone (+0x080; the voice
+/* DreamSys::soundObj is a VabStreamObj (include/VabStreamObj.h; tag only
+   here, DreamSys.c includes the header). StartVoice / ExecuteLink call playTone (+0x080; the voice
    it returns goes to voiceIndex), StopVoice calls stopVoice (+0x084), and
    StartVoice calls setPitchOffset (+0x09C). */
 
 struct LinkResource;
+struct VabStreamObj;
+struct TimImage;
 
 /* DreamSys__DreamSys's `modelSource` is a LinkResource (include/LinkResource.h;
    GameApplication__GameApplication passes New_LinkResource("ETC\DREAME5.TMD")): the
@@ -236,9 +238,8 @@ struct LinkResource;
 struct DreamSys {
     ACTOR_FIELDS(DreamSysMethods);
     /* +0x058 onward: DreamSys's own */
-    /* Set by DreamSys__SetSoundObj(self, value): a VabStreamObj, cast to
-           one where it is called through (include/VabStreamObj.h). */
-    s32 soundObj;
+    /* Set by the ctor and DreamSys__SetSoundObj (see `soundObj` above). */
+    struct VabStreamObj *soundObj;
     /* The camera: set by DreamSys__SetViewport (and the ctor's `viewport`); see
            `struct Viewport` above for the refView fields this class moves. */
     struct Viewport *viewport;
@@ -248,7 +249,7 @@ struct DreamSys {
     /* The TimImage DayTask__DayTask hands over through
        DreamSys__SetEtcTim (vtable +0x114); cleared by the ctor, never
        dereferenced by the DreamSys. */
-    s32 etcTim;
+    struct TimImage *etcTim;
 
     bool isFlashbackSession;
     /* A DreamSysMoveOverride: which movement DreamSys__TickMove runs. */
@@ -492,8 +493,8 @@ typedef enum DreamColors {
  *    no offset; ObjM__SetupSceneStyle calls it through
  *    DreamSysAttachToParentFn. */
 struct DreamSysMethods {
-    ACTOR_SLOTS(DreamSys,
-                (DreamSys * self, struct LinkResource *modelSource, s32 soundObj, s32 viewport));
+    ACTOR_SLOTS(DreamSys, (DreamSys * self, struct LinkResource *modelSource,
+                           struct VabStreamObj *soundObj, struct Viewport *viewport));
     /* +0x0F0 */ s32 (*getSetFlashbackSession)(DreamSys *self, DreamColors *out,
                                                s32 value); /* DreamSys__GetSetFlashbackSession: value < 0 writes the day's colour to *out */
     /* +0x0F4 */ void (*setMoveOverride)(DreamSys *self, s32 value); /* DreamSys__SetMoveOverride */
@@ -502,11 +503,11 @@ struct DreamSysMethods {
     /* +0x100 */ s32 (*getLinkCommandFlag)(DreamSys *self); /* DreamSys__GetLinkCommandFlag */
     /* +0x104 */ s32 (*getSetDreamTimeLimit)(DreamSys *self, s32 time); /* DreamSys__GetSetDreamTimeLimit */
     /* +0x108 */ s32 (*getDreamTimerScaled)(DreamSys *self); /* DreamSys__GetDreamTimerScaled: tick / 15 */
-    /* +0x10C */ void (*setSoundObj)(DreamSys *self, s32 value); /* DreamSys__SetSoundObj */
+    /* +0x10C */ void (*setSoundObj)(DreamSys *self, struct VabStreamObj *value); /* DreamSys__SetSoundObj */
     /* +0x110 */ void (*setViewport)(DreamSys *self, struct Viewport *value); /* DreamSys__SetViewport */
-    /* +0x114 */ void (*setEtcTim)(DreamSys *self, s32 value); /* DreamSys__SetEtcTim: etcTim = value */
-    /* +0x118 */ void (*updateTickState)(DreamSys *self);      /* DreamSys__UpdateTickState */
-    /* +0x11C */ void (*runTickCallbacks)(DreamSys *self);     /* DreamSys__RunTickCallbacks */
+    /* +0x114 */ void (*setEtcTim)(DreamSys *self, struct TimImage *value); /* DreamSys__SetEtcTim: etcTim = value */
+    /* +0x118 */ void (*updateTickState)(DreamSys *self);  /* DreamSys__UpdateTickState */
+    /* +0x11C */ void (*runTickCallbacks)(DreamSys *self); /* DreamSys__RunTickCallbacks */
     /* +0x120 */ s32 (*projectPointAtDistance)(DreamSys *self, s32 *out, s32 dist, s32 *reference,
                                                s32 tolerance); /* DreamSys__ProjectPointAtDistance */
     /* +0x124 */ void (*slot124)(DreamSys *self); /* DreamSys__func_59590: unk7C = 0; never called */
@@ -789,7 +790,8 @@ void DreamSys__ResetFlashbackList(DreamSys *self);
 DreamSysMethods *GetDreamSysMethods(void);
 
 /* @brief Allocates and constructs a DreamSys instance. */
-DreamSys *New_DreamSys(struct LinkResource *modelSource, s32 soundObj, s32 viewport);
+DreamSys *New_DreamSys(struct LinkResource *modelSource, struct VabStreamObj *soundObj,
+                       struct Viewport *viewport);
 
 /* @brief Initializes the values that will be used by CalcNavigationScore. */
 /* @param arrayMem Pointer to the array of challenges completed */
@@ -825,7 +827,8 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 fromStage, s32 unused)
 MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day);
 
 /* The occupants of gDreamSysMethods not declared above, in slot order. */
-DreamSys *DreamSys__DreamSys(DreamSys *self, struct LinkResource *modelSource, s32 soundObj, s32 viewport);
+DreamSys *DreamSys__DreamSys(DreamSys *self, struct LinkResource *modelSource,
+                             struct VabStreamObj *soundObj, struct Viewport *viewport);
 void DreamSys__ResetSessionState(DreamSys *self);
 void DreamSys__SpawnAtLink(DreamSys *self, struct StageMap *grid);
 void DreamSys__DetachFromParent(DreamSys *self);
