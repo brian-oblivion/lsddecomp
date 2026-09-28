@@ -66,6 +66,15 @@ struct Pad; /* initSystems's pad: main()'s New_Pad(0, 0) */
     /* +0x01C */ IntermediateBaseInitArgs *aux /* initSystems's allocation: every task's init argument */
 /* clang-format on */
 
+/* What runTitleMenu (+0x058) returns to Application__RunMainLoop, and the
+ * hook each value runs; named, like the hooks, for GameApplication's
+ * occupants (whose own view is GameApplication.h's GameApplicationLoopStatus). */
+enum ApplicationLoopStatus {
+    APPLICATION_LOOP_OPENING = 0, /* ends the inner loop: +0x054 (playOpeningMovie) again */
+    APPLICATION_LOOP_SLOT5C = 1, /* +0x05C (slot5C), then runTitleMenu again; GameApplication never returns it */
+    APPLICATION_LOOP_DAY = 2 /* +0x060 (runDayTask), +0x064 if it returns nonzero, then runTitleMenu again */
+};
+
 struct ApplicationMethods {
     APPLICATION_SLOTS(Application, (Application * self, s32 dataSource));
 };

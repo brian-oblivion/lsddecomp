@@ -44,7 +44,7 @@ void Application__InitSystems(Application *self, DrawSystem *drawSystem, struct 
         drawSystem->methods->initGraph(drawSystem, &self->dims, self->vramMode);
         SsInit();
         GsInit3D();
-        self->aux = BMemPMgrAlloc(0x14);
+        self->aux = BMemPMgrAlloc(sizeof(IntermediateBaseInitArgs));
         self->aux->drawSystem = (BasicClass *)drawSystem;
         self->aux->pad = (BasicClass *)pad;
         self->aux->frameClock = NULL;
@@ -65,16 +65,16 @@ void Application__RunMainLoop(Application *self) {
             self->methods->playOpeningMovie(self);
             for (;;) {
                 status = self->methods->runTitleMenu(self);
-                if (status == 1) {
+                if (status == APPLICATION_LOOP_SLOT5C) {
                     self->methods->slot5C(self);
                     continue;
                 }
-                if (status == 2) {
+                if (status == APPLICATION_LOOP_DAY) {
                     if (self->methods->runDayTask(self)) {
                         self->methods->playEndingMovie(self);
                     }
                 }
-                if (status == 0) {
+                if (status == APPLICATION_LOOP_OPENING) {
                     break;
                 }
             }
