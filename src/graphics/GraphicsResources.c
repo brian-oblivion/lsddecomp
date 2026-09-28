@@ -292,7 +292,7 @@ void TimBlockSrc__SetEntryShift(TimBlockSrc *self, s32 index, s32 shift) {
 }
 
 /* fadeAllEntries (+0x07C): fadeEntry every ramp toward `color`. */
-void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, TimBlockSrcColor *color) {
+void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, ColorRgb *color) {
     s32 i;
 
     LockActiveDataSource();
@@ -303,7 +303,7 @@ void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, TimBlockSrcColor *color) {
 }
 
 /* fadeEntry (+0x080): set ramp `index`'s colour and rebuild it. */
-void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, TimBlockSrcColor *src) {
+void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, ColorRgb *src) {
     TimBlockSrcEntry *e;
 
     LockActiveDataSource();
@@ -347,9 +347,9 @@ void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
     dst.x = 0;
     dst.y = 0;
     dst.w = CLUT_COLORS;
-    r = (u8)e->color.r;
-    g = (u8)e->color.g;
-    b = (u8)e->color.b;
+    r = e->color.r;
+    g = e->color.g;
+    b = e->color.b;
     shift = FIX12_SHIFT - e->shift;
     e->clutH = e->mask;
     for (i = 0; i < e->mask - 1; i++) {
