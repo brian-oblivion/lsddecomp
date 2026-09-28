@@ -64,7 +64,7 @@ view stays `UnkChildObj_3ac78`/`UnkChildMethods_3ac78`.
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the +0x0B8 slot it calls is LightRig's `getLight` (LightRig__GetLight, `lights[index]`), and the two slots it drives on each result, +0x044 and +0x048, are FlatLightObj's setColor and setDirection (src/code_3311c.c), consistent with the 3- and 6-byte strides. StageMap's own view (include/dream_day.h) still names the slot `getChild` and its result `UnkChildObj_3ac78`; the body is untouched.
+2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/light_rig.h`; the +0x0B8 slot it calls is LightRig's `getLight` (LightRig__GetLight, `lights[index]`), and the two slots it drives on each result, +0x044 and +0x048, are FlatLightObj's setColor and setDirection (src/code_3311c.c), consistent with the 3- and 6-byte strides. StageMap's own view (include/dream_day.h) still names the slot `getChild` and its result `UnkChildObj_3ac78`; the body is untouched.
 
 ## Track 6 (2026-09-26, round 93, alpha)
 

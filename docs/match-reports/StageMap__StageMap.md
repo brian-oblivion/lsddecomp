@@ -241,7 +241,7 @@ unknown. Do not "correct" the stride to 21 on this function's evidence alone.
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the first call is `GetLightRigMethods()->ctor((LightRig *)self)` through include/LightRig.h (was a unit-local `BaseCtorTable_3ac78 *` view of the same getter). A pointer cast emits no code; image byte-identical. StageMap's own view is unchanged.
+2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/light_rig.h`; the first call is `GetLightRigMethods()->ctor((LightRig *)self)` through include/light_rig.h (was a unit-local `BaseCtorTable_3ac78 *` view of the same getter). A pointer cast emits no code; image byte-identical. StageMap's own view is unchanged.
 
 ## Track 4 (2026-09-26, round 87, bravo)
 

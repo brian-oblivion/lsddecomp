@@ -975,7 +975,7 @@
         "gLightRigMethods": {
           "class": "LightRig",
           "date": "2026-09-26",
-          "header": "include/LightRig.h"
+          "header": "include/light_rig.h"
         },
         "gLinkResourceMethods": {
           "class": "LinkResource",

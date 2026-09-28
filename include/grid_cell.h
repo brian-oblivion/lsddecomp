@@ -57,7 +57,7 @@ typedef struct GridCellMethods GridCellMethods;
 /* SceneNode's slots, then this class's own. The overrides of inherited
  * slots are the ctor, reset and dispatchLinkCommand (see the banner). The
  * ctor returns nothing, but the slot keeps SceneNode's `void *` ctor type:
- * New_GridCell ignores the value (as LightRig's ctor, include/LightRig.h). */
+ * New_GridCell ignores the value (as LightRig's ctor, include/light_rig.h). */
 /* clang-format off */
 #define GRIDCELL_SLOTS(Self, CtorParams)                                                         \
     SCENENODE_SLOTS(Self, CtorParams);                                                            \

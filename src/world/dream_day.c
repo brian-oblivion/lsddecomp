@@ -45,7 +45,7 @@
 #include "LinkResource.h"
 #include "ObjM.h"
 #include "actor.h"
-#include "LightRig.h"
+#include "light_rig.h"
 #include "TimedTask.h"
 #include "draw_system.h"
 #include "PlacementGrid.h"

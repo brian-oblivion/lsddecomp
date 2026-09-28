@@ -1,5 +1,5 @@
-#ifndef LIGHTRIG_H
-#define LIGHTRIG_H
+#ifndef LIGHT_RIG_H
+#define LIGHT_RIG_H
 
 #include "scene_node.h"
 

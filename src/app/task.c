@@ -30,7 +30,7 @@
 #include "pad.h"
 #include "tim_image.h"
 #include "Viewport.h"
-#include "LightRig.h"
+#include "light_rig.h"
 #include "frame_clock.h"
 #include <strings.h>
 

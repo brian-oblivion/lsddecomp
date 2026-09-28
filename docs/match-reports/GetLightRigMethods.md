@@ -26,4 +26,4 @@ LightRigMethods *GetLightRigMethods(void) {
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `Get_vtable_D8006EFAC`, tier A: the table getter, spelled like every unified class's (`Get<Class>Methods`). Returns `LightRigMethods *` and `&gLightRigMethods` (was `void *` over a local `extern s32 D_8006EFAC[]`). The Source block above is the unified spelling. Image byte-identical.
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/light_rig.h`. Renamed from `Get_vtable_D8006EFAC`, tier A: the table getter, spelled like every unified class's (`Get<Class>Methods`). Returns `LightRigMethods *` and `&gLightRigMethods` (was `void *` over a local `extern s32 D_8006EFAC[]`). The Source block above is the unified spelling. Image byte-identical.

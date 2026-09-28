@@ -31,4 +31,4 @@ void LightRig__Reset(LightRig *self) {
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__Reset`, tier A: slot +0x040. `self` is `LightRig *` (was `SceneNode *`; `coord2` is inherited, so the access is unchanged). The Source block above is the unified spelling. Image byte-identical.
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/light_rig.h`. Renamed from `D8006EFAC__Reset`, tier A: slot +0x040. `self` is `LightRig *` (was `SceneNode *`; `coord2` is inherited, so the access is unchanged). The Source block above is the unified spelling. Image byte-identical.

@@ -44,7 +44,7 @@ With a counter and a pointer walking together, the order of the comma operands i
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__D8006EFAC`, tier A: slot +0x008, the ctor, named for its class as every ctor is. `self` is `LightRig *` (was the unit-local `D_8006EFACObj`); the three FlatLightObj it makes into `lights[3]` are the evidence for the class name (include/LightRig.h's banner). The Source block above is the unified spelling. Image byte-identical.
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/light_rig.h`. Renamed from `D8006EFAC__D8006EFAC`, tier A: slot +0x008, the ctor, named for its class as every ctor is. `self` is `LightRig *` (was the unit-local `D_8006EFACObj`); the three FlatLightObj it makes into `lights[3]` are the evidence for the class name (include/light_rig.h's banner). The Source block above is the unified spelling. Image byte-identical.
 
 ## Track 7 (round 99, charlie)
 

@@ -21,7 +21,7 @@
  * DrawSystem frame that counts frames and tells its parents whether it is
  * running, paused or stopped.
  *
- * LightRig (include/LightRig.h, 0x14): a SceneNode that owns three flat
+ * LightRig (include/light_rig.h, 0x14): a SceneNode that owns three flat
  * lights and the ambient colour. StageMap inherits its getLight unchanged.
  */
 #include "common.h"
@@ -29,7 +29,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "char_sprite.h"
-#include "LightRig.h"
+#include "light_rig.h"
 #include "flat_light_obj.h"
 #include "RequestedFile.h"
 #include "tim_image.h"
