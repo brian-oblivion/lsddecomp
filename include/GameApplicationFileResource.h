@@ -4,7 +4,7 @@
 /* src/GameApplicationFileResource.c's own view of what it calls. The
  * classes it defines are declared by their own headers: GameApplication in
  * include/GameApplication.h, FileResource and ResourceRequest in
- * include/FileResource.h (included here for code_179d8_h.c, which reaches
+ * include/FileResource.h (included here for CdDriver.c, which reaches
  * it through this header). */
 
 #include "common.h"

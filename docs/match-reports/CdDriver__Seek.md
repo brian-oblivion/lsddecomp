@@ -115,12 +115,12 @@ below.
 `self->unk18` is a 4-byte position buffer (only its ADDRESS is taken here,
 passed to `CdPosToInt`) and `self->unk1C` is a `u32` byte-length field
 (rounded up to a 0x800-byte sector boundary, same formula as
-`GetCdFileSize`'s own `((self->unk1C >> 11) + 1) << 11`, code_179d8_h.c) --
+`GetCdFileSize`'s own `((self->unk1C >> 11) + 1) << 11`, CdDriver.c) --
 this is the SAME struct as `ObjA34_179D8H` there, and that unit already
 names offset 0x1C the same way, independently. `gCdSeekLoc` is an 8-byte
 zero-initialized buffer (`asm/data/5DB70.data.s`); this function only ever
 takes its address, so it's declared as a plain byte array locally.
-`gCdSeekParam = gCdSeekLoc - 0x14` matches `code_179d8_r.c`'s existing reads of
+`gCdSeekParam = gCdSeekLoc - 0x14` matches `CdDriver.c`'s existing reads of
 that global (`(u8 *)gCdSeekParam + 0x14`) -- the same pointer, offset the other
 direction.
 

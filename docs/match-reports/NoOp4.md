@@ -3,7 +3,7 @@
 > Renamed from `func_80028B64` on 2026-09-21 (tools/rename.py, round 64,
 > runner alpha). Address 0x80028B64.
 
-Unit: `code_179d8_h`. One of the three 2-instruction leaves the unit's own
+Unit: `CdDriver`. One of the three 2-instruction leaves the unit's own
 header comment already noted as "splat matched itself" at carve time
 (mid-round 17, 2026-09-04) -- no C was ever written for it, and no report
 existed before this one.

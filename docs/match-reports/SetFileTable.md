@@ -2,7 +2,7 @@
 
 > Renamed from `func_80027FD8` on 2026-09-17 (tools/rename.py). Address 0x80027fd8.
 
-**Unit:** code_179d8_q (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
+**Unit:** CdDriver (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 
 ## What this function does
 
@@ -22,7 +22,7 @@ void SetFileTable(s32 a0)
 
 ## Provenance
 
-round 45 (2026-09-15), runner echo, unit code_179d8_q (fresh carve). See
+round 45 (2026-09-15), runner echo, unit CdDriver (fresh carve). See
 IsCdBusy.md for the sibling-accessor context.
 
 ## Naming
@@ -35,7 +35,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `D_8008A868` | `gFileTable` | A |
 
 **Evidence.** The global is the base of an array of 0x1C-byte records:
-`FindCdFileEntry` and `FindCdFileIndex` (code_179d8_r) walk it with a literal
+`FindCdFileEntry` and `FindCdFileIndex` (CdDriver) walk it with a literal
 0x1C stride doing `strstr(record, needle)` from offset 0, `GetCdFileEntry`
 indexes it as `base + index * 0x1C`, and `ResolveFileEntries` (this unit)
 fills each record's `+0x14`/`+0x18` from a `CdSearchFile` lookup on the name
@@ -44,7 +44,7 @@ then resolves `base + idx * 0x1C` -- the three-call sequence that makes the
 array a file table. Setter of a base pointer: tier A.
 
 Note for track 4: the symbol is still declared `s32` here and `char *` in
-`code_179d8_r`. That is a type, not a name, so this round did not touch it.
+`CdDriver`. That is a type, not a name, so this round did not touch it.
 
 ## Track 4b (2026-09-25, round 85)
 

@@ -206,7 +206,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 | `func_80027A24` | `CdDriver__RunRequestQueue` | A |
 
 **Evidence.** Called every service tick through the class table by
-`ServiceCdDriver` (code_179d8_q), whose local view already names the slot
+`ServiceCdDriver` (CdDriver), whose local view already names the slot
 `runRequestQueue`. It takes the head of `gCdRequestQueue`: if the node is
 not yet active it raises `owner->inQueueDispatch` and calls the owner's
 slot for `node->op` (open/close/seek/read/loadFile, the CD_OP_* values the

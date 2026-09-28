@@ -40,7 +40,7 @@ try, with the straightforward `if`/`else` written in source order.
 to return a pointer, not void -- direct positive evidence this whole function
 is non-void per CLAUDE.md's tail-call caution. `GetCdDriverMethods` is still
 uncarved (`asm/code_179d8.s`) but is declared elsewhere in the repo
-(`code_179d8_h.c`, `code_179d8_o.c`) as returning a table pointer too, under
+(`CdDriver.c`, `code_179d8_o.c`) as returning a table pointer too, under
 each unit's own independent local type -- this report follows the same
 "multiple independent local views" convention and declares it `void *` here.
 

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80028864` on 2026-09-18 (tools/rename.py). Address 0x80028864.
 
-**Unit:** code_179d8_r · **Size:** 9 words · **Status:** MATCHED (9/9 words) · **Round 45**
+**Unit:** CdDriver · **Size:** 9 words · **Status:** MATCHED (9/9 words) · **Round 45**
 
 ## What it does
 
@@ -33,7 +33,7 @@ Closed on the first attempt.
 **Tier A.** Zeroes the phase/operation/tick-step globals, marks the driver
 idle (`gCdIdle = 1`) and clears busy/timeout -- the exact mirror image of
 `StartCdOperation`, called from both tick functions on a successful
-`CdReadSync` and from `CdDriver__CancelRequests` (code_179d8_q.c) when
+`CdReadSync` and from `CdDriver__CancelRequests` (CdDriver.c) when
 cancelling the in-flight head request. Corroborated by that unit's own
-pre-existing comment on this function: "code_179d8_r: reset the state
+pre-existing comment on this function: "CdDriver: reset the state
 machine".

@@ -49,7 +49,7 @@ just supplies the getter's own C body.
 are its whole purpose), following the exact convention this project
 already uses for the same shape elsewhere: `GetCdDriverMethods`,
 `GetGameApplicationMethods`, `GetFileResourceMethods` (all
-`include/GameApplicationFileResource.h`/`code_179d8_q`'s own file family). Held back
+`include/GameApplicationFileResource.h`/`CdDriver`'s own file family). Held back
 from an actual rename because this exact symbol is called, BY NAME,
 from a large number of OTHER units with DIFFERENT per-call-site arities
 and return types (the established "arity/signature is per-call-site,

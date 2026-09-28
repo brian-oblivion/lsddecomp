@@ -43,7 +43,7 @@ global it returns is written up once, in
 
 The one thing specific to this half: **this function is what pins the
 semantics**, and it does so from outside this unit. `func_800280EC`
-(`src/code_179d8_q.c`) calls it and returns early when it is non-zero,
+(`src/CdDriver.c`) calls it and returns early when it is non-zero,
 before touching `VSyncCallback` -- interrupt-time code declining to run
 while the pool allocator is walking its free list. The setter's two call
 sites alone would only have shown a flag being raised and lowered.

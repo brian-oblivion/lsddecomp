@@ -100,7 +100,7 @@ segments:
       # slot can see, so they are attached to the unit that owns them.
       # (Round 14's shared-slot dance, docs/PARALLEL-RUNS.md Gate 2.)
       - [0xFD8, rodata]   # D_800107D8, D_800107F4 -> code_179d8_q / _h, NOT ours
-      - [0x1010, .rodata, code_179d8_s]   # jtbl_80010810, jtbl_80010828
+      - [0x1010, .rodata, CdDriver]   # jtbl_80010810, jtbl_80010828
       # ROUND 34 (head): libcd/sys's .rdata is the 5-byte "none" at 0x1040
       # (vram 0x80010840, D_80010840 -- referenced only from sys's own text).
       # It ends at 0x1045; retail has three zero bytes and the plain
@@ -680,9 +680,7 @@ segments:
       # NOT attached.
       # Expect this slice to span more than one class; identify each with
       # `tools/classtable.py` rather than assuming the unit has one.
-      - [0x17AD0, c, code_179d8_s]
-      - [0x18480, c, code_179d8_q]
-      - [0x18B2C, c, code_179d8_r]
+      - [0x17AD0, c, CdDriver]
       # code_179d8_h: functions 43..59 of the original monolith's head,
       # 0x19098..0x194E0 (17 functions).  Carved MID-round 17 to re-staff a
       # runner whose own unit was exhausted.  Census 2026-09-04, three-grep
@@ -722,7 +720,6 @@ segments:
       # Both splits are made below (0x1040 in the rodata list, 0x5DD7C in
       # the data list); the 5-byte .rdata needed the pad, the 0x80 .data
       # ends 4-aligned and needed none.
-      - [0x19098, c, code_179d8_h]     # now 0x19098..0x19378, 11 functions
       - [0x19378, o, libc2/strcpy]     # strcpy
       - [0x193BC, o, libc2/strstr]     # strstr
       - [0x19434, o, libcd/sys]        # CdStatus .. CdPosToInt, 25 functions (CdControl/F/B were stalls)
@@ -1185,7 +1182,7 @@ segments:
       - [0x2b660, o, libsnd/sspause]     # Snd_SetPauseMode, SsSeqPause, SsSepPause
       # Gap: 0x2B78C..0x2BA1C. Called "the game's own libsnd build" until
       # revision 18: game code, carved as a C unit.
-      - [0x2b78c, c, code_2b78c]
+      - [0x2b78c, c, Application]
       # Chunk E: the block's last two runs.
       - [0x2ba1c, o, libgs/gs_104]       # GsInit3D
       - [0x2ba94, o, libcd/event]        # CdInit, def_cbsync, def_cbready, def_cbread

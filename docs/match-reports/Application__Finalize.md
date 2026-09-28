@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003B024` on 2026-09-25 (tools/rename.py). Address 0x8003b024.
 
-**Round 81 (delta)** · **Unit:** code_2b78c · **Size:** 2 words · **Status:** MATCHED (2/2 words, whole-image SHA1 green)
+**Round 81 (delta)** · **Unit:** Application · **Size:** 2 words · **Status:** MATCHED (2/2 words, whole-image SHA1 green)
 
 ## What it does
 

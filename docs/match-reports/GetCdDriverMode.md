@@ -2,7 +2,7 @@
 
 > Renamed from `func_80027EF8` on 2026-09-17 (tools/rename.py). Address 0x80027ef8.
 
-Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
+Round 45, runner echo (second sitting), `src/CdDriver.c`.
 
 ## Result
 
@@ -56,7 +56,7 @@ independently confirms "read back the two mode values" rather than anything
 specific to the CD. Tier B: the pairing is certain, the second value is not.
 
 **Evidence for `gCdAsyncEnabled`.** Every reader branches the same way: when
-it is non-zero, the class's methods in `code_179d8_s` set up the state machine
+it is non-zero, the class's methods in `CdDriver` set up the state machine
 (or `EnqueueCdRequest` a node) and return immediately; when it is zero they
 run a blocking `do { v = CdSync(0,0); } while (v == 0);` spin to completion.
 `CdDriver__RequestLoadFile` shows the same split -- queue a request versus
@@ -66,7 +66,7 @@ flag switches on; tier A.
 
 **`gCdSyncQueueMode` keeps its placeholder, on purpose.** Its only writer stores
 `SetCdDriverMode`'s second argument verbatim, and its only readers are this
-getter and five guards in `code_179d8_s` of the form
+getter and five guards in `CdDriver` of the form
 `gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0` -- i.e. "neither mode is on, take
 the plain synchronous path". That tells you the two are alternative modes and
 nothing at all about what the second one is. Naming it would be invention;
@@ -78,7 +78,7 @@ the `.c` now carries this paragraph as a comment instead.
 
 **Callee evidence** (`0x80027EF8`): the very first instruction is `beqz a0,...`
 — `$a0` is read before it is written, so the definition in
-`src/code_179d8_q.c` (`s32 GetCdDriverMode(s32 *outMode2)`) is right: one real
+`src/CdDriver.c` (`s32 GetCdDriverMode(s32 *outMode2)`) is right: one real
 argument, an optional out-pointer that is written only when non-NULL.
 
 **Why the `(void)` extern is right anyway.** Its only carved caller,

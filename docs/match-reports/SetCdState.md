@@ -2,7 +2,7 @@
 
 > Renamed from `func_80028888` on 2026-09-18 (tools/rename.py). Address 0x80028888.
 
-**Unit:** code_179d8_r · **Size:** 4 words · **Status:** MATCHED (4/4 words) · **Round 45**
+**Unit:** CdDriver · **Size:** 4 words · **Status:** MATCHED (4/4 words) · **Round 45**
 
 ## What it does
 
@@ -29,5 +29,5 @@ Closed on the first attempt.
 **Tier A.** Sets `gCdState` to a new phase and clears `gCdTimeoutCounter` --
 the shared "advance to phase N" primitive both tick functions route every
 transition through (`goto L_set; ... SetCdState(newstate);`). Named to
-parallel `GetCdState` (code_179d8_q.c's already-established accessor for
+parallel `GetCdState` (CdDriver.c's already-established accessor for
 the same global).

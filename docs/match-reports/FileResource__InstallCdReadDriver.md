@@ -4,7 +4,7 @@
 
 > Renamed from `func_80028898` on 2026-09-21 (tools/rename.py). Address 0x80028898.
 
-Unit: `code_179d8_h`. Runner: echo, round 17 (second assignment).
+Unit: `CdDriver`. Runner: echo, round 17 (second assignment).
 
 ## Result
 
@@ -66,7 +66,7 @@ letter-for-letter ("methods `Class__Method`, where `Class` is the struct's
 type name"). The rest of the name describes only confirmed MECHANICS: chain
 to `FileResource`'s own ctor, then overwrite `self->methods` with
 `GetCdDriverMethods()`'s table -- `gCdDriverMethods`, independently named
-elsewhere in the tree (`src/code_179d8_q.c`'s own header comment) as "the
+elsewhere in the tree (`src/CdDriver.c`'s own header comment) as "the
 CD-ROM read driver", not a guess coined here. WHICH broader class or game
 subsystem this function itself belongs to (why a `FileResource` instance gets
 reclassified this way here, distinct from `src/code_179d8_o.c`'s own

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80028844` on 2026-09-18 (tools/rename.py). Address 0x80028844.
 
-**Unit:** code_179d8_r · **Size:** 8 words · **Status:** MATCHED (8/8 words) · **Round 45**
+**Unit:** CdDriver · **Size:** 8 words · **Status:** MATCHED (8/8 words) · **Round 45**
 
 ## What it does
 
@@ -37,6 +37,6 @@ Closed on the first attempt.
 of `ResetCdStateMachine`; the "start the operation the head queue node
 represents" purpose is evident from the body (every field it writes is one
 this unit's other functions later read to drive or unwind that operation)
-and confirmed by five call sites across code_179d8_s.c, each passing a
+and confirmed by five call sites across CdDriver.c, each passing a
 distinct `(op, state)` pair for a distinct request type (open, close, seek,
 read, load-file).

@@ -2,7 +2,7 @@
 
 > Renamed from `func_800284C4` on 2026-09-18 (tools/rename.py). Address 0x800284c4.
 
-**Unit:** code_179d8_r · **Size:** 31 words · **Status:** MATCHED (31/31 words) · **Round 45**
+**Unit:** CdDriver · **Size:** 31 words · **Status:** MATCHED (31/31 words) · **Round 45**
 
 ## What it does
 
@@ -39,8 +39,8 @@ Closed on the first attempt.
 
 **Tier A.** Sibling of `FindCdFileEntry` over the same table, returning the
 matching record's index (`-1` if none), consumed as `fileIndex` by
-code_179d8_q.c's `EnqueueCdRequest` and as `func_800284C4`'s own
-pre-existing comment there put it: "code_179d8_r: name -> table index".
+CdDriver.c's `EnqueueCdRequest` and as `func_800284C4`'s own
+pre-existing comment there put it: "CdDriver: name -> table index".
 
 ## Track 4b (2026-09-25, round 85)
 

@@ -109,7 +109,7 @@ tier B rather than A.
 Renamed `VabStreamObj__Update` -> `VabStreamObj__AdvanceLoadState` with
 `rename.py`. The slot is +0x064, FileResource's `setFlag`. It is not a
 per-frame poll. The CD driver calls `self->methods->setFlag(self)` when a
-request completes (`src/code_179d8_s.c`: `CdDriver__LoadFile` and the
+request completes (`src/CdDriver.c`: `CdDriver__LoadFile` and the
 request-queue completion, each right after it ORs a `CD_FLAG_*_DONE` bit
 into `flags`). The 0x200 this body tests is `CD_FLAG_LOAD_FILE_DONE`. So the
 state machine moves forward once per completed file load. First the `.VH`
@@ -127,5 +127,5 @@ interface slots into every table `gDataSourceClientGetters` lists
 
 The states are `enum VabStreamLoadState` (include/VabStreamObj.h:
 `VABSTREAM_LOAD_IDLE` 0, `_HEADER` 1, `_BODY` 6) and the flag is
-`CD_FLAG_LOAD_FILE_DONE` (0x200, the bit code_179d8_s.c's CD driver sets
+`CD_FLAG_LOAD_FILE_DONE` (0x200, the bit CdDriver.c's CD driver sets
 when a load finishes); the path buffer is `VAB_PATH_SIZE` (32). Byte-exact.

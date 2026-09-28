@@ -48,10 +48,10 @@ Round 79 (delta).
   project's constructor shape exactly: parent ctor first
   (`GetFileResourceMethods()->ctor(self)`), then install its own table
   (`self->methods = GetCdDriverMethods()`), then its own fields
-  (`unk28 = 0`), then `InitCdDrive()` (code_179d8_q: one-shot
+  (`unk28 = 0`), then `InitCdDrive()` (CdDriver: one-shot
   `CdSetDebug(0)` + set double-speed mode). `New_CdDriver` dispatches it.
 - The two externs' notes that `GetCdDriverMethods` and `InitCdDrive` are
-  "still INCLUDE_ASM" were stale (both are matched C in code_179d8_q.c) and
+  "still INCLUDE_ASM" were stale (both are matched C in CdDriver.c) and
   are corrected in the unit.
 - `unk28` (+0x28, s16) is kept: cleared here and by FileResource's own ctor,
   read nowhere in this unit, so nothing establishes a meaning.
@@ -64,5 +64,5 @@ Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, i
 Track 7, round 101 (charlie). The `unk28` bullet above is out of date: the
 field at +0x028 is FileResource's `inQueueDispatch` (u16), which
 CdDriver__RunRequestQueue sets around its dispatch back into a request method
-(code_179d8_s.c), and the ctor's store is `self->inQueueDispatch = 0`. No
+(CdDriver.c), and the ctor's store is `self->inQueueDispatch = 0`. No
 source change for this function in round 101 beyond the unit banner.

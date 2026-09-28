@@ -352,7 +352,7 @@ Head work while two runners converted the text-only game-unit runs
 the `libgs`/`libgte` objects in `ScreenWidgets`).
 
 **`libc2/strcpy` + `libc2/strstr` + `libcd/sys`** (0x19378..0x19C78, crossing
-`code_179d8_h` / `libcd_bios`): 27 functions, 22 of them matched C and three
+`CdDriver` / `libcd_bios`): 27 functions, 22 of them matched C and three
 INCLUDE_ASM stalls (`CdControl`, `CdControlF`, `CdControlB`, ~1200 report
 lines). `sys` has a 5-byte `.rdata` ("none", 0x1040) and a 0x80-byte `.data`
 (0x5DD7C, a table of 0/1 words); both slots split at the derived offsets, the

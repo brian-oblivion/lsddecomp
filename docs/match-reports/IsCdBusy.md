@@ -2,7 +2,7 @@
 
 > Renamed from `func_80027EC8` on 2026-09-17 (tools/rename.py). Address 0x80027ec8.
 
-**Unit:** code_179d8_q (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
+**Unit:** CdDriver (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 
 ## What this function does
 
@@ -23,7 +23,7 @@ s32 IsCdBusy(void)
 
 ## Provenance
 
-round 45 (2026-09-15), runner echo, unit code_179d8_q (fresh carve). One of
+round 45 (2026-09-15), runner echo, unit CdDriver (fresh carve). One of
 a run of identically-shaped `$gp_rel` accessors in this unit
 (IsCdBusy/ED4/EE0/EEC are getters, SetFileTable/FE4 are setters,
 GetFileTableCount is a paired getter, LockCd/E0 are a 1/0 setter pair) --
@@ -39,10 +39,10 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `func_80027EC8` | `IsCdBusy` | A |
 | `D_8008A864` | `gCdBusy` | A |
 
-**Evidence.** The global is set to 1 by `StartCdOperation` (code_179d8_r), which
+**Evidence.** The global is set to 1 by `StartCdOperation` (CdDriver), which
 every method of this class calls to BEGIN an operation, and back to 0 by
 `ResetCdStateMachine`, the state-machine reset. Every reader is a refusal guard:
-`code_179d8_s` tests `gCdBusy == 0` before starting any transfer, and
+`CdDriver` tests `gCdBusy == 0` before starting any transfer, and
 `SetCdDriverMode` in this unit returns 0 (rejected) while it is non-zero.
 `GameApplicationFileResource.c`'s wrapper `IsActiveDataSourceBusy` returns 0 -- not busy -- when no CD
 source is selected. Getter of a flag whose writers define it: tier A by the

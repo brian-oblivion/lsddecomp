@@ -100,13 +100,13 @@ initialise fields) ARE its purpose, so tier A by the plan's own rule.
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/code_179d8_h.c:143`
+mis-hit had to be resolved by receiver type: `src/CdDriver.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
-`FileResource` is shared with `code_179d8_h.c`/`code_179d8_q.c`
+`FileResource` is shared with `code_179d8_h.c`/`CdDriver.c`
 (see `FileResource__LoadFile.md`); every field this constructor zeroes is
 therefore checked, and only `flags` (this round's own rename, zero
 cross-unit hits) renamed outright. The rest:
@@ -151,8 +151,8 @@ zeroed and otherwise untouched" from scratch.
   why the slot keeps a `Self *` parameter.
 - **CdLoc16 is Sony's `CdlLOC`, substitution parked.** Layout (4 bytes at
   +0x018) and use agree: `CdControl(CdlSetloc, &self->pos, 0)`
-  (code_179d8_h/s), `CdSearchFile`'s `CdlFILE.pos` copied into it
-  (code_179d8_q/s), `CdPosToInt(&self->pos)` (code_179d8_s). The
+  (CdDriver/s), `CdSearchFile`'s `CdlFILE.pos` copied into it
+  (code_179d8_q/s), `CdPosToInt(&self->pos)` (CdDriver). The
   2-alignment of the s16 pair is NOT needed: measured through the pinned
   pipeline, a whole-struct copy of Sony's 1-aligned
   `struct { u_char minute, second, sector, track; }` compiles to the same
@@ -160,14 +160,14 @@ zeroed and otherwise untouched" from scratch.
   pointer. The blocker is the include: adding `<libcd.h>` to
   `include/FileResource.h` (measured with `MAKEFLAGS=-k`) makes exactly four
   units fail with `conflicting types`, each re-declaring Cd* functions its
-  own way: code_179d8_h (CdSearchFile, CdControl, CdSync, CdRead,
-  CdReadSync), code_179d8_q (CdControlB, CdSearchFile), code_179d8_r
-  (CdControlF, CdRead, CdReadSync, CdSync), code_179d8_s (CdControl,
+  own way: CdDriver (CdSearchFile, CdControl, CdSync, CdRead,
+  CdReadSync), CdDriver (CdControlB, CdSearchFile), code_179d8_r
+  (CdControlF, CdRead, CdReadSync, CdSync), CdDriver (CdControl,
   CdIntToPos, CdPosToInt, CdRead, CdReadSync, CdSearchFile, CdSync). Those
   are those units' polish passes (`sonyheaders.py`). Once they take Sony's
   prototypes, `CdLoc16` is deleted, `FileResource.h` includes `<libcd.h>`,
   and `renametype.py --any-stem CdLoc16 CdlLOC` (or a hand edit of the four
-  users: CdDriver.h, code_179d8_h/q/s) finishes it; no field accessor
+  users: CdDriver.h, code_179d8_s/q/s) finishes it; no field accessor
   changes, since the halves are never read apart.
 
 ### Proposed field and slot names (not applied: accessors outside the job)

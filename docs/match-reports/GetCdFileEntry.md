@@ -2,7 +2,7 @@
 
 > Renamed from `func_80028540` on 2026-09-18 (tools/rename.py). Address 0x80028540.
 
-**Unit:** code_179d8_r · **Round 46** · **MATCHED**
+**Unit:** CdDriver · **Round 46** · **MATCHED**
 
 ## What it does
 
@@ -102,7 +102,7 @@ tend to skip.
 **Tier A.** Direct index-to-pointer helper over the same `gFileTable` table
 (`gFileTable + index * 0x1C`), no search -- distinguished from
 `FindCdFileEntry`/`FindCdFileIndex` (which scan) by the Get/Find naming
-convention. Called from `CdDriver__RunRequestQueue` (code_179d8_s.c, still `INCLUDE_ASM`)
+convention. Called from `CdDriver__RunRequestQueue` (CdDriver.c, still `INCLUDE_ASM`)
 by table index.
 
 ## Track 4b (2026-09-25, round 85)
@@ -120,5 +120,5 @@ now initialised at its declaration. With the typed pointer that shape is
 byte-exact too (measured round 101), so the declare-then-assign split
 above was a fact about the `char *` / `void *` spelling, not about this
 function; no MATCHING line is needed. The return type stays `void *`
-because code_179d8_s.c declares it that way (proposal in the round's
+because CdDriver.c declares it that way (proposal in the round's
 summary).

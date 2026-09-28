@@ -11,7 +11,7 @@
  * own fields run from TimedTask's 0x38. No class derives from it. Methods:
  * src/class_39e08.c, New_DayTask through GetDayTaskMethods.
  *
- * Who creates it. Application__RunMainLoop (src/code_2b78c.c) calls
+ * Who creates it. Application__RunMainLoop (src/Application.c) calls
  * GameApplication__RunDayTask (src/GameApplicationFileResource.c) when the GraphRoom poll
  * returns 2, and that builds one with New_DayTask(the application's
  * IntermediateBaseInitArgs, its DreamSys, config->unk04), runs its init to

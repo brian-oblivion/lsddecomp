@@ -2,7 +2,7 @@
 
 > Renamed from `func_800283C4` on 2026-09-18 (tools/rename.py). Address 0x800283c4.
 
-**Unit:** code_179d8_r · **Size:** 33 words · **Status:** MATCHED (33/33 words) · **Round 45**
+**Unit:** CdDriver · **Size:** 33 words · **Status:** MATCHED (33/33 words) · **Round 45**
 
 ## What it does
 
@@ -44,5 +44,5 @@ Closed on the first attempt (uses the `Node8008A894` struct from
 
 **Tier A.** The remove/free counterpart to `AllocCdRequestNode`: unlinks a
 node from `gCdRequestQueue` and frees it via `BMemPMgrFree`. Corroborated
-by code_179d8_q.c's own comment (pre-rename): "func_800283C4 unlinks and
+by CdDriver.c's own comment (pre-rename): "func_800283C4 unlinks and
 frees".

@@ -42,7 +42,7 @@ Needs the unit-local view at the top of `src/DrawSystem.c`
 
 `DrawSystem__InitGraph`, tier B. Wraps GsInitGraph/GsDefDispBuff; confirmed
 as the object's own +0x044 slot from OUTSIDE the unit too --
-`code_2b78c.c`'s `Application__InitSystems` receives this same object as its
+`Application.c`'s `Application__InitSystems` receives this same object as its
 `source` argument and dispatches `source->methods->slot44(source, &self->dims,
 self->dimsArg)`, the identical offset.
 

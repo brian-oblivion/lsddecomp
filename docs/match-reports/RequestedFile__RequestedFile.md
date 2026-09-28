@@ -63,7 +63,7 @@ Renamed from `D8006EED8__D8006EED8` with rename.py (the class name).
 `flag2C` is `loaded`: the only setter of 1 is `RequestedFile__MarkLoaded`, the
 +0x064 setFlag override, and the CD driver calls setFlag when a queued
 operation completes (`CdDriver__LoadFile`, the request dispatch in
-code_179d8_s); the one reader, `WBgm__HandleMonitorEvent`, waits for it
+CdDriver); the one reader, `WBgm__HandleMonitorEvent`, waits for it
 before handing `buffer` to `SsSeqOpen`. `slot6C` is FileResource's
 inherited `requestLoadFile` (CD occupant `CdDriver__RequestLoadFile`).
 The base ctor call is `GetActiveDataSourceMethods()->ctor((FileResource *)self)`.

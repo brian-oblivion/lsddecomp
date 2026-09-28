@@ -2,7 +2,7 @@
 
 > Renamed from `func_80027EEC` on 2026-09-17 (tools/rename.py). Address 0x80027eec.
 
-**Unit:** code_179d8_q (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
+**Unit:** CdDriver (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 
 ## What this function does
 
@@ -22,7 +22,7 @@ s32 GetCdState(void)
 
 ## Provenance
 
-round 45 (2026-09-15), runner echo, unit code_179d8_q (fresh carve). See
+round 45 (2026-09-15), runner echo, unit CdDriver (fresh carve). See
 IsCdBusy.md for the sibling-accessor context.
 
 ## Naming
@@ -35,7 +35,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `D_8008A878` | `gCdState` | A |
 
 **Evidence.** The global is the phase variable of the CD read state machine
-in `code_179d8_r`: `TickCdStateMachine` and `TickCdLoadFileStateMachine` both open with
+in `CdDriver`: `TickCdStateMachine` and `TickCdLoadFileStateMachine` both open with
 `state = gCdState` and then switch on it (1 -> issue `CdlSetloc` via
 `CdControlF`, 2 -> poll `CdSync`, 7 -> issue `CdRead`, 8 -> poll
 `CdReadSync`), and `SetCdState` is a one-line "set the phase and reset the

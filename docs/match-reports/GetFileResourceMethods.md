@@ -59,7 +59,7 @@ Pure leaf, mechanics are its purpose.
 ## Proposed type names
 
 Not renamed (types aren't `rename.py` symbols, and `FileResource`/
-`FileResourceMethods` are used by `code_179d8_h.c` too -- same
+`FileResourceMethods` are used by `CdDriver.c` too -- same
 cross-unit exposure as the fields below), but proposed for the head to
 apply as a whole-tree replace, since a `ClassNNNN__Method` function prefix
 (this round gave the class's own functions `FileResource__` names) reading
