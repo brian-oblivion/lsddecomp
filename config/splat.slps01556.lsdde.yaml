@@ -1046,7 +1046,7 @@ segments:
       # unit owns no jump table, so NO rodata attach moved.
       - [0x247B8, o, libsnd/replay]     # Snd_replay
       - [0x24820, o, libsnd/vs_vab]     # SsVabClose, SsVabOpen
-      - [0x2490C, c, libsnd_play]
+      - [0x2490C, c, psyq/libsnd_play]
       # code_179d8_k: what was the `code_179d8_tail` remainder after the
       # code_179d8_i carve -- functions 238..255 of the original,
       # 0x24938..0x2673C (18 functions, func_80034138 .. func_80035E80).
