@@ -1997,7 +1997,7 @@ void Entity__MoodCue76(Entity *this, SoundCueSet *out) {
         ((EntityPlayTodFn)this->methods->playTod)(this);
         if (this->todFrame == this->todFrameCount - 1) {
             this->methods->stopTod(this);
-            this->methods->updateScale(this, 0, SCALE_MINUS_SIXTY_FOURTH);
+            this->methods->updateScale(this, 0, sScaleMinusSixtyFourth);
         }
     } else {
         this->methods->stopTod(this);

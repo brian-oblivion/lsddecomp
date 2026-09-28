@@ -23,7 +23,7 @@ void Entity__MoodCue76(Entity *this, EntityMoodHandlerArg *out) {
         if (this->unk84 == this->unk80 - 1) {
             this->methods->slot130(this);
             fn = (void (*)(Entity *, s32, void *))this->methods->slot48;
-            table = SCALE_MINUS_SIXTY_FOURTH;
+            table = sScaleMinusSixtyFourth;
             fn(this, 0, table);
         }
     } else {
@@ -42,7 +42,7 @@ disassembly directly; the difficulty was entirely in getting GCC to
 regenerate retail's tail-merge.
 
 **First attempt** wrote the natural, idiomatic version -- two separate
-statement calls, `this->methods->slot48(this, 0, SCALE_MINUS_SIXTY_FOURTH);` in one
+statement calls, `this->methods->slot48(this, 0, sScaleMinusSixtyFourth);` in one
 branch and `this->methods->slot44(this, 0, sRotationYawPlus9);` in the other,
 both with discarded return values. This compiled to the *correct control
 flow* but **did not tail-merge**: each branch got its own `jalr $2 / nop`
@@ -107,7 +107,7 @@ principles alone.
 
 Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 76 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity.
 
-**`SCALE_MINUS_SIXTY_FOURTH` left unnamed this round.** s16-pair-decoded it reads (-1,64,-1,64,-1,64,8,7) -- X=Y=Z=-1/64, none of the round-number ratios (1/2, 1/1, 6/1, ...) every named `SCALE_*` table uses so far. Passed to `updateScale` through a `void (*)(Entity*,s32,void*)` function pointer rather than a direct call, so it is genuinely a scale table by construction, just not one with an evident round value to name it after.
+**`sScaleMinusSixtyFourth` left unnamed this round.** s16-pair-decoded it reads (-1,64,-1,64,-1,64,8,7) -- X=Y=Z=-1/64, none of the round-number ratios (1/2, 1/1, 6/1, ...) every named `SCALE_*` table uses so far. Passed to `updateScale` through a `void (*)(Entity*,s32,void*)` function pointer rather than a direct call, so it is genuinely a scale table by construction, just not one with an evident round value to name it after.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
@@ -115,4 +115,4 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 7 (round 93, echo)
 
-Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). `D_80089DFC` -> `SCALE_MINUS_SIXTY_FOURTH` (`python3 tools/rename.py`, tier A, named by value like the other motion templates): three Ratio16 {-1, 64} (words 0x0040FFFF), passed to updateScale with set 0, so it subtracts 1/64 from each axis's scale (SceneNode__UpdateScale adds when `set` is 0). Its extern is in include/Entity.h's motion-template block as Ratio16[]. The body now calls updateScale and updateRotation directly: the local void function pointer the derivation above needed existed because updateScale was then typed `s32 (*)`, which blocked the crossjump; the slot is void now (SCENENODE_SLOTS) and the direct calls merge the same way, byte-identical. Byte-identical (whole image green).
+Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). `D_80089DFC` -> `sScaleMinusSixtyFourth` (`python3 tools/rename.py`, tier A, named by value like the other motion templates): three Ratio16 {-1, 64} (words 0x0040FFFF), passed to updateScale with set 0, so it subtracts 1/64 from each axis's scale (SceneNode__UpdateScale adds when `set` is 0). Its extern is in include/Entity.h's motion-template block as Ratio16[]. The body now calls updateScale and updateRotation directly: the local void function pointer the derivation above needed existed because updateScale was then typed `s32 (*)`, which blocked the crossjump; the slot is void now (SCENENODE_SLOTS) and the direct calls merge the same way, byte-identical. Byte-identical (whole image green).
