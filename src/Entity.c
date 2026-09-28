@@ -2463,7 +2463,7 @@ void Entity__MoodCue91(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if (Entity__GetOrCreateFadeBox(this, NULL, NULL, (void *)5, 0) != NULL) {
             if (rand() & 1) {
-                this->methods->addTranslation(this, TRANSLATE_Y_MINUS256);
+                this->methods->addTranslation(this, sTranslateYMinus256);
             }
             this->fadeBox->methods->startFadeDown(this->fadeBox, (BasicClass *)this->ticker, 0, 0);
         }
