@@ -21,7 +21,7 @@ void Entity__MoodCue39(Entity *this, EntityMoodHandlerArg *out) {
         } else if (r != 2) {
             goto skip48;
         }
-        this->methods->slot48(this, 1, SCALE_Y4);
+        this->methods->slot48(this, 1, sScaleY4);
     }
 skip48:
     if (out->unk4 % 22 == 0) {

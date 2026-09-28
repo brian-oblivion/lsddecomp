@@ -1182,7 +1182,7 @@ void Entity__MoodCue39(Entity *this, SoundCueSet *out) {
         } else if (dayYearPhase != 2) {
             goto skipScaleBump;
         }
-        this->methods->updateScale(this, 1, SCALE_Y4);
+        this->methods->updateScale(this, 1, sScaleY4);
     }
 skipScaleBump:
     if (out->tick % 22 == 0) {
