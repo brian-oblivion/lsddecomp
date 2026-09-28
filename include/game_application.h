@@ -1,5 +1,5 @@
-#ifndef GAMEAPPLICATION_H
-#define GAMEAPPLICATION_H
+#ifndef GAME_APPLICATION_H
+#define GAME_APPLICATION_H
 
 #include "application.h"
 

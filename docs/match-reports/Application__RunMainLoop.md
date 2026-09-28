@@ -73,7 +73,7 @@ usual switch.
 **Round 81 (delta), track 3.** Renamed `func_8003B110` -> `Application__RunMainLoop`.
 **Tier B**: "runs forever while initialized, dispatching the subclass's own
 state-machine slots" is evident from the body alone; "main loop" is
-corroborated by `include/GameApplication.h`'s own note that this is the slot
+corroborated by `include/game_application.h`'s own note that this is the slot
 "first dispatched by main" (`src/main.c`), but that is one caller, not two
 agreeing ones, so it stays B rather than A.
 
@@ -95,7 +95,7 @@ The status literals are `enum ApplicationLoopStatus` (include/application.h):
 `APPLICATION_LOOP_SLOT5C` (1, +0x05C then `continue`) and
 `APPLICATION_LOOP_DAY` (2, +0x060 and, on nonzero, +0x064). Evidence: this
 body's own dispatch; the names follow the hooks', which are named for
-GameApplication's occupants, and agree with GameApplication.h's
+GameApplication's occupants, and agree with game_application.h's
 `GameApplicationLoopStatus` (0 = OPENING, 2 = DAY; its RunTitleMenu never
 returns 1). Tier B, like the hook names. Byte-identical. The Final C above is
 the pre-track-7 text.

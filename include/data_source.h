@@ -6,7 +6,7 @@
  * (DATASOURCE_CD, include/cd_driver.h) or the SPU/VAB one (DATASOURCE_NULL,
  * include/NullDriver.h), and the data directory file names are built in.
  * The classes the file defines are declared by their own headers:
- * GameApplication in include/GameApplication.h, FileResource and
+ * GameApplication in include/game_application.h, FileResource and
  * ResourceRequest in include/file_resource.h. */
 
 #include "common.h"

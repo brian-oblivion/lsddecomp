@@ -15,7 +15,7 @@ class of `gDayTaskMethods` (resolved with
 `tools/classtable.py 0x800865C8 --vs 0x8006E878`, then cross-checked against
 `0x80086668` -- both share the same base, `gIntermediateBaseMethods`). If `self->unk30` is
 set, notifies `self->subB` (guarded slot, same pattern as
-`include/GameApplication.h`'s `unk18`/`GameApplication__InitSystems` comment). Then chains to the
+`include/game_application.h`'s `unk18`/`GameApplication__InitSystems` comment). Then chains to the
 BASE class's own dtor, fetched through `GetIntermediateBaseMethods()` (a plain
 no-parameter accessor returning `&gIntermediateBaseMethods`, same shape as
 `GetDreamSysMethods`).

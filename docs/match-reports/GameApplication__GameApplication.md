@@ -114,7 +114,7 @@ another caller is found that writes them.
 
 ## New struct/header knowledge (recorded in `include/`)
 
-- `include/GameApplication.h`: added `GameApplicationConfig` (the ctor's `arg`
+- `include/game_application.h`: added `GameApplicationConfig` (the ctor's `arg`
   parameter type — only `+0x00` and `+0x14` are read here, observed against
   the one call site's data, `asm/main.s`'s `sGameApplicationConfig` global:
   `{0x13, 0, 1, 1, 1, 1}`), added `LoadModelRequest`, retyped
@@ -186,7 +186,7 @@ Types renamed with it:
   `GameApplication__SeedRandom` (see that report).
 - `Class6D3C8InitSystemsFn` -> `GameApplicationInitSystemsFn`,
   `Class6D3C8Methods` -> `GameApplicationMethods`: the family rename.
-- Header guard `CLASS_6D3C8_H` -> `GAMEAPPLICATION_H` by hand: renametype.py's
+- Header guard `CLASS_6D3C8_H` -> `GAME_APPLICATION_H` by hand: renametype.py's
   upper-case pattern is `CLASS6D3C8`, so an underscored guard is invisible to it.
 
 Kept: `GameApplicationConfig::unk04` (DayTask's ctor passes `unk04 == 0` to

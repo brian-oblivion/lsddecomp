@@ -3,7 +3,7 @@
  * the game's Application, and FileResource, the base of everything loaded
  * from a file, with the active-data-source layer and the data directory.
  *
- * GameApplication (include/GameApplication.h, which documents the class):
+ * GameApplication (include/game_application.h, which documents the class):
  * its allocator and ctor, the RNG seed and initSystems overrides, then the
  * hooks Application__RunMainLoop calls, each with the helpers it uses:
  *  - ShowIntroLogos: ETC\ASMKLOGO.TIM, the ETC\ASMK.STR movie, ETC\OSDLOGO.TIM
@@ -31,7 +31,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <libetc.h>
-#include "GameApplication.h"
+#include "game_application.h"
 #include "dream_sys.h"
 #include "LinkResource.h"
 #include "TaskCore.h"

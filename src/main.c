@@ -14,7 +14,7 @@
  * linked object places it, so it is written here.
  */
 #include "common.h"
-#include "GameApplication.h"
+#include "game_application.h"
 #include "pad.h"
 #include "bmem_pmgr.h"
 #include <kernel.h>

@@ -14,7 +14,7 @@
 class's own vtable slot +0x008) with the allocated object and the caller's
 own `dreamSys` argument.
 
-Also externally visible as a `PollTaskCtor` callback -- `include/GameApplication.h`
+Also externally visible as a `PollTaskCtor` callback -- `include/game_application.h`
 (a different unit) already declares this exact symbol,
 `extern PollTask *New_TitleMenu(void *dreamSys);`, used by `GameApplication__RunTitleMenu`
 as `GameApplication__RunTask`'s `ctor` argument. That declaration's return/param
@@ -58,7 +58,7 @@ None beyond what's already documented for this unit's `New_X` idiom.
 **New_TitleMenu** -- tier A. Same `New_X` allocator idiom as
 `New_NodeGuardedViewport`/`New_GridCell`, one extra forwarded argument
 (`dreamSys`). Also externally used as a `PollTaskCtor` callback
-(`include/GameApplication.h`); that unit's own independent local view keeps its
+(`include/game_application.h`); that unit's own independent local view keeps its
 own return/param naming and is untouched by this rename (function names
 are unique symbols, tree-wide by construction, so that call site now reads
 `New_TitleMenu` too).

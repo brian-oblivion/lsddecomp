@@ -12,7 +12,7 @@
  * BasicClass subclass. Methods in src/app/application.c.
  *
  * Lifecycle. It is abstract and never built on its own: its one subclass,
- * GameApplication (include/GameApplication.h), is the object main() (src/main.c)
+ * GameApplication (include/game_application.h), is the object main() (src/main.c)
  * builds, and that subclass's ctor runs this one first.
  *   ctor(dataSource)  runs CdInit once per boot, selects the data source
  *                     (SetActiveDataSource) and sets the default screen,

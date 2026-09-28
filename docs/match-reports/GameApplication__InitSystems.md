@@ -49,7 +49,7 @@ that is itself derived from BasicClass, and `classtable.py 0x8006D3C8 --vs
 with that intermediate table — evidence this class's real parent is that
 intermediate class, not BasicClass directly (the earlier `--vs 0x8006B58C`
 comparison only showed a match on the BasicClass-common low slots, which
-both classes inherit). Recorded in `include/GameApplication.h`.
+both classes inherit). Recorded in `include/game_application.h`.
 
 No instruction sets `$v0` after the conditional call, so the function's own
 return value (if used at all) is whatever the base method leaves behind —

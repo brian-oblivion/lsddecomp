@@ -56,7 +56,7 @@ StreamTaskObj now expands TASKCORE_SLOTS (include/TaskCore.h, round 84): its `sl
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BDF4. Occupies +0x094 refreshViewValue (reached from setState(0x12)). `abortBeforeFade` set: MoviePlayer__Abort at once; clear: setState(7), and SetState's case 8 aborts after the fade.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BDF4. Occupies +0x094 refreshViewValue (reached from setState(0x12)). `abortBeforeFade` set: MoviePlayer__Abort at once; clear: setState(7), and SetState's case 8 aborts after the fade.
 
 ## Track 4 (2026-09-26, round 89)
 

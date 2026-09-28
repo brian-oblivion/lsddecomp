@@ -45,7 +45,7 @@ which can only be `TimedTask__PlaySound`'s own second parameter, forwarded uncha
 (no `move` needed since it's already resident in the right register).
 
 Named the two classes by vtable address per project convention (see
-`GameApplication.h`): `TimedTask` (gTimedTaskMethods) and `StageMap` (gStageMapMethods).
+`game_application.h`): `TimedTask` (gTimedTaskMethods) and `StageMap` (gStageMapMethods).
 Both declared in the new `include/dream_day.h`.
 
 ## Proposed learning

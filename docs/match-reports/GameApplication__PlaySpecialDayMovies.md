@@ -72,7 +72,7 @@ field's own address.**
 
 ## New struct/header knowledge
 
-`include/GameApplication.h`: added `StreamTaskMethods.slot6C` and `.slot12C` (new
+`include/game_application.h`: added `StreamTaskMethods.slot6C` and `.slot12C` (new
 slots, both `(void *self, s32 a1)`), retyped `slot44`'s 3rd parameter from
 `const char *path` to plain `s32 arg2` -- confirmed generic by this call
 site passing a computed count where `GameApplication__ShowIntroLogos` passed a string
@@ -118,7 +118,7 @@ mention GraphRoom).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
+game_application.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
 
 ## Track 7 polish (round 100, echo)
 

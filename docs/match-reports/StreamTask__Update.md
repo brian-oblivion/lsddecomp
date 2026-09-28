@@ -66,7 +66,7 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BB5C. Occupies +0x05C update and up-calls TaskCore's first, then polls MoviePlayer__Advance into `playDone` and, once it reports done while not already fading out, setState(7).
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BB5C. Occupies +0x05C update and up-calls TaskCore's first, then polls MoviePlayer__Advance into `playDone` and, once it reports done while not already fading out, setState(7).
 
 ## Track 4 (2026-09-26, round 89)
 

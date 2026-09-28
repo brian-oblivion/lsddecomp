@@ -103,7 +103,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
 
 ## New struct/header knowledge
 
-`include/GameApplication.h`: `SetActiveDataSourceDriverMode`'s extern retyped from `void` to
+`include/game_application.h`: `SetActiveDataSourceDriverMode`'s extern retyped from `void` to
 `s32` (it does return a meaningful value -- whatever its internal dispatch
 loop last produced -- confirmed here even though this call site, like
 `GameApplication__ShowIntroLogos`/`GameApplication__PlayOpeningMovie`, discards it). Added `GetSpecialDayOrEventRecord`
@@ -151,7 +151,7 @@ shared by this unit's other four StreamTask launchers.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-The task these functions build with New_TaskCore is a plain TaskCore (include/TaskCore.h, track 4 round 84); GameApplication.h's LoaderTask view is gone and the calls use TaskCore's slot names (setCallback, setFrameBound, setSubHandle, init, release). The old `start` slot at +0x004 is BasicClass's release, and StreamTask's own +0x004 is typed `void *(*release)` too: with one void and one value-returning, StartCinematicStream's two branches stopped cross-jumping into one call (+6 instructions). Byte-identical.
+The task these functions build with New_TaskCore is a plain TaskCore (include/TaskCore.h, track 4 round 84); game_application.h's LoaderTask view is gone and the calls use TaskCore's slot names (setCallback, setFrameBound, setSubHandle, init, release). The old `start` slot at +0x004 is BasicClass's release, and StreamTask's own +0x004 is typed `void *(*release)` too: with one void and one value-returning, StartCinematicStream's two branches stopped cross-jumping into one call (+6 instructions). Byte-identical.
 
 ## Track 7 polish (round 100, echo)
 

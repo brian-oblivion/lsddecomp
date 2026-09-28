@@ -127,7 +127,7 @@ s32 GameApplication__RunDayTask(GameApplication *self) {
 #endif
 ```
 
-This needs `GameApplication.h`'s `StatusObj`/`StatusObjMethods` (already
+This needs `game_application.h`'s `StatusObj`/`StatusObjMethods` (already
 committed) and the `GameApplication__PlayCinematic` forward declaration (already committed).
 
 ## Derivation and the levers that got this from 1/57 to 53/57

@@ -24,7 +24,7 @@ BasicClassMethods *GetBasicClassMethods(void)
 
 `gBasicClassMethods` had no extern declaration anywhere in the tree yet (only prose
 references to it in `pad.h`, `data_source.h`, `tod_actor.h`,
-`scene_node.h`, `GameApplication.h`). Added one to `include/code_8220.h`:
+`scene_node.h`, `game_application.h`). Added one to `include/code_8220.h`:
 
 ```c
 extern BasicClassMethods gBasicClassMethods;

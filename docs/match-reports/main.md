@@ -26,7 +26,7 @@ correctly left untouched per the runner brief).
 
 ```c
 #include "common.h"
-#include "GameApplication.h"
+#include "game_application.h"
 #include "pad.h"
 
 /* Local, opaque: code_8220.h can't be included alongside pad.h
@@ -178,7 +178,7 @@ this is a documentation sync only.)
   - `D_80066828` -> `sGameApplicationConfig`, tier A: purely mechanical, it
     IS the one `GameApplicationConfig` block in the image, passed to
     `New_GameApplication` at its only call site. `{0x13, 0, 1, 1, 1, 1}`, per
-    `include/GameApplication.h`'s existing documentation of which two fields
+    `include/game_application.h`'s existing documentation of which two fields
     (`+0x00`, `+0x14`) `GameApplication__GameApplication` actually reads.
 
   All three: `./build-and-verify.sh` byte-identical, `tools/check-nonmatching.sh`
@@ -202,7 +202,7 @@ fingerprint) evidence that the callee IS that toolchain-standard symbol.
 Use a non-colliding name (`main`, `EntryMain`, etc.) for the game's
 real entry point instead.
 
-Also in `include/GameApplication.h`: `GameApplicationMethods.unk4C` (never dispatched
+Also in `include/game_application.h`: `GameApplicationMethods.unk4C` (never dispatched
 by any carved C before this) is retyped from `void *` to `void
 (*slot4C)(GameApplication *self);` -- this function is its first caller.
 

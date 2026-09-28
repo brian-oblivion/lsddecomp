@@ -7,7 +7,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** not a slot; called from src/app/game_shell.c.
-- **What:** returns the small-data word `sDefaultDataDirectory` (`%gp_rel` load; the gp_rel blocker is RESOLVED). Return type `s32` kept as `include/GameApplication.h` declares it, although retail stores a pointer (`&D_8008A958`) there.
+- **What:** returns the small-data word `sDefaultDataDirectory` (`%gp_rel` load; the gp_rel blocker is RESOLVED). Return type `s32` kept as `include/game_application.h` declares it, although retail stores a pointer (`&D_8008A958`) there.
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 

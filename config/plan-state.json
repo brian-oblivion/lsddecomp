@@ -945,7 +945,7 @@
         "gGameApplicationMethods": {
           "class": "GameApplication",
           "date": "2026-09-26",
-          "header": "include/GameApplication.h"
+          "header": "include/game_application.h"
         },
         "gGraphRoomMethods": {
           "class": "GraphRoom",

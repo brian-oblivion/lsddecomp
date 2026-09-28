@@ -52,7 +52,7 @@ this unit's queue) and `extern StreamTaskObjMethods gStreamTaskMethods;`.
 ## Proposed learning
 
 `gStreamTaskMethods` sits right next to a second class's table, `gTaskCoreMethods`
-(`GameApplication.h`'s `LoaderTaskMethods`, established from a completely
+(`game_application.h`'s `LoaderTaskMethods`, established from a completely
 different allocator/unit, `New_TaskCore`). `StreamTaskObj`'s own slots
 `+0x00C`/`+0x080`/`+0x084` (`StreamTask__Finalize`/`StreamTask__OnPadPrev`/`StreamTask__OnPadNext`)
 forward straight through to `gTaskCoreMethods`'s implementations of the *same*
@@ -73,4 +73,4 @@ the established `Get_vtable_<Class>` convention exactly
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Returns &gStreamTaskMethods.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Returns &gStreamTaskMethods.

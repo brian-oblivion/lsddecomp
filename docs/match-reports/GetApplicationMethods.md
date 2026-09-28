@@ -18,7 +18,7 @@ ApplicationMethods *GetApplicationMethods(void) {
 
 ## Declarations
 
-`include/GameApplication.h` already declares `extern MiddleClassMethods
+`include/game_application.h` already declares `extern MiddleClassMethods
 *func_8003B20C(void);` with its own view of the table. This unit does NOT
 include that header and declares its own local `ApplicationMethods` view,
 so the two never meet in one translation unit (the multiple-local-views

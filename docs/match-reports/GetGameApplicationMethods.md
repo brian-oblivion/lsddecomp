@@ -66,6 +66,6 @@ purpose.
 ## Track 4 (2026-09-26, round 88)
 
 Retyped to `GameApplicationMethods *GetGameApplicationMethods(void)`, returning
-`&gGameApplicationMethods`; both are declared once, in `include/GameApplication.h`
+`&gGameApplicationMethods`; both are declared once, in `include/game_application.h`
 (`include/data_source.h`'s `extern s32 gGameApplicationMethods[]` view is deleted, and
 New_GameApplication no longer casts the result). Image byte-identical.

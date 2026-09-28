@@ -9,7 +9,7 @@
 ## What it does
 
 A one-line forwarder: fetches the sibling class's method table via
-`GetTaskCoreMethods()` (returns `&gTaskCoreMethods`, `GameApplication.h`'s `LoaderTaskMethods`
+`GetTaskCoreMethods()` (returns `&gTaskCoreMethods`, `game_application.h`'s `LoaderTaskMethods`
 -- see `GetStreamTaskMethods`'s report for how the delegation between the two
 sibling classes was established) and calls its slot `+0x080`, passing
 `self` straight through. Occupies `gStreamTaskMethods` slot `+0x080` itself.
@@ -42,13 +42,13 @@ inner call returns is left in `$v0` at exit either way, and typing this
 wrapper `void` vs. forwarding a return value compiles to byte-identical
 code. Typed `void` here based on the sibling-slot convention: every OTHER
 slot of this same table typed so far (`+0x004`/`+0x044`/`+0x06C`/`+0x12C` in
-`GameApplication.h`'s `StreamTaskMethods`) is void. No caller of `+0x080`
+`game_application.h`'s `StreamTaskMethods`) is void. No caller of `+0x080`
 specifically was found to confirm either way -- flagged for whoever adds one.
 
 ## New struct/header knowledge
 
 Added `include/task.h`'s `TaskCoreMethods` (this unit's own local view
-of `gTaskCoreMethods`, independent of `GameApplication.h`'s `LoaderTaskMethods`, same
+of `gTaskCoreMethods`, independent of `game_application.h`'s `LoaderTaskMethods`, same
 precedent as `GetStreamTaskMethods`'s report) with slot `+0x080` typed
 `void (*)(StreamTaskObj *self)`.
 
@@ -71,4 +71,4 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BD74. Occupies +0x080 onPadPrev and only up-calls TaskCore's.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BD74. Occupies +0x080 onPadPrev and only up-calls TaskCore's.

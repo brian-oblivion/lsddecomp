@@ -51,7 +51,7 @@ argument from the start).
 
 ## New struct/header knowledge
 
-`include/GameApplication.h`: split `GameApplicationConfig`'s `+0x04..+0x0B` padding
+`include/game_application.h`: split `GameApplicationConfig`'s `+0x04..+0x0B` padding
 to expose `+0x08` (`unk08`, this function's gate) as its own field,
 matching the existing `+0x0C` (`unk0C`, `GameApplication__ShowIntroLogos`'s gate). Declared
 `PickOpeningMovie` (day/week-style helper, `psyq_memset.s`, same "write an
@@ -87,7 +87,7 @@ shape as its three siblings in this unit).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
+game_application.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
 
 ## Track 7 polish (round 100, echo)
 

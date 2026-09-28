@@ -199,7 +199,7 @@ needed anywhere in this 107-word function.
   *arg1)`).
 - New local type `LoadRequest` (`{ s32 type; const char *path; s32 unk08;
   s32 unk0C; }`, 0x10 bytes) — this unit's own local view of the SAME
-  request-block shape `GameApplication.h` already established as
+  request-block shape `game_application.h` already established as
   `LoadModelRequest` at a different unit's ctor (`GameApplication__GameApplication`); reused
   here rather than cross-including that header, per the per-unit-view
   convention. Declared 0x10 bytes (4 fields) even though only the first two
@@ -211,7 +211,7 @@ needed anywhere in this 107-word function.
   a DIFFERENT (but ABI-compatible) type than an existing declaration
   elsewhere in the project (`New_LinkResource`, `RegisterRecordTableFiles`,
   `SetActiveDataSourceDriverMode`, `New_StageMap`) — all four already have an extern
-  somewhere else (`GameApplication.h` or `game_shell.c`); this unit keeps its
+  somewhere else (`game_application.h` or `game_shell.c`); this unit keeps its
   own local view rather than cross-including, per established policy. The
   other five (`GetSoundEffectDir`, `InitDreamAux`, `New_TimImage`,
   `PickSoundBank`, `New_WBgm`, `New_NodeGuardedViewport`, `New_FrameClock`) are
