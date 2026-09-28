@@ -1276,7 +1276,7 @@ void ApplyStyleDecorationIfSet(void) {
 #define STYLE_VARIANT2_EFFECTS 16
 
 /* The palette entry that, as a variant-0 config's decor colour, selects
- * gStyleDecorColorsB instead of gStyleDecorColorsA (PickStyleFallbackConfig). */
+ * gStyleDecorColorsB instead of sStyleDecorColorsA (PickStyleFallbackConfig). */
 #define STYLE_DECOR_B_PALETTE_INDEX 18
 
 
@@ -1302,7 +1302,7 @@ extern const u8 *sStyleClearColor;
 extern u8 gStyleDecorColorsB[];
 extern u8 gStylePalette[][3];
 extern const u8 *sStyleDecorColors;
-extern u8 gStyleDecorColorsA[];
+extern u8 sStyleDecorColorsA[];
 extern s32 gStyleDecorVariant;
 
 /* The config for a stage without a fixed one: the variant from
@@ -1332,7 +1332,7 @@ void *PickStyleFallbackConfig(void) {
         decorIndex = config[2];
         decorColors = gStyleDecorColorsB;
         if (decorIndex != STYLE_DECOR_B_PALETTE_INDEX) {
-            decorColors = gStyleDecorColorsA;
+            decorColors = sStyleDecorColorsA;
         }
         sStyleDecorColors = decorColors;
         if (index < 4) {
