@@ -302,7 +302,7 @@ not in banned territory.
 Positioned where it would compile: immediately after `func_800319A4`'s
 closing brace and before the `extern Rec16D7F0 D_8008D7F8[];` block, in
 strict ROM-address order. The declarations it needs already exist in
-`src/libsnd_vmanager.c` at the lines noted; they are repeated here so the body
+`src/psyq/libsnd_vmanager.c` at the lines noted; they are repeated here so the body
 travels complete.
 
 ```c

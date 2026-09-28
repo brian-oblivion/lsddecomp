@@ -838,7 +838,7 @@ segments:
       #
       # Expect this slice to span more than one class; identify each with
       # tools/classtable.py rather than assuming the unit has one.
-      - [0x1D508, c, libsnd_vmanager]
+      - [0x1D508, c, psyq/libsnd_vmanager]
       # (carve history; merged into libsnd_vmanager above, round 100)
       # code_179d8_m: BACK half of the old `code_179d8_mid_c` remainder --
       # functions 161..172 of the original, 0x1ECD8..0x20ADC (12 functions,

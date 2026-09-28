@@ -4,7 +4,7 @@
 
 > Renamed from `func_800300D0` on 2026-09-20 (tools/rename.py). Address 0x800300d0.
 
-Unit: `src/libsnd_vmanager.c`. Round 24, runner bravo.
+Unit: `src/psyq/libsnd_vmanager.c`. Round 24, runner bravo.
 
 ## Result
 
@@ -221,4 +221,4 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `ObjDAD4` is `SpuRegs`, the SPU register block at 0x1F801C00; its +0x194/+0x196 (`unk194`/`unk196`) are `noiseOn[0]`/`noiseOn[1]`, the SPU noise-mode enable bits for voices 0-15 and 16-23. Normalized disassembly unchanged.
+Round 96 (charlie, track 6) moved `src/psyq/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `ObjDAD4` is `SpuRegs`, the SPU register block at 0x1F801C00; its +0x194/+0x196 (`unk194`/`unk196`) are `noiseOn[0]`/`noiseOn[1]`, the SPU noise-mode enable bits for voices 0-15 and 16-23. Normalized disassembly unchanged.

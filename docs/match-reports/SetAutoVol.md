@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002E4D8` on 2026-09-20 (tools/rename.py). Address 0x8002e4d8.
 
-Unit: `src/libsnd_vmanager.c`. Round 26 (second pass), runner bravo, applying
+Unit: `src/psyq/libsnd_vmanager.c`. Round 26 (second pass), runner bravo, applying
 the HEAD's "split scaled index" diagnosis per the work order.
 
 ## Screens (clean)
@@ -631,7 +631,7 @@ is ADSR-shaped in the audio sense.
 
 ## NON_MATCHING body promoted, round 67
 
-Placed in `src/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+Placed in `src/psyq/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
 kept in `#else`. This function is first in ROM order in the unit, so its
 own preserved body's local `Rec34Half`/`Rec34HalfU`/plain-byte-global
 declarations duplicate the unit's shared prelude that already sits above

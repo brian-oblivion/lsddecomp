@@ -9,7 +9,7 @@
 > satisfying the bar without a header prototype (see below). This stays an
 > `INCLUDE_ASM` STALL: it is Sony's code and leaves every matching queue,
 > it is only being named here. The three call sites
-> (`src/libsnd_vmanager.c`, `src/psyq/libsnd_seqread.c`, `src/code_179d8_j_c.c`) keep
+> (`src/psyq/libsnd_vmanager.c`, `src/psyq/libsnd_seqread.c`, `src/code_179d8_j_c.c`) keep
 > their existing byte-exact local `extern` signatures rather than a
 > LIBSND.H copy: unlike `SsUtKeyOn`, `SpuVmKeyOn` is libsnd/vmanager
 > INTERNAL and has no public prototype in `include/psyq/libsnd.h` (grep
@@ -20,7 +20,7 @@
 
 > Renamed from `func_8002FAC4` on 2026-09-20 (tools/rename.py). Address 0x8002fac4.
 
-Unit: `src/libsnd_vmanager.c`. Round 27, runner bravo. This is the ordered
+Unit: `src/psyq/libsnd_vmanager.c`. Round 27, runner bravo. This is the ordered
 work-list's item 1 -- FRESH ground, no prior report existed for this
 function.
 
@@ -629,7 +629,7 @@ velocity, pan-split pair, status).
 (`bendCurveUp`/`bendCurveDown`, others still `unk0`..`unk7`/`unk16`) are
 declared in this unit but only used by functions still `INCLUDE_ASM`
 (SetAutoVol, SetAutoPan, SpuVmPBVoice, and this
-function) -- the field renames are live in `src/libsnd_vmanager.c` now (pure
+function) -- the field renames are live in `src/psyq/libsnd_vmanager.c` now (pure
 documentation, nothing compiled references them yet); the base symbols
 themselves (`_svm_vh`, `_svm_tn`) were not renamed since
 `_svm_tn` is shared with bravo's live `libsnd_vm_vol_ut_key_ut_keyv.c` this round
@@ -637,7 +637,7 @@ themselves (`_svm_vh`, `_svm_tn`) were not renamed since
 
 ## NON_MATCHING body promoted, round 67
 
-Placed in `src/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+Placed in `src/psyq/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
 kept in `#else`. Applied both stale-symbol fixes this report's round-37
 update already diagnosed but the preserved `#if 0` text above still shows
 literally: `func_80032148(a1, a2)` -> `SpuVmVSetUp(a1, a2)` (already
@@ -656,7 +656,7 @@ naming pass gave the same offsets: `_svm_vh->unk12` ->
 this function's usage doesn't depend on which direction the name
 implies). `./build-and-verify.sh` green (zero bytes changed);
 `tools/check-nonmatching.sh libsnd_vmanager` green; `tools/stalesyms.py`
-shows no stale references left in `src/libsnd_vmanager.c` (only the report's
+shows no stale references left in `src/psyq/libsnd_vmanager.c` (only the report's
 own preserved-block text still carries the old name, expected and
 harmless).
 
@@ -732,7 +732,7 @@ The NON_MATCHING body now stores `_svm_voice[D_8008EA26].unkNN`; normalized disa
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile.
+Round 96 (charlie, track 6) moved `src/psyq/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile.
 
 - `ObjE970` -> `VabHdr` (`_svm_vh`): the bound check reads `D_8008E970->ps` (the program count; was `difficultyThreshold`). `D_8008EA13` is `_svm_cur + 7`, the program number.
 - `SlotE968M` -> `ProgAtr` (`_svm_pg`, 0x8008E968): `unk0`/`unk1`/`unk4` are `tones`/`mvol`/`mpan`.

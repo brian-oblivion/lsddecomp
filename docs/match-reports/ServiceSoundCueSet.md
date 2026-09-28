@@ -502,7 +502,7 @@ are two distinct symbols at two distinct addresses, 0x8002CD08 vs
 Object/field identity (`self`/`set`): confirmed against `PlacementGridVabSound.c`'s
 own `VabStreamObj`/`SoundCueSet`/`SoundCueSlot` and `gVabStreamObjMethods`
 (`tools/classtable.py gVabStreamObjMethods`) -- see the struct comment in
-`src/libsnd_vmanager.c` above the type definitions, and `FlushSoundCueSet.md`/
+`src/psyq/libsnd_vmanager.c` above the type definitions, and `FlushSoundCueSet.md`/
 `DreamSys__SetSoundObj.md` for the cross-unit trail. Renamed fields, tier A
 unless noted:
 

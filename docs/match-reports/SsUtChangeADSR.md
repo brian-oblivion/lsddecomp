@@ -119,7 +119,7 @@ functions it matched.
 
 ## Final body
 
-Lives in `src/libsnd_vmanager.c` in ROM order.
+Lives in `src/psyq/libsnd_vmanager.c` in ROM order.
 
 ### Proposed learning
 

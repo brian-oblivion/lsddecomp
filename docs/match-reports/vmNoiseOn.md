@@ -15,7 +15,7 @@
 > that it is unfixable. Round 44 attempted the function for the first time ever
 > and reached 309/311; everything below the divider is that work.
 
-Unit: `src/libsnd_vmanager.c` (carved round 24, 2026-09-08) · Size: 311 words
+Unit: `src/psyq/libsnd_vmanager.c` (carved round 24, 2026-09-08) · Size: 311 words
 (0x4DC bytes), file offset `0x1E0E0`, vram `0x8002D8E0`.
 
 **2 words short** (best derivation compiles to 309 words against retail's
@@ -423,7 +423,7 @@ roughly HALF structurally different, not a 2-word-short near-miss. The
 isolated scaffold's own `--debug` dump shows large blocks of the function's
 TAIL (the `_svm_okon1`/`22C`/`80090C60`/`64`/`8008E230`/`234` enable-bit
 section) diverging in ways the real in-unit build does not -- confirmed by
-rebuilding the exact same 309/311 body in `src/libsnd_vmanager.c` and reading
+rebuilding the exact same 309/311 body in `src/psyq/libsnd_vmanager.c` and reading
 `tools/asm-differ/diff.py vmNoiseOn` directly: the realigned diff shows
 the SAME single 2-word gap (isolated to the opening register swap plus the
 frame size, exactly as this report already documents) with NO large

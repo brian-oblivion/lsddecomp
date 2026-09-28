@@ -287,7 +287,7 @@ placement will transfer.
 ## Round 47 (2026-09-16), runner delta -- rebuilt in-tree (third confirmation), then permuter DECLINED on check (b)
 
 **Rebuild-before-trusting-the-score, third time.** Spliced the preserved
-body into `src/libsnd_vmanager.c` (local reduced-view declarations for
+body into `src/psyq/libsnd_vmanager.c` (local reduced-view declarations for
 `spuVmMaxVoice`, `D_8008D996`, `_svm_sreg_buf`, `_svm_sreg_dirty`, reusing this file's
 own already-declared `Entry90902E8`/`D_8008EA22`) and ran the real oracle:
 `build exit=2`, no compile-error grep hits, `funcdiff.py` reproduces
@@ -504,7 +504,7 @@ s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
 #endif
 ```
 
-`Entry90902E8` and `_ss_score`/`D_8008EA22` are `src/libsnd_vmanager.c`'s own
+`Entry90902E8` and `_ss_score`/`D_8008EA22` are `src/psyq/libsnd_vmanager.c`'s own
 existing top-of-file declarations; only the block above is new.
 
 ### The ONE residue that remains
