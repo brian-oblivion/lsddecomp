@@ -29,7 +29,7 @@ the field names:
    highest-numbered button is handled first.
 
 `sButtonMasks` is confirmed here as a 16-entry mask table indexed `0..15` — the
-runtime copy that `Pad__LoadButtonTable` fills from Psy-Q's `D_80010764`.
+runtime copy that `Pad__LoadButtonTable` fills from Psy-Q's `sDefaultButtonMasks`.
 
 ## Derivation
 
@@ -138,3 +138,18 @@ red (8 bytes), `funcdiff` 61/65, and asm-differ shows only the four prologue
 stores reordered: retail `sw ra,0x60 / s2,0x58 / s1,0x54 / s0,0x50`, without
 the barrier `s0,0x50 / ra,0x60 / s2,0x58 / s1,0x54` -- same registers, same
 offsets. No source change.
+
+## History: the barrier's source comment (moved here round 101, track 7)
+
+The `__asm__("")` in `src/class_16334.c` carried a five-line comment giving
+the prologue order without it (s0, ra, s2, s1 against retail's ra, s2, s1,
+s0), why that makes it the permitted form under CLAUDE.md rule 6 (order only,
+registers and stack offsets identical), and that ten source shapes were tried
+first. All of that is the Derivation section above; the source now keeps one
+`/* MATCHING: ... */` line.
+
+Two names in the sections above are older than the class model: the handler
+the tail calls is the INHERITED `notifyParents` slot (`PadMethods` via
+`BASICCLASS_SLOTS`, +0x30), not a Pad-specific `onButtonEvent`, and
+`sDefaultButtonMasks` is this unit's own rodata, not Psy-Q's
+(`Pad__LoadButtonTable.md`, "Correction").

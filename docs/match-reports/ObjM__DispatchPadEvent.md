@@ -129,7 +129,7 @@ Renamed from `ObjM__DispatchEvent` (rename.py): it occupies IntermediateBase's `
 The four codes are named from include/Pad.h, where this round added
 (additively) `PAD_EVENT_HELD/PRESSED/RELEASED` (0x02/0x12/0x22, Pad__DispatchEvents'
 edge bases) and `enum PadButton` (sButtonMasks' indices; Pad__LoadButtonTable
-copies the fixed table D_80010764, whose words are libetc's masks PADLup,
+copies the fixed table sDefaultButtonMasks, whose words are libetc's masks PADLup,
 PADLdown, PADLleft, PADLright, PADRup, PADRdown, PADRleft, PADRright, PADi,
 PADj, PADk, PADl, PADm, PADn, PADo, PADh in that order):
 

@@ -31,7 +31,7 @@
 #define PAD_CLASS_ID 0x2
 
 /* sButtonMasks' indices. Pad__LoadButtonTable fills it from one fixed
- * table (D_80010764), whose words are libetc's masks in this order. */
+ * table (sDefaultButtonMasks), whose words are libetc's masks in this order. */
 enum PadButton {
     PAD_BUTTON_LUP = 0,     /* PADLup */
     PAD_BUTTON_LDOWN = 1,   /* PADLdown */
@@ -48,7 +48,8 @@ enum PadButton {
     PAD_BUTTON_R2 = 12,     /* PADm, PADR2 */
     PAD_BUTTON_L1 = 13,     /* PADn, PADL1 */
     PAD_BUTTON_L2 = 14,     /* PADo, PADL2 */
-    PAD_BUTTON_START = 15   /* PADh, PADstart */
+    PAD_BUTTON_START = 15,  /* PADh, PADstart */
+    PAD_BUTTON_COUNT = 16   /* sButtonMasks' length, one event per button per frame at most */
 };
 
 typedef struct Pad Pad;
@@ -59,9 +60,9 @@ struct PadMethods {
     /* +0x040 */ void (*init)(Pad *self, s32 port); /* Pad__Init */
     /* +0x044 */ u32 (*updateMasks)(Pad *self); /* Pad__UpdateMasks: returns the new held mask */
     /* +0x048 */ void (*dispatchEvents)(Pad *self); /* Pad__DispatchEvents */
-    /* +0x04C */ void (*slot4C)(void);              /* Pad__func_80025E14, empty, never called */
+    /* +0x04C */ void (*slot4C)(void);              /* Pad__NoOpSlot4C, empty, never called */
     /* +0x050 */ void (*loadButtonTable)(void);     /* Pad__LoadButtonTable */
-    /* +0x054 */ void (*slot54)(void);              /* Pad__func_80025E94, empty, never called */
+    /* +0x054 */ void (*slot54)(void);              /* Pad__NoOpSlot54, empty, never called */
 };
 
 struct Pad {

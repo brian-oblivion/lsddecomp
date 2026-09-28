@@ -1,10 +1,22 @@
+/*
+ * The Pad class: a controller port wrapped as a BasicClass (include/Pad.h
+ * documents the class and its events; main() creates the one instance).
+ * Instances share the Psy-Q pad library: the first ctor calls PadInit and
+ * the last finalize PadStop (sPadRefCount). On every DrawSystem vsync
+ * event (IntermediateBase__OnTag1Notify) updateMasks turns two consecutive
+ * PadRead words into held, pressed and released edge masks, and
+ * dispatchEvents sends at most one event per button to the pad's parents.
+ * loadButtonTable copies sDefaultButtonMasks, a fixed table of libetc's
+ * mask values, into sButtonMasks, whose order is enum PadButton. The two
+ * remaining slots are empty and never called.
+ */
 #include "common.h"
 #include "class_16334.h"
 
 Pad *New_Pad(s32 mode, s32 port) {
     Pad *self;
 
-    self = BMemPMgrAlloc(0x20);
+    self = BMemPMgrAlloc(sizeof(Pad));
     if (self == NULL) {
         goto fail;
     }
@@ -53,7 +65,7 @@ u32 Pad__UpdateMasks(Pad *self) {
 }
 
 void Pad__DispatchEvents(Pad *self) {
-    s32 events[16];
+    s32 events[PAD_BUTTON_COUNT];
     void (*notifyParents)(Pad *self, s32 event);
     u32 held;
     u32 released;
@@ -62,11 +74,7 @@ void Pad__DispatchEvents(Pad *self) {
     s32 code;
     s32 i;
 
-    /* Bare scheduling barrier. Without it the four prologue register stores
-     * come out in the order s0, ra, s2, s1 instead of retail's ra, s2, s1, s0
-     * -- same registers, same stack offsets, order only, so this is the
-     * permitted form under the project rule and not a register pin. Ten source
-     * shapes were tried first; see docs/match-reports/Pad__DispatchEvents.md. */
+    /* MATCHING: without this barrier the prologue saves s0 before ra, s2, s1. */
     __asm__("");
     held = self->heldMask;
     released = self->releasedMask;
@@ -76,16 +84,16 @@ void Pad__DispatchEvents(Pad *self) {
         return;
     }
 
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < PAD_BUTTON_COUNT; i++) {
         u32 mask = sButtonMasks[i];
 
         code = -1;
         if (released & mask) {
-            code = 0x22;
+            code = PAD_EVENT_RELEASED;
         } else if (pressed & mask) {
-            code = 0x12;
+            code = PAD_EVENT_PRESSED;
         } else if (held & mask) {
-            code = 0x02;
+            code = PAD_EVENT_HELD;
         }
         if (code >= 0) {
             *p++ = code + i;
@@ -98,7 +106,7 @@ void Pad__DispatchEvents(Pad *self) {
     }
 }
 
-void Pad__func_80025E14(void) {}
+void Pad__NoOpSlot4C(void) {}
 
 void Pad__LoadButtonTable(void) {
     Block64 local;
@@ -107,15 +115,15 @@ void Pad__LoadButtonTable(void) {
     s32 i;
 
     dst = sButtonMasks;
-    local = D_80010764;
+    local = sDefaultButtonMasks;
     i = 0;
     src = local.w;
-    for (; i < 16; i++) {
+    for (; i < PAD_BUTTON_COUNT; i++) {
         *dst++ = *src++;
     }
 }
 
-void Pad__func_80025E94(void) {}
+void Pad__NoOpSlot54(void) {}
 
 PadMethods *Get_vtable_Pad(void) {
     return &gPadMethods;

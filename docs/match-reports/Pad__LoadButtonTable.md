@@ -13,8 +13,8 @@ gPadMethods`) inherits 14 slots verbatim from `BASICCLASS_METHODS`
 (`gBasicClassMethods`, returned by `Get_vtable_BasicClass`) and adds 7 of its own at
 `+0x38..+0x54`. `Pad__LoadButtonTable` is the slot at `+0x50`.
 
-It copies a 0x40-byte (16-word) block from `D_80010764` into the runtime
-global `sButtonMasks`. `D_80010764`'s vram falls inside the `psyq_15d04`
+It copies a 0x40-byte (16-word) block from `sDefaultButtonMasks` into the runtime
+global `sButtonMasks`. `sDefaultButtonMasks`'s vram falls inside the `psyq_15d04`
 rodata blob (file offset 0xF64, between the `0xF28` and `0xFA4` rodata
 segment boundaries in `config/splat.slps01556.lsdde.yaml`) -- i.e. this
 function copies a Psy-Q-owned constant table into game-owned bss. Given the
@@ -22,7 +22,7 @@ surrounding class also drives `func_80025EAC`/`func_80025EFC`/`func_80025F2C`
 (which disassemble as part of `psyq_PadInit`, immediately adjacent in the
 yaml at file offset 0x166ac) and does edge-detected held/pressed/released
 button masking (see `Pad__UpdateMasks`), the working hypothesis for this whole
-unit is a Pad/controller wrapper class, and `D_80010764`/`sButtonMasks` are the
+unit is a Pad/controller wrapper class, and `sDefaultButtonMasks`/`sButtonMasks` are the
 16 canonical digital-button bit masks. See `include/class_16334.h` for the
 full writeup and struct layout.
 
@@ -30,7 +30,7 @@ full writeup and struct layout.
 
 ```c
 typedef struct { u32 w[16]; } Block64;
-extern Block64 D_80010764;
+extern Block64 sDefaultButtonMasks;
 extern u32 sButtonMasks[16];
 
 void Pad__LoadButtonTable(void) {
@@ -40,7 +40,7 @@ void Pad__LoadButtonTable(void) {
     s32 i;
 
     dst = sButtonMasks;
-    local = D_80010764;
+    local = sDefaultButtonMasks;
     i = 0;
     src = local.w;
     for (; i < 16; i++) {
@@ -51,10 +51,10 @@ void Pad__LoadButtonTable(void) {
 
 ## Derivation notes
 
-- The first half of the retail body copies `D_80010764` into a stack-local
+- The first half of the retail body copies `sDefaultButtonMasks` into a stack-local
   0x40-byte buffer using GCC's inlined block-move codegen (four registers,
   4 words per iteration) rather than a per-word loop. That only happens for
-  a **struct assignment** (`local = D_80010764;`), not a `for` loop over
+  a **struct assignment** (`local = sDefaultButtonMasks;`), not a `for` loop over
   `u32[16]` -- an indexed-loop translation produces a single-word-per-iteration
   copy and is 4 words *shorter*, which also shows up as address drift in
   every function after it. This was the first (wrong) attempt; see below.
@@ -78,7 +78,7 @@ void Pad__LoadButtonTable(void) {
    instruction count (26 words vs retail's 30) and address drift in every
    later function. Diagnosed via `asm-differ`: retail's first loop batches
    4 words/iteration, mine did 1.
-2. Introduced `Block64` and `local = D_80010764;` struct assignment (matches
+2. Introduced `Block64` and `local = sDefaultButtonMasks;` struct assignment (matches
    GCC's block-move codegen) plus a pointer-based second loop -- sizes
    matched (30/30 words compared) but two registers were swapped in the
    second loop (`a0`/`v1`).
@@ -100,7 +100,30 @@ address (funcdiff's "differs OUTSIDE this range" warning is the tell).
 ## Naming
 
 **Tier A.** Vtable slot `+0x50`, already named `loadButtonTable`. Copies
-Sony's own default 16-entry digital-button mask table (`D_80010764`, inside
+Sony's own default 16-entry digital-button mask table (`sDefaultButtonMasks`, inside
 the `psyq_15d04` rodata blob) into this unit's runtime copy (`sButtonMasks`)
 -- mechanics fully derived in this report, matching the slot's existing name
 exactly.
+
+## Naming of `sDefaultButtonMasks` (round 101, track 7)
+
+Renamed from `D_80010764` (`tools/rename.py`). **Tier A** for what it is: the
+16 read-only words this function copies into `sButtonMasks`, and nothing else
+reads them (`grep` over `src/` and `asm/`). Its values are libetc's pad masks
+(`PADLup` 0x1000 ... `PADstart` 0x0800) in `enum PadButton` order, so it is
+the default contents of the table `Pad__DispatchEvents` scans. `s` prefix,
+not `g`: it is this unit's own data, from the link order below.
+
+### Correction: the table is class_16334's rodata, not Psy-Q's
+
+This report and `include/class_16334.h` used to call the table "Psy-Q's own
+... inside the `psyq_15d04` rodata blob". The link order says otherwise.
+Rodata follows the code objects' order: `libetc/intr_dma` .rdata at 0xF28 and
+`libetc/vsync` .rdata at 0xF54 are placed, the next code objects are
+`libc2/puts` (no .rdata; its only data is 7 bytes of .sdata),
+`class_16334`, `libetc/pad` (the linked 3.5 `pad.o`: .text and .bss only, no
+.rdata) and `libapi/a22`, and the next rodata slot, 0xFA4, is
+`GameApplicationFileResource`'s (the unit after them). The only object in
+that stretch able to own 0x40 bytes of .rodata at 0xF64 is this unit. The yaml
+line for 0xF64 still says "owner not placed yet (libetc intr?)"; proposed to
+the head, not edited (runners do not edit the yaml).
