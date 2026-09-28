@@ -55,6 +55,11 @@ struct TimImage;
 struct SpriteRgb;
 struct VabStreamObj;
 
+/* ItemList's class id (gItemListMethods word +0x000). Two nibbles, so
+ * `(u8)header == ITEMLIST_CLASS_ID` is its is-kind-of test (TaskObjF's
+ * addChild/removeChild/onNotify). */
+#define ITEMLIST_CLASS_ID 0x20
+
 typedef struct ItemList ItemList;
 typedef struct ItemListMethods ItemListMethods;
 

@@ -307,7 +307,7 @@ void TitleMenu__Finalize(TitleMenu *self) {
 
 void TitleMenu__OnNotify(TitleMenu *self, BasicClass *sender, s32 event) {
     GetTaskCoreMethods()->onNotify((TaskCore *)self, sender, event);
-    if ((sender->methods->header & 0xF) == TASKOBJF_CLASS_ID) {
+    if ((sender->methods->header & CLASS_ID_ROOT_MASK) == TASKOBJF_CLASS_ID) {
         self->methods->onCardEvent(self, sender, event);
     }
 }
@@ -467,7 +467,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
     self->saveTitle->methods->setColor(self->saveTitle, &rgb);
 }
 
-/* setState(5)'s and a finished card operation's: the save title's text reloaded,
+/* setState(ACTIVE)'s and a finished card operation's: the save title's text reloaded,
  * FLASHBACK's lock recomputed, the widgets re-attached and SHAKE's cursor
  * set from DreamSys's setting; then the entry that was active is
  * reselected. */
@@ -487,9 +487,9 @@ void TitleMenu__RefreshMenu(TitleMenu *self) {
     self->methods->updateSlotElements(self, self->lightRig);
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
     self->activeSlot = TITLEMENU_SHAKE;
-    self->methods->setState(self, 0xB);
+    self->methods->setState(self, TASKCORE_STATE_SLOT_CONFIRMED);
     self->methods->setSlotCursor(self, shake, 1);
-    self->methods->setState(self, 0xF);
+    self->methods->setState(self, TASKCORE_STATE_ITEM_CONFIRMED);
     self->methods->setActiveSlot(self, origSlot, 0);
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
 }
@@ -649,11 +649,11 @@ void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
         self->tickSource = child;
         return;
     }
-    if ((classId & 0xFF) == 0x10) {
+    if ((u8)classId == TEXTENTRY_CLASS_ID) {
         self->textEntry = (struct TextEntry *)child;
         return;
     }
-    if ((classId & 0xFF) == 0x20) {
+    if ((u8)classId == ITEMLIST_CLASS_ID) {
         self->itemList = (struct ItemList *)child;
     }
 }
@@ -669,9 +669,9 @@ void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child) {
         self->inputSource = NULL;
     } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->tickSource = NULL;
-    } else if ((classId & 0xFF) == 0x10) {
+    } else if ((u8)classId == TEXTENTRY_CLASS_ID) {
         self->textEntry = NULL;
-    } else if ((classId & 0xFF) == 0x20) {
+    } else if ((u8)classId == ITEMLIST_CLASS_ID) {
         self->itemList = NULL;
     }
     GetBasicClassMethods()->removeChild((BasicClass *)self, child);
@@ -1335,19 +1335,17 @@ void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
     base = GetBasicClassMethods();
     base->onNotify((BasicClass *)self, sender, event);
 
-    /* Pad's class id is 0x2 and FrameClock's 0x5, matched with their
-     * subclasses on the low nibble; TextEntry's is 0x10, ItemList's 0x20. */
     tag = ((BasicClass *)sender)->methods->header;
-    kind = tag & 0xF;
-    if (kind == 0x2) {
+    kind = tag & CLASS_ID_ROOT_MASK;
+    if (kind == PAD_CLASS_ID) {
         methods->onInputEvent(self, sender, event);
-    } else if (kind == 0x5) {
+    } else if (kind == FRAMECLOCK_CLASS_ID) {
         methods->tickStateDelay(self, sender, event);
     } else {
-        kind = tag & 0xFF;
-        if (kind == 0x10) {
+        kind = (u8)tag;
+        if (kind == TEXTENTRY_CLASS_ID) {
             methods->onTextEntryResult(self, sender, event);
-        } else if (kind == 0x20) {
+        } else if (kind == ITEMLIST_CLASS_ID) {
             methods->onItemListResult(self, sender, event);
         }
     }

@@ -39,6 +39,11 @@
 struct VabStreamObj;
 struct TextRow;
 
+/* TextEntry's class id (gTextEntryMethods word +0x000). Two nibbles, so
+ * `(u8)header == TEXTENTRY_CLASS_ID` is its is-kind-of test (TaskObjF's
+ * addChild/removeChild/onNotify). */
+#define TEXTENTRY_CLASS_ID 0x10
+
 typedef struct TextEntry TextEntry;
 typedef struct TextEntryMethods TextEntryMethods;
 
