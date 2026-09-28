@@ -15,7 +15,7 @@ void StyleUpdateEffectSlots(void *arg0);
 
 `gStyleEffectSlots` (already declared `extern void *gStyleEffectSlots[];` for the
 already-matched `StyleReleaseEffectSlots`, which just forwards it to
-`ReleaseBasicClassArray(gStyleEffectSlots, gStyleEffectSlotCount)`) holds pointers to objects that this
+`ReleaseBasicClassArray(gStyleEffectSlots, sStyleEffectSlotCount)`) holds pointers to objects that this
 function dispatches *directly*, one at a time, through a method table at
 object offset 0 -- the same `ObjAB54`-style pattern already established
 earlier in this unit, just at a different slot offset:
@@ -37,7 +37,7 @@ local-views convention applies, and this is the only place in the executable
 that dispatches slot `+0xEC` on this array's elements (no other caller found
 via `grep -rn 80054C74`).
 
-`gStyleVariant`/`gStyleEffectSlotCount`/`gStyleEffectSlots` are declared `extern` a second time,
+`gStyleVariant`/`sStyleEffectSlotCount`/`gStyleEffectSlots` are declared `extern` a second time,
 verbatim, ahead of this function -- ROM order puts `StyleUpdateEffectSlots` textually
 *before* `StyleReleaseEffectSlots`'s own copy of the same three externs, so a fresh set
 was added here rather than hoisting the existing ones (repeated identical
@@ -54,7 +54,7 @@ void StyleUpdateEffectSlots(void *arg0) {
     if (gStyleVariant < 0) {
         return;
     }
-    for (i = 0; i < gStyleEffectSlotCount; i++) {
+    for (i = 0; i < sStyleEffectSlotCount; i++) {
         obj = (ObjE0C8 *) gStyleEffectSlots[i];
         obj->methods->slotEC(obj, arg0);
     }
@@ -74,7 +74,7 @@ needed, matched directly from the natural C shape.
 
 **`StyleUpdateEffectSlots`, tier B.**
 
-Iterates `gStyleEffectSlots[0 .. gStyleEffectSlotCount)` dispatching
+Iterates `gStyleEffectSlots[0 .. sStyleEffectSlotCount)` dispatching
 `slotEC(obj, arg0)` on each -- the per-frame update half of the
 `StyleBuildEffectSlots`/`StyleUpdateEffectSlots`/`StyleReleaseEffectSlots`
 triad. MATCHED, 34/34, first build.

@@ -1468,7 +1468,7 @@ extern s32 gStyleVariant;
 extern s32 gStyleSceneRefs;
 extern s32 rand(void);
 extern s8 gStyleKind0Counts[];
-extern s32 gStyleEffectSlotCount;
+extern s32 sStyleEffectSlotCount;
 extern StyleEffect *gStyleEffectSlots[];
 extern StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos);
 extern StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos);
@@ -1493,7 +1493,7 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
                           (s32)refs->viewport);
     kind0Count = gStyleKind0Counts[rand() & 3];
     kind1Count = (gStyleVariant == 2) ? STYLE_VARIANT2_EFFECTS - kind0Count : 0;
-    gStyleEffectSlotCount = kind0Count + kind1Count;
+    sStyleEffectSlotCount = kind0Count + kind1Count;
     next = StyleFillEffectKind0(gStyleEffectSlots, kind0Count, pos);
     next = StyleFillEffectKind1(next, kind1Count, pos);
     if (gStyleVariant == 0) {
@@ -1503,11 +1503,11 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
     } else {
         return;
     }
-    gStyleEffectSlotCount = gStyleEffectSlotCount + 1;
+    sStyleEffectSlotCount = sStyleEffectSlotCount + 1;
 }
 
 extern s32 gStyleVariant;
-extern s32 gStyleEffectSlotCount;
+extern s32 sStyleEffectSlotCount;
 
 /* Each slot's +0x0EC is StyleEffect__Update, called with the position
  * (include/StyleEffect.h: the slot keeps Actor's setPendingExtra type). */
@@ -1518,19 +1518,19 @@ void StyleUpdateEffectSlots(LongVec3 *pos) {
     if (gStyleVariant < 0) {
         return;
     }
-    for (i = 0; i < gStyleEffectSlotCount; i++) {
+    for (i = 0; i < sStyleEffectSlotCount; i++) {
         slot = gStyleEffectSlots[i];
         ((StyleEffectUpdateFn)slot->methods->setPendingExtra)(slot, pos);
     }
 }
 
 extern s32 gStyleVariant;
-extern s32 gStyleEffectSlotCount;
+extern s32 sStyleEffectSlotCount;
 
 /* Releases the effect slots, if StyleBuildEffectSlots ran. */
 void StyleReleaseEffectSlots(void) {
     if (gStyleVariant >= 0) {
-        ReleaseBasicClassArray((void **)gStyleEffectSlots, gStyleEffectSlotCount);
+        ReleaseBasicClassArray((void **)gStyleEffectSlots, sStyleEffectSlotCount);
     }
 }
 

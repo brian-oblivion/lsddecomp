@@ -27,7 +27,7 @@ extern void StyleFillEffectKind2(void *arg0, void *arg1);                   /* f
 `void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3)`; this
 call site only needs the ABI shape (`s32,void*,s32,s32`), matching the
 project's convention of a looser cross-unit local signature. `gStyleVariant`,
-`gStyleSceneRefs`, `gStyleEffectSlotCount` and `gStyleEffectSlots` are fresh copies of externs
+`gStyleSceneRefs`, `sStyleEffectSlotCount` and `gStyleEffectSlots` are fresh copies of externs
 already declared later in this file, needed here because this function's
 ROM address is earlier (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`).
 
@@ -47,7 +47,7 @@ void StyleBuildEffectSlots(void *arg0) {
     SetStyleEffectSources(gStyleVariant, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
     val = gStyleKind0Counts[rand() & 3];
     count = (gStyleVariant == 2) ? 0x10 - val : 0;
-    gStyleEffectSlotCount = val + count;
+    sStyleEffectSlotCount = val + count;
     filled = (void **) StyleFillEffectKind0(gStyleEffectSlots, val, arg0);
     filled = StyleFillEffectKind1(filled, count, arg0);
     if (gStyleVariant == 0) {
@@ -57,7 +57,7 @@ void StyleBuildEffectSlots(void *arg0) {
     } else {
         return;
     }
-    gStyleEffectSlotCount = gStyleEffectSlotCount + 1;
+    sStyleEffectSlotCount = sStyleEffectSlotCount + 1;
 }
 ```
 
@@ -72,7 +72,7 @@ without needing to fight CSE.
 The trailing `if (gStyleVariant == 0) {...} else if (gStyleVariant == 2) {...}
 else { return; }` (rather than three independent `if`s) is what reproduces
 retail's shared "both branches converge, third one skips straight past" tail
-exactly: the `gStyleEffectSlotCount = gStyleEffectSlotCount + 1;` increment is genuinely SKIPPED
+exactly: the `sStyleEffectSlotCount = sStyleEffectSlotCount + 1;` increment is genuinely SKIPPED
 when `gStyleVariant` is neither 0 nor 2 (retail's third path jumps directly to
 the epilogue, bypassing the increment block entirely) -- an early `return`
 in the `else` reproduces that skip.
