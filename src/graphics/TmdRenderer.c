@@ -61,8 +61,7 @@ void BasicClass__NotifyParents(BasicClass *self, s32 event) {
 }
 
 /* BasicClassMethods slot +0x034. Empty, and no BasicClass-derived table
- * overrides it, so nothing says what it is for: the name stays a tier-C
- * placeholder (the table census is in the report). */
+ * overrides it. */
 void BasicClass__NoOpSlot34(void) {}
 
 /* BasicClassMethods slot +0x038, the receiving half of NotifyParents:
@@ -108,14 +107,13 @@ s32 GetBMemPMgrBusy(void) {
 
 /* The drawn object's attribute bits, as SortTmdObject publishes them for
  * SetupPrimCode and the submit wrappers. Sony's GsSortObject4 keeps the same
- * four fields in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. sSortLightOff is bit 6 of
- * the object's flags word, which SetupPrimCode ORs into the GPU command
- * byte's shade-texture bit 0x1 (Psy-Q's SetShadeTex); it keeps its address
- * name because it is bss past the image end, where rename.py cannot reach
- * (the proposed name is in SetupPrimCode.md). sSortNdiv is the default ndiv
- * from bits 9-11. */
-extern s32 sSortLightOff;              /* GsLOFF */
-extern s32 sSortNdiv;              /* GsDIV1..5: subdivision level */
+ * four fields in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. sSortLightOff is bit 6
+ * of the object's attribute word, which SetupPrimCode ORs into the GPU
+ * command byte's shade-texture bit 0x1 (Psy-Q's SetShadeTex). sSortNdiv is
+ * the object's subdivision level, bits 9-11, the ndiv every DIVPOLYGON gets
+ * unless SetNdivOverride has set one. */
+extern s32 sSortLightOff;           /* GsLOFF */
+extern s32 sSortNdiv;               /* GsDIV1..5: subdivision level */
 extern s32 sSortUseGlobalLightMode; /* GsLLMOD */
 extern s32 sSortLightMode;          /* GsFOG | GsMATE */
 
@@ -1194,8 +1192,8 @@ void FlagLargePolyForDivide(void *ctxIn, s32 count) {
 
     xp = &ctx->sxy[1].vx;
     /* MATCHING: this is &ctx->sxy[count - 1].vx, but that spelling folds the
-     * 0x5C into the index before adding ctx, and retail adds ctx first. */
-    end = (short *)((u8 *)ctx + count * sizeof(DVECTOR) + 0x5C);
+     * constant into the index before adding ctx, and retail adds ctx first. */
+    end = (short *)((u8 *)ctx + count * sizeof(DVECTOR) + (offsetof(PolyDrawCtx, sxy) - sizeof(DVECTOR)));
 
     /* MATCHING: a guarded do/while with yp set inside the guard. Setting yp
      * before the test moves the frame setup out of the branch delay slot. */
