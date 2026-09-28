@@ -48,7 +48,7 @@
 #include "light_rig.h"
 #include "TimedTask.h"
 #include "draw_system.h"
-#include "PlacementGrid.h"
+#include "placement_grid.h"
 #include "lbd_file.h"
 #include "grid_cell.h"
 #include "flat_light_obj.h"

@@ -1015,7 +1015,7 @@
         "gPlacementGridMethods": {
           "class": "PlacementGrid",
           "date": "2026-09-26",
-          "header": "include/PlacementGrid.h"
+          "header": "include/placement_grid.h"
         },
         "gRequestedFileMethods": {
           "class": "RequestedFile",

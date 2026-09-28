@@ -1,5 +1,5 @@
-#ifndef PLACEMENTGRID_H
-#define PLACEMENTGRID_H
+#ifndef PLACEMENT_GRID_H
+#define PLACEMENT_GRID_H
 
 #include "file_resource.h"
 

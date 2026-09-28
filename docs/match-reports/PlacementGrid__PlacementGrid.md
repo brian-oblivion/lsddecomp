@@ -64,7 +64,7 @@ whole family: object, `Class6D940Methods`, the getter, constructors,
 methods, `Class6D940Record` -> `PlacementGridRecord`,
 `Class6D940ResolveEntryFn` -> `PlacementGridResolveEntryFn`,
 `Class6D940GetModelFn` -> `PlacementGridGetModelFn`, the header
-`include/Class6D940.h` -> `include/PlacementGrid.h`), then
+`include/Class6D940.h` -> `include/placement_grid.h`), then
 `python3 tools/rename.py D_8006D940 gPlacementGridMethods` (the table,
 g<Class>Methods) and
 `python3 tools/renametype.py PlacementGridPlacement CellPlacement --any-stem`

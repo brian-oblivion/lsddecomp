@@ -834,7 +834,7 @@ Round 78 (track 3, naming pass, bravo).
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-`LinkTarget866E8` and `BE54OutBuf` were views of PlacementGrid and its placement record; both are gone for `include/PlacementGrid.h` (`buffer`, `bufferSize`, `linkResource`; `CellPlacement` x/y/z/rotY/unk2E/chained/next). The slot78 call casts the inherited `void *slot78` to `PlacementGridResolveEntryFn` (no code). The local LinkResource view went with it: `linkResource` is `FileResource *` and its +0x004 is `release`. Byte-identical.
+`LinkTarget866E8` and `BE54OutBuf` were views of PlacementGrid and its placement record; both are gone for `include/placement_grid.h` (`buffer`, `bufferSize`, `linkResource`; `CellPlacement` x/y/z/rotY/unk2E/chained/next). The slot78 call casts the inherited `void *slot78` to `PlacementGridResolveEntryFn` (no code). The local LinkResource view went with it: `linkResource` is `FileResource *` and its +0x004 is `release`. Byte-identical.
 
 ## asm sites
 

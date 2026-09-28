@@ -3,7 +3,7 @@
  * VAB sound backend (NullDriver, VabStreamObj and the SoundCueSet's init,
  * flush and per-tick service), with ReturnZero between them.
  *
- * PlacementGrid (include/PlacementGrid.h), New_PlacementGrid to
+ * PlacementGrid (include/placement_grid.h), New_PlacementGrid to
  * GetPlacementGridMethods: the model placements of one map chunk's 20 x 20
  * cells: its allocator, ctor, finalize, read-done flag, the processBuffer
  * occupant that turns one placement record per call into a CellPlacement and
@@ -19,7 +19,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "null_driver.h"
-#include "PlacementGrid.h"
+#include "placement_grid.h"
 #include "link_resource.h"
 #include "StageMap.h"
 #include <libsnd.h>

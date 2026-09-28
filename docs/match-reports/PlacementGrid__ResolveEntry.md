@@ -825,7 +825,7 @@ built and scored).
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Retyped, byte-identical, with the class unified in `include/PlacementGrid.h`. `Ctx278` was the PlacementGrid object itself: this is slot +0x078 of gPlacementGridMethods (`classtable.py gPlacementGridMethods --vs gFileResourceMethods`), called only by StageMap__PopulateSlotCells as `target->methods->slot78(target, &outBuf, i)` on the object New_PlacementGrid built. So `unk10` is FileResource's `buffer` (the caller points it into a loaded resource), `unk2C` is `linkResource` (the caller stores New_LinkResource there), and `Ctx278Sub`'s +0x080 is LinkResource__GetModel (gLinkResourceMethods). `Obj278` is the caller's 0x40-byte stack record, now `CellPlacement` (x/y/z at +0x0C..+0x14 go to the GPU coordinate, rotY +0x1A, `chained` +0x30, `next` +0x34 the offset of the cell's next record, which the caller loops on without advancing the cell); `Entry278` is `PlacementGridRecord`. The cell index splits as row = cell / 20, column = cell % 20, a 20x20 grid of 0x800-unit cells. The four-argument LinkResource call stays: `placement` must be in $a3.
+Retyped, byte-identical, with the class unified in `include/placement_grid.h`. `Ctx278` was the PlacementGrid object itself: this is slot +0x078 of gPlacementGridMethods (`classtable.py gPlacementGridMethods --vs gFileResourceMethods`), called only by StageMap__PopulateSlotCells as `target->methods->slot78(target, &outBuf, i)` on the object New_PlacementGrid built. So `unk10` is FileResource's `buffer` (the caller points it into a loaded resource), `unk2C` is `linkResource` (the caller stores New_LinkResource there), and `Ctx278Sub`'s +0x080 is LinkResource__GetModel (gLinkResourceMethods). `Obj278` is the caller's 0x40-byte stack record, now `CellPlacement` (x/y/z at +0x0C..+0x14 go to the GPU coordinate, rotY +0x1A, `chained` +0x30, `next` +0x34 the offset of the cell's next record, which the caller loops on without advancing the cell); `Entry278` is `PlacementGridRecord`. The cell index splits as row = cell / 20, column = cell % 20, a 20x20 grid of 0x800-unit cells. The four-argument LinkResource call stays: `placement` must be in $a3.
 
 ## Track 4 (LinkResource)
 
@@ -845,7 +845,7 @@ whole family: object, `Class6D940Methods`, the getter, constructors,
 methods, `Class6D940Record` -> `PlacementGridRecord`,
 `Class6D940ResolveEntryFn` -> `PlacementGridResolveEntryFn`,
 `Class6D940GetModelFn` -> `PlacementGridGetModelFn`, the header
-`include/Class6D940.h` -> `include/PlacementGrid.h`), then
+`include/Class6D940.h` -> `include/placement_grid.h`), then
 `python3 tools/rename.py D_8006D940 gPlacementGridMethods` (the table,
 g<Class>Methods) and
 `python3 tools/renametype.py PlacementGridPlacement CellPlacement --any-stem`

@@ -60,7 +60,7 @@ section are authoritative).
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-The paragraph above ("NOT class-framework code") is superseded: gPlacementGridMethods is a FileResource method table and this is its getter, the first entry of sDataSourceClientGetters. Declared in `include/PlacementGrid.h`.
+The paragraph above ("NOT class-framework code") is superseded: gPlacementGridMethods is a FileResource method table and this is its getter, the first entry of sDataSourceClientGetters. Declared in `include/placement_grid.h`.
 
 
 ## Track 6 (2026-09-26, round 93, charlie)
@@ -70,7 +70,7 @@ whole family: object, `Class6D940Methods`, the getter, constructors,
 methods, `Class6D940Record` -> `PlacementGridRecord`,
 `Class6D940ResolveEntryFn` -> `PlacementGridResolveEntryFn`,
 `Class6D940GetModelFn` -> `PlacementGridGetModelFn`, the header
-`include/Class6D940.h` -> `include/PlacementGrid.h`), then
+`include/Class6D940.h` -> `include/placement_grid.h`), then
 `python3 tools/rename.py D_8006D940 gPlacementGridMethods` (the table,
 g<Class>Methods) and
 `python3 tools/renametype.py PlacementGridPlacement CellPlacement --any-stem`
