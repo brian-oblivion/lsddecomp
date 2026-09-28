@@ -174,7 +174,7 @@ extern s8 sMoveCommandSigns[8];
    object's rotation vector (flag != 0) or ADDS them modulo a full turn
    (flag == 0). Every constant this unit hands that slot is three of these,
    and every one of them decodes to a plausible angle: see
-   sRotationYaw180 / _PLUS45 / _MINUS45 and CARDINAL_ROTATIONS below. */
+   sRotationYaw180 / _PLUS45 / _MINUS45 and sCardinalRotations below. */
 typedef struct RotationRatio {
     s16 numerator;
     s16 denominator;
@@ -387,7 +387,7 @@ extern struct RelativePos STAIRCASE_OFFSET_3;
    arg2 with flag 0 (relative) by DreamSys__TickStaircaseCase0 and
    DreamSys__TickStaircaseCase2. Typed RotationRatios round 66: its three
    {numerator, denominator} words are {0,1} {0x2D,1} {0,1}, byte-identical in
-   form to sRotationYaw180 and to every CARDINAL_ROTATIONS entry. */
+   form to sRotationYaw180 and to every sCardinalRotations entry. */
 extern RotationRatios sRotationYawPlus45;
 
 /* (0 deg, -45 deg, 0 deg) -- the mirror of sRotationYawPlus45 above

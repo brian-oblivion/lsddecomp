@@ -38,11 +38,11 @@ s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2)
 	heading = STAIRCASE_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
-			*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
+			*arg1 = (s32)&sCardinalRotations[heading];
 
 		if (arg0 != NULL) {
 			idx = STAIRCASE_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
-			*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
+			*arg0 = (s32)&sCardinalRotations[idx];
 		}
 		result = 1;
 	} else {

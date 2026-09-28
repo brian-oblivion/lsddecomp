@@ -18,7 +18,7 @@ Looks up a "heading" byte from `TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTrigge
 validates it against `currentPos`'s stored heading via the already-matched
 `IsHeadingAligned` (a cardinal-direction proximity test), and on success
 writes one or two computed pointers (into a `DirectionTableEntry`-strided
-table, `CARDINAL_ROTATIONS`) through its two optional output parameters. Called by
+table, `sCardinalRotations`) through its two optional output parameters. Called by
 `DreamSys__TryTunnelLink` (still `INCLUDE_ASM`) as `DreamSys__CheckTunnelHeading(&this->unk_0x888,
 &this->unk_0x884, local)`.
 
@@ -33,20 +33,20 @@ extern u8 *TUNNEL_ENTER_HEADINGS[];
 extern u8 *TUNNEL_EXIT_HEADINGS[];
 ```
 
-`CARDINAL_ROTATIONS` is more subtle: it is a `DirectionTableEntry`-strided (12-byte)
+`sCardinalRotations` is more subtle: it is a `DirectionTableEntry`-strided (12-byte)
 table whose first element sits exactly 4 bytes before the SEPARATELY
 referenced `CARDINAL_ANGLES` (the angle table `IsHeadingAligned` already indexes,
 matched earlier this round's queue). splat drew a symbol boundary there
 because `CARDINAL_ANGLES` is independently referenced elsewhere, not because the
 underlying retail data is genuinely two different tables. This function
-only ever ADDRESS-TAKES an element (`&CARDINAL_ROTATIONS[i]`, storing the pointer
+only ever ADDRESS-TAKES an element (`&sCardinalRotations[i]`, storing the pointer
 into an output parameter) and never dereferences one, so the element type
 only needs to fix the STRIDE -- reusing the already-declared
 `DirectionTableEntry` (12 bytes) is exact and avoids inventing a third
 local type for one call site:
 
 ```c
-extern DirectionTableEntry CARDINAL_ROTATIONS[];
+extern DirectionTableEntry sCardinalRotations[];
 ```
 
 Also moved the `DirectionCheckArg` typedef, the `DirectionTableEntry`
@@ -72,11 +72,11 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 		return 0;
 
 	if (arg1 != NULL)
-		*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
+		*arg1 = (s32)&sCardinalRotations[heading];
 
 	if (arg0 != NULL) {
 		idx = TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
-		*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
+		*arg0 = (s32)&sCardinalRotations[idx];
 	}
 	return 1;
 }
@@ -104,11 +104,11 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	heading = TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
-			*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
+			*arg1 = (s32)&sCardinalRotations[heading];
 
 		if (arg0 != NULL) {
 			idx = TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
-			*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
+			*arg0 = (s32)&sCardinalRotations[idx];
 		}
 		result = 1;
 	} else {

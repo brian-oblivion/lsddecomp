@@ -1574,8 +1574,8 @@ typedef struct DirectionCheckArg {
     u16 heading;
 } DirectionCheckArg;
 
-/* CARDINAL_ROTATIONS seen from its yaw: this label starts 4 bytes into that
-   table, so `angle` is CARDINAL_ROTATIONS[i].y.numerator (0, 90, 180, 270
+/* sCardinalRotations seen from its yaw: this label starts 4 bytes into that
+   table, so `angle` is sCardinalRotations[i].y.numerator (0, 90, 180, 270
    degrees). A separate view, because this one reads the angle as a number
    and the other is only handed to SceneNode__UpdateRotation. */
 typedef struct DirectionTableEntry {
@@ -1600,7 +1600,7 @@ extern u8 *TUNNEL_EXIT_HEADINGS[];
    CheckStaircaseHeading store an entry's address in enterRotation /
    exitRotation, which SetMoveOverride, SpawnAtLink and TryStaircaseLink
    apply. */
-extern RotationRatios CARDINAL_ROTATIONS[];
+extern RotationRatios sCardinalRotations[];
 
 s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     u8 heading;
@@ -1610,11 +1610,11 @@ s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     heading = TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
     if (IsHeadingAligned((DirectionCheckArg *)rotation, heading)) {
         if (outEnter != NULL)
-            *outEnter = (s32)&CARDINAL_ROTATIONS[heading];
+            *outEnter = (s32)&sCardinalRotations[heading];
 
         if (outExit != NULL) {
             idx = TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
-            *outExit = (s32)&CARDINAL_ROTATIONS[idx];
+            *outExit = (s32)&sCardinalRotations[idx];
         }
         result = 1;
     } else {
@@ -1740,11 +1740,11 @@ s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation)
     heading = STAIRCASE_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
     if (IsHeadingAligned((DirectionCheckArg *)rotation, heading)) {
         if (outEnter != NULL)
-            *outEnter = (s32)&CARDINAL_ROTATIONS[heading];
+            *outEnter = (s32)&sCardinalRotations[heading];
 
         if (outExit != NULL) {
             idx = STAIRCASE_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
-            *outExit = (s32)&CARDINAL_ROTATIONS[idx];
+            *outExit = (s32)&sCardinalRotations[idx];
         }
         result = 1;
     } else {
