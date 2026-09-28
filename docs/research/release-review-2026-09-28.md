@@ -93,7 +93,7 @@ rather than API.
   which are also typed `u8[0xC]` for `Ratio16[3]`). Move into the .c or
   rename `g`. Conversely 8 `g` symbols used by one unit only
   (`gCdStreamAudioMixSet`, `gCdFileNotFoundFmt`, `gFileTableRegistered`, ...).
-- **Typos:** `DreamSys__InitMoodContibutors`, `totalFlasbackUnlockScore` and
+- **Typos:** `DreamSys__InitMoodContributors`, `totalFlasbackUnlockScore` and
   siblings, DreamSys.h's @brief typos (flashabcks, appropiate, indicies,
   recieve, adquired, lank). `Test4*` (4 functions) for `TestFor*`.
 - **Misleading names** (rename; each quoted against its code by a reviewer):

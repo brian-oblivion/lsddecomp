@@ -1305,7 +1305,7 @@ void DreamSys__GetPreviousDayMood(DreamSys *this, MoodGraphPoint *target, bool l
     target->axis.upper = upper;
 }
 
-void DreamSys__InitMoodContibutors(DreamSys *this, MoodGraphPoint *special) {
+void DreamSys__InitMoodContributors(DreamSys *this, MoodGraphPoint *special) {
     this->methods->clearMoodGraph(this, &this->areaMoods);
     this->methods->clearMoodGraph(this, &this->entityMoods);
     if (special != NULL) {

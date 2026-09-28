@@ -1,17 +1,19 @@
-# DreamSys__InitMoodContibutors
+# DreamSys__InitMoodContributors
+
+> Renamed from `DreamSys__InitMoodContibutors` on 2026-09-28 (tools/rename.py). Address 0x8005b2f4.
 
 **Unit:** DreamSys · **Size:** 44 words · **Status:** MATCHED (44/44)
 
 ## What it does
 
-Already forward-declared (`void DreamSys__InitMoodContibutors(DreamSys
+Already forward-declared (`void DreamSys__InitMoodContributors(DreamSys
 *this, MoodGraphPoint *special);`). Clears both mood contributors, then --
 only if a `special` mood point is supplied -- logs it into both.
 
 ## The C
 
 ```c
-void DreamSys__InitMoodContibutors(DreamSys *this, MoodGraphPoint *special)
+void DreamSys__InitMoodContributors(DreamSys *this, MoodGraphPoint *special)
 {
 	this->vt->ClearMoodGraph(this, &this->areaMoods);
 	this->vt->ClearMoodGraph(this, &this->entityMoods);

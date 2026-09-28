@@ -711,7 +711,7 @@ struct DreamSysMethods {
                                                   s32 effect); /* DreamSys__InstanceEffectsOnJournal: onActorLinkCommand's Entity (0x1F234) case */
     /* +0x1EC */ void (*getPreviousDayMood)(DreamSys *self, MoodGraphPoint *target,
                                             bool unknown); /* DreamSys__GetPreviousDayMood */
-    /* +0x1F0 */ void (*initMoodContributors)(DreamSys *self, MoodGraphPoint *special); /* DreamSys__InitMoodContibutors */
+    /* +0x1F0 */ void (*initMoodContributors)(DreamSys *self, MoodGraphPoint *special); /* DreamSys__InitMoodContributors */
     /* +0x1F4 */ void (*logChunkMood)(DreamSys *self, PlayerSpawnPoint *currentPos); /* DreamSys__LogChunkMood */
     /* +0x1F8 */ void (*logInstanceMood)(DreamSys *self, MoodGraphPoint *source); /* DreamSys__LogInstanceMood */
     /* +0x1FC */ void (*updateDreamChart)(DreamSys *self, MoodGraphPoint *ret); /* DreamSys__UpdateDreamChart */
@@ -904,7 +904,7 @@ void DreamSys__GetPreviousDayMood(DreamSys *this, MoodGraphPoint *target, bool u
 
 /* @brief (Re)initializes both Mood Contributors in preparation for the start of the day. */
 /* @param special If not NULL, both graphs will be initialized with this point logged in. */
-void DreamSys__InitMoodContibutors(DreamSys *this, MoodGraphPoint *special);
+void DreamSys__InitMoodContributors(DreamSys *this, MoodGraphPoint *special);
 
 /* @brief Logs the mood effect of the chunk at the given position. */
 /* @param currentPos The player's current position on the stage */
