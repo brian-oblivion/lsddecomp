@@ -12,7 +12,7 @@ runner BRAVO. Matched on the first attempt — no residue.
 ## What it does
 
 A "retry/attempt band" gate, the same family as the already-matched
-`DreamSys__TickStaircaseYawPlus90`/`DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase3` a few functions earlier in
+`DreamSys__TickStaircaseYawPlus90`/`DreamSys__TickStaircaseYawPlus45`/`DreamSys__TickStaircaseCase3` a few functions earlier in
 this unit (all four share the identical skeleton: on the first call,
 initialize `this->unk_0x91C` via `DreamSys__ApplyRelativeOffset` with a per-function
 `struct RelativePos` constant; branch on `this->unk_0xAC != 4`; in each

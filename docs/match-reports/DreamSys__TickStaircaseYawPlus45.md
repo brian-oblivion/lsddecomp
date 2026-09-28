@@ -1,4 +1,6 @@
-# DreamSys__TickStaircaseCase2
+# DreamSys__TickStaircaseYawPlus45
+
+> Renamed from `DreamSys__TickStaircaseCase2` on 2026-09-28 (tools/rename.py). Address 0x8005ad68.
 
 > Renamed from `func_8005AD68` on 2026-09-22 (tools/rename.py). Address 0x8005ad68.
 
@@ -38,7 +40,7 @@ through to a shared tail: `unk_0xA0 = 1`, `unk_0x914++`, `return 0`.
 ## Final C
 
 ```c
-s32 DreamSys__TickStaircaseCase2(DreamSys *this)
+s32 DreamSys__TickStaircaseYawPlus45(DreamSys *this)
 {
 	if (this->unk_0x914 == 0) {
 		DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset2, &this->unk_0x91C);

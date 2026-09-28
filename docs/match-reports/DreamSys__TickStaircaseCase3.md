@@ -7,7 +7,7 @@
 
 ## What it does
 
-Third sibling of `DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseYawPlus90` (same retry-counter shape),
+Third sibling of `DreamSys__TickStaircaseYawPlus45`/`DreamSys__TickStaircaseYawPlus90` (same retry-counter shape),
 with a THIRD extra piece: both arms, after their own window checks, also
 compute a boolean "close to the next trigger" flag that (if set) bumps
 `unk_0x88` to 2 — shared tail logic neither of the other two siblings had:
@@ -61,7 +61,7 @@ additional coaxing.
 ## New knowledge
 
 - **`sStaircaseOffset3`** (`struct RelativePos`), a third constant in the same table
-  as `DreamSys__TickStaircaseCase2`'s `sStaircaseOffset2` and `DreamSys__TickStaircaseYawPlus90`'s `sStaircaseOffset0`,
+  as `DreamSys__TickStaircaseYawPlus45`'s `sStaircaseOffset2` and `DreamSys__TickStaircaseYawPlus90`'s `sStaircaseOffset0`,
   passed as `DreamSys__ApplyRelativeOffset`'s `a` argument.
 - **`sRotationYawMinus45`**, another opaque forwarded-pointer constant for
   `vt->SceneNode__UpdateRotation`'s `arg2`, same shape as the already-known

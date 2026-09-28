@@ -1132,7 +1132,7 @@ s32 DreamSys__TickStaircaseYawMinus135(DreamSys *this) {
     return 0;
 }
 
-s32 DreamSys__TickStaircaseCase2(DreamSys *this) {
+s32 DreamSys__TickStaircaseYawPlus45(DreamSys *this) {
     if (this->staircaseFrame == 0) {
         DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset2, &this->staircaseOrigin);
     }

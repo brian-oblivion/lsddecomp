@@ -322,7 +322,7 @@ extern LongVec3 sDriftStep;
 extern s32 gProjectOffsetZ;
 
 /* A `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a` argument
-   by DreamSys__TickStaircaseCase2. */
+   by DreamSys__TickStaircaseYawPlus45. */
 extern struct RelativePos sStaircaseOffset2;
 
 /* The same, for DreamSys__TickStaircaseYawPlus90. */
@@ -336,7 +336,7 @@ extern struct RelativePos sStaircaseOffset3;
 
 /* (0 deg, +45 deg, 0 deg), forwarded as vtable slot +0x044's (SceneNode__UpdateRotation)
    arg2 with flag 0 (relative) by DreamSys__TickStaircaseYawPlus90 and
-   DreamSys__TickStaircaseCase2. Its three {numerator, denominator} words
+   DreamSys__TickStaircaseYawPlus45. Its three {numerator, denominator} words
    are {0,1} {0x2D,1} {0,1}, the same form as sRotationYaw180 and every
    sCardinalRotations entry. */
 extern RotationRatios sRotationYawPlus45;
@@ -556,7 +556,7 @@ struct DreamSys {
        `sStaircaseTickFns[GetLastSpawnExtra()]` or NULLed, and tested
        against 0 before every call. */
     s32 (*staircaseTickFn)(struct DreamSys *this);
-    /* A retry/attempt counter (DreamSys__TickStaircaseCase2): read as a
+    /* A retry/attempt counter (DreamSys__TickStaircaseYawPlus45): read as a
        whole word, compared against several literal bands, and incremented
        by 1 at that function's normal exit. */
     s32 staircaseFrame;
@@ -564,7 +564,7 @@ struct DreamSys {
            PlayerSpawnPoint whole-struct-copied here by DreamSys__TryStaircaseLink. */
     PlayerSpawnGridPos staircaseGridPos;
     /* A `struct RelativePos`, address-taken and passed to DreamSys__ApplyRelativeOffset as
-       its `b` argument (DreamSys__TickStaircaseCase2). */
+       its `b` argument (DreamSys__TickStaircaseYawPlus45). */
     struct RelativePos staircaseOrigin;
     s8 unknown_values_0x922[2];
     s32 unk_0x924;
@@ -598,7 +598,7 @@ typedef struct DreamSaveBlock {
 extern void (*sMoveCommandDispatch[5])(DreamSys *this, s32 val, void *extra);
 
 /* 4-entry table of `s32 (DreamSys *this)` functions (DreamSys__TickStaircaseYawPlus90,
-   DreamSys__TickStaircaseYawMinus135, DreamSys__TickStaircaseCase2, DreamSys__TickStaircaseCase3),
+   DreamSys__TickStaircaseYawMinus135, DreamSys__TickStaircaseYawPlus45, DreamSys__TickStaircaseCase3),
    indexed by GetLastSpawnExtra()'s return value and
    stashed into DreamSys::staircaseTickFn by DreamSys__TryStaircaseLink. */
 extern s32 (*sStaircaseTickFns[4])(DreamSys *this);
