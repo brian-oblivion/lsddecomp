@@ -10,7 +10,7 @@ pointer to that chunk's entry in the stage's mood table.
 
 ```c
 MoodGraphPoint *GetMoodFromStageChunk(s32 stage, StageChunk *chunk) {
-    return STAGE_CHUNK_MOODS[stage] + chunk->row * sStageGridDimensions[stage].columns + chunk->column;
+    return sStageChunkMoods[stage] + chunk->row * sStageGridDimensions[stage].columns + chunk->column;
 }
 ```
 
@@ -22,7 +22,7 @@ of the executable:
   `s16 columns; s16 rows; bool isVertical;` with `bool` = `int` (`include/types.h`)
   gives exactly 8. Entry 0 is `{1, 5, 1}`, entry 1 `{3, 2, 0}`, entry 2 `{6, 6, 0}`,
   entry 3 `{16, 16, 0}` — the existing header struct is correct as written.
-- `STAGE_CHUNK_MOODS` (`0x80086590`) is 14 pointers, to `STG00_CHUNK_MOODS` …
+- `sStageChunkMoods` (`0x80086590`) is 14 pointers, to `STG00_CHUNK_MOODS` …
   `STG13_CHUNK_MOODS`. Row-major arrays of the 2-byte `MoodGraphPoint` union.
 - `D_800861D6` is **not a separate object**: it is splat's symbol for
   `sStageGridDimensions[0].rows`, at base+2. `%hi`/`%lo(D_800861D6)` and a
@@ -35,7 +35,7 @@ of the executable:
 The first attempt was the natural spelling and it came out **19 words, one short**:
 
 ```c
-return &STAGE_CHUNK_MOODS[stage][chunk->row * sStageGridDimensions[stage].columns + chunk->column];
+return &sStageChunkMoods[stage][chunk->row * sStageGridDimensions[stage].columns + chunk->column];
 ```
 
 That form builds ONE index expression, so GCC 2.6.3 sums `row*cols + col` as

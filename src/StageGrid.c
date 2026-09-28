@@ -4,7 +4,7 @@
  * Each of the game's stages divides into a `columns` x `rows` grid of chunks
  * (StageGridDimensions, one entry per stage in sStageGridDimensions), and
  * every chunk owns one MoodGraphPoint in a row-major per-stage table
- * (STAGE_CHUNK_MOODS -- 14 pointers to the per-stage STGnn_CHUNK_MOODS
+ * (sStageChunkMoods -- 14 pointers to the per-stage STGnn_CHUNK_MOODS
  * arrays). GetMoodFromStageChunk and GetStageChunkFromMood convert between a
  * mood value and its owning (stage, chunk); DreamSys (src/DreamSys.c) is the
  * only caller of either, using them to read the mood at the player's current
@@ -47,7 +47,7 @@ s32 GetStageChunkFromMood(StageChunk *ret, MoodGraphPoint *mood) {
     s32 columns;
 
     for (stage = 0; stage < STAGE_GRID_DIMENSIONS_COUNT; stage++) {
-        p = STAGE_CHUNK_MOODS[stage];
+        p = sStageChunkMoods[stage];
         rows = sStageGridDimensions[stage].rows;
         columns = sStageGridDimensions[stage].columns;
         for (row = 0; row < rows; row++) {
@@ -65,5 +65,5 @@ s32 GetStageChunkFromMood(StageChunk *ret, MoodGraphPoint *mood) {
 }
 
 MoodGraphPoint *GetMoodFromStageChunk(s32 stage, StageChunk *chunk) {
-    return STAGE_CHUNK_MOODS[stage] + chunk->row * sStageGridDimensions[stage].columns + chunk->column;
+    return sStageChunkMoods[stage] + chunk->row * sStageGridDimensions[stage].columns + chunk->column;
 }

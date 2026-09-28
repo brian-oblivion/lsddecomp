@@ -21,9 +21,9 @@ struct simplePair {
 
 extern StageGridDimensions sStageGridDimensions[];
 
-extern MoodGraphPoint *STAGE_CHUNK_MOODS[];
+extern MoodGraphPoint *sStageChunkMoods[];
 
-/* @brief Number of entries in sStageGridDimensions / STAGE_CHUNK_MOODS (14). */
+/* @brief Number of entries in sStageGridDimensions / sStageChunkMoods (14). */
 extern s32 GetStageGridDimensionsCount(void);
 
 /* @brief Gets the stage-dimensions table, optionally writing its length out. */
