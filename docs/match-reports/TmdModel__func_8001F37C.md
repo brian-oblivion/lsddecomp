@@ -15,7 +15,7 @@ Round 82, runner charlie (matching slot). Unit `src/graphics/TmdModel.c`. Fresh 
 ```c
 void TmdModel__func_8001F37C(void) {
 }
-void *Get_vtable_TmdModel(void) {
+void *GetTmdModelMethods(void) {
     return gTmdModelMethods;
 }
 ```

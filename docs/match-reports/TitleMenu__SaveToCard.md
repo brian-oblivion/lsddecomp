@@ -23,7 +23,7 @@ void TitleMenu__SaveToCard(TitleMenu *self)
     if (self->unkA4->methods->slot1AC(self->unkA4)) {
         *(u8 *)sSaveFileName = 0;
     }
-    self->unkAC->methods->slot78(self->unkAC, sSaveFileName, gSaveTitle, 0xD, 3,
+    self->unkAC->methods->slot78(self->unkAC, sSaveFileName, sSaveTitle, 0xD, 3,
                                   self->iconHandle, self->unkBC, self->unkC0);
 }
 ```
@@ -36,9 +36,9 @@ SLPS_015.56`.
 
 - `buf = self->unk60->unk14; self->unkA4->methods->slot19C(self->unkA4,
   &buf);` -- the IDENTICAL idiom already matched in this unit's own
-  `TitleMenu__RefreshViewValue` (stack-buffer-out-parameter call on the same
+  `TitleMenu__Exit` (stack-buffer-out-parameter call on the same
   `DreamSysView_3bb8c_c::slot19C`), just without that function's own
-  leading `Get_vtable_TaskCore()->slot94(self)` base-class call.
+  leading `GetTaskCoreMethods()->slot94(self)` base-class call.
 - `self->methods->slot128(self)` -- the slot this round's `TitleMenu__LoadFromCard`
   established (single-argument, `self` only).
 - `self->unkA4->methods->slot1AC(self->unkA4)` -- a NEW slot on
@@ -54,7 +54,7 @@ SLPS_015.56`.
   VALUE, reloaded here with an identical `lw`).
 - The final call, `self->unkAC->methods->slot78(...)`, is an 8-argument
   dispatch (four in registers, four on the stack at `0x10`-`0x1C($sp)`):
-  `self->unkAC`, `sSaveFileName`, `gSaveTitle`, the literal `0xD`, the
+  `self->unkAC`, `sSaveFileName`, `sSaveTitle`, the literal `0xD`, the
   literal `3`, `self->iconHandle`, `self->unkBC`, `self->unkC0`. The offset
   (+0x078) falls immediately after this round's `TitleMenu__LoadFromCard`-derived
   `slot74` (+0x074, 4 bytes) with no gap, so it was appended there.
@@ -84,7 +84,7 @@ its own new slot immediately after it.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E0E4` -> `TitleMenu__SaveToCard`. **Tier B, lower confidence**: Refreshes the view (same idiom as `TitleMenu__RefreshViewValue`), calls `slot128`, conditionally clears `sSaveFileName` behind the same `self->unkA4->methods->slot1AC()` gate `TitleMenu__CreateSaveTitle` also tests, then forwards `self->iconHandle` plus literal flags (0xD, 3) through `unkAC`'s `slot78`. It is `TitleMenu__Tick`'s case-2 dispatch target. Purpose beyond "the icon-carrying variant of the two unkAC dispatch calls" is not established.
+Renamed `func_8004E0E4` -> `TitleMenu__SaveToCard`. **Tier B, lower confidence**: Refreshes the view (same idiom as `TitleMenu__Exit`), calls `slot128`, conditionally clears `sSaveFileName` behind the same `self->unkA4->methods->slot1AC()` gate `TitleMenu__CreateSaveTitle` also tests, then forwards `self->iconHandle` plus literal flags (0xD, 3) through `unkAC`'s `slot78`. It is `TitleMenu__ConfirmSlot`'s case-2 dispatch target. Purpose beyond "the icon-carrying variant of the two unkAC dispatch calls" is not established.
 
 ## Proposed field names
 

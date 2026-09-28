@@ -62,7 +62,7 @@ struct FlatLightObj {
 };
 
 extern FlatLightObjMethods gFlatLightObjMethods;
-extern FlatLightObjMethods *Get_vtable_FlatLightObj(void); /* returns &gFlatLightObjMethods */
+extern FlatLightObjMethods *GetFlatLightObjMethods(void); /* returns &gFlatLightObjMethods */
 
 /* The class's own methods, FlatLightObj, in ROM order. */
 FlatLightObj *New_FlatLightObj(s32 lightId);

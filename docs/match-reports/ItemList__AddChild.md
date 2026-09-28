@@ -19,7 +19,7 @@ void ItemList__AddChild(ItemList_3bb8c_j *self, void *arg1)
     s32 tag;
 
     if (arg1) {
-        Get_vtable_BasicClass()->addChild(self, arg1);
+        GetBasicClassMethods()->addChild(self, arg1);
         tag = **(s32 **)arg1 & 0xF;
         if (tag == 2) {
             self->unk34 = arg1;

@@ -51,6 +51,6 @@ object behind them is the `New_TextRow` result, so TextEntry::textRow
 (+0x044, include/TextEntry.h) is `struct TextRow *`. The slots map onto
 TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
 (position cast to `LongVec3 *`, as ScreenSprite's banner describes), +0x0B8
-`setColor` (`gTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
+`setColor` (`sTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
 +0x0C4 `setCell`, called through `TextRowSetCellAtFn` because
 TextRow__SetCellAt takes the index too. Zero bytes changed.

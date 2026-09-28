@@ -9,7 +9,7 @@ whole-image build verified byte-exact)
 
 One entry (function pointer + 3 data words per 16-byte row) of the
 `this->moodIndex`-selected event-dispatch table `gEntityMoodHandlerTable`
-(`asm/data/79528.data.s`, immediately after the `gEntityMoodTable` mood-row family;
+(`asm/data/79528.data.s`, immediately after the `sEntityMoodTable` mood-row family;
 not itself named/carved this round). Takes `this` and an output/state buffer
 `out` (`EntityMoodHandlerArg`, a new opaque struct this round — see "Proposed
 learning"): stores `this->methods->slot148(this)`'s result into `out->unk10`

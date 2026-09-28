@@ -8,7 +8,7 @@
 
 /*
  * WBgm -- class id 0x50, method table gWBgmMethods (24 slots), a direct
- * BasicClass subclass (its ctor calls Get_vtable_BasicClass()->ctor first;
+ * BasicClass subclass (its ctor calls GetBasicClassMethods()->ctor first;
  * `classtable.py gWBgmMethods --vs gBasicClassMethods` overrides the ctor, finalize
  * and onNotify and adds nine slots). Methods in src/sound/WBgm.c. No class
  * derives from it. Name from rodata sSeqOpenErrorMsg, "Seq Open error in
@@ -27,14 +27,14 @@
  *
  * Its one construction: DayTask__DayTask (src/world/DayTaskStageMap.c),
  * New_WBgm(PickSoundBank(0), NULL, 1): the VAB path is one of the seven
- * gSoundBankPaths strings ("SND\\AMBIENT" ... "SND\\STANDERD",
+ * sSoundBankPaths strings ("SND\\AMBIENT" ... "SND\\STANDERD",
  * asm/data/1B84.rodata.s), no SEQ yet, autoPlay on. That caller keeps the
  * object as DayTask::bgm (include/DayTask.h), and
  * hands it to New_ObjM, whose ObjM keeps it at +0x054 and calls +0x04C
  * pause and +0x050 resume on it (ObjM__AdvancePauseSetup,
  * ObjM__TeardownPauseOverlay; include/ObjM.h).
  *
- * gWBgmActive is 1 from the ctor to finalize; IsWBgmActive returns it, and
+ * sWBgmActive is 1 from the ctor to finalize; IsWBgmActive returns it, and
  * VabStreamObj__Finalize (src/sound/PlacementGridVabSound.c) shuts libsnd down (SsEnd,
  * SsQuit) only when the last VAB closes AND no WBgm is active.
  */
@@ -77,9 +77,7 @@ struct WBgm {
 }; /* 0x24 bytes: New_WBgm */
 
 extern WBgmMethods gWBgmMethods;
-extern WBgmMethods *Get_vtable_WBgm(void); /* returns &gWBgmMethods */
-
-extern s32 gWBgmActive; /* 1 between WBgm__WBgm and WBgm__Finalize */
+extern WBgmMethods *GetWBgmMethods(void); /* returns &gWBgmMethods */
 
 /* The class's own methods and helpers, in address order. */
 WBgm *New_WBgm(char *vabPath, char *seqPath, s32 autoPlay); /* BMemPMgrAlloc(0x24), then ctor */
@@ -96,7 +94,7 @@ void WBgm__SetVol(WBgm *self, s16 left, s16 right);
 void WBgm__Crescendo(WBgm *self, s16 vol, s32 seconds);
 void WBgm__SetSeq(WBgm *self, char *seqPath);
 void WBgm__SetVab(WBgm *self, char *vabPath);
-s32 IsWBgmActive(void);        /* returns gWBgmActive */
-void *GetSsSizeTableBuf(void); /* &gSsSizeTableBuf, the SsSetTableSize buffer */
+s32 IsWBgmActive(void);        /* returns sWBgmActive */
+void *GetSsSizeTableBuf(void); /* &sSsSizeTableBuf, the SsSetTableSize buffer */
 
 #endif

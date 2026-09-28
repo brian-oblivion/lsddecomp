@@ -6,16 +6,16 @@
 
 ## What it does
 
-Calls method slot `DreamSys__SelectCallback98` with 0, then conditionally method slot `DreamSys__SelectCallback80` with 0 when the flag argument is set. Both go through the object's method table at offset 0, per the hand-rolled class framework.
+Calls method slot `DreamSys__SelectMoveCallback` with 0, then conditionally method slot `DreamSys__SelectLookCallback` with 0 when the flag argument is set. Both go through the object's method table at offset 0, per the hand-rolled class framework.
 
 ## The C
 
 ```c
 void DreamSys__ClearTickCallbacks(DreamSys *this, bool arg1)
 {
-	this->vt->DreamSys__SelectCallback98(this, 0);
+	this->vt->DreamSys__SelectMoveCallback(this, 0);
 	if (arg1)
-		this->vt->DreamSys__SelectCallback80(this, 0);
+		this->vt->DreamSys__SelectLookCallback(this, 0);
 }
 ```
 

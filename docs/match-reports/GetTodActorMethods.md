@@ -14,7 +14,7 @@
 Returns the address of `gTodActorMethods`, this class's own 80-slot method table
 (header word `0x234`, per `tools/classtable.py gTodActorMethods --vs 0x800878D4`).
 The `Get_vtable`-style accessor for this class, same shape as
-`Get_vtable_DreamSys` and `GetGameApplicationMethods` (`GameApplicationFileResource`'s equivalent for
+`GetDreamSysMethods` and `GetGameApplicationMethods` (`GameApplicationFileResource`'s equivalent for
 `gGameApplicationMethods`): a plain `lui`/`addiu` address computation, no load — this is
 `&gTodActorMethods`, not `*gTodActorMethods`.
 
@@ -45,7 +45,7 @@ address computation.
 
 Round 75 (charlie), track 3.
 
-- `GetTodActorMethods` (was `func_80066818`), tier A. Returns &gTodActorMethods (lui/addiu). Named like Get_vtable_Entity, the same accessor for the subclass. Entity.c calls it as its base-table getter.
+- `GetTodActorMethods` (was `func_80066818`), tier A. Returns &gTodActorMethods (lui/addiu). Named like GetEntityMethods, the same accessor for the subclass. Entity.c calls it as its base-table getter.
 - `gTodActorMethods` (was `D_8008A6C4`), tier A. The 80-slot method table (header 0x234) this function returns and the ctor installs; `g<Class>Methods` like gStyleEffectMethods/gSceneNodeMethods.
 
 ## Track 4 (2026-09-25, round 85, alpha)

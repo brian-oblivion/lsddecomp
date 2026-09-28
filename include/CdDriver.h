@@ -5,8 +5,8 @@
 
 /*
  * CdDriver -- the CD-ROM data-source driver (class id 0x13 = DATASOURCE_CD,
- * method table gCdDriverMethods), a FileResource subclass and VabDriver's
- * (gVabDriverMethods, 0x23) sibling; and, below the class, the request
+ * method table gCdDriverMethods), a FileResource subclass and NullDriver's
+ * (gNullDriverMethods, 0x23) sibling; and, below the class, the request
  * queue, the file table and the module state its units share.
  *
  *   src/cd/CdDriver.c      the whole class, in five parts:
@@ -38,7 +38,7 @@
  *
  * Every own method is named for its slot (`classtable.py gCdDriverMethods
  * --vs gFileResourceMethods`); the slot names and types are FileResource's:
- * open/close/loadFile/setFlag/stopService return void and read's buf is
+ * open/close/loadFile/onRequestDone/stopService return void and read's buf is
  * void *.
  *
  * NO FIELDS/SLOTS MACROS: no class lies below 0x13 (`typeviews.py --tree`).
@@ -78,7 +78,7 @@ void CdDriver__CancelRequests(CdDriver *self);              /* +0x074 cancelRequ
 /* One record of the file table: a name resolved once by ResolveFileEntries
  * (CdSearchFile on BuildCdFilePath(name)) and then reused as a seek target.
  * FindCdFileEntry / FindCdFileIndex / GetCdFileEntry walk it at this 0x1C
- * stride; the state machines seek to `pos` of the entry gCdSeekParam holds. */
+ * stride; the state machines seek to `pos` of the entry sCdSeekParam holds. */
 typedef struct CdFileEntry {
     /* +0x00 */ char name[0x14];
     /* +0x14 */ CdlLOC pos;
@@ -86,7 +86,7 @@ typedef struct CdFileEntry {
 } CdFileEntry; /* size 0x1C */
 
 /* One queued request: AllocCdRequestNode allocates and links it at the tail
- * of gCdRequestQueue, EnqueueCdRequest fills it, StartCdOperation sets
+ * of sCdRequestQueue, EnqueueCdRequest fills it, StartCdOperation sets
  * `active` on the head node, CdDriver__RunRequestQueue dispatches `op` back
  * to `owner`'s slot of the same name, FreeCdRequestNode unlinks and frees. */
 typedef struct CdRequestNode {
@@ -109,13 +109,13 @@ typedef struct CdRequestNode {
 #define CD_OP_READ 5
 #define CD_OP_LOAD_FILE 7
 
-/* gCdTickStep: which of CdDriver.c's two state machines ServiceCdDriver
+/* sCdTickStep: which of CdDriver.c's two state machines ServiceCdDriver
  * ticks. */
 #define CD_TICK_NONE 0          /* neither: ResetCdStateMachine's value */
 #define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
 #define CD_TICK_LOAD_FILE 2     /* TickCdLoadFileStateMachine */
 
-/* gCdOperation: which method's request the state machine is running,
+/* sCdOperation: which method's request the state machine is running,
  * StartCdOperation's first argument and GetCdOperation's (and so
  * GetActiveDataSourceOperation's) result. Each value is passed by exactly one
  * of CdDriver.c's methods. 0 is also what ResetCdStateMachine leaves
@@ -126,7 +126,7 @@ typedef struct CdRequestNode {
 #define CD_OPERATION_READ 3
 #define CD_OPERATION_LOAD_FILE 4
 
-/* gCdState: the state machines' phase, StartCdOperation's second argument
+/* sCdState: the state machines' phase, StartCdOperation's second argument
  * (CdDriver.c's banner; that unit still spells them as literals). */
 #define CD_STATE_IDLE 0        /* ResetCdStateMachine's value */
 #define CD_STATE_SETLOC 1      /* issue CdControl(CdlSetloc) */
@@ -180,7 +180,7 @@ extern void FreeCdRequestNode(CdRequestNode *node); /* unlink and free */
 
 /* The file-table lookups. */
 extern void *FindCdFileEntry(char *name);
-extern s32 FindCdFileIndex(char *name); /* name -> gFileTable index */
+extern s32 FindCdFileIndex(char *name); /* name -> sFileTable index */
 extern void *GetCdFileEntry(s32 index); /* the entry is also its name, its first member */
 
 /* The state machines. op is a CD_OPERATION_* and state the first CD_STATE_*. */
@@ -199,23 +199,5 @@ extern void CloseCdFile(CdDriver *self);
 extern s32 GetCdFileSize(CdDriver *self);
 extern s32 ReadCdFile(CdDriver *self, void *buf, s32 size);
 extern s32 GetCdUseVSyncCallback(void);
-
-/* The module state: the globals two or more of the units above share. A
- * global only one unit touches is a local extern in that unit. */
-extern s32 gCdAsyncEnabled;
-extern s32 gCdSyncQueueMode; /* nonzero with gCdAsyncEnabled 0: requests queue, then run blocking */
-extern s32 gCdBusy;          /* 0/1 */
-extern CdFileEntry *gFileTable;        /* SetFileTable */
-extern s32 gFileTableCount;            /* SetFileTableCount */
-extern s32 gCdIdle;                    /* 0/1 */
-extern s32 gCdOperation;               /* StartCdOperation's op, GetCdOperation's result */
-extern s32 gCdState;                   /* the state machine's phase */
-extern CdFileEntry *gCdSeekParam;      /* the state machines seek to &gCdSeekParam->pos */
-extern s32 gCdReadSectorCount;         /* CdRead sector count */
-extern void *gCdReadBuffer;            /* CdRead target buffer */
-extern CdFileEntry *gCdSavedSeekParam; /* LoadFile's saved gCdSeekParam */
-extern CdRequestNode *gCdRequestQueue; /* list head */
-extern s32 gCdTickStep;                /* CD_TICK_* */
-extern s32 gCdUseVSyncCallback;
 
 #endif /* CDDRIVER_H */

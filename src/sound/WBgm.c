@@ -17,9 +17,11 @@
 #include <stdio.h>
 #include "VabStreamObj.h"
 
+extern s32 sWBgmActive; /* 1 between WBgm__WBgm and WBgm__Finalize */
+
 extern char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 
-extern u8 gSsSizeTableBuf[];
+extern u8 sSsSizeTableBuf[];
 
 /* The volume, left and right, a SEQ gets when it opens and again on every
  * play (libsnd's range is 0 to 127). */
@@ -30,15 +32,15 @@ WBgm *New_WBgm(char *vabPath, char *seqPath, s32 autoPlay) {
 
     self = BMemPMgrAlloc(sizeof(WBgm));
     if (self != NULL) {
-        Get_vtable_WBgm()->ctor(self, vabPath, seqPath, autoPlay);
+        GetWBgmMethods()->ctor(self, vabPath, seqPath, autoPlay);
         return self;
     }
     return NULL;
 }
 
 void WBgm__WBgm(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_WBgm();
+    GetBasicClassMethods()->ctor((BasicClass *)self);
+    self->methods = GetWBgmMethods();
     self->vab = NULL;
     self->seqData = NULL;
     self->seqId = 0;
@@ -46,14 +48,14 @@ void WBgm__WBgm(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay) {
     self->paused = 0;
     self->playing = 0;
     self->autoPlay = autoPlay;
-    gWBgmActive = 1;
+    sWBgmActive = 1;
     self->methods->setSeq(self, seqPath);
     self->methods->setVab(self, vabPath);
     self->methods->addChild(self, (BasicClass *)GetDrawSystem());
 }
 
 void WBgm__Finalize(WBgm *self) {
-    gWBgmActive = 0;
+    sWBgmActive = 0;
     self->methods->stop(self);
     SsSeqClose(self->seqId);
     if (self->vab != NULL) {
@@ -63,11 +65,11 @@ void WBgm__Finalize(WBgm *self) {
         self->seqData->methods->release(self->seqData);
     }
     self->methods->removeChild(self, (BasicClass *)GetDrawSystem());
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void WBgm__OnNotify(WBgm *self, void *sender, s32 event) {
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
     if ((((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK) == DRAWSYSTEM_CLASS_ID) {
         self->methods->update(self, (DrawSystem *)sender, event);
     }
@@ -186,14 +188,14 @@ void WBgm__SetVab(WBgm *self, char *vabPath) {
     }
 }
 
-WBgmMethods *Get_vtable_WBgm(void) {
+WBgmMethods *GetWBgmMethods(void) {
     return &gWBgmMethods;
 }
 
 s32 IsWBgmActive(void) {
-    return gWBgmActive;
+    return sWBgmActive;
 }
 
 void *GetSsSizeTableBuf(void) {
-    return &gSsSizeTableBuf;
+    return &sSsSizeTableBuf;
 }

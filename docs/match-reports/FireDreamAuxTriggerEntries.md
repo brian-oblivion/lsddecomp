@@ -17,7 +17,7 @@ and matched it.
 Construct a `TriggerWorld` via `New_TriggerWorld`; if construction succeeds,
 walk 3 candidate bytes (`a1[3..5]`, terminated early by a `-1` sentinel) and
 fire `ProcessDreamAuxTriggerRecord` once per non-sentinel byte against the SAME
-`gDreamAuxGroupRecords`/`gDreamAuxStage` parallel-group table `InitDreamAux` clears
+`sDreamAuxGroupRecords`/`sDreamAuxStage` parallel-group table `InitDreamAux` clears
 (8-byte stride, confirmed there and reused here identically); the loop's
 `ProcessDreamAuxTriggerRecord` results are discarded (called for side effects only). The
 return value is just whether construction succeeded:
@@ -35,7 +35,7 @@ s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
     world = New_TriggerWorld(ctxArg);
 
     if (world != NULL) {
-        DreamAuxGroupRecord *base = gDreamAuxGroupRecords[gDreamAuxStage];
+        DreamAuxGroupRecord *base = sDreamAuxGroupRecords[sDreamAuxStage];
         s8 *p = a1 + 3;
         s8 *end = a1 + 6;
 
@@ -55,7 +55,7 @@ s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
 ```
 
 `ProcessDreamAuxTriggerRecord`'s `record` parameter here is a `DreamAuxGroupRecord *`
-(8-byte stride, `gDreamAuxGroupRecords`) reinterpret-cast to `TriggerRecord *` (0x38-byte
+(8-byte stride, `sDreamAuxGroupRecords`) reinterpret-cast to `TriggerRecord *` (0x38-byte
 stride, `ProcessDreamAuxTriggerRecord`'s own already-matched typed view). Both sizes are
 independently confirmed correct for their own already-matched call sites
 (`InitDreamAux`'s pointer scaling for the first, `ProcessDreamAuxTriggerRecord`'s own
@@ -64,7 +64,7 @@ a small 8-byte slot to a function that privately treats it as a much larger
 struct, which is safe here only because the recursive (`kind == 2`) arm of
 `ProcessDreamAuxTriggerRecord` is never taken for these particular records. This is the
 same kind of cross-type reinterpretation CLAUDE.md documents for
-`IsCurrentDreamColor`/`RemapTriggerForDreamColor`'s shared `gDreamAuxWorld` global, just at a
+`IsCurrentDreamColor`/`RemapTriggerForDreamColor`'s shared `sDreamAuxWorld` global, just at a
 struct-pointer level instead of a scalar.
 
 `New_TriggerWorld` is a new symbol, not owned by this unit and not previously

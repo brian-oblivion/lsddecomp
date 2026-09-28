@@ -7,18 +7,18 @@
 ## What this function does
 
 A plain `$gp`-relative setter: stores its single `s32` argument into the
-scalar global `gFileTableCount` (in `.sdata`). No return value. Paired with the
+scalar global `sFileTableCount` (in `.sdata`). No return value. Paired with the
 getter `GetFileTableCount` immediately after it in ROM order, which reads the
 same global back.
 
 ## The C
 
 ```c
-extern s32 gFileTableCount;
+extern s32 sFileTableCount;
 
 void SetFileTableCount(s32 a0)
 {
-    gFileTableCount = a0;
+    sFileTableCount = a0;
 }
 ```
 
@@ -34,10 +34,10 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | was | now | tier |
 | --- | --- | --- |
 | `func_80027FE4` | `SetFileTableCount` | A |
-| `D_8008A86C` | `gFileTableCount` | A |
+| `D_8008A86C` | `sFileTableCount` | A |
 
 **Evidence.** The loop bound both table scans in `CdDriver` stop at
-(`while (i < gFileTableCount)`, `if (i >= gFileTableCount) return -1;`) over
-the 0x1C-stride array based at `gFileTable`. `GameApplicationFileResource.c`'s `RegisterFileTableEntries`
+(`while (i < sFileTableCount)`, `if (i >= sFileTableCount) return -1;`) over
+the 0x1C-stride array based at `sFileTable`. `GameApplicationFileResource.c`'s `RegisterFileTableEntries`
 sets it to `GetFileTableCount() + n` before resolving `n` new entries, i.e.
 the table grows by appending. Setter of the element count: tier A.

@@ -64,7 +64,7 @@ completion".
 
 ### Naming
 
-**`GameApplication__RegisterFilesCallback` -- tier A** (renamed from `GameApplication__LoaderTaskDoneCallback` with tools/rename.py). Evidence: the body is RegisterRecordTableFiles(0) (DayTaskStageMap.c, registers gRecordTable's files with the CD driver); its one use is ShowImage's setCallback, the TaskCore's view callback, which refreshViewValue calls as the image ends.
+**`GameApplication__RegisterFilesCallback` -- tier A** (renamed from `GameApplication__LoaderTaskDoneCallback` with tools/rename.py). Evidence: the body is RegisterRecordTableFiles(0) (DayTaskStageMap.c, registers sRecordTable's files with the CD driver); its one use is ShowImage's setCallback, the TaskCore's view callback, which refreshViewValue calls as the image ends.
 
 Body changes, all byte-identical: RegisterRecordTableFiles's extern parameter a0 -> all, as DayTaskStageMap.h declares it.
 

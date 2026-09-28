@@ -23,7 +23,7 @@ round-43 body could not show because its `lbu`s were read as `lb`s-with-renames.
 | # | change | funcdiff | reading |
 | --- | --- | --- | --- |
 | 0 | preserved body | 3/78, ins/del 9/9, 2 words short | baseline |
-| 1 | `base = buf;` moved ABOVE `Get_vtable_TaskCore()->slotE4(...)` | 47/78, 7/7, length exact | `$s1` appears: `base` now crosses a call, so it gets a callee-saved reg; sched1 still sinks the `addiu s1,sp,0x10` into the `beqz` delay slot, which is why retail shows it after the call |
+| 1 | `base = buf;` moved ABOVE `GetTaskCoreMethods()->slotE4(...)` | 47/78, 7/7, length exact | `$s1` appears: `base` now crosses a call, so it gets a callee-saved reg; sched1 still sinks the `addiu s1,sp,0x10` into the `beqz` delay slot, which is why retail shows it after the call |
 | 2 | separate `p = base + sSaveTitleColorChannel` per arm (not `base += ...`) | 40/78, 7/7 | store address in `$v1` like retail; s1/s2 swapped (transient) |
 | 3 | `v` typed `s32` | same | `addiu 0x80` instead of `-0x80` (QImode const canonicalisation) |
 | 4 | `s32` temps for the three bytes | drift | `lb` appears (retail loads are SIGN-extending) but CSE then reuses the register for `buf[0]+0x80` where retail reloads with `lbu` |
@@ -50,7 +50,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, Arg1DCD0_3bb8c_d *arg1)
     u8 *base;
 
     base = (u8 *)&buf;
-    Get_vtable_TaskCore()->slotE4(self, arg1);
+    GetTaskCoreMethods()->slotE4(self, arg1);
     if (self->unk3C != 0) {
         base[0] = 0;
         base[1] = 0;
@@ -148,7 +148,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, Arg1DCD0_3bb8c_d *arg1)
     u8 *base;
     u8 v;
 
-    Get_vtable_TaskCore()->slotE4(self, arg1);
+    GetTaskCoreMethods()->slotE4(self, arg1);
     base = buf;
     if (self->unk3C != 0) {
         base[0] = 0;
@@ -187,7 +187,7 @@ This is preserved verbatim, `#if 0`-wrapped, immediately above the
 
 ## Derivation (all confirmed by the diff -- this is not in question)
 
-- `Get_vtable_TaskCore()->slotE4(self, arg1)` -- a NEW slot on
+- `GetTaskCoreMethods()->slotE4(self, arg1)` -- a NEW slot on
   `BaseTaskCtorTable_3bb8c_c` at +0x0E4 (right after the existing
   `slotE0`, no gap), 2-argument, `self` forwarded then `arg1`. **Confirmed
   correct**: the diff shows the `jal 3dfbc` / `lw v0,0xe4(v0)` / `jalr`
@@ -301,7 +301,7 @@ Renamed `func_8004DCD0` -> `TitleMenu__CycleSaveTitleColor`. **Tier B**: Guarded
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

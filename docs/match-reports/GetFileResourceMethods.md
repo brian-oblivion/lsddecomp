@@ -32,7 +32,7 @@ void *GetFileResourceMethods(void) {
 Confirmed via `tools/classtable.py 0x8006D430`: slots `+0x004`/`+0x008`/`+0x00C`
 are this unit's own `FileResource__Release`/`FileResource__FileResource`/`FileResource__Finalize` (dtor /
 ctor-by-the-`+0x008`-convention / a third override), and `+0x058`.`+0x064`
-are `FileResource__LoadFile`..`FileResource__SetFlag`, also this unit. So this function is the
+are `FileResource__LoadFile`..`FileResource__OnRequestDone`, also this unit. So this function is the
 "get my own class's methods" accessor for the class that owns roughly a third
 of `GameApplicationFileResource`'s remaining queue — worth knowing for whoever picks up
 `FileResource__Release`, `FileResource__FileResource`, `FileResource__Finalize`, `FileResource__LoadFile`, or

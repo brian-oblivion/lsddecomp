@@ -35,13 +35,13 @@ s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = sStaircaseEnterHeadings[gLinkSrcStage][gLinkTriggerIndex];
+	heading = sStaircaseEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
 			*arg1 = (s32)&sCardinalRotations[heading];
 
 		if (arg0 != NULL) {
-			idx = sStaircaseExitHeadings[gLinkDstStage][gLinkSpawnIndex];
+			idx = sStaircaseExitHeadings[sLinkDstStage][sLinkSpawnIndex];
 			*arg0 = (s32)&sCardinalRotations[idx];
 		}
 		result = 1;

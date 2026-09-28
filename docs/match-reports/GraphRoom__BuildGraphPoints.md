@@ -27,8 +27,8 @@ round's final summary for the disposition of `GraphRoom__PopulateGraphPoints`.
 Builds a 100-entry array of allocated `D_80087AACEntry` objects
 (`self->unk_0xA8[0..99]`), each constructed via `New_BoxFill` (already
 matched, `ScreenWidgets.c`) with a colour-like 3-byte argument: entry 0
-gets the constant `gGraphPointNewestColor` directly; entries 1-99 get successive
-values of a mutable local copy of `gGraphPointBaseColor` (also 3 bytes), decremented
+gets the constant `sGraphPointNewestColor` directly; entries 1-99 get successive
+values of a mutable local copy of `sGraphPointBaseColor` (also 3 bytes), decremented
 by 0x14 for the first 6 loop iterations and by 1 thereafter. Finally
 allocates a 4-byte scratch buffer into `self->unk_0x240`.
 
@@ -45,21 +45,21 @@ typedef struct GraphPointColor {
     s8 g;
     s8 b;
 } GraphPointColor;
-extern u8 gGraphPointSize;
-extern u8 gGraphPointNewestColor;
-extern GraphPointColor gGraphPointBaseColor;
+extern u8 sGraphPointSize;
+extern u8 sGraphPointNewestColor;
+extern GraphPointColor sGraphPointBaseColor;
 extern D_80087AACEntry *New_BoxFill(void *a0, void *a1, s32 a2);
 
 void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
     GraphPointColor rgb;
     s32 i;
 
-    self->unk_0xA8[0] = New_BoxFill(&gGraphPointSize, &gGraphPointNewestColor, 0);
-    rgb = gGraphPointBaseColor;
+    self->unk_0xA8[0] = New_BoxFill(&sGraphPointSize, &sGraphPointNewestColor, 0);
+    rgb = sGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
-        self->unk_0xA8[i] = New_BoxFill(&gGraphPointSize, &rgb, 0);
+        self->unk_0xA8[i] = New_BoxFill(&sGraphPointSize, &rgb, 0);
         dec = 1;
         if (i < 7) {
             dec = 0x14;
@@ -72,10 +72,10 @@ void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
 }
 ```
 
-`New_BoxFill` is called with `&gGraphPointSize` (its own address, opaque,
+`New_BoxFill` is called with `&sGraphPointSize` (its own address, opaque,
 never dereferenced by this function) as the first argument -- the
-salvaged snapshot below passed `gGraphPointSize` bare (without `&`), which
-would only compile/link correctly if `gGraphPointSize` were itself already a
+salvaged snapshot below passed `sGraphPointSize` bare (without `&`), which
+would only compile/link correctly if `sGraphPointSize` were itself already a
 pointer-typed global; declaring it as a plain byte and taking its address
 explicitly is the safer, self-consistent reading and is what was used
 here.
@@ -165,12 +165,12 @@ void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
     GraphPointColor rgb;
     s32 i;
 
-    self->unk_0xA8[0] = New_BoxFill(gGraphPointSize, &gGraphPointNewestColor, 0);
-    rgb = gGraphPointBaseColor;
+    self->unk_0xA8[0] = New_BoxFill(sGraphPointSize, &sGraphPointNewestColor, 0);
+    rgb = sGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
-        self->unk_0xA8[i] = New_BoxFill(gGraphPointSize, &rgb, 0);
+        self->unk_0xA8[i] = New_BoxFill(sGraphPointSize, &rgb, 0);
         dec = 1;
         if (i < 7) {
             dec = 0x14;
@@ -200,25 +200,25 @@ comment); also allocates the 4-byte `matchedDayIndices` scratch buffer
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-The points are New_BoxFill boxes (include/BoxFill.h): size &gGraphPointSize, colour &gGraphPointNewestColor then the fading `rgb`, priority 0. Zero bytes.
+The points are New_BoxFill boxes (include/BoxFill.h): size &sGraphPointSize, colour &sGraphPointNewestColor then the fading `rgb`, priority 0. Zero bytes.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__BuildGraphPoints` -> `GraphRoom__BuildGraphPoints`
 
 The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Occupies +0x0D8, TaskCore's `setTarget`, and keeps its own name (step 6: the body sets no target, it builds the 100 BoxFill dots and matchedDayIndices). The ctor reaches it as setTarget(self, NULL).
 
-## Track 6 (2026-09-27, round 97, delta): `D_8008ABB8Color` -> `GraphPointColor`, `D_8008ABB8` -> `gGraphPointBaseColor`
+## Track 6 (2026-09-27, round 97, delta): `D_8008ABB8Color` -> `GraphPointColor`, `D_8008ABB8` -> `sGraphPointBaseColor`
 
 - **`GraphPointColor`** (tier A for what it is): the colour argument this function hands `New_BoxFill`; `BoxFill__SetColor` copies its three bytes into the box's `GsBOXF` r, g, b (`include/BoxFill.h`, `color[3]`), which confirms round 19's "plausible RGB reading" of the field names. It is the only user of the type (`grep -rn` over `src/`, no other view).
 - **Not Sony's `CVECTOR`**: `CVECTOR` is `u_char r, g, b, cd`, four bytes. Retail copies the global into the local with three `lb`/`sb` pairs (signed, three bytes), so a four-byte unsigned struct would not compile to it. Kept as its own `s8` triple, like `BgLayerRgb`/`ViewportRgb`.
-- **`gGraphPointBaseColor`** (tier A): 4 bytes of sdata `FF FF FF 00`, white. This function is its only reader: points 1..99 start from a copy of it and darken by 0x14 per point for the first six, then by 1. (Point 0 takes `gGraphPointNewestColor`, `FF 00 00`, red -- left unnamed, outside the job.)
+- **`sGraphPointBaseColor`** (tier A): 4 bytes of sdata `FF FF FF 00`, white. This function is its only reader: points 1..99 start from a copy of it and darken by 0x14 per point for the first six, then by 1. (Point 0 takes `sGraphPointNewestColor`, `FF 00 00`, red -- left unnamed, outside the job.)
 - The type's comment moved round 19's history here and says what the type is; zero bytes changed.
 
 ## Track 7 (2026-09-27, round 97, delta)
 
-- **Naming: `D_8008ABAC` -> `gGraphPointSize`** (tier A): two sdata words `{10, 10}`, New_BoxFill's size argument (BoxFill reads the low halfwords into boxW/boxH, include/BoxFill.h `BoxFillSize`) for all 100 dots. Its only user. Now declared `s32 gGraphPointSize[2]` and passed bare instead of `&` of a `u8`: zero bytes changed.
-- **Naming: `D_8008ABB4` -> `gGraphPointNewestColor`** (tier A): sdata `FF 00 00`, red, the colour of `points[0]`, which PopulateGraphPoints plots from the newest logged day (`currentDay - 1`) and Update blinks. Its only user. Declared `GraphPointColor` instead of `u8`: zero bytes changed.
-- Local `dec` -> `step`; the loop bound is `ARRAY_COUNT(self->points)`; the darkening step 0x14 is decimal 20; `matchedDayIndices` is `BMemPMgrAlloc(GRAPH_SCORE_MOOD_COUNT * sizeof(s8))`, one byte per gGraphScoreMoods entry.
+- **Naming: `D_8008ABAC` -> `sGraphPointSize`** (tier A): two sdata words `{10, 10}`, New_BoxFill's size argument (BoxFill reads the low halfwords into boxW/boxH, include/BoxFill.h `BoxFillSize`) for all 100 dots. Its only user. Now declared `s32 sGraphPointSize[2]` and passed bare instead of `&` of a `u8`: zero bytes changed.
+- **Naming: `D_8008ABB4` -> `sGraphPointNewestColor`** (tier A): sdata `FF 00 00`, red, the colour of `points[0]`, which PopulateGraphPoints plots from the newest logged day (`currentDay - 1`) and Update blinks. Its only user. Declared `GraphPointColor` instead of `u8`: zero bytes changed.
+- Local `dec` -> `step`; the loop bound is `ARRAY_COUNT(self->points)`; the darkening step 0x14 is decimal 20; `matchedDayIndices` is `BMemPMgrAlloc(GRAPH_SCORE_MOOD_COUNT * sizeof(s8))`, one byte per sGraphScoreMoods entry.
 
 ## Track 6 (2026-09-27, round 98, delta): `GraphPointColor` -> `BoxFillRgb`
 
-The local `GraphPointColor` (round 97) is retired onto include/BoxFill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (ScreenWidgets's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `gGraphPointNewestColor`, `gGraphPointBaseColor`, `gGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.
+The local `GraphPointColor` (round 97) is retired onto include/BoxFill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (ScreenWidgets's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `sGraphPointNewestColor`, `sGraphPointBaseColor`, `sGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.

@@ -22,10 +22,10 @@ extern s32 New_TimBlockSrc(s32 arg0);
 extern void GetSetHitHeightGate(s32 arg0);
 extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
 
-extern s32 gObjMViewPoint;
-extern s32 gObjMViewRefPoint;
-extern s32 gStagePendingExtras[];
-extern s32 gStage0Bounds;
+extern s32 sObjMViewPoint;
+extern s32 sObjMViewRefPoint;
+extern s32 sStagePendingExtras[];
+extern s32 sStage0Bounds;
 
 void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2, s32 arg3) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
@@ -41,7 +41,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
     ret1 = PickStageTexture(self->unk38, 0, ret1);
     self->unk58 = (Obj87034_3bb8c_l *) New_TimBlockSrc(ret1);
 
-    unk18->methods->slot70(unk18, self->unk3C, &gObjMViewPoint, &gObjMViewRefPoint, 0);
+    unk18->methods->slot70(unk18, self->unk3C, &sObjMViewPoint, &sObjMViewRefPoint, 0);
 
     self->unk78 = unk18;
     ret1 = self->unk3C->methods->slot1A0(self->unk3C, 0);
@@ -72,7 +72,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
         self->unk40 = 0x10;
         self->unk44 = 2;
         flag = 1;
-        self->unk14->methods->slot134(self->unk14, &gStage0Bounds);
+        self->unk14->methods->slot134(self->unk14, &sStage0Bounds);
     }
 
     self->unk48 = arg1;
@@ -81,7 +81,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
     }
     GetSetHitHeightGate(flag);
 
-    self->unk3C->methods->slotEC(self->unk3C, gStagePendingExtras[(s32) self->unk38]);
+    self->unk3C->methods->slotEC(self->unk3C, sStagePendingExtras[(s32) self->unk38]);
     self->unk20 = 5;
 }
 ```
@@ -89,10 +89,10 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
 Cross-unit helpers (`PickStageBgm`, `PickStageTexture`, `New_TimBlockSrc`,
 `GetSetHitHeightGate`, `RegisterStyleConfig`) have no established prototypes anywhere
 else in the project (all still `INCLUDE_ASM` in their own units), so they
-are declared locally per CLAUDE.md's rule. `gObjMViewPoint`/`gObjMViewRefPoint` are
+are declared locally per CLAUDE.md's rule. `sObjMViewPoint`/`sObjMViewRefPoint` are
 referenced only by address (never loaded), so their real type is unknown;
-`gStagePendingExtras` is a plain word array indexed by `self->unk38`;
-`gStage0Bounds` is likewise referenced only by address.
+`sStagePendingExtras` is a plain word array indexed by `self->unk38`;
+`sStage0Bounds` is likewise referenced only by address.
 
 ## Three levers, in the order that closed the gap (138 -> 137 words)
 
@@ -251,7 +251,7 @@ Naming, all zero bytes:
 - local `ret1` split into `record` (PickStageBgm / PickStageTexture results)
   and `day` (getCurrentDayAndYear); the split compiled identically.
 - `0x10` -> 16, `0xA000` -> `DEFAULT_GRID_SPAN` (40960, unit-local; the value
-  of gDefaultGridSpan, what StageMap starts with; StageMap::gridHalfCells is
+  of sDefaultGridSpan, what StageMap starts with; StageMap::gridHalfCells is
   gridSpan >> 12 = 10).
 - `arg3` / `unk4C` kept: stored, never read, and IntermediateBase__Init
   passes 0, so nothing names it.

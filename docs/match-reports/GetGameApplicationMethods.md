@@ -10,7 +10,7 @@
 
 Returns the address of `gGameApplicationMethods`, a 25-slot hand-rolled-class method table
 (per `tools/classtable.py`, header word `0x00001F60`). It is a "get the method
-table" accessor, the same shape as `Get_vtable_DreamSys` in `include/DreamSys.h`.
+table" accessor, the same shape as `GetDreamSysMethods` in `include/DreamSys.h`.
 
 ## Derivation
 

@@ -6,9 +6,9 @@
 /*
  * VariantSprite -- a world-space sprite (Sprite, include/Sprite.h) that comes
  * in two variants, and the variant is the whole of what it adds: `variant`,
- * 0 or 1, picks the texture cell the Sprite ctor binds (gVariantSpriteCells,
+ * 0 or 1, picks the texture cell the Sprite ctor binds (sVariantSpriteCells,
  * two adjacent 16x16 cells) and the CLUT the reset slot then points the
- * GsSPRITE at (gVariantSpriteClutX/Y, two adjacent 16-colour rows at
+ * GsSPRITE at (sVariantSpriteClutX/Y, two adjacent 16-colour rows at
  * VRAM y 0x1FF). Class id 0x1F44: its low 12 bits are not 0x144, so
  * Viewport__DrawNode projects it from its coordinate like any Sprite, not
  * the screen-space path ScreenSprite takes. Method table
@@ -18,7 +18,7 @@
  *
  * Who makes it: only StyleEffect (include/StyleEffect.h), five per instance of
  * kinds 2 and 3, in StyleEffect__SpawnSprites, as New_VariantSprite(variant,
- * 0, gStyleEffectTim) with `variant` 0 on every path, so variant 1's cell and
+ * 0, sStyleEffectTim) with `variant` 0 on every path, so variant 1's cell and
  * CLUT are never selected. StyleEffect drives them only through inherited
  * slots: attachToParent, setColor, updateScale, setDisplay, the semitrans
  * pair, and sprite.rotate directly.

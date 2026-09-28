@@ -8,7 +8,7 @@
 
 The sibling tick of the CD-read state machine implemented by
 `TickCdStateMachine` (see that report for the full state description), called
-from `ServiceCdDriver` when `gCdTickStep == 2`. Identical to `TickCdStateMachine`
+from `ServiceCdDriver` when `sCdTickStep == 2`. Identical to `TickCdStateMachine`
 in every state except:
 
 - **state 2, `CdSync` reports "still busy, same phase"**: `TickCdStateMachine`
@@ -17,7 +17,7 @@ in every state except:
   directly rather than resetting.
 - **state 8, `CdReadSync` succeeds (`v1 == 0`)**: after
   `ResetCdStateMachine()`, this function additionally swaps two globals
-  (`gCdSeekParam = gCdSavedSeekParam; gCdSavedSeekParam = NULL;`) that `TickCdStateMachine`
+  (`sCdSeekParam = sCdSavedSeekParam; sCdSavedSeekParam = NULL;`) that `TickCdStateMachine`
   does not touch at all.
 
 ## Round 45's stall, and what closed it
@@ -78,7 +78,7 @@ void TickCdLoadFileStateMachine(void)
     void *tmp;
 
     LockCd();
-    state = gCdState;
+    state = sCdState;
 
     if (state == 2)
         goto L_state2;
@@ -94,7 +94,7 @@ void TickCdLoadFileStateMachine(void)
     goto L_end;
 
 L_state1:
-    if (CdControlF(2, (u8 *)gCdSeekParam + 0x14) == 0)
+    if (CdControlF(2, (u8 *)sCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -118,14 +118,14 @@ L_busy:
     goto L_set;
 
 L_count:
-    gCdTimeoutCounter++;
-    if (gCdTimeoutCounter < 0x259)
+    sCdTimeoutCounter++;
+    if (sCdTimeoutCounter < 0x259)
         goto L_end;
     newstate = 1;
     goto L_set;
 
 L_state7:
-    if (CdRead(gCdReadSectorCount, gCdReadBuffer, 0x80) == 0)
+    if (CdRead(sCdReadSectorCount, sCdReadBuffer, 0x80) == 0)
         goto L_end;
     newstate = 8;
     goto L_set;
@@ -139,9 +139,9 @@ L_state8:
     if (v1 != 0)
         goto L_end;
     ResetCdStateMachine();
-    tmp = gCdSavedSeekParam;
-    gCdSavedSeekParam = NULL;
-    gCdSeekParam = tmp;
+    tmp = sCdSavedSeekParam;
+    sCdSavedSeekParam = NULL;
+    sCdSeekParam = tmp;
     goto L_end;
 
 L_set:
@@ -171,7 +171,7 @@ arm and both compiled to the same (wrong) encoding; hoisting it above the
 ## Naming
 
 **Tier B.** The state machine's other tick function, selected by
-`ServiceCdDriver` when `gCdTickStep == 2`. Grepping every `gCdTickStep = 2`
+`ServiceCdDriver` when `sCdTickStep == 2`. Grepping every `sCdTickStep = 2`
 assignment in CdDriver.c finds exactly one: `CdDriver__LoadFile`, which
 `docs/match-reports` for the class's method table (`GetCdDriverMethods`'s
 own comment, CdDriver.c) identifies via `tools/classtable.py` as the
@@ -181,10 +181,10 @@ own comment, CdDriver.c) identifies via `tools/classtable.py` as the
 phase-2 "still busy" signal it proceeds straight into the read phase
 (`newstate = 7`) instead of resetting, because a LoadFile always intends a
 read to follow the seek; and on a successful read it restores
-`gCdSeekParam` from `gCdSavedSeekParam`, because `CdDriver__LoadFile` is the one
-call site that stashes the caller's previous `gCdSeekParam` there before
-overwriting it with the file it looked up (`gCdSavedSeekParam =
-gCdSeekParam; ... gCdSeekParam = rec;`). "LoadFile" names the operation this
+`sCdSeekParam` from `sCdSavedSeekParam`, because `CdDriver__LoadFile` is the one
+call site that stashes the caller's previous `sCdSeekParam` there before
+overwriting it with the file it looked up (`sCdSavedSeekParam =
+sCdSeekParam; ... sCdSeekParam = rec;`). "LoadFile" names the operation this
 function is used for, established by the classtable evidence above, not a
 guess -- kept tier B because the report can name the caller and the effect
 but not independently confirm from this unit alone why LoadFile specifically
@@ -194,11 +194,11 @@ implement it).
 ## Round 101 (track 7 polish): the goto dispatch is a switch
 
 Rewritten the same way as TickCdStateMachine (see its report): a switch on
-gCdState's `CD_STATE_*`, an inner switch on CdSync's `CdlComplete` /
+sCdState's `CD_STATE_*`, an inner switch on CdSync's `CdlComplete` /
 `CdlNoIntr` / `CdlDiskError` in that natural order, `newState` and one
 `SetCdState(newState)` after it. Byte-exact on the first build. Round 45's
 residue, the `== 5` test's polarity, is what the natural case order gives
 here; TickCdStateMachine needs `CdlDiskError` first to get the other
-encoding. The `tmp` temporary is gone: `gCdSeekParam = gCdSavedSeekParam;
-gCdSavedSeekParam = NULL;` compiles to the same load/store order.
+encoding. The `tmp` temporary is gone: `sCdSeekParam = sCdSavedSeekParam;
+sCdSavedSeekParam = NULL;` compiles to the same load/store order.
 Constants as TickCdStateMachine's report lists.

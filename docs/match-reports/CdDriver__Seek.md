@@ -9,9 +9,9 @@
 ## Source
 
 ```c
-extern u8 gCdSeekLoc[8];
-extern void *gCdSeekParam;
-extern s32 gCdTickStep;
+extern u8 sCdSeekLoc[8];
+extern void *sCdSeekParam;
+extern s32 sCdTickStep;
 
 extern s32 GetCdFileSize(Obj80027480 *self);
 extern s32 CdPosToInt(void *pos);
@@ -23,26 +23,26 @@ s32 CdDriver__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
     s32 v0;
     u32 s0tmp;
 
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && sCdSyncQueueMode == 0) {
         return GetCdFileSize(self);
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (gCdBusy == 0 && self->unk0C != 0) {
+        if (sCdBusy == 0 && self->unk0C != 0) {
             StartCdOperation(2, 1);
             s0tmp = arg1 >> 11;
             if ((arg1 & 0x7FF) != 0) {
                 s0tmp = s0tmp + 1;
             }
             v0 = CdPosToInt(self->unk18);
-            CdIntToPos(v0 + s0tmp, gCdSeekLoc);
+            CdIntToPos(v0 + s0tmp, sCdSeekLoc);
             if (arg2 == 0) {
-                if (gCdAsyncEnabled != 0) {
-                    gCdSeekParam = gCdSeekLoc - 0x14;
-                    gCdTickStep = 1;
+                if (sCdAsyncEnabled != 0) {
+                    sCdSeekParam = sCdSeekLoc - 0x14;
+                    sCdTickStep = 1;
                 } else {
                     do {
-                        CdControl(2, gCdSeekLoc, 0);
+                        CdControl(2, sCdSeekLoc, 0);
                         do {
                             v0 = CdSync(0, 0);
                         } while (v0 == 0);
@@ -72,7 +72,7 @@ below.
 
 ## What it took, in order
 
-1. **`if (arg2 != 0) { ...; return X; } if (gCdAsyncEnabled...) {...} else {...}`
+1. **`if (arg2 != 0) { ...; return X; } if (sCdAsyncEnabled...) {...} else {...}`
    vs `if (arg2 == 0) {...} else { ...; return X; }`** -- the same
    nested-if/else-if-vs-nested-if POLARITY lever as `CdDriver__Close` and
    `CdDriver__Read`, on a THIRD shape this time (an early-return `if` next to
@@ -117,11 +117,11 @@ passed to `CdPosToInt`) and `self->unk1C` is a `u32` byte-length field
 (rounded up to a 0x800-byte sector boundary, same formula as
 `GetCdFileSize`'s own `((self->unk1C >> 11) + 1) << 11`, CdDriver.c) --
 this is the SAME struct as `ObjA34_179D8H` there, and that unit already
-names offset 0x1C the same way, independently. `gCdSeekLoc` is an 8-byte
+names offset 0x1C the same way, independently. `sCdSeekLoc` is an 8-byte
 zero-initialized buffer (`asm/data/5DB70.data.s`); this function only ever
 takes its address, so it's declared as a plain byte array locally.
-`gCdSeekParam = gCdSeekLoc - 0x14` matches `CdDriver.c`'s existing reads of
-that global (`(u8 *)gCdSeekParam + 0x14`) -- the same pointer, offset the other
+`sCdSeekParam = sCdSeekLoc - 0x14` matches `CdDriver.c`'s existing reads of
+that global (`(u8 *)sCdSeekParam + 0x14`) -- the same pointer, offset the other
 direction.
 
 ### Proposed learning
@@ -147,7 +147,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 **Evidence.** `(self, offset, mode)`. Inside a queue dispatch on an open
 file it converts `self->pos` to a sector number (`CdPosToInt`), adds
 `offset` rounded up to whole 0x800-byte sectors, and writes the result to
-`gCdSeekLoc` (`CdIntToPos`). With `mode == 0` it then seeks there
+`sCdSeekLoc` (`CdIntToPos`). With `mode == 0` it then seeks there
 (CdlSetloc, or queues the seek on the state machine) and returns 0; with
 `mode != 0` it instead returns `self->size` rounded up to a whole sector.
 Outside a dispatch it enqueues op 4 with both arguments. The base-class
@@ -169,10 +169,10 @@ at slot `+0x04C`. The prefix names the table, not the developers' class.
 ## Track 4b (2026-09-25, round 85)
 
 The CD driver's shared globals and records are now declared once, in
-`include/CdDriver.h`, and this body uses that one reading: the fake seek entry is spelled `(CdFileEntry *)(gCdSeekLoc - 0x14)`, so the state machine's `&gCdSeekParam->pos` lands on the loc. The
-global's type comes from its accessors (`gFileTable` is walked at the 0x1C
-`CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
+`include/CdDriver.h`, and this body uses that one reading: the fake seek entry is spelled `(CdFileEntry *)(sCdSeekLoc - 0x14)`, so the state machine's `&sCdSeekParam->pos` lands on the loc. The
+global's type comes from its accessors (`sFileTable` is walked at the 0x1C
+`CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Seek` -> `CdDriver__Seek` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Seek` -> `CdDriver__Seek` by rename.py.

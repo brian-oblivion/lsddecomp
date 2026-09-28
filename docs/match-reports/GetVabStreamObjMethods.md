@@ -22,9 +22,9 @@ Byte-exact, 4/4 words.
 The "get methods table" accessor for the `gVabStreamObjMethods` class -- called from
 `New_VabStreamObj` (this unit) and from `VabStreamObj__VabStreamObj`/`VabStreamObj__Finalize` (this
 unit) to obtain the constructor/dispatch table before indexing a slot. Same
-idiom as `GetVabDriverMethods` (this unit) for `gVabDriverMethods`.
+idiom as `GetNullDriverMethods` (this unit) for `gNullDriverMethods`.
 
 ## Naming
 
 Renamed `func_8002CC0C` -> `GetVabStreamObjMethods`, tier A. Pure getter --
-same reasoning as `GetVabDriverMethods`.
+same reasoning as `GetNullDriverMethods`.

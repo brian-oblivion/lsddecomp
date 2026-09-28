@@ -15,7 +15,7 @@ so this really is a delay-slot residue, filled by reorg (`dbr`).
 
 The round-73 broadcast levers were checked first and did not apply. Every
 callee's argument registers are written by the caller in retail
-(`Test4InstantTeleporters` a0-a2 with a1 forwarded, `GetTeleportTimeBonus` void,
+(`TestForInstantTeleporters` a0-a2 with a1 forwarded, `GetTeleportTimeBonus` void,
 `ExecuteLink` a0-a3, slot 0xE8 a0-a2), there is no struct copy, and the
 shared `$s1` (result, then saved) is two pseudos with disjoint lives, the
 same in both builds.
@@ -150,7 +150,7 @@ search expecting a different outcome without new information.
 ## What it does (fully derived, control flow confirmed)
 
 Third sibling of `DreamSys__TryTunnelLink`/`DreamSys__TryStageTimerLink` (same round): a
-`Test4InstantTeleporters` link test, then on success an `ExecuteLink` with
+`TestForInstantTeleporters` link test, then on success an `ExecuteLink` with
 literal type `0x11`, then -- new in this one -- a block of vtable/class
 calls gated on the `ExecuteLink` result, itself internally gated on two
 more conditions.
@@ -162,7 +162,7 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
 	s32 saved;
 	s32 local[4];
 
-	result = Test4InstantTeleporters(&this->linkCoordinates, currentPos, this->currentStage);
+	result = TestForInstantTeleporters(&this->linkCoordinates, currentPos, this->currentStage);
 	if (result < 0)
 		return false;
 	saved = GetTeleportTimeBonus();
@@ -437,7 +437,7 @@ it would not apply here, saving a blind attempt.
 
 ## Naming
 
-- **Tier B.** STALL (still INCLUDE_ASM). Wraps Test4InstantTeleporters and calls ExecuteLink (type 0x11) on success, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink. Renaming a stall's symbol changes no bytes.
+- **Tier B.** STALL (still INCLUDE_ASM). Wraps TestForInstantTeleporters and calls ExecuteLink (type 0x11) on success, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink. Renaming a stall's symbol changes no bytes.
 
 ## Comment moved from src/world/DreamSys.c (round 92, track 7)
 

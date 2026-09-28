@@ -17,7 +17,7 @@ void ItemList__OnNotify(ItemList_3bb8c_j *self, void *arg1, s32 arg2)
 {
     s32 tag;
 
-    Get_vtable_BasicClass()->slot38(self, arg1, arg2);
+    GetBasicClassMethods()->slot38(self, arg1, arg2);
     tag = **(s32 **)arg1 & 0xF;
     if (tag == 2) {
         self->methods->slot5C(self, arg1, arg2);
@@ -44,7 +44,7 @@ Matched first try.
 Renamed from `ItemList__NotifyChild`: it occupies gItemListMethods
 +0x038, BasicClass's `onNotify` slot (`classtable.py gItemListMethods --vs
 gBasicClassMethods`: OVERRIDDEN BasicClass__OnNotify), and it chains
-`Get_vtable_BasicClass()->onNotify` first, so the override takes the slot's
+`GetBasicClassMethods()->onNotify` first, so the override takes the slot's
 name (FINISHING-PLAN track 4 step 6). The tag-2 child's notifications go to
 `handleInputCode` (+0x05C), the tag-5 child's to `tickClosing` (+0x058).
 

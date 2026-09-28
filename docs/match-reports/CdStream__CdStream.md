@@ -41,14 +41,14 @@ Tier A. `CdStream__CdStream` -- slot +0x008, the ctor (`Class__Class` convention
 ### Field, slot and global names (round 82 naming pass)
 
 `struct CdStreamObj`/`CdStreamObjMethods` are unit-local (no other unit
-references them, `gCdStreamMethods` or `gActiveCdStream` -- confirmed
+references them, `gCdStreamMethods` or `sActiveCdStream` -- confirmed
 by `grep -rn` over `src/`, `include/`), so these were renamed directly
 (CLAUDE.md/FINISHING-PLAN track 3 step 3's ownership rule), not proposed:
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_800817E0` (table) | `gCdStreamMethods` | A | `Get_vtable_<Class>` / `g<Class>Methods` convention (`include/Pad.h`) |
-| `D_8008A950` (global) | `gActiveCdStream` | A | the single active-stream pointer every state-changing method compares `self` against |
+| `D_8008A950` (global) | `sActiveCdStream` | A | the single active-stream pointer every state-changing method compares `self` against |
 | slot +0x044 | `open` | A | dispatches to `CdStream__Open` |
 | slot +0x048 | `close` | A | dispatches to `CdStream__Close` |
 | slot +0x050 | `startRead` | A | dispatches to `CdStream__StartRead` |
@@ -71,8 +71,8 @@ by `grep -rn` over `src/`, `include/`), so these were renamed directly
 
 ```c
 void CdStream__CdStream(CdStreamObj *self, u32 arg1, s32 arg2, s32 arg3) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_CdStream();
+    GetBasicClassMethods()->ctor((BasicClass *)self);
+    self->methods = GetCdStreamMethods();
     self->unk34 = arg1;
     self->muted = 0;
     self->unk38 = (((arg1 < 4) ? 300 : 150) / arg2 / 2) * 2054;

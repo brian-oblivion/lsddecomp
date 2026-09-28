@@ -14,7 +14,7 @@ on the first build.
 
 ## What it does
 
-`if (gActiveDataSource == 0x13) { UnlockCd(); }` — same shape as
+`if (sActiveDataSource == 0x13) { UnlockCd(); }` — same shape as
 `LockActiveDataSource`, forwarding to a different still-uncarved function
 (`UnlockCd`, in `asm/code_179d8.s`).
 
@@ -24,13 +24,13 @@ on the first build.
 extern s32 UnlockCd(void);
 
 void UnlockActiveDataSource(void) {
-    if (gActiveDataSource == 0x13) {
+    if (sActiveDataSource == 0x13) {
         UnlockCd();
     }
 }
 ```
 
-(`extern s32 gActiveDataSource;` is declared once, above `LockActiveDataSource` earlier in
+(`extern s32 sActiveDataSource;` is declared once, above `LockActiveDataSource` earlier in
 this file.)
 
 ## Proposed learning

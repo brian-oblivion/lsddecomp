@@ -63,4 +63,4 @@ structs, where the signed load is the tell.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/BgLayer.h`: this is its own slot +0x0B8 `setColor`. `self` is `BgLayer *`, the source is `BgLayerRgb *rgb` (was `Vec3S8 *src`), the field `color` (was unk54). The TaskCore callers (TaskCore__OnInit, TaskCore__TickColorFade, TaskCore__TickFadeColor) now call it by name, casting their u8[3] buffers to `BgLayerRgb *` (no code). Byte-identical.
+Class unified in `include/BgLayer.h`: this is its own slot +0x0B8 `setColor`. `self` is `BgLayer *`, the source is `BgLayerRgb *rgb` (was `Vec3S8 *src`), the field `color` (was unk54). The TaskCore callers (TaskCore__OnInit, TaskCore__TickFadeIn, TaskCore__TickFadeOut) now call it by name, casting their u8[3] buffers to `BgLayerRgb *` (no code). Byte-identical.

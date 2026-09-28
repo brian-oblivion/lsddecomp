@@ -22,9 +22,9 @@ s32 ReturnZero(void)
 
 Checked against both class tables this unit's slice of code_179d8 touches:
 not a slot of `gPlacementGridMethods` (30 slots, ends at `+0x078`, `tools/classtable.py
-0x8006D940`) and not a slot of `gVabDriverMethods` (29 slots,
+0x8006D940`) and not a slot of `gNullDriverMethods` (29 slots,
 `tools/classtable.py 0x8006D9BC`) or `gCdDriverMethods` (`tools/classtable.py
-0x8006D4E8`). Not in `gDataSourceClientGetters`'s client-getter array either
+0x8006D4E8`). Not in `sDataSourceClientGetters`'s client-getter array either
 (`asm/data/5DB70.data.s`: 14 entries, `GetPlacementGridMethods` through
 `GetLbdFileMethods`, none at this address). No caller found anywhere in
 `src/`. Genuinely free-standing as far as this unit's own evidence goes;

@@ -56,7 +56,7 @@ void FillDivPolygonHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 a
 }
 ```
 
-Populates a GPU primitive header at `arg0` (`gDivPolygon3`/`gDivPolygon4`
+Populates a GPU primitive header at `arg0` (`sDivPolygon3`/`sDivPolygon4`
 depending on caller): a selected OT/code word at +0x00, `sDivClipWidth` at
 +0x04, `sDivClipHeight` at +0x08, an unaligned `PolyUV4` at +0x10 copied from
 `*arg2`, and the plain word at `arg1 + 0x30` at +0x14. Only the two `u16`
@@ -156,7 +156,7 @@ which pass `1` plus the calling primitive's own `+0xE`/`+0x16` (FT3/FT4)
 or `+0xE`/`+0x1A` (GT3/GT4) fields -- POLY_FTn/GTn's CLUT and TPAGE words
 in the Psy-Q layout -- while F3/G3/F4/G4 pass `0, 0, 0` and leave the
 table's `+0xC`/`+0xE` untouched. `table`/`ctx` match TmdRenderer's/this
-unit's own established terms for these two objects (gDivPolygon3/
+unit's own established terms for these two objects (sDivPolygon3/
 Quad, and the per-face draw context).
 
 ## Round 91 polish (bravo)

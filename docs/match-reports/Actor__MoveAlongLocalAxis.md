@@ -23,7 +23,7 @@ void Actor__MoveAlongLocalAxis(DreamSys *self, s16 *slot, s32 val, void *extra, 
     s16 val16 = (s16) val;
     *slot = val16;
     self->lastOffsetValue = val16;
-    self->vt->Actor__AddLocalTranslation(self, &gActorLocalMove[0]);
+    self->vt->Actor__AddLocalTranslation(self, &sActorLocalMove[0]);
     *slot = 0;
     if (extra != NULL) {
         self->vt->DreamSys__NotifyLinkAttempt(self, count);
@@ -35,7 +35,7 @@ Writes `val` (truncated to 16 bits) into `*slot` and into
 `self->lastOffsetValue`, dispatches through the shared base table's `+0x0C0`
 slot (`Actor__AddLocalTranslation`, resolves to `Actor__MoveLocalZ`'s neighbour -- out of
 this unit's range, see `include/DreamSys.h`) with a hardcoded
-`&gActorLocalMove[0]` argument (always the FIRST element, regardless of which
+`&sActorLocalMove[0]` argument (always the FIRST element, regardless of which
 `slot` was written), unconditionally resets `*slot` to 0, then -- only if
 `extra` is non-NULL -- dispatches through `+0x088`
 (`DreamSys__NotifyLinkAttempt`, already named in `include/DreamSys.h`) with `count`.
@@ -136,7 +136,7 @@ in the same function; truncate once into a named local instead).
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__ApplyOffsetSlotAndNotify`. The body behind the three moves: store val in one component (`axis`) of the local move vector gActorLocalMove, keep it in lastOffsetValue, addLocalTranslation (+0x0C0) the whole vector, clear the component, and when `notify` is non-NULL call notifyIfUnk20Active (+0x088) with the move's event (6 z, 7 x, 8 y). DreamSys__NotifyLinkAttempt was DreamSys's override of that slot, not the slot. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__ApplyOffsetSlotAndNotify`. The body behind the three moves: store val in one component (`axis`) of the local move vector sActorLocalMove, keep it in lastOffsetValue, addLocalTranslation (+0x0C0) the whole vector, clear the component, and when `notify` is non-NULL call notifyIfUnk20Active (+0x088) with the move's event (6 z, 7 x, 8 y). DreamSys__NotifyLinkAttempt was DreamSys's override of that slot, not the slot. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 

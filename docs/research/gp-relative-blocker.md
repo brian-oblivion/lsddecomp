@@ -5,7 +5,7 @@ The pin is still `-G0` everywhere. maspsx gained `--gp-symbols=FILE`
 (`tools/patches/maspsx-lsd-flags.patch`), the Makefile passes
 `config/gp-symbols.txt`, the whole image is byte-exact with it on, and three
 previously blocked functions match (`SetDataDirectory` 3/3, `GetDataDirectory` 3/3,
-`SetVabDriverMode` 4/4). Everything below the RESOLVED section is the historical
+`SetNullDriverMode` 4/4). Everything below the RESOLVED section is the historical
 record, kept because the diagnosis it reaches is wrong in an instructive way.**
 
 ## RESOLVED — what the blocker actually was
@@ -107,7 +107,7 @@ Retail reaches small-data globals gp-relatively, in one instruction:
 
 ```
 lw   $v0, 0x40($gp)          # $gp = 0x8008A808, so this is sPadRefCount
-sw   $a0, %gp_rel(gDataDirectory)($gp)
+sw   $a0, %gp_rel(sDataDirectory)($gp)
 ```
 
 The project's pinned pipeline cannot emit that form from C. It emits the
@@ -124,8 +124,8 @@ function after it in the same translation unit shifts by a word.
 ## The reproducer
 
 ```c
-extern void *gDataDirectory;
-void setter(void *value) { gDataDirectory = value; }
+extern void *sDataDirectory;
+void setter(void *value) { sDataDirectory = value; }
 ```
 
 Through the pinned pipeline, varying only `-G` at cc1 and at `as`:
@@ -145,7 +145,7 @@ The mechanism at cc1 is visible in its output. At `-G8` it emits a size hint
 that `-G0` omits entirely:
 
 ```
-.extern	gDataDirectory, 4
+.extern	sDataDirectory, 4
 ```
 
 That hint is what lets the assembler place the symbol in small data and
@@ -258,10 +258,10 @@ exactly retail's shape — verified at the object level, not inferred:
 
 ```
 built at -G8:   af840000   sw   a0,0(gp)        # 3 words, 12 bytes
-retail:         4C0084AF   sw   $a0, %gp_rel(gDataDirectory)($gp)
+retail:         4C0084AF   sw   $a0, %gp_rel(sDataDirectory)($gp)
 ```
 
-`gDataDirectory` links at `0x8008a854` and `_gp` at `0x8008a808`, a displacement
+`sDataDirectory` links at `0x8008a854` and `_gp` at `0x8008a808`, a displacement
 of `0x4C`, which is retail's encoding. So the small-data mechanism does work,
 and `-G0` really is what blocks it.
 

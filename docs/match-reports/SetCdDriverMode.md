@@ -15,12 +15,12 @@ byte-identical, and the `## Naming` section at the end of this report
 carries the evidence for each one.
 
 ```c
-extern s32 GetDrawSystem(void); /* returns gDrawSystem, a singleton object */
+extern s32 GetDrawSystem(void); /* returns sDrawSystem, a singleton object */
 extern s32 ServiceCdDriver(void);
-extern s32 gCdBusy;
-extern s32 gCdAsyncEnabled;
-extern s32 gCdSyncQueueMode;
-extern s32 gCdUseVSyncCallback;
+extern s32 sCdBusy;
+extern s32 sCdAsyncEnabled;
+extern s32 sCdSyncQueueMode;
+extern s32 sCdUseVSyncCallback;
 
 /* The singleton GetDrawSystem returns; only the slot this call site
  * dispatches (+0x84 of its method table) is typed here. That slot is handed
@@ -42,11 +42,11 @@ s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
 {
     ObjF18 *obj;
 
-    if (gCdBusy == 0) {
+    if (sCdBusy == 0) {
         if (useVSyncCallback == 0) {
             obj = (ObjF18 *)GetDrawSystem();
 
-            if (gCdAsyncEnabled == 0) {
+            if (sCdAsyncEnabled == 0) {
                 if (async != 0) {
                     obj->methods->setCallback(obj, (void *)ServiceCdDriver);
                 }
@@ -57,9 +57,9 @@ s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
             }
         }
 
-        gCdUseVSyncCallback = useVSyncCallback;
-        gCdAsyncEnabled = async;
-        gCdSyncQueueMode = mode2;
+        sCdUseVSyncCallback = useVSyncCallback;
+        sCdAsyncEnabled = async;
+        sCdSyncQueueMode = mode2;
 
         return 1;
     }
@@ -75,13 +75,13 @@ drift) and corrected on the second:
 
 1. **The whole-body guard is `if (cond == 0) { body; return 1; } return 0;`,
    not `if (cond != 0) { return 0; } body; return 1;`.** Retail's
-   `gCdBusy != 0` check branches DIRECTLY to the shared `move v0,zero`
+   `sCdBusy != 0` check branches DIRECTLY to the shared `move v0,zero`
    tail already sitting at the very end of the function (right after the
    `return 1` tail), rather than to a duplicate `v0=0`/jump pair inlined at
    the top. Writing the guard as an early `if (cond) return 0;` makes GCC
    duplicate that tail at the entry instead of reusing the one at the end,
    adding two words and shifting everything after. Wrapping the entire rest
-   of the function in `if (gCdBusy == 0) { ...; return 1; }` followed by
+   of the function in `if (sCdBusy == 0) { ...; return 1; }` followed by
    a single trailing `return 0;` reproduces retail's single physical copy.
 2. **The virtual dispatch takes an explicit `self` argument, not just the
    callback.** `obj->methods->setCallback(callback)` (`slot84` when this was written) compiles the callback into
@@ -120,11 +120,11 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | was | now | tier |
 | --- | --- | --- |
 | `func_80027F18` | `SetCdDriverMode` | B |
-| `D_8008A8A4` | `gCdUseVSyncCallback` | A |
+| `D_8008A8A4` | `sCdUseVSyncCallback` | A |
 
-**Evidence for the function.** It refuses (returns 0) while `gCdBusy`, and
-otherwise stores its three arguments into `gCdUseVSyncCallback`,
-`gCdAsyncEnabled` and `gCdSyncQueueMode` and returns 1 -- the write half of the
+**Evidence for the function.** It refuses (returns 0) while `sCdBusy`, and
+otherwise stores its three arguments into `sCdUseVSyncCallback`,
+`sCdAsyncEnabled` and `sCdSyncQueueMode` and returns 1 -- the write half of the
 pair `GetCdDriverMode` reads back. `GameApplicationFileResource.c`'s `SetActiveDataSourceDriverMode` calls it
 in a `do {} while (fn(...) == 0)` loop, i.e. "retry until the driver accepts
 the new mode", which is what the refusal-while-busy return value is for.
@@ -132,8 +132,8 @@ Parameters are now named `async`, `mode2`, `useVSyncCallback`. Tier B: the
 second argument is unidentified (see `GetCdDriverMode.md`), so the function's
 full contract is not established.
 
-**Evidence for `gCdUseVSyncCallback`.** Every one of its five readers is
-`if (gCdUseVSyncCallback != 0) VSyncCallback(...)` -- register or clear the
+**Evidence for `sCdUseVSyncCallback`.** Every one of its five readers is
+`if (sCdUseVSyncCallback != 0) VSyncCallback(...)` -- register or clear the
 tick. And this function only installs the ALTERNATIVE delivery path (the
 `+0x84` slot of the singleton `GetDrawSystem` returns, handed
 `ServiceCdDriver` or 0) when the argument is zero. So the flag chooses which
@@ -150,7 +150,7 @@ The local view of the DrawSystem singleton quoted above is gone; the unit takes 
 
 ## Track 7 (round 101, echo): comments moved here, and names
 
-Parameter `mode2` -> `syncQueueMode` (it is stored in `gCdSyncQueueMode`),
+Parameter `mode2` -> `syncQueueMode` (it is stored in `sCdSyncQueueMode`),
 local `obj` -> `drawSystem` (GetDrawSystem's result); `setCallback(obj, 0)`
 is `setCallback(drawSystem, NULL)`. GetCdDriverMode's `outMode2` is
 `outSyncQueueMode` for the same reason.

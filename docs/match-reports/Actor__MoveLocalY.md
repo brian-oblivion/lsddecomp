@@ -17,12 +17,12 @@ void Actor__MoveLocalY(DreamSys *self, s32 val, void *extra);
 
 ```c
 void Actor__MoveLocalY(DreamSys *self, s32 val, void *extra) {
-    Actor__MoveAlongLocalAxis(self, &gActorLocalMove[1], val, extra, 8);
+    Actor__MoveAlongLocalAxis(self, &sActorLocalMove[1], val, extra, 8);
 }
 ```
 
 Sibling of `Actor__MoveLocalX` (see that report for the shared helper and the
-`gActorLocalMove[2]` array discovery): same shape, writes element 1 instead of
+`sActorLocalMove[2]` array discovery): same shape, writes element 1 instead of
 element 0, and passes `8` instead of `7` as the trailing constant.
 
 ## Naming
@@ -40,4 +40,4 @@ tools/funcdiff.py Actor__MoveLocalY   # 14/14
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__ApplyOffsetSlot1`. Occupant of +0x0CC: gActorLocalMove[1], the y component, event 8. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__ApplyOffsetSlot1`. Occupant of +0x0CC: sActorLocalMove[1], the y component, event 8. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

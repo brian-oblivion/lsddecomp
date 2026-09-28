@@ -4,14 +4,14 @@
 /*
  * The getters over the game's table of file names, src/cd/GameFiles.c (the
  * LbdFile class it also holds is include/LbdFile.h). A record is one
- * zero-padded path in gRecordTable; the file's banner lists the table's
+ * zero-padded path in sRecordTable; the file's banner lists the table's
  * layout. The movie getters also write a movie id through movieIdOut, which
  * GetMovieFrameCount turns into the movie's frame count.
  */
 
 #include "common.h"
 
-/* One gRecordTable record: a file path, zero-padded to 0x1C bytes. */
+/* One sRecordTable record: a file path, zero-padded to 0x1C bytes. */
 typedef struct FilePathRecord {
     u8 data[0x1C];
 } FilePathRecord;

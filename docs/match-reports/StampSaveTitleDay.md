@@ -24,7 +24,7 @@ typedef struct {
 void StampSaveTitleDay(s32 arg0)
 {
     FormatFullWidthNumber(sDayDigits, arg0, 3, 0);
-    *(Buf6_3bb8c_c *)((s8 *)gSaveTitle + 0x12) = *(Buf6_3bb8c_c *)sDayDigits;
+    *(Buf6_3bb8c_c *)((s8 *)sSaveTitle + 0x12) = *(Buf6_3bb8c_c *)sDayDigits;
 }
 ```
 
@@ -37,7 +37,7 @@ project's independent-local-view convention.
 
 `sDayDigits` is a new declaration in `include/class_3bb8c.h`
 (`extern void *sDayDigits;`), added additively next to the existing
-`sSaveFileName`/`gSaveTitle` VALUE-of `%gp_rel` globals — same pattern: the ROM
+`sSaveFileName`/`sSaveTitle` VALUE-of `%gp_rel` globals — same pattern: the ROM
 image initializes it to a rodata placeholder (`D_8008AA1C`, the "7654321"
 string in `asm/data/7B12C.sdata.s`) but the runtime value is a writable
 buffer that `FormatFullWidthNumber` formats into.
@@ -107,8 +107,8 @@ struct-copy question.
 `TitleMenu__TitleMenu`, not through any vtable), `VerbNoun`. Mechanics are
 fully evident: formats `arg0` via `FormatFullWidthNumber` into
 `sDayDigits`'s buffer, then copies 6 raw bytes of that buffer into
-`gSaveTitle`'s buffer at `+0x12`. Purpose is explicitly NOT established --
-the header's own comments on `gSaveTitle`/`sDayDigits` document both as
+`sSaveTitle`'s buffer at `+0x12`. Purpose is explicitly NOT established --
+the header's own comments on `sSaveTitle`/`sDayDigits` document both as
 "writable-buffer placeholders" whose real runtime role is outside this
 unit's own carved ground (a nearby string, "CARD\FILEICN1.TIM", and the
 disc's own product-code string sit in the same rodata block, which is
@@ -116,7 +116,7 @@ disc's own product-code string sit in the same rodata block, which is
 that is exactly the kind of purpose-guess the naming rule forbids without
 a function that actually establishes it). Named for the one certain
 mechanic -- format a number, copy it into another buffer -- and nothing
-more. `sDayDigits`/`gSaveTitle` themselves are left unrenamed for the same
+more. `sDayDigits`/`sSaveTitle` themselves are left unrenamed for the same
 reason.
 
 ## Track 6 (2026-09-27, round 96)
@@ -131,18 +131,18 @@ same record TitleMenuTaskObjF's StampSaveTitleFileLetter copies, so the three
 types (`FullWidthChar`, `FullWidthChars3`, `FullWidthChars6`) moved from
 TitleMenuTaskObjF.c into `include/TitleMenu.h`: the save title is TitleMenu's
 buffer (its banner: createSaveTitle builds `saveTitle` from the SJIS title
-in gSaveTitle's buffer; both writers serve it), and `TaskObjF.h` only sees
+in sSaveTitle's buffer; both writers serve it), and `TaskObjF.h` only sees
 a `char *title` passed in. Alignment is still 1 (all-`s8` leaves), so the
 copy is still one `lwl`/`lwr` word plus two `lb`/`sb` pairs, as derived
 above; the header keeps the one `MATCHING:` line. Image byte-identical.
 
-Left for track 7 (this unit's polish): the raw `(s8 *)gSaveTitle + 0x12`
-(could read `&((FullWidthChar *)gSaveTitle)[9]`) and the
-`gSaveTitle`/`sDayDigits` names.
+Left for track 7 (this unit's polish): the raw `(s8 *)sSaveTitle + 0x12`
+(could read `&((FullWidthChar *)sSaveTitle)[9]`) and the
+`sSaveTitle`/`sDayDigits` names.
 
 Comment moved out of the source (verbatim), on the old local type:
 "The 6-byte value formatted into sDayDigits's buffer by FormatFullWidthNumber
-above, copied whole into gSaveTitle's buffer at +0x12 as ONE struct
+above, copied whole into sSaveTitle's buffer at +0x12 as ONE struct
 assignment. All-`s8` fields (alignment 1, not 2 or 4) is what makes
 retail's block-move split this way: the leading 4 bytes go via the
 unaligned lwl/lwr word copy regardless of declared alignment (same
@@ -166,9 +166,9 @@ loads/stores."
 
 Constants: `SAVE_TITLE_DAY` (9) and `SAVE_TITLE_DAY_DIGITS` (3),
 unit-local, on TitleMenuTaskObjF.c's `SAVE_TITLE_*` model; the store is
-`*(FullWidthChars3 *)&((FullWidthChar *)gSaveTitle)[SAVE_TITLE_DAY]`, as
+`*(FullWidthChars3 *)&((FullWidthChar *)sSaveTitle)[SAVE_TITLE_DAY]`, as
 StampSaveTitleFileLetter indexes its `FullWidthChar *title`, in place of
-`(s8 *)gSaveTitle + 0x12`. Byte-identical.
+`(s8 *)sSaveTitle + 0x12`. Byte-identical.
 
 ## History: the FormatFullWidthNumber extern's comment (moved round 100)
 

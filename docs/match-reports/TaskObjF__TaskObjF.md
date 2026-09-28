@@ -24,7 +24,7 @@ void TaskObjF__TaskObjF(GenericCtorObj_3bb8c_d *self, s32 arg1, s32 arg2)
 {
     s32 count;
 
-    Get_vtable_BasicClass()->ctor(self);
+    GetBasicClassMethods()->ctor(self);
     self->methods = GetTaskObjFMethods();
     count = sTaskObjFCount;
     sTaskObjFCount = count + 1;
@@ -44,7 +44,7 @@ SLPS_015.56`.
 
 ## Derivation
 
-1. `Get_vtable_BasicClass()->ctor(self)` -- the base-class (`BasicClass`) ctor
+1. `GetBasicClassMethods()->ctor(self)` -- the base-class (`BasicClass`) ctor
    chain call, one argument, already-canonical
    (`BasicMethods866E8F::ctor`, `include/class_3bb8c.h`).
 2. `self->methods = GetTaskObjFMethods();` -- `GetTaskObjFMethods()` returns
@@ -93,7 +93,7 @@ header -- CLAUDE.md's "To `include/` has one exception").
 this codebase type-checks the two against each other (the vtable's own
 initializer is still raw, uncarved `.data`, not a C initializer), so this
 is the same "independent arities for the same real callee" situation
-already documented for `Get_vtable_TaskCore`/`BaseTaskCtorTable_3bb8c_c` versus
+already documented for `GetTaskCoreMethods`/`BaseTaskCtorTable_3bb8c_c` versus
 `TaskCoreMethods` in `include/Task.h`.
 
 ### Proposed learning

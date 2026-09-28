@@ -40,12 +40,16 @@
 #include "TitleMenu.h"
 #include "DayTask.h"
 #include "GameApplicationFileResource.h"
-#include "VabDriver.h"
+#include "NullDriver.h"
 #include "CdDriver.h"
 #include "BMemPMgr.h"
 #include "GameFiles.h"
 #include <strings.h>
 #include "DayTaskStageMap.h"
+
+/* The table getters of every class SetActiveDataSource rebinds, NULL-
+ * terminated; it sits right after gFileResourceMethods's last slot. */
+extern void *(*sDataSourceClientGetters[])(void);
 
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
 
@@ -131,14 +135,14 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
     TaskCore *task = New_TaskCore(0, 0, 0);
 
     /* The callback takes no ctx and returns a value nobody reads. */
-    task->methods->setCallback(task, (void (*)(void *))GameApplication__RegisterFilesCallback, self);
+    task->methods->setExitCallback(task, (void (*)(void *))GameApplication__RegisterFilesCallback, self);
     task->methods->setFrameBound(task, 0);
     task->methods->setSubHandle(task, path, 0);
     task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, 0);
     task->methods->release(task);
 }
 
-/* ShowImage's view callback: registers gRecordTable's files with the CD
+/* ShowImage's view callback: registers sRecordTable's files with the CD
  * driver. */
 s32 GameApplication__RegisterFilesCallback(void) {
     return RegisterRecordTableFiles(0);
@@ -345,14 +349,14 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
  * game loads from a file: a BasicClass subclass owning one file buffer
  * (FileResource__LoadFile reads a whole named file into it, FreeBuffer
  * releases it) and declaring the file-I/O interface that the CD driver
- * (gCdDriverMethods, include/CdDriver.h) and the SPU/VAB driver
- * (gVabDriverMethods, include/VabDriver.h) implement.
+ * (gCdDriverMethods, include/CdDriver.h) and the null driver
+ * (gNullDriverMethods, include/NullDriver.h) implement.
  *
- * gActiveDataSource selects one of those two drivers. SetActiveDataSource
+ * sActiveDataSource selects one of those two drivers. SetActiveDataSource
  * installs one and copies its interface slots into FileResource's table and
  * into every client table. The Lock/Unlock, IsBusy/Idle, Get.../Set...
  * functions after it forward to the CD driver when it is active, and
- * otherwise do nothing, return a fixed value or call the SPU/VAB driver.
+ * otherwise do nothing, return a fixed value or call the null driver.
  * RegisterFileTableEntries appends CdFileEntry records to the CD driver's
  * file table and resolves them.
  *
@@ -364,103 +368,103 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
  * which BuildFileName calls, is Sony's libc2 object, linked after this file.
  */
 
-/* gActiveDataSource's two observed values are the header words of the two
+/* sActiveDataSource's two observed values are the header words of the two
  * sibling classes it selects between: gCdDriverMethods (the CD-ROM read driver,
- * CdDriver.c) and gVabDriverMethods (VabDriver, the SPU/VAB driver, include/VabDriver.h). */
+ * CdDriver.c) and gNullDriverMethods (NullDriver, the null driver, include/NullDriver.h). */
 #define DATASOURCE_CD 0x13
-#define DATASOURCE_SPU 0x23
+#define DATASOURCE_NULL 0x23
 
-void *FileResource__Release(FileResource *this) {
-    this->freeGuard = 0;
-    this->methods->finalize(this);
-    Get_vtable_BasicClass()->finalize((BasicClass *)this);
-    BMemPMgrFree(this);
+void *FileResource__Release(FileResource *self) {
+    self->freeGuard = 0;
+    self->methods->finalize(self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
+    BMemPMgrFree(self);
     return NULL;
 }
 
-void FileResource__FileResource(FileResource *this) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)this);
-    this->methods = GetFileResourceMethods();
-    this->isOpen = 0;
-    this->buffer = NULL;
-    this->bufferSize = 0;
-    this->freeGuard = 0;
-    this->pendingRequests = 0;
-    this->flags = 0;
-    this->inQueueDispatch = 0;
-    this->loadState = 0;
+void FileResource__FileResource(FileResource *self) {
+    GetBasicClassMethods()->ctor((BasicClass *)self);
+    self->methods = GetFileResourceMethods();
+    self->isOpen = 0;
+    self->buffer = NULL;
+    self->bufferSize = 0;
+    self->freeGuard = 0;
+    self->pendingRequests = 0;
+    self->flags = 0;
+    self->inQueueDispatch = 0;
+    self->loadState = 0;
 }
 
-void FileResource__Finalize(FileResource *this) {
-    this->methods->close(this);
-    this->methods->freeBuffer(this);
+void FileResource__Finalize(FileResource *self) {
+    self->methods->close(self);
+    self->methods->freeBuffer(self);
 }
 
-void FileResource__LoadFile(FileResource *this, char *name) {
+void FileResource__LoadFile(FileResource *self, char *name) {
     s32 savedIsOpen;
     s32 size;
     void *buffer;
 
-    if (this->buffer != NULL) {
+    if (self->buffer != NULL) {
         return;
     }
-    savedIsOpen = this->isOpen;
-    this->isOpen = 0;
-    this->methods->open(this, name, 1, 0);
-    size = this->methods->seek(this, 0, 2);
+    savedIsOpen = self->isOpen;
+    self->isOpen = 0;
+    self->methods->open(self, name, 1, 0);
+    size = self->methods->seek(self, 0, 2);
     buffer = BMemPMgrAlloc(size);
     if (buffer != NULL) {
-        this->methods->seek(this, 0, 0);
-        this->methods->read(this, buffer, size);
-        this->methods->close(this);
-        this->buffer = buffer;
-        this->bufferSize = size;
-        this->isOpen = savedIsOpen;
+        self->methods->seek(self, 0, 0);
+        self->methods->read(self, buffer, size);
+        self->methods->close(self);
+        self->buffer = buffer;
+        self->bufferSize = size;
+        self->isOpen = savedIsOpen;
     } else {
         BMemPMgrFree(NULL);
-        this->methods->close(this);
+        self->methods->close(self);
     }
 }
 
-void FileResource__FreeBuffer(FileResource *this) {
-    if (this->buffer == NULL) {
+void FileResource__FreeBuffer(FileResource *self) {
+    if (self->buffer == NULL) {
         return;
     }
-    if (this->bufferSize == 0) {
+    if (self->bufferSize == 0) {
         return;
     }
-    if (this->freeGuard != 0) {
+    if (self->freeGuard != 0) {
         return;
     }
-    BMemPMgrFree(this->buffer);
-    this->buffer = NULL;
+    BMemPMgrFree(self->buffer);
+    self->buffer = NULL;
 }
 
 void NoOp(void) {}
 
-void FileResource__SetFlag(FileResource *this) {
-    this->flags |= 1;
+void FileResource__OnRequestDone(FileResource *self) {
+    self->flags |= 1;
 }
 
 FileResourceMethods *GetFileResourceMethods(void) {
     return &gFileResourceMethods;
 }
 
-extern s32 gActiveDataSource;
+extern s32 sActiveDataSource;
 
 FileResourceMethods *GetActiveDataSourceMethods(void) {
-    if (gActiveDataSource == DATASOURCE_SPU) {
-        return (FileResourceMethods *)GetVabDriverMethods();
+    if (sActiveDataSource == DATASOURCE_NULL) {
+        return (FileResourceMethods *)GetNullDriverMethods();
     } else {
         return (FileResourceMethods *)GetCdDriverMethods();
     }
 }
 
-ResourceRequest *ResourceRequest__Set(ResourceRequest *this, void *buffer, char *name, s32 mode) {
-    this->src.buffer = buffer;
-    this->src.name = name;
-    this->mode = mode;
-    return this;
+ResourceRequest *ResourceRequest__Set(ResourceRequest *self, void *buffer, char *name, s32 mode) {
+    self->src.buffer = buffer;
+    self->src.name = name;
+    self->mode = mode;
+    return self;
 }
 
 /* Install a new active data source, then copy its method block
@@ -472,12 +476,12 @@ void SetActiveDataSource(s32 source) {
     void *(*getMethods)(void);
     void *(**entry)(void);
 
-    entry = gDataSourceClientGetters;
-    gActiveDataSource = source;
+    entry = sDataSourceClientGetters;
+    sActiveDataSource = source;
     if (source == DATASOURCE_CD) {
         src = (FileResourceMethods *)GetCdDriverMethods();
     } else {
-        src = (FileResourceMethods *)GetVabDriverMethods();
+        src = (FileResourceMethods *)GetNullDriverMethods();
     }
     methods = GetFileResourceMethods();
     /* MATCHING: a while/for loop compiles top-tested; retail jumps into a bottom test. */
@@ -511,40 +515,40 @@ void CopyDataSourceSlots(FileResourceMethods *dst, FileResourceMethods *src) {
 }
 
 void LockActiveDataSource(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         LockCd();
     }
 }
 
 void UnlockActiveDataSource(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         UnlockCd();
     }
 }
 
 s32 IsActiveDataSourceBusy(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         return IsCdBusy();
     }
     return 0;
 }
 
 s32 IsActiveDataSourceIdle(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         return IsCdIdle();
     }
     return 1;
 }
 
 s32 GetActiveDataSourceOperation(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         return GetCdOperation();
     }
     return 0;
 }
 
 s32 GetActiveDataSourceState(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         return GetCdState();
     }
     return 0;
@@ -552,46 +556,46 @@ s32 GetActiveDataSourceState(void) {
 
 typedef s32 (*DataSourceSetDriverModeFn)(s32, s32, s32);
 
-/* SetVabDriverMode takes two arguments and SetCdDriverMode three. Both are
+/* SetNullDriverMode takes two arguments and SetCdDriverMode three. Both are
  * called through the three-argument type, and the VAB driver ignores the
- * third. Assigning SetVabDriverMode to `fn` warns about incompatible pointer
+ * third. Assigning SetNullDriverMode to `fn` warns about incompatible pointer
  * types, and that is harmless. */
 
 void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     DataSourceSetDriverModeFn fn;
 
-    fn = SetVabDriverMode;
-    if (gActiveDataSource == DATASOURCE_CD) {
+    fn = SetNullDriverMode;
+    if (sActiveDataSource == DATASOURCE_CD) {
         fn = SetCdDriverMode;
     }
-    /* Retry until the driver accepts: SetCdDriverMode refuses while gCdBusy. */
+    /* Retry until the driver accepts: SetCdDriverMode refuses while sCdBusy. */
     do {
     } while (fn(async, mode2, useVSyncCallback) == 0);
 }
 
 s32 GetActiveDataSourceDriverMode(s32 *outMode2) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         return GetCdDriverMode(outMode2);
     } else {
-        return GetVabDriverMode(outMode2);
+        return GetNullDriverMode(outMode2);
     }
 }
 
 s32 GetActiveDataSourceUseVSyncCallback(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         return GetCdUseVSyncCallback();
     } else {
-        return GetVabUseVSyncCallback();
+        return GetNullDriverUseVSyncCallback();
     }
 }
 
-extern s32 gFileTableRegistered;
+extern s32 sFileTableRegistered;
 
 s32 RegisterFileTableEntries(CdFileEntry *table, s32 count) {
     s32 first;
 
-    if (gActiveDataSource == DATASOURCE_CD) {
-        gFileTableRegistered = 1;
+    if (sActiveDataSource == DATASOURCE_CD) {
+        sFileTableRegistered = 1;
         SetFileTable(table);
         first = GetFileTableCount();
         SetFileTableCount(first + count);
@@ -600,14 +604,14 @@ s32 RegisterFileTableEntries(CdFileEntry *table, s32 count) {
     return 1;
 }
 
-extern char *gDataDirectory;
+extern char *sDataDirectory;
 
 void SetDataDirectory(char *dir) {
-    gDataDirectory = dir;
+    sDataDirectory = dir;
 }
 
 char *GetDataDirectory(void) {
-    return gDataDirectory;
+    return sDataDirectory;
 }
 
 char *BuildFileName(char *dest, char *name, char *dir, char *ext) {

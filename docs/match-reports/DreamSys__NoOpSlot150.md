@@ -8,4 +8,4 @@ Unit: `src/world/DreamSys.c`. Class: `DreamSys`.
 
 ## Naming
 
-- **Tier A.** Empty `{}` body. One of DreamSys__SelectCallback80's three non-NULL menu choices (mode 3), vtable slot +0x150.
+- **Tier A.** Empty `{}` body. One of DreamSys__SelectLookCallback's three non-NULL menu choices (mode 3), vtable slot +0x150.

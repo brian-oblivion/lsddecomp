@@ -13,14 +13,14 @@ One construct, carried over from `StyleBuildDecorSet` earlier in this same sessi
 assignment, not field by field.**
 
 ```c
-pos = *(PairXY *) &gStyleDecorPosX;      /* NOT pos.x = gStyleDecorPosX; pos.y = gStyleDecorPosY; */
+pos = *(PairXY *) &sStyleDecorPosX;      /* NOT pos.x = sStyleDecorPosX; pos.y = sStyleDecorPosY; */
 ```
 
 A struct assignment is a BLKmode `set`, and gcc 2.6.3's `cse.c` answers a
 BLKmode destination by calling `invalidate_memory()` -- it discards **every**
 cached memory value rather than the ones that might overlap. That is the
-entire reason retail reloads `gStyleDecorVariant` for its `== 2` test (`lw v1,
-%gp_rel(gStyleDecorVariant)` at 0x45220, after the guard already read it at 0x451A8)
+entire reason retail reloads `sStyleDecorVariant` for its `== 2` test (`lw v1,
+%gp_rel(sStyleDecorVariant)` at 0x45220, after the guard already read it at 0x451A8)
 and reloads `pos.y` from the stack immediately after writing it (`lw v0,
 0x1C(sp)` at 0x45230). Rounds 46 and 47 both classified those two reloads as
 *"register-pressure-driven, not something a source rewrite obviously
@@ -41,7 +41,7 @@ read off the raw `.s` rather than guessed:
 | the output buffer is 8 bytes, not 3 or 4 | it occupies sp+0x10..0x17, because `pos` sits at sp+0x18. `AdjustRgbByDelta` writes only `[0..2]`, so the SIZE is inferred from the stack layout and nothing else -- see the comment at the definition. |
 
 Round 46's `s3` name is kept as `shift` and `s1` as `srcOfs`; `srcOfs` walks a
-3-byte-stride table (the same stride `StyleFillEffectKind3` uses on `gStyleKind3Colors`),
+3-byte-stride table (the same stride `StyleFillEffectKind3` uses on `sStyleKind3Colors`),
 which is consistent with `AdjustRgbByDelta`'s three byte writes.
 
 ## What round 46 got right, and is worth keeping
@@ -54,7 +54,7 @@ proposed -- brute-force the divisor rather than reverse the reciprocal math --
 stands.
 
 The struct-and-flow recovery (call targets, method slots +0xB8/+0xBC/+0x64,
-`gStyleSceneRefs + 0xC` chased one field further, the loop bounds) was also correct
+`sStyleSceneRefs + 0xC` chased one field further, the loop bounds) was also correct
 throughout. **What was wrong was only the VERDICT**, and specifically the part
 of it that named an unfalsifiable cause. "Register pressure" identifies no
 construct, suggests no experiment, and ends the investigation; two rounds
@@ -74,25 +74,25 @@ void StyleUpdateDecorSet(void) {
     void **wp;
     ObjSlotB8B8 *obj;
 
-    if (gStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == 0) {
         return;
     }
-    self = *(ObjAC7CSub **) (gStyleSceneRefs + 0xC);
+    self = *(ObjAC7CSub **) (sStyleSceneRefs + 0xC);
     delta = self->field18 - self->field24;
     shift = (delta / 600) * 3;
     if (shift <= 0) {
         return;
     }
-    pos = *(PairXY *) &gStyleDecorPosX;
+    pos = *(PairXY *) &sStyleDecorPosX;
     i = 0;
-    if (gStyleDecorVariant == 2) {
+    if (sStyleDecorVariant == 2) {
         pos.y += 0x1E;
     }
-    wp = gStyleDecorSlots;
+    wp = sStyleDecorSlots;
     srcOfs = 0;
     pos.y += shift * 3;
     do {
-        AdjustRgbByDelta(rgb, (u8 *) (srcOfs + gStyleDecorColors), shift);
+        AdjustRgbByDelta(rgb, (u8 *) (srcOfs + sStyleDecorColors), shift);
         obj = (ObjSlotB8B8 *) *wp;
         obj->methods->slotB8(obj, 1, rgb);
         obj = (ObjSlotB8B8 *) *wp;
@@ -102,7 +102,7 @@ void StyleUpdateDecorSet(void) {
         pos.y += 3;
         wp++;
     } while (i < 0x12);
-    AdjustRgbByDelta(rgb, (u8 *) gStyleClearColor, shift);
+    AdjustRgbByDelta(rgb, (u8 *) sStyleClearColor, shift);
     self->methods->slot64(self, rgb);
 }
 ```
@@ -133,8 +133,8 @@ made this cheap.
 
 **`StyleUpdateDecorSet`, tier B.**
 
-Sibling of `StyleBuildDecorSet` (same `gStyleDecorVariant` guard, same
-`gStyleDecorSlots` array, same `paramA`/`paramB`-shaped position pair).
+Sibling of `StyleBuildDecorSet` (same `sStyleDecorVariant` guard, same
+`sStyleDecorSlots` array, same `paramA`/`paramB`-shaped position pair).
 Computes a time-based `shift` from an `ObjAC7CSub` object's `field18`/
 `field24` delta, then per-element recolors (`AdjustRgbByDelta`) and
 repositions (`slotB8`/`slotBC`) all 18 objects every frame. MATCHED,

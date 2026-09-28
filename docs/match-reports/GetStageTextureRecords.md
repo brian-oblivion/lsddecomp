@@ -9,7 +9,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** not a slot.
-- **What:** tail wrapper: `return GetStageRecords(index);` (GetStageRecords returns `GetRecordTable(NULL) + gStageFirstRecord[index] * 0x1C`; its prototype is declared locally as `void *GetStageRecords(s32 index)`). The byte match says nothing about the return type.
+- **What:** tail wrapper: `return GetStageRecords(index);` (GetStageRecords returns `GetRecordTable(NULL) + sStageFirstRecord[index] * 0x1C`; its prototype is declared locally as `void *GetStageRecords(s32 index)`). The byte match says nothing about the return type.
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
@@ -27,7 +27,7 @@ void *GetStageTextureRecords(s32 index) {
 
 - **Name:** `GetStageTextureRecords`
 - **Tier:** A
-- **Evidence:** tail call of GetStageRecords: the group's first four records are TEXA..TEXD.TIX (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100); PickStageTexture indexes it and ObjM hands the pick to New_TimBlockSrc (ObjMStyleActor.c).
+- **Evidence:** tail call of GetStageRecords: the group's first four records are TEXA..TEXD.TIX (the record paths are retail's sRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100); PickStageTexture indexes it and ObjM hands the pick to New_TimBlockSrc (ObjMStyleActor.c).
 
 ## Naming history
 

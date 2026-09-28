@@ -28,7 +28,7 @@ round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Naming
 
-**ObjM__UpdateCloseReadyFlag** -- tier B. Sets `self->unk84 = 1` (the flag `ObjM__CloseAndNotifyC`/`ObjM__CloseAndNotifyD` read) when `self->unk80 != 0` (the pause-setup counter is running) and `ObjM::mode == 0` (idle). Named for the mechanical poll; "close-ready" describes the flag's later use, not an established game concept.
+**ObjM__UpdateCloseReadyFlag** -- tier B. Sets `self->unk84 = 1` (the flag `ObjM__CloseAndNotify`/`ObjM__CloseAndNotifyNewGame` read) when `self->unk80 != 0` (the pause-setup counter is running) and `ObjM::mode == 0` (idle). Named for the mechanical poll; "close-ready" describes the flag's later use, not an established game concept.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

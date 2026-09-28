@@ -967,6 +967,11 @@
           "date": "2026-09-26",
           "header": "include/NodeGuardedViewport.h"
         },
+        "gNullDriverMethods": {
+          "class": "NullDriver",
+          "date": "2026-09-26",
+          "header": "include/NullDriver.h"
+        },
         "gObjMMethods": {
           "class": "ObjM",
           "date": "2026-09-26",
@@ -1096,11 +1101,6 @@
           "class": "TriggerWorld",
           "date": "2026-09-26",
           "header": "include/TriggerWorld.h"
-        },
-        "gVabDriverMethods": {
-          "class": "VabDriver",
-          "date": "2026-09-26",
-          "header": "include/VabDriver.h"
         },
         "gVabStreamObjMethods": {
           "class": "VabStreamObj",

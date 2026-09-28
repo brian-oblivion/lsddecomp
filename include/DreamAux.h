@@ -24,12 +24,6 @@ typedef struct DreamAuxSlot {
     s32 pos[3];
 } DreamAuxSlot;
 
-extern DreamAuxSlot gDreamAuxSlots[1];
-
-/* gDreamAuxSlots one word in, so each element's `model` is that slot's
- * entity: ReleaseDreamAuxEntities walks it. */
-extern DreamAuxSlot gDreamAuxSlots2[1];
-
 /* One chunk trigger. `key` is the chunk's ChunkCoord (column, then row)
  * read as one s16. `dayParity` restricts the day: 0 any day, 1 odd days, 2
  * even days (CheckTriggerDayParity). `recordIndices` name up to three
@@ -39,14 +33,6 @@ typedef struct DreamAuxTriggerEntry {
     s8 dayParity;
     s8 recordIndices[3];
 } DreamAuxTriggerEntry;
-
-extern s8 gDreamAuxTriggerCounts[DREAM_AUX_STAGE_COUNT];
-extern DreamAuxTriggerEntry *gDreamAuxTriggerEntries[DREAM_AUX_STAGE_COUNT];
-
-/* The two ModelData files InitDreamAux can load. With one slot, only
- * SYMSPY.MOM is ever requested. */
-extern const char gMomPathSymSpy[];
-extern const char gMomPathSymDog[];
 
 /* TriggerRecord.condition: CheckDreamAuxTriggerCondition's tests, by id. A
  * negative condition tests -condition and passes only while the record has
@@ -67,11 +53,11 @@ enum TriggerCondition {
     TRIGGER_COND_ODD_DAY = 21
 };
 
-/* One spawn record of a stage's table (gDreamAuxGroupRecords[stage], 8-byte
+/* One spawn record of a stage's table (sDreamAuxGroupRecords[stage], 8-byte
  * stride). `triggered` latches once `condition` has passed; InitDreamAux
  * clears every latch. `modelIndex` picks the ModelData of the chunk's
  * TriggerWorld, and each of `spawnIndices` (-1 ends the list) one
- * gDreamAuxSpawnInfo placement for an Entity of mood row `moodIndex`. A
+ * sDreamAuxSpawnInfo placement for an Entity of mood row `moodIndex`. A
  * record whose moodIndex is 2 is followed by the one seven records on. */
 typedef struct TriggerRecord {
     s8 triggered;
@@ -80,9 +66,6 @@ typedef struct TriggerRecord {
     u8 moodIndex;
     s8 spawnIndices[4];
 } TriggerRecord;
-
-extern s8 gDreamAuxGroupCounts[DREAM_AUX_STAGE_COUNT];
-extern TriggerRecord *gDreamAuxGroupRecords[DREAM_AUX_STAGE_COUNT];
 
 extern bool CheckDreamAuxTriggerCondition(s32 day, TriggerRecord *record);
 /* `desc` is New_Entity's descriptor, forwarded untouched; the caller has

@@ -6,12 +6,12 @@
 
 ## What it does
 
-Range-gates on `arg2` and the "GetLinkStage" mood table (`gEntityLinkStageTable`) before
+Range-gates on `arg2` and the "GetLinkStage" mood table (`sEntityLinkStageTable`) before
 calling a new `BasicClassMethods` slot (`slotDC`, forwarding `arg1`/`arg2`),
 then, only when `arg2 == 4` and the link stage is positive, dispatches a
 small state code (0xA/0xB/0xC) into `EntityMethods::slot30` -- 0xA unless the
 link stage is exactly `0x7F`, in which case a second table
-(`gEntityEventVideoTable`, "GetEventVideo") picks between 0xB and 0xC.
+(`sEntityEventVideoTable`, "GetEventVideo") picks between 0xB and 0xC.
 
 ## Final C
 
@@ -19,7 +19,7 @@ link stage is exactly `0x7F`, in which case a second table
 void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
     s32 linkStage;
 
-    linkStage = gEntityLinkStageTable[this->moodIndex * 0x10];
+    linkStage = sEntityLinkStageTable[this->moodIndex * 0x10];
     if ((u32)(arg2 - 2) < 7) {
         if (linkStage <= 0) {
             return;
@@ -34,7 +34,7 @@ void Entity__NotifyLinkStage(Entity *this, s32 arg1, s32 arg2) {
     }
     if (linkStage != 0x7F) {
         arg2 = 0xA;
-    } else if (gEntityEventVideoTable[this->moodIndex * 0x10] != 0) {
+    } else if (sEntityEventVideoTable[this->moodIndex * 0x10] != 0) {
         arg2 = 0xB;
     } else {
         arg2 = 0xC;
@@ -56,7 +56,7 @@ Byte-exact, whole-image build verified.
    attempts trying to fix the order by literally reordering the two
    statements, or introducing a boolean `inRange` computed first, both
    made it WORSE (32/62 and 5/62 respectively) -- the second duplicated
-   the `gEntityLinkStageTable` load into two separate `lb` instructions instead of
+   the `sEntityLinkStageTable` load into two separate `lb` instructions instead of
    being CSE'd back into one, causing a genuine 139789-byte whole-image
    drift.
 2. **The actual fix was to stop introducing a second local entirely.**
@@ -80,7 +80,7 @@ Byte-exact, whole-image build verified.
    `if (linkStage != 0x7F) { arg2 = 0xA; } else {...}` (condition negated,
    arms swapped) matched retail's explicit-jump-for-the-short-arm layout.
    Took it to 59/62.
-4. The innermost `gEntityEventVideoTable[...] == 0` check had the identical polarity
+4. The innermost `sEntityEventVideoTable[...] == 0` check had the identical polarity
    residue one level deeper -- flipped to `!= 0` with arms swapped the same
    way, closing it to 62/62.
 
@@ -116,10 +116,10 @@ with the negative answer too" instruction.
 
 **Tier B.** Renamed from `func_8005D560` this round (tools/rename.py).
 Forwards `(arg1, arg2)` straight through to the base ancestor's `slotDC`,
-and on `arg2 == 4` with a positive `gEntityLinkStageTable` value, also
+and on `arg2 == 4` with a positive `sEntityLinkStageTable` value, also
 notifies `EntityMethods::slot30` with a link/event-derived code (0xA/0xB/0xC).
 "Link" here is not a fresh guess -- it is the SAME vocabulary this function
-directly reads (`gEntityLinkStageTable`, the table `Entity__GetLinkStage`
+directly reads (`sEntityLinkStageTable`, the table `Entity__GetLinkStage`
 already established, tier A, in an earlier round) via the identical
 `moodIndex`-selected row.
 
@@ -139,13 +139,13 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Polish (round 96, bravo, track 7)
 
-- Step 2: The flat mood-row "tables" this body read are columns of gEntityMoodTable's
+- Step 2: The flat mood-row "tables" this body read are columns of sEntityMoodTable's
 16-byte row (their symbols are the row base 0x80089EA4 plus the column
-offset: gEntityUnlockKindTable +0x02, gEntityLinkStageTable +0x07,
-gEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
+offset: gEntityUnlockKindTable +0x02, sEntityLinkStageTable +0x07,
+sEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
 gEntityMoodHandlerTable +0x0C), now EntityMoodRow fields; byte-identical.
 Entity.h's old claim that they were "SEPARATE global arrays (own base
-symbols, own lui/addiu) ... not sub-fields of the gEntityMoodTable row" was
+symbols, own lui/addiu) ... not sub-fields of the sEntityMoodTable row" was
 wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.
 

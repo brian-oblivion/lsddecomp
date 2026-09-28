@@ -16,19 +16,19 @@
 #include "BMemPMgr.h"
 #include "GameApplicationFileResource.h"
 
-extern s32 gCdInitDone;               /* CdInit has been called */
-extern ScreenDims gDefaultScreenDims; /* {320, 240} */
+extern s32 sCdInitDone;               /* CdInit has been called */
+extern ScreenDims sDefaultScreenDims; /* {320, 240} */
 
 void Application__Application(Application *self, s32 dataSource) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetApplicationMethods();
-    if (gCdInitDone == 0) {
+    if (sCdInitDone == 0) {
         CdInit();
-        gCdInitDone = 1;
+        sCdInitDone = 1;
     }
     self->initialized = 0;
     SetActiveDataSource(dataSource);
-    self->methods->setScreenDims(self, &gDefaultScreenDims, 0);
+    self->methods->setScreenDims(self, &sDefaultScreenDims, 0);
 }
 
 void Application__Finalize(Application *self) {}

@@ -47,13 +47,13 @@ changes, read straight off that candidate's mutated source:
 2. **The `entry` pointer's address computation needed a different operand
    ORDER, not a different value.** The one remaining word after removing
    the redundant guard was `addu $s1,$a0,$v0` (retail) vs `addu
-   $s1,$v0,$a0` (mine) -- `$a0` held `gStyleCueRecordIndex * 8` and `$v0` held
+   $s1,$v0,$a0` (mine) -- `$a0` held `sStyleCueRecordIndex * 8` and `$v0` held
    `base`, both correctly, just encoded in the opposite operand order.
-   **Four different C spellings of `base + gStyleCueRecordIndex * 8` (the original
-   form, `gStyleCueRecordIndex * 8 + base`, `(EntrySlot *) base + gStyleCueRecordIndex`, and
-   `&((EntrySlot *) base)[gStyleCueRecordIndex]`) all produced the SAME operand
+   **Four different C spellings of `base + sStyleCueRecordIndex * 8` (the original
+   form, `sStyleCueRecordIndex * 8 + base`, `(EntrySlot *) base + sStyleCueRecordIndex`, and
+   `&((EntrySlot *) base)[sStyleCueRecordIndex]`) all produced the SAME operand
    order** -- this is not a simple "write the addends in the other order"
-   fix. What worked: `(EntrySlot *) (gStyleCueRecordIndex * 8 + (s32) base)`, casting
+   fix. What worked: `(EntrySlot *) (sStyleCueRecordIndex * 8 + (s32) base)`, casting
    `base` to `s32` explicitly before the addition rather than letting the
    pointer-plus-integer arithmetic happen implicitly. Confirmed byte-exact:
    `build exit=0`, `OK: build matches retail SLPS_015.56`,
@@ -73,15 +73,15 @@ void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
     if (arg2 == 0) {
         goto fail;
     }
-    base = gStyleCueRecordLists[gStyleStage];
-    n = gStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
-    entry = (EntrySlot *) (gStyleCueRecordIndex * 8 + (s32) base);
+    base = sStyleCueRecordLists[sStyleStage];
+    n = sStyleCueRecordCounts[sStyleStage] - sStyleCueRecordIndex;
+    entry = (EntrySlot *) (sStyleCueRecordIndex * 8 + (s32) base);
     for (j = 0; j < n; j++, entry++) {
-        gStyleCueRecordIndex++;
+        sStyleCueRecordIndex++;
         if (entry->count > 0) {
             buf.pos = entry->pos;
-            buf.tab = *(TabEntry *) (gStyleCueOffsets + entry->idx * 6);
-            self = (void *) gStyleGrid;
+            buf.tab = *(TabEntry *) (sStyleCueOffsets + entry->idx * 6);
+            self = (void *) sStyleGrid;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;
             if (d1 < 0) {
@@ -94,7 +94,7 @@ void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
                 dist = d1 - d2;
             }
             *arg1 = dist;
-            if (dist < gStyleCueDistanceTable[entry->count]) {
+            if (dist < sStyleCueDistanceTable[entry->count]) {
                 return entry;
             }
         }
@@ -106,8 +106,8 @@ fail:
 
 Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
-`extern s32 gStyleStage, gStyleCueRecordIndex, gStyleGrid, gStyleCueDistanceTable[];`,
-`extern u8 *gStyleCueRecordLists[], gStyleCueRecordCounts[], gStyleCueOffsets[];` (all already
+`extern s32 sStyleStage, sStyleCueRecordIndex, sStyleGrid, sStyleCueDistanceTable[];`,
+`extern u8 *sStyleCueRecordLists[], sStyleCueRecordCounts[], sStyleCueOffsets[];` (all already
 declared in `src/world/ObjMStyleActor.c` ahead of this function).
 
 ### Proposed learning
@@ -177,12 +177,12 @@ Scans a run of 8-byte records starting at a base pointer for one whose
 returning the first such record or `NULL`.
 
 ```c
-extern s32 gStyleStage;
-extern s32 gStyleCueRecordIndex;
-extern u8 *gStyleCueRecordLists[];    /* word array of base pointers, indexed by gStyleStage */
-extern u8 gStyleCueRecordCounts[];    /* byte array of counts, same index */
-extern u8 gStyleCueOffsets[];    /* table, 6-byte stride entries */
-extern s32 gStyleCueDistanceTable[];   /* word table, indexed by entry->count */
+extern s32 sStyleStage;
+extern s32 sStyleCueRecordIndex;
+extern u8 *sStyleCueRecordLists[];    /* word array of base pointers, indexed by sStyleStage */
+extern u8 sStyleCueRecordCounts[];    /* byte array of counts, same index */
+extern u8 sStyleCueOffsets[];    /* table, 6-byte stride entries */
+extern s32 sStyleCueDistanceTable[];   /* word table, indexed by entry->count */
 
 typedef struct Pos4 { s16 hi, lo; } Pos4;              /* 4B, alignment 2 */
 typedef struct TabEntry { Pos4 head; s16 tail; } TabEntry;   /* 6B */
@@ -202,18 +202,18 @@ void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
     if (arg2 == 0) {
         goto fail;
     }
-    base = gStyleCueRecordLists[gStyleStage];
-    n = gStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
+    base = sStyleCueRecordLists[sStyleStage];
+    n = sStyleCueRecordCounts[sStyleStage] - sStyleCueRecordIndex;
     if (n <= 0) {
         goto fail;
     }
-    entry = (EntrySlot *) (base + gStyleCueRecordIndex * 8);
+    entry = (EntrySlot *) (base + sStyleCueRecordIndex * 8);
     for (j = 0; j < n; j++, entry++) {
-        gStyleCueRecordIndex++;
+        sStyleCueRecordIndex++;
         if (entry->count > 0) {
             buf.pos = entry->pos;
-            buf.tab = *(TabEntry *) (gStyleCueOffsets + entry->idx * 6);
-            self = (void *) gStyleGrid;
+            buf.tab = *(TabEntry *) (sStyleCueOffsets + entry->idx * 6);
+            self = (void *) sStyleGrid;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;
             if (d1 < 0) {
@@ -226,7 +226,7 @@ void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
                 dist = d1 - d2;
             }
             *arg1 = dist;
-            if (dist < gStyleCueDistanceTable[entry->count]) {
+            if (dist < sStyleCueDistanceTable[entry->count]) {
                 return entry;
             }
         }
@@ -246,7 +246,7 @@ Notes on the recovery:
   `lwl 3(s1)/lwr 0(s1)` + `swl 0x13(sp)/swr 0x10(sp)` sequences.
 - **The `ObjAB4C`/`ObjAB4CMethods` local view (self-dispatch through method
   slot `+0xE8`) is the SAME idiom `TickStyle` establishes** for
-  `gStyleGrid` -- moved that typedef earlier in the unit (it originally sat
+  `sStyleGrid` -- moved that typedef earlier in the unit (it originally sat
   just before `TickStyle`, which is ROM-later) since this function,
   ROM-earlier, also needs it. No behavioural change, pure reordering of a
   type declaration.
@@ -256,13 +256,13 @@ Notes on the recovery:
   the explicit if/else "combine" shape `IsStyleCueNear` already uses for an
   identical Manhattan-distance pattern in this same unit).
 - `entry->count` is read from memory **twice** by retail (once for the
-  `> 0` guard, again for the `gStyleCueDistanceTable[entry->count]` index) rather than
+  `> 0` guard, again for the `sStyleCueDistanceTable[entry->count]` index) rather than
   cached in a local -- matched by not caching it in the C either.
 
 ## The stall: preamble scheduling order
 
 Retail places `j = 0` (as `move $s2,zero`) as the literal first instruction
-after the `ctx == 0` guard, BEFORE either of the two `gStyleStage`-indexed
+after the `ctx == 0` guard, BEFORE either of the two `sStyleStage`-indexed
 lookups. My build computes both lookups first and initializes `j` last
 (as part of the `for`'s own init clause), which is semantically identical
 but produces a different instruction SCHEDULE around the two lookups (see
@@ -313,9 +313,9 @@ shared-label unification still doesn't happen for free.
 
 **`FindNextStyleCueInRange`, tier B.**
 
-Scans a run of 8-byte `EntrySlot` records (`gStyleCueRecordIndex` onward)
+Scans a run of 8-byte `EntrySlot` records (`sStyleCueRecordIndex` onward)
 for one whose `count` field is positive and whose Manhattan-style distance
-to `arg2` is under a per-record threshold (`gStyleCueDistanceTable[entry->count]`),
+to `arg2` is under a per-record threshold (`sStyleCueDistanceTable[entry->count]`),
 returning the first such record or `NULL` and writing the computed distance
 through `arg1`. "Nearest" is a simplification: it is actually the FIRST
 record under threshold in scan order, not a true nearest-of-all-candidates
@@ -327,15 +327,15 @@ MATCHED, 111/111.
 
 ### Naming
 
-**Renamed from `FindNearestStyleCueEntry`, tier A.** The loop returns the FIRST unclaimed record (cue > 0) whose X+Z distance to the target is under its cue's `gStyleCueDistanceTable` entry, advancing `gStyleCueRecordIndex` past every record it looks at; it never compares candidates, so "nearest" said more than the body does.
+**Renamed from `FindNearestStyleCueEntry`, tier A.** The loop returns the FIRST unclaimed record (cue > 0) whose X+Z distance to the target is under its cue's `sStyleCueDistanceTable` entry, advancing `sStyleCueRecordIndex` past every record it looks at; it never compares candidates, so "nearest" said more than the body does.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_800876B4` | `gStyleCueRecordLists` | A | per-stage pointer to the stage's 8-byte cue records. |
-| `D_800876EC` | `gStyleCueRecordCounts` | A | per-stage record count, the loop bound. |
-| `D_800874EC` | `gStyleCueOffsets` | A | 6-byte s16 x/y/z entries, indexed by the record's byte 4; copied after the record's 4 cell bytes to make the 10-byte cell key (StageMap's Descriptor10 shape) computeCellOffsets turns into a world position. |
+| `D_800876B4` | `sStyleCueRecordLists` | A | per-stage pointer to the stage's 8-byte cue records. |
+| `D_800876EC` | `sStyleCueRecordCounts` | A | per-stage record count, the loop bound. |
+| `D_800874EC` | `sStyleCueOffsets` | A | 6-byte s16 x/y/z entries, indexed by the record's byte 4; copied after the record's 4 cell bytes to make the 10-byte cell key (StageMap's Descriptor10 shape) computeCellOffsets turns into a world position. |
 
-The `+0x0E8` local view on `gStyleGrid` is StageMap's computeCellOffsets. Locals: `pos`, `outDist`, `target`, `remaining`, `records`, `dx`, `dz`, `grid`.
+The `+0x0E8` local view on `sStyleGrid` is StageMap's computeCellOffsets. Locals: `pos`, `outDist`, `target`, `remaining`, `records`, `dx`, `dz`, `grid`.
 
 ### Comments moved here from src/world/ObjMStyleActor.c
 

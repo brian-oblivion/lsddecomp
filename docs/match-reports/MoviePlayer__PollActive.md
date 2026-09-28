@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-If +0x54 is set: post-increments the global gMoviePollCounter and, when its old value was over 100, resets it to 1 and calls slot +0x044 with self; returns 0. Otherwise clears gActiveMoviePlayer and returns 1.
+If +0x54 is set: post-increments the global sMoviePollCounter and, when its old value was over 100, resets it to 1 and calls slot +0x044 with self; returns 0. Otherwise clears sActiveMoviePlayer and returns 1.
 
 Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x064.
 
@@ -20,10 +20,10 @@ The unit-local view `DataSrc33808` (a FileResource subclass built with the unifi
 fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
 
 ```c
-/* gMoviePlayerMethods +0x064: while +0x54 is set, count calls in gMoviePollCounter and
+/* gMoviePlayerMethods +0x064: while +0x54 is set, count calls in sMoviePollCounter and
  * once the count before the increment passes 100, resets it to 1 and calls
  * slot +0x044; returns 0. Otherwise
- * clears gActiveMoviePlayer and returns 1. */
+ * clears sActiveMoviePlayer and returns 1. */
 typedef struct Methods45C94 {
     /* +0x000 */ u8 pad0[0x44];
     /* +0x044 */ void (*slot44)();
@@ -35,18 +35,18 @@ typedef struct Obj45C94 {
     /* +0x054 */ s32 unk54;
 } Obj45C94;
 
-extern s32 gMoviePollCounter;
-extern DataSrc33808 *gActiveMoviePlayer;
+extern s32 sMoviePollCounter;
+extern DataSrc33808 *sActiveMoviePlayer;
 
 s32 MoviePlayer__PollActive(Obj45C94 *self) {
     if (self->unk54 != 0) {
-        if (gMoviePollCounter++ > 100) {
-            gMoviePollCounter = 1;
+        if (sMoviePollCounter++ > 100) {
+            sMoviePollCounter = 1;
             self->methods->slot44(self);
         }
         return 0;
     }
-    gActiveMoviePlayer = NULL;
+    sActiveMoviePlayer = NULL;
     return 1;
 }
 ```

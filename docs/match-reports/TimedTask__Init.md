@@ -20,7 +20,7 @@ addu  $s1, $a1, $zero        ; s1 = arg1
 sw    $s2, 0x18($sp)
 addu  $s2, $a2, $zero        ; s2 = arg2
 sw    $ra, 0x1C($sp)
-jal   Get_vtable_IntermediateBase
+jal   GetIntermediateBaseMethods
  sw   $zero, 0x28($s0)       ; self->unk28 = 0 (delay slot)
 addu  $a0, $s0, $zero
 addu  $a1, $s1, $zero
@@ -40,7 +40,7 @@ jr    $ra
 ```c
 s32 TimedTask__Init(Obj865C8 *self, s32 arg1, s32 arg2) {
     self->unk28 = 0;
-    Get_vtable_IntermediateBase()->slot44(self, arg1, arg2);
+    GetIntermediateBaseMethods()->slot44(self, arg1, arg2);
     return self->unk28;
 }
 ```
@@ -48,7 +48,7 @@ s32 TimedTask__Init(Obj865C8 *self, s32 arg1, s32 arg2) {
 ## Header change
 
 `include/DayTaskStageMap.h`'s `IntermediateBaseMethods` (the view of
-`Get_vtable_IntermediateBase()`'s table, `gIntermediateBaseMethods`) had no `+0x044` slot typed yet —
+`GetIntermediateBaseMethods()`'s table, `gIntermediateBaseMethods`) had no `+0x044` slot typed yet —
 only `dtor` (+0x00C), `slot48` (+0x048), `slot60` (+0x060). Added:
 
 ```c
@@ -57,9 +57,9 @@ void (*slot44)(void *self, s32 arg1, s32 arg2); /* +0x044 */
 
 typed `(void *self, s32, s32)`, matching the sibling unit's existing
 `Task.h` `TaskUtilMethods::slot44`, which resolves through the SAME
-accessor (`Get_vtable_IntermediateBase()`, same `gIntermediateBaseMethods` table). That sibling's
+accessor (`GetIntermediateBaseMethods()`, same `gIntermediateBaseMethods` table). That sibling's
 occupant, `TaskCore__Init`, is a near-identical shape one level down a
-different delegation chain: `Get_vtable_IntermediateBase()->slot44(self, a1, a2); return
+different delegation chain: `GetIntermediateBaseMethods()->slot44(self, a1, a2); return
 self->unk38;` — no pre-zero, just call-then-return. This function pre-zeroes
 `self->unk28` in the `jal`'s own delay slot before the call and reads it back
 after, i.e. "default value, base call may overwrite" rather than "base call
@@ -70,11 +70,11 @@ the analogous position in its own chain.
 ## Attempts
 
 1 (matched on first attempt — the sibling-unit precedent for the same
-`Get_vtable_IntermediateBase()->slot44` accessor/slot pair made the shape unambiguous).
+`GetIntermediateBaseMethods()->slot44` accessor/slot pair made the shape unambiguous).
 
 ### Proposed learning
 
-`Get_vtable_IntermediateBase()` (table `gIntermediateBaseMethods`) slot +0x044 is confirmed
+`GetIntermediateBaseMethods()` (table `gIntermediateBaseMethods`) slot +0x044 is confirmed
 `void (*)(void *self, s32 arg1, s32 arg2)` from two independent call sites in
 two different units (`Task.c`'s `TaskCore__Init`, this unit's
 `TimedTask__Init`) — both immediately store the same two register-passed

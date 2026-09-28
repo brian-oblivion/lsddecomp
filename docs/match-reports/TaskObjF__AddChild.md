@@ -7,7 +7,7 @@
 ## What it does
 
 `void TaskObjF__AddChild(Node3bb8cE *self, Res3bb8cE *res)`. If `res` is
-non-NULL: chains to the base class's `addChild` (`Get_vtable_BasicClass()`'s
+non-NULL: chains to the base class's `addChild` (`GetBasicClassMethods()`'s
 +0x010 slot), then reads `res->methods->header` (a type-tag word) and
 stores `res` itself into one of self's four typed resource slots
 (`unk60`/`unk64`/`unk78`/`unk7C`) depending on whether the tag is
@@ -42,7 +42,7 @@ void TaskObjF__AddChild(Node3bb8cE *self, Res3bb8cE *res)
     if (res == NULL) {
         return;
     }
-    Get_vtable_BasicClass()->addChild(self, res);
+    GetBasicClassMethods()->addChild(self, res);
     tag = res->methods->header;
     if ((tag & 0xF) == 2) {
         self->unk60 = res;

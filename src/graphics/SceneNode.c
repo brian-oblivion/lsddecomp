@@ -33,6 +33,11 @@
 #include "Actor.h"
 #include "BMemPMgr.h"
 
+/* The identity inputs SceneNode__Reset hands to updateRotation and
+ * updateScale: three Ratio16s each, {0/1, 0/1, 0/1} and {1/1, 1/1, 1/1}. */
+extern Ratio16 sRotationZero[3];
+extern Ratio16 sSceneNodeScaleOne[3];
+
 /* UpdateRotation's divisor: its inputs are degrees, and a degree count in
  * 20.12 fixed point divided by 360 is the angle in 4096ths of a turn (ONE to
  * the turn), GsCOORD2PARAM.rotate's unit. */
@@ -65,7 +70,7 @@ void *SceneNode__SceneNode(SceneNode *self) {
         BMemPMgrFree(self->coord2);
         return NULL;
     }
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetSceneNodeMethods();
     self->model = NULL;
     self->tmd = 0;
@@ -81,11 +86,11 @@ void SceneNode__Finalize(SceneNode *self) {
     self->methods->slot5C(self, 0);
     BMemPMgrFree(self->coord2->param);
     BMemPMgrFree(self->coord2);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void SceneNode__AddChild(SceneNode *self, BasicClass *child) {
-    Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
+    GetBasicClassMethods()->addChild((BasicClass *)self, child);
     if ((child->methods->header & CLASS_ID_ROOT_MASK) == TMDMODEL_CLASS_ID) {
         SceneNode__LinkModel(self, child);
     }
@@ -95,12 +100,12 @@ void SceneNode__RemoveChild(SceneNode *self, BasicClass *child) {
     if ((child->methods->header & CLASS_ID_ROOT_MASK) == TMDMODEL_CLASS_ID) {
         SceneNode__UnlinkModel(self);
     }
-    Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
+    GetBasicClassMethods()->removeChild((BasicClass *)self, child);
 }
 
 void SceneNode__RemoveAllChildren(SceneNode *self) {
     SceneNode__UnlinkModel(self);
-    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
+    GetBasicClassMethods()->removeAllChildren((BasicClass *)self);
 }
 
 /* The base onNotify first, then by the SENDER's class: a Pad's event goes to
@@ -109,7 +114,7 @@ void SceneNode__RemoveAllChildren(SceneNode *self) {
 void SceneNode__OnNotify(SceneNode *self, BasicClass *sender, s32 event) {
     s32 tag;
 
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
     tag = sender->methods->header & CLASS_ID_ROOT_MASK;
     if (tag == PAD_CLASS_ID) {
         self->methods->onPadEvent(self, sender, event);
@@ -314,7 +319,7 @@ u32 SceneNode__SetLightMode(SceneNode *self, u32 mode) {
 
 /* RaycastHullAgainstFaces: an edge hit counts only above this height (the
  * hit point's y above the face box's minimum, TmdModel__RaycastFaces); so
- * does a centre-line hit while gHitHeightGate is set. */
+ * does a centre-line hit while sHitHeightGate is set. */
 #define HIT_HEIGHT_THRESHOLD 512
 
 /* Sets the GsLDIM field to `value` and returns the old field. The four
@@ -603,13 +608,13 @@ s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, TmdVec3 *delta
     return overlap;
 }
 
-extern s32 gHitHeightGate;
+extern s32 sHitHeightGate;
 
 /* Ray-casts segments of the hull through the model's faces, each only
  * against the bounds records its segment crosses (ClipSegmentToBox).
  * First the centre line, from the centre of the hull's first face to the
  * centre of its second: a hit sets bit i of hitMask for bounds record i
- * (above HIT_HEIGHT_THRESHOLD only, while gHitHeightGate is set), and
+ * (above HIT_HEIGHT_THRESHOLD only, while sHitHeightGate is set), and
  * *hullHits = 1. With no centre-line hit, the edges joining corners 1 and 2
  * of each box's first face to the second face are cast: a hit above
  * HIT_HEIGHT_THRESHOLD sets bit i of hitMask and bit k of *hullHits for box
@@ -653,7 +658,7 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *
         bounds = TmdModel__GetBoundsBuffer(self->model, i);
         if (ClipSegmentToBox(NULL, bounds, &center[0], &center[1])) {
             if (TmdModel__RaycastFaces(self->model, &nearest, hitPoint, &height, &center[0], &center[1])) {
-                if (gHitHeightGate == 0) {
+                if (sHitHeightGate == 0) {
                     self->hitMask |= 1 << i;
                 } else if (height > HIT_HEIGHT_THRESHOLD) {
                     self->hitMask |= 1 << i;
@@ -1194,7 +1199,7 @@ s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b) {
     return 1;
 }
 
-/* Sets gHitHeightGate and returns its old value. While it is non-zero,
+/* Sets sHitHeightGate and returns its old value. While it is non-zero,
  * SceneNode__RaycastHullAgainstFaces's segment test accepts only a hit whose
  * height (TmdModel__RaycastFaces: above the face box's minimum y) is at least
  * 513, which its edge tests always require. ObjM__InitStyleAndWorld sets it
@@ -1202,7 +1207,7 @@ s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b) {
 s32 GetSetHitHeightGate(s32 value) {
     s32 old;
 
-    old = gHitHeightGate;
-    gHitHeightGate = value;
+    old = sHitHeightGate;
+    sHitHeightGate = value;
     return old;
 }

@@ -14,9 +14,9 @@ void FadeBox__FadeBox(FadeBoxObj *self, void *a1, s32 a2, s32 a3) {
 
     base = GetBoxFillMethods();
     if (a2 != 0) {
-        tableEntry = &gFadeBoxMaskColors[a2 * 3];
+        tableEntry = &sFadeBoxMaskColors[a2 * 3];
     } else {
-        tableEntry = gFadeBoxBlackColors;
+        tableEntry = sFadeBoxBlackColors;
     }
     base->ctor((ClassEAC0Obj *)self, a1, tableEntry, a3);
     self->methods = GetFadeBoxMethods();
@@ -81,13 +81,13 @@ this report's earlier history too (known, pending an operator decision).
 
 ### Naming
 
-- **`gFadeBoxMaskColors`** (was `D_8006EA90`) -- tier A. Eight 3-byte RGB
+- **`sFadeBoxMaskColors`** (was `D_8006EA90`) -- tier A. Eight 3-byte RGB
   entries indexed by a FadeBox channel mask at a 3-byte stride (this ctor,
   StartFadeDown, GetColor). Retail's bytes are the mask's own channels at
   0xFF: entry 1 `00 00 FF` (b), 2 `00 FF 00` (g), 3 `00 FF FF`, 4 `FF 00 00`
   (r), 5 `FF 00 FF`, 6 `FF FF 00`, 7 and 0 `FF FF FF`. The table IS the
   mask-to-colour mapping, so the name is its mechanics.
-- **`gFadeBoxBlackColors`** (was `D_8006EAA8`) -- tier A. Directly after it,
+- **`sFadeBoxBlackColors`** (was `D_8006EAA8`) -- tier A. Directly after it,
   24 zero bytes: the same eight-entry shape, every entry black. StartFadeUp
   indexes it by mask; this ctor (mask 0), Stop and GetColor (mask 0xF) use
   its first entry whole. Named for its contents and for being the black

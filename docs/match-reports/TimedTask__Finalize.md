@@ -16,9 +16,9 @@ class of `gDayTaskMethods` (resolved with
 `0x80086668` -- both share the same base, `gIntermediateBaseMethods`). If `self->unk30` is
 set, notifies `self->subB` (guarded slot, same pattern as
 `include/GameApplication.h`'s `unk18`/`GameApplication__InitSystems` comment). Then chains to the
-BASE class's own dtor, fetched through `Get_vtable_IntermediateBase()` (a plain
+BASE class's own dtor, fetched through `GetIntermediateBaseMethods()` (a plain
 no-parameter accessor returning `&gIntermediateBaseMethods`, same shape as
-`Get_vtable_DreamSys`).
+`GetDreamSysMethods`).
 
 ## Derivation
 
@@ -33,7 +33,7 @@ lw    $v0, 0x4($v0)
 jalr  $v0
  nop
 .L8004A268:
-jal   Get_vtable_IntermediateBase
+jal   GetIntermediateBaseMethods
  nop
 lw    $v0, 0xC($v0)
 jalr  $v0
@@ -47,7 +47,7 @@ void TimedTask__Finalize(Obj865C8 *self) {
     if (self->unk30 != 0) {
         self->subB->methods->slot4(self->subB);
     }
-    Get_vtable_IntermediateBase()->dtor(self);
+    GetIntermediateBaseMethods()->dtor(self);
 }
 ```
 
@@ -73,4 +73,4 @@ inherited/override code as a subclass relationship.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Renamed from `TimedTask__Dtor`, tier A: it occupies +0x00C, BasicClass's `finalize` slot, and its body is a finalize: release `sound` when `soundBankPath` is set (the ctor made it), then the base finalize through `Get_vtable_IntermediateBase()->finalize`. `self` is `TimedTask *`; `unk30`/`subB` are `soundBankPath`/`sound`. DayTask__Finalize and ObjM__Finalize reach it as `GetTimedTaskMethods()->finalize((TimedTask *)self)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Renamed from `TimedTask__Dtor`, tier A: it occupies +0x00C, BasicClass's `finalize` slot, and its body is a finalize: release `sound` when `soundBankPath` is set (the ctor made it), then the base finalize through `GetIntermediateBaseMethods()->finalize`. `self` is `TimedTask *`; `unk30`/`subB` are `soundBankPath`/`sound`. DayTask__Finalize and ObjM__Finalize reach it as `GetTimedTaskMethods()->finalize((TimedTask *)self)`. Image byte-identical.

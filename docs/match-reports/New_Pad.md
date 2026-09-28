@@ -12,7 +12,7 @@ The `New_X` allocator for the Pad class (`gPadMethods`, resolved with
 `tools/classtable.py 0x8006D370 --vs 0x8006B58C`). Allocates a 0x20-byte
 instance through the game allocator `BMemPMgrAlloc`, and on success calls the
 class's own constructor — slot `+0x08` of the table returned by
-`Get_vtable_Pad()` — with `(self, arg1, port)`. Returns the instance, or NULL if
+`GetPadMethods()` — with `(self, arg1, port)`. Returns the instance, or NULL if
 the allocation failed.
 
 ```c
@@ -23,7 +23,7 @@ Pad *New_Pad(void *arg1, s32 port) {
     if (self == NULL) {
         goto fail;
     }
-    Get_vtable_Pad()->ctor(self, arg1, port);
+    GetPadMethods()->ctor(self, arg1, port);
     return self;
 fail:
     return NULL;
@@ -41,7 +41,7 @@ result sunk into the branch's own delay slot:
 ```
 beqz  $s0, .L80025B84
  addu $v0, $zero, $zero      ; delay slot: result = NULL
-jal   Get_vtable_Pad
+jal   GetPadMethods
  nop
 addu  $a0, $s0, $zero
 lw    $v0, 0x8($v0)
@@ -114,7 +114,7 @@ one shared epilogue. Try both before spending attempts on scheduling barriers.
 **Tier A.** `New_X` allocator+ctor-wrapper shape (matches `New_GameApplication`,
 `New_DreamSys`, `New_TodActor`, etc. project-wide): allocates the instance
 through `BMemPMgrAlloc`, then calls the class's own ctor slot through
-`Get_vtable_Pad()`. `Pad` is the class name established for this whole unit
+`GetPadMethods()`. `Pad` is the class name established for this whole unit
 (see `include/Pad.h`'s header comment, confirmed by the direct
 `PadInit`/`PadRead`/`PadStop` calls in `Pad__Pad`/`Pad__Finalize`/
 `Pad__UpdateMasks`). Only caller: `src/main.c`'s `New_Pad(0, 0)`.

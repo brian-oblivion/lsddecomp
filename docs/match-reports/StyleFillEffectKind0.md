@@ -26,7 +26,7 @@ void **StyleFillEffectKind0(void **arg0, s32 arg1, void *arg2) {
     ...
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arg0 = New_StyleEffect((void *) 0, &gStyleSpawnOffsetX, (void *) gStyleGrid, arg2);
+        *arg0 = New_StyleEffect((void *) 0, &sStyleSpawnOffsetX, (void *) sStyleGrid, arg2);
         arg0++;
     }
     return arg0;
@@ -116,7 +116,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);
 
 Already forward-declared this way at the call site in `StyleBuildEffectSlots`
 (matched, this unit, earlier round): `filled = (void **)
-StyleFillEffectKind0(gStyleEffectSlots, val, arg0);`. `arg1` is the loop bound, `arg0` is
+StyleFillEffectKind0(sStyleEffectSlots, val, arg0);`. `arg1` is the loop bound, `arg0` is
 the output array walked and returned one slot advanced (the same
 "array-fill, return next slot" idiom as `StyleFillEffectKind1`/`StyleFillEffectKind3`/
 `StyleFillEffectKind2`), `arg2` is passed through unchanged to every callee.
@@ -124,13 +124,13 @@ the output array walked and returned one slot advanced (the same
 ## What the function does (recovered from the raw disassembly)
 
 ```c
-extern u8 gStyleSpawnScales[];
-extern s32 gStyleSpawnYChoices[];
-extern u8 *gStyleSpawnScale;
-extern s32 gStyleSpawnTableIndex;
-extern u8 gStyleSpawnOffsetX[];
-extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);   /* this unit, cold */
-extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);   /* this unit, cold,
+extern u8 sStyleSpawnScales[];
+extern s32 sStyleSpawnYChoices[];
+extern u8 *sStyleSpawnScale;
+extern s32 sStyleSpawnTableIndex;
+extern u8 sStyleSpawnOffsetX[];
+extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);   /* this unit, cold */
+extern void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1);   /* this unit, cold,
                                                          signature widened */
 extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3);
 
@@ -141,19 +141,19 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     void (*fp)(void *, void *);
 
     arr = (void **) arg0;
-    gStyleSpawnTableIndex = rand() % 7;
-    gStyleSpawnScale = (u8 *) gStyleSpawnScales + ((u32) rand() % 5) * 12;
+    sStyleSpawnTableIndex = rand() % 7;
+    sStyleSpawnScale = (u8 *) sStyleSpawnScales + ((u32) rand() % 5) * 12;
     t3 = (u32) rand() % 5;
     if (t3 != 0) {
-        t3 = gStyleSpawnYChoices[t3];
+        t3 = sStyleSpawnYChoices[t3];
     }
-    fp = SetupStyleSpawnParamsB;
-    if (gStyleDay % 7 != 0) {
-        fp = SetupStyleSpawnParamsA;
+    fp = SetupStyleSpawnParamsDayMod7;
+    if (sStyleDay % 7 != 0) {
+        fp = SetupStyleSpawnParamsRandom;
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arr = New_StyleEffect((void *) 0, gStyleSpawnOffsetX, (void *) gStyleGrid, arg2);
+        *arr = New_StyleEffect((void *) 0, sStyleSpawnOffsetX, (void *) sStyleGrid, arg2);
         arr++;
     }
     return (void *) arr;
@@ -165,27 +165,27 @@ Every value confirmed directly off the raw bytes:
 - `rand() % 7` uses the signed reciprocal `0x92492493`/`sra 2` (the standard
   GCC signed-divide-by-7 idiom); `rand() % 5` (twice) uses the unsigned
   reciprocal `0xCCCCCCCD`/`srl 2`.
-- The `gStyleSpawnYChoices` table lookup is a **word**-stride array (`sll v0,s1,2`
+- The `sStyleSpawnYChoices` table lookup is a **word**-stride array (`sll v0,s1,2`
   before the `lw`), and the guard `beqz s1,...` skips the lookup only when
   the `rand()%5` remainder is exactly 0 -- matching the `if (t3 != 0)`
   reassignment shape.
 - **A function pointer, not a branch, dispatches the per-iteration call.**
   `s3` is reused: first as the `%7` magic constant, then unconditionally
-  loaded with `&SetupStyleSpawnParamsB` (filling the `mult`'s latency slot for free),
-  then conditionally overwritten to `&SetupStyleSpawnParamsA` if
-  `gStyleDay % 7 != 0`. This is the **same shared-dispatch idiom
+  loaded with `&SetupStyleSpawnParamsDayMod7` (filling the `mult`'s latency slot for free),
+  then conditionally overwritten to `&SetupStyleSpawnParamsRandom` if
+  `sStyleDay % 7 != 0`. This is the **same shared-dispatch idiom
   `TickStyle` uses via `ObjAB4C::slotE8`**, except here the two
   candidates are plain functions (not vtable slots), selected by a modulo
   test rather than a self-object's own state.
-- `SetupStyleSpawnParamsB` is called through this pointer with **two live argument
+- `SetupStyleSpawnParamsDayMod7` is called through this pointer with **two live argument
   registers** (`a0=arg2`, `a1=t3`) even though its OWN body (round 46's
   derivation, unrelated to this call) never references either -- the
   standard "already-matched/derived signature can be too narrow" situation.
-  Widened its signature from `void SetupStyleSpawnParamsB(void)` to
-  `void SetupStyleSpawnParamsB(void *arg0, void *arg1)` (dead params, zero cost in
-  the callee, confirmed: rebuilding `SetupStyleSpawnParamsB`'s own preserved body
+  Widened its signature from `void SetupStyleSpawnParamsDayMod7(void)` to
+  `void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1)` (dead params, zero cost in
+  the callee, confirmed: rebuilding `SetupStyleSpawnParamsDayMod7`'s own preserved body
   under the wider signature still reproduces its recorded 25/87 score
-  exactly -- see `docs/match-reports/SetupStyleSpawnParamsB.md`).
+  exactly -- see `docs/match-reports/SetupStyleSpawnParamsDayMod7.md`).
 
 ## The stall: `arg0`/`arg1`/`arg2` land in swapped saved registers
 
@@ -232,19 +232,19 @@ runner/round rather than re-deriving the structure.
 
 **`StyleFillEffectKind0`, tier B.**
 
-Fills `arg1` slots of `gStyleEffectSlots` by repeatedly calling
+Fills `arg1` slots of `sStyleEffectSlots` by repeatedly calling
 `ObjMStyleActor.c`'s `New_StyleEffect` (New_X for the `Obj876FC` class) with a
 literal FIRST argument of `0`. That argument is confirmed (by reading
 `New_StyleEffect`'s own ctor chain, `ObjMStyleActor.c`) to become the new
 object's `kind` field -- so "Kind0" in the name is the literal tag value
 this function passes, not a guessed category. Selects which of two
-"spawn-parameter" setup functions (`SetupStyleSpawnParamsA`/`B`) to call each
-iteration via a `gStyleDay % 7` test. STALL, 93/99, whole-function
+"spawn-parameter" setup functions (`SetupStyleSpawnParamsRandom`/`B`) to call each
+iteration via a `sStyleDay % 7` test. STALL, 93/99, whole-function
 3-register rotation; naming from mechanics, unaffected by match state.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+`sStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared sStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and sStyleGrid as the `SceneNode *` parent. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 
@@ -252,11 +252,11 @@ iteration via a `gStyleDay % 7` test. STALL, 93/99, whole-function
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_8008E0A4`..`D_8008E0C0` | `gStyleSpawnOffsetX`, `...OffsetY`, `...OffsetZ`, `gStyleSpawnRotation`, `gStyleSpawnScale`, `gStyleSpawnModelLayout`, `gStyleSpawnTableIndex`, `gStyleSpawnColors` | A | the 0x24-byte block passed to New_StyleEffect as its `StyleEffectParams` (include/StyleEffect.h, which names each member: offset x/y/z, rotation, scale, modelChildLayout, tableIndex, color/altColor). Kept as separate symbols: SetupStyleSpawnParamsA's match depends on the scalar declarations. |
-| `D_800871C8` | `gStyleSpawnScales` | A | 5 Ratio16 triples, one picked by `rand() % 5` into the params' scale. |
-| `D_80087328` | `gStyleSpawnYChoices` | A | 4 words {-0x1800, -0x2800, -0x3800, -0x5000}: the offset-y values SetupStyleSpawnParamsA picks from. |
+| `D_8008E0A4`..`D_8008E0C0` | `sStyleSpawnOffsetX`, `...OffsetY`, `...OffsetZ`, `sStyleSpawnRotation`, `sStyleSpawnScale`, `sStyleSpawnModelLayout`, `sStyleSpawnTableIndex`, `sStyleSpawnColors` | A | the 0x24-byte block passed to New_StyleEffect as its `StyleEffectParams` (include/StyleEffect.h, which names each member: offset x/y/z, rotation, scale, modelChildLayout, tableIndex, color/altColor). Kept as separate symbols: SetupStyleSpawnParamsRandom's match depends on the scalar declarations. |
+| `D_800871C8` | `sStyleSpawnScales` | A | 5 Ratio16 triples, one picked by `rand() % 5` into the params' scale. |
+| `D_80087328` | `sStyleSpawnYChoices` | A | 4 words {-0x1800, -0x2800, -0x3800, -0x5000}: the offset-y values SetupStyleSpawnParamsRandom picks from. |
 
-Note: the offset-y pick is `rand() % 5`, and 0 means "let SetupStyleSpawnParamsA choose"; index 4 reads one word past the 4-entry table (0x80087338, the next symbol, D_80087338: 0x0A0A0200). That is retail's behaviour, reproduced as written.
+Note: the offset-y pick is `rand() % 5`, and 0 means "let SetupStyleSpawnParamsRandom choose"; index 4 reads one word past the 4-entry table (0x80087338, the next symbol, D_80087338: 0x0A0A0200). That is retail's behaviour, reproduced as written.
 
 Locals: `slots`, `count`, `pos`, `offsetY`, `setup`.
 
@@ -267,7 +267,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
 ```c
 /* Fills arg1 slots with New_StyleEffect(kind 0, ...) objects, first setting
  * up the random style parameters and choosing the per-slot setup function by
- * gStyleDay % 7; returns the next free slot. Matched round 75: arg0 is
+ * sStyleDay % 7; returns the next free slot. Matched round 75: arg0 is
  * the walking pointer itself (a separate `arr = arg0` copy reordered the
  * prologue's argument moves). */
 ```

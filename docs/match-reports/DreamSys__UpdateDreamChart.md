@@ -32,7 +32,7 @@ void DreamSys__UpdateDreamChart(DreamSys *this, MoodGraphPoint *ret)
 - `this->vt->GetMoodAverage`: already-established vtable slot `+0x20C`
   (`void (*GetMoodAverage)(DreamSys *this, MoodGraphContributor *layer,
   MoodGraphPoint *ret);`), immediately after `LogMood` (`+0x208`, used by
-  `DreamSys__InitMoodContibutors` this round) in the struct declaration --
+  `DreamSys__InitMoodContributors` this round) in the struct declaration --
   no new header work needed.
 - `this->entityMoods.amountMoods`: offset `0x160` falls inside the already-
   named `entityMoods` field (`0x154`..`0x164`, a `MoodGraphContributor`);

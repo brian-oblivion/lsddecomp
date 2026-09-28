@@ -11,12 +11,12 @@
 This is `StreamTaskObj`'s constructor — occupies `gStreamTaskMethods`'s own slot
 `+0x008` (per `classtable.py gStreamTaskMethods`, confirming the earlier header
 comment that named this function as the ctor reached through
-`Get_vtable_StreamTask()`'s slot).
+`GetStreamTaskMethods()`'s slot).
 
 ```c
 void StreamTask__StreamTask(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
-    Get_vtable_TaskCore()->slot08(self, a1, a2, a3);
-    self->methods = Get_vtable_StreamTask();
+    GetTaskCoreMethods()->slot08(self, a1, a2, a3);
+    self->methods = GetStreamTaskMethods();
     if (a4 != NULL) {
         self->unkA8 = *a4;
     } else {
@@ -30,7 +30,7 @@ void StreamTask__StreamTask(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamT
 
 ## New structure discovered
 
-- `Get_vtable_TaskCore()->slot08(...)`: new `TaskCoreMethods` slot `+0x008`.
+- `GetTaskCoreMethods()->slot08(...)`: new `TaskCoreMethods` slot `+0x008`.
   `classtable.py gTaskCoreMethods` shows it occupied by `TaskCore__TaskCore` — **this
   unit's own next queued function**, confirming the 4-argument
   `(self, a1, a2, a3)` signature ahead of writing that function.
@@ -76,7 +76,7 @@ load-all-then-store-all form exactly.
 ## Third-learning check (per head's request)
 
 **Not needed here** in the "value read then re-read after a `jalr`" sense —
-`self->methods` IS written mid-function (`self->methods = Get_vtable_StreamTask();`)
+`self->methods` IS written mid-function (`self->methods = GetStreamTaskMethods();`)
 and read again at the very end after two more calls
 (`GetDefaultMovieFrame`/`New_MoviePlayer`) for `self->methods->slot40(self)`, but that
 final read is a **plain, single, natural field dereference** with no earlier
@@ -109,7 +109,7 @@ codebase (`IntermediateBase__IntermediateBase`, `StageMap__StageMap`).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87)
 
@@ -122,7 +122,7 @@ The player is a MoviePlayer (`include/MoviePlayer.h`); Task.h's StreamTaskUnkB4O
 
 ## Track 6 (2026-09-27, round 99, runner bravo)
 
-`StreamTaskInitData` was a local spelling of DrawSystem.h's `DrawRect` (the same three words, and `gDefaultMovieFrame`, the fallback, was already `extern DrawRect` in both units that name it); it is deleted. `initData` (+0x0A8), the fifth parameter and `GetDefaultMovieFrame()` are `DrawRect`, so the allocation is `New_MoviePlayer(GetDefaultMovieFrame(), 0, 0)` with no cast. The struct copy is unchanged (both types are 12 bytes, 4-aligned). Byte-identical; `typeviews.py --warnings` 0 new. The getter and the data were renamed this round from `GetDefaultStreamTaskInitData`/`gDefaultStreamTaskInitData` (see GetDefaultMovieFrame.md).
+`StreamTaskInitData` was a local spelling of DrawSystem.h's `DrawRect` (the same three words, and `sDefaultMovieFrame`, the fallback, was already `extern DrawRect` in both units that name it); it is deleted. `initData` (+0x0A8), the fifth parameter and `GetDefaultMovieFrame()` are `DrawRect`, so the allocation is `New_MoviePlayer(GetDefaultMovieFrame(), 0, 0)` with no cast. The struct copy is unchanged (both types are 12 bytes, 4-aligned). Byte-identical; `typeviews.py --warnings` 0 new. The getter and the data were renamed this round from `GetDefaultStreamTaskInitData`/`gDefaultStreamTaskInitData` (see GetDefaultMovieFrame.md).
 
 ## History (moved from include/StreamTask.h, round 102)
 

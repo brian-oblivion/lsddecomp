@@ -34,7 +34,7 @@
  *  - init hands the DreamSys the pad, the FrameClock and the viewport;
  *    onInit sizes the viewport, shows its fade box and attaches the
  *    DreamSys as its view child (phase 1).
- *  - onTag1Notify event 2 (DayTask__AdvancePhase): in phase 1 runs
+ *  - onDrawSystemEvent event 2 (DayTask__AdvancePhase): in phase 1 runs
  *    startDay and StartObjM on the stage it returns; in phase 3 releases
  *    the old ObjM and StartObjM on getCurrentStage. StartObjM builds the
  *    ObjM from sound, bgm, etcTim, dreamerTmd and the stage, adopts it and
@@ -82,7 +82,7 @@ enum DayTaskResult {
 
 /* TimedTask's slots, then this class's own. Overridden: ctor, finalize,
  * onNotify, resetCounters (DayTask__ResetPhase), init, deinit, onInit,
- * onDeinit, onTag1Notify (DayTask__AdvancePhase) and onState4. */
+ * onDeinit, onDrawSystemEvent (DayTask__AdvancePhase) and onTimedOut. */
 /* clang-format off */
 #define DAYTASK_SLOTS(Self, CtorParams)                                                         \
     TIMEDTASK_SLOTS(Self, CtorParams);                                                            \
@@ -130,7 +130,7 @@ void DayTask__OnInit(DayTask *self);
 void DayTask__OnDeinit(DayTask *self);
 void DayTask__AdvancePhase(DayTask *self, BasicClass *sender, s32 event);
 void DayTask__StartObjM(DayTask *self, s32 stage);
-void DayTask__OnState4(void);         /* +0x07C; empty, reads no argument */
+void DayTask__OnTimedOut(void);       /* +0x07C; empty, reads no argument */
 void DayTask__OnDreamSysNotify(void); /* +0x080; empty, reads no argument */
 void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event);
 

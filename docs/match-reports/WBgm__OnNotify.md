@@ -15,7 +15,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 ## Naming
 
-`WBgm__OnNotify`, tier A. overrides BasicClass's `onNotify` slot (+0x038); chains to `Get_vtable_BasicClass()->onNotify` first, matching every other class's onNotify override in this codebase.
+`WBgm__OnNotify`, tier A. overrides BasicClass's `onNotify` slot (+0x038); chains to `GetBasicClassMethods()->onNotify` first, matching every other class's onNotify override in this codebase.
 
 ## View changes (additive, unit-local)
 
@@ -30,7 +30,7 @@ still matches after the change.
 
 ```c
 void WBgm__OnNotify(WBgm *self, void *sender, s32 event) {
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
     if ((((BasicClass *)sender)->methods->header & 0xF) == 1) {
         self->methods->update(self, (s32)sender, event);
     }
@@ -106,14 +106,14 @@ extern SeqData *New_RequestedFile(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-WBgmMethods *Get_vtable_WBgm(void);
+WBgmMethods *GetWBgmMethods(void);
 
 extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern s32 sWBgmActive;
+extern u8 sSsSizeTableBuf[];
 ```
 
 ## Track 4 (2026-09-26, round 88, alpha)

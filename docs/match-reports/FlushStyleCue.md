@@ -14,7 +14,7 @@ derivation started.
 ## Derivation
 
 ```
-/* 45FDC 800557DC 7404828F */  lw   $v0, %gp_rel(gStyleSceneRefs)($gp)
+/* 45FDC 800557DC 7404828F */  lw   $v0, %gp_rel(sStyleSceneRefs)($gp)
 /* 45FE4 800557E4 1000B0AF */  sw   $s0, 0x10($sp)
 /* 45FE8 800557E8 21808000 */  addu $s0, $a0, $zero
 /* 45FF0 800557F0 0000448C */  lw   $a0, 0x0($v0)
@@ -29,7 +29,7 @@ derivation started.
 jr $ra
 ```
 
-`gStyleSceneRefs` is a plain `s32` (established in `ObjMStyleActor.c`) holding the
+`sStyleSceneRefs` is a plain `s32` (established in `ObjMStyleActor.c`) holding the
 address of a small descriptor object; this function reads *that object's*
 own offset 0 (a value, not the `FieldAC7CHolder.unkC` field
 `ObjMStyleActor.c` names at +0xC -- a different offset of the same base
@@ -46,11 +46,11 @@ both the embedded sub-object handed to `FlushSoundCueSet` (`&arg0->unk14`) and
 the byte toggled after the call (`arg0->unk0->unk6`, negated in place).
 
 ```c
-extern s32 gStyleSceneRefs;
+extern s32 sStyleSceneRefs;
 extern void FlushSoundCueSet(s32 arg0, void *arg1);
 
 s32 FlushStyleCue(ObjN14 *arg0) {
-    FlushSoundCueSet(*(s32 *) gStyleSceneRefs, &arg0->unk14);
+    FlushSoundCueSet(*(s32 *) sStyleSceneRefs, &arg0->unk14);
     arg0->unk0->unk6 = -arg0->unk0->unk6;
     return 0;
 }
@@ -64,7 +64,7 @@ straddling the call.
 ### Proposed learning
 
 None beyond confirming the multiple-independent-local-views convention:
-`gStyleSceneRefs`'s pointed-to object is read at offset 0 here and offset 0xC in
+`sStyleSceneRefs`'s pointed-to object is read at offset 0 here and offset 0xC in
 a sibling unit, with two unrelated local structs describing it -- both
 correct locally, neither claiming to be the whole object.
 
@@ -84,4 +84,4 @@ slot, when `ServiceStyleCueIfNear` reports the cue is no longer near). MATCHED,
 
 ### Naming
 
-Round 93: returns `StyleCueSlot *` (always NULL, stored back into gStyleCueSlots) rather than `s32`; FlushSoundCueSet given its real prototype. Parameter `slot`.
+Round 93: returns `StyleCueSlot *` (always NULL, stored back into sStyleCueSlots) rather than `s32`; FlushSoundCueSet given its real prototype. Parameter `slot`.

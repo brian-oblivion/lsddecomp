@@ -12,7 +12,7 @@ Two dispatches in a row, both discarding/forwarding through `self`, no other
 side effect. First, a genuine virtual call through `self->unkB4`'s own
 1-slot vtable (a small object type distinct from `StreamTaskObj`, discovered
 here for the first time in this unit); second, the same
-`Get_vtable_TaskCore()`-mediated delegation to the sibling class `gTaskCoreMethods`
+`GetTaskCoreMethods()`-mediated delegation to the sibling class `gTaskCoreMethods`
 (`LoaderTaskMethods`) used by `StreamTask__OnPadPrev`/`StreamTask__OnPadNext`, this time
 slot `+0x00C`. Occupies `gStreamTaskMethods` slot `+0x00C` itself.
 
@@ -23,7 +23,7 @@ lw   $a0, 0xB4($s0)          ; a0 = self->unkB4
 lw   $v0, 0x0($a0)            ; v0 = a0->methods
 lw   $v0, 0x4($v0)             ; v0 = methods->slot04
 jalr $v0                          ; a0 (still the sub-object) unchanged
-jal  Get_vtable_TaskCore
+jal  GetTaskCoreMethods
 lw   $v0, 0xC($v0)                ; v0 = table->slot0C
 jalr $v0
  addu $a0, $s0, zero               ; a0 = self, explicitly reloaded
@@ -33,7 +33,7 @@ jalr $v0
 ```c
 void StreamTask__Finalize(StreamTaskObj *self) {
     self->unkB4->methods->slot04(self->unkB4);
-    Get_vtable_TaskCore()->slot0C(self);
+    GetTaskCoreMethods()->slot0C(self);
 }
 ```
 
@@ -66,7 +66,7 @@ comparison confirms (see the unit header comment).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87)
 

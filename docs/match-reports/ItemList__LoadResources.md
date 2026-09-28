@@ -18,8 +18,8 @@ extern ItemListHandle_3bb8c_j *New_ScreenSprite(ItemListHandle_3bb8c_j *arg0, vo
 extern s32 sStrSelect;
 extern s32 sItemListCardPathPrefix;
 extern s32 sItemListTimExt;
-extern s32 gItemListPanelRect;
-extern s32 gItemListPanelPos;
+extern s32 sItemListPanelRect;
+extern s32 sItemListPanelPos;
 extern s32 sItemListStrFontIcon;
 
 void ItemList__LoadResources(ItemList_3bb8c_j *self, void *arg1)
@@ -36,9 +36,9 @@ void ItemList__LoadResources(ItemList_3bb8c_j *self, void *arg1)
 
     h = New_TimImage(BuildFileName(local, &sStrSelect, &sItemListCardPathPrefix, &sItemListTimExt));
     h->methods->slot78(h);
-    self->unk50 = New_ScreenSprite(h, &gItemListPanelRect, 0);
+    self->unk50 = New_ScreenSprite(h, &sItemListPanelRect, 0);
     h->methods->slot4(h);
-    self->unk50->methods->slot4C(self->unk50, arg1, &gItemListPanelPos);
+    self->unk50->methods->slot4C(self->unk50, arg1, &sItemListPanelPos);
 
     h = New_TimImage(BuildFileName(local, &sItemListStrFontIcon, &sItemListCardPathPrefix, &sItemListTimExt));
     h->methods->slot78(h);
@@ -304,7 +304,7 @@ cross-unit sibling with the same call skeleton first.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (ItemListHandle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&gItemListPanelRect, 0)`: gItemListPanelRect is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position gItemListPanelPos = (-100, -60). Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (ItemListHandle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&sItemListPanelRect, 0)`: sItemListPanelRect is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position sItemListPanelPos = (-100, -60). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88)
 
@@ -331,8 +331,8 @@ Data this function reads, renamed with tools/rename.py:
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| D_80087028 | gItemListPanelRect | A | the only reference is this New_ScreenSprite call's rect: SELECT.TIM's cell, SpriteRect {0, 0, 256, 160}; sibling of gTextEntryPanelRect |
-| D_8008AAF8 | gItemListPanelPos | A | the panel's attachToParent position (-100, -60), a ScreenSpritePos; sibling of gTextEntryPanelPos |
+| D_80087028 | sItemListPanelRect | A | the only reference is this New_ScreenSprite call's rect: SELECT.TIM's cell, SpriteRect {0, 0, 256, 160}; sibling of sTextEntryPanelRect |
+| D_8008AAF8 | sItemListPanelPos | A | the panel's attachToParent position (-100, -60), a ScreenSpritePos; sibling of sTextEntryPanelPos |
 | D_8008AB14 | sStrSelect | A | the string "SELECT", the panel TIM's name; sibling of sStrComInput |
 | D_800116E4 | sItemListStrFontIcon | A | this unit's copy of "FONTICON" (TextEntryItemList's is sStrFontIcon, 0x8001161C) |
 | D_8008AB1C | sItemListCardPathPrefix | A | this unit's copy of "CARD\\" (TextEntryItemList's is sCardPathPrefix) |

@@ -31,7 +31,7 @@ void *GetLbdFileMethods(void) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `GetDataSrc39094Methods` -> `GetLbdFileMethods` with `rename.py`: the table getter, returns &gLbdFileMethods. It is gFileResourceMethods's gDataSourceClientGetters entry at +0x0A0, so SetActiveDataSource rebinds this class's interface slots. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `GetDataSrc39094Methods` -> `GetLbdFileMethods` with `rename.py`: the table getter, returns &gLbdFileMethods. It is gFileResourceMethods's sDataSourceClientGetters entry at +0x0A0, so SetActiveDataSource rebinds this class's interface slots. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)
@@ -50,9 +50,9 @@ loadHeader (+0x078) with each rate entry's `ptr0`, which
 StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__GetGridRecord (ObjM__AttachTarget installs it), whose
 tail call GetStageMapChunkRecord(stage, chunk) / GetStageMapChunkRecordXY leaves
-`&group[9 + chunk]` of gRecordTable in $v0. gRecordTable's 0x1C-byte records
+`&group[9 + chunk]` of sRecordTable in $v0. sRecordTable's 0x1C-byte records
 begin with a path, and record 9 of every stage group is its M000.LBD
-(stage 0: gStageFirstRecord[0] = 16, record 25 at 0x80081CC0 =
+(stage 0: sStageFirstRecord[0] = 16, record 25 at 0x80081CC0 =
 "STG00\M000.LBD"; stage 1: record 39 at 0x80081E48 = "STG01\M000.LBD").
 The same index goes into `ownerRate` and is split into column and row
 (StageMap__SplitChunkIndex). LBD is the game's own extension, and the

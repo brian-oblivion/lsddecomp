@@ -41,7 +41,7 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 Renamed `TodActor__SetUnk64` -> `TodActor__SetMainPartNotifies`
 (`tools/rename.py`), slot `setUnk64` -> `setMainPartNotifies`, field `unk64`
 -> `mainPartNotifies` (header edit; the compiler listed 3 accessors, all in
-TodActor.c). **Tier B**: the field's one reader, TodActor__TickCallbackA,
+TodActor.c). **Tier B**: the field's one reader, TodActor__TickMoveZ,
 has mainPart send event 6 (`notifyWithHull`) after the actor's own move only
 while it is 1; Reset sets it to 1. What the notification is for is not
 established.

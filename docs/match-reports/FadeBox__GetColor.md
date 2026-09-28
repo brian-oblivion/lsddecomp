@@ -9,9 +9,9 @@ Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::getColor` (`+0x0E4`).
 ```c
 void *FadeBox__GetColor(FadeBoxObj *self) {
     if (self->unk78 == 0xF) {
-        return gFadeBoxBlackColors;
+        return sFadeBoxBlackColors;
     }
-    return &gFadeBoxMaskColors[self->unk78 * 3];
+    return &sFadeBoxMaskColors[self->unk78 * 3];
 }
 ```
 
@@ -23,8 +23,8 @@ elsewhere in this unit as a mode/flags word tested against `0xF`).
 ## Naming (round 61, track 3)
 
 **`FadeBox__GetColor`** -- tier A. `FadeBoxMethods::getColor`
-(`+0x0E4`). Pure getter: returns `gFadeBoxBlackColors` (the fixed/default table)
-when `unk78 == 0xF`, else `&gFadeBoxMaskColors[unk78 * 3]` (the indexed table) --
+(`+0x0E4`). Pure getter: returns `sFadeBoxBlackColors` (the fixed/default table)
+when `unk78 == 0xF`, else `&sFadeBoxMaskColors[unk78 * 3]` (the indexed table) --
 the same two tables `FadeBox__StartFadeDown`/`StartFadeUp`
 write through `slotB8`. A pure leaf whose mechanics ARE its purpose (a
 getter) is tier A by this project's own naming rule.

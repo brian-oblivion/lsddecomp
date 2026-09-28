@@ -58,25 +58,25 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
     self->attrsReady = 0;
     self->bodyTransferPending = 0;
     self->baseFilename = NULL;
-    if (gVabSizeTableInited == 0) {
+    if (sVabSizeTableInited == 0) {
         SsInit();
-        gVabSizeTableInited = 1;
+        sVabSizeTableInited = 1;
         SsSetTableSize(GetSsSizeTableBuf(), 2, 1);
     }
-    if (gVabStreamInited == 0) {
-        gSsTicksPerSecond = 0x3C;
+    if (sVabStreamInited == 0) {
+        sSsTicksPerSecond = 0x3C;
         SsSetTickMode(1);
-        gVabStreamInited = 1;
+        sVabStreamInited = 1;
     }
-    gOpenVabCount++;
+    sOpenVabCount++;
     if (arg1 != NULL) {
         buf = BMemPMgrAlloc(strlen(arg1) + 1);
         if (buf != NULL) {
             self->baseFilename = buf;
             strcpy(buf, arg1);
-            BuildFileName(path, buf, NULL, gVabHeaderSuffix);
+            BuildFileName(path, buf, NULL, sVabHeaderSuffix);
             self->unk2A = 1;
-            BuildFileName(path, buf, NULL, gVabHeaderSuffix);
+            BuildFileName(path, buf, NULL, sVabHeaderSuffix);
             self->loadState = 1;
             self->methods->slot6C(self, path);
         }
@@ -89,7 +89,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
 `vagAttrPool`/`progVagTable`/`vabId`/`muted`/`attrsReady`/
 `bodyTransferPending`/`baseFilename`/`loadState`; the bytes are unchanged.)
 
-`gVabHeaderSuffix` is retail's own `.sdata` string `".VH"` -- referenced, not
+`sVabHeaderSuffix` is retail's own `.sdata` string `".VH"` -- referenced, not
 retyped, per the duplicated-string-shift lesson in CLAUDE.md.
 
 ## Result
@@ -161,11 +161,11 @@ slots this ctor calls now carry their inherited FileResource names:
 `char *path` (was `s32`). The slot table above calls +0x58 and +0x6C "null
 in retail". That is true of the static table only: SetActiveDataSource binds
 the active driver's `loadFile`/`requestLoadFile` there
-(`GetVabStreamObjMethods` is in `gDataSourceClientGetters`).
+(`GetVabStreamObjMethods` is in `sDataSourceClientGetters`).
 
 ## Round 98 (charlie, track 7)
 
-`SsSetTickMode(SS_TICK60)` (was `1`), `gSsTicksPerSecond = 60` (was
+`SsSetTickMode(SS_TICK60)` (was `1`), `sSsTicksPerSecond = 60` (was
 `D_8008A8CC = 0x3C`; see GetSsTicksPerSecond.md), `loadState =
 VABSTREAM_LOAD_HEADER`, `char vhPath[VAB_PATH_SIZE]`. `New_VabStreamObj`
 allocates `sizeof(VabStreamObj)` (0x64). Byte-exact.

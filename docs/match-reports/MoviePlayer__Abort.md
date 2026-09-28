@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Only when self is the object in gActiveMoviePlayer: set +0x48 = 1, clear +0x54, call the +0x60 object's +0x048 with it, set +0x44 = 1; then, if +0x64 is clear, call the +0x60 object's +0x07C with (obj, 0, 0) (clearing the callback MoviePlayer__Stop installed), set +0x64 = 1 and +0x44 = 1 again.
+Only when self is the object in sActiveMoviePlayer: set +0x48 = 1, clear +0x54, call the +0x60 object's +0x048 with it, set +0x44 = 1; then, if +0x64 is clear, call the +0x60 object's +0x07C with (obj, 0, 0) (clearing the callback MoviePlayer__Rewind installed), set +0x64 = 1 and +0x44 = 1 again.
 
 Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x04C.
 
@@ -48,11 +48,11 @@ typedef struct Obj458B8 {
     /* +0x064 */ s32 unk64;
 } Obj458B8;
 
-/* gMoviePlayerMethods +0x04C: when this is the object in gActiveMoviePlayer, set +0x48,
+/* gMoviePlayerMethods +0x04C: when this is the object in sActiveMoviePlayer, set +0x48,
  * clear +0x54, call the +0x60 object's +0x048, set +0x44, and the first
  * time (+0x64 clear) clear that object's +0x07C callback and set +0x64. */
 void MoviePlayer__Abort(Obj458B8 *self) {
-    Obj458B8 *cur = (Obj458B8 *)gActiveMoviePlayer;
+    Obj458B8 *cur = (Obj458B8 *)sActiveMoviePlayer;
 
     if (cur == self) {
         cur->unk48 = 1;
@@ -70,7 +70,7 @@ void MoviePlayer__Abort(Obj458B8 *self) {
 
 ## Notes
 
-First build. The same through-the-global shape as MoviePlayer__Stop (a local `cur` copy of gActiveMoviePlayer). The duplicated `unk44 = 1` is real source: retail stores it in the bnez delay slot (both paths) and again inside the if. Views Methods458B8/Obj458B8 (defined at MoviePlayer__Stop) gained slot48 and unk54 additively.
+First build. The same through-the-global shape as MoviePlayer__Rewind (a local `cur` copy of sActiveMoviePlayer). The duplicated `unk44 = 1` is real source: retail stores it in the bnez delay slot (both paths) and again inside the if. Views Methods458B8/Obj458B8 (defined at MoviePlayer__Rewind) gained slot48 and unk54 additively.
 
 ## Naming
 

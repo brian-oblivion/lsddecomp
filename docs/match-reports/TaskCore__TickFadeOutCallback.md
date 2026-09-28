@@ -45,10 +45,10 @@ epilogue:
 ## Signature update -- TRIED, did not move the residue
 
 Originally attempted as `s32 TaskCore__TickFadeOutCallback(Obj86B60 *self, s32 a1)`, an
-unused-but-forwarded parameter matching `TaskCore__TickFadeCallback`'s ORIGINAL
+unused-but-forwarded parameter matching `TaskCore__TickFadeInCallback`'s ORIGINAL
 signature. `TaskCore__Update`'s own residue (matched separately, see its
 report) proved this class of assumption wrong for its sibling slot
-`slotAC`/`TaskCore__TickFadeCallback`: the `s32 a1` at that call site was never a real
+`slotAC`/`TaskCore__TickFadeInCallback`: the `s32 a1` at that call site was never a real
 argument, just a leftover caller-saved register value from an earlier,
 unrelated call. `Obj86B60Methods::slotC0` (this function's own vtable
 slot, `+0x0C0`) was retyped to `s32 (*)(Obj86B60*)` (one argument) as part
@@ -79,20 +79,20 @@ BASE SHAPE, not more search on this one, was needed.
 
 ## What it does
 
-The `self->unk8C` counterpart to `TaskCore__TickFadeCallback`'s `self->unk88` (both set
-by `TaskCore__SetFadeOutCallbackEnabled`/`TaskCore__SetFadeCallbackEnabled` respectively). UNLIKE `TaskCore__TickFadeCallback`,
+The `self->unk8C` counterpart to `TaskCore__TickFadeInCallback`'s `self->unk88` (both set
+by `TaskCore__SetFadeOutCallbackEnabled`/`TaskCore__SetFadeInCallbackEnabled` respectively). UNLIKE `TaskCore__TickFadeInCallback`,
 this function's control flow has a genuine extra early-exit: if the
 callback returns 0, retail branches DIRECTLY to the shared epilogue,
 skipping the `slot60` call entirely, rather than reaching the same skip via
-a single unified `if (result != 0)` test the way `TaskCore__TickFadeCallback` does.
+a single unified `if (result != 0)` test the way `TaskCore__TickFadeInCallback` does.
 
 ## Progression
 
-**Attempt 1: `TaskCore__TickFadeCallback`'s exact shape** (`result = 1; if (unk8C) result
+**Attempt 1: `TaskCore__TickFadeInCallback`'s exact shape** (`result = 1; if (unk8C) result
 = unk8C(self); if (result != 0) slot60(...); return result;`) scored
 **23/27**, four words off, with a DIFFERENT branch immediate at the first
 `beqz` and three more knock-on differences -- confirmed this function's CFG
-genuinely differs from `TaskCore__TickFadeCallback`'s (per DECOMPILATION_LEARNINGS'
+genuinely differs from `TaskCore__TickFadeInCallback`'s (per DECOMPILATION_LEARNINGS'
 "two structurally-similar residues want different C shapes" entry), not
 just that the same C compiles slightly differently.
 
@@ -166,7 +166,7 @@ mutations never reach it from an `if`/`return` seed, so a stall in this
 exact shape (single register, a constant vs. a register-copy) is worth a
 manual `goto` rewrite before it's accepted as permuter-exhausted.
 
-`TaskCore__TickFadeCallback`/`TaskCore__TickFadeOutCallback` remain the same idiom (a callback stored by
+`TaskCore__TickFadeInCallback`/`TaskCore__TickFadeOutCallback` remain the same idiom (a callback stored by
 a matching setter, defaulting to 1, invoked and conditionally followed by a
 `slot60` reason-code call) at two different offsets in the same class,
 needing genuinely different C shapes despite that.
@@ -187,8 +187,8 @@ changed.
 
 **Tier C.** `func_8003CCDC` -> `Obj86B60__func_8003CCDC`. Same
 "invoke-optional-callback, transition on nonzero" shape as
-`TaskCore__TickFadeCallback` above, but for the `unk8C`/`slotC4` pair
-(`TaskCore__TickFadeColor`, external, unread here -- see `TaskCore__SetFadeOutCallbackEnabled`), so
+`TaskCore__TickFadeInCallback` above, but for the `unk8C`/`slotC4` pair
+(`TaskCore__TickFadeOut`, external, unread here -- see `TaskCore__SetFadeOutCallbackEnabled`), so
 it is not established as a "fade" tick either; transitions to state 8
 instead of 5 on completion. Kept tier C for the same reason as `TaskCore__SetFadeOutCallbackEnabled`.
 

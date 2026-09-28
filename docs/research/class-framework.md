@@ -13,7 +13,7 @@ should be checkable rather than believed.
 
 ## Why the symbol names prove nothing
 
-`New_DreamSys`, `DreamSys__DreamSys`, `Get_vtable_DreamSys`, `BasicClass__*` —
+`New_DreamSys`, `DreamSys__DreamSys`, `GetDreamSysMethods`, `BasicClass__*` —
 all of these are **FirecatFG's hypotheses**, inherited from lsddecomp along with
 the rest of the symbol file. There has never been a symbol leak for this game.
 Reasoning "the names look like C++, therefore it is C++" is circular: the names
@@ -30,7 +30,7 @@ ori   $a0, $zero, 0x928        ; size
 jal   BMemPMgrAlloc            ; allocator
 addu  $s0, $v0, $zero
 beqz  $s0, .L800587D0          ; NULL CHECK
-jal   Get_vtable_DreamSys      ; -> &gDreamSysMethods
+jal   GetDreamSysMethods      ; -> &gDreamSysMethods
 lw    $v0, 0x8($v0)            ; slot +0x008
 addu  $a0, $s0, $zero          ; this
 jalr  $v0                      ; CONSTRUCTOR, CALLED INDIRECTLY
@@ -43,7 +43,7 @@ addu  $v0, $s0, $zero          ; return the object
 jal   GetActorMethods            ; -> &gActorMethods (the BASE class table)
 lw    $v0, 0x8($v0)            ; slot +0x008 again
 jalr  $v0, $a0 = this          ; BASE CONSTRUCTOR, ALSO INDIRECT
-jal   Get_vtable_DreamSys
+jal   GetDreamSysMethods
 sw    $v0, 0x0($s0)            ; store table pointer at object offset 0
 sw    $s2, 0x58($s0)           ; ... then ordinary field init
 ```
@@ -171,10 +171,10 @@ independent checks agree:
   BasicClass's table is 15 slots, not 14.
 
 `python3 tools/typeviews.py --tree` prints the tree; it finds 58 classes.
-`classtable.py --scan`'s 60 tables include `gStyleCueCallbacks` (a callback
+`classtable.py --scan`'s 60 tables include `sStyleCueCallbacks` (a callback
 array sharing no slot with any class) and `D_8006C0F8` (its first word is a
 code pointer). `gFileResourceMethods`'s scan also reads on into the next symbol,
-`gDataSourceClientGetters`, a NULL-terminated list of table getters.
+`sDataSourceClientGetters`, a NULL-terminated list of table getters.
 
 **Class methods in `psyq_*` segments.** 26 classes keep some or all of their
 own methods in segments named `psyq_*` (`psyq_33808` holds 76, `psyq_322b4`

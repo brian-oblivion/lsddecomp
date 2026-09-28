@@ -1,4 +1,4 @@
-# StyleBuildDecorSet -- MATCHED 86/86 (round 76), lever: indexed `for` loop with `gStyleDecorColors + i * 3` (loop.c strength reduction makes the walker and the stride)
+# StyleBuildDecorSet -- MATCHED 86/86 (round 76), lever: indexed `for` loop with `sStyleDecorColors + i * 3` (loop.c strength reduction makes the walker and the stride)
 
 REVISITED, round 76: MATCHED 86/86 in 3 builds, no permuter, no barrier; names/types not relevant (existing names kept).
 
@@ -18,11 +18,11 @@ variables:
 | build | change | score |
 | --- | --- | --- |
 | 1 | preserved body | 17/86, 1 short, ins 4 / del 4 |
-| 2 | `for (i = 1; i < 0x12; i++)`, `gStyleDecorSlots[0] = New(...)` before the loop, `gStyleDecorSlots[i] = obj` and `gStyleDecorSlots[0]` as the dispatch argument inside it; no `arr`/`wp`, no `__asm__("")` | **77/86, length EXACT**, ins 1 / del 1 |
-| 3 | + drop the `s1` counter: `(void *) (gStyleDecorColors + i * 3)` | **86/86**, `OK: build matches retail` |
+| 2 | `for (i = 1; i < 0x12; i++)`, `sStyleDecorSlots[0] = New(...)` before the loop, `sStyleDecorSlots[i] = obj` and `sStyleDecorSlots[0]` as the dispatch argument inside it; no `arr`/`wp`, no `__asm__("")` | **77/86, length EXACT**, ins 1 / del 1 |
+| 3 | + drop the `s1` counter: `(void *) (sStyleDecorColors + i * 3)` | **86/86**, `OK: build matches retail` |
 
 - **Build 2 produces retail's `move s3,v1`.** The pre-loop store's address
-  is one pseudo (`$v1`); loop.c's invariant `&gStyleDecorSlots` for the
+  is one pseudo (`$v1`); loop.c's invariant `&sStyleDecorSlots` for the
   loop's `slots[i]`/`slots[0]` is another (`$s3`) initialised from it, and
   the strength-reduced giv for `&slots[i]` starts at `$s3 + 4` -- exactly the
   `addiu s0,s3,4` round 61 took for a hand-written `wp = arr + 1`. The
@@ -46,26 +46,26 @@ void StyleBuildDecorSet(void) {
     ObjSlotAC *self2;
     void *result;
 
-    if (gStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == 0) {
         return;
     }
-    paramA = *(PairXY *) &gStyleDecorPosX;
-    if (gStyleDecorVariant == 2) {
+    paramA = *(PairXY *) &sStyleDecorPosX;
+    if (sStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
-    paramB = *(PairXY *) &gStyleDecorSizeW;
-    gStyleDecorSlots[0] = New_BoxFill(&paramB, (void *) gStyleDecorColors, 0x1FFF);
+    paramB = *(PairXY *) &sStyleDecorSizeW;
+    sStyleDecorSlots[0] = New_BoxFill(&paramB, (void *) sStyleDecorColors, 0x1FFF);
     for (i = 1; i < 0x12; i++) {
-        obj = New_BoxFill(&paramB, (void *) (gStyleDecorColors + i * 3), 0x1FFF);
-        gStyleDecorSlots[i] = obj;
-        ((ObjSlot4C *) obj)->methods->slot4C(obj, gStyleDecorSlots[0], &paramA);
+        obj = New_BoxFill(&paramB, (void *) (sStyleDecorColors + i * 3), 0x1FFF);
+        sStyleDecorSlots[i] = obj;
+        ((ObjSlot4C *) obj)->methods->slot4C(obj, sStyleDecorSlots[0], &paramA);
         paramA.y += 3;
         paramB.y -= 7;
     }
 
-    self2 = *(ObjSlotAC **) (gStyleSceneRefs + 0xC);
+    self2 = *(ObjSlotAC **) (sStyleSceneRefs + 0xC);
     result = self2->methods->slotAC(self2);
-    ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
+    ((ObjSlot4C *) sStyleDecorSlots[0])->methods->slot4C(sStyleDecorSlots[0], result, &paramA);
 }
 ```
 
@@ -98,10 +98,10 @@ both a single source-shape difference and are CLOSED; names/types not relevant
 Round 46 named two effects and round 47 re-affirmed both:
 
 1. *"A stack-resident local (`paramA[1]`) gets reloaded from memory in retail
-   immediately after an intervening `gStyleDecorVariant` check reuses the register that
+   immediately after an intervening `sStyleDecorVariant` check reuses the register that
    held it ... register-pressure-driven, not something a source rewrite
    obviously controls."*
-2. Retail also reloads `gStyleDecorVariant` itself for the `== 2` test rather than
+2. Retail also reloads `sStyleDecorVariant` itself for the `== 2` test rather than
    reusing the value the guard already read.
 
 Neither is register pressure and both are the same thing: **retail copies each
@@ -113,18 +113,18 @@ typedef struct PairXY { s32 x; s32 y; } PairXY;
 
 PairXY paramA, paramB;
 
-paramA = *(PairXY *) &gStyleDecorPosX;      /* NOT paramA[0] = ..; paramA[1] = ..; */
-if (gStyleDecorVariant == 2) {
+paramA = *(PairXY *) &sStyleDecorPosX;      /* NOT paramA[0] = ..; paramA[1] = ..; */
+if (sStyleDecorVariant == 2) {
     paramA.y += 0x1E;
 }
-paramB = *(PairXY *) &gStyleDecorSizeW;
+paramB = *(PairXY *) &sStyleDecorSizeW;
 ```
 
 **Mechanism.** A struct assignment is a BLKmode `set`. gcc 2.6.3's `cse.c`
 cannot reason about the extent of a BLKmode destination, so `invalidate()`
 falls back to `invalidate_memory()` -- it throws away **every** cached memory
 value in the hash table, not just the ones that could overlap. So the read of
-`gStyleDecorVariant` the guard performed is no longer available for the `== 2` test
+`sStyleDecorVariant` the guard performed is no longer available for the `== 2` test
 (reload 2), and the value just written into `paramA.y` is no longer available
 for the `+= 0x1E` (reload 1). Written as scalar stores, the stack slot is a
 fixed frame address, CSE keeps everything, and **both reloads vanish** -- which
@@ -134,9 +134,9 @@ With that one change, retail's whole setup block matches byte for byte,
 reloads, load-delay `nop` and all:
 
 ```
-45070  lw    v0,%gp_rel(gStyleDecorPosX)     45078  sw  v0,0x10(sp)
-45074  lw    v1,%gp_rel(gStyleDecorPosY)     4507c  sw  v1,0x14(sp)
-45080  lw    v1,%gp_rel(gStyleDecorVariant)   <-- reload 2
+45070  lw    v0,%gp_rel(sStyleDecorPosX)     45078  sw  v0,0x10(sp)
+45074  lw    v1,%gp_rel(sStyleDecorPosY)     4507c  sw  v1,0x14(sp)
+45080  lw    v1,%gp_rel(sStyleDecorVariant)   <-- reload 2
 45084  li    v0,0x2
 45088  bne   v1,v0,450a0
 4508c   li   a2,0x1fff
@@ -154,7 +154,7 @@ read straight off the raw `.s`:
 | # | correction | evidence in retail |
 | --- | --- | --- |
 | 1 | the pair copies are struct assignments (above) | the two reloads |
-| 2 | the trailing double dispatch reads the GLOBAL `gStyleDecorSlots[0]` twice, not the cached `arr[0]` | `lui v1/lw %lo(gStyleDecorSlots)` at 45160 **and again** `lui a0/lw %lo` at 45170, where the loop body uses `lw a1,0(s3)` |
+| 2 | the trailing double dispatch reads the GLOBAL `sStyleDecorSlots[0]` twice, not the cached `arr[0]` | `lui v1/lw %lo(sStyleDecorSlots)` at 45160 **and again** `lui a0/lw %lo` at 45170, where the loop body uses `lw a1,0(s3)` |
 | 3 | the array is walked with a separate pointer starting at `arr + 1`, not indexed by the loop counter | `addiu s0,s3,4` before the loop; `sw a0,0(s0); addiu s0,s0,4` inside |
 | 4 | `arr` is assigned AFTER the first call, not before | `lui v1/addiu v1` sit at 450c4, past the `jal` at 450bc |
 
@@ -188,10 +188,10 @@ register, same value, branch targets agreeing"), and it is the whole of the
 byte-identical output, i.e. the residue is invariant to all of them rather
 than merely unimproved:
 
-- `arr = gStyleDecorSlots; wp = arr + 1;`
-- `wp = gStyleDecorSlots; arr = wp; wp = arr + 1;`
-- an extra `void **base;` temp: `base = gStyleDecorSlots; arr = base;`
-- `wp = gStyleDecorSlots + 1;` (derive the walker from the global, not from `arr`)
+- `arr = sStyleDecorSlots; wp = arr + 1;`
+- `wp = sStyleDecorSlots; arr = wp; wp = arr + 1;`
+- an extra `void **base;` temp: `base = sStyleDecorSlots; arr = base;`
+- `wp = sStyleDecorSlots + 1;` (derive the walker from the global, not from `arr`)
 - `wp[0] = obj; wp = wp + 1;` instead of `*wp = obj; wp++;`
 - `obj` typed `ObjSlot4C *` instead of `void *`, dropping the cast at the
   dispatch
@@ -221,8 +221,8 @@ side effect of the image moving. The honest figures are the two in the title:
 ## Preserved near-miss body (1 word short, `#if 0` in `src/world/ObjMStyleActor.c`)
 
 Needs, already present earlier in the unit in strict ROM order:
-`extern s32 gStyleDecorVariant, gStyleDecorPosX, gStyleDecorPosY, gStyleDecorSizeW, gStyleDecorSizeH,
-gStyleSceneRefs, gStyleDecorColors;`, `extern void *gStyleDecorSlots[];`,
+`extern s32 sStyleDecorVariant, sStyleDecorPosX, sStyleDecorPosY, sStyleDecorSizeW, sStyleDecorSizeH,
+sStyleSceneRefs, sStyleDecorColors;`, `extern void *sStyleDecorSlots[];`,
 `extern void *New_BoxFill(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
 the function in the unit.
@@ -245,23 +245,23 @@ void StyleBuildDecorSet(void) {
     ObjSlotAC *self2;
     void *result;
 
-    if (gStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == 0) {
         return;
     }
-    paramA = *(PairXY *) &gStyleDecorPosX;
-    if (gStyleDecorVariant == 2) {
+    paramA = *(PairXY *) &sStyleDecorPosX;
+    if (sStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
-    paramB = *(PairXY *) &gStyleDecorSizeW;
+    paramB = *(PairXY *) &sStyleDecorSizeW;
     i = 1;
     s1 = 3;
-    obj = New_BoxFill(&paramB, (void *) gStyleDecorColors, 0x1FFF);
+    obj = New_BoxFill(&paramB, (void *) sStyleDecorColors, 0x1FFF);
     __asm__("");
-    arr = gStyleDecorSlots;
+    arr = sStyleDecorSlots;
     wp = arr + 1;
     *arr = obj;
     do {
-        obj = New_BoxFill(&paramB, (void *) (s1 + gStyleDecorColors), 0x1FFF);
+        obj = New_BoxFill(&paramB, (void *) (s1 + sStyleDecorColors), 0x1FFF);
         *wp = obj;
         wp++;
         ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], &paramA);
@@ -271,9 +271,9 @@ void StyleBuildDecorSet(void) {
         i++;
     } while (i < 0x12);
 
-    self2 = *(ObjSlotAC **) (gStyleSceneRefs + 0xC);
+    self2 = *(ObjSlotAC **) (sStyleSceneRefs + 0xC);
     result = self2->methods->slotAC(self2);
-    ((ObjSlot4C *) gStyleDecorSlots[0])->methods->slot4C(gStyleDecorSlots[0], result, &paramA);
+    ((ObjSlot4C *) sStyleDecorSlots[0])->methods->slot4C(sStyleDecorSlots[0], result, &paramA);
 }
 ```
 
@@ -312,9 +312,9 @@ stopped on it. The discriminator here costs one build.
 
 **`StyleBuildDecorSet`, tier B.**
 
-Guarded by `gStyleDecorVariant` (set only for `gStyleVariant == 0` by
+Guarded by `sStyleDecorVariant` (set only for `sStyleVariant == 0` by
 `PickStyleFallbackConfig`). Allocates 18 `New_BoxFill` instances into
-`gStyleDecorSlots`, walking two position pairs (`paramA`/`paramB`) that step
+`sStyleDecorSlots`, walking two position pairs (`paramA`/`paramB`) that step
 by a fixed per-iteration delta. Released by `StyleReleaseDecorSet`,
 per-frame-updated by `StyleUpdateDecorSet` (sibling report; same guard, same
 array). "DecorSet" names the mechanics (a released/updated SET of objects
@@ -324,7 +324,7 @@ STALL, 1 word short; naming is unaffected by match state per track 3.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-gStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` view's +0x04C is attachToParent, cast to BoxFillAttachToParentFn with the PairXY position cast to BoxFillPos *. Zero bytes.
+sStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` view's +0x04C is attachToParent, cast to BoxFillAttachToParentFn with the PairXY position cast to BoxFillPos *. Zero bytes.
 
 ## Round 93 polish (delta, track 7)
 
@@ -332,37 +332,37 @@ gStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` vi
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `gStyleDecorPosAX`/`AY` | `gStyleDecorPosX`/`Y` | A | copied whole and passed as attachToParent's third argument, BoxFill's screen position (BoxFillPos). |
-| `gStyleDecorPosBX`/`BY` | `gStyleDecorSizeW`/`H` | A | copied whole and passed as New_BoxFill's first argument, the size (BoxFill.h: BoxFillSize, width then height); `h` drops by 7 per band. |
-| `gStyleCueSelf` | `gStyleGrid` | A | RegisterStyleConfig stores its arg0; its one caller passes ObjM's `unk14`, the StageMap (IntermediateBase.h, ObjM.h); this unit calls StageMap's computeCellOffsets on it and parents every effect under it. |
+| `gStyleDecorPosAX`/`AY` | `sStyleDecorPosX`/`Y` | A | copied whole and passed as attachToParent's third argument, BoxFill's screen position (BoxFillPos). |
+| `gStyleDecorPosBX`/`BY` | `sStyleDecorSizeW`/`H` | A | copied whole and passed as New_BoxFill's first argument, the size (BoxFill.h: BoxFillSize, width then height); `h` drops by 7 per band. |
+| `gStyleCueSelf` | `sStyleGrid` | A | RegisterStyleConfig stores its arg0; its one caller passes ObjM's `unk14`, the StageMap (IntermediateBase.h, ObjM.h); this unit calls StageMap's computeCellOffsets on it and parents every effect under it. |
 | `0x12` | `STYLE_DECOR_BANDS` (18) | A | the band count: New_BoxFill loop bound, ReleaseBasicClassArray count, the colour tables' 18 triples. |
 | `0x1FFF` | `STYLE_DECOR_PRI` | A | New_BoxFill's pri argument; 13 bits, the mask BoxFill__Reset's setMask(13) sets. Hex: a mask-shaped value. |
-| `0x1E` | `STYLE_DECOR_VARIANT2_DROP` (30) | B | added to the y position when `gStyleDecorVariant == 2`, here and in StyleUpdateDecorSet. |
+| `0x1E` | `STYLE_DECOR_VARIANT2_DROP` (30) | B | added to the y position when `sStyleDecorVariant == 2`, here and in StyleUpdateDecorSet. |
 
-Local views replaced by the real classes: the `+0x0AC` slot on `gStyleSceneRefs`'s `+0x00C` is Viewport's getSubHandle (that word is ObjM's `cachedViewport`; `StyleSceneRefs`); the band objects are BoxFill. Locals: `pos`, `size`, `band`, `viewport`, `parent`.
+Local views replaced by the real classes: the `+0x0AC` slot on `sStyleSceneRefs`'s `+0x00C` is Viewport's getSubHandle (that word is ObjM's `cachedViewport`; `StyleSceneRefs`); the band objects are BoxFill. Locals: `pos`, `size`, `band`, `viewport`, `parent`.
 
 ### Comments moved here from src/world/ObjMStyleActor.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 
 ```c
-/* Local view: gStyleDecorPosX/gStyleDecorPosY and gStyleDecorSizeW/gStyleDecorSizeH are two
+/* Local view: sStyleDecorPosX/sStyleDecorPosY and sStyleDecorSizeW/sStyleDecorSizeH are two
  * adjacent 8-byte pairs, and this unit copies each into a local pair as a
  * WHOLE-STRUCT assignment rather than field by field.  That is not a style
  * choice -- it is load-bearing.  A BLKmode set makes gcc 2.6.3's cse.c call
  * invalidate_memory(), dropping every cached memory value, which is what
- * produces retail's otherwise inexplicable reload of gStyleDecorVariant for the
+ * produces retail's otherwise inexplicable reload of sStyleDecorVariant for the
  * `== 2` test and its reload of the pair's second word right after writing
  * it.  Written as two scalar stores, neither reload appears and the body is
  * several words short.  Round 61; see docs/match-reports/StyleBuildDecorSet.md. */
 ```
 
 ```c
-/* Allocates the 18 decor objects into gStyleDecorSlots, each attached
+/* Allocates the 18 decor objects into sStyleDecorSlots, each attached
  * (attachToParent, +0x04C) to slot 0, then attaches slot 0 to the target object's slotAC
  * result.  MATCHED round 76 (charlie): an indexed for loop -- loop.c's
  * strength reduction produces both the slot walker and the colour-table
- * stride (`gStyleDecorColors + i * 3`), which earlier rounds had written as
+ * stride (`sStyleDecorColors + i * 3`), which earlier rounds had written as
  * hand-rolled pointer/counter variables.  See
  * docs/match-reports/StyleBuildDecorSet.md. */
 ```

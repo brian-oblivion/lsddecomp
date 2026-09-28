@@ -7,16 +7,16 @@
 ## What this function does
 
 A plain `$gp`-relative setter: stores its single `s32` argument into the
-scalar global `gFileTable` (in `.sdata`). No return value.
+scalar global `sFileTable` (in `.sdata`). No return value.
 
 ## The C
 
 ```c
-extern s32 gFileTable;
+extern s32 sFileTable;
 
 void SetFileTable(s32 a0)
 {
-    gFileTable = a0;
+    sFileTable = a0;
 }
 ```
 
@@ -32,7 +32,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | was | now | tier |
 | --- | --- | --- |
 | `func_80027FD8` | `SetFileTable` | A |
-| `D_8008A868` | `gFileTable` | A |
+| `D_8008A868` | `sFileTable` | A |
 
 **Evidence.** The global is the base of an array of 0x1C-byte records:
 `FindCdFileEntry` and `FindCdFileIndex` (CdDriver) walk it with a literal
@@ -50,6 +50,6 @@ Note for track 4: the symbol is still declared `s32` here and `char *` in
 
 The CD driver's shared globals and records are now declared once, in
 `include/CdDriver.h`, and this body uses that one reading: the parameter is `CdFileEntry *` (was `s32`). The
-global's type comes from its accessors (`gFileTable` is walked at the 0x1C
-`CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
+global's type comes from its accessors (`sFileTable` is walked at the 0x1C
+`CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.

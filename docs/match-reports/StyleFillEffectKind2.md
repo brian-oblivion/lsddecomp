@@ -13,14 +13,14 @@ local. Four separate things were wrong, found in this order:
 
 | # | change | effect |
 | --- | --- | --- |
-| 1 | `gStyleSpawnTableIndex = randval % 6;` | retail's magic is `0x2AAAAAAB` with no shift = signed **/6**; the preserved `randval - (randval / 3) * 6` computed a different function. 49 -> 51/79 |
-| 2 | first `gStyleSpawnColors` store through `S32BoxK2 *slot` (`slot->v = ...`) | the whole `% 20` prefix (`lui 0x6666`, `lw gStyleDay`, `mult`) now interleaves into the `% 3`'s `multu` latency exactly as retail. Same mechanism as StyleFillEffectKind3 this round: a store through a plain `s32 *` is an opaque `(mem (reg))` the scheduler will not hoist a global load above; an in-struct store at a varying address does not conflict with a scalar at a fixed address. Went 1 word short (the if/else, below). |
+| 1 | `sStyleSpawnTableIndex = randval % 6;` | retail's magic is `0x2AAAAAAB` with no shift = signed **/6**; the preserved `randval - (randval / 3) * 6` computed a different function. 49 -> 51/79 |
+| 2 | first `sStyleSpawnColors` store through `S32BoxK2 *slot` (`slot->v = ...`) | the whole `% 20` prefix (`lui 0x6666`, `lw sStyleDay`, `mult`) now interleaves into the `% 3`'s `multu` latency exactly as retail. Same mechanism as StyleFillEffectKind3 this round: a store through a plain `s32 *` is an opaque `(mem (reg))` the scheduler will not hoist a global load above; an in-struct store at a varying address does not conflict with a scalar at a fixed address. Went 1 word short (the if/else, below). |
 | 3 | `r = rand();` then `(u32) r % 3`, instead of inlining `rand()` or a separate `idx = rand() % 3` | inline put `slot` in `$s0`; `idx` put the remainder in `$a0`. With the rand RESULT in a local, both `$a2` (slot) and `$v0` (remainder) are retail's. |
-| 4 | `val = (gStyleDay / 20) * 20; if (gStyleDay != val) val = gStyleKind2AltColor; else val = 0;` | **79/79**, `OK: build matches retail` |
+| 4 | `val = (sStyleDay / 20) * 20; if (sStyleDay != val) val = sStyleKind2AltColor; else val = 0;` | **79/79**, `OK: build matches retail` |
 
 ### Step 4: the if/else was being rewritten by jump.c
 
-Retail keeps both arms: `beq a1,v0 -> zero-arm; lw v0,gStyleKind2AltColor; j join;
+Retail keeps both arms: `beq a1,v0 -> zero-arm; lw v0,sStyleKind2AltColor; j join;
 nop; zero-arm: move v0,zero; join:`. Every `% 20` spelling with the load arm
 first (if/else, `!= 0`, ternary either way, `switch` with `default` first)
 compiled to `move a3,zero` ahead of the branch and a one-armed skip:
@@ -65,21 +65,21 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     u8 **q;
 
     r = rand();
-    slot = (S32BoxK2 *) gStyleSpawnColors;
-    slot->v = (s32) (gStyleKind2Colors + ((u32) r % 3) * 3);
+    slot = (S32BoxK2 *) sStyleSpawnColors;
+    slot->v = (s32) (sStyleKind2Colors + ((u32) r % 3) * 3);
     slot++;
-    val = (gStyleDay / 20) * 20;
-    if (gStyleDay != val) {
-        val = gStyleKind2AltColor;
+    val = (sStyleDay / 20) * 20;
+    if (sStyleDay != val) {
+        val = sStyleKind2AltColor;
     } else {
         val = 0;
     }
     slot->v = val;
-    SetupStyleSpawnParamsA(arg1, (void *) gStyleSpawnYChoice2);
-    q = &gStyleSpawnRotation;
-    *q = gStyleSpawnRotations;
-    gStyleSpawnTableIndex = rand() % 6;
-    *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
+    SetupStyleSpawnParamsRandom(arg1, (void *) sStyleSpawnYChoice2);
+    q = &sStyleSpawnRotation;
+    *q = sStyleSpawnRotations;
+    sStyleSpawnTableIndex = rand() % 6;
+    *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) sStyleGrid, arg1);
     arg0++;
     return arg0;
 }
@@ -118,38 +118,38 @@ names/types USED -- one of the two levers was the parameter type.**
 
 Rebuilt the inherited body verbatim: `build exit=2`, no compile-error grep
 hits, **16/79 reproduced exactly**, and `build/lsdde.map` puts the next
-function `SetupStyleSpawnParamsA` at `0x80055254` against retail's `0x80055258`,
+function `SetupStyleSpawnParamsRandom` at `0x80055254` against retail's `0x80055258`,
 confirming the recorded "1 word short" precisely.
 
 **`insertions 10 / deletions 10`, positional skeleton diffs 59.** Round 48
 recorded the scaffold at ins 12 / del 13 and called it AGREE, which was right.
 What nobody had done was read the diff for *what* those ten insertions were.
 
-### Lever 1 (+26 words and the whole length gap): retail caches `&gStyleSpawnRotation`
+### Lever 1 (+26 words and the whole length gap): retail caches `&sStyleSpawnRotation`
 
 Round 47 filed the residue as "`arg1` capture timing" plus "instruction
 scheduling interleave". The length arithmetic says otherwise, and it closes
 exactly. From the disassembly, retail:
 
 ```
-lui   s0,%hi(gStyleSpawnRotation) ; addiu s0,s0,%lo(gStyleSpawnRotation)   /* $s0 = &gStyleSpawnRotation */
-lui   v0,%hi(gStyleSpawnRotations) ; addiu v0,v0,%lo(gStyleSpawnRotations)
+lui   s0,%hi(sStyleSpawnRotation) ; addiu s0,s0,%lo(sStyleSpawnRotation)   /* $s0 = &sStyleSpawnRotation */
+lui   v0,%hi(sStyleSpawnRotations) ; addiu v0,v0,%lo(sStyleSpawnRotations)
 jal   rand
  sw   v0,0x0($s0)                      /* the store rides rand's delay slot */
 ...
-addiu a1,s0,-0xc                       /* gStyleSpawnOffsetX's address, ONE word */
+addiu a1,s0,-0xc                       /* sStyleSpawnOffsetX's address, ONE word */
 ```
 
 The inherited body wrote the global by name and re-materialised the second
 address absolutely, which costs a word and wastes the delay slot:
 
 ```
-lui v0,%hi(gStyleSpawnRotations) ; addiu v0,v0,%lo(gStyleSpawnRotations)
-lui at,%hi(gStyleSpawnRotation) ; sw v0,%lo(gStyleSpawnRotation)(at)      /* 2 words */
+lui v0,%hi(sStyleSpawnRotations) ; addiu v0,v0,%lo(sStyleSpawnRotations)
+lui at,%hi(sStyleSpawnRotation) ; sw v0,%lo(sStyleSpawnRotation)(at)      /* 2 words */
 jal rand
  nop                                                     /* delay slot wasted */
 ...
-lui a1,%hi(gStyleSpawnOffsetX) ; addiu a1,a1,%lo(gStyleSpawnOffsetX)    /* 2 words */
+lui a1,%hi(sStyleSpawnOffsetX) ; addiu a1,a1,%lo(sStyleSpawnOffsetX)    /* 2 words */
 ```
 
 Retail 6 words with a free store; built 7 words. **And the prologue was 2
@@ -164,15 +164,15 @@ carries in its own preserved body:
 ```c
 u8 **q;
 ...
-q = &gStyleSpawnRotation;
-*q = gStyleSpawnRotations;
+q = &sStyleSpawnRotation;
+*q = sStyleSpawnRotations;
 ...
-New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
+New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) sStyleGrid, arg1);
 ```
 
 **16/79 and 1 short -> 42/79 and LENGTH EXACT**, skeleton diffs 59 -> 35.
 
-Round 48's attempt 6 tried this exact lever (`u8 **ptr = &gStyleSpawnRotation;`) and
+Round 48's attempt 6 tried this exact lever (`u8 **ptr = &sStyleSpawnRotation;`) and
 recorded "regressed badly (8/79, +47000 more bytes of drift)". I cannot
 reproduce that; on this body it is worth +26 words and the entire length gap.
 Whatever differed, **the recorded negative on this lever is wrong and should
@@ -192,7 +192,7 @@ Retyping to the sibling's shape:
 ```c
 void **StyleFillEffectKind2(void **arg0, void *arg1) {
     ...
-    *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
+    *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) sStyleGrid, arg1);
     arg0++;
     return arg0;
 }
@@ -217,11 +217,11 @@ image verified green with it in place.
 **Negative 1: inverting the if/else arm order. Measured twice, on two
 different bodies, both worse and both reintroducing length drift.**
 
-Retail's block layout is unambiguous -- the `gStyleKind2AltColor` load is physically
+Retail's block layout is unambiguous -- the `sStyleKind2AltColor` load is physically
 FIRST and jumps (`j` with a `nop` delay), the `move v0,zero` arm is physically
 LAST and falls through -- which by section 3a's rule ("GCC 2.6.3 gives the
 fallthrough to whichever candidate is LAST in source order") says retail's
-source is `if (gStyleDay % 20 != 0) { v0 = gStyleKind2AltColor; } else { v0 = 0; }`,
+source is `if (sStyleDay % 20 != 0) { v0 = sStyleKind2AltColor; } else { v0 = 0; }`,
 the inverse of the inherited body. Applying it:
 
 | body it was applied to | before | after |
@@ -248,7 +248,7 @@ slot and forcing the two-block form.
 **Negative 2: deleting the single-use `idx` local is exactly INERT.**
 `idx = (u32) rand() % 3;` used once, inlined into the store expression:
 42/79 -> 42/79, ins 8/8, 35 skeleton diffs -- byte-identical, not merely
-similar. This is a useful boundary on the lever that closed `SetupStyleSpawnParamsB`
+similar. This is a useful boundary on the lever that closed `SetupStyleSpawnParamsDayMod7`
 in this same session and same unit: **that lever needs a local whose LIVE
 RANGE CROSSES A CALL** (`r` there carried three `rand()` results across
 intervening calls, costing one `move` per call). `idx`'s live range is
@@ -276,10 +276,10 @@ length-exact, so round 48's negative does not cover it.
    within one. Search is meaningful.
 
 The `Reorderings: 3` matches the diff by eye exactly: retail hoists
-`ori v1,v1,0x6667`, `mfhi a0`, `lw a1,%gp_rel(gStyleDay)` and `mult a1,v1`
+`ori v1,v1,0x6667`, `mfhi a0`, `lw a1,%gp_rel(sStyleDay)` and `mult a1,v1`
 into the `/3` `multu`'s latency window, *ahead* of the `lui/addiu` for
-`&gStyleSpawnColors`, and finishes the `/3` chain afterwards. The build computes
-`&gStyleSpawnColors` first and defers the `/20` `mult` until after the first store.
+`&sStyleSpawnColors`, and finishes the `/3` chain afterwards. The build computes
+`&sStyleSpawnColors` first and defers the `/20` `mult` until after the first store.
 
 **One thing this rules out cheaply:** the `% 20 == 0` test must stay INLINE in
 the `if`. Retail compares `a1 == (a1/20)*20` with no `subu`, which is cc1's
@@ -334,8 +334,8 @@ local COUNT (this session's other two matches) or a declaration.
 `output-495-1` made two changes, both using one extra local `new_var`:
 
 - **(a)** an explicit alias for the first store:
-  `new_var = slot; *new_var = (s32) (gStyleKind2Colors + idx * 3);`
-- **(b)** a named local for the `gStyleGrid` load, passed as
+  `new_var = slot; *new_var = (s32) (sStyleKind2Colors + idx * 3);`
+- **(b)** a named local for the `sStyleGrid` load, passed as
   `New_StyleEffect`'s third argument.
 
 Screened for UB first (no use-before-init, no staleness across a back-edge,
@@ -379,16 +379,16 @@ window.
 ## Preserved near-miss body (49/79, length exact, `#if 0` in src/world/ObjMStyleActor.c)
 
 ```c
-extern s32 gStyleDay;
-extern s32 gStyleGrid;
-extern s32 gStyleKind2AltColor;
-extern s32 gStyleSpawnYChoice2;
-extern u8 gStyleKind2Colors[];
-extern s32 gStyleSpawnColors[];
-extern u8 *gStyleSpawnRotation;
-extern u8 gStyleSpawnRotations[];
-extern s32 gStyleSpawnTableIndex;
-extern void SetupStyleSpawnParamsA(void *arg0, void *arg1);
+extern s32 sStyleDay;
+extern s32 sStyleGrid;
+extern s32 sStyleKind2AltColor;
+extern s32 sStyleSpawnYChoice2;
+extern u8 sStyleKind2Colors[];
+extern s32 sStyleSpawnColors[];
+extern u8 *sStyleSpawnRotation;
+extern u8 sStyleSpawnRotations[];
+extern s32 sStyleSpawnTableIndex;
+extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);
 extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3);
 
 void **StyleFillEffectKind2(void **arg0, void *arg1) {
@@ -399,21 +399,21 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     u8 **q;
 
     idx = (u32) rand() % 3;
-    slot = gStyleSpawnColors;
-    *slot = (s32) (gStyleKind2Colors + idx * 3);
+    slot = sStyleSpawnColors;
+    *slot = (s32) (sStyleKind2Colors + idx * 3);
     slot++;
-    if (gStyleDay % 20 == 0) {
+    if (sStyleDay % 20 == 0) {
         v0 = 0;
     } else {
-        v0 = gStyleKind2AltColor;
+        v0 = sStyleKind2AltColor;
     }
     *slot = v0;
-    SetupStyleSpawnParamsA(arg1, (void *) gStyleSpawnYChoice2);
-    q = &gStyleSpawnRotation;
-    *q = gStyleSpawnRotations;
+    SetupStyleSpawnParamsRandom(arg1, (void *) sStyleSpawnYChoice2);
+    q = &sStyleSpawnRotation;
+    *q = sStyleSpawnRotations;
     randval = rand();
-    gStyleSpawnTableIndex = randval - (randval / 3) * 6;
-    *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) gStyleGrid, arg1);
+    sStyleSpawnTableIndex = randval - (randval / 3) * 6;
+    *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) sStyleGrid, arg1);
     arg0++;
     return arg0;
 }
@@ -429,7 +429,7 @@ the correct signature regardless of whether the body is live.
 **1. "Retail caches an address in a callee-saved register" and "retail
 re-materialises it per access" are BOTH real shapes, they occur in adjacent
 functions in one unit, and the source spellings are different.** This session
-matched `SetupStyleSpawnParamsA` by STOPPING an address from being cached (an
+matched `SetupStyleSpawnParamsRandom` by STOPPING an address from being cached (an
 incomplete-array declaration was producing the cache) and improved
 `StyleFillEffectKind2` by FORCING one (a `u8 **q` local). Same unit, same symbol
 group, opposite directions. So neither is a rule about the codebase; read
@@ -456,7 +456,7 @@ slot instead and collapses the whole `if`. **An empty delay slot on retail's
 check before spending a build.
 
 **3. A stall report's per-lever negatives decay too, not just its score and
-its class.** Round 48's attempt 6 recorded the `&gStyleSpawnRotation` pointer local as
+its class.** Round 48's attempt 6 recorded the `&sStyleSpawnRotation` pointer local as
 "regressed badly (8/79)". It is worth +26 words and the entire length gap.
 Section 4 already says the CLASS goes stale unnoticed while the measurement
 stays good; this adds that an individual lever recorded as FAILED is the most
@@ -491,7 +491,7 @@ record of what someone did, not a proof of what does not work.
 
 **`StyleFillEffectKind2`, tier B.**
 
-Called only when `gStyleVariant == 2`, from `StyleBuildEffectSlots`, as
+Called only when `sStyleVariant == 2`, from `StyleBuildEffectSlots`, as
 the kind-2-exclusive finishing fill (the sibling of `StyleFillEffectKind3`,
 mirrored for the other variant). Passes a literal kind argument of `2` to
 `New_StyleEffect`. STALL, 49/79 words (length exact), residue at ins 3/del 3
@@ -499,7 +499,7 @@ per the round-64 revisit.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+`sStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared sStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and sStyleGrid as the `SceneNode *` parent. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 
@@ -507,8 +507,8 @@ per the round-64 revisit.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_80087228` | `gStyleKind2Colors` | A | 3 RGB triples stored as the params' color for kind 2. |
-| `D_80087430` | `gStyleKind2AltColor` | C | the word stored as the params' altColor when `gStyleDay % 20 != 0`. Its data word is 0 (the record is {0, &D_8008AB7C, -1, 0, 0}) and nothing in the tree writes it, so both paths store 0 unless a writer is found. |
+| `D_80087228` | `sStyleKind2Colors` | A | 3 RGB triples stored as the params' color for kind 2. |
+| `D_80087430` | `sStyleKind2AltColor` | C | the word stored as the params' altColor when `sStyleDay % 20 != 0`. Its data word is 0 (the record is {0, &D_8008AB7C, -1, 0, 0}) and nothing in the tree writes it, so both paths store 0 unless a writer is found. |
 
 Locals: `slots`, `pos`, `r`, `color`, `altColor`, `rotation`.
 
@@ -517,17 +517,17 @@ Locals: `slots`, `pos`, `r`, `color`, `altColor`, `rotation`.
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 
 ```c
-/* Local view, same reason as PtrBoxK3 above: the first gStyleSpawnColors store goes
- * through a pointer to a one-field struct so the gStyleDay load may
+/* Local view, same reason as PtrBoxK3 above: the first sStyleSpawnColors store goes
+ * through a pointer to a one-field struct so the sStyleDay load may
  * schedule above it (retail interleaves the % 20 into the % 3's multu
  * latency).  Round 76; see docs/match-reports/StyleFillEffectKind2.md. */
 ```
 
 ```c
 /* Appends one kind-2 New_StyleEffect object after picking a random colour
- * triple and a per-20-ticks gStyleKind2AltColor value.  MATCHED round 76 (charlie).
- * `val = (gStyleDay / 20) * 20; if (gStyleDay != val)` is the
+ * triple and a per-20-ticks sStyleKind2AltColor value.  MATCHED round 76 (charlie).
+ * `val = (sStyleDay / 20) * 20; if (sStyleDay != val)` is the
  * load-bearing spelling of `% 20 != 0`: because the tested variable is also
  * the assigned one, jump.c cannot rewrite the if/else into `val = 0; if (..)
- * val = gStyleKind2AltColor;`, which is what every `% 20` spelling compiles to. */
+ * val = sStyleKind2AltColor;`, which is what every `% 20` spelling compiles to. */
 ```

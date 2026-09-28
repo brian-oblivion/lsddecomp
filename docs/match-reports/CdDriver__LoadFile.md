@@ -16,7 +16,7 @@ the six assigned before `CdDriver__RunRequestQueue`.
  * that already matched against the earlier, narrower Obj80027480 still
  * match after this extension. */
 extern void FileResource__LoadFile(void);
-extern void *gCdSavedSeekParam;
+extern void *sCdSavedSeekParam;
 
 /* generic doubly-linked-list node, 0x24 bytes (src/cd/CdDriver.c's own
  * reading); only offset 0x0 is touched here -- declared LOCAL, per the
@@ -25,7 +25,7 @@ typedef struct Node8008A894 {
     s32 unk0;
 } Node8008A894;
 
-extern Node8008A894 *gCdRequestQueue;
+extern Node8008A894 *sCdRequestQueue;
 extern void *BMemPMgrAlloc(s32 size);
 
 void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
@@ -35,7 +35,7 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
     void *ret;
     s32 v1;
 
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && sCdSyncQueueMode == 0) {
         FileResource__LoadFile();
         self->unk24 |= 0x200;
         self->methods->slot64(self);
@@ -43,44 +43,44 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (gCdBusy == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
+        if (sCdBusy == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
             StartCdOperation(4, 1);
-            gCdSavedSeekParam = gCdSeekParam;
+            sCdSavedSeekParam = sCdSeekParam;
             rec = FindCdFileEntry(arg1);
-            gCdSeekParam = rec;
+            sCdSeekParam = rec;
             if (rec == NULL) {
                 return;
             }
             {
                 sectorCount = rec->unk18 >> 11;
-                gCdReadSectorCount = sectorCount;
+                sCdReadSectorCount = sectorCount;
                 if ((rec->unk18 & 0x7FF) != 0) {
-                    gCdReadSectorCount = sectorCount + 1;
+                    sCdReadSectorCount = sectorCount + 1;
                 }
-                pos = gCdReadSectorCount << 11;
+                pos = sCdReadSectorCount << 11;
                 if (self->unk10 == NULL) {
                     ret = BMemPMgrAlloc(pos);
                     if (ret == NULL) {
                         self->methods->slot48(self);
                         return;
                     }
-                    gCdReadBuffer = ret;
+                    sCdReadBuffer = ret;
                     self->unk10 = ret;
                 } else {
-                    gCdReadBuffer = self->unk10;
+                    sCdReadBuffer = self->unk10;
                 }
-                if (gCdAsyncEnabled != 0) {
+                if (sCdAsyncEnabled != 0) {
                     self->unk14 = pos;
-                    gCdTickStep = 2;
+                    sCdTickStep = 2;
                 } else {
                 retry:
                     do {
-                        CdControl(2, (u8 *)gCdSeekParam + 0x14, 0);
+                        CdControl(2, (u8 *)sCdSeekParam + 0x14, 0);
                         do {
                             v1 = CdSync(0, 0);
                         } while (v1 == 0);
                     } while (v1 == 5);
-                    CdRead(gCdReadSectorCount, self->unk10, 0x80);
+                    CdRead(sCdReadSectorCount, self->unk10, 0x80);
                     do {
                         v1 = CdReadSync(0, 0);
                     } while (v1 > 0);
@@ -88,7 +88,7 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
                         goto retry;
                     }
                     self->unk14 = pos;
-                    gCdRequestQueue->unk0 = 1;
+                    sCdRequestQueue->unk0 = 1;
                     ResetCdStateMachine();
                 }
             }
@@ -117,13 +117,13 @@ not necessarily the order that matters most:
 
 1. **The nested-if/else-if-vs-nested-if polarity lever, a FOURTH instance in
    this unit**, on the outermost `self->unk28` split: `if (self->unk28 != 0)
-   { if (gCdBusy==0 && ...) {...} } else { EnqueueCdRequest(...); }`, not
+   { if (sCdBusy==0 && ...) {...} } else { EnqueueCdRequest(...); }`, not
    the flattened else-if form.
 
 2. **The SAME polarity lever again, a fifth instance, on `self->unk10 ==
    NULL` vs `!= NULL`**: the fall-through (immediately after the test) must
    be the LONGER continuation (`BMemPMgrAlloc` call and its own nested
-   checks), with the trivial one-line store (`gCdReadBuffer = self->unk10;`)
+   checks), with the trivial one-line store (`sCdReadBuffer = self->unk10;`)
    at the branch target. This is now the clearest pattern in the unit: with
    five confirmed instances across four functions, whichever arm is
    textually longer needs to be read off the `.s` as the fall-through, not
@@ -156,7 +156,7 @@ not necessarily the order that matters most:
    RECOMPUTED `a0=2` (the next iteration's `CdControl` argument setup) that
    duplicates an already-present, real instruction at the retry target --
    1 word too long -- instead of retail's `li v0,1` (the constant later
-   stored through `gCdRequestQueue->unk0`). Rewriting only this OUTERMOST loop
+   stored through `sCdRequestQueue->unk0`). Rewriting only this OUTERMOST loop
    as `retry: ...; if (v1 == -1) goto retry;` (keeping the two INNER retry
    loops as plain `do`/`while`, since their own hoisted-constant shapes
    already matched) fixed it immediately. **So the goto-vs-do-while choice
@@ -247,7 +247,7 @@ opens, sizes, allocates for, reads and closes a named file, i.e. it is the
 base-class LoadFile. Not renamed here (out of unit).
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__LoadFile` -> `CdDriver__LoadFile` by rename.py. The arg-less FileResource__LoadFile call goes through the LoadFileNoArgsFn cast (no code) now that FileResource.h's prototype is in scope.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__LoadFile` -> `CdDriver__LoadFile` by rename.py. The arg-less FileResource__LoadFile call goes through the LoadFileNoArgsFn cast (no code) now that FileResource.h's prototype is in scope.
 
 ## History (moved from code_179d8_s.c, round 100)
 

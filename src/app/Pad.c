@@ -3,7 +3,7 @@
  * documents the class and its events; main() creates the one instance).
  * Instances share the Psy-Q pad library: the first ctor calls PadInit and
  * the last finalize PadStop (sPadRefCount). On every DrawSystem vsync
- * event (IntermediateBase__OnTag1Notify) updateMasks turns two consecutive
+ * event (IntermediateBase__OnDrawSystemEvent) updateMasks turns two consecutive
  * PadRead words into held, pressed and released edge masks, and
  * dispatchEvents sends at most one event per button to the pad's parents.
  * loadButtonTable copies sDefaultButtonMasks, a fixed table of libetc's
@@ -38,15 +38,15 @@ Pad *New_Pad(s32 mode, s32 port) {
     if (self == NULL) {
         goto fail;
     }
-    Get_vtable_Pad()->ctor(self, mode, port);
+    GetPadMethods()->ctor(self, mode, port);
     return self;
 fail:
     return NULL;
 }
 
 void Pad__Pad(Pad *self, s32 mode, s32 port) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_Pad();
+    GetBasicClassMethods()->ctor((BasicClass *)self);
+    self->methods = GetPadMethods();
     if (sPadRefCount++ == 0) {
         PadInit(mode);
     }
@@ -57,7 +57,7 @@ void Pad__Finalize(Pad *self) {
     if (--sPadRefCount == 0) {
         PadStop();
     }
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void Pad__Init(Pad *self, s32 port) {
@@ -143,6 +143,6 @@ void Pad__LoadButtonTable(void) {
 
 void Pad__NoOpSlot54(void) {}
 
-PadMethods *Get_vtable_Pad(void) {
+PadMethods *GetPadMethods(void) {
     return &gPadMethods;
 }

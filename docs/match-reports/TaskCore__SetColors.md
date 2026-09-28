@@ -116,7 +116,7 @@ logic, a pure multi-field assignment.
 
 `Obj86B60::unk90` (`u8[3]`, +0x090) -> `baseColor`. Tier B: the only field
 of the three `SetColors` writes that is independently READ elsewhere in this
-unit -- `TaskCore__TickColorFade` adds `frameCounter * unk84` to each of its
+unit -- `TaskCore__TickFadeIn` adds `frameCounter * unk84` to each of its
 three bytes as a fade base. `unk93`/`unk96` are set the same way by
 `SetColors` but never independently read in this unit's evidence, so no
 distinguishing name is proposed for them (kept `unk93`/`unk96`). Grep shows
@@ -138,7 +138,7 @@ the unit). Evidence: the copy compiles to `lb`/`sb` per byte, so the record is
 a signed 3-byte `s8` triple -- not Sony's `CVECTOR` (4 bytes, `u_char`); and
 `baseColor`, the first of the three, is what `TaskCore__OnInit`
 (`Task.c`) hands to `BgLayer`'s `setColor` as a `BgLayerRgb *`, and
-`TaskCore__TickColorFade` hands it the faded copy of it the same way. `unk93`/`unk96` are filled from the same rodata table
+`TaskCore__TickFadeIn` hands it the faded copy of it the same way. `unk93`/`unk96` are filled from the same rodata table
 (`sTaskCoreDefaultColors`, three records 3 bytes apart) and `unk93` goes to the same
 TaskTextObj slot78 as `baseColor`, so one record type covers all three.
 Byte-identical: whole image green, 0 new warnings, nonmatching green.

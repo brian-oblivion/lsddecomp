@@ -40,11 +40,11 @@ the epilogue: the null path sets `v0 = 0`, the success path sets
 ## New externs
 
 ```c
-extern s32 gStyleSceneRefs;                                 /* fresh copy -- see below */
+extern s32 sStyleSceneRefs;                                 /* fresh copy -- see below */
 extern void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2);  /* forward decl, own unit,
                                                           111w, STALL -- widened round 47,
                                                           see FindNextStyleCueInRange.md */
-extern s32 gStyleCueCallbacks[];                                /* 14-slot table, ObjMStyleActor.c's gStyleCueCallbacks */
+extern s32 sStyleCueCallbacks[];                                /* 14-slot table, ObjMStyleActor.c's sStyleCueCallbacks */
 extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
 ```
 
@@ -53,10 +53,10 @@ extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4)
 arg4)`); this call site only needs `void *`/`s32` at the ABI level (matches
 the looser local signatures `Entity.c` and `DreamSys.c` already use for the
 same cross-unit call, per the multiple-independent-local-views convention).
-`gStyleSceneRefs` is redeclared fresh here (not reusing the copy later in this
+`sStyleSceneRefs` is redeclared fresh here (not reusing the copy later in this
 file for `FlushStyleCue`/`ServiceStyleCueIfNear`) because this function's ROM
-address is earlier -- same pattern as `StyleUpdateEffectSlots`'s fresh `gStyleVariant`
-copy. `gStyleCueCallbacks` is `ObjMStyleActor.c`'s already-identified 14-function
+address is earlier -- same pattern as `StyleUpdateEffectSlots`'s fresh `sStyleVariant`
+copy. `sStyleCueCallbacks` is `ObjMStyleActor.c`'s already-identified 14-function
 table (its own `ParamMethods` slot list); here it is read as a raw `s32`
 bit pattern (a function pointer forwarded opaquely as `InitSoundCueSet`'s 5th
 argument, which just stores it into `obj->unkC` -- confirmed by reading that
@@ -72,7 +72,7 @@ ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void *arg3) {
     sub = (ObjN14Sub *) FindNextStyleCueInRange(&arg0->unk4, &arg0->unk10, arg2);
     if (sub != 0) {
         arg0->unk0 = sub;
-        InitSoundCueSet(*(s32 *) gStyleSceneRefs, &arg0->unk14, sub->unk6, arg0, gStyleCueCallbacks[sub->unk6]);
+        InitSoundCueSet(*(s32 *) sStyleSceneRefs, &arg0->unk14, sub->unk6, arg0, sStyleCueCallbacks[sub->unk6]);
         if (sub->unk6 == *arg1) {
             *arg1 = -sub->unk6;
         }
@@ -140,14 +140,14 @@ Looks up a nearby record via `FindNextStyleCueInRange`; on success,
 claims it into `arg0->entry`, starts `InitSoundCueSet` on the slot's
 embedded `cueSet`, and toggles the claimed entry's sign tag so it will not
 be picked twice. Called from `TickStyle` for each of the two
-`gStyleCueSlots` when that slot is empty. "TryStart" over a bare "Start"
+`sStyleCueSlots` when that slot is empty. "TryStart" over a bare "Start"
 because failure (returning `NULL`) is a real, handled path, not an error --
 the slot stays empty and `TickStyle` retries next frame (implicit from the
-call site's `gStyleCueSlots[i] = TryStartStyleCue(...)` pattern, no
+call site's `sStyleCueSlots[i] = TryStartStyleCue(...)` pattern, no
 error-log or assert on failure). MATCHED, 45/45.
 
 ## Round 93 polish (delta, track 7)
 
 ### Naming
 
-Parameters: `slot`, `lastCue` (TickStyle's third argument, by address: set to the negated cue when the started cue equals it), `target` (the grid target's world position), `unused`. `gStyleCueCallbacks` typed `SoundCueCallbackFn[]` and InitSoundCueSet given its real prototype (SoundCueSet.h); `EntrySlot::count`/`StyleCueEntryView::countSign` renamed `cue`: it is the record's cue index (gStyleCueCallbacks row, InitSoundCueSet tag, gStyleCueDistanceTable row), positive while free, negated while a slot holds it.
+Parameters: `slot`, `lastCue` (TickStyle's third argument, by address: set to the negated cue when the started cue equals it), `target` (the grid target's world position), `unused`. `sStyleCueCallbacks` typed `SoundCueCallbackFn[]` and InitSoundCueSet given its real prototype (SoundCueSet.h); `EntrySlot::count`/`StyleCueEntryView::countSign` renamed `cue`: it is the record's cue index (sStyleCueCallbacks row, InitSoundCueSet tag, sStyleCueDistanceTable row), positive while free, negated while a slot holds it.

@@ -22,7 +22,7 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *ref
 	s32 *vec;
 	s32 *p;
 
-	p = &gProjectOffsetZ;
+	p = &sProjectOffsetZ;
 	*p = day;
 	SceneNode__LocalOffsetToWorldPos(this, local, p - 2, 0);
 
@@ -55,14 +55,14 @@ the signature edit).
 
 ## New global named: the unnamed 3-word vector at 0x80087EE0
 
-`gProjectOffsetZ` is the LAST word of an unnamed 3-word (`DreamSysVec3`-shaped)
+`sProjectOffsetZ` is the LAST word of an unnamed 3-word (`DreamSysVec3`-shaped)
 global scratch vector. The other two words were NOT independently named --
 splat's dlabel boundary put them inside `sVoicePitchBySelect`'s dlabel as unlabeled
 tail bytes (`asm/data/783DC.data.s`), because nothing took their address
 directly until this function. Declared in `include/DreamSys.h` as
-`extern s32 gProjectOffsetZ;` (unchanged type -- it really is a lone word by
+`extern s32 sProjectOffsetZ;` (unchanged type -- it really is a lone word by
 itself); the vector's start is reached with pointer arithmetic off it,
-`(s32 *)&gProjectOffsetZ - 2`, since renaming/resegmenting `sVoicePitchBySelect`'s dlabel
+`(s32 *)&sProjectOffsetZ - 2`, since renaming/resegmenting `sVoicePitchBySelect`'s dlabel
 is a `config/` change and out of scope this round.
 
 **This is not a guess -- two independent pieces of evidence pin it down:**
@@ -80,10 +80,10 @@ is a `config/` change and out of scope this round.
    parameter to `ApplyMatrixToLVArray(dst, src, 1, buf)`, and `ApplyMatrixToLVArray`'s
    own doc comment (`include/SceneNode.h`) confirms it treats both pointers
    as 0xC-byte (3-word) elements. `DreamSys__ProjectPointAtDistance` passes
-   `(s32 *)&gProjectOffsetZ - 2` as that exact `src` argument, which only
+   `(s32 *)&sProjectOffsetZ - 2` as that exact `src` argument, which only
    type-checks sensibly as a 3-word vector's start -- matching the 8
    "spare" bytes above exactly (2 words = 8 bytes immediately before
-   `gProjectOffsetZ`, which is the vector's 3rd word).
+   `sProjectOffsetZ`, which is the vector's 3rd word).
 
 ## Two real bugs found and fixed in the inherited sketch
 
@@ -93,20 +93,20 @@ anything) -- both defects were in HOW two already-identified pieces of
 logic were expressed in C, not in what the function does.
 
 **Bug 1: the shared-pointer computation was split into two separate
-expressions, so GCC computed `&gProjectOffsetZ`'s address TWICE instead of
-once.** The snapshot wrote `gProjectOffsetZ = day;` and, later, `&gProjectOffsetZ -
+expressions, so GCC computed `&sProjectOffsetZ`'s address TWICE instead of
+once.** The snapshot wrote `sProjectOffsetZ = day;` and, later, `&sProjectOffsetZ -
 2` as a fresh address-of expression at the call site. Retail computes the
 address ONCE (into a single register) and reuses it for both the plain
 store and the pointer-arithmetic argument -- GCC 2.6.3 does not CSE this
-across two syntactically distinct `&gProjectOffsetZ` occurrences. Fix: bind it
+across two syntactically distinct `&sProjectOffsetZ` occurrences. Fix: bind it
 to a named pointer once, use it for both:
 ```c
-p = &gProjectOffsetZ;
+p = &sProjectOffsetZ;
 *p = day;
 SceneNode__LocalOffsetToWorldPos(this, local, p - 2, 0);
 ```
 This alone was worth several words and, more importantly, is what makes
-`gProjectOffsetZ`'s own later uses read as a genuine defect rather than random
+`sProjectOffsetZ`'s own later uses read as a genuine defect rather than random
 noise -- a nice instance of the round's own standing theme (an unverified
 intermediate claim reads as something else entirely once actually
 recompiled).
@@ -147,7 +147,7 @@ shape of the already-existing `DreamSysVec3` struct, so:
 ```
 closed the remaining 3-word overshoot (`objdump` word count 59 -> 56,
 matching retail exactly) and, since the whole-image drift this caused had
-been shifting even the LATER, unrelated `gProjectOffsetZ` global's own resolved
+been shifting even the LATER, unrelated `sProjectOffsetZ` global's own resolved
 address (data placed after this code in the single contiguous PS-X image)
 and `InterpolateKeyframeValue`'s call target, fixing this one bug cleared every other
 remaining diff in the same build.
@@ -202,7 +202,7 @@ OUTSIDE the range**.
 
 ```c
 #if 0
-extern s32 gProjectOffsetZ;
+extern s32 sProjectOffsetZ;
 extern s32 SceneNode__LocalOffsetToWorldPos();
 extern s32 InterpolateKeyframeValue();
 extern s32 IsVec3WithinRange();
@@ -212,8 +212,8 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 day, s32 *ref
 	s32 local[3];
 	s32 v0;
 
-	gProjectOffsetZ = day;
-	SceneNode__LocalOffsetToWorldPos(this, local, &gProjectOffsetZ - 2, 0);
+	sProjectOffsetZ = day;
+	SceneNode__LocalOffsetToWorldPos(this, local, &sProjectOffsetZ - 2, 0);
 
 	v0 = InterpolateKeyframeValue((void *)((u8 *)this->unk_0x5C + 0x14),
 	                    (void *)((u8 *)this->unk_0x5C + 0x20), day);

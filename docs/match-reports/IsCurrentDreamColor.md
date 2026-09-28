@@ -17,7 +17,7 @@ and matched it fresh.
 
 ## What it does
 
-A predicate: call the object at global `gDreamAuxWorld`'s vtable slot 0x80 (byte
+A predicate: call the object at global `sDreamAuxWorld`'s vtable slot 0x80 (byte
 offset 0x200) with no argument but `self`, and compare the (word-sized)
 result against a per-`idx` signed byte from a small lookup table
 `D_80088D16`.
@@ -27,7 +27,7 @@ typedef s32 (*TriggerWorldFn80)(TriggerWorld *self);
 
 bool IsCurrentDreamColor(s32 idx)
 {
-    TriggerWorld *w = (TriggerWorld *)gDreamAuxWorld;
+    TriggerWorld *w = (TriggerWorld *)sDreamAuxWorld;
     s32 val = D_80088D16[idx];
     s32 result = ((TriggerWorldFn80)w->vtable[0x80])(w);
 
@@ -67,7 +67,7 @@ bool IsCurrentDreamColor(s32 idx)
    reading `$s0` first) reproduced the exact register choice. Byte-exact on
    this change.
 
-`gDreamAuxWorld`'s declaration (`extern s32 gDreamAuxWorld;`, shared with
+`sDreamAuxWorld`'s declaration (`extern s32 sDreamAuxWorld;`, shared with
 `SetDreamAuxWorld`) predates this function; it is cast to `TriggerWorld *` at
 the point of use here rather than declared as a pointer at file scope, since
 `SetDreamAuxWorld` treats the same global as a generic `s32` parameter store.
@@ -93,19 +93,19 @@ before treating a residue like this as a deeper stall.
 ## Naming
 
 **IsCurrentDreamColor** — tier A. A pure predicate: calls
-`gDreamAuxWorld`'s vtable slot 0x80 (self-only) and compares the result
+`sDreamAuxWorld`'s vtable slot 0x80 (self-only) and compares the result
 against a per-`idx` entry of `D_80088D16`. The mechanics (query the world,
 compare) ARE the name; tier A by the pure-leaf rule even though what the
 world's vtable-0x80 slot itself represents is unknown.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-The view `*gDreamAuxWorld` is cast to is renamed `DreamAuxWorld` /
+The view `*sDreamAuxWorld` is cast to is renamed `DreamAuxWorld` /
 `DreamAuxWorldFn80` in include/DreamAux.h (was `TriggerWorld` /
 `TriggerWorldFn80`, same `{ void **vtable; }` shape, so the call is
 unchanged). The name `TriggerWorld` now belongs to the class gTriggerWorldMethods
 (include/TriggerWorld.h), whose table is 0x8C bytes: this call loads byte
-+0x200 of its object's table (`lw v0,512(v0)`), so gDreamAuxWorld is not a
++0x200 of its object's table (`lw v0,512(v0)`), so sDreamAuxWorld is not a
 TriggerWorld. Its real class is unresolved. Bytes unchanged.
 
 ## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
@@ -124,13 +124,13 @@ condition/player/color/current.
 The comments, as they stood:
 
 ```c
-/* Compares gDreamAuxWorld's getDreamColor (DreamSys +0x200) against a per-idx signed byte from D_80088D16. */
+/* Compares sDreamAuxWorld's getDreamColor (DreamSys +0x200) against a per-idx signed byte from D_80088D16. */
 
 /* A small signed-byte lookup table read by CheckDreamAuxWorldState, indexed by its
  * `idx` parameter. Layout beyond "one signed byte per entry" is not known
  * from this unit alone. */
 
-/* gDreamAuxWorld is the player DreamSys (include/DreamSys.h, track 4
+/* sDreamAuxWorld is the player DreamSys (include/DreamSys.h, track 4
  * round 88): the +0x200 its table is called at is getDreamColor, and
  * ObjMStyleActor hands SetDreamAuxWorld its DreamSys `target`. DreamAux.c
  * declares it; the DreamAuxWorld view that stood here is gone. */

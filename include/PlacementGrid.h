@@ -12,7 +12,7 @@
  * chains to GetActiveDataSourceMethods()->ctor, and Finalize and SetFlag
  * forward to the active driver's, as TimBlockSrc, Tod and ModelData do); no
  * subclasses. Methods in src/sound/PlacementGridVabSound.c. GetPlacementGridMethods is the
- * first entry of gDataSourceClientGetters, so SetActiveDataSource rebinds
+ * first entry of sDataSourceClientGetters, so SetActiveDataSource rebinds
  * its file-I/O slots like every client's.
  *
  * Lifecycle: the grid manager (StageMap) is its one user.
@@ -80,7 +80,7 @@ struct PlacementGridMethods {
 struct PlacementGrid {
     FILERESOURCE_FIELDS(PlacementGridMethods);
     /* +0x02C */ struct LinkResource *linkResource; /* the models' LinkResource (include/LinkResource.h); zeroed by the ctor */
-    /* +0x030 */ s32 loaded; /* set by PlacementGrid__SetFlag (the driver's read-done callback); zeroed by the ctor; nothing reads it */
+    /* +0x030 */ s32 loaded; /* set by PlacementGrid__OnRequestDone (the driver's read-done callback); zeroed by the ctor; nothing reads it */
 }; /* 0x34 bytes: New_PlacementGrid */
 
 extern PlacementGridMethods gPlacementGridMethods;
@@ -89,7 +89,7 @@ extern PlacementGridMethods *GetPlacementGridMethods(void);
 PlacementGrid *New_PlacementGrid(char *name);
 void PlacementGrid__PlacementGrid(PlacementGrid *self, char *name);
 void PlacementGrid__Finalize(PlacementGrid *self);
-void PlacementGrid__SetFlag(PlacementGrid *self);
+void PlacementGrid__OnRequestDone(PlacementGrid *self);
 s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s32 cell);
 
 #endif

@@ -42,10 +42,10 @@
 /* Defined in other units. */
 
 /* The zero offset ScreenSprite__AttachToParent attaches with. */
-extern LongVec3 gVec3Zero;
+extern LongVec3 sVec3Zero;
 
 /* Cell 0 of the font texture, {u 0, v 0, w 8, h 8}: GetCellRect offsets it. */
-extern SpriteRect gCharSpriteCellRect;
+extern SpriteRect sCharSpriteCellRect;
 
 /* A 0..255 colour channel to GsSetAmbient's 0..ONE scale (255 << 4 is 4080). */
 #define AMBIENT_TO_FIX12_SHIFT 4
@@ -99,10 +99,10 @@ CharSpriteMethods *GetCharSpriteMethods(void) {
     return &gCharSpriteMethods;
 }
 
-/* The rect of character `cell` in the font texture: gCharSpriteCellRect moved
+/* The rect of character `cell` in the font texture: sCharSpriteCellRect moved
  * to the cell's column and row. Only the low byte of `cell` counts. */
 void GetCellRect(SpriteRect *dst, u32 cell) {
-    *dst = gCharSpriteCellRect;
+    *dst = sCharSpriteCellRect;
     cell &= 0xFF;
     dst->u += (cell % CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE;
     dst->v += (cell / CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE;
@@ -135,7 +135,7 @@ void ScreenSprite__Reset(ScreenSprite *self) {}
  * setPosition (+0x0BC). */
 void ScreenSprite__AttachToParent(ScreenSprite *self, SceneNode *parent, ScreenSpritePos *pos) {
     if (self->parent == NULL) {
-        GetSpriteMethods()->attachToParent((Sprite *)self, parent, &gVec3Zero);
+        GetSpriteMethods()->attachToParent((Sprite *)self, parent, &sVec3Zero);
         self->methods->setPosition(self, pos);
     }
 }
@@ -320,7 +320,7 @@ void RequestedFile__Finalize(RequestedFile *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* gRequestedFileMethods slot +0x064 (setFlag): the driver reports the requested
+/* gRequestedFileMethods slot +0x064 (onRequestDone): the driver reports the requested
  * file loaded. */
 void RequestedFile__MarkLoaded(RequestedFile *self) {
     self->loaded = 1;
@@ -336,7 +336,7 @@ FrameClock *New_FrameClock(void) {
     FrameClock *obj = BMemPMgrAlloc(sizeof(FrameClock));
 
     if (obj != NULL) {
-        Get_vtable_FrameClock()->ctor(obj);
+        GetFrameClockMethods()->ctor(obj);
         return obj;
     }
     return NULL;
@@ -344,14 +344,14 @@ FrameClock *New_FrameClock(void) {
 
 /* gFrameClockMethods slot +0x008 (ctor): the BasicClass ctor, install the table, reset(0). */
 void FrameClock__FrameClock(FrameClock *self) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_FrameClock();
+    GetBasicClassMethods()->ctor((BasicClass *)self);
+    self->methods = GetFrameClockMethods();
     self->methods->reset(self, 0);
 }
 
 /* gFrameClockMethods slot +0x00C (finalize): the BasicClass finalize. */
 void FrameClock__Finalize(FrameClock *self) {
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 /* gFrameClockMethods slot +0x024 (removeParentRef): step the cursor past the parent
@@ -360,7 +360,7 @@ void FrameClock__RemoveParentRef(FrameClock *self, BasicClass *parent) {
     if (self->parentCursor != NULL && parent == self->parentCursor->value) {
         self->parentCursor = self->parentCursor->next;
     }
-    Get_vtable_BasicClass()->removeParentRef((BasicClass *)self, parent);
+    GetBasicClassMethods()->removeParentRef((BasicClass *)self, parent);
 }
 
 /* gFrameClockMethods slot +0x030 (notifyParents): walk the parent refs with
@@ -381,18 +381,18 @@ void FrameClock__NotifyParents(FrameClock *self, s32 event) {
  * flags and the cursor. */
 void FrameClock__Reset(FrameClock *self, s32 frameCount) {
     self->frameCount = frameCount;
-    self->flag14 = 0;
+    self->stopped = 0;
     self->paused = 0;
     self->parentCursor = 0;
 }
 
-/* gFrameClockMethods slot +0x044 (tick): notify FLAG14 if flag14 is set, else
+/* gFrameClockMethods slot +0x044 (tick): notify STOPPED if stopped is set, else
  * PAUSED if paused, else count the frame and notify RUNNING. */
 void FrameClock__Tick(FrameClock *self) {
     s32 event;
 
-    if (self->flag14 != 0) {
-        event = FRAMECLOCK_EVENT_FLAG14;
+    if (self->stopped != 0) {
+        event = FRAMECLOCK_EVENT_STOPPED;
     } else if (self->paused != 0) {
         event = FRAMECLOCK_EVENT_PAUSED;
     } else {
@@ -423,12 +423,12 @@ s32 FrameClock__IsPaused(FrameClock *self) {
 }
 
 /* gFrameClockMethods slot +0x058. */
-void FrameClock__SetFlag14(FrameClock *self) {
-    self->flag14 = 1;
+void FrameClock__Stop(FrameClock *self) {
+    self->stopped = 1;
 }
 
 /* Returns the gFrameClockMethods method table. */
-FrameClockMethods *Get_vtable_FrameClock(void) {
+FrameClockMethods *GetFrameClockMethods(void) {
     return &gFrameClockMethods;
 }
 

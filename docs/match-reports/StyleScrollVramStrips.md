@@ -14,13 +14,13 @@ Fresh ground, carved round 45, never attempted. No blockers.
 
 ```
 /* 46224 80055A24 E8FFBD27 */  addiu $sp, $sp, -0x18
-/* 46228 80055A28 6404838F */  lw    $v1, %gp_rel(gStyleStage)($gp)
+/* 46228 80055A28 6404838F */  lw    $v1, %gp_rel(sStyleStage)($gp)
 /* 4622C 80055A2C 02000234 */  ori   $v0, $zero, 0x2
 /* 46230 80055A30 07006214 */  bne   $v1, $v0, .L80055A50
-/* 46238 80055A38 0880043C */  lui   $a0, %hi(gStyleStripRectA)
-/* 4623C 80055A3C 44748424 */  addiu $a0, $a0, %lo(gStyleStripRectA)
-/* 46240 80055A40 0880063C */  lui   $a2, %hi(gStyleStripScratchA)
-/* 46244 80055A44 5074C624 */  addiu $a2, $a2, %lo(gStyleStripScratchA)
+/* 46238 80055A38 0880043C */  lui   $a0, %hi(sStyleStripRectA)
+/* 4623C 80055A3C 44748424 */  addiu $a0, $a0, %lo(sStyleStripRectA)
+/* 46240 80055A40 0880063C */  lui   $a2, %hi(sStyleStripScratchA)
+/* 46244 80055A44 5074C624 */  addiu $a2, $a2, %lo(sStyleStripScratchA)
 /* 46248 80055A48 9C560108 */  j     .L80055A70
 /* 4624C 80055A4C 01000534 */   ori  $a1, $zero, 0x1
 .L80055A50:
@@ -28,10 +28,10 @@ Fresh ground, carved round 45, never attempted. No blockers.
 /* 46254 80055A54 0300422C */  sltiu $v0, $v0, 0x3
 /* 46258 80055A58 07004010 */  beqz  $v0, .L80055A78
 /* 4625C 80055A5C 01000534 */   ori  $a1, $zero, 0x1
-/* 46260 80055A60 0880043C */  lui   $a0, %hi(gStyleStripRectB)
-/* 46264 80055A64 5C748424 */  addiu $a0, $a0, %lo(gStyleStripRectB)
-/* 46268 80055A68 0880063C */  lui   $a2, %hi(gStyleStripScratchB)
-/* 4626C 80055A6C 6874C624 */  addiu $a2, $a2, %lo(gStyleStripScratchB)
+/* 46260 80055A60 0880043C */  lui   $a0, %hi(sStyleStripRectB)
+/* 46264 80055A64 5C748424 */  addiu $a0, $a0, %lo(sStyleStripRectB)
+/* 46268 80055A68 0880063C */  lui   $a2, %hi(sStyleStripScratchB)
+/* 4626C 80055A6C 6874C624 */  addiu $a2, $a2, %lo(sStyleStripScratchB)
 .L80055A70:
 /* 46270 80055A70 89ED000C */  jal   RotateVramRectRight
 .L80055A78:
@@ -39,8 +39,8 @@ Fresh ground, carved round 45, never attempted. No blockers.
 jr $ra
 ```
 
-`gStyleStage` is a plain `s32` (already established as such in
-`ObjMStyleActor.c`, `RegisterStyleConfig`). `(gStyleStage - 3)` cast to unsigned and
+`sStyleStage` is a plain `s32` (already established as such in
+`ObjMStyleActor.c`, `RegisterStyleConfig`). `(sStyleStage - 3)` cast to unsigned and
 compared `< 3` is the standard idiom for a closed range test, matching
 retail's `sltiu` exactly. `RotateVramRectRight` is a not-yet-carved,
 still-`INCLUDE_ASM` function in `asm/psyq_2bb9c.s` (a 4-argument draw-style
@@ -50,25 +50,25 @@ matters here, declared loosely as `void RotateVramRectRight(void *arg0, s32 arg1
 void *arg2);`.
 
 ```c
-extern s32 gStyleStage;
+extern s32 sStyleStage;
 extern void RotateVramRectRight(void *arg0, s32 arg1, void *arg2);
-extern s32 gStyleStripRectA[];
-extern s32 gStyleStripScratchA[];
-extern s32 gStyleStripRectB[];
-extern s32 gStyleStripScratchB[];
+extern s32 sStyleStripRectA[];
+extern s32 sStyleStripScratchA[];
+extern s32 sStyleStripRectB[];
+extern s32 sStyleStripScratchB[];
 
 void StyleScrollVramStrips(void) {
     void *a0, *a2;
     s32 a1;
 
-    if (gStyleStage == 2) {
-        a0 = gStyleStripRectA;
-        a2 = gStyleStripScratchA;
+    if (sStyleStage == 2) {
+        a0 = sStyleStripRectA;
+        a2 = sStyleStripScratchA;
         a1 = 1;
-    } else if ((u32) (gStyleStage - 3) < 3) {
+    } else if ((u32) (sStyleStage - 3) < 3) {
         a1 = 1;
-        a0 = gStyleStripRectB;
-        a2 = gStyleStripScratchB;
+        a0 = sStyleStripRectB;
+        a2 = sStyleStripScratchB;
     } else {
         return;
     }
@@ -103,7 +103,7 @@ call.
 
 **`StyleScrollVramStrips`, tier B.**
 
-Selects one of two 12-byte-tuple table pairs by `gStyleStage` (`== 2`, or
+Selects one of two 12-byte-tuple table pairs by `sStyleStage` (`== 2`, or
 `3..5`) and forwards them to `RotateVramRectRight`, a not-yet-carved routine this
 unit's OWN header comment (round 45) already characterizes as "a 4-argument
 draw-style routine reading 12-byte tuples through a0/a2" -- that
@@ -120,7 +120,7 @@ every frame. MATCHED, 25/25, second build (one lever: hoist the shared `a1
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_80087444`/`D_80087450` | `gStyleStripRectA`/`gStyleStripScratchA` | A | DrawRect {0, 0x1F0, 248, 8} and {256, 0x1F0, 1, 8}: RotateVramRectRight's rect and scratch for stage 2. |
-| `D_8008745C`/`D_80087468` | `gStyleStripRectB`/`gStyleStripScratchB` | A | the same at y 0x1F8, for stages 3..5. |
+| `D_80087444`/`D_80087450` | `sStyleStripRectA`/`sStyleStripScratchA` | A | DrawRect {0, 0x1F0, 248, 8} and {256, 0x1F0, 1, 8}: RotateVramRectRight's rect and scratch for stage 2. |
+| `D_8008745C`/`D_80087468` | `sStyleStripRectB`/`sStyleStripScratchB` | A | the same at y 0x1F8, for stages 3..5. |
 
 Locals `rect`, `count`, `scratch`.

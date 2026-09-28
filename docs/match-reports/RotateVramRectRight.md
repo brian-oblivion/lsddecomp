@@ -70,7 +70,7 @@ void RotateVramRectRight(DrawRect *r, s32 count, DrawPoint *p) {
   in-place, then copy the saved column back in as the new leftmost column.
   `count` repeats the whole three-step shift, so it scrolls by `count`
   columns. Only caller: `ObjMStyleActor.c`'s `StyleScrollVramStrips`, always with
-  `count = 1`; what visual "table" this scrolls (`gStyleStage`-selected) is
+  `count = 1`; what visual "table" this scrolls (`sStyleStage`-selected) is
   unestablished, per that unit's own header comment, so tier B rather than
   A. Same rename.py-bug block as `func_8003B39C` (now `New_TimImage`) had; that bug is fixed (FINISHING-PLAN revision 19).
 - **`draw->methods->moveImage`** (this unit's own local field, not a

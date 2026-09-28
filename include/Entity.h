@@ -9,7 +9,7 @@
 /*
  * Entity -- a TodActor (TOD-animated Actor) driven by a per-mood row of
  * tables (class id 0x1F234, method table gEntityMethods, getter
- * Get_vtable_Entity): TodActor's one subclass (include/TodActor.h); no
+ * GetEntityMethods): TodActor's one subclass (include/TodActor.h); no
  * class derives from it. The ctor calls TodActor's first
  * (GetTodActorMethods()->ctor), so the id parent is the ctor-chain
  * parent. Its methods and its MoodCue handlers are in src/world/Entity.c. The
@@ -18,13 +18,13 @@
  * (SetDreamAuxWorld, SpawnDreamAuxTriggerEntity).
  *
  * The mood row. New_Entity's first argument is `moodIndex`, which selects a
- * 16-byte row of gEntityMoodTable and of the parallel byte tables below.
+ * 16-byte row of sEntityMoodTable and of the parallel byte tables below.
  * Every tick, update (+0x098) runs updateActivationState (activate when the
  * row's activateKind condition holds), updateDeactivationState, the sound-cue
  * start/stop pair and updateTargetProximity, then TodActor's update.
  *
  * The peer is the player. attachToParent's (self, peer, companion, parent,
- * offset) is TodActor's; DreamAux passes gDreamAuxWorld as the peer, and
+ * offset) is TodActor's; DreamAux passes sDreamAuxWorld as the peer, and
  * the slots Entity calls on `peer` (+0x100, +0x120, +0x1A0, +0x200, +0x21C)
  * lie past the end of TodActor's table: their occupants in
  * gDreamSysMethods are DreamSys__GetLinkCommandFlag,
@@ -36,7 +36,7 @@
  *
  * Sound cues. startSoundCue calls InitSoundCueSet on `soundCueSet` with
  * TodActor's `sound` (the ctor's third argument; DreamAux passes
- * gDreamAuxSound) as the sound object, itself as the owner and the mood row's
+ * sDreamAuxSound) as the sound object, itself as the owner and the mood row's
  * handler as the callback, and selects tick callback 'B' in reset
  * (Entity__TickSoundCue, +0x11C), which services the set once per tick. So a
  * MoodCue handler is a SoundCueSet callback (include/SoundCueSet.h):
@@ -71,7 +71,7 @@ struct EntityMethods {
     TODACTOR_SLOTS(Entity, (Entity * self, s32 moodIndex, void *desc, void *sound));
     /* +0x144 */ s32 (*distanceToPeer)(Entity *self, TodActor *peer); /* Entity__DistanceToPeer: |dx| + |dz| from coord2's translation to peer's world position */
     /* +0x148 */ s32 (*getProximityRatio)(Entity *self); /* Entity__GetProximityRatio: -1 when no peer or out of range */
-    /* +0x14C */ EntityMoodRow *(*getMoodEffect)(Entity *self); /* Entity__GetMoodEffect: &gEntityMoodTable[moodIndex] */
+    /* +0x14C */ EntityMoodRow *(*getMoodEffect)(Entity *self); /* Entity__GetMoodEffect: &sEntityMoodTable[moodIndex] */
     /* +0x150 */ s32 (*getUnlockEffect)(Entity *self); /* Entity__GetUnlockEffect */
     /* +0x154 */ s32 (*getLinkStage)(Entity *self);    /* Entity__GetLinkStage */
     /* +0x158 */ s32 (*getEventVideo)(Entity *self);   /* Entity__GetEventVideo */
@@ -89,7 +89,7 @@ struct EntityMethods {
 
 struct Entity {
     TODACTOR_FIELDS(EntityMethods);
-    /* +0x098 */ s32 moodIndex; /* New_Entity's first argument: the row of gEntityMoodTable and the byte tables */
+    /* +0x098 */ s32 moodIndex; /* New_Entity's first argument: the row of sEntityMoodTable and the byte tables */
     /* +0x09C */ SoundCueSet soundCueSet; /* startSoundCue starts it; the MoodCue handlers are its callback */
     /* +0x0F0 */ s32 active;              /* activate / deactivate */
     /* +0x0F4 */ s32 targetReached;  /* setTargetReached; latched by updateTargetProximity */
@@ -114,7 +114,7 @@ typedef void (*EntityPlayTodFn)(Entity *self);
  * what each does; it ignores them all while a link is pending.
  * Entity__SetTargetReached sends ENTITY_EFFECT_LOG_MOOD, and
  * Entity__NotifyLinkStage picks one of the other three from the mood row's
- * gEntityLinkStageTable and gEntityEventVideoTable entries. */
+ * sEntityLinkStageTable and sEntityEventVideoTable entries. */
 enum EntityEffect {
     ENTITY_EFFECT_LOG_MOOD = 9, /* log getMoodEffect's mood, add getUnlockEffect to the unlock score */
     ENTITY_EFFECT_LINK_STAGE = 10,  /* link to the stage getLinkStage names */
@@ -130,23 +130,17 @@ enum EntityEffect {
 #define ENTITY_STATE_DONE 1
 
 extern EntityMethods gEntityMethods;
-extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
+extern EntityMethods *GetEntityMethods(void); /* returns &gEntityMethods */
 
 /* The object Entity__AttachToParent keeps in Actor's `grid` field (+0x04C)
  * is the grid manager, StageMap (include/StageMap.h; DreamAux passes
- * gDreamAuxStageMap). Entity/_e/_g call its startScaleRamp (+0x138). */
-
-/* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
- * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what
- * Viewport gives its FadeBox (FadeBox.h). */
-extern s32 gEntityFadeBoxDefaultSize[2];
-extern s32 gEntityFadeBoxDefaultOffset[2];
+ * sDreamAuxStageMap). Entity/_e/_g call its startScaleRamp (+0x138). */
 
 /* One row of the mood table (16 bytes): New_Entity's moodIndex selects it, and
  * every per-mood setting of an Entity is a column of it. Signed columns are
  * `s8` (`lb`); plain `char` would be unsigned here (-funsigned-char).
  *
- * gEntityLinkStageTable and gEntityEventVideoTable are two of its columns
+ * sEntityLinkStageTable and sEntityEventVideoTable are two of its columns
  * seen as flat arrays (the row base + 7 and + 8, indexed moodIndex * 16):
  * GCC spells a constant-offset field of a global array as `%hi`/`%lo(sym +
  * off)`, which splat labels as a symbol of its own. Entity still reads them
@@ -158,8 +152,8 @@ struct EntityMoodRow {
     u8 deactivateKind; /* +0x04, read by Entity__UpdateDeactivationState (unsigned load) */
     s8 activeRange; /* +0x05, Entity__IsNearTarget's distance for the activation and deactivation range tests; 0: no range test */
     s8 proximityRange; /* +0x06, read by Entity__UpdateTargetProximity: magnitude (after abs) is Entity__IsNearTarget's distance arg for raising targetReached via setTargetReached; a NEGATIVE value also makes the entity face its target every tick */
-    s8 linkStage; /* +0x07, Entity__GetLinkStage and Entity__NotifyLinkStage (gEntityLinkStageTable) */
-    s8 eventVideo; /* +0x08, Entity__GetEventVideo and Entity__NotifyLinkStage (gEntityEventVideoTable) */
+    s8 linkStage; /* +0x07, Entity__GetLinkStage and Entity__NotifyLinkStage (sEntityLinkStageTable) */
+    s8 eventVideo; /* +0x08, Entity__GetEventVideo and Entity__NotifyLinkStage (sEntityEventVideoTable) */
     s8 nearTolerance; /* +0x09, Entity__IsNearTarget's tolerance for every range test on this row (activation, deactivation, proximity, cue start/stop) */
     s8 proximityThreshold; /* +0x0A, Entity__GetProximityRatio's range, in ENTITY_RANGE_UNITs */
     s8 cueRange; /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop and Entity__AttachToParent: 0 = the cue starts at attach (when the entity activated there) and never on range; magnitude (after abs) is Entity__IsNearTarget's distance arg for starting the sound cue; a NEGATIVE value also stops it again once the target leaves that range. SEPARATE field from proximityRange (+0x06) */
@@ -202,10 +196,6 @@ enum EntityDeactivateKind {
 #define ENTITY_RANGE_SHIFT 11
 #define ENTITY_RANGE_UNIT (1 << ENTITY_RANGE_SHIFT)
 
-extern EntityMoodRow gEntityMoodTable[];
-extern s8 gEntityLinkStageTable[];  /* the linkStage column (Entity) */
-extern s8 gEntityEventVideoTable[]; /* the eventVideo column (Entity) */
-
 /* The class's own methods, in ROM order (Entity, then Entity). A caller
  * reaching the base ones goes through GetTodActorMethods() and upcasts. */
 Entity *New_Entity(s32 moodIndex, void *desc, void *sound);
@@ -245,60 +235,5 @@ void Entity__MoodCue51(Entity *self, SoundCueSet *out); /* Entity; called by Ent
 void Entity__MoodCue71(Entity *self, SoundCueSet *out); /* Entity; called by Entity__MoodCue108 (Entity) */
 void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 windowStart,
                                             s32 deactivateTimer, s32 zStep); /* Entity; called by Entity */
-
-/* The motion templates (.data, in address order):
- * the constant triples the MoodCue handlers in src/world/Entity.c pass to
- * updateRotation (+0x044) and updateScale (+0x048) -- three Ratio16s
- * (include/SceneNode.h), degrees or scale factors, {x, y, z} -- and to
- * addTranslation (+0x0BC), three s32 deltas. Named by value. The slots take
- * the table untyped, so the element type is the reader's (SceneNode__Update-
- * Rotation/UpdateScale), not the callers'. sTranslateYMinus64's label also
- * holds a second triple, (0, -0x20, 0); sScaleX3's z den is Entity.c's
- * sScaleTemplateZDenom. */
-extern Ratio16 sRotationXPlusEighth[];
-extern Ratio16 sRotationYawPlus9[];
-extern Ratio16 sRotationYawMinus9[];
-extern Ratio16 sRotationYawPlus180[];
-extern Ratio16 sRotationYawPlus90[];
-extern Ratio16 sRotationYawMinus90[];
-extern Ratio16 sRotationYawPlus2[];
-extern Ratio16 sRotationYawMinusThird[];
-extern Ratio16 sRotationYawMinusHalf[];
-extern Ratio16 sRotationZPlus9[];
-extern Ratio16 sRotationZPlus1[];
-extern Ratio16 sRotationZMinus9[];
-extern Ratio16 sRotationYawMinus120[];
-extern Ratio16 sRotationX50YMinus120Z30[];
-extern Ratio16 sRotationYawPlus4[];
-extern Ratio16 sRotationXPlus90[];
-extern Ratio16 sRotationYawPlus1[];
-extern Ratio16 sRotationZMinus90[];
-extern LongVec3 sTranslateYPlus256[];
-extern LongVec3 sTranslateYMinus4096[];
-extern LongVec3 sTranslateYMinus512[];
-extern LongVec3 sTranslateYPlus64[];
-extern LongVec3 sTranslateYPlus8[];
-extern LongVec3 sTranslateYMinus64[];
-extern LongVec3 sTranslateYMinus256[];
-extern LongVec3 sTranslateXMinus64[];
-extern LongVec3 sTranslateYPlus64ZMinus64[];
-extern LongVec3 sTranslateYMinus1500ZPlus1024[];
-extern LongVec3 sTranslateZMinus256[];
-extern Ratio16 sScaleQuarter[];
-extern Ratio16 sScaleHalf[];
-extern Ratio16 sScaleXFourFifthsYSixFifths[]; /* {4/5, 6/5, 5/5} */
-extern Ratio16 sScaleDouble[];
-extern Ratio16 sScaleMinusSixtyFourth[];
-extern Ratio16 sScaleEightSevenths[];
-extern Ratio16 sScaleUnit[]; /* {1/1, 1/1, 1/1}, a .data copy of SceneNode.h's sSceneNodeScaleOne */
-extern Ratio16 sScaleEighth[];
-extern Ratio16 sScaleXEighthY2ZEighth[];
-extern Ratio16 sScaleSix[];
-extern Ratio16 sScaleTwoFifths[];
-extern Ratio16 sScaleY2[];
-extern Ratio16 sScaleY4[];
-extern Ratio16 sScaleTriple[];
-extern Ratio16 sScaleThirtySecond[];
-extern Ratio16 sScaleX3[];
 
 #endif

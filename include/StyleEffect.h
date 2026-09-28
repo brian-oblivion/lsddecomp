@@ -16,13 +16,13 @@
  *
  * Who builds it. StyleBuildEffectSlots, on the style layer's first tick,
  * first calls SetStyleEffectSources with the scene's DREAMER.TMD resource,
- * ETC.TIM image and viewport (gStyleEffectTmd, gStyleEffectTim,
- * gStyleEffectViewport), then StyleFillEffectKind0..3 fill
- * gStyleEffectSlots with New_StyleEffect(kind, params, gStyleGrid, pos):
+ * ETC.TIM image and viewport (sStyleEffectTmd, sStyleEffectTim,
+ * sStyleEffectViewport), then StyleFillEffectKind0..3 fill
+ * sStyleEffectSlots with New_StyleEffect(kind, params, sStyleGrid, pos):
  * several of kind 0, of kind 1 for variant 2, then one of kind 3 (variant 0)
  * or kind 2 (variant 2). `params` is one StyleEffectParams laid over the
- * separately-declared gStyleSpawnOffsetX .. gStyleSpawnColors, which the
- * fill functions and SetupStyleSpawnParamsA/B randomise before each build.
+ * separately-declared sStyleSpawnOffsetX .. sStyleSpawnColors, which the
+ * fill functions and SetupStyleSpawnParamsRandom/B randomise before each build.
  * StyleUpdateEffectSlots runs every slot's update with the target position,
  * and StyleReleaseEffectSlots releases them.
  *
@@ -31,8 +31,8 @@
  *            Actor's ctor, `state` 0, `kind` into Actor's `pendingExtra`
  *            (+0x054), then reset(params), then InitByKind: attach under
  *            `parent` at pos + offset with the params' rotation and scale,
- *            snapshot the viewpoint y (gStyleEffectBaseViewY), link a model
- *            from gStyleEffectTmd (kinds 0 and 1, gStyleEffectModelIds[kind])
+ *            snapshot the viewpoint y (sStyleEffectBaseViewY), link a model
+ *            from sStyleEffectTmd (kinds 0 and 1, sStyleEffectModelIds[kind])
  *            and build the kind's children.
  *   reset (+0x040)
  *            SetParams: copy the whole params block into `params`, zero
@@ -71,8 +71,8 @@ struct StyleEffectParams {
     /* +0x000 */ LongVec3 offset; /* added to the caller's position (InitByKind, UpdateByKind) */
     /* +0x00C */ Ratio16 *rotation; /* Ratio16[3] degrees, self's and the model children's updateRotation (AttachWithRotScale) */
     /* +0x010 */ Ratio16 *scale; /* Ratio16[3], their updateScale; scale[0].num also scales the model-child spacing (PlaceModelChildren) */
-    /* +0x014 */ s32 modelChildLayout; /* 0 = no modelChildren, else an index 1..4 into gModelChildSpacing: 1-2 along x, 3-4 along y */
-    /* +0x018 */ s32 tableIndex;   /* index into gModelChildDriftZ and gSpriteShiftX */
+    /* +0x014 */ s32 modelChildLayout; /* 0 = no modelChildren, else an index 1..4 into sModelChildSpacing: 1-2 along x, 3-4 along y */
+    /* +0x018 */ s32 tableIndex;   /* index into sModelChildDriftZ and sSpriteShiftX */
     /* +0x01C */ SpriteRgb *color; /* every sprite's setColor (SpawnSprites) */
     /* +0x020 */ SpriteRgb *altColor; /* sprites[1]'s colour instead, when non-NULL (BuildRandomSprites) */
 };
@@ -109,9 +109,7 @@ extern StyleEffectMethods gStyleEffectMethods;
 extern StyleEffectMethods *GetStyleEffectMethods(void); /* ObjMStyleActor.c; returns &gStyleEffectMethods */
 
 /* The class's own methods, in address order (src/world/ObjMStyleActor.c).
- * Four are declared WITHOUT a prototype on purpose: each is one-parameter,
- * but a caller in ObjMStyleActor.c passes a dead second argument that is
- * byte-load-bearing (the `arity-ok` notes there and in the reports). */
+ * The four marked MATCHING are declared without a prototype. */
 StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *parent,
                              LongVec3 *pos); /* BMemPMgrAlloc(sizeof(StyleEffect)), then ctor */
 StyleEffect *StyleEffect__StyleEffect(StyleEffect *self, s32 kind, StyleEffectParams *params,
@@ -123,13 +121,13 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
 void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos);
 void StyleEffect__ReleaseByKind(StyleEffect *self);
 void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse);
-void StyleEffect__DriftModelChildren(); /* (StyleEffect *self); see above */
+void StyleEffect__DriftModelChildren(); /* MATCHING: (StyleEffect *self); a caller passes a dead 2nd argument */
 void StyleEffect__ReleaseModelChildren(StyleEffect *self);
-void StyleEffect__BuildRandomSprites(); /* (StyleEffect *self); see above */
+void StyleEffect__BuildRandomSprites(); /* MATCHING: (StyleEffect *self); a caller passes a dead 2nd argument */
 void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale);
 void StyleEffect__ReleaseSprites(StyleEffect *self);
-void StyleEffect__SpawnPlainSprites(); /* (StyleEffect *self); see above */
-void StyleEffect__RandomizeSprites();  /* (StyleEffect *self); see above */
-void StyleEffect__ReleaseSpritesB(StyleEffect *self);
+void StyleEffect__SpawnPlainSprites(); /* MATCHING: (StyleEffect *self); a caller passes a dead 2nd argument */
+void StyleEffect__RandomizeSprites(); /* MATCHING: (StyleEffect *self); a caller passes a dead 2nd argument */
+void StyleEffect__ReleaseJitterSprites(StyleEffect *self);
 
 #endif

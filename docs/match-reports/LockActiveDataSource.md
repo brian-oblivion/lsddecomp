@@ -18,8 +18,8 @@ report verbatim (no source change needed) and it matched on the first build.
 
 ## What it does
 
-`if (gActiveDataSource == 0x13) { LockCd(); }` — a region/mode-gated
-forward. `gActiveDataSource` lives in the real `.sdata` section (file offset
+`if (sActiveDataSource == 0x13) { LockCd(); }` — a region/mode-gated
+forward. `sActiveDataSource` lives in the real `.sdata` section (file offset
 `0x7b008`, per `config/splat.slps01556.lsdde.yaml`) and is initialized to
 `0x13` in the retail image. `LockCd` is a still-uncarved function in
 `asm/code_179d8.s`.
@@ -27,11 +27,11 @@ forward. `gActiveDataSource` lives in the real `.sdata` section (file offset
 ## Final body
 
 ```c
-extern s32 gActiveDataSource;
+extern s32 sActiveDataSource;
 extern s32 LockCd(void);
 
 void LockActiveDataSource(void) {
-    if (gActiveDataSource == 0x13) {
+    if (sActiveDataSource == 0x13) {
         LockCd();
     }
 }
@@ -41,15 +41,15 @@ void LockActiveDataSource(void) {
 
 This is one of a six-function family in this unit (`LockActiveDataSource`,
 `UnlockActiveDataSource`, `IsActiveDataSourceBusy`, `IsActiveDataSourceIdle`, `GetActiveDataSourceOperation`,
-`GetActiveDataSourceState`) sharing the exact shape `if (gActiveDataSource == 0x13) { ...forward
+`GetActiveDataSourceState`) sharing the exact shape `if (sActiveDataSource == 0x13) { ...forward
 to a still-uncarved func_800280xx/func_80027Exx... }`, differing only in the
 callee and (for four of the six) whether the callee's return value is
 propagated (`return func();`) or a constant is returned on the false path.
-All six matched on the first build once `gActiveDataSource` was declared as a plain
+All six matched on the first build once `sActiveDataSource` was declared as a plain
 `extern s32` — no source-shape change was needed at all, confirming the
 round-2026-08-29-a "toolchain, not source" diagnosis was correct. See
 `GetActiveDataSourceMethods.md` for a second, `if`/`else` variant of the same family (nine
-functions total share the `gActiveDataSource == 0x13` gate).
+functions total share the `sActiveDataSource == 0x13` gate).
 
 ## Naming
 
@@ -59,7 +59,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80026E0C` | `LockActiveDataSource` | B |
 
-**Evidence.** `if (gActiveDataSource == DATASOURCE_CD) LockCd();` -- forwards
+**Evidence.** `if (sActiveDataSource == DATASOURCE_CD) LockCd();` -- forwards
 to the CD driver's own `LockCd` only when it is the active source, no-op
 otherwise. First of a six-function family sharing this shape (see
 `GetActiveDataSourceMethods.md` and the unit header comment); named

@@ -6,7 +6,7 @@
 
 Round 82, runner charlie (matching slot). Unit `src/graphics/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
-- **Where:** not in any method table; called from ObjMStyleActor.c as `TmdModel__SetFirstPrimClut(obj, &gStyleEffectClutPos)` (`tools/classtable.py gTmdModelMethods`).
+- **Where:** not in any method table; called from ObjMStyleActor.c as `TmdModel__SetFirstPrimClut(obj, &sStyleEffectClutPos)` (`tools/classtable.py gTmdModelMethods`).
 - **What:** `t = self->unk10->unk10; v = xy[0] / 16; t->unk6 = v; t->unk6 = v + xy[1] * 64;`: a double store to one s16 field, the second one reusing the first value without reloading it.
 - **Result:** byte-exact; 14/14 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** local views (`TmdModel`, `ModelData_fa50`, `Quad_fa50`, `TmdObject_fa50`, `Outer_fa50`/`Inner_fa50`/`Target_fa50`) and prototypes live in the unit; no shared header was touched.
@@ -47,7 +47,7 @@ Named the fields (see `TmdModel__AddFirstPrimClut.md`'s matching entry for the
 full rationale; both functions share the same three structs and both are
 the only readers/writers, all inside this unit): `Target_fa50::unk6` ->
 `offset`, `Inner_fa50::unk10` -> `target`, `Outer_fa50::unk10` -> `inner`.
-`ObjMStyleActor.c`'s call site (`TmdModel__SetFirstPrimClut(obj, &gStyleEffectClutPos)`) passes
+`ObjMStyleActor.c`'s call site (`TmdModel__SetFirstPrimClut(obj, &sStyleEffectClutPos)`) passes
 opaque pointers and never names these fields itself, so the field rename
 does not touch it. Compiler-verified accessor list, build and
 check-nonmatching.sh green.
@@ -61,8 +61,8 @@ deleted.
 
 - **`Outer_fa50` -> `TmdModel`** (`inner` -> `object`). The one caller,
   `SetStyleEffectSources` (ObjMStyleActor.c), passes the value
-  `gStyleEffectTmd`'s slot +0x080 returns for a model id; the same slot's
-  result for the same `gStyleEffectModelIds[]` is what
+  `sStyleEffectTmd`'s slot +0x080 returns for a model id; the same slot's
+  result for the same `sStyleEffectModelIds[]` is what
   `StyleEffect__InitByKind` (ObjMStyleActor.c) hands to
   `SceneNode__LinkModel`, which reads it as a `TmdModel` (`->object`,
   `->data->objects`). TmdModel's +0x010 is `object`.
@@ -72,7 +72,7 @@ deleted.
   every textured TMD packet (`TMD_P_TF3`/`TF4`/`TNF3`/..., `<libgs.h>`) is
   `u_short clut`, after `tu0, tv0`. The value stored is `x / 16 + y * 64`,
   which is libgpu's `getClut(x, y)` (`(y << 6) | ((x >> 4) & 0x3f)`) for a
-  non-negative 16-aligned x; and the caller's argument `gStyleEffectClutPos` is the
+  non-negative 16-aligned x; and the caller's argument `sStyleEffectClutPos` is the
   pair `{0x3F0, 0x1FF}`, VRAM (1008, 511), a standard CLUT position (its
   CLUT id is 0x7FFF). The macro itself is not used: its shift and OR are not
   the division and add retail compiles.

@@ -105,7 +105,7 @@ this same correction.
 `arg1` is a NUL-terminated array of string/opaque pointers; `arg2` is a
 mode flag (0 or 1), also stashed into `self->unkC`.
 
-1. Chain the base ctor: `Get_vtable_BasicClass()->ctor(self);` then
+1. Chain the base ctor: `GetBasicClassMethods()->ctor(self);` then
    `self->methods = GetItemListMethods();` (this really is `ItemListMethods_3bb8c_j
    *GetItemListMethods(void)` -- NOT a separate "ctor table" type: this same
    getter is what `New_ItemList` dereferences `->ctor` on, and here its
@@ -141,7 +141,7 @@ void ItemList__ItemList(ItemList_3bb8c_j *self, void **arg1, s32 arg2)
     s32 index;
     s32 len;
 
-    Get_vtable_BasicClass()->ctor(self);
+    GetBasicClassMethods()->ctor(self);
     self->methods = GetItemListMethods();
 
     count = 0;

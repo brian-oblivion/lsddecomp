@@ -19,8 +19,8 @@ of the same file; this function is ordinary matching work.
 extern char *ItemList__FormatRowText(ItemList *self, char *dest, s32 arg3, s32 arg4, char *base);
 extern void ItemList__SetView(ItemList *self, s32 a1, s32 a2, s32 a3, s32 a4);
 
-extern s32 gItemListRowOriginX;
-extern s32 gItemListRowOriginY;
+extern s32 sItemListRowOriginX;
+extern s32 sItemListRowOriginY;
 
 typedef struct {
     s32 a;
@@ -39,8 +39,8 @@ void ItemList__CreateRows(ItemList *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4
         return;
     }
 
-    local.a = gItemListRowOriginX;
-    local.b = gItemListRowOriginY;
+    local.a = sItemListRowOriginX;
+    local.b = sItemListRowOriginY;
     count = self->unk10;
     p = &self->unk40[0];
     if (count >= 5) {
@@ -51,7 +51,7 @@ void ItemList__CreateRows(ItemList *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4
         ItemList__FormatRowText(self, buf, i, arg3, (char *)arg4);
         *p = (ItemListElem *)New_TextRow((void *)arg2, 0x1A, buf);
         (*p)->methods->slot4C(*p, arg1, &local);
-        (*p)->methods->slotB8(*p, &gItemListRowColor);
+        (*p)->methods->slotB8(*p, &sItemListRowColor);
         local.b += 0xA;
         p++;
     }
@@ -65,7 +65,7 @@ void ItemList__CreateRows(ItemList *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4
 count = 4;` clamp, same `ItemList__FormatRowText` text-formatting call inside the
 loop): the two differ in that this function ALSO calls each freshly-created
 element's own `slot4C` (with a 2-word stack-local argument seeded from
-`gItemListRowOriginX`/`gItemListRowOriginY`, the second word accumulating by `0xA` per
+`sItemListRowOriginX`/`sItemListRowOriginY`, the second word accumulating by `0xA` per
 iteration) and `slotB8` before `ItemList__RefreshRows`'s sibling code reaches its
 own `slotCC`, and this one always passes `1` (not a caller flag) as the
 final `ItemList__SetView` argument. `ItemListElemMethods::slot4C` (offset
@@ -122,7 +122,7 @@ shifts register allocation across the whole function").
 
 Round 75 (bravo, track 3). `func_80052644` -> `ItemList__CreateRows`, **tier A**.
 
-Slot +0x08C (`tools/classtable.py gItemListMethods`). Called by ItemList__LoadResources (TextEntryItemList) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (gItemListRowOriginX, gItemListRowOriginY + 0xA*i), colours it gItemListRowColor, then SetView(..., highlight=1).
+Slot +0x08C (`tools/classtable.py gItemListMethods`). Called by ItemList__LoadResources (TextEntryItemList) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (sItemListRowOriginX, sItemListRowOriginY + 0xA*i), colours it sItemListRowColor, then SetView(..., highlight=1).
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
 

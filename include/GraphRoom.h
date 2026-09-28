@@ -43,7 +43,7 @@
  *                         a non-empty log, points[0] blinks on frameCounter's
  *                         low bit; then tickHighlight.
  *   +0x078 onPadConfirm   GraphRoom__OnPadConfirm: unscored only,
- *                         playSound(0x10) and refreshViewValue.
+ *                         playSound(0x10) and exit.
  *   +0x0D8 setTarget      GraphRoom__BuildGraphPoints: no target at all; the
  *                         100 BoxFill dots and the 4-byte matchedDayIndices.
  *   +0x0DC releaseTarget  GraphRoom__ReleaseGraphPoints: frees what

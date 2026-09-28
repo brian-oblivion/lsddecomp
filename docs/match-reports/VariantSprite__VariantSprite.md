@@ -22,7 +22,7 @@ void *VariantSprite__VariantSprite(D800879C4Obj *self, s32 arg1, void *arg2, voi
 
 ```c
 void *VariantSprite__VariantSprite(D800879C4Obj *self, s32 arg1, void *arg2, void *arg3) {
-    GetSpriteMethods()->ctor((Sprite *)self, arg3, 0, &gVariantSpriteCells[arg1], arg2, 0);
+    GetSpriteMethods()->ctor((Sprite *)self, arg3, 0, &sVariantSpriteCells[arg1], arg2, 0);
     self->methods = GetVariantSpriteMethods();
     self->unk_0xA4 = 0;
     return self->methods->postConstruct(self, arg1);
@@ -37,11 +37,11 @@ matched with no iteration:
    meaningful file grouping) is a plain no-argument getter, `return
    &gSpriteMethods;`. Its `+0x008` slot (a DIFFERENT class's own ctor,
    `Sprite__Sprite`, out of scope) is called with `(self, arg3, 0,
-   &gVariantSpriteCells[arg1], arg2, 0)` -- SIX arguments, four in registers and
+   &sVariantSpriteCells[arg1], arg2, 0)` -- SIX arguments, four in registers and
    two on the stack, even though `GetSpriteMethods` itself takes none: the
    callee simply ignores the extras, same "per-call-site signature"
    precedent as `AcceptGridElem`'s report.
-2. `gVariantSpriteCells` is a newly-typed 2-element, `0xC`-byte-stride table
+2. `sVariantSpriteCells` is a newly-typed 2-element, `0xC`-byte-stride table
    (address-of only here, never dereferenced -- kept opaque beyond the
    stride).
 3. This function is ITSELF `gVariantSpriteMethods`'s ctor: it sets `self->methods =
@@ -76,7 +76,7 @@ tools/funcdiff.py VariantSprite__VariantSprite   # 43/43
 
 ## Track 4 (2026-09-25, round 82, alpha)
 
-The base class is unified as `Sprite` (`include/Sprite.h`, table `gSpriteMethods`, formerly `D_8006EE1C`). The unit-local `D8006EE1CMethods` view is gone: the call goes through `SpriteMethods`' ctor, whose parameters are `(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5)` (Sprite__Sprite forwards all five to its +0x040 reset, which reads texture/abr/rect), so `self` is upcast (a pointer cast, no code) and `gVariantSpriteCells` is now `SpriteRect[2]` instead of an opaque 12-byte entry. Byte-identical: whole image green, 0 new warnings.
+The base class is unified as `Sprite` (`include/Sprite.h`, table `gSpriteMethods`, formerly `D_8006EE1C`). The unit-local `D8006EE1CMethods` view is gone: the call goes through `SpriteMethods`' ctor, whose parameters are `(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5)` (Sprite__Sprite forwards all five to its +0x040 reset, which reads texture/abr/rect), so `self` is upcast (a pointer cast, no code) and `sVariantSpriteCells` is now `SpriteRect[2]` instead of an opaque 12-byte entry. Byte-identical: whole image green, 0 new warnings.
 
 ## Track 4 (2026-09-26, round 87, alpha)
 
@@ -89,7 +89,7 @@ are gone. Current body:
 
 ```c
 void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *arg2, void *texture) {
-    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &gVariantSpriteCells[variant], arg2, 0);
+    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &sVariantSpriteCells[variant], arg2, 0);
     self->methods = GetVariantSpriteMethods();
     self->unkA4 = 0;
     ((VariantSpriteResetFn)self->methods->reset)(self, variant);
@@ -118,8 +118,8 @@ The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
 `python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
-(`gVariantSpriteCells`) and the CLUT row the reset slot sets
-(`gVariantSpriteClutX/Y`). What the sprites are in the game is not
+(`sVariantSpriteCells`) and the CLUT row the reset slot sets
+(`sVariantSpriteClutX/Y`). What the sprites are in the game is not
 established (their only builder is StyleEffect, kinds 2 and 3, and every
 path passes variant 0), which is why it is not tier A. The table, getter,
 allocator, methods and the three data tables followed the class name.

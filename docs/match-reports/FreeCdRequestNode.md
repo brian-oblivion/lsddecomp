@@ -7,7 +7,7 @@
 ## What it does
 
 The remove/free counterpart to `AllocCdRequestNode`: unlinks a node from the
-doubly-linked list rooted at `gCdRequestQueue` (fixing up `prev->next`,
+doubly-linked list rooted at `sCdRequestQueue` (fixing up `prev->next`,
 `next->prev`, or the list head as appropriate) and frees it via
 `BMemPMgrFree`. Void return. Never-attempted cold ground.
 
@@ -25,7 +25,7 @@ void FreeCdRequestNode(Node8008A894 *node)
         if (prev != NULL) {
             prev->next = node->next;
         } else {
-            gCdRequestQueue = node->next;
+            sCdRequestQueue = node->next;
         }
         next = node->next;
         if (next != NULL) {
@@ -43,6 +43,6 @@ Closed on the first attempt (uses the `Node8008A894` struct from
 ## Naming
 
 **Tier A.** The remove/free counterpart to `AllocCdRequestNode`: unlinks a
-node from `gCdRequestQueue` and frees it via `BMemPMgrFree`. Corroborated
+node from `sCdRequestQueue` and frees it via `BMemPMgrFree`. Corroborated
 by CdDriver.c's own comment (pre-rename): "func_800283C4 unlinks and
 frees".

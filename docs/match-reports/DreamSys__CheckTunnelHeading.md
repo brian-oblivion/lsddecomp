@@ -14,7 +14,7 @@ assigned queue).
 
 ## What it does
 
-Looks up a "heading" byte from `sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex]`,
+Looks up a "heading" byte from `sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex]`,
 validates it against `currentPos`'s stored heading via the already-matched
 `IsHeadingAligned` (a cardinal-direction proximity test), and on success
 writes one or two computed pointers (into a `DirectionTableEntry`-strided
@@ -25,8 +25,8 @@ table, `sCardinalRotations`) through its two optional output parameters. Called 
 ## New declarations needed
 
 `sTunnelEnterHeadings` and `sTunnelExitHeadings` are per-stage tables of pointers to byte
-arrays (4-byte stride, indexed by `gLinkSrcStage`/`gLinkDstStage` respectively,
-each further indexed by `gLinkTriggerIndex`/`gLinkSpawnIndex` to read a single `u8`):
+arrays (4-byte stride, indexed by `sLinkSrcStage`/`sLinkDstStage` respectively,
+each further indexed by `sLinkTriggerIndex`/`sLinkSpawnIndex` to read a single `u8`):
 
 ```c
 extern u8 *sTunnelEnterHeadings[];
@@ -67,7 +67,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	u8 heading;
 	s32 idx;
 
-	heading = sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex];
+	heading = sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
 	if (!IsHeadingAligned((DirectionCheckArg *)arg2, heading))
 		return 0;
 
@@ -75,7 +75,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 		*arg1 = (s32)&sCardinalRotations[heading];
 
 	if (arg0 != NULL) {
-		idx = sTunnelExitHeadings[gLinkDstStage][gLinkSpawnIndex];
+		idx = sTunnelExitHeadings[sLinkDstStage][sLinkSpawnIndex];
 		*arg0 = (s32)&sCardinalRotations[idx];
 	}
 	return 1;
@@ -101,13 +101,13 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex];
+	heading = sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
 			*arg1 = (s32)&sCardinalRotations[heading];
 
 		if (arg0 != NULL) {
-			idx = sTunnelExitHeadings[gLinkDstStage][gLinkSpawnIndex];
+			idx = sTunnelExitHeadings[sLinkDstStage][sLinkSpawnIndex];
 			*arg0 = (s32)&sCardinalRotations[idx];
 		}
 		result = 1;
@@ -132,7 +132,7 @@ retail has. Byte-exact on this second attempt.
 
 ### Proposed learning
 
-Same family as `Test4InstantTeleporters`'s and `Test4StageTransition`'s lessons
+Same family as `TestForInstantTeleporters`'s and `TestForStageTransition`'s lessons
 earlier this round, now confirmed a third time with a genuinely different
 shape (an early-return GUARD at the top of a function, not an if/else
 spanning the whole body): an early `if (!cond) return X;` at the top of a
@@ -159,9 +159,9 @@ Replaced in the source by a comment that says what the code does; kept here as w
 
 ```c
 /* sTunnelEnterHeadings: a per-stage table of pointers to byte arrays (4-byte stride,
-   indexed by gLinkSrcStage), each further indexed by gLinkTriggerIndex to read the
+   indexed by sLinkSrcStage), each further indexed by sLinkTriggerIndex to read the
    "heading" byte passed to IsHeadingAligned. sTunnelExitHeadings is the analogous
-   table for gLinkDstStage/gLinkSpawnIndex. Neither array's own element type is
+   table for sLinkDstStage/sLinkSpawnIndex. Neither array's own element type is
    dereferenced beyond a single `u8` here. */
 ```
 

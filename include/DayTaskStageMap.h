@@ -32,10 +32,6 @@ struct SubObjE {
 /* src/world/DreamAux.c; DayTask's ctor calls it, and its finalize
  * ReleaseDreamAuxModels. */
 
-/* "ETC\\ETC.TIM" and "ETC\\DREAMER.TMD", the files DayTask's ctor loads. */
-extern const char sEtcTimPath[];
-extern const char sDreamerTmdPath[];
-
 /* Defined in src/world/DayTaskStageMap.c, after DayTask's methods; GameApplicationFileResource.c
  * declares it too. */
 extern s32 RegisterRecordTableFiles(s32 all);

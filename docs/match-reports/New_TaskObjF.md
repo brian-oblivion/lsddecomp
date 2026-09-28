@@ -56,7 +56,7 @@ own return value is discarded).
 - New type `GenericCtorTable_3bb8c_d` (fully opaque past `ctor` at
   `+0x008`) and `extern GenericCtorTable_3bb8c_d *GetTaskObjFMethods(void);`
   -- this function's own base/sibling class ctor-table getter, same shape
-  as `Get_vtable_TaskCore`/`GetSceneNodeMethods` elsewhere in this header but for yet
+  as `GetTaskCoreMethods`/`GetSceneNodeMethods` elsewhere in this header but for yet
   another table. `BMemPMgrAlloc` was already declared in this header from
   prior `TitleMenuTaskObjF` work, so no change needed there.
 

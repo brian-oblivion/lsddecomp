@@ -35,7 +35,7 @@ worth translating).
 
 **The lever, translated and verified against the REAL build (not just the
 scaffold):** a dead `i++; i--;` pair, placed as the LAST two statements
-inside the `if (gStyleCueSlots[i] != 0) { ... }` arm (after the
+inside the `if (sStyleCueSlots[i] != 0) { ... }` arm (after the
 `ServiceStyleCueIfNear`/`FlushStyleCue` handling, before that arm's closing brace),
 perturbs GCC 2.6.3's register allocator enough to swap `ctx`/`i` back into
 retail's colours -- with zero net effect on either variable's value at any
@@ -131,8 +131,8 @@ struct ObjAB4C {
 };
 ```
 
-`gStyleGrid`'s value is another "pointer stored as a plain `s32`" global
-(same idiom as `gStyleSceneRefs`), dispatched here as a self object through
+`sStyleGrid`'s value is another "pointer stored as a plain `s32`" global
+(same idiom as `sStyleSceneRefs`), dispatched here as a self object through
 method slot `+0xE8` -- the third such `ObjXXXX`/`ObjXXXXMethods` local view
 in this unit (`ObjAB54`, `ObjE0C8`, now `ObjAB4C`).
 
@@ -141,7 +141,7 @@ in this unit (`ObjAB54`, `ObjE0C8`, now `ObjAB4C`).
 Retail assigns `ctx` (the local scratch-buffer pointer, defaulting to
 `NULL`, conditionally set to `&buf` before the first call) to `$s3`, and the
 loop counter `i` to `$s2`. My best body -- which independently confirmed
-GCC 2.6.3 DOES auto-strength-reduce `gStyleCueSlotPool + i * 0x68` into a proper
+GCC 2.6.3 DOES auto-strength-reduce `sStyleCueSlotPool + i * 0x68` into a proper
 `$s1`-style per-iteration accumulator, matching retail's use of a genuine
 fifth saved register for exactly that purpose -- lands `ctx` in `$s2` and
 `i` in `$s3`: the two are swapped, and every other saved register (`$s0`
@@ -154,7 +154,7 @@ before ctx, ctx before i -- no effect, confirming charlie's finding that
 declaration order plays no role); an explicit named `ObjAB4C *self` local
 for the `slotE8` dispatch chain (to perturb pseudo-numbering before ctx's
 own pseudo is created) -- no effect, byte-identical residue. A genuine
-accumulator-pointer rewrite of the `gStyleCueSlotPool` walk (an explicit
+accumulator-pointer rewrite of the `sStyleCueSlotPool` walk (an explicit
 `u8 *entry` incremented by `0x68` each iteration, matching retail's
 literal shape more closely than the multiply) was tried twice (plain
 increment, and combined into the `for`'s own increment clause) and both
@@ -182,9 +182,9 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     ctx = 0;
     if (arg0 != 0) {
         ctx = buf;
-        ((ObjAB4C *) gStyleGrid)->methods->slotE8((ObjAB4C *) gStyleGrid, ctx, arg0);
+        ((ObjAB4C *) sStyleGrid)->methods->slotE8((ObjAB4C *) sStyleGrid, ctx, arg0);
     }
-    if (gStyleTickCount++ == 0) {
+    if (sStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();
         StyleBuildDecorSet();
         StyleBuildEffectSlots(ctx);
@@ -192,14 +192,14 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     StyleUpdateDecorSet();
     StyleUpdateEffectSlots(ctx);
     StyleScrollVramStrips();
-    gStyleCueRecordIndex = 0;
+    sStyleCueRecordIndex = 0;
     for (i = 0; i < 2; i++) {
-        if (gStyleCueSlots[i] != 0) {
-            if (ServiceStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
-                gStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(gStyleCueSlots[i]);
+        if (sStyleCueSlots[i] != 0) {
+            if (ServiceStyleCueIfNear(sStyleCueSlots[i], ctx, arg1) == 0) {
+                sStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(sStyleCueSlots[i]);
             }
         } else {
-            gStyleCueSlots[i] = TryStartStyleCue((ObjN14 *) (gStyleCueSlotPool + i * 0x68), &arg2, ctx, arg1);
+            sStyleCueSlots[i] = TryStartStyleCue((ObjN14 *) (sStyleCueSlotPool + i * 0x68), &arg2, ctx, arg1);
         }
     }
     return arg2;
@@ -209,13 +209,13 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
 
 Needs (already present earlier in the unit, in strict ROM order, at the
 point this body would compile): the `ObjAB4C`/`ObjAB4CMethods` local view
-above; `extern s32 gStyleGrid;`, `extern s32 gStyleTickCount;`,
+above; `extern s32 sStyleGrid;`, `extern s32 sStyleTickCount;`,
 `extern void ApplyStyleDecorationIfSet(void);` (matched, `ObjMStyleActor.c`),
 `extern void StyleBuildDecorSet(void);`/`extern void StyleUpdateDecorSet(void);`
 (forward, own unit, still cold), `void StyleBuildEffectSlots(void *arg0);` (matched
 earlier this unit, this round), `void StyleUpdateEffectSlots(void *arg0);` (matched,
 this unit), `extern void StyleScrollVramStrips(void);` (forward, matched, this
-unit, defined later), `extern s32 gStyleCueRecordIndex;`, `extern u8 gStyleCueSlotPool[];`,
+unit, defined later), `extern s32 sStyleCueRecordIndex;`, `extern u8 sStyleCueSlotPool[];`,
 `extern ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void
 *arg3);`, `extern s32 ServiceStyleCueIfNear(ObjN14 *arg0, void *arg1, void
 *arg2);`.
@@ -248,10 +248,10 @@ residue); reverted to the best body and restored `INCLUDE_ASM`.
 
 **`TickStyle`, tier B.**
 
-The per-frame orchestrator: on the FIRST call (`gStyleTickCount++ == 0`)
+The per-frame orchestrator: on the FIRST call (`sStyleTickCount++ == 0`)
 runs `ApplyStyleDecorationIfSet`/`StyleBuildDecorSet`/`StyleBuildEffectSlots`
 (one-time setup), then every call runs `StyleUpdateDecorSet`/
-`StyleUpdateEffectSlots`/`StyleScrollVramStrips` and the two `gStyleCueSlots`
+`StyleUpdateEffectSlots`/`StyleScrollVramStrips` and the two `sStyleCueSlots`
 flush-or-start steps. Called from `src/world/ObjMStyleActor.c`'s `ObjM__TickStyle`
 (the call this unit had already forward-declared as its own entry point),
 which is a genuine per-tick call site -- the evidence for "Tick" over a
@@ -263,7 +263,7 @@ swap).
 
 ### Naming
 
-Round 93: parameters `(Descriptor10 *cell, void *unused, s32 lastCue)` -- ObjM__TickStyle passes the grid's getTargetDescriptor result, 0, 0; `cell` goes through StageMap's computeCellOffsets into `targetPos` (a LongVec3; was `u8 buf[0x10]`, same bytes). The pool is `StyleCueSlot gStyleCueSlotPool[]` (0x68-byte slots, now that `cueSet` is a SoundCueSet).
+Round 93: parameters `(Descriptor10 *cell, void *unused, s32 lastCue)` -- ObjM__TickStyle passes the grid's getTargetDescriptor result, 0, 0; `cell` goes through StageMap's computeCellOffsets into `targetPos` (a LongVec3; was `u8 buf[0x10]`, same bytes). The pool is `StyleCueSlot sStyleCueSlotPool[]` (0x68-byte slots, now that `cueSet` is a SoundCueSet).
 
 ### Comments moved here from src/world/ObjMStyleActor.c
 
@@ -278,8 +278,8 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * NAMING PASS, round 72 (runner alpha).  Every function, and the thirteen
  * globals its functions set up or gate on, renamed via `tools/rename.py`,
  * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
- * cluster (`gStyleStage`/`gStyleDay`/`gStyleSceneRefs`/`gStyleVariant`/
- * `gStyleDecorObj`/`gStyleGrid`/`gStyleTickCount`, formerly
+ * cluster (`sStyleStage`/`sStyleDay`/`sStyleSceneRefs`/`sStyleVariant`/
+ * `sStyleDecorObj`/`sStyleGrid`/`sStyleTickCount`, formerly
  * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
  * `ObjMStyleActor.c`'s already-confirmed "Style" subsystem sets
  * (`RegisterStyleConfig`/`ApplyStyleConfig`/`FillStyleFromConfig`/
@@ -289,19 +289,19 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * None of this unit's functions are themselves class methods (no vtable
  * self-dispatch on their OWN symbol); they are free functions dispatching
  * into THREE separate object families through local method-table views: a
- * decoration object (`gStyleDecorObj`, `New_BoxFill`-allocated), an
- * 18-slot "decor set" array (`gStyleDecorSlots`, same allocator) and an
- * StyleEffect "effect slots" array (`gStyleEffectSlots`, include/
+ * decoration object (`sStyleDecorObj`, `New_BoxFill`-allocated), an
+ * 18-slot "decor set" array (`sStyleDecorSlots`, same allocator) and an
+ * StyleEffect "effect slots" array (`sStyleEffectSlots`, include/
  * StyleEffect.h, `New_StyleEffect`-allocated, kind-tagged 0..3 by
  * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot
- * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
+ * positional sound-cue subsystem (`sStyleCueSlots`, `TryStartStyleCue`/
  * `FindNextStyleCueInRange`/`FlushStyleCue`/`ServiceStyleCueIfNear`/
  * `IsStyleCueNear`). `TickStyle` is the per-frame entry point (called from
  * `src/world/ObjMStyleActor.c`); `StyleTeardown` is the scene-exit release of
  * everything `TickStyle` builds.
  *
  * What the "Style" subsystem is FOR in gameplay terms -- which dream/link
- * property `gStyleStage` actually selects -- remains UNESTABLISHED; every
+ * property `sStyleStage` actually selects -- remains UNESTABLISHED; every
  * name above describes MECHANICS, not a guessed purpose, per track 3's
  * naming rule. Full evidence and tier per function: `docs/match-reports/
  * <name>.md`, `## Naming`.

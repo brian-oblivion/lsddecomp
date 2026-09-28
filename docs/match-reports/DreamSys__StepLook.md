@@ -19,7 +19,7 @@ void DreamSys__StepLook(DreamSys *this)
 Vtable slot `0x140`. Two straight-line, single-argument (`this` only)
 virtual calls; the second reloads `this->vt` fresh instead of caching it in
 a local (no shared pointer between the two calls, so there's nothing to
-hoist here — contrast `DreamSys__SelectCallback80`/`DreamSys__SelectCallback98` earlier this round,
+hoist here — contrast `DreamSys__SelectLookCallback`/`DreamSys__SelectMoveCallback` earlier this round,
 where the SAME `vt` value feeds multiple slot reads).
 
 ## Proposed learning
@@ -33,7 +33,7 @@ None — clean first-attempt match, no residue.
 Renamed from `func_800597C0`.
 
 Calls `DreamSys__StepLookOffset` then `DreamSys__StepLookYaw`
-and nothing else. It is the function `DreamSys__SelectCallback80(this, 1)` installs
+and nothing else. It is the function `DreamSys__SelectLookCallback(this, 1)` installs
 in `callback_0x80`, so it is one of the two things that can run every tick.
 Grouping the pair as "look" is the tier-B part: they are the same
 spring-with-decay shape driven by two command fields that

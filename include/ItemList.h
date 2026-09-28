@@ -18,8 +18,8 @@
  *    every list method does nothing while `panelSprite` is NULL.
  *  - cursorUp/cursorDown move `cursorIndex` (scrolling `topIndex` at the
  *    window's edges), scrollLeft/Right move `column` inside every string; the
- *    cursor row is coloured gItemListCursorColor, the others
- *    gItemListRowColor.
+ *    cursor row is coloured sItemListCursorColor, the others
+ *    sItemListRowColor.
  *  - handleInputCode (the tag-2 child's notifications): 25 closes with
  *    result 2, 23 with result 3; setState(4) then passes `result` to
  *    notifyParents, and the parent reads the chosen item with getCursorIndex.
@@ -128,11 +128,6 @@ struct ItemList {
 
 extern ItemListMethods gItemListMethods;
 extern ItemListMethods *GetItemListMethods(void); /* returns &gItemListMethods */
-
-/* The row colours, two 3-byte RGBs in sdata, 4 bytes apart; only their
- * addresses are taken (setColor). */
-extern struct SpriteRgb gItemListRowColor;
-extern struct SpriteRgb gItemListCursorColor;
 
 /* The overrides whose parameter lists differ from their slot's (see the
  * banner), as a caller that passes the extra arguments casts them: attachTarget

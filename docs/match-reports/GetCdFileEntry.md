@@ -6,14 +6,14 @@
 
 ## What it does
 
-Index-to-pointer helper over the same `gFileTable` string-record table used
-by `FindCdFileEntry`/`FindCdFileIndex`: returns `gFileTable + index * 0x1C`,
+Index-to-pointer helper over the same `sFileTable` string-record table used
+by `FindCdFileEntry`/`FindCdFileIndex`: returns `sFileTable + index * 0x1C`,
 bracketed by the unit's lock/unlock pair.
 
 ## Round 45's stall, and what closed it
 
 Round 45 got to 9/19 (length-exact) with `base` computed inline in the
-return expression, and separately tried `char *base = gFileTable;`
+return expression, and separately tried `char *base = sFileTable;`
 **declared and initialized together** before the lock call -- both of
 those put `base` in `$s2` (an extra callee-saved register retail does not
 use), 4 bytes longer. This session re-confirmed that exact result
@@ -44,9 +44,9 @@ diff:
  {
    void *result;
 +  char *new_var;
-+  new_var = (char *) gFileTable;
++  new_var = (char *) sFileTable;
    LockCd();
--  result = ((char *) gFileTable) + (index * 0x1C);
+-  result = ((char *) sFileTable) + (index * 0x1C);
 +  result = new_var + (index * 0x1C);
    UnlockCd();
    return result;
@@ -56,7 +56,7 @@ diff:
 The load-bearing change is not *when* `base` is computed (round 45 also
 tried "before the lock call") but that it is **declared, then assigned in
 a separate statement**, rather than declared-with-initializer. Translated
-to idiomatic naming and rebuilt in-tree (`char *base; base = gFileTable;`
+to idiomatic naming and rebuilt in-tree (`char *base; base = sFileTable;`
 as two statements, ahead of the lock call) -- **19/19 words, byte-exact,
 whole-image `OK: build matches retail SLPS_015.56`.**
 
@@ -68,7 +68,7 @@ void *GetCdFileEntry(s32 index)
     void *result;
     char *base;
 
-    base = gFileTable;
+    base = sFileTable;
     LockCd();
     result = base + index * 0x1C;
     UnlockCd();
@@ -82,7 +82,7 @@ void *GetCdFileEntry(s32 index)
 (separate declaration then assignment) are NOT interchangeable under GCC
 2.6.3 -O2's register allocator, even though they are semantically
 identical and C89 permits either.** Round 45 tried exactly this value
-(`gFileTable` loaded before the lock call) as a combined
+(`sFileTable` loaded before the lock call) as a combined
 declaration-with-initializer and got it allocated to an extra unused
 saved register ($s2, 4 bytes longer than retail). Splitting the identical
 initialization into two statements put it in $s0 as retail does, with no
@@ -99,8 +99,8 @@ tend to skip.
 
 ## Naming
 
-**Tier A.** Direct index-to-pointer helper over the same `gFileTable` table
-(`gFileTable + index * 0x1C`), no search -- distinguished from
+**Tier A.** Direct index-to-pointer helper over the same `sFileTable` table
+(`sFileTable + index * 0x1C`), no search -- distinguished from
 `FindCdFileEntry`/`FindCdFileIndex` (which scan) by the Get/Find naming
 convention. Called from `CdDriver__RunRequestQueue` (CdDriver.c, still `INCLUDE_ASM`)
 by table index.
@@ -109,8 +109,8 @@ by table index.
 
 The CD driver's shared globals and records are now declared once, in
 `include/CdDriver.h`, and this body uses that one reading: `&base[index]` over `CdFileEntry *` (was `char *` plus `index * 0x1C`). The
-global's type comes from its accessors (`gFileTable` is walked at the 0x1C
-`CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
+global's type comes from its accessors (`sFileTable` is walked at the 0x1C
+`CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
 
 ## Round 101 (track 7 polish)

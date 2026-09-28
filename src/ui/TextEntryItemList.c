@@ -37,6 +37,10 @@
 #include "FullWidthSjis.h"
 #include "GameApplicationFileResource.h"
 
+/* The cursor sprite's position at index 0, (-62, -12): loadCardResources
+ * attaches the cursor there, setCursorPos moves it to x + index * 7, y. */
+extern ScreenSpritePos sTextEntryCursorPos;
+
 TextEntry *New_TextEntry(char *text, s32 mode) {
     TextEntry *self;
 
@@ -49,19 +53,19 @@ TextEntry *New_TextEntry(char *text, s32 mode) {
 }
 
 /* The characters nextChar/prevChar step through, NUL-terminated. */
-extern u8 *gNameCharTable;
+extern u8 *sNameCharTable;
 
 void TextEntry__TextEntry(TextEntry *self, char *text, s32 mode) {
     u8 *p;
     s32 count;
 
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetTextEntryMethods();
     self->textLen = strlen(text);
     self->editBuf = BMemPMgrAlloc(self->textLen + 4);
 
-    /* MATCHING: counted inline; strlen(gNameCharTable) would be a call. */
-    p = gNameCharTable;
+    /* MATCHING: counted inline; strlen(sNameCharTable) would be a call. */
+    p = sNameCharTable;
     count = 0;
     while (*p != 0) {
         p++;
@@ -81,14 +85,14 @@ void TextEntry__ClearChildRefs(TextEntry *self) {
 
 void TextEntry__Finalize(TextEntry *self) {
     BMemPMgrFree(self->editBuf);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void TextEntry__AddChild(TextEntry *self, void *child) {
     s32 kind;
 
     if (child != NULL) {
-        Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)child);
+        GetBasicClassMethods()->addChild((BasicClass *)self, (BasicClass *)child);
         kind = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
         if (kind == PAD_CLASS_ID) {
             self->inputSource = child;
@@ -108,7 +112,7 @@ void TextEntry__RemoveChild(TextEntry *self, void *child) {
         } else if (kind == FRAMECLOCK_CLASS_ID) {
             self->tickSource = NULL;
         }
-        Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)child);
+        GetBasicClassMethods()->removeChild((BasicClass *)self, (BasicClass *)child);
     }
 }
 
@@ -116,13 +120,13 @@ void TextEntry__RemoveAllChildren(TextEntry *self) {
     self->inputSource = NULL;
     self->tickSource = NULL;
     self->panelSprite = NULL;
-    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
+    GetBasicClassMethods()->removeAllChildren((BasicClass *)self);
 }
 
 void TextEntry__OnNotify(TextEntry *self, void *sender, s32 event) {
     s32 kind;
 
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
 
     kind = ((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK;
     if (kind == PAD_CLASS_ID) {
@@ -152,10 +156,10 @@ extern char sStrComInput[];                /* "COMINPUT" */
 extern char sStrFontIcon[];                /* "FONTICON" */
 extern char sCardPathPrefix[];             /* "CARD\\" */
 extern char sTimExt[];                     /* ".TIM" */
-extern SpriteRect gTextEntryPanelRect;     /* COMINPUT's cell: 224 x 120 from (0, 0) */
-extern SpriteRgb gTextEntryTextColor;      /* the text row's colour: (128, 128, 0) */
-extern ScreenSpritePos gTextEntryPanelPos; /* (-70, -60) */
-extern ScreenSpritePos gTextEntryTextPos;  /* (-62, -15) */
+extern SpriteRect sTextEntryPanelRect;     /* COMINPUT's cell: 224 x 120 from (0, 0) */
+extern SpriteRgb sTextEntryTextColor;      /* the text row's colour: (128, 128, 0) */
+extern ScreenSpritePos sTextEntryPanelPos; /* (-70, -60) */
+extern ScreenSpritePos sTextEntryTextPos;  /* (-62, -15) */
 
 void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
     char path[32];
@@ -176,10 +180,10 @@ void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
 
     panelTim = New_TimImage(BuildFileName(path, sStrComInput, dir, ext));
     ((TimImageUploadFn)panelTim->methods->processBuffer)(panelTim);
-    self->panelSprite = New_ScreenSprite(panelTim, &gTextEntryPanelRect, 0);
+    self->panelSprite = New_ScreenSprite(panelTim, &sTextEntryPanelRect, 0);
     panelTim->methods->release(panelTim);
     self->panelSprite->methods->attachToParent(self->panelSprite, (SceneNode *)parent,
-                                               (LongVec3 *)&gTextEntryPanelPos);
+                                               (LongVec3 *)&sTextEntryPanelPos);
 
     fontTim = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
     ((TimImageUploadFn)fontTim->methods->processBuffer)(fontTim);
@@ -187,10 +191,10 @@ void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
     self->cursorSprite = New_CharSprite(fontTim, '_');
     fontTim->methods->release(fontTim);
     self->textRow->methods->attachToParent(self->textRow, (SceneNode *)parent,
-                                           (LongVec3 *)&gTextEntryTextPos);
-    self->textRow->methods->setColor(self->textRow, &gTextEntryTextColor);
+                                           (LongVec3 *)&sTextEntryTextPos);
+    self->textRow->methods->setColor(self->textRow, &sTextEntryTextColor);
     self->cursorSprite->methods->attachToParent(self->cursorSprite, (SceneNode *)parent,
-                                                (LongVec3 *)&gTextEntryCursorPos);
+                                                (LongVec3 *)&sTextEntryCursorPos);
 }
 
 void TextEntry__ReleaseCardResources(TextEntry *self) {
@@ -432,8 +436,8 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
     CharSprite *cursor;
 
     if (self->panelSprite) {
-        screenPos.y = gTextEntryCursorPos.y;
-        screenPos.x = pos * TEXTROW_DEFAULT_PITCH + gTextEntryCursorPos.x;
+        screenPos.y = sTextEntryCursorPos.y;
+        screenPos.x = pos * TEXTROW_DEFAULT_PITCH + sTextEntryCursorPos.x;
         cursor = self->cursorSprite;
         cursor->methods->setPosition(cursor, &screenPos);
         self->cursorIndex = pos;
@@ -447,9 +451,9 @@ void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify) {
     TextRow *row;
 
     if (self->panelSprite) {
-        self->editBuf[pos] = gNameCharTable[charIndex];
+        self->editBuf[pos] = sNameCharTable[charIndex];
         row = self->textRow;
-        ((TextRowSetCellAtFn)row->methods->setCell)(row, gNameCharTable[charIndex], pos);
+        ((TextRowSetCellAtFn)row->methods->setCell)(row, sNameCharTable[charIndex], pos);
         self->cursorIndex = pos;
         self->charIndex = charIndex;
         if (notify) {
@@ -506,7 +510,7 @@ void ItemList__ItemList(ItemList *self, char **items, s32 mode) {
     /* MATCHING: both set before the base ctor call. */
     i = 0;
     item = items;
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetItemListMethods();
 
     while (*item++ != NULL) {
@@ -555,14 +559,14 @@ void ItemList__Finalize(ItemList *self) {
     }
     BMemPMgrFree(self->textLens);
     BMemPMgrFree(self->texts);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void ItemList__AddChild(ItemList *self, void *child) {
     s32 tag;
 
     if (child) {
-        Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)child);
+        GetBasicClassMethods()->addChild((BasicClass *)self, (BasicClass *)child);
         tag = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
         if (tag == PAD_CLASS_ID) {
             self->inputSource = child;
@@ -582,7 +586,7 @@ void ItemList__RemoveChild(ItemList *self, void *child) {
         } else if (tag == FRAMECLOCK_CLASS_ID) {
             self->tickSource = NULL;
         }
-        Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)child);
+        GetBasicClassMethods()->removeChild((BasicClass *)self, (BasicClass *)child);
     }
 }
 
@@ -590,13 +594,13 @@ void ItemList__RemoveAllChildren(ItemList *self) {
     self->inputSource = NULL;
     self->tickSource = NULL;
     self->panelSprite = NULL;
-    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
+    GetBasicClassMethods()->removeAllChildren((BasicClass *)self);
 }
 
 void ItemList__OnNotify(ItemList *self, void *sender, s32 event) {
     s32 tag;
 
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
     tag = ((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK;
     if (tag == PAD_CLASS_ID) {
         self->methods->handleInputCode(self, sender, event);
@@ -617,12 +621,12 @@ void ItemList__ResetView(ItemList *self) {
 extern char sStrSelect[];                 /* "SELECT" */
 extern char sItemListCardPathPrefix[];    /* "CARD\\" */
 extern char sItemListTimExt[];            /* ".TIM" */
-extern SpriteRect gItemListPanelRect;     /* SELECT's cell: 256 x 160 from (0, 0) */
-extern ScreenSpritePos gItemListPanelPos; /* (-100, -60) */
+extern SpriteRect sItemListPanelRect;     /* SELECT's cell: 256 x 160 from (0, 0) */
+extern ScreenSpritePos sItemListPanelPos; /* (-100, -60) */
 extern char sItemListStrFontIcon[];       /* "FONTICON" */
 
 /*
- * Loads CARD\SELECT.TIM as the panel sprite, placed at gItemListPanelPos
+ * Loads CARD\SELECT.TIM as the panel sprite, placed at sItemListPanelPos
  * under `parent`, and has createRows build the rows from CARD\FONTICON.TIM.
  * Does nothing without a parent or when already loaded. The same shape as
  * TextEntry__LoadCardResources (TextEntryItemList).
@@ -646,9 +650,9 @@ void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
 
     panelTim = New_TimImage(BuildFileName(path, sStrSelect, dir, ext));
     ((TimImageUploadFn)panelTim->methods->processBuffer)(panelTim);
-    self->panelSprite = New_ScreenSprite(panelTim, &gItemListPanelRect, 0);
+    self->panelSprite = New_ScreenSprite(panelTim, &sItemListPanelRect, 0);
     panelTim->methods->release(panelTim);
-    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&gItemListPanelPos);
+    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&sItemListPanelPos);
 
     fontTim = New_TimImage(BuildFileName(path, sItemListStrFontIcon, dir, ext));
     ((TimImageUploadFn)fontTim->methods->processBuffer)(fontTim);

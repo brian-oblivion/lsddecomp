@@ -28,7 +28,7 @@
  * it may set to -1 to restart the count. The owners: Entity embeds one at
  * +0x09C and its callbacks are gEntityMoodHandlerTable's Entity__MoodCueNN
  * handlers (include/Entity.h); ObjMStyleActor's style-cue slots embed one and
- * install gStyleCueCallbacks' StyleCueNN (ObjMStyleActor.c); DreamSys embeds
+ * install sStyleCueCallbacks' StyleCueNN (ObjMStyleActor.c); DreamSys embeds
  * one and installs DreamSys__SoundCueCallback.
  *
  * Both proximity helpers that feed attenuation (Entity__GetProximityRatio,

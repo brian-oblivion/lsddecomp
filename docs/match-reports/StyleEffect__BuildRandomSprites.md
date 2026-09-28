@@ -21,7 +21,7 @@ branch:
 ```
 
 The stall report argued `$a1` is never read on either path. That is right for
-the fallthrough (`$a1` is overwritten by `%hi(gSpriteShiftScratch)` in the very next
+the fallthrough (`$a1` is overwritten by `%hi(sSpriteShiftScratch)` in the very next
 instruction) and **wrong for the branch-taken path**, which is the half that
 decides. Read `.L80056C78` forward to its first call:
 
@@ -78,7 +78,7 @@ siblings cheap and non-binding.
 
 Delta's other two findings were correct and are kept: the `child->methods`
 hoist that fills an earlier load-delay slot, and the `(parity != 0) ?
-gSpriteScaleLarge : gSpriteScaleSmall` branch sense. Without those this is 84/87, not 86/87 --
+sSpriteScaleLarge : sSpriteScaleSmall` branch sense. Without those this is 84/87, not 86/87 --
 the head's contribution here is the last word, not the body.
 
 ## Adjudication: why the class was wrong, and the discriminator that catches it
@@ -169,19 +169,19 @@ added to `src/world/ObjMStyleActor.c:146`. Oracle green.
 Round 70 (alpha). `func_80056BBC` -> `StyleEffect__BuildRandomSprites`, **tier B**.
 
 Only caller StyleEffect__InitByKind, kind 2. Body: parity = rand() % 2;
-StyleEffect__SpawnSprites with gSpriteScaleHalf on parity 0, NULL otherwise;
+StyleEffect__SpawnSprites with sSpriteScaleHalf on parity 0, NULL otherwise;
 then tableIndex >= 2: sprites[1] gets Actor__AddTranslation by
-(gSpriteShiftX[tableIndex], 0, 0) and slotB8 with altColor or color; else
+(sSpriteShiftX[tableIndex], 0, 0) and slotB8 with altColor or color; else
 sprites[1] gets setSemiTrans(1), setSemiTransRate(0) and updateScale(set,
-parity ? gSpriteScaleLarge : gSpriteScaleSmall); finally sprites[2]
+parity ? sSpriteScaleLarge : sSpriteScaleSmall); finally sprites[2]
 setDisplay(0). "Sprites" rests on the D800879C4 reading (see
 StyleEffect__SpawnSprites); B.
 
 Globals named in this pass (only this unit references them, tier B, named by
-their ratio-triple values): `gSpriteShiftX` (was D_80087844, s32[6]),
-`gSpriteScaleLarge` (was D_8008785C, {6/5, 6/5, 1/1}), `gSpriteScaleHalf`
-(was D_80087868, {3/6, 3/6, 1/1}), `gSpriteScaleSmall` (was D_80087874,
-{4/6, 4/6, 1/1}), `gSpriteShiftScratch` (was D_80087880, a zero Vec3S whose
+their ratio-triple values): `sSpriteShiftX` (was D_80087844, s32[6]),
+`sSpriteScaleLarge` (was D_8008785C, {6/5, 6/5, 1/1}), `sSpriteScaleHalf`
+(was D_80087868, {3/6, 3/6, 1/1}), `sSpriteScaleSmall` (was D_80087874,
+{4/6, 4/6, 1/1}), `sSpriteShiftScratch` (was D_80087880, a zero Vec3S whose
 .x is overwritten before each use).
 
 ## Track 4 (2026-09-26, round 88, charlie)
@@ -192,7 +192,7 @@ ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: 
 
 - Locals: `tblOrNull` -> `scale` (SpawnSprites' scale argument), `child` ->
   `sprite`, `arg` -> `color`, `m` -> `methods`.
-- gSpriteScaleLarge/Half/Small are declared `Ratio16[3]`: their data is
+- sSpriteScaleLarge/Half/Small are declared `Ratio16[3]`: their data is
   three {num, den} halfword pairs (x and y both 6/5, 3/6 or 4/6, then z
   1/1),
   and they only reach updateScale / SpawnSprites.

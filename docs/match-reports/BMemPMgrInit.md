@@ -46,7 +46,7 @@ void *BMemPMgrInit(s32 poolSize)
   runner delta). The rodata string is
   `"bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n"`, and its one reader is
   this function's malloc-failed branch. `s` prefix: unit-static data, read
-  by no other unit (precedent `sStrComInput`; `gCdFileNotFoundFmt` is the
+  by no other unit (precedent `sStrComInput`; `sCdFileNotFoundFmt` is the
   same shape of name for a string another unit shares).
 
 ## Three levers, each confirmed by objdump before moving to the next
@@ -66,7 +66,7 @@ void *BMemPMgrInit(s32 poolSize)
    own disassembly (`asm/nonmatchings/BMemPMgr/SetupBMemPMgrFreeList.s`) shows why:
    its own `$a1` is read as a *fallback* pool pointer (`bnez $a1,
    .L80017ADC; ori $v0,$zero,0x1; addu $a1,$a0,$zero` — defaults to `$a0`,
-   i.e. self, when the global default pool `gDefaultBMemPMgr` is unset), and
+   i.e. self, when the global default pool `sDefaultBMemPMgr` is unset), and
    `BMemPMgrInit`'s call site never sets `$a1` before the `jal` — it is a
    genuinely-uninitialized, forwarded register, the same shape
    DECOMPILATION_LEARNINGS documents as "an unused parameter in the callee

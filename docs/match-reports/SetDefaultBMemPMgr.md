@@ -17,13 +17,13 @@ memory-pool subsystem's global default-pool pointer) was already correct.
 ```c
 void SetDefaultBMemPMgr(BMemPMgr *pool)
 {
-    gDefaultBMemPMgr = pool;
+    sDefaultBMemPMgr = pool;
 }
 ```
 
-`gDefaultBMemPMgr` is the global "current default pool" pointer, the same global
+`sDefaultBMemPMgr` is the global "current default pool" pointer, the same global
 `SetupBMemPMgrFreeList`, `BMemPMgrAlloc` and `BMemPMgrFree` (this unit) all read.
-Declared `extern BMemPMgr *gDefaultBMemPMgr;` in `include/BMemPMgr.h`, next to
+Declared `extern BMemPMgr *sDefaultBMemPMgr;` in `include/BMemPMgr.h`, next to
 `SetupBMemPMgrFreeList`'s own doc comment which already named this global. Not
 called from any carved C yet — nothing in this unit or its siblings
 invokes it, so whoever establishes the game's one default pool at startup
@@ -43,8 +43,8 @@ work for a one-line accessor — the old derivation transcribes directly.
 ## Naming (round 74)
 
 `SetDefaultBMemPMgr`, **tier A** (head, from runner alpha's evidence): the
-body is exactly `gDefaultBMemPMgr = pool;`, a pure setter, and its one
+body is exactly `sDefaultBMemPMgr = pool;`, a pure setter, and its one
 caller (`main.c`) calls it immediately after `BMemPMgrInit(pool)` with the
-same pool. `D_8008A818` -> `gDefaultBMemPMgr`, tier A: the pointer
+same pool. `D_8008A818` -> `sDefaultBMemPMgr`, tier A: the pointer
 `SetupBMemPMgrFreeList`, `BMemPMgrAlloc` and `BMemPMgrFree` read as the
 current pool.

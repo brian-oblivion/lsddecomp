@@ -17,7 +17,7 @@ void TaskCore__SetFadeRate(Obj86B60 *self, s32 a1)
 
 The unit's smallest real function (a single `sw`, plus its `jr $ra` delay
 slot). Confirms `Obj86B60::unk84` (already established as a multiplier by
-`TaskCore__TickColorFade`) is a plain setter target, not computed internally.
+`TaskCore__TickFadeIn`) is a plain setter target, not computed internally.
 
 ## Provenance
 
@@ -26,7 +26,7 @@ round 2026-09-02, runner echo, unit Task. 1 attempt.
 ## Naming (round 78, delta)
 
 **Tier A** (pure setter). `func_8003CBB8` -> `Obj86B60__SetFadeRate`. Body:
-`self->unk84 = a1;`, nothing else. Corroborated by `TaskCore__TickColorFade`,
+`self->unk84 = a1;`, nothing else. Corroborated by `TaskCore__TickFadeIn`,
 the sole reader of `unk84`, which multiplies it against `frameCounter` to
 build the per-tick colour delta -- exactly what a "rate" describes
 mechanically, without asserting what the fade itself means in the game.

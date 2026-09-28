@@ -37,12 +37,12 @@
  *
  * Playback. setTod(index) selects a TOD of the TodSet and applies its first
  * frame; playTod/stopTod gate frame advance. tick runs the selected tick
- * callback (tickCallbackA..C, chosen by selectTickCallback, while
+ * callback (tickMoveZ, tickCallbackB or tickCallbackC, chosen by selectTickCallback, while
  * enableTickCallback holds) and, while playing, applies the next frame,
  * wrapping at the frame count. applyTodFrame walks a frame's packets through
  * applyTodPacket, which writes attribute, coordinate (the part's
  * GsCOORD2PARAM), model-id and parent packets into the part the packet's
- * object id names. tickCallbackA moves the object -30 along local Z and,
+ * object id names. tickMoveZ moves the object -30 along local Z and,
  * while mainPartNotifies is 1, has mainPart send event 6 (notifyWithHull);
  * B and C are empty here (Entity fills B).
  *
@@ -94,7 +94,7 @@ struct TagCheckArg;  /* onNotify's sender, read only for its table's low id half
     /* +0x10C */ void (*selectTickCallback)(Self *self, s32 which); /* TodActor__SelectTickCallback: TICK_CALLBACK_A..C */ \
     /* +0x110 */ s32 (*enableTickCallback)(Self *self);         /* TodActor__EnableTickCallback */ \
     /* +0x114 */ void (*disableTickCallback)(Self *self);       /* TodActor__DisableTickCallback */ \
-    /* +0x118 */ void *tickCallbackA;                           /* TodActor__TickCallbackA; only the VALUE is read (selectTickCallback) */ \
+    /* +0x118 */ void *tickMoveZ;                             /* TodActor__TickMoveZ; only the VALUE is read (selectTickCallback) */ \
     /* +0x11C */ void *tickCallbackB;                           /* TodActor__TickCallbackB, empty (Entity: Entity__TickSoundCue) */ \
     /* +0x120 */ void *tickCallbackC;                           /* TodActor__TickCallbackC, empty */ \
     /* +0x124 */ void (*playTone)(Self *self, s32 index);       /* TodActor__PlayTone: arg2's playTone(index, 0x6E, 0x6E); not dispatched in C */ \
@@ -113,12 +113,12 @@ struct TagCheckArg;  /* onNotify's sender, read only for its table's low id half
     /* +0x058 */ struct VabStreamObj *sound; /* the ctor's second argument, the sound bank playTone plays on; NULL when none */ \
     /* +0x05C */ struct ModelData *modelData; /* borrowed from the ctor's descriptor or made by New_ModelData; NULL when none */ \
     /* +0x060 */ s32 ownsModelData;        /* 1 when New_ModelData made modelData; only an owned one is released */ \
-    /* +0x064 */ s32 mainPartNotifies;     /* setMainPartNotifies (1 in reset); while 1, TickCallbackA has mainPart send the move notification */ \
+    /* +0x064 */ s32 mainPartNotifies;     /* setMainPartNotifies (1 in reset); while 1, TickMoveZ has mainPart send the move notification */ \
     /* +0x068 */ Actor *mainPart;          /* parts[the index scanPackets writes first]; NULL after the parts are destroyed */ \
     /* +0x06C */ s32 partCount;            /* entries in parts/partIds */                          \
     /* +0x070 */ Actor **parts;            /* one New_Actor per TOD object */                      \
     /* +0x074 */ u8 *partIds;              /* each part's TOD object id; findPartIndex searches it */ \
-    /* +0x078 */ void *tickCallback;       /* tickCallbackA/B/C as selected; tick calls it while tickCallbackEnabled */ \
+    /* +0x078 */ void *tickCallback;       /* tickMoveZ, tickCallbackB or tickCallbackC as selected; tick calls it while tickCallbackEnabled */ \
     /* +0x07C */ s32 todIndex;             /* the current TOD's index in the TodSet */             \
     /* +0x080 */ s32 todFrameCount;        /* the current TOD's frame count (setTod) */            \
     /* +0x084 */ s32 todFrame;             /* the current frame number; wraps at todFrameCount */  \
@@ -175,7 +175,7 @@ void TodActor__Tick(TodActor *self);
 void TodActor__SelectTickCallback(TodActor *self, s32 which);
 s32 TodActor__EnableTickCallback(TodActor *self);
 void TodActor__DisableTickCallback(TodActor *self);
-void TodActor__TickCallbackA(TodActor *self);
+void TodActor__TickMoveZ(TodActor *self);
 void TodActor__TickCallbackB(void);
 void TodActor__TickCallbackC(void);
 void TodActor__PlayTone(TodActor *self, s32 index);

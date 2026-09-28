@@ -22,7 +22,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
 /* Hang until +0x4C is nonzero (it is read once). MoviePlayer__DecodeFrame's only call
- * passes its gActiveMoviePlayer object, so the parameter is that Obj45CFC view. */
+ * passes its sActiveMoviePlayer object, so the parameter is that Obj45CFC view. */
 void MoviePlayer__WaitFrameReady(Obj45CFC *self) {
     while (self->unk4C == 0) {
     }

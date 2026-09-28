@@ -17,7 +17,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 `WBgm__Crescendo`, tier A. vtable slot `crescendo`; body is exactly SsSeqSetCrescendo, scaled by GetSsTicksPerSecond()'s return.
 
 Parameter `seconds` (was `scale`, round 101 track 7): it is multiplied by
-GetSsTicksPerSecond() (src/sound/PlacementGridVabSound.c, returns gSsTicksPerSecond)
+GetSsTicksPerSecond() (src/sound/PlacementGridVabSound.c, returns sSsTicksPerSecond)
 to give SsSeqSetCrescendo's `v_time`, which libsnd counts in ticks, so the
 argument is the fade's length in seconds.
 
@@ -71,8 +71,8 @@ extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern s32 sWBgmActive;
+extern u8 sSsSizeTableBuf[];
 ```
 
 ## Track 4 (2026-09-26, round 88, alpha)

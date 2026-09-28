@@ -19,7 +19,7 @@ void TextEntry__RemoveAllChildren(Obj86ED0 *self)
     self->unk34 = NULL;
     self->unk38 = NULL;
     self->unk48 = NULL;
-    Get_vtable_BasicClass()->removeAllChildren(self);
+    GetBasicClassMethods()->removeAllChildren(self);
 }
 ```
 

@@ -12,10 +12,10 @@ This is the game's own `main()`. It runs an empty startup stub
 (`__main`, already matched, a no-op), sets a Psy-Q memory mode via
 `SetMem(2)`, stands up the game's `BMemPMgr` heap (`BMemPMgrInit`), installs
 it as the default pool (`SetDefaultBMemPMgr`), constructs the `GameApplication`
-instance at `gGameApplication` (`New_GameApplication`, seeded from the constant block
-`gGameApplicationConfig = {0x13, 0, 1, 1, 1, 1}`), allocates a second object via the
+instance at `sGameApplication` (`New_GameApplication`, seeded from the constant block
+`sGameApplicationConfig = {0x13, 0, 1, 1, 1, 1}`), allocates a second object via the
 still-uncarved `New_DrawSystem`, opens a `Pad` (`New_Pad(NULL, 0)`),
-and dispatches two methods through `gGameApplication`'s own vtable (`+0x044` and
+and dispatches two methods through `sGameApplication`'s own vtable (`+0x044` and
 `+0x04C`) before returning. It never loops -- the real game loop presumably
 lives inside whatever `slot4C` (`Application__RunMainLoop`) or a callee reached from it
 does; this function is just game-code setup, past which retail's own crt0
@@ -50,7 +50,7 @@ extern void SetMem(s32 mode);
  * code_8220.h already uses for BMemPMgrAlloc/BMemPMgrFree. */
 extern void *BMemPMgrInit();
 
-/* SetDefaultBMemPMgr(BMemPMgr *pool) -- one-line `gDefaultBMemPMgr = pool;`, matched
+/* SetDefaultBMemPMgr(BMemPMgr *pool) -- one-line `sDefaultBMemPMgr = pool;`, matched
  * in code_8220.c but not yet declared in code_8220.h (no carved caller
  * existed until now). */
 extern void SetDefaultBMemPMgr(BMemPMgr *pool);
@@ -64,9 +64,9 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
  * of THIS call, not of the one whose delay slot it sits in. */
 extern void *New_DrawSystem(void);
 
-extern BMemPMgr *gStartupBMemPMgr;
-extern GameApplication *gGameApplication;
-extern GameApplicationConfig gGameApplicationConfig;
+extern BMemPMgr *sStartupBMemPMgr;
+extern GameApplication *sGameApplication;
+extern GameApplicationConfig sGameApplicationConfig;
 
 /* Matched in GameApplicationFileResource.c; not yet declared in any header (no other carved
  * caller existed until now). */
@@ -79,13 +79,13 @@ void main(void)
 
     __main();
     SetMem(2);
-    gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
-    SetDefaultBMemPMgr(gStartupBMemPMgr);
-    gGameApplication = New_GameApplication(&gGameApplicationConfig);
+    sStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
+    SetDefaultBMemPMgr(sStartupBMemPMgr);
+    sGameApplication = New_GameApplication(&sGameApplicationConfig);
     obj = New_DrawSystem();
     pad = New_Pad(0, 0);
-    gGameApplication->methods->forwardToBaseSlot44UnlessFlagged(gGameApplication, obj, pad);
-    gGameApplication->methods->slot4C(gGameApplication);
+    sGameApplication->methods->forwardToBaseSlot44UnlessFlagged(sGameApplication, obj, pad);
+    sGameApplication->methods->slot4C(sGameApplication);
 }
 
 void __main(void) {
@@ -163,19 +163,19 @@ this is a documentation sync only.)
   `tools/broadcast.sh`.
 
 - **Globals, all three named (this unit is their only C reference site):**
-  - `D_8008A808` -> `gStartupBMemPMgr`, tier B. Holds `BMemPMgrInit`'s
+  - `D_8008A808` -> `sStartupBMemPMgr`, tier B. Holds `BMemPMgrInit`'s
     return value between that call and the immediately following
     `SetDefaultBMemPMgr(...)` call -- set once, read once, both in
     `main`. Mechanics are clear (it stages the newly created heap
     pointer); whether any still-uncarved code elsewhere also reads this
-    exact global (as opposed to `gDefaultBMemPMgr`, a different address,
+    exact global (as opposed to `sDefaultBMemPMgr`, a different address,
     `BMemPMgr.c`) is not established, hence tier B rather than A.
-  - `D_8008AC20` -> `gGameApplication`, tier B. The one instance of `GameApplication`
+  - `D_8008AC20` -> `sGameApplication`, tier B. The one instance of `GameApplication`
     the game constructs, matching this header's own stated convention of
     keeping the class's identity tied to its vtable address until a
     game-purpose name is established (track 4). Read and written only here
     and in the shared header's comments (updated by this rename).
-  - `D_80066828` -> `gGameApplicationConfig`, tier A: purely mechanical, it
+  - `D_80066828` -> `sGameApplicationConfig`, tier A: purely mechanical, it
     IS the one `GameApplicationConfig` block in the image, passed to
     `New_GameApplication` at its only call site. `{0x13, 0, 1, 1, 1, 1}`, per
     `include/GameApplication.h`'s existing documentation of which two fields
@@ -351,7 +351,7 @@ The `arity-ok` line's retail evidence: the dead second argument of
 | --- | --- | --- | --- |
 | local `obj` | `drawSystem` | A | it holds `New_DrawSystem()`'s return and is passed as `initSystems`'s `DrawSystem *drawSystem` |
 | `2` (SetMem) | `CONSOLE_RAM_MB` | A | Psy-Q libapi's `SetMem(n)` takes the RAM size in megabytes, 2 on a retail console, 8 on a development board |
-| `0x166C00` | `DEFAULT_POOL_SIZE` = `(1435 * 1024)` | A | `BMemPMgrInit(s32 poolSize)` (src/app/BMemPMgr.c) stores it as `pool->poolSize`; the pool is installed by `SetDefaultBMemPMgr`, whose only caller is `main`, as the `gDefaultBMemPMgr` every `BMemPMgrAlloc` uses |
+| `0x166C00` | `DEFAULT_POOL_SIZE` = `(1435 * 1024)` | A | `BMemPMgrInit(s32 poolSize)` (src/app/BMemPMgr.c) stores it as `pool->poolSize`; the pool is installed by `SetDefaultBMemPMgr`, whose only caller is `main`, as the `sDefaultBMemPMgr` every `BMemPMgrAlloc` uses |
 
 `New_Pad(0, 0)` keeps its literals with a comment: they are `PadInit`'s mode
 and the port, and a name would restate them.

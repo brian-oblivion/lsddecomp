@@ -6,11 +6,11 @@ Round 81, runner delta. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x00C (finalize) (slots resolved with `tools/classtable.py gWBgmMethods`).
-- **What:** finalize: `gWBgmActive = 0`, own `stop` (+0x048), `SsSeqClose(seqId)`, `release` (+0x004) on the +0x0C and +0x10 objects when non-NULL, `removeChild(self, GetDrawSystem())`, then the base finalize.
+- **What:** finalize: `sWBgmActive = 0`, own `stop` (+0x048), `SsSeqClose(seqId)`, `release` (+0x004) on the +0x0C and +0x10 objects when non-NULL, `removeChild(self, GetDrawSystem())`, then the base finalize.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 52/52
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`).
-- **Levers:** none. The `sw $zero, gWBgmActive` scheduled between the slot load and the `jalr` is the global store written FIRST in source (a store to memory cannot move ahead of a call that follows it in source, so its position pins the source order).
+- **Levers:** none. The `sw $zero, sWBgmActive` scheduled between the slot load and the `jalr` is the global store written FIRST in source (a store to memory cannot move ahead of a call that follows it in source, so its position pins the source order).
 - **Name:** renamed round 82 to `WBgm__Finalize` (see `## Naming` below).
 
 ## Naming
@@ -30,7 +30,7 @@ still matches after the change.
 
 ```c
 void WBgm__Finalize(WBgm *self) {
-    gWBgmActive = 0;
+    sWBgmActive = 0;
     self->methods->stop(self);
     SsSeqClose(self->seqId);
     if (self->vab != NULL) {
@@ -40,7 +40,7 @@ void WBgm__Finalize(WBgm *self) {
         self->seqData->methods->release((BasicClass *)self->seqData);
     }
     self->methods->removeChild(self, GetDrawSystem());
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 ```
 
@@ -113,14 +113,14 @@ extern SeqData *New_RequestedFile(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-WBgmMethods *Get_vtable_WBgm(void);
+WBgmMethods *GetWBgmMethods(void);
 
 extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern s32 sWBgmActive;
+extern u8 sSsSizeTableBuf[];
 ```
 
 ## Track 4 (2026-09-26, round 87, bravo)

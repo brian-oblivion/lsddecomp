@@ -14,7 +14,7 @@ attempt once rebuilt.
 
 ```c
 extern s32 strlen(char *s);
-extern u8 *gNameCharTable;
+extern u8 *sNameCharTable;
 extern void TextEntry__ClearChildRefs(Obj86ED0 *self);
 
 void TextEntry__TextEntry(Obj86ED0 *self, char *arg1, s32 arg2)
@@ -22,12 +22,12 @@ void TextEntry__TextEntry(Obj86ED0 *self, char *arg1, s32 arg2)
     u8 *p;
     s32 count;
 
-    Get_vtable_BasicClass()->ctor(self);
+    GetBasicClassMethods()->ctor(self);
     self->methods = GetTextEntryMethods();
     self->unk10 = strlen(arg1);
     self->unk28 = BMemPMgrAlloc(self->unk10 + 4);
 
-    p = gNameCharTable;
+    p = sNameCharTable;
     count = 0;
     while (*p != 0) {
         p++;
@@ -42,7 +42,7 @@ void TextEntry__TextEntry(Obj86ED0 *self, char *arg1, s32 arg2)
 
 This is `Obj86ED0`'s own ctor, called through `Obj86ED0Methods::ctor` at
 `New_TextEntry`'s allocation site: base ctor first
-(`Get_vtable_BasicClass()->ctor(self)`), then `self->methods` overridden to this
+(`GetBasicClassMethods()->ctor(self)`), then `self->methods` overridden to this
 class's own table (`GetTextEntryMethods()`, defined in `TextEntryItemList.c`) — same
 shape as `NodeGuardedViewport__NodeGuardedViewport` in `TitleMenuTaskObjF.c`.
 
@@ -54,11 +54,11 @@ value rather than reloading `self->unk10` from memory) — ordinary redundant-
 load elimination, not something the C needs to spell out by hand.
 
 **One thing worth flagging explicitly:** the byte-counting loop over
-`gNameCharTable` is a HAND-WRITTEN `while (*p != 0) { p++; count++; }`, not a
+`sNameCharTable` is a HAND-WRITTEN `while (*p != 0) { p++; count++; }`, not a
 `strlen()` call — this project's `-fno-builtin` means GCC 2.6.3 never turns
 a `strlen` call into inline code, so retail's identical-looking inline loop
 means the SOURCE itself never called `strlen` for this count. Writing
-`count = strlen((char *)gNameCharTable);` here would emit an actual `jal
+`count = strlen((char *)sNameCharTable);` here would emit an actual `jal
 strlen` instruction retail does not have.
 
 **Header changes** (`include/class_3bb8c.h`, additive):
@@ -100,10 +100,10 @@ Parameters `arg1`/`arg2` -> `text`/`mode` (the prototype's names).
 `extern s32 strlen(char *s)`; the K&R declaration returns int, zero bytes
 changed.
 
-Moved here from the comment on `gNameCharTable` in src/ui/TextEntryItemList.c:
+Moved here from the comment on `sNameCharTable` in src/ui/TextEntryItemList.c:
 "VALUE-of `%gp_rel`, round 45's own local view -- same global as
-TextEntryItemList's `gNameCharTable` (a byte lookup table whose length this
+TextEntryItemList's `sNameCharTable` (a byte lookup table whose length this
 function counts by hand rather than via `strlen`, since GCC 2.6.3 with
 `-fno-builtin` never turns a `strlen` CALL into inline code -- the inline
 loop below has to be literal source, not a call)." The source keeps one
-line: `MATCHING: counted inline; strlen(gNameCharTable) would be a call.`
+line: `MATCHING: counted inline; strlen(sNameCharTable) would be a call.`

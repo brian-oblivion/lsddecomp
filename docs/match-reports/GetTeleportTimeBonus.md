@@ -13,7 +13,7 @@ the first attempt.
 
 ## What it does
 
-`return (gLinkSrcStage == 0) ? 0xA : 0;` -- the asm computes this via
+`return (sLinkSrcStage == 0) ? 0xA : 0;` -- the asm computes this via
 `sltiu`/`negu`/`andi` rather than a branch (an unsigned "is zero" test turned
 into an all-ones mask, then masked to `0xA`), which is exactly what GCC 2.6.3
 emits for a ternary on a simple equality-to-zero test; no special shape was
@@ -28,11 +28,11 @@ the existing header prototype `extern s32 GetTeleportTimeBonus(void);`.
 ```c
 s32 GetTeleportTimeBonus(void)
 {
-	return (gLinkSrcStage == 0) ? 0xA : 0;
+	return (sLinkSrcStage == 0) ? 0xA : 0;
 }
 ```
 
-`gLinkSrcStage` was already declared `extern s32 gLinkSrcStage;` in `include/DreamSys.h`.
+`sLinkSrcStage` was already declared `extern s32 sLinkSrcStage;` in `include/DreamSys.h`.
 
 ## Verification
 
@@ -50,8 +50,8 @@ Renamed from `func_8005BFC4` (tier C since round 66).
 
 Round 66 kept the placeholder because "nothing in any carved unit calls it"; that
 stopped being true when `DreamSys__TryInstantTeleportLink` was matched. That
-caller, after `Test4InstantTeleporters` has found a link (which leaves the
-trigger's stage in `gLinkSrcStage`), calls this with no arguments and, when the
+caller, after `TestForInstantTeleporters` has found a link (which leaves the
+trigger's stage in `sLinkSrcStage`), calls this with no arguments and, when the
 result is non-zero and the dream is not a flashback session, sets the dream time
 limit to `getDreamTimerScaled() + result` -- i.e. the result is extra time, in
 the same units as `DreamSys__GetSetDreamTimeLimit`, granted by the teleport. The

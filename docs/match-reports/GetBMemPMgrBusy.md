@@ -16,7 +16,7 @@ already correct.
 ```c
 s32 GetBMemPMgrBusy(void)
 {
-    return gBMemPMgrBusy;
+    return sBMemPMgrBusy;
 }
 ```
 

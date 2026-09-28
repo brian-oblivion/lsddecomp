@@ -26,16 +26,16 @@ the sibling's `slotBC`. Zero bytes affected.
 ## Derivation
 
 ```c
-extern u8 *gNameCharTable;
+extern u8 *sNameCharTable;
 
 void TextEntry__SetCharAt(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
 {
     ChildObj86ED0 *obj;
 
     if (self->unk48) {
-        self->unk28[arg1] = gNameCharTable[arg2];
+        self->unk28[arg1] = sNameCharTable[arg2];
         obj = self->unk44;
-        obj->methods->slotC4(obj, gNameCharTable[arg2], arg1);
+        obj->methods->slotC4(obj, sNameCharTable[arg2], arg1);
         self->unk18 = arg1;
         self->unk1C = arg2;
         if (arg3) {
@@ -47,7 +47,7 @@ void TextEntry__SetCharAt(Obj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)
 
 Same `Obj86ED0` "countdown/flush" group as `TextEntry__SetCursorPos` (see that
 report): gated on `self->unk48`, this one copies one byte out of a lookup
-table (`gNameCharTable`, VALUE-of `%gp_rel`, ROM image points it at
+table (`sNameCharTable`, VALUE-of `%gp_rel`, ROM image points it at
 still-uncarved rodata `D_800115D0`) into `self->unk28[arg1]`, forwards the
 same byte plus `arg1` to `self->unk44`'s own method table at slot `0xC4`,
 records `self->unk18`/`self->unk1C`, and — if `arg3` is non-zero — notifies
@@ -72,13 +72,13 @@ notify-on-flag-set tail shape common to both siblings.
 
 ## Naming
 
-- `TextEntry__SetCharAt` -- tier B. slotA8 occupant. Looks up gNameCharTable[arg2], stores it into self->unk28[arg1], forwards the same byte to self->unk44's slotC4, records self->unk18/unk1C, optionally notifies via slot60. Same evidence class as its sibling TextEntry__SetCursorPos. classtable.py gTextEntryMethods +0x0A8.
+- `TextEntry__SetCharAt` -- tier B. slotA8 occupant. Looks up sNameCharTable[arg2], stores it into self->unk28[arg1], forwards the same byte to self->unk44's slotC4, records self->unk18/unk1C, optionally notifies via slot60. Same evidence class as its sibling TextEntry__SetCursorPos. classtable.py gTextEntryMethods +0x0A8.
 
 ## Track 4 (2026-09-26, round 87)
 
 Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
-Renamed from Obj86ED0__DispatchLookupValue: editBuf[pos] = gNameCharTable[charIndex], the same byte to textRow's +0x0C4 (TextRow__SetCellAt) at pos, stores cursorIndex/charIndex, notifyTarget(0) when `notify`. Occupant of slot +0x0A8, called by NextChar/PrevChar/ResetChar/ResetAllChars. Tier A.
+Renamed from Obj86ED0__DispatchLookupValue: editBuf[pos] = sNameCharTable[charIndex], the same byte to textRow's +0x0C4 (TextRow__SetCellAt) at pos, stores cursorIndex/charIndex, notifyTarget(0) when `notify`. Occupant of slot +0x0A8, called by NextChar/PrevChar/ResetChar/ResetAllChars. Tier A.
 
 ## Round 94 (track 6, charlie): textRow is a TextRow
 
@@ -87,7 +87,7 @@ object behind them is the `New_TextRow` result, so TextEntry::textRow
 (+0x044, include/TextEntry.h) is `struct TextRow *`. The slots map onto
 TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
 (position cast to `LongVec3 *`, as ScreenSprite's banner describes), +0x0B8
-`setColor` (`gTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
+`setColor` (`sTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
 +0x0C4 `setCell`, called through `TextRowSetCellAtFn` because
 TextRow__SetCellAt takes the index too. Zero bytes changed.
 

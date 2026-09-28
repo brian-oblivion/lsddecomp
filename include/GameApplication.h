@@ -6,7 +6,7 @@
 /*
  * GameApplication -- the game itself, as an Application (include/Application.h):
  * the one object main() (src/main.c) builds, New_GameApplication(
- * &gGameApplicationConfig) into gGameApplication, before running its
+ * &sGameApplicationConfig) into sGameApplication, before running its
  * initSystems and then runMainLoop, which never returns. Application brings the
  * console up and owns the outer loop; this class fills the loop's six hooks with
  * the game's sequence and owns the game's DreamSys (include/DreamSys.h). Class id
@@ -54,7 +54,7 @@ typedef struct GameApplication GameApplication;
 typedef struct GameApplicationMethods GameApplicationMethods;
 
 /* The ctor's argument: which parts of the sequence run. One instance,
- * gGameApplicationConfig = {0x13, 0, 1, 1, 1, 1}, kept at self->config; each
+ * sGameApplicationConfig = {0x13, 0, 1, 1, 1, 1}, kept at self->config; each
  * gate below is read `!= 0` by the methods it names. */
 typedef struct GameApplicationConfig {
     /* +0x00 */ s32 dataSource; /* Application's ctor argument (0x13 = the CD driver's class id) */

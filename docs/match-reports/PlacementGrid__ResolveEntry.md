@@ -470,7 +470,7 @@ On the revisit hypothesis specifically: this unit's own types and names
 function's own earlier attempts and were already live in
 `src/sound/PlacementGridVabSound.c`, so there was nothing newer to import; the unit's
 other matched functions (`New_PlacementGrid`, `PlacementGrid__PlacementGrid`,
-`PlacementGrid__Finalize`, `PlacementGrid__SetFlag`) touch a different object family
+`PlacementGrid__Finalize`, `PlacementGrid__OnRequestDone`) touch a different object family
 (`Obj6D940`/`Table6D940`) and share no field with this one. **Nothing in
 the four rounds of names and types since the stall was filed changed
 anything here.** What moved the score was re-reading the diff instead of

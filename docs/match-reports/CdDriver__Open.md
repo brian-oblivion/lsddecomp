@@ -6,7 +6,7 @@
 
 108/108 words, byte-exact, file 0x17AD0-0x17C80. Cold ground. First function
 in ROM order in this unit, so the shared `Obj80027480` local struct and
-`gCdAsyncEnabled`/`gCdSyncQueueMode`/`gCdBusy`/`LockCd`/`StartCdOperation`/
+`sCdAsyncEnabled`/`sCdSyncQueueMode`/`sCdBusy`/`LockCd`/`StartCdOperation`/
 `ResetCdStateMachine`/`EnqueueCdRequest`/`UnlockCd` externs were moved ahead of
 it (they were previously declared between it and `CdDriver__Close`).
 
@@ -29,8 +29,8 @@ typedef struct Rec80028448 {
 
 extern void *FindCdFileEntry(char *arg0);
 extern s32 FindCdFileIndex(char *arg0);
-extern void *gCdSeekParam;
-extern s32 gCdTickStep;
+extern void *sCdSeekParam;
+extern s32 sCdTickStep;
 
 extern void OpenCdFile(Obj80027480 *self, char *suffix);
 extern char *BuildCdFilePath(char *dest, char *suffix);
@@ -51,23 +51,23 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     s32 temp;
     s32 v0;
 
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && sCdSyncQueueMode == 0) {
         OpenCdFile(self, suffix);
         return;
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (gCdBusy == 0 && self->unk0C == 0) {
+        if (sCdBusy == 0 && self->unk0C == 0) {
             StartCdOperation(1, 1);
-            if (gCdAsyncEnabled != 0) {
+            if (sCdAsyncEnabled != 0) {
                 rec = FindCdFileEntry(suffix);
-                gCdSeekParam = rec;
+                sCdSeekParam = rec;
                 if (rec == NULL) {
                     return;
                 }
                 self->unk18 = rec->unk14;
-                temp = ((Rec80028448 *)gCdSeekParam)->unk18;
-                gCdTickStep = 1;
+                temp = ((Rec80028448 *)sCdSeekParam)->unk18;
+                sCdTickStep = 1;
                 self->unk0C = 1;
                 self->unk1C = temp;
             } else {
@@ -114,12 +114,12 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
 
 3. **The `NEW STALL CLASS` from round 44 (`Viewport__InitDefaults`): retail
    recomputes/re-reads an address our GCC CSEs away.** After
-   `gCdSeekParam = rec;`, retail reloads `gCdSeekParam` from memory a second
-   time (`lw v0,%gp_rel(gCdSeekParam)`) to read `->unk18`, instead of reusing
+   `sCdSeekParam = rec;`, retail reloads `sCdSeekParam` from memory a second
+   time (`lw v0,%gp_rel(sCdSeekParam)`) to read `->unk18`, instead of reusing
    the register that still holds the identical value (`rec`/`a2`). My first
-   attempt wrote `self->unk1C = ((Rec80028448 *)gCdSeekParam)->unk18;` as the
+   attempt wrote `self->unk1C = ((Rec80028448 *)sCdSeekParam)->unk18;` as the
    LAST statement in the branch (after the two flag stores
-   `gCdTickStep = 1; self->unk0C = 1;`), and GCC's CSE collapsed the global
+   `sCdTickStep = 1; self->unk0C = 1;`), and GCC's CSE collapsed the global
    read into reusing `rec`'s register anyway -- 1 word short.
    **Moving that same statement to IMMEDIATELY after the first field copy
    (`self->unk18 = rec->unk14;`), before the two flag stores, was enough to
@@ -135,7 +135,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
    EXCLUSIVE `if`/`else` branches can still perturb register allocation in
    the OTHER branch, even though the two uses never execute on the same
    path.** My first draft used a single `s32 v0;` for both (a) the
-   `gCdSeekParam` reload above and (b) the `CdSync` retry loop's return value
+   `sCdSeekParam` reload above and (b) the `CdSync` retry loop's return value
    in the sibling `else` branch. That produced an EXTRA `move v1,v0` right
    after the `CdSync` call, with the loop's own comparisons then reading
    `$v1` -- retail reads `$v0` directly, with no move at all (like
@@ -151,7 +151,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
 
 `Obj80027480.unk18` is now `Pos18` (was `u8[4]`) -- a CdlLOC-shaped 4-byte
 position, alignment 2. `Rec80028448` is a local view of the 0x1C-byte string
-records at `gFileTable` (`src/cd/CdDriver.c`'s own comment already
+records at `sFileTable` (`src/cd/CdDriver.c`'s own comment already
 describes this table); only the trailing two fields this function reads are
 named. `StatBuf80027` is this unit's OWN local view of the CD stat buffer
 `CdDriver.c`'s `OpenCdFile` already independently discovered as
@@ -235,7 +235,7 @@ oracles green after.
 | `Class6D4E8Methods` | `slot4C` | `seek` | B | resolves to `CdDriver__Seek` |
 | `Class6D4E8Methods` | `slot54` | `read` | A | resolves to `CdDriver__Read` |
 | `Class6D4E8Methods` | `slot58` | `loadFile` | A | resolves to `CdDriver__LoadFile`; CdDriver's name |
-| `Class6D4E8Methods` | `slot64` | `setFlag` | A | resolves to `FileResource__SetFlag` |
+| `Class6D4E8Methods` | `slot64` | `setFlag` | A | resolves to `FileResource__OnRequestDone` |
 | `Class6D4E8Methods` | `slot70` | `stopCdService` | A | resolves to `CdDriver__StopService` |
 | `CdFileEntry` | `pad0`/`unk14`/`unk18` | `name`/`pos`/`size` | A | CdDriver's CdFileEntry |
 | `CdFileInfo` | `unk0`/`unk4` | `pos`/`size` | A | CdDriver's CdFileInfo |
@@ -246,21 +246,21 @@ its one reader here ORs flags bit 0, but no writer of a nonzero value is
 identified (CdDriver's `UnkC80::unk04` store goes through an
 uninitialised pointer).
 
-Globals: `D_8006D574` -> `gCdSeekLoc` (A: 8 bytes of .data written only by
+Globals: `D_8006D574` -> `sCdSeekLoc` (A: 8 bytes of .data written only by
 `CdDriver__Seek`'s `CdIntToPos` and used as its CdlSetloc target).
-`gCdSyncQueueMode` keeps its placeholder for CdDriver's stated reason: every
-read here is the `gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0` sync-mode test and
+`sCdSyncQueueMode` keeps its placeholder for CdDriver's stated reason: every
+read here is the `sCdAsyncEnabled == 0 && sCdSyncQueueMode == 0` sync-mode test and
 nothing names the second mode.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Open` -> `CdDriver__Open` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Open` -> `CdDriver__Open` by rename.py.
 
-### Round 100 (charlie, track 7): `D_8008A860` -> `gCdSyncQueueMode`, tier B
+### Round 100 (charlie, track 7): `D_8008A860` -> `sCdSyncQueueMode`, tier B
 
 The paragraph above predates this rename (the tool rewrote the name in it).
 What the five methods' bodies show, read together: the mode word only ever
-matters when `gCdAsyncEnabled` is 0. Both 0: each method forwards straight
-to CdDriver's blocking call and never touches the queue. `gCdAsyncEnabled`
+matters when `sCdAsyncEnabled` is 0. Both 0: each method forwards straight
+to CdDriver's blocking call and never touches the queue. `sCdAsyncEnabled`
 0 and this word nonzero: the call is enqueued like an async one, and when
 `CdDriver__RunRequestQueue` dispatches it back the method runs it as a
 blocking CdControl/CdSync/CdRead spin on the spot. So the word selects

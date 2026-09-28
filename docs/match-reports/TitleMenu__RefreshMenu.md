@@ -25,7 +25,7 @@ void TitleMenu__RefreshMenu(TitleMenu *self)
     size = self->nameField->unkA9;
     origState = self->state;
     buf1 = BMemPMgrAlloc(size);
-    DecodeFullWidthSjis(buf1, gSaveTitle);
+    DecodeFullWidthSjis(buf1, sSaveTitle);
     self->nameField->methods->slotCC(self->nameField, buf1);
     BMemPMgrFree(buf1);
     UpdateFlashbackLock(self, self->unk4C, self->unkA4);
@@ -59,7 +59,7 @@ the whole image after any further edit there.)
   Read at function entry (before the allocator call) in the disassembly,
   which is why the C statement is placed there too rather than immediately
   before its one use at the very end.
-- `buf1 = BMemPMgrAlloc(size); DecodeFullWidthSjis(buf1, gSaveTitle); self->
+- `buf1 = BMemPMgrAlloc(size); DecodeFullWidthSjis(buf1, sSaveTitle); self->
   nameField->methods->slotCC(self->nameField, buf1); BMemPMgrFree(buf1);` -- the
   identical allocate/fill/consume/free idiom already matched in this unit's
   own `TitleMenu__CreateSaveTitle` (this round), just simpler (no `strcpy`/`strlen`
@@ -72,7 +72,7 @@ the whole image after any further edit there.)
   genuinely 2-parameter function (`Ctx678_3bb8c_c *ctx, Result678_3bb8c_c
   *out`). This call site sets up a THIRD argument (`self->unkA4` in `$a2`)
   that unit's own signature never receives -- the same independent-arities
-  situation already on file for `Get_vtable_TaskCore`/`BaseTaskCtorTable_
+  situation already on file for `GetTaskCoreMethods`/`BaseTaskCtorTable_
   3bb8c_c` vs. `TaskCoreMethods` (`include/Task.h`). This unit's own
   local 3-argument extern matches what THIS call site actually needs;
   TitleMenuTaskObjF.c's 2-argument declaration is untouched. (`include/class_
@@ -84,7 +84,7 @@ the whole image after any further edit there.)
   forwarding the already-established `unk14` (`void *`, from this round's
   `TitleMenu__BeginCardAccess`) opaquely.
 - `self->unkA4->methods->slot19C(self->unkA4, &buf2);` -- the SAME slot
-  already established (`TitleMenu__RefreshViewValue`), but used here as an OUT
+  already established (`TitleMenu__Exit`), but used here as an OUT
   parameter: `buf2` is uninitialized before the call and its value is read
   afterward (`self->methods->slot11C(self, buf2, 1)`), unlike every
   earlier call site which supplied a value IN. The signature
@@ -166,7 +166,7 @@ Comment moved here from the unit: UpdateFlashbackLock is matched in
 src/ui/TitleMenuTaskObjF.c as a 2-argument function, but this call site sets up
 a 3rd argument (self->dreamSys in $a2) that the definition never
 receives; the same independent-arities situation was documented for
-Get_vtable_TaskCore until round 84. The extern's arity-ok note said: the
+GetTaskCoreMethods until round 84. The extern's arity-ok note said: the
 callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the
 3rd argument is byte-load-bearing here: retail emits `lw a2,164(s0)` at
 0x8004DE74.

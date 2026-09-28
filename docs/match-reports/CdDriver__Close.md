@@ -21,9 +21,9 @@ typedef struct Obj80027480 {
     u16 unk28;
 } Obj80027480;
 
-extern s32 gCdAsyncEnabled;
-extern s32 gCdSyncQueueMode;
-extern s32 gCdBusy;
+extern s32 sCdAsyncEnabled;
+extern s32 sCdSyncQueueMode;
+extern s32 sCdBusy;
 
 extern void CloseCdFile(Obj80027480 *self);
 extern void LockCd(void);
@@ -34,13 +34,13 @@ extern void EnqueueCdRequest(Obj80027480 *arg0, s32 arg1, s32 arg2, s32 arg3,
 extern void UnlockCd(void);
 
 void CdDriver__Close(Obj80027480 *self) {
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && sCdSyncQueueMode == 0) {
         CloseCdFile(self);
         return;
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (gCdBusy == 0) {
+        if (sCdBusy == 0) {
             StartCdOperation(0, 0);
             self->unk0C = 0;
             ResetCdStateMachine();
@@ -59,14 +59,14 @@ matched immediately (retail compiles a plain short-circuit `&&` as two
 separate `bnez`-to-same-target branches, which is exactly this shape).
 
 The one miss: I first wrote the second half as
-`if (self->unk28 == 0) { EnqueueCdRequest(...); } else if (gCdBusy == 0) { ...
+`if (self->unk28 == 0) { EnqueueCdRequest(...); } else if (sCdBusy == 0) { ...
 }` -- logically identical to the nested form, but GCC 2.6.3 lays out the
 `then`-arm of an `if` as the fall-through immediately after the test, so this
 inverted the *physical order* of the two blocks relative to retail (retail's
-`beqz` falls through to the `gCdBusy` check block, with the
+`beqz` falls through to the `sCdBusy` check block, with the
 `EnqueueCdRequest` call living at the branch TARGET, further down). `m2ctx.py
 --run`'s seed already had the correct nested shape
-(`if (self->unk28 != 0) { if (gCdBusy == 0) {...} } else { EnqueueCdRequest(...); }`)
+(`if (self->unk28 != 0) { if (sCdBusy == 0) {...} } else { EnqueueCdRequest(...); }`)
 -- switching to it matched on the very next build with zero other changes.
 This is the same family as round 46's "put the longer continuation in the
 `if` body" lever, but on the OTHER axis: here it was about which of two
@@ -133,4 +133,4 @@ For the head to apply by type scope (out of unit):
 | include/GameApplicationFileResource.h | `FileResourceMethods` | `onBufferChanged` | `close` | A | `+0x048`; `FileResource__LoadFile` calls it after the read and on allocation failure, `FileResource__Finalize` before freeing the buffer; the one populated override is `CdDriver__Close` |
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Close` -> `CdDriver__Close` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Close` -> `CdDriver__Close` by rename.py.

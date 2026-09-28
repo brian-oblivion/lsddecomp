@@ -20,19 +20,19 @@ matches byte-exact on the first rebuild, no reshaping needed.
 ## Evidence
 
 ```
-lw $v0, %gp_rel(gCdUseVSyncCallback)($gp)
+lw $v0, %gp_rel(sCdUseVSyncCallback)($gp)
 jr $ra
 nop
 ```
 
-`gCdUseVSyncCallback` is a plain `s32` in `.sdata` (`asm/data/7B048.sdata.s`:
-`dlabel gCdUseVSyncCallback` / `.word 0x00000001`), so the getter is exactly:
+`sCdUseVSyncCallback` is a plain `s32` in `.sdata` (`asm/data/7B048.sdata.s`:
+`dlabel sCdUseVSyncCallback` / `.word 0x00000001`), so the getter is exactly:
 
 ```c
-extern s32 gCdUseVSyncCallback;
+extern s32 sCdUseVSyncCallback;
 
 s32 GetCdUseVSyncCallback(void) {
-    return gCdUseVSyncCallback;
+    return sCdUseVSyncCallback;
 }
 ```
 
@@ -84,10 +84,10 @@ No C was written and no score was measured; the screen ran at carve time.
 ## Naming (round 64, runner alpha)
 
 `func_80028B6C` -> `GetCdUseVSyncCallback`, tier A. Pure getter -- the whole
-body is `return gCdUseVSyncCallback;` -- and per CLAUDE.md/FINISHING-PLAN.md
+body is `return sCdUseVSyncCallback;` -- and per CLAUDE.md/FINISHING-PLAN.md
 track 3, "a pure leaf whose mechanics ARE its purpose (a getter, a clamp, a
-list push) is tier A by definition." `gCdUseVSyncCallback` itself was
+list push) is tier A by definition." `sCdUseVSyncCallback` itself was
 already properly named (not a placeholder) before this round, by
 `src/cd/CdDriver.c`'s own header comment ("the driver mode:
-gCdAsyncEnabled and gCdUseVSyncCallback, set through SetCdDriverMode"); no
+sCdAsyncEnabled and sCdUseVSyncCallback, set through SetCdDriverMode"); no
 further rename needed there.

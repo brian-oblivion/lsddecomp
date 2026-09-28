@@ -10,7 +10,7 @@
 
 `void TaskObjF__OnNotify(TaskObjF *self, void *arg1, s32 arg2)`. First forwards
 `(self, arg1, arg2)` to the BASE class's own generic notification slot —
-`Get_vtable_BasicClass()` returns `BasicClass`'s method table
+`GetBasicClassMethods()` returns `BasicClass`'s method table
 (`include/code_8220.h`), and its slot +0x038 (`BasicClassMethods::slot38`)
 is dispatched directly on `self` cast as a `BasicClass` (this is the
 `notifyParents`-style "notify every parent" mechanism that class documents).
@@ -20,11 +20,11 @@ arg1, arg2)`) depending on the tag, masked two different ways.
 
 ## Levers
 
-1. **Cache `self->methods` in a local BEFORE the `Get_vtable_BasicClass()` call,
+1. **Cache `self->methods` in a local BEFORE the `GetBasicClassMethods()` call,
    reuse it for the final four-way dispatch.** The first attempt re-read
    `self->methods` fresh at each of the four dispatch sites; retail reads
    it ONCE, into a register that survives the intervening
-   `Get_vtable_BasicClass()`/`slot38` calls, and reuses it for `slot88`/`slot98`/
+   `GetBasicClassMethods()`/`slot38` calls, and reuses it for `slot88`/`slot98`/
    `slotA4`/`slotB0`. Not caching it costs exactly one whole callee-saved
    register — the prologue drops from `$s0`-`$s3` (retail, `-0x28` frame)
    to `$s0`-`$s2` (`-0x20` frame), and the WHOLE REST OF THE OBJECT FILE
@@ -56,13 +56,13 @@ arg1, arg2)`) depending on the tag, masked two different ways.
    need an explicit local function-pointer variable).
 
 See `TaskObjF__ForEachEvent`'s report for the `TaskObjF` class and the
-`BasicMethods866E8F`/`Get_vtable_BasicClass` local view.
+`BasicMethods866E8F`/`GetBasicClassMethods` local view.
 
 ## Naming (round 60, track 3)
 
 `func_8004FB04` -> `TaskObjF__OnNotify`. **Tier A.** Forwards `(self, arg1,
 arg2)` to the inherited `BasicClass` notify slot
-(`Get_vtable_BasicClass()->slot38`, the project's own established
+(`GetBasicClassMethods()->slot38`, the project's own established
 "notify every parent" mechanism, `include/code_8220.h`), then reads a
 type tag out of `arg1` and dispatches one of this class's own four
 vtable slots (+0x088/+0x098/+0x0A4/+0x0B0) accordingly -- a message

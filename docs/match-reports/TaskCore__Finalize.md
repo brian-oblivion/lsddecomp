@@ -24,7 +24,7 @@ void TaskCore__Finalize(StreamTaskObj *self) {
         self->unk74->methods->slot04(self->unk74);
     }
     self->methods->slotDC(self);
-    Get_vtable_IntermediateBase()->slot0C(self);
+    GetIntermediateBaseMethods()->slot0C(self);
 }
 ```
 
@@ -34,7 +34,7 @@ The "`StreamTaskUnk78Obj` folded into `StreamTaskUnkB4Obj`" unification
 described just below was **reversed** by `TaskCore__OnInit`: it calls
 `self->unk78`'s own slot `+0x04C` with 3 arguments, where
 `StreamTaskUnkB4Methods::slot4C` (this same offset, established
-single-argument by the already-matched `StreamTask__RefreshViewValue`) cannot take 3. A
+single-argument by the already-matched `StreamTask__Exit`) cannot take 3. A
 real arity conflict at a shared slot means the two are sibling classes that
 merely agree at `slot04` (this function's own evidence), not one class.
 `self->unk78` is back to its own `StreamTaskUnk78Obj/Methods` type; the code

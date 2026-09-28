@@ -17,29 +17,29 @@ missing.
 ## What it does
 
 A one-instruction setter: stores its argument into the global flag
-`gInstantTeleportersEnabled`. `DreamAux.c` calls it as `SetInstantTeleportersEnabled(bool value)` with
+`sInstantTeleportersEnabled`. `DreamAux.c` calls it as `SetInstantTeleportersEnabled(bool value)` with
 either a computed boolean expression or the literal `1` -- consistent with a
 plain `bool` parameter here.
 
 ## Final body
 
 ```c
-/* Flag set here, tested by Test4InstantTeleporters right below; local to
+/* Flag set here, tested by TestForInstantTeleporters right below; local to
    this unit -- DreamAux.c calls the setter through its own extern
    (`extern void SetInstantTeleportersEnabled(bool value);`), never touches the flag
    directly. */
-extern s32 gInstantTeleportersEnabled;
+extern s32 sInstantTeleportersEnabled;
 
 void SetInstantTeleportersEnabled(bool value)
 {
-	gInstantTeleportersEnabled = value;
+	sInstantTeleportersEnabled = value;
 }
 ```
 
-`gInstantTeleportersEnabled` is declared `extern s32` (not `bool`) because it is also read as
-a plain nonzero/zero flag by `Test4InstantTeleporters` (next in ROM order),
+`sInstantTeleportersEnabled` is declared `extern s32` (not `bool`) because it is also read as
+a plain nonzero/zero flag by `TestForInstantTeleporters` (next in ROM order),
 and its underlying data is a full 32-bit word (`asm/data/7B3C0.sdata.s`,
-`gInstantTeleportersEnabled`, one `.word`).
+`sInstantTeleportersEnabled`, one `.word`).
 
 ## Verification
 
@@ -58,14 +58,14 @@ round 43, runner ALPHA, unit DreamSys.
 
 ## Naming
 
-- **Tier A.** Sets the flag Test4InstantTeleporters gates on (returns -1 immediately when it is 0); called externally from src/world/DreamAux.c via its own extern declaration.
+- **Tier A.** Sets the flag TestForInstantTeleporters gates on (returns -1 immediately when it is 0); called externally from src/world/DreamAux.c via its own extern declaration.
 
 ## Comment moved from src/world/DreamSys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 
 ```c
-/* Flag set here, tested by Test4InstantTeleporters right below; local to
+/* Flag set here, tested by TestForInstantTeleporters right below; local to
    this unit -- DreamAux.c calls the setter through its own extern
    (`extern void SetInstantTeleportersEnabled(bool value);`), never touches the flag
    directly. */

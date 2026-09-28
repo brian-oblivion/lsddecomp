@@ -20,8 +20,8 @@
  *    sources (added as children; TaskObjF__AddChild files each child by its
  *    class id: low nibble 2 -> inputSource, 5 -> tickSource, 0x10 ->
  *    textEntry, 0x20 -> itemList), the sprite parent and the sound. Its one
- *    caller is TitleMenu__BeginCardAccess: initArgs->unk4, unk10 (a
- *    FrameClock, id 0x5), unk14, and TaskCore's `sound` (a VabStreamObj).
+ *    caller is TitleMenu__BeginCardAccess: initArgs->pad, frameClock (a
+ *    FrameClock, id 0x5), lightRig, and TaskCore's `sound` (a VabStreamObj).
  *  - beginLoad (+0x074, opMode 1) lists the save files that exist
  *    (collectExistingMemcardFiles into `titles`/`foundSuffixes`), lets the
  *    player pick one in a ItemList list (state 0x12), then reads it into
@@ -89,7 +89,7 @@ struct TaskObjFMethods {
                                    u8 iconFrames, struct TimImage *icon, void *data,
                                    s32 size);                 /* TaskObjF__BeginSave */
     /* +0x07C */ void (*setState)(TaskObjF *self, s32 state); /* TaskObjF__SetState */
-    /* +0x080 */ void (*loadCardIcon)(TaskObjF *self, s32 index); /* TaskObjF__LoadCardIcon: CARD\<gCardIconNames[index]>.TIM */
+    /* +0x080 */ void (*loadCardIcon)(TaskObjF *self, s32 index); /* TaskObjF__LoadCardIcon: CARD\<sCardIconNames[index]>.TIM */
     /* +0x084 */ void (*releaseCardIcon)(TaskObjF *self); /* TaskObjF__ReleaseCardIcon */
     /* +0x088 */ void (*onInputEvent)(TaskObjF *self, void *sender,
                                       s32 event); /* TaskObjF__OnInputEvent (reads self and event) */
@@ -112,7 +112,7 @@ struct TaskObjF {
     BASICCLASS_FIELDS(TaskObjFMethods);
     /* +0x00C */ s32 cardSlot; /* setCardSlot; 0 or 1: BuildMemcardPath's "bu00:"/"bu10:" */
     /* +0x010 */ s32 cardHandle; /* setCardSlot: cardSlot << 4, the _card_info/_card_load/_card_clear channel */
-    /* +0x014 */ s32 events[4]; /* openEvents: OpenEvent per gCardEventSpecs entry; ForEachEvent/WaitForReadyEvent walk them */
+    /* +0x014 */ s32 events[4]; /* openEvents: OpenEvent per sCardEventSpecs entry; ForEachEvent/WaitForReadyEvent walk them */
     /* +0x024 */ s32 opMode; /* 1 beginLoad, 2 beginSave; the terminal states clear it. advanceState retries the one that is set */
     /* +0x028 */ s32 state;  /* setState; init clears it */
     /* +0x02C */ s32 bufCount; /* collectExistingMemcardFiles's count; how many `titles` buffers are kept */
@@ -153,7 +153,7 @@ enum TaskObjFOpMode {
 };
 
 /* TaskObjF::state, setState's argument. 0x02..0x10 show a message:
- * loadCardIcon indexes gCardIconNames by the state, and the quoted name is
+ * loadCardIcon indexes sCardIconNames by the state, and the quoted name is
  * the CARD\<name>.TIM each one loads. 0x11..0x15 run an entry action in
  * setState. 0x16 and 0x17 are terminal: setState clears state and opMode
  * on either, and frees beginLoad's buffers. No code sets state 1. */
@@ -209,18 +209,9 @@ enum TaskObjFState {
 extern TaskObjFMethods gTaskObjFMethods;
 extern TaskObjFMethods *GetTaskObjFMethods(void); /* returns &gTaskObjFMethods */
 
-/* TaskObjF__TaskObjF's construction count: InitCARD/StartCARD/_bu_init run
- * only on the first construction, when it was 0 before the increment. */
-extern s32 sTaskObjFCount;
-
 /* The kernel event calls TaskObjF's event methods make (OpenEvent,
  * EnableEvent, DisableEvent, TestEvent; Sony's libapi) are declared in the
  * units that call them. */
-
-/* Per TaskObjF::events slot: the event spec TaskObjF__OpenEvents passes to
- * OpenEvent, and the value WaitForReadyEvent returns for that slot.
- * Unsized: only the four slots are read. */
-extern s32 gCardEventSpecs[];
 
 /* A 6-byte memory-card device name, "bu00:" or "bu10:" (the BIOS names of
  * the two card slots). BuildMemcardPath copies one as a whole struct.
@@ -229,9 +220,6 @@ extern s32 gCardEventSpecs[];
 typedef struct McDevicePath {
     s8 b0, b1, b2, b3, b4, b5;
 } McDevicePath;
-
-extern McDevicePath gMcDevicePath1; /* "bu10:" */
-extern McDevicePath gMcDevicePath0; /* "bu00:" */
 
 /* Game code (src/ui/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it
  * around its retry loop, and with (arg, 0) when the loop gives up. The BIOS

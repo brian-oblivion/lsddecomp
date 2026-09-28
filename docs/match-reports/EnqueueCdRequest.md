@@ -17,9 +17,9 @@ carries the evidence for each one.
 ```c
 /* The same 0x24-byte queue node CdRequest_D70 above is a view of, from the
  * writing side: AllocCdRequestNode (CdDriver) allocates one and links it onto
- * gCdRequestQueue, and only the fields this call site writes are typed here
+ * sCdRequestQueue, and only the fields this call site writes are typed here
  * (padded to their offsets, per this unit's convention). `op` takes the
- * CD_OP_* values, `fileIndex` is FindCdFileIndex's index into gFileTable (0
+ * CD_OP_* values, `fileIndex` is FindCdFileIndex's index into sFileTable (0
  * when the op does not name a file), and param0/param1 are the two per-op
  * arguments CdDriver passes through: a byte count and a flag for op 4, a
  * buffer and a size for op 5. */
@@ -103,7 +103,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `func_800282AC` | `EnqueueCdRequest` | A |
 
 **Evidence.** Allocates and links a node via `AllocCdRequestNode` (CdDriver,
-which appends to the `gCdRequestQueue` list), fills five of its fields from the
+which appends to the `sCdRequestQueue` list), fills five of its fields from the
 parameters, bumps the requesting object's pending count, clears its flags and
 calls `StartCdService`. Every caller is a class method taking its
 asynchronous path (`CdDriver` at op 2/3/4/5/7,
@@ -116,7 +116,7 @@ service runs: tier A.
 | --- | --- | --- | --- |
 | `+0x08` | `op` | A | the five call sites pass 2, 3, 4, 5, 7 -- one constant per class method, and `CdDriver__RunRequestQueue` switches on it when it drains the queue |
 | `+0x0C` | `owner` | A | the requesting object; `CdDriver__CancelRequests` matches on it to cancel one object's requests |
-| `+0x10` | `fileIndex` | A | `FindCdFileIndex`'s return -- an index into `gFileTable` -- at the two ops that name a file, 0 at the others |
+| `+0x10` | `fileIndex` | A | `FindCdFileIndex`'s return -- an index into `sFileTable` -- at the two ops that name a file, 0 at the others |
 | `+0x14` | `param0` | B | the op's first extra argument: `arg2` for op 2, a byte count for op 4, a buffer for op 5 |
 | `+0x18` | `param1` | B | the op's second extra argument, same call sites |
 
@@ -158,7 +158,7 @@ The comment on the definition was cut to a one-line `MATCHING:` on the
 first store; the full text was:
 
 ```c
-/* Fills a node AllocCdRequestNode has already linked onto gCdRequestQueue,
+/* Fills a node AllocCdRequestNode has already linked onto sCdRequestQueue,
  * counts it against its owner and starts the service tick.
  * MATCHING: the stores are in retail's order (+0x08, +0x14, +0x0C, +0x10,
  * +0x18); this compiler keeps statement order. */

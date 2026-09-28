@@ -263,7 +263,7 @@ void *BMemPMgrAlloc(size, pool)
 
     SetBMemPMgrBusy(1);
     result = NULL;
-    mgr = gDefaultBMemPMgr;
+    mgr = sDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -377,7 +377,7 @@ remaining register-identity residues that stalled it short of byte-exact.
 
 The old report was right that `BMemPMgrAlloc`'s own body genuinely reads
 `$a1` as a fallback pool pointer (live only when the global default pool
-`gDefaultBMemPMgr` is unset), and right that every external caller passes only one
+`sDefaultBMemPMgr` is unset), and right that every external caller passes only one
 argument and must keep doing so. What it did not resolve is HOW a function
 can have a real second parameter in its own body while every external
 prototype — including a same-file call, `PushBasicClassListNode`'s
@@ -565,7 +565,7 @@ void *BMemPMgrAlloc(size, pool)
 
     SetBMemPMgrBusy(1);
     result = NULL;
-    mgr = gDefaultBMemPMgr;
+    mgr = sDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -706,7 +706,7 @@ before writing it:
 ```
 
 `$a1` is a fallback pool pointer, consumed only on the path where the
-`$gp`-relative default pool `gDefaultBMemPMgr` is unset (`lw t0,16(gp)` /
+`$gp`-relative default pool `sDefaultBMemPMgr` is unset (`lw t0,16(gp)` /
 `bnez t0,...` immediately before). It is dead in practice at every decoded call
 site, because `SetupBMemPMgrFreeList`/`SetDefaultBMemPMgr` set that global first — but it is
 read, so these are two-argument functions.

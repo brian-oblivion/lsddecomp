@@ -17,7 +17,7 @@ then unconditionally forwards to the base class's own `+0x018` slot.
 ```c
 void SceneNode__RemoveAllChildren(SceneNodeObj *self) {
     SceneNode__UnlinkModel(self);
-    Get_vtable_BasicClass()->slot18(self);
+    GetBasicClassMethods()->slot18(self);
 }
 ```
 

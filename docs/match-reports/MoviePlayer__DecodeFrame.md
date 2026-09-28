@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Per-frame step of the MDEC movie player, active only when `self` is the object in gActiveMoviePlayer: when a finished frame is pending (+0x44) it tail-returns its own +0x064; otherwise, when a frame is running (+0x40) it waits for the last strip (MoviePlayer__WaitFrameReady spins on +0x4C), clears +0x4C, DrawSyncs when +0x34 is under 0x80, feeds the bitstream at +0x14[+0x3C] to DecDCTin (mode 2) and the first strip buffer (+0x1C, +0x38 words) to DecDCTout; then stores (own +0x058 returned 0) at +0x40 and returns 0. When not the active object it falls off the end (no return value set).
+Per-frame step of the MDEC movie player, active only when `self` is the object in sActiveMoviePlayer: when a finished frame is pending (+0x44) it tail-returns its own +0x064; otherwise, when a frame is running (+0x40) it waits for the last strip (MoviePlayer__WaitFrameReady spins on +0x4C), clears +0x4C, DrawSyncs when +0x34 is under 0x80, feeds the bitstream at +0x14[+0x3C] to DecDCTin (mode 2) and the first strip buffer (+0x1C, +0x38 words) to DecDCTout; then stores (own +0x058 returned 0) at +0x40 and returns 0. When not the active object it falls off the end (no return value set).
 
 Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x068.
 
@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSour
 top of / earlier in `src/graphics/GraphicsResources.c`.
 
 ```c
-/* gMoviePlayerMethods +0x068: when this is the object in gActiveMoviePlayer -- with a
+/* gMoviePlayerMethods +0x068: when this is the object in sActiveMoviePlayer -- with a
  * finished frame pending (+0x44) run its own +0x064 and return that;
  * otherwise, when a frame is going (+0x40), wait for its last strip (+0x4C),
  * clear the flag, DrawSync when +0x34 is under 0x80, and feed the next
@@ -53,7 +53,7 @@ typedef struct Obj45CFC {
 extern void DecDCTin(u32 *buf, int mode);
 
 s32 MoviePlayer__DecodeFrame(Obj45CFC *self) {
-    Obj45CFC *cur = (Obj45CFC *)gActiveMoviePlayer;
+    Obj45CFC *cur = (Obj45CFC *)sActiveMoviePlayer;
 
     if (cur == self) {
         if (cur->unk44 == 0) {

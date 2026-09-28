@@ -73,5 +73,5 @@ Byte-identical.
 tier A. The local is `{ s32 count; TmdBox box; }`, its count set to 1 and
 never read: the box analogue of the `TmdHull` it fills (`{ s32 count;
 TmdVec3 v[8]; }`, count 1), i.e. a counted list of boxes holding one. No
-project type has that layout (`gTmdModelBoundsBuf` is a bare `TmdBox[]`
+project type has that layout (`sTmdModelBoundsBuf` is a bare `TmdBox[]`
 with its count in a separate global).

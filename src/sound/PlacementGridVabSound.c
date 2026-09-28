@@ -1,6 +1,6 @@
 /*
  * PlacementGridVabSound -- two subjects in one file: PlacementGrid, then the
- * VAB sound backend (VabDriver, VabStreamObj and the SoundCueSet's init,
+ * VAB sound backend (NullDriver, VabStreamObj and the SoundCueSet's init,
  * flush and per-tick service), with ReturnZero between them.
  *
  * PlacementGrid (include/PlacementGrid.h), New_PlacementGrid to
@@ -18,7 +18,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "VabDriver.h"
+#include "NullDriver.h"
 #include "PlacementGrid.h"
 #include "LinkResource.h"
 #include "StageMap.h"
@@ -71,9 +71,9 @@ void PlacementGrid__Finalize(PlacementGrid *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-void PlacementGrid__SetFlag(PlacementGrid *self) {
+void PlacementGrid__OnRequestDone(PlacementGrid *self) {
     self->loaded = 1;
-    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
+    GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
 }
 
 /* Fill `placement` from cell `cell`'s first record, or, when
@@ -123,37 +123,37 @@ s32 ReturnZero(void) {
     return 0;
 }
 
-void VabDriver__VabDriver(void) {}
+void NullDriver__NullDriver(void) {}
 
-void VabDriver__Destroy(void) {}
+void NullDriver__Destroy(void) {}
 
-void VabDriver__NoOpSlot40(void) {
+void NullDriver__NoOpSlot40(void) {
     /* MATCHING: retail reserves a 64-byte frame it never touches. */
     char unused[64];
 }
 
-void VabDriver__Open(void) {
+void NullDriver__Open(void) {
     /* MATCHING: the same unused 64-byte frame. */
     char unused[64];
 }
 
-void VabDriver__Close(void) {}
+void NullDriver__Close(void) {}
 
-void VabDriver__Seek(void) {}
+void NullDriver__Seek(void) {}
 
-void VabDriver__NoOpSlot50(void) {}
+void NullDriver__NoOpSlot50(void) {}
 
 /*
- * The VAB sound backend: the rest of the VabDriver data source's empty slots and mode
+ * The VAB sound backend: the rest of the NullDriver data source's empty slots and mode
  * accessors, the VabStreamObj class (one sound bank, loaded through the
  * active data source and played through libsnd), and the SoundCueSet
  * start/flush pair.
  *
- * VabDriver (include/VabDriver.h, class id 0x23 = DATASOURCE_SPU) is the
+ * NullDriver (include/NullDriver.h, class id 0x23 = DATASOURCE_NULL) is the
  * data source GameApplicationFileResource.c selects when it is not reading the CD; the CD
  * driver (include/CdDriver.h, 0x13) is the other. Its Read, LoadFile,
  * RunRequestQueue, RequestLoadFile, StopService and CancelRequests slots do
- * nothing. GetVabDriverMode, SetVabDriverMode and GetVabUseVSyncCallback
+ * nothing. GetNullDriverMode, SetNullDriverMode and GetNullDriverUseVSyncCallback
  * answer the queries GameApplicationFileResource.c's GetActiveDataSource* functions forward
  * to the CD driver's GetCdDriverMode, SetCdDriverMode and
  * GetCdUseVSyncCallback: they keep the two mode words and report no VSync
@@ -164,7 +164,7 @@ void VabDriver__NoOpSlot50(void) {}
  * describes the load sequence and the slots. The first bank constructed
  * initialises libsnd (SsInit, the score size table, a 60 Hz tick); the first
  * whose attributes load starts it (SsStart, the master volume). Finalizing
- * the last open bank (gOpenVabCount) while no WBgm plays ends it.
+ * the last open bank (sOpenVabCount) while no WBgm plays ends it.
  *
  * InitSoundCueSet and FlushSoundCueSet (include/SoundCueSet.h) are free
  * functions, not methods: they take the sound object first, and Flush stops
@@ -172,56 +172,56 @@ void VabDriver__NoOpSlot50(void) {}
  */
 
 /* ".VH" and ".VB", in .sdata. */
-extern char gVabHeaderSuffix[];
-extern char gVabBodySuffix[];
+extern char sVabHeaderSuffix[];
+extern char sVabBodySuffix[];
 
-/* SetVabDriverMode's two words, read back by GetVabDriverMode. */
-extern s32 gVabDriverMode;
-extern s32 gVabDriverModeArg;
+/* SetNullDriverMode's two words, read back by GetNullDriverMode. */
+extern s32 sNullDriverMode;
+extern s32 sNullDriverModeArg;
 
 /* libsnd set-up, done once and undone when the last bank closes: SsInit and
  * the size table; the tick mode; SsStart and the master volume. */
-extern s32 gVabSizeTableInited;
-extern s32 gVabStreamInited;
-extern s32 gVabVolumeInited;
-extern s32 gOpenVabCount;     /* VabStreamObjs constructed and not yet finalized */
-extern s32 gSsTicksPerSecond; /* the SsSetTickMode rate, for callers timing in ticks */
+extern s32 sVabSizeTableInited;
+extern s32 sVabStreamInited;
+extern s32 sVabVolumeInited;
+extern s32 sOpenVabCount;     /* VabStreamObjs constructed and not yet finalized */
+extern s32 sSsTicksPerSecond; /* the SsSetTickMode rate, for callers timing in ticks */
 /* The .VH buffer, kept from the header state until LoadVagAttrs takes it
  * back as the object's buffer. */
-extern void *gPendingVabBuffer;
+extern void *sPendingVabBuffer;
 
-s32 VabDriver__Read(void) {
+s32 NullDriver__Read(void) {
     return 0;
 }
 
-void VabDriver__LoadFile(void) {}
+void NullDriver__LoadFile(void) {}
 
-void VabDriver__RunRequestQueue(void) {}
+void NullDriver__RunRequestQueue(void) {}
 
-void VabDriver__RequestLoadFile(void) {}
+void NullDriver__RequestLoadFile(void) {}
 
-void VabDriver__StopService(void) {}
+void NullDriver__StopService(void) {}
 
-void VabDriver__CancelRequests(void) {}
+void NullDriver__CancelRequests(void) {}
 
-VabDriverMethods *GetVabDriverMethods(void) {
-    return &gVabDriverMethods;
+NullDriverMethods *GetNullDriverMethods(void) {
+    return &gNullDriverMethods;
 }
 
-s32 GetVabDriverMode(s32 *outMode2) {
+s32 GetNullDriverMode(s32 *outMode2) {
     if (outMode2 != NULL) {
-        *outMode2 = gVabDriverModeArg;
+        *outMode2 = sNullDriverModeArg;
     }
-    return gVabDriverMode;
+    return sNullDriverMode;
 }
 
-s32 SetVabDriverMode(s32 async, s32 mode2) {
-    gVabDriverMode = async;
-    gVabDriverModeArg = mode2;
+s32 SetNullDriverMode(s32 async, s32 mode2) {
+    sNullDriverMode = async;
+    sNullDriverModeArg = mode2;
     return 1;
 }
 
-s32 GetVabUseVSyncCallback(void) {
+s32 GetNullDriverUseVSyncCallback(void) {
     return 0;
 }
 
@@ -258,23 +258,23 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
     self->attrsReady = 0;
     self->bodyTransferPending = 0;
     self->baseFilename = NULL;
-    if (gVabSizeTableInited == 0) {
+    if (sVabSizeTableInited == 0) {
         SsInit();
-        gVabSizeTableInited = 1;
+        sVabSizeTableInited = 1;
         SsSetTableSize(GetSsSizeTableBuf(), 2, 1); /* two scores of one track */
     }
-    if (gVabStreamInited == 0) {
-        gSsTicksPerSecond = 60; /* SS_TICK60 */
+    if (sVabStreamInited == 0) {
+        sSsTicksPerSecond = 60; /* SS_TICK60 */
         SsSetTickMode(SS_TICK60);
-        gVabStreamInited = 1;
+        sVabStreamInited = 1;
     }
-    gOpenVabCount++;
+    sOpenVabCount++;
     if (path != NULL) {
         buf = BMemPMgrAlloc(strlen(path) + 1);
         if (buf != NULL) {
             self->baseFilename = buf;
             strcpy(buf, path);
-            BuildFileName(vhPath, buf, NULL, gVabHeaderSuffix);
+            BuildFileName(vhPath, buf, NULL, sVabHeaderSuffix);
             self->loadState = VABSTREAM_LOAD_HEADER;
             self->methods->requestLoadFile(self, vhPath);
         }
@@ -283,13 +283,13 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
 
 void VabStreamObj__Finalize(VabStreamObj *self) {
     SsVabClose(self->vabId);
-    if (--gOpenVabCount < 0) {
-        gOpenVabCount = 0;
+    if (--sOpenVabCount < 0) {
+        sOpenVabCount = 0;
     }
-    if (gOpenVabCount == 0 && IsWBgmActive() == 0) {
-        gVabSizeTableInited = 0;
-        gVabVolumeInited = 0;
-        gVabStreamInited = 0;
+    if (sOpenVabCount == 0 && IsWBgmActive() == 0) {
+        sVabSizeTableInited = 0;
+        sVabVolumeInited = 0;
+        sVabStreamInited = 0;
         SsEnd();
         SsQuit();
     }
@@ -308,8 +308,8 @@ void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
         case VABSTREAM_LOAD_HEADER:
             if (self->flags & CD_FLAG_LOAD_FILE_DONE) {
                 self->vabId = SsVabOpenHead(self->buffer, -1);
-                BuildFileName(path, self->baseFilename, NULL, gVabBodySuffix);
-                gPendingVabBuffer = self->buffer;
+                BuildFileName(path, self->baseFilename, NULL, sVabBodySuffix);
+                sPendingVabBuffer = self->buffer;
                 self->loadState = VABSTREAM_LOAD_BODY;
                 self->buffer = NULL;
                 self->methods->loadFile(self, path);
@@ -360,7 +360,7 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
         return;
     }
     self->methods->freeBuffer(self);
-    self->buffer = gPendingVabBuffer;
+    self->buffer = sPendingVabBuffer;
     result = SsUtGetVabHdr(self->vabId, (VabHdr *)&self->vabHdr);
     if (result == -1) {
         return;
@@ -388,10 +388,10 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
             pool++;
         }
     }
-    if (gVabVolumeInited == 0) {
+    if (sVabVolumeInited == 0) {
         SsStart();
         SsSetMVol(VAB_MASTER_VOLUME, VAB_MASTER_VOLUME);
-        gVabVolumeInited = 1;
+        sVabVolumeInited = 1;
     }
 }
 
@@ -481,11 +481,11 @@ VabStreamObjMethods *GetVabStreamObjMethods(void) {
 }
 
 s32 GetOpenVabCount(void) {
-    return gOpenVabCount;
+    return sOpenVabCount;
 }
 
 s32 GetSsTicksPerSecond(void) {
-    return gSsTicksPerSecond;
+    return sSsTicksPerSecond;
 }
 
 s32 InitSoundCueSet(VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,

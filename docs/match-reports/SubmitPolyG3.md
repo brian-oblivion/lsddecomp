@@ -153,7 +153,7 @@ The search continued past this lead (per `--best-only`, not
 260 base exactly, consistent with the residue now being identical to the
 6 siblings'). One further candidate, `output-230-1`, scored below 260 but
 is a semantic non-candidate on inspection — it introduces
-`if (gDivPolygon3) { X } else { X }` with byte-identical bodies on both
+`if (sDivPolygon3) { X } else { X }` with byte-identical bodies on both
 arms (branching on a rodata table POINTER as a boolean condition that
 appears nowhere in retail's control flow) plus several dead-value/masking
 tricks (`0xF & 0xFFFFFFFFFFFFFFFF`). Not oracle-tested — the shape itself
@@ -204,7 +204,7 @@ void SubmitPolyG3(void *arg0, void *arg1) {
             (*(OtTag **)(prim + 0x30))->addr = (u32)self;
         } while (0);
     } else {
-        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(sDivPolygon3, prim, self + 0x4, 0, 0, 0);
         FillRVectors3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
                       (PolyUV4 *)(self + 0x18));
@@ -218,7 +218,7 @@ void SubmitPolyG3(void *arg0, void *arg1) {
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x8C) + 0xC) = *(Vec2s16_98 *)(self + 0xC);
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x90) + 0xC) = *(Vec2s16_98 *)(self + 0x14);
 
-        RCpolyG3(self, gDivPolygon3);
+        RCpolyG3(self, sDivPolygon3);
     }
 }
 #endif
@@ -340,7 +340,7 @@ void SubmitPolyG3(void *arg0, void *arg1) {
         ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
-        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(sDivPolygon3, prim, self + 0x4, 0, 0, 0);
         FillRVectors3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x10),
                       (PolyUV4 *)(self + 0x18));
@@ -353,7 +353,7 @@ void SubmitPolyG3(void *arg0, void *arg1) {
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x8C) + 0xC) = *(Vec2s16_98 *)(self + 0xC);
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x90) + 0xC) = *(Vec2s16_98 *)(self + 0x14);
 
-        RCpolyG3(self, gDivPolygon3);
+        RCpolyG3(self, sDivPolygon3);
     }
 }
 #endif
@@ -410,7 +410,7 @@ void SubmitPolyG3(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(sDivPolygon3, prim, self + 0x4, 0, 0, 0);
         FillRVectors3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18);
 
         *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u8 *)(self + 0xF);
@@ -421,7 +421,7 @@ void SubmitPolyG3(void *arg0, void *arg1)
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x8C) + 0xC) = *(Vec2s16_98 *)(self + 0xC);
         *(Vec2s16_98 *)(*(u8 **)(prim + 0x90) + 0xC) = *(Vec2s16_98 *)(self + 0x14);
 
-        func_8001AD54(self, gDivPolygon3);
+        func_8001AD54(self, sDivPolygon3);
     }
 }
 #endif
@@ -661,10 +661,10 @@ own `extern void *SubmitPolyG3(void *prim, void *ctx);` view already used.
 
 Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
 report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
-RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+RCpoly* prototype, the renamed `sDivPolygon3`/`sDivPolygon4`). Byte-identical
 on the first build. The field reads, for this primitive:
 
-`FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0)`;
+`FillDivPolygonHeader(sDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0)`;
 RVECTOR `pad` from `prim->pad1`, `pad1`, `pad2` (0xF, 0xF, 0x17: vertex 1
 reuses vertex 0's byte, as retail does); RVECTOR `c` from the colour words
 `r0`, `r1`, `r2` (0x4, 0xC, 0x14). Returns `prim + 1` (0x1C).

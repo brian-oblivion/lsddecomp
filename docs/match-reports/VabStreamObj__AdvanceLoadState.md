@@ -23,8 +23,8 @@ void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
     case 1:
         if (self->flags & 0x200) {
             self->vabId = SsVabOpenHead(self->streamBuffer, -1);
-            func_800270C4(path, self->baseFilename, NULL, gVabBodySuffix);
-            gPendingVabBuffer = self->streamBuffer;
+            func_800270C4(path, self->baseFilename, NULL, sVabBodySuffix);
+            sPendingVabBuffer = self->streamBuffer;
             self->loadState = 6;
             self->streamBuffer = NULL;
             self->methods->slot58(self, path);
@@ -56,7 +56,7 @@ unk10/unk5C/unk5A` are now `loadState`/`flags`/`vabId`/`streamBuffer`/
 State 1 ("header pending", set by `VabStreamObj__VabStreamObj`): if the object's flag
 word has bit 0x200 set, open the VAB header (`SsVabOpenHead`), build a
 ".VB" path from the same base filename, hand the old streaming buffer
-pointer off to the shared `gPendingVabBuffer` global, transition to state 6, and
+pointer off to the shared `sPendingVabBuffer` global, transition to state 6, and
 dispatch the body transfer through `methods->slot58` (null in retail's own
 `gVabStreamObjMethods` -- see `VabStreamObj__VabStreamObj.md`); then free the filename copy if one
 was allocated. State 6 ("body pending"): if the same flag is set, continue
@@ -64,8 +64,8 @@ the body transfer (`SsVabTransBody`), and on success mark the object ready
 (`bodyTransferPending = 1`) and notify via `methods->slot78` (==
 `VabStreamObj__OnBodyReady`).
 
-`gVabBodySuffix` is retail's own `.sdata` string `".VB"`, referenced not
-retyped, same as `gVabHeaderSuffix` in the sibling function.
+`sVabBodySuffix` is retail's own `.sdata` string `".VB"`, referenced not
+retyped, same as `sVabHeaderSuffix` in the sibling function.
 
 ## Result
 
@@ -119,7 +119,7 @@ TimBlockSrc's override of the same slot, `TimBlockSrc__AdvanceLoadState`.
 
 The report above says +0x058 and +0x06C are "null in retail". That is only
 true of the static table. `SetActiveDataSource` copies the active driver's
-interface slots into every table `gDataSourceClientGetters` lists
+interface slots into every table `sDataSourceClientGetters` lists
 (`include/FileResource.h`), and `GetVabStreamObjMethods` is on that list
 (gFileResourceMethods +0x098). At run time these calls reach the driver.
 

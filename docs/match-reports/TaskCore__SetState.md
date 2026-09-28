@@ -24,7 +24,7 @@ void TaskCore__SetState(Obj86B60 *self, s32 a1)
     Obj86B60Methods *methods;
 
     methods = self->methods;
-    Get_vtable_IntermediateBase()->slot60(self, a1);
+    GetIntermediateBaseMethods()->slot60(self, a1);
     switch (a1) {
     case 5:
         methods->slotE4(self, self->unk4C->unk10);

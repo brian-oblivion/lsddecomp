@@ -119,14 +119,14 @@ extern SeqData *New_RequestedFile(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-WBgmMethods *Get_vtable_WBgm(void);
+WBgmMethods *GetWBgmMethods(void);
 
 extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern s32 sWBgmActive;
+extern u8 sSsSizeTableBuf[];
 ```
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
@@ -144,4 +144,4 @@ unchanged.
 
 The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
 
-Parameter retyped `s32 arg` -> `char *vabPath` (slot +0x060 with it); the `(char *)` cast before New_VabStreamObj is gone and the test reads `vabPath != NULL`. Callers: WBgm__WBgm, whose vabPath is one of the gSoundBankPaths VAB paths (see New_WBgm's Track 4 paragraph).
+Parameter retyped `s32 arg` -> `char *vabPath` (slot +0x060 with it); the `(char *)` cast before New_VabStreamObj is gone and the test reads `vabPath != NULL`. Callers: WBgm__WBgm, whose vabPath is one of the sSoundBankPaths VAB paths (see New_WBgm's Track 4 paragraph).

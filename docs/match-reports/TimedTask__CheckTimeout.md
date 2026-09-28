@@ -16,7 +16,7 @@ sw    $s0, 0x10($sp)
 addu  $s0, $a1, $zero        ; s0 = arg1
 sw    $s1, 0x14($sp)
 sw    $ra, 0x1C($sp)
-jal   Get_vtable_IntermediateBase
+jal   GetIntermediateBaseMethods
  addu $s1, $a2, $zero        ; s1 = arg2
 addu  $a0, $s2, $zero
 addu  $a1, $s0, $zero
@@ -43,7 +43,7 @@ jr $ra
 
 ```c
 void TimedTask__CheckTimeout(Obj865C8 *self, s32 arg1, s32 arg2) {
-    Get_vtable_IntermediateBase()->slot5C(self, arg1, arg2);
+    GetIntermediateBaseMethods()->slot5C(self, arg1, arg2);
     if ((u32)self->unk1C > (u32)self->unk2C) {
         self->methods->onEventArg(self, 4);
     }
@@ -65,7 +65,7 @@ one source change, two residue lines.
 
 - `Obj865C8::unk1C` (s32) — compared unsigned against `unk2C`.
 - `IntermediateBaseMethods::slot5C` typed `void (*)(void *self, s32 arg1,
-  s32 arg2)` — same `Get_vtable_IntermediateBase()` base accessor as `slot44`/`slot48`/
+  s32 arg2)` — same `GetIntermediateBaseMethods()` base accessor as `slot44`/`slot48`/
   `slot60`, arguments just forwarded with no other evidence of type.
 
 ## Attempts

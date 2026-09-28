@@ -8,7 +8,7 @@
 
 ## What it does
 
-Forwards to a SECOND sibling class's table (`Get_vtable_IntermediateBase()`, returns
+Forwards to a SECOND sibling class's table (`GetIntermediateBaseMethods()`, returns
 `&gIntermediateBaseMethods`) at slot `+0x044`, passing `self` and both of its own
 arguments unchanged, discards that call's return, then reads and returns
 `self->unk38`. This function itself occupies `gTaskCoreMethods` slot `+0x044` --
@@ -23,7 +23,7 @@ uncarved).
 ```
 addu $s2, $a0, zero            ; s2 = self
 addu $s0, $a1, zero            ; s0 = a1
-jal  Get_vtable_IntermediateBase
+jal  GetIntermediateBaseMethods
  addu $s1, $a2, zero            ; s1 = a2 (delay slot)
 addu $a0, $s2, zero
 addu $a1, $s0, zero
@@ -36,7 +36,7 @@ lw   $v0, 0x38($s2)              ; v0 = self->unk38, AFTER the call returns
 
 ```c
 s32 TaskCore__Init(StreamTaskObj *self, s32 a1, s32 a2) {
-    Get_vtable_IntermediateBase()->slot44(self, a1, a2);
+    GetIntermediateBaseMethods()->slot44(self, a1, a2);
     return self->unk38;
 }
 ```

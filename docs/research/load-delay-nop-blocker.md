@@ -43,7 +43,7 @@ without.** Round 62 counted 40 including the linked Sony objects, which this
 scan cannot see. None lies in a function written as C, which is why the
 image stayed green for 62 rounds: 25 sit inside `INCLUDE_ASM` bodies (11 in
 `SsUtKeyOnV`, 9 in `SsUtKeyOn`, 2 in `SpuVmKeyOn`, 1 each in
-`SetupStyleSpawnParamsA`, `SsUtChangePitch`, `CD_cw`) and 3 in a `psyq_*`
+`SetupStyleSpawnParamsRandom`, `SsUtChangePitch`, `CD_cw`) and 3 in a `psyq_*`
 segment.
 
 ## What it retracts

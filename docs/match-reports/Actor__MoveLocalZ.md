@@ -14,22 +14,22 @@ calls `Actor__MoveAlongLocalAxis` (still `INCLUDE_ASM`, sibling unit
 ## Final source
 
 ```c
-extern s32 gActorLocalMoveZ;
+extern s32 sActorLocalMoveZ;
 extern void Actor__MoveAlongLocalAxis(BaseObjO *self, void *arg0, s32 arg1, s32 arg2, s32 arg3);
 
 void Actor__MoveLocalZ(BaseObjO *self, s32 arg1, s32 arg2) {
-    Actor__MoveAlongLocalAxis(self, &gActorLocalMoveZ, arg1, arg2, 6);
+    Actor__MoveAlongLocalAxis(self, &sActorLocalMoveZ, arg1, arg2, 6);
 }
 ```
 
 ## Derivation
 
 Register setup before the `jal`: `$a0` untouched (still `self`), `$a1` =
-`&gActorLocalMoveZ` (freshly computed, overwriting the incoming `arg1`'s old
+`&sActorLocalMoveZ` (freshly computed, overwriting the incoming `arg1`'s old
 register), `$a2` = the ORIGINAL `arg1` (saved into `$a2` before `$a1` is
 overwritten), `$a3` = the original `arg2`, and one stack word (`$sp+0x10`)
 = the literal `6`. This is a genuine 5-argument call (4 registers + 1
-stack slot, o32 ABI), matching `Actor__MoveAlongLocalAxis(self, &gActorLocalMoveZ, arg1,
+stack slot, o32 ABI), matching `Actor__MoveAlongLocalAxis(self, &sActorLocalMoveZ, arg1,
 arg2, 6)` written left-to-right in C.
 
 **Kept `void`, a bare statement call rather than `return Actor__MoveAlongLocalAxis(...)`
@@ -44,7 +44,7 @@ call-site typing choice consistent with that constraint; its own real
 return type (if any) is unconfirmed and irrelevant to this call site, which
 discards it either way.
 
-`gActorLocalMoveZ` is declared as an arbitrary scalar (`extern s32 gActorLocalMoveZ;`)
+`sActorLocalMoveZ` is declared as an arbitrary scalar (`extern s32 sActorLocalMoveZ;`)
 since only its address is ever taken here, never its value.
 
 ### Proposed learning
@@ -68,8 +68,8 @@ not what the slot means). Kept the tier-C `Class__func_xxxxx` form.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__func_5748c`. Occupant of +0x0C4: Actor__MoveAlongLocalAxis(self, &gActorLocalMoveZ, val, notify, 6). gActorLocalMove is an s16 vector passed whole to addLocalTranslation (RotateLocalVector reads src[0..2]), so ABA4/ABA6/ABA8 are x/y/z and this is the z move. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__func_5748c`. Occupant of +0x0C4: Actor__MoveAlongLocalAxis(self, &sActorLocalMoveZ, val, notify, 6). sActorLocalMove is an s16 vector passed whole to addLocalTranslation (RotateLocalVector reads src[0..2]), so ABA4/ABA6/ABA8 are x/y/z and this is the z move. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 99, alpha)
 
-`python3 tools/rename.py D_8008ABA8 gActorLocalMoveZ`, **tier A**: the s16 at 0x8008ABA8, right after gActorLocalMove's x (ABA4) and y (ABA6), used as the axis here as they are in MoveLocalX/Y. The event is ACTOR_EVENT_MOVED_Z (enum ActorMoveEvent, include/Actor.h).
+`python3 tools/rename.py D_8008ABA8 sActorLocalMoveZ`, **tier A**: the s16 at 0x8008ABA8, right after sActorLocalMove's x (ABA4) and y (ABA6), used as the axis here as they are in MoveLocalX/Y. The event is ACTOR_EVENT_MOVED_Z (enum ActorMoveEvent, include/Actor.h).

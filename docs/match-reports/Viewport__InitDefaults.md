@@ -16,7 +16,7 @@ reproducing this report's own documented figure exactly. Not stale.
 
 The standing open question (rounds 44/46) was whether GCC 2.6.3's CSE of
 a pure symbol address across two whole-struct copies is defeatable from
-C89 at all. It is. Retail computes `gDefaultViewportColor`'s address (a `lui %hi`/
+C89 at all. It is. Retail computes `sDefaultViewportColor`'s address (a `lui %hi`/
 `addiu %lo` pair) INDEPENDENTLY for each of the two copies; our compiler
 computes it once and reuses the register, because both reads are
 syntactically the same declared symbol and GCC's local CSE recognizes
@@ -26,19 +26,19 @@ Declaring a SECOND extern name for the SAME linker symbol via GCC's
 `__asm__("name")` alternate-name extension --
 
 ```c
-extern SByte3_d294 gDefaultViewportColor;
-extern SByte3_d294 D_8008A8F8_b __asm__("gDefaultViewportColor");
+extern SByte3_d294 sDefaultViewportColor;
+extern SByte3_d294 D_8008A8F8_b __asm__("sDefaultViewportColor");
 ```
 
 -- and reading the second copy through `D_8008A8F8_b` instead of
-`gDefaultViewportColor` again gives the two accesses textually distinct symbols, so
+`sDefaultViewportColor` again gives the two accesses textually distinct symbols, so
 CSE never fires: two independent `la`/`lui`+`addiu` pairs are emitted,
 matching retail exactly. This is not a new idiom for the project --
 `libsnd_vmanager.c` already uses `__asm__("D_8008D988")`-style aliasing for
 array reinterpretation -- but it had not been applied to defeat an
 address CSE before. Verified first in isolation through the pinned
 pipeline (`tools/gcc263/cpp | cc1`) on a 6-line reproducer: the aliased
-read produces a second `la $6,gDefaultViewportColor`, confirmed byte-for-byte
+read produces a second `la $6,sDefaultViewportColor`, confirmed byte-for-byte
 against retail's own two `lui`/`addiu` pairs once assembled in the real
 function.
 
@@ -60,7 +60,7 @@ matching byte-for-byte -- confirming the CSE was genuinely the whole
 length story. What remained was a residue in the function's FIRST 21
 words: retail interleaves the two unconditional zero-inits
 (`self->unk90 = 0; self->unk70 = 0;`) and the two global-loaded field
-stores (`self->unk34.a = gDefaultViewportWidth; self->unk34.b = gDefaultViewportHeight;`) at
+stores (`self->unk34.a = sDefaultViewportWidth; self->unk34.b = sDefaultViewportHeight;`) at
 their natural source position, immediately after the two `lw`s that
 produce them. Our build (correctly ordered in C, unchanged from every
 prior round) instead deferred ALL FOUR of those stores to just before
@@ -79,8 +79,8 @@ Two bare `__asm__("");` scheduling barriers close it:
 self->unk90 = 0;
 self->unk70 = 0;
 __asm__("");
-self->unk34.a = gDefaultViewportWidth;
-self->unk34.b = gDefaultViewportHeight;
+self->unk34.a = sDefaultViewportWidth;
+self->unk34.b = sDefaultViewportHeight;
 __asm__("");
 self->unk3C = 0xD;
 ...
@@ -98,17 +98,17 @@ happen early vs. late), never which register holds a value.
 ### Final matched body
 
 ```c
-extern s32 gDefaultViewportWidth;
-extern s32 gDefaultViewportHeight;
-extern SByte3_d294 gDefaultViewportColor;
-extern SByte3_d294 D_8008A8F8_b __asm__("gDefaultViewportColor");
+extern s32 sDefaultViewportWidth;
+extern s32 sDefaultViewportHeight;
+extern SByte3_d294 sDefaultViewportColor;
+extern SByte3_d294 D_8008A8F8_b __asm__("sDefaultViewportColor");
 
 void Viewport__InitDefaults(Unk18Obj *self) {
     self->unk90 = 0;
     self->unk70 = 0;
     __asm__("");
-    self->unk34.a = gDefaultViewportWidth;
-    self->unk34.b = gDefaultViewportHeight;
+    self->unk34.a = sDefaultViewportWidth;
+    self->unk34.b = sDefaultViewportHeight;
     __asm__("");
     self->unk3C = 0xD;
     self->unk44 = 0x7D0;
@@ -118,7 +118,7 @@ void Viewport__InitDefaults(Unk18Obj *self) {
     self->unk50 = 0x10000;
     self->unk54 = 0;
     self->unk60 = 0x4E20;
-    self->unk5B = gDefaultViewportColor;
+    self->unk5B = sDefaultViewportColor;
     self->unk58 = D_8008A8F8_b;
     self->unkB4 = 0;
     self->unkB8 = 1;
@@ -164,14 +164,14 @@ of the 2-word CSE'd shortfall, not a new regression). Not stale.
 
 **New lever, not in the existing attempt list:** attempt 3 (already on
 file) qualifies the GLOBAL's own declaration as `extern volatile
-SByte3_d294 gDefaultViewportColor;`, forcing every access to it through a
+SByte3_d294 sDefaultViewportColor;`, forcing every access to it through a
 conservative, always-observable-side-effect path. This round instead
 qualified `volatile` only at the two READ *sites*, leaving the
 declaration itself plain:
 
 ```c
-self->unk5B = *(volatile SByte3_d294 *)&gDefaultViewportColor;
-self->unk58 = *(volatile SByte3_d294 *)&gDefaultViewportColor;
+self->unk5B = *(volatile SByte3_d294 *)&sDefaultViewportColor;
+self->unk58 = *(volatile SByte3_d294 *)&sDefaultViewportColor;
 ```
 
 This tests a genuinely different hypothesis than attempt 3: does the
@@ -230,15 +230,15 @@ this unit (`unk90`, `unk70`, `unk34` (`Pair32_d294`), `unk3C`/`unk40`/
 is a pure codegen residue.
 
 ```c
-extern s32 gDefaultViewportWidth;
-extern s32 gDefaultViewportHeight;
-extern SByte3_d294 gDefaultViewportColor;
+extern s32 sDefaultViewportWidth;
+extern s32 sDefaultViewportHeight;
+extern SByte3_d294 sDefaultViewportColor;
 
 void Viewport__InitDefaults(Unk18Obj *self) {
     self->unk90 = 0;
     self->unk70 = 0;
-    self->unk34.a = gDefaultViewportWidth;
-    self->unk34.b = gDefaultViewportHeight;
+    self->unk34.a = sDefaultViewportWidth;
+    self->unk34.b = sDefaultViewportHeight;
     self->unk3C = 0xD;
     self->unk44 = 0x7D0;
     self->unk48 = 0x40;
@@ -247,16 +247,16 @@ void Viewport__InitDefaults(Unk18Obj *self) {
     self->unk50 = 0x10000;
     self->unk54 = 0;
     self->unk60 = 0x4E20;
-    self->unk5B = gDefaultViewportColor;
-    self->unk58 = gDefaultViewportColor;
+    self->unk5B = sDefaultViewportColor;
+    self->unk58 = sDefaultViewportColor;
     self->unkB4 = 0;
     self->unkB8 = 1;
 }
 ```
 
-`gDefaultViewportWidth`/`gDefaultViewportHeight` are plain `.sdata` words (already in
+`sDefaultViewportWidth`/`sDefaultViewportHeight` are plain `.sdata` words (already in
 `config/gp-symbols.txt`, ordinary `%gp_rel` accesses, no issue).
-`gDefaultViewportColor` is a 4-byte all-zero `.sdata` region, read as a whole
+`sDefaultViewportColor` is a 4-byte all-zero `.sdata` region, read as a whole
 `SByte3_d294` struct (3 signed bytes) via its ADDRESS -- retail computes
 that address with an ABSOLUTE `lui`/`addiu` (not `%gp_rel`), consistent
 with CLAUDE.md's rule that `la` of an sdata symbol stays absolute even
@@ -264,15 +264,15 @@ though loads/stores of it go through `$gp`.
 
 ## The residue
 
-Retail copies the same 3-byte struct from `gDefaultViewportColor` TWICE (once to
+Retail copies the same 3-byte struct from `sDefaultViewportColor` TWICE (once to
 `self->unk5B`, once to `self->unk58`), and computes the struct's address
 via `lui`/`addiu` **independently each time** -- two separate 2-instruction
-`lui %hi(gDefaultViewportColor)` / `addiu %lo(gDefaultViewportColor)` sequences, back to back
+`lui %hi(sDefaultViewportColor)` / `addiu %lo(sDefaultViewportColor)` sequences, back to back
 with nothing in between. My build's GCC 2.6.3 CSEs this: it computes the
 address ONCE and reuses the same register for both copies, coming out
 **2 words (8 bytes) shorter** than retail. The rest of the function
 additionally gets **rescheduled wholesale** around this: retail issues the
-two loads of `gDefaultViewportWidth`/`gDefaultViewportHeight` early (to hide load latency) but
+two loads of `sDefaultViewportWidth`/`sDefaultViewportHeight` early (to hide load latency) but
 stores them, and stores the two unconditional zero-inits (`unk90`,
 `unk70`), almost immediately after; my build defers ALL FOUR of those
 stores to just before the byte-copy blocks, apparently because removing
@@ -295,26 +295,26 @@ even though nearly every instruction downstream is present, just shifted.
    clobber only forces MEMORY operations not to be reordered/cached across
    it; a pure address CONSTANT (no memory read involved in computing it)
    isn't affected, so it can't stop this specific CSE.
-3. `extern volatile SByte3_d294 gDefaultViewportColor;` -- markedly WORSE: forces a
+3. `extern volatile SByte3_d294 sDefaultViewportColor;` -- markedly WORSE: forces a
    completely different, more conservative codegen shape with its own
    stack frame (`addiu sp,sp,-8`) and a saved `$s0`, ~44 instructions.
    Volatile makes the compiler treat every access as an observable side
    effect, which stops the CSE but at a much higher cost that doesn't
    remotely resemble retail either.
-4. Per-field byte assignments (`self->unk5B.b0 = gDefaultViewportColor.b0;` etc.,
+4. Per-field byte assignments (`self->unk5B.b0 = sDefaultViewportColor.b0;` etc.,
    6 statements instead of 2 whole-struct copies) -- WORSE and in a new
    way: GCC emits `lbu` (zero-extending) loads for the per-field version
    instead of retail's `lb` (sign-extending), since the compiler can prove
    the sign bits are dead when each byte flows straight into another `s8`
    field. Confirms the whole-struct-assignment shape (attempt 1) is the
    right one; per-field access diverges further, not closer.
-5. A chained assignment, `self->unk58 = (self->unk5B = gDefaultViewportColor);`,
+5. A chained assignment, `self->unk58 = (self->unk5B = sDefaultViewportColor);`,
    suggested by a bounded permuter search (below) -- compiles to reading
    the SECOND copy from `self->unk5B` (i.e. `self`+0x5B) rather than
    re-reading the global, confirmed by disassembly (`lb v0,0x5b(a0)` etc.,
-   no second `lui %hi(gDefaultViewportColor)` at all). Semantically valid (both
+   no second `lui %hi(sDefaultViewportColor)` at all). Semantically valid (both
    sides are zero either way) but structurally wrong: retail's two
-   identical `lui %hi(gDefaultViewportColor)` pairs prove it re-reads the GLOBAL
+   identical `lui %hi(sDefaultViewportColor)` pairs prove it re-reads the GLOBAL
    both times, not `self`. Real in-range word match: 7/41, worse than
    attempt 1.
 
@@ -363,7 +363,7 @@ toolchain question, not a per-function one)?
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__InitDefaults`. The +0x040 slot's occupant, named `initDefaults`. The defaults name the fields: screenSize 256x240 (gDefaultViewportWidth/gDefaultViewportHeight), otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 0x10000, drawEnabled 1. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__InitDefaults`. The +0x040 slot's occupant, named `initDefaults`. The defaults name the fields: screenSize 256x240 (sDefaultViewportWidth/sDefaultViewportHeight), otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 0x10000, drawEnabled 1. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## asm sites
 
@@ -372,7 +372,7 @@ Round 89 (runner delta, track 5 `asm-sites`), three sites, all kept:
 - **First bare `__asm__("")`** (after `self->otReady = 0;`) -- **justified**,
   now commented at the site. Deleting it alone: image red (12 bytes),
   `funcdiff` 37/41, asm-differ shows `lw v0,0xf4(gp)` / `lw v1,0xf8(gp)`
-  (`gDefaultViewportWidth`, `gDefaultViewportHeight`) hoisted above `sw zero,0x90(a0)` and
+  (`sDefaultViewportWidth`, `sDefaultViewportHeight`) hoisted above `sw zero,0x90(a0)` and
   `sw zero,0x70(a0)`. Instruction order.
 - **Second bare `__asm__("")`** (after the two `screenSize` stores) --
   **justified**, now commented at the site. Deleting it alone: image red
@@ -382,10 +382,10 @@ Round 89 (runner delta, track 5 `asm-sites`), three sites, all kept:
   two loaded values moving to `v1`/`a1` because `v0` is then reused by the
   constants. The primary change is instruction order.
 - **The asm-label alias** `extern ViewportRgb D_8008A8F8_b
-  __asm__("gDefaultViewportColor");` -- already justified at the site by the block
+  __asm__("sDefaultViewportColor");` -- already justified at the site by the block
   comment above it (a second textual name defeats GCC's CSE of the two
-  `gDefaultViewportColor` address computations). Re-measured by spelling the second
-  copy `self->clearColor = gDefaultViewportColor;`: image red (the function came out two
+  `sDefaultViewportColor` address computations). Re-measured by spelling the second
+  copy `self->clearColor = sDefaultViewportColor;`: image red (the function came out two
   words shorter, 39 against 41, `funcdiff` 17/39, and the whole image after it
   drifted). So the alias is load-bearing; which instructions went missing was
   not itemised. Kept.
@@ -393,14 +393,14 @@ Round 89 (runner delta, track 5 `asm-sites`), three sites, all kept:
 
 ## Track 7 (round 95, alpha, polish pass)
 
-Constants in decimal (otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 65536, fogNear 20000). The data it reads are renamed with `tools/rename.py`: `D_8008A8FC`/`D_8008A900` -> `gDefaultViewportWidth`/`gDefaultViewportHeight` (256, 240), `D_8008A8F8` -> `gDefaultViewportColor` ({0, 0, 0}); the local alias `D_8008A8F8_b` is now `gDefaultViewportColorAlias` (a C identifier only; its `__asm__` name is the symbol). The comment above the externs now keeps only `MATCHING:` lines; what it said, verbatim:
+Constants in decimal (otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 65536, fogNear 20000). The data it reads are renamed with `tools/rename.py`: `D_8008A8FC`/`D_8008A900` -> `sDefaultViewportWidth`/`sDefaultViewportHeight` (256, 240), `D_8008A8F8` -> `sDefaultViewportColor` ({0, 0, 0}); the local alias `D_8008A8F8_b` is now `gDefaultViewportColorAlias` (a C identifier only; its `__asm__` name is the symbol). The comment above the externs now keeps only `MATCHING:` lines; what it said, verbatim:
 
 ```c
 /* MATCHED round 49. Two levers were needed, see docs/match-reports/Viewport__InitDefaults.md:
- * (1) retail reloads the address of `gDefaultViewportColor` INDEPENDENTLY for each of
+ * (1) retail reloads the address of `sDefaultViewportColor` INDEPENDENTLY for each of
  * the two whole-struct copies (two separate lui/addiu pairs); GCC 2.6.3
  * otherwise CSEs that into one shared computation. Declaring a second
- * extern name aliased to the same symbol via `__asm__("gDefaultViewportColor")` (the
+ * extern name aliased to the same symbol via `__asm__("sDefaultViewportColor")` (the
  * same alternate-name idiom `libsnd_vmanager.c` already uses) gives the
  * second copy a textually distinct symbol, defeating the CSE without
  * `volatile`'s much worse codegen. (2) Two bare `__asm__("")` scheduling

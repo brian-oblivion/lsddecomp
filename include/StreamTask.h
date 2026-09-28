@@ -43,7 +43,7 @@
  *                         not fadingOut is setState(7).
  *   +0x060 setState       StreamTask__SetState: TaskCore's; 5 clears
  *                         fadingOut, 7 sets it, 8 aborts the player unless
- *                         abortBeforeFade, 0x12 refreshViewValue.
+ *                         abortBeforeFade, 0x12 exit.
  *   +0x06C setFrameBound  StreamTask__SetFrameBound: bound * 15 (TaskCore's
  *                         is * 20), negative kept.
  *   +0x078 onPadConfirm   StreamTask__OnPadConfirm: TaskCore's; with
@@ -51,7 +51,7 @@
  *   +0x080 onPadPrev      StreamTask__OnPadPrev: TaskCore's only.
  *   +0x084 onPadNext      StreamTask__OnPadNext: TaskCore's only.
  *   +0x088, +0x08C        StreamTask__NoOpSlot88/8C (NULL in TaskCore).
- *   +0x094 refreshViewValue StreamTask__RefreshViewValue: abortBeforeFade,
+ *   +0x094 exit StreamTask__Exit: abortBeforeFade,
  *                         the player's Abort now; else setState(7) and the
  *                         abort at state 8.
  * The overrides of +0x04C/+0x080/+0x084 (and TaskCore's) take self alone;
@@ -75,7 +75,7 @@ typedef struct StreamTaskMethods StreamTaskMethods;
 
 /* StreamTask's own state, past TaskCore's (enum TaskCoreState): onPadConfirm
  * sets it when skipOnConfirm is on, and setState answers it with
- * refreshViewValue, which aborts the player at once or fades out first. */
+ * exit, which aborts the player at once or fades out first. */
 enum StreamTaskState { STREAMTASK_STATE_SKIPPED = 18 };
 
 /* `result` after a confirm press skipped the stream (TaskCore's timeout
@@ -88,7 +88,7 @@ enum StreamTaskState { STREAMTASK_STATE_SKIPPED = 18 };
 #define STREAMTASK_FRAMES_PER_SECOND 15
 
 /* `initData` is a DrawRect (include/DrawSystem.h): the ctor's optional fifth
- * (stack) argument, else GetDefaultMovieFrame()'s &gDefaultMovieFrame,
+ * (stack) argument, else GetDefaultMovieFrame()'s &sDefaultMovieFrame,
  * {x 640, y 0, w 320, h 240}, the rect the ctor also hands New_MoviePlayer
  * as the player's frame and TaskCore__OnInit clears. Copied whole (retail
  * loads all three words before storing any: a struct assignment); no method
@@ -115,12 +115,12 @@ struct StreamTask {
     /* +0x0B4 */ struct MoviePlayer *player; /* New_MoviePlayer(GetDefaultMovieFrame(), 0, 0); finalize releases it */
     /* +0x0B8 */ s32 streamName;  /* Init's; the player's Play name. ctor: 0 */
     /* +0x0BC */ s32 streamGroup; /* Init's (GetMovieFrameCount, or -1); Play's second argument */
-    /* +0x0C0 */ s32 autoPlay; /* Init's (every caller 1); the player's setAutoPlay (MoviePlayer::autoPlay, +0x068), which Play tests to MarkPlaying at once */
+    /* +0x0C0 */ s32 autoPlay; /* Init's (every caller 1); the player's setAutoPlay (MoviePlayer::autoPlay, +0x068), which Play tests to RequestStart at once */
     /* +0x0C4 */ s32 keepActive; /* setKeepActive; reset 0; Play's keepActive (MoviePlayer::keepActive, +0x054) */
     /* +0x0C8 */ s32 loopCount; /* setLoopCount; reset -1; Play's fourth argument, the player's `loops` (MoviePlayer__Advance) */
     /* +0x0CC */ s32 skipOnConfirm; /* setSkipOnConfirm; reset 1; OnPadConfirm: nonzero ends the task with result 2 */
     /* +0x0D0 */ s32 unkD0; /* setUnkD0; reset 0; no method of this class reads it */
-    /* +0x0D4 */ s32 abortBeforeFade; /* setAbortBeforeFade; reset 1; RefreshViewValue aborts at once, else SetState(8) after the fade */
+    /* +0x0D4 */ s32 abortBeforeFade; /* setAbortBeforeFade; reset 1; Exit aborts at once, else SetState(8) after the fade */
     /* +0x0D8 */ s32 fadingOut; /* SetState: 5 clears, 7 sets; Update skips its setState(7) when set */
 };
 
@@ -129,7 +129,7 @@ typedef void (*StreamTaskInitFn)(StreamTask *self, IntermediateBaseInitArgs *arg
                                  s32 streamGroup, s32 autoPlay);
 
 extern StreamTaskMethods gStreamTaskMethods;
-extern StreamTaskMethods *Get_vtable_StreamTask(void); /* returns &gStreamTaskMethods */
+extern StreamTaskMethods *GetStreamTaskMethods(void); /* returns &gStreamTaskMethods */
 
 StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound,
                            DrawRect *initData);
@@ -148,7 +148,7 @@ void StreamTask__OnPadPrev(StreamTask *self);
 void StreamTask__OnPadNext(StreamTask *self);
 void StreamTask__NoOpSlot88(void);
 void StreamTask__NoOpSlot8C(void);
-void StreamTask__RefreshViewValue(StreamTask *self);
+void StreamTask__Exit(StreamTask *self);
 void StreamTask__SetKeepActive(StreamTask *self, s32 keepActive);
 void StreamTask__SetLoopCount(StreamTask *self, s32 count);
 void StreamTask__SetSkipOnConfirm(StreamTask *self, s32 enable);

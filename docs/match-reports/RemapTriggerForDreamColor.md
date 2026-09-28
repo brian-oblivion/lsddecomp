@@ -22,10 +22,10 @@ dispatch idiom.
 ```c
 s32 RemapTriggerForDreamColor(s32 a0, s32 a1)
 {
-    s32 val = gDreamAuxStage;
+    s32 val = sDreamAuxStage;
 
     if (val == 4 && a1 == 0x10) {
-        TriggerWorld *w = (TriggerWorld *)gDreamAuxWorld;
+        TriggerWorld *w = (TriggerWorld *)sDreamAuxWorld;
         s32 result = ((TriggerWorldFn80)w->vtable[0x80])(w);
 
         if (result == val) {
@@ -36,12 +36,12 @@ s32 RemapTriggerForDreamColor(s32 a0, s32 a1)
 }
 ```
 
-`a0 + 0x1E` (30) only happens when the unit is in state 4 (`gDreamAuxStage == 4`),
+`a0 + 0x1E` (30) only happens when the unit is in state 4 (`sDreamAuxStage == 4`),
 the caller passes `0x10` as `a1`, and a re-check of the same vtable-0x80
 predicate used by `IsCurrentDreamColor` still reports state 4. Otherwise `a0` is
 returned unchanged. `val` is read once into a local and reused both for the
 initial `== 4` test and the post-call re-check (`result == val`), matching
-retail's single `lw $s1, %gp_rel(gDreamAuxStage)($gp)` cached across the call --
+retail's single `lw $s1, %gp_rel(sDreamAuxStage)($gp)` cached across the call --
 re-reading the global a second time in C, or comparing against the literal
 `4` instead of `val`, would very likely still be correct C but was not
 tested since the cached-local reading matched on the first build.
@@ -74,12 +74,12 @@ gates it, are not established from this unit alone, hence B not A.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-The view `*gDreamAuxWorld` is cast to is renamed `DreamAuxWorld` /
+The view `*sDreamAuxWorld` is cast to is renamed `DreamAuxWorld` /
 `DreamAuxWorldFn80` in include/DreamAux.h (was `TriggerWorld` /
 `TriggerWorldFn80`, same `{ void **vtable; }` shape, so the call is
 unchanged). The name `TriggerWorld` now belongs to the class gTriggerWorldMethods
 (include/TriggerWorld.h), whose table is 0x8C bytes: this call loads byte
-+0x200 of its object's table (`lw v0,512(v0)`), so gDreamAuxWorld is not a
++0x200 of its object's table (`lw v0,512(v0)`), so sDreamAuxWorld is not a
 TriggerWorld. Its real class is unresolved. Bytes unchanged.
 
 ## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h

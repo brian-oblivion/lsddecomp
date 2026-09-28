@@ -6,7 +6,7 @@ Round 81, runner delta. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot none (not in the table); allocator (slots resolved with `tools/classtable.py gWBgmMethods`).
-- **What:** `New_` wrapper: `BMemPMgrAlloc(0x24)`, then the ctor through `Get_vtable_WBgm()->ctor` (slot +0x008) with the three arguments, `return self` / `return NULL`.
+- **What:** `New_` wrapper: `BMemPMgrAlloc(0x24)`, then the ctor through `GetWBgmMethods()->ctor` (slot +0x008) with the three arguments, `return self` / `return NULL`.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 31/31
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -34,7 +34,7 @@ WBgm *New_WBgm(s32 vabArg, s32 seqArg, s32 autoPlay) {
 
     self = BMemPMgrAlloc(0x24);
     if (self != NULL) {
-        Get_vtable_WBgm()->ctor(self, vabArg, seqArg, autoPlay);
+        GetWBgmMethods()->ctor(self, vabArg, seqArg, autoPlay);
         return self;
     }
     return NULL;
@@ -110,21 +110,21 @@ extern SeqData *New_RequestedFile(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-WBgmMethods *Get_vtable_WBgm(void);
+WBgmMethods *GetWBgmMethods(void);
 
 extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern s32 sWBgmActive;
+extern u8 sSsSizeTableBuf[];
 ```
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
 The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
 
-Parameters retyped `(s32 vabArg, s32 seqArg, s32 autoPlay)` -> `(char *vabPath, char *seqPath, s32 autoPlay)`. Caller checked: the only one is `DayTask__DayTask` (src/world/DayTaskStageMap.c), `New_WBgm(PickSoundBank(0), 0, 1)`; PickSoundBank (src/cd/GameFiles.c) returns a word of gSoundBankPaths, and all seven words point at VAB path strings ("SND\\AMBIENT", "SND\\CARTOON", "SND\\ELECTRO", "SND\\ETHNOVA", "SND\\HUMAN", "SND\\LOVELY", "SND\\STANDERD"; asm/data/1B84.rodata.s), and the path reaches New_VabStreamObj(char *) through setVab. That call site now casts `(char *)` on the word and `(SubObjG *)` on the result, and `include/DayTaskStageMap.h`'s local `extern SubObjG *New_WBgm(s32, s32, s32)` view is deleted.
+Parameters retyped `(s32 vabArg, s32 seqArg, s32 autoPlay)` -> `(char *vabPath, char *seqPath, s32 autoPlay)`. Caller checked: the only one is `DayTask__DayTask` (src/world/DayTaskStageMap.c), `New_WBgm(PickSoundBank(0), 0, 1)`; PickSoundBank (src/cd/GameFiles.c) returns a word of sSoundBankPaths, and all seven words point at VAB path strings ("SND\\AMBIENT", "SND\\CARTOON", "SND\\ELECTRO", "SND\\ETHNOVA", "SND\\HUMAN", "SND\\LOVELY", "SND\\STANDERD"; asm/data/1B84.rodata.s), and the path reaches New_VabStreamObj(char *) through setVab. That call site now casts `(char *)` on the word and `(SubObjG *)` on the result, and `include/DayTaskStageMap.h`'s local `extern SubObjG *New_WBgm(s32, s32, s32)` view is deleted.
 
 ## Proposed field names
 

@@ -4,9 +4,9 @@
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/TmdModel.c`. Fresh ground, no prior attempt.
 
-- **What:** the allocator of class gTmdModelMethods: `p = BMemPMgrAlloc(0x24); if (p != NULL) { Get_vtable_TmdModel()->ctor(p, arg); return p; } return NULL;`. The ctor (slot +0x008, `TmdModel__TmdModel`) takes the allocator's argument as its second parameter.
+- **What:** the allocator of class gTmdModelMethods: `p = BMemPMgrAlloc(0x24); if (p != NULL) { GetTmdModelMethods()->ctor(p, arg); return p; } return NULL;`. The ctor (slot +0x008, `TmdModel__TmdModel`) takes the allocator's argument as its second parameter.
 - **Result:** byte-exact; 24/24 words, whole-image SHA1 green. First build (the broadcast allocator shape).
-- **Types:** the unit's local `TmdModel` view is now `BASICCLASS_FIELDS(TmdModelMethods)` + its own fields, with `TmdModelMethods` = `BASICCLASS_SLOTS(TmdModel, (TmdModel *self, void *arg))` (unit includes `BasicClass.h`, the UNIFIED header, unchanged). The previous view had `void *vtable; u8 pad4[8];` at the same offsets. `Get_vtable_TmdModel` (matched earlier this round) was retyped in this unit from `void *` to `TmdModelMethods *` (same bytes; no other unit declares it).
+- **Types:** the unit's local `TmdModel` view is now `BASICCLASS_FIELDS(TmdModelMethods)` + its own fields, with `TmdModelMethods` = `BASICCLASS_SLOTS(TmdModel, (TmdModel *self, void *arg))` (unit includes `BasicClass.h`, the UNIFIED header, unchanged). The previous view had `void *vtable; u8 pad4[8];` at the same offsets. `GetTmdModelMethods` (matched earlier this round) was retyped in this unit from `void *` to `TmdModelMethods *` (same bytes; no other unit declares it).
 
 ## Source
 
@@ -24,13 +24,13 @@ struct TmdModel {
     s32 quad[4];            /* +0x014 */
 };
 extern void *BMemPMgrAlloc(s32 size);
-TmdModelMethods *Get_vtable_TmdModel(void);
+TmdModelMethods *GetTmdModelMethods(void);
 
 TmdModel *New_TmdModel(void *arg) {
     TmdModel *p = BMemPMgrAlloc(0x24);
 
     if (p != NULL) {
-        Get_vtable_TmdModel()->ctor(p, arg);
+        GetTmdModelMethods()->ctor(p, arg);
         return p;
     }
     return NULL;
@@ -41,8 +41,8 @@ TmdModel *New_TmdModel(void *arg) {
 
 `New_TmdModel` -- tier A. Convention: `New_Class` allocator. Evidence: the
 standard `BMemPMgrAlloc` + ctor-through-vtable allocator shape, chained to
-`Get_vtable_TmdModel()->ctor`; the class it allocates is named from its
-table's role (see `Get_vtable_TmdModel.md`).
+`GetTmdModelMethods()->ctor`; the class it allocates is named from its
+table's role (see `GetTmdModelMethods.md`).
 
 ## Naming (field)
 

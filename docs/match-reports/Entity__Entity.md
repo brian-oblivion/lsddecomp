@@ -5,13 +5,13 @@
 ## What it does
 
 Entity's constructor, reached both directly (this function) and indirectly
-through the vtable's own `ctor` slot (`Get_vtable_Entity()->ctor`, see
+through the vtable's own `ctor` slot (`GetEntityMethods()->ctor`, see
 `New_Entity`). First calls the shared base-class constructor,
 `GetTodActorMethods()->ctor(this, arg2, arg3)` — `GetTodActorMethods()` (matched in
 `TodActor.c`) returns the SAME shared "BasicClass" ancestor vtable that
 `TodActor` also derives from (see the big comment at the top of
 `include/Entity.h`). Only on success does it finish initializing: assigns
-`this->methods` to `Get_vtable_Entity()` (Entity's OWN vtable — the base
+`this->methods` to `GetEntityMethods()` (Entity's OWN vtable — the base
 ctor call above runs before this entity is "really" an Entity), stores
 `arg1` into `moodIndex`, zeroes `unk9C`/`unk100`/`unk104`, then calls its own
 (now-current) `methods->slot40(this)`.
@@ -31,7 +31,7 @@ convention (`docs/research/class-framework.md`).
 ```c
 Entity *Entity__Entity(Entity *this, s32 arg1, s32 arg2, s32 arg3) {
     if (GetTodActorMethods()->ctor(this, arg2, arg3) != NULL) {
-        this->methods = Get_vtable_Entity();
+        this->methods = GetEntityMethods();
         this->moodIndex = arg1;
         this->unk9C = 0;
         this->unk100 = NULL;

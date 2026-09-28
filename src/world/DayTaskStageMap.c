@@ -12,7 +12,7 @@
  * DayTask__OnObjMNotify turns ObjM's states into the next phase or the
  * task's result.
  *
- * RegisterRecordTableFiles: registers gRecordTable's file entries with the
+ * RegisterRecordTableFiles: registers sRecordTable's file entries with the
  * CD driver in at most two batches (DayTask's ctor, and the loader-task
  * callback in GameApplicationFileResource.c).
  *
@@ -56,6 +56,43 @@
 #include "GameFiles.h"
 #include "GameApplicationFileResource.h"
 #include "DreamAux.h"
+
+/* The rectangle StageMap__InitFootprintRect copies into rects[index] before
+ * setting its slotIndex: no slot (-1), the whole 20 x 20 cells from (0, 0). */
+extern CellRect sFullSlotRect;
+
+/* The default "enable every element" spec table SetTargetAndLoadChunks
+ * passes to buildRateEntries: seven entries, every `flag` nonzero. */
+extern ChunkSlotSpec sDefaultTargetSpecs[7];
+
+/* Indexed by ChunkSlotSpec::key in StageMap__LoadChunksAround: the world
+ * offset of that neighbour's cellParent from the centre position. Unsized:
+ * `key` is the caller's byte. */
+extern LongVec3 sNeighbourOffsets[];
+
+/* `key`-indexed bitmask table (`1 << key`) StageMap__ComputeChunkLoadEntry
+ * tests against ComputeNeighbourMask's result. */
+extern const s32 sNeighbourBits[7];
+
+/* `key`-indexed chunk-index steps to the seven chunks around a centre chunk
+ * (ChunkNeighbourDelta, include/StageMap.h). */
+extern const ChunkNeighbourDelta sChunkNeighbourDeltas[7];
+
+/* LbdFile::ownerKey-indexed remap, read signed by
+ * StageMap__UpdateFootprintTracking (01 02 03 00 04 05 06 00). The byte
+ * (0..6) is UpdateFootprintTracking's return value and the index into
+ * sFootprintResultPtrTable. */
+extern const s8 sFootprintResultRemap[8];
+
+/* 7 pointers, the first NULL, the rest to 4-word tables of ChunkSlotSpecs
+ * (seven 2-byte entries, padded): UpdateFootprintTracking passes the
+ * selected one to buildRateEntries as its spec table, as
+ * SetTargetAndLoadChunks passes sDefaultTargetSpecs. */
+extern ChunkSlotSpec *sFootprintResultPtrTable[7];
+
+/* "ETC\\ETC.TIM" and "ETC\\DREAMER.TMD", the files DayTask's ctor loads. */
+extern const char sEtcTimPath[];
+extern const char sDreamerTmdPath[];
 
 /* The viewpoint and view-reference points DayTask__OnInit hands the
  * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000). */
@@ -153,7 +190,7 @@ void DayTask__Deinit(DayTask *self) {
     GetTimedTaskMethods()->deinit((TimedTask *)self);
     dreamSys->methods->setViewport(dreamSys, 0);
     dreamSys->methods->removeChild(dreamSys, self->initArgs->pad);
-    dreamSys->methods->removeChild(dreamSys, self->unk10);
+    dreamSys->methods->removeChild(dreamSys, self->frameClock);
 }
 
 void DayTask__OnInit(DayTask *self) {
@@ -181,13 +218,13 @@ void DayTask__OnDeinit(DayTask *self) {
     vp->methods->detachViewChild(vp);
 }
 
-/* onTag1Notify: on each DrawSystem VSync, starts the day's first ObjM
+/* onDrawSystemEvent: on each DrawSystem VSync, starts the day's first ObjM
  * (READY) or replaces the ObjM a link state ended (REPLACE_OBJM). A day
  * startDay refuses ends at once. */
 void DayTask__AdvancePhase(DayTask *self, BasicClass *sender, s32 event) {
     s32 result;
 
-    GetTimedTaskMethods()->onTag1Notify((TimedTask *)self, sender, event);
+    GetTimedTaskMethods()->onDrawSystemEvent((TimedTask *)self, sender, event);
     if (event == DRAWSYSTEM_EVENT_VSYNC && self->phase != DAYTASK_PHASE_RUNNING) {
         switch (self->phase) {
             case DAYTASK_PHASE_READY:
@@ -219,7 +256,7 @@ void DayTask__StartObjM(DayTask *self, s32 stage) {
     self->phase = DAYTASK_PHASE_RUNNING;
 }
 
-void DayTask__OnState4(void) {}
+void DayTask__OnTimedOut(void) {}
 
 void DayTask__OnDreamSysNotify(void) {}
 
@@ -268,7 +305,7 @@ DayTaskMethods *GetDayTaskMethods(void) {
 extern s32 sRecordRegisterCalls;
 extern s32 sRecordFirstBatchCount;
 
-/* Registers gRecordTable's records with the CD driver, retrying until it
+/* Registers sRecordTable's records with the CD driver, retrying until it
  * accepts them. The first call registers the whole table when `all` is set,
  * else its first half; the second call registers the rest; any later call
  * registers nothing. */
@@ -316,7 +353,7 @@ TimedTask *New_TimedTask(char *soundBankPath, BasicClass *sound) {
 }
 
 void TimedTask__TimedTask(TimedTask *self, char *soundBankPath, BasicClass *sound) {
-    Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
+    GetIntermediateBaseMethods()->ctor((IntermediateBase *)self);
     self->methods = GetTimedTaskMethods();
     if (soundBankPath != NULL) {
         self->sound = (BasicClass *)New_VabStreamObj(soundBankPath);
@@ -331,7 +368,7 @@ void TimedTask__Finalize(TimedTask *self) {
     if (self->soundBankPath != NULL) {
         self->sound->methods->release(self->sound);
     }
-    Get_vtable_IntermediateBase()->finalize((IntermediateBase *)self);
+    GetIntermediateBaseMethods()->finalize((IntermediateBase *)self);
 }
 
 void TimedTask__CancelTimeout(TimedTask *self) {
@@ -340,28 +377,28 @@ void TimedTask__CancelTimeout(TimedTask *self) {
 
 s32 TimedTask__Init(TimedTask *self, IntermediateBaseInitArgs *args, s32 mode) {
     self->result = 0;
-    Get_vtable_IntermediateBase()->init((IntermediateBase *)self, args, mode);
+    GetIntermediateBaseMethods()->init((IntermediateBase *)self, args, mode);
     return self->result;
 }
 
 void TimedTask__Deinit(TimedTask *self) {
-    Get_vtable_IntermediateBase()->deinit((IntermediateBase *)self);
+    GetIntermediateBaseMethods()->deinit((IntermediateBase *)self);
 }
 
 void TimedTask__NoOpSlot58(void) {}
 
 void TimedTask__CheckTimeout(TimedTask *self, BasicClass *sender, s32 event) {
-    Get_vtable_IntermediateBase()->update((IntermediateBase *)self, sender, event);
+    GetIntermediateBaseMethods()->update((IntermediateBase *)self, sender, event);
     if ((u32)self->frameCounter > (u32)self->timeoutFrames) {
         self->methods->setState(self, TIMEDTASK_STATE_TIMED_OUT);
     }
 }
 
 void TimedTask__SetState(TimedTask *self, s32 state) {
-    Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, state);
+    GetIntermediateBaseMethods()->setState((IntermediateBase *)self, state);
     if (state == TIMEDTASK_STATE_TIMED_OUT) {
         self->result = TIMEDTASK_RESULT_TIMED_OUT;
-        self->methods->onState4(self);
+        self->methods->onTimedOut(self);
     }
 }
 
@@ -415,7 +452,7 @@ StageMap *New_StageMap(LongVec3 *origin, s32 autoLoad) {
     return NULL;
 }
 
-extern LongVec3 gDefaultOrigin;
+extern LongVec3 sDefaultOrigin;
 
 void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
     s32 i;
@@ -432,7 +469,7 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
     if (origin != NULL) {
         self->origin = *origin;
     } else {
-        self->origin = gDefaultOrigin;
+        self->origin = sDefaultOrigin;
     }
 
     self->loadsPending = 0;
@@ -547,22 +584,22 @@ void StageMap__Finalize(StageMap *self) {
     GetLightRigMethods()->finalize((LightRig *)self);
 }
 
-/* A sender of DrawSystem's class (id nibble 0x1) goes on to onNotifyTag1. */
+/* A sender of DrawSystem's class (id nibble 0x1) goes on to onDrawSystemEvent. */
 void StageMap__OnNotify(StageMap *self, BasicClass *sender, s32 command) {
     GetSceneNodeMethods()->onNotify((SceneNode *)self, sender, command);
 
     if ((sender->methods->header & CLASS_ID_ROOT_MASK) == DRAWSYSTEM_CLASS_ID) {
-        self->methods->onNotifyTag1(self, sender, command);
+        self->methods->onDrawSystemEvent(self, sender, command);
     }
 }
 
-extern s32 gDefaultGridSpan;
+extern s32 sDefaultGridSpan;
 
 void StageMap__Reset(StageMap *self) {
     self->config = NULL;
     self->acceptedTags = NULL;
     self->rectCount = 0;
-    self->methods->setGridSpan(self, gDefaultGridSpan);
+    self->methods->setGridSpan(self, sDefaultGridSpan);
     self->unk1CC = -1;
     self->unk1D0 = -1;
     self->unk1D4 = -1;
@@ -842,7 +879,7 @@ void StageMap__SetConfig(StageMap *self, StageGridDimensions *config) {
  *  - LoadChunksAround, ComputeNeighbourMask, ComputeChunkLoadEntry,
  *    ApplyChunkLoads, CountPendingLoads: moving the slots around a centre
  *    chunk and starting (or cancelling) each slot's LbdFile load.
- *  - OnNotifyTag1: on the DrawSystem's per-VSync notification, finishing
+ *  - OnDrawSystemEvent: on the DrawSystem's per-VSync notification, finishing
  *    the loads that have completed.
  *  - PopulateSlotCells / ClearSlotCells: linking a loaded chunk's
  *    placements and models into its slot's cells, and clearing them.
@@ -1157,7 +1194,7 @@ s32 StageMap__CountPendingLoads(StageMap *self) {
     return count;
 }
 
-void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 command) {
+void StageMap__OnDrawSystemEvent(StageMap *self, void *sender, s32 command) {
     s32 i;
     ChunkSlot *slot;
     s32 pending;
@@ -1761,7 +1798,7 @@ s32 StageMap__InitFootprintRect(StageMap *self, s32 unused, s32 index, s32 chunk
     CellRect *rect;
 
     rect = &self->rects.e[index];
-    *rect = gFullSlotRect;
+    *rect = sFullSlotRect;
     rect->slotIndex = self->methods->findSlotIndexByChunk(self, chunkIndex);
     return index + 1;
 }

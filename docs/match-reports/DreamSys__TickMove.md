@@ -59,7 +59,7 @@ written that way.
 
 Renamed from `func_80059A58`.
 
-The function `DreamSys__SelectCallback98(this, 1)` installs in
+The function `DreamSys__SelectMoveCallback(this, 1)` installs in
 `callback_0x98`, so it runs every tick in mode 1. Its whole body is a dispatch on
 `moveOverride`: 0 runs `DreamSys__ApplyPendingTurn` then `DreamSys__TickMoveFree`,
 2 runs `DreamSys__TickMoveHeld`, anything else runs `DreamSys__TickMoveForced`, and

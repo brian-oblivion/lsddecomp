@@ -22,7 +22,7 @@ void Viewport__AddChild(Unk18Obj *self, GenericObj *arg1)
 {
     s32 header;
 
-    Get_vtable_BasicClass()->slot10(self, arg1);
+    GetBasicClassMethods()->slot10(self, arg1);
     header = arg1->methods->header & 0xF;
     if (header == 4) {
         self->unk10 = arg1;
@@ -83,7 +83,7 @@ first build.
 ## Naming
 
 **Unk18Obj__AddChild** (renamed from `func_8003E770`, round 55, runner
-alpha). Tier A: forwards to `Get_vtable_BasicClass()->addChild` first (base
+alpha). Tier A: forwards to `GetBasicClassMethods()->addChild` first (base
 slot name confirmed, matches canonical `BasicClassMethods::addChild`
 `+0x010`), then examines the added child's dynamic class tag
 (`arg1->methods->header & 0xF`) to cache a typed reference -- the standard

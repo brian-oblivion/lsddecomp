@@ -101,7 +101,7 @@ Round 79 (delta).
   other method of this class already carries in CdDriver.c).
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `New_Class6D4E8` -> `New_CdDriver` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `New_Class6D4E8` -> `New_CdDriver` by rename.py.
 
 Track 7, round 101 (charlie). The allocation size is now `sizeof(CdDriver)`:
 the unit's `CDDRIVER_SIZE 0x2C` define is gone. The note above that the view

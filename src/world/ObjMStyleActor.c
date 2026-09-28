@@ -59,6 +59,11 @@
 #include <strings.h>
 #include "DreamAux.h"
 
+/* The row colours, two 3-byte RGBs in sdata, 4 bytes apart; only their
+ * addresses are taken (setColor). */
+extern struct SpriteRgb sItemListRowColor;
+extern struct SpriteRgb sItemListCursorColor;
+
 void ItemList__SetState(ItemList *self, s32 state) {
     /* MATCHING: the gotos keep retail's branch polarity and block order. */
     self->closeTicks = 0;
@@ -213,8 +218,8 @@ void ItemList__CursorDown(ItemList *self, s32 unused1, s32 unused2, s32 forwarde
 /* The first row's position, two sdata words (-92, -15). Read by value into
  * ItemList__CreateRows's `pos`; each further row is ITEMLIST_ROW_SPACING
  * lower. */
-extern s32 gItemListRowOriginX;
-extern s32 gItemListRowOriginY;
+extern s32 sItemListRowOriginX;
+extern s32 sItemListRowOriginY;
 
 /* The y step from one row to the next (createRows). */
 #define ITEMLIST_ROW_SPACING 10
@@ -231,8 +236,8 @@ void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32
         return;
     }
 
-    pos.x = gItemListRowOriginX;
-    pos.y = gItemListRowOriginY;
+    pos.x = sItemListRowOriginX;
+    pos.y = sItemListRowOriginY;
     count = self->itemCount;
     row = &self->rows[0];
     if (count > ARRAY_COUNT(self->rows)) {
@@ -243,7 +248,7 @@ void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32
         ItemList__FormatRowText(self, buf, i, top, column);
         *row = New_TextRow(font, ITEMLIST_ROW_CHARS, buf);
         (*row)->methods->attachToParent(*row, parent, (LongVec3 *)&pos);
-        (*row)->methods->setColor(*row, &gItemListRowColor);
+        (*row)->methods->setColor(*row, &sItemListRowColor);
         pos.y += ITEMLIST_ROW_SPACING;
         row++;
     }
@@ -327,7 +332,7 @@ void ItemList__SetView(ItemList *self, s32 top, s32 column, s32 cursor, s32 high
     }
     cursor -= top; /* MATCHING: reuses cursor's register for the index */
     row = self->rows[cursor];
-    row->methods->setColor(row, &gItemListCursorColor);
+    row->methods->setColor(row, &sItemListCursorColor);
 }
 
 void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 notify) {
@@ -339,7 +344,7 @@ void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 notify) {
     }
     idx = self->cursorIndex - self->topIndex;
     row = &self->rows[idx]; /* MATCHING: one address, stepped, as retail */
-    (*row)->methods->setColor(*row, &gItemListRowColor);
+    (*row)->methods->setColor(*row, &sItemListRowColor);
     if (dir) {
         self->cursorIndex++;
         row++;
@@ -347,7 +352,7 @@ void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 notify) {
         self->cursorIndex--;
         row--;
     }
-    (*row)->methods->setColor(*row, &gItemListCursorColor);
+    (*row)->methods->setColor(*row, &sItemListCursorColor);
     if (notify) {
         self->methods->playSound(self, 0);
     }
@@ -417,7 +422,7 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
     }
 }
 
-/* ---- ObjM, resetCounters (+0x040) to enterState6 (+0x09C) ---------------
+/* ---- ObjM, resetCounters (+0x040) to enterLinkWall (+0x09C) ---------------
  *
  * In table order.
  *
@@ -428,7 +433,7 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
  *    stage's BGM sequence and the day's TIM block, register the stage's
  *    StyleConfig, set the viewport's view and the StageMap's bounds; stop
  *    it all again.
- *  - onTag1Notify's event 2 runs PollTimBlockLoad: once the TIM block has
+ *  - onDrawSystemEvent's event 2 runs PollTimBlockLoad: once the TIM block has
  *    loaded (or failed) the scene is set up, and once the StageMap has
  *    nothing pending the style session starts.
  *  - onPadEvent (DispatchPadEvent) maps Start, Select and triangle onto the
@@ -436,8 +441,9 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
  *    while it is being built; togglePause.
  *  - the style scene slots +0x080..+0x08C: SetupSceneStyle,
  *    ExitSceneStyle, EnterStyleSession, TickStyle.
- *  - OnDreamSysNotify turns the DreamSys's link codes into enterState4..B;
- *    EnterState4/5/6 set IntermediateBase::state and start a fade up
+ *  - OnDreamSysNotify turns the DreamSys's link codes into the enter*
+ *    slots and notifyLinkTeleport; EnterTimeUp, EnterLinkDynamic and
+ *    EnterLinkWall set IntermediateBase::state and start a fade up
  *    (ObjM__StartFadeUp, next section).
  * NoOpSlot40 and NoOpSlot7C are empty.
  */
@@ -445,7 +451,7 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
 void ObjM__NoOpSlot40(void) {}
 
 /* init. `args` is the building DayTask's init args: args->lightRig is its
- * StageMap (IntermediateBase__Init keeps it as unk14), whose callback
+ * StageMap (IntermediateBase__Init keeps it as lightRig), whose callback
  * becomes ObjM__GetGridRecord. */
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dreamSys) {
     ((StageMap *)args->lightRig)
@@ -475,18 +481,18 @@ void ObjM__DetachTarget(ObjM *self) {
 
 /* Defined elsewhere, no header: src/graphics/SceneNode.c (GetSetHitHeightGate
  * sets the flag SceneNode__RaycastHullAgainstFaces tests). RegisterStyleConfig,
- * which keeps `sceneRefs` as gStyleSceneRefs, is defined below, after ObjM. */
+ * which keeps `sceneRefs` as sStyleSceneRefs, is defined below, after ObjM. */
 extern s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadArg);
 
 /* The viewport's view point and reference point (attachViewChild), the
  * StageMap's bounds on stage 0, and one DreamSys setPendingExtra value per
  * stage. */
-extern LongVec3 gObjMViewPoint;
-extern LongVec3 gObjMViewRefPoint;
-extern s32 gStagePendingExtras[];
-extern CellBounds gStage0Bounds;
+extern LongVec3 sObjMViewPoint;
+extern LongVec3 sObjMViewRefPoint;
+extern s32 sStagePendingExtras[];
+extern CellBounds sStage0Bounds;
 
-/* onInit's gridSpan when it is passed 0: gDefaultGridSpan's value, the one
+/* onInit's gridSpan when it is passed 0: sDefaultGridSpan's value, the one
  * the StageMap starts with (10 half-cells: StageMap::gridHalfCells is
  * gridSpan >> 12). */
 #define DEFAULT_GRID_SPAN 40960
@@ -507,12 +513,12 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
     record = PickStageTexture(self->stage, 0, day);
     self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc((s32)record);
 
-    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &gObjMViewPoint,
-                                 &gObjMViewRefPoint, 0);
+    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sObjMViewPoint,
+                                 &sObjMViewRefPoint, 0);
 
     self->cachedViewport = vp;
     day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-    self->styleConfig = (StyleConfig *)RegisterStyleConfig((s32)self->unk14, self->stage,
+    self->styleConfig = (StyleConfig *)RegisterStyleConfig((s32)self->lightRig, self->stage,
                                                            (s32)&self->ctorSound, day, 0);
     if (style != 0) {
         self->styleConfig = style;
@@ -537,12 +543,12 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
         if (stage == three) {
             flag = 1;
         }
-        ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, 0);
+        ((StageMap *)self->lightRig)->methods->setBounds((StageMap *)self->lightRig, 0);
     } else {
         self->tickPeriod = 16;
         self->moveMode = 2;
         flag = 1;
-        ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, &gStage0Bounds);
+        ((StageMap *)self->lightRig)->methods->setBounds((StageMap *)self->lightRig, &sStage0Bounds);
     }
 
     self->gridSpan = gridSpan;
@@ -551,7 +557,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
     }
     GetSetHitHeightGate(flag);
 
-    self->dreamSys->methods->setPendingExtra(self->dreamSys, gStagePendingExtras[self->stage]);
+    self->dreamSys->methods->setPendingExtra(self->dreamSys, sStagePendingExtras[self->stage]);
     self->state = 5;
 }
 
@@ -566,7 +572,7 @@ void ObjM__TeardownStyle(ObjM *self) {
     self->bgm->methods->stop(self->bgm);
 }
 
-void ObjM__OnTag1Notify(ObjM *self, void *sender, s32 event) {
+void ObjM__OnDrawSystemEvent(ObjM *self, void *sender, s32 event) {
     if (event == DRAWSYSTEM_EVENT_VSYNC) {
         ObjM__PollTimBlockLoad(self, self->timBlockSrc);
     }
@@ -604,7 +610,7 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
         }
     }
     if (self->timBlockPending == 0) {
-        if (((StageMap *)self->unk14)->pendingLoadCount == 0 && self->inSession == 0) {
+        if (((StageMap *)self->lightRig)->pendingLoadCount == 0 && self->inSession == 0) {
             self->unk64 = 1;
             self->methods->enterStyleSession(self);
         }
@@ -613,7 +619,7 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
 
 /* onPadEvent, only in session: Start pressed toggles the pause, Select
  * held and released sets and clears the close-ready flag, triangle pressed
- * closes (closeAndNotifyD).
+ * closes (closeAndNotifyNewGame).
  * MATCHING: the gotos keep retail's compare order; a switch sorts the cases. */
 void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code) {
     ObjMMethods *m = self->methods;
@@ -645,7 +651,7 @@ updateCloseReady:
     fn = m->updateCloseReadyFlag;
     goto call;
 closeAndNotify:
-    fn = m->closeAndNotifyD;
+    fn = m->closeAndNotifyNewGame;
     goto call;
 clearCloseReady:
     fn = m->clearCloseReadyFlag;
@@ -684,11 +690,11 @@ void ObjM__NoOpSlot7C(void) {}
 
 /* Added to the viewport's projection distance; 0 in the image and never
  * written. */
-extern s32 gObjMProjectionBias;
+extern s32 sObjMProjectionBias;
 
 /* The StageMap's accepted tags (setAcceptedTags): the class ids of DreamSys
  * (0x1F34) and Entity (0x1F234), 0-terminated. */
-extern s32 gObjMAcceptedClassIds[];
+extern s32 sObjMAcceptedClassIds[];
 
 void ObjM__SetupSceneStyle(ObjM *self) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
@@ -701,15 +707,15 @@ void ObjM__SetupSceneStyle(ObjM *self) {
 
     drawSystem = (DrawSystem *)self->initArgs->drawSystem;
     width = drawSystem->methods->getDims(drawSystem, NULL)->w;
-    vp->methods->setProjection(vp, width / 2 * 5 / 3 + gObjMProjectionBias);
+    vp->methods->setProjection(vp, width / 2 * 5 / 3 + sObjMProjectionBias);
 
-    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &gObjMViewPoint,
-                                 &gObjMViewRefPoint, 0);
+    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sObjMViewPoint,
+                                 &sObjMViewRefPoint, 0);
 
-    SetDreamAuxWorld(self->stage, (StageMap *)self->unk14, self->dreamSys,
-                     (struct VabStreamObj *)self->sound, (struct FrameClock *)self->unk10);
+    SetDreamAuxWorld(self->stage, (StageMap *)self->lightRig, self->dreamSys,
+                     (struct VabStreamObj *)self->sound, (struct FrameClock *)self->frameClock);
 
-    rig = (StageMap *)self->unk14;
+    rig = (StageMap *)self->lightRig;
     self->methods->addChild(self, (BasicClass *)rig);
 
     rig->methods->setAmbientColor(rig, (LightRigRgb *)style->ambientColor, 0);
@@ -717,7 +723,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     rig->methods->setConfig(rig, GetStageGridDimensions(self->stage));
     ((DreamSysAttachToParentFn)self->dreamSys->methods->attachToParent)(self->dreamSys, rig);
     rig->methods->setGridSpan(rig, self->gridSpan);
-    rig->methods->setAcceptedTags(rig, gObjMAcceptedClassIds);
+    rig->methods->setAcceptedTags(rig, sObjMAcceptedClassIds);
 }
 
 void ObjM__ExitSceneStyle(ObjM *self) {
@@ -725,7 +731,7 @@ void ObjM__ExitSceneStyle(ObjM *self) {
     self->dreamSys->methods->blockMovement(self->dreamSys);
     self->dreamSys->methods->detachFromParent(self->dreamSys);
     ((NodeGuardedViewport *)self->viewport)->methods->detachViewChild((NodeGuardedViewport *)self->viewport);
-    self->methods->removeChild(self, self->unk14);
+    self->methods->removeChild(self, self->lightRig);
 }
 
 void ObjM__EnterStyleSession(ObjM *self) {
@@ -741,7 +747,7 @@ void ObjM__EnterStyleSession(ObjM *self) {
 
     self->inSession = 1;
     self->dreamSys->methods->resetLinkState(self->dreamSys, self->moveMode, self->tickPeriod);
-    ((StageMap *)self->unk14)->methods->enable((StageMap *)self->unk14);
+    ((StageMap *)self->lightRig)->methods->enable((StageMap *)self->lightRig);
 
     vp = (NodeGuardedViewport *)self->viewport;
     style = self->styleConfig;
@@ -769,14 +775,14 @@ void ObjM__EnterStyleSession(ObjM *self) {
     } else {
         channels = flashColor;
     }
-    m2->startFadeDown(fade, self->unk10, channels, 0);
+    m2->startFadeDown(fade, self->frameClock, channels, 0);
 }
 
 /* Defined below, in the style layer. */
 extern s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue);
 
 void ObjM__TickStyle(ObjM *self) {
-    TickStyle(((StageMap *)self->unk14)->methods->getTargetDescriptor((StageMap *)self->unk14, 0, 0),
+    TickStyle(((StageMap *)self->lightRig)->methods->getTargetDescriptor((StageMap *)self->lightRig, 0, 0),
               0, 0);
 }
 
@@ -787,27 +793,27 @@ void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code) {
     if (self->state == 0) {
         switch (code) {
             case DREAMSYS_TIME_UP:
-                self->methods->enterState4(self);
+                self->methods->enterTimeUp(self);
                 break;
             case DREAMSYS_LINK_DAY_START:
                 break;
             case DREAMSYS_LINK_DYNAMIC:
-                self->methods->enterState5(self);
+                self->methods->enterLinkDynamic(self);
                 break;
             case DREAMSYS_LINK_WALL:
-                self->methods->enterState6(self);
+                self->methods->enterLinkWall(self);
                 break;
             case DREAMSYS_LINK_FLASHBACK:
-                self->methods->enterState7(self);
+                self->methods->enterLinkFlashback(self);
                 break;
             case DREAMSYS_LINK_TUNNEL:
-                self->methods->enterState8(self);
+                self->methods->enterLinkTunnel(self);
                 break;
             case DREAMSYS_LINK_STAGE_TIMER:
-                self->methods->enterStateA(self);
+                self->methods->enterLinkStageTimer(self);
                 break;
             case DREAMSYS_LINK_TELEPORT:
-                self->methods->notifyParentsCodeB(self);
+                self->methods->notifyLinkTeleport(self);
                 break;
         }
     } else if (code >= 9) {
@@ -815,7 +821,7 @@ void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code) {
     }
 }
 
-void ObjM__EnterState4(ObjM *self) {
+void ObjM__EnterTimeUp(ObjM *self) {
     DreamColors color;
     s32 phase;
     s32 t;
@@ -848,11 +854,11 @@ void ObjM__EnterState4(ObjM *self) {
     ObjM__StartFadeUp(self, DREAM_COLOR_BLACK, 0, 5, 1);
 }
 
-void ObjM__EnterState5(ObjM *self) {
+void ObjM__EnterLinkDynamic(ObjM *self) {
     s32 color;
 
     if (self->dreamSys->currentStage < 0) {
-        self->methods->enterState6(self);
+        self->methods->enterLinkWall(self);
     } else {
         self->state = 5;
         color = self->dreamSys->methods->getDreamColor(self->dreamSys);
@@ -861,7 +867,7 @@ void ObjM__EnterState5(ObjM *self) {
     }
 }
 
-void ObjM__EnterState6(ObjM *self) {
+void ObjM__EnterLinkWall(ObjM *self) {
     s32 color;
 
     self->state = 6;
@@ -877,7 +883,7 @@ void ObjM__EnterState6(ObjM *self) {
  * the stage's scene style.
  *
  * ObjM, in ROM order:
- *  - EnterState7/8/A and NotifyParentsCodeB, the DreamSys link codes
+ *  - EnterLinkFlashback, EnterLinkTunnel, EnterLinkStageTimer and NotifyLinkTeleport, the DreamSys link codes
  *    ObjM__OnDreamSysNotify hands on (flashback, tunnel, stage timer,
  *    teleport): each sets IntermediateBase::state (enum ObjMState) and
  *    fades up through StartFadeUp, or notifies its parent at once.
@@ -890,7 +896,7 @@ void ObjM__EnterState6(ObjM *self) {
  *  - The pause overlay: AdvancePauseSetup builds the "Pause" TextRow and,
  *    four calls later, hides the viewport and pauses the FrameClock, the
  *    WBgm and the VabStreamObj; TeardownPauseOverlay undoes it. While it is
- *    up and ObjM is IDLE, the close-ready flag arms CloseAndNotifyC/D,
+ *    up and ObjM is IDLE, the close-ready flag arms CloseAndNotify and CloseAndNotifyNewGame,
  *    which tear it down and notify a close (DayTask ends the day).
  *    NoOpSlotBC is empty.
  *
@@ -921,7 +927,7 @@ extern char sPauseText[];             /* "Pause" */
 extern ScreenSpritePos sPauseTextPos; /* (-20, -50) */
 extern SpriteRgb sPauseTextColor;     /* red: (255, 0, 0) */
 
-void ObjM__EnterState7(ObjM *self) {
+void ObjM__EnterLinkFlashback(ObjM *self) {
     DreamColors color;
     self->state = OBJM_STATE_LINK_FLASHBACK;
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &color, -1);
@@ -929,25 +935,25 @@ void ObjM__EnterState7(ObjM *self) {
     self->dreamSys->methods->blockMovement(self->dreamSys);
 }
 
-void ObjM__EnterState8(ObjM *self) {
+void ObjM__EnterLinkTunnel(ObjM *self) {
     self->state = OBJM_STATE_LINK_TUNNEL;
     ObjM__StartFadeUp(self, DREAM_COLOR_BLACK, 0, 6, 1);
     self->dreamSys->methods->setMoveOverride(self->dreamSys, MOVE_OVERRIDE_FORCED);
 }
 
-void ObjM__EnterStateA(ObjM *self) {
+void ObjM__EnterLinkStageTimer(ObjM *self) {
     self->state = OBJM_STATE_LINK_STAGE_TIMER;
     ObjM__StartFadeUp(self, DREAM_COLOR_BLACK, 0, 6, 1);
-    self->dreamSys->methods->selectCallback98(self->dreamSys, MOVE_CALLBACK_TICK_DRIFT);
+    self->dreamSys->methods->selectMoveCallback(self->dreamSys, MOVE_CALLBACK_TICK_DRIFT);
     self->dreamSys->methods->setMoveOverride(self->dreamSys, MOVE_OVERRIDE_HELD);
 }
 
-void ObjM__NotifyParentsCodeB(ObjM *self) {
+void ObjM__NotifyLinkTeleport(ObjM *self) {
     self->methods->notifyParents(self, OBJM_NOTIFY_LINK_TELEPORT);
 }
 
 /* The fade box is the viewport's (IntermediateBase::viewport, a
- * NodeGuardedViewport: getFadeBox); IntermediateBase::unk10, the FrameClock,
+ * NodeGuardedViewport: getFadeBox); IntermediateBase::frameClock, the FrameClock,
  * drives it. A zero step keeps the box's own. */
 void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 fadeMode, s32 step, s32 addChild) {
     FadeBox *fade = (FadeBox *)((NodeGuardedViewport *)self->viewport)
@@ -958,7 +964,7 @@ void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 fadeMode, s32 step, s32 add
     if (addChild != 0) {
         self->methods->addChild(self, (BasicClass *)fade);
     }
-    fade->methods->startFadeUp(fade, self->unk10, channels, fadeMode);
+    fade->methods->startFadeUp(fade, self->frameClock, channels, fadeMode);
 }
 
 void ObjM__OnFadeNotify(ObjM *self, FadeBox *sender, s32 event) {
@@ -998,8 +1004,8 @@ void ObjM__OnStageMapNotify(ObjM *self, BasicClass *sender, s32 event) {
 s32 ObjM__CheckAuxTrigger(ObjM *self) {
     ChunkCoord coord;
     s32 held;
-    ChunkSlot *slot =
-        ((StageMap *)self->unk14)->methods->getLastEventSlotChunk((StageMap *)self->unk14, &coord.column);
+    ChunkSlot *slot = ((StageMap *)self->lightRig)
+                          ->methods->getLastEventSlotChunk((StageMap *)self->lightRig, &coord.column);
     s32 day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     held = TryDreamAuxTrigger((s32)slot->loader->dataBuffer, (s16 *)&coord, day); /* the coord is the trigger key */
     slot->heldObj = (BasicClass *)held;
@@ -1022,14 +1028,14 @@ void ObjM__ClearCloseReadyFlag(ObjM *self) {
     self->closeReady = 0;
 }
 
-void ObjM__CloseAndNotifyD(ObjM *self) {
+void ObjM__CloseAndNotifyNewGame(ObjM *self) {
     if (self->closeReady) {
         self->methods->teardownPauseOverlay(self);
         self->methods->notifyParents(self, OBJM_NOTIFY_CLOSE_NEW_GAME);
     }
 }
 
-void ObjM__CloseAndNotifyC(ObjM *self) {
+void ObjM__CloseAndNotify(ObjM *self) {
     if (self->closeReady) {
         self->methods->teardownPauseOverlay(self);
         self->methods->notifyParents(self, OBJM_NOTIFY_CLOSE);
@@ -1039,12 +1045,12 @@ void ObjM__CloseAndNotifyC(ObjM *self) {
 /* Called each update while the overlay is up. Step 0 builds the "Pause"
  * TextRow under the StageMap; the fourth call after it hides the viewport
  * and pauses the FrameClock, the WBgm and the VabStreamObj
- * (IntermediateBase::unk10, bgm, TimedTask::sound). */
+ * (IntermediateBase::frameClock, bgm, TimedTask::sound). */
 void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 step = self->pauseSetupStep;
     if (step == 0) {
         self->pauseText = New_TextRow(self->etcTim, 5, sPauseText);
-        self->pauseText->methods->attachToParent(self->pauseText, (SceneNode *)self->unk14,
+        self->pauseText->methods->attachToParent(self->pauseText, (SceneNode *)self->lightRig,
                                                  (LongVec3 *)&sPauseTextPos);
         self->pauseText->methods->setColor(self->pauseText, &sPauseTextColor);
         self->pauseSetupStep = step + 1;
@@ -1055,7 +1061,7 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
         return;
     }
     ((NodeGuardedViewport *)self->viewport)->methods->setDrawEnabled((NodeGuardedViewport *)self->viewport, 0);
-    ((FrameClock *)self->unk10)->methods->pause((FrameClock *)self->unk10);
+    ((FrameClock *)self->frameClock)->methods->pause((FrameClock *)self->frameClock);
     self->bgm->methods->pause(self->bgm);
     ((VabStreamObj *)self->sound)->methods->mute((VabStreamObj *)self->sound);
 }
@@ -1066,7 +1072,7 @@ void ObjM__TeardownPauseOverlay(ObjM *self) {
     }
     ((VabStreamObj *)self->sound)->methods->unmute((VabStreamObj *)self->sound);
     self->bgm->methods->resume(self->bgm);
-    ((FrameClock *)self->unk10)->methods->resume((FrameClock *)self->unk10);
+    ((FrameClock *)self->frameClock)->methods->resume((FrameClock *)self->frameClock);
     ((NodeGuardedViewport *)self->viewport)->methods->setDrawEnabled((NodeGuardedViewport *)self->viewport, 1);
     self->pauseSetupStep = 0;
 }
@@ -1075,16 +1081,16 @@ ObjMMethods *GetObjMMethods(void) {
     return &gObjMMethods;
 }
 
-extern s32 gStyleGrid;
-extern s32 gStyleStage;
-extern s32 gStyleTickCount;
-extern s32 gStyleDay;
+extern s32 sStyleGrid;
+extern s32 sStyleStage;
+extern s32 sStyleTickCount;
+extern s32 sStyleDay;
 extern s32 sStyleUnreadArg;
-extern s32 gStyleSceneRefs; /* a StyleSceneRefs * (below) */
-extern s32 gStyleVariant;
+extern s32 sStyleSceneRefs; /* a StyleSceneRefs * (below) */
+extern s32 sStyleVariant;
 /* StyleCueSlot is defined with the cue functions below; this only clears the slots. */
 typedef struct StyleCueSlot StyleCueSlot;
-extern StyleCueSlot *gStyleCueSlots[2];
+extern StyleCueSlot *sStyleCueSlots[2];
 
 extern void *ApplyStyleConfig(void);
 
@@ -1092,16 +1098,16 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
     StyleCueSlot **slot;
     s32 i;
 
-    if (gStyleGrid == 0) {
-        i = ARRAY_COUNT(gStyleCueSlots) - 1;
-        slot = &gStyleCueSlots[ARRAY_COUNT(gStyleCueSlots) - 1];
-        gStyleGrid = grid;
-        gStyleStage = stage;
-        gStyleSceneRefs = sceneRefs;
-        gStyleVariant = -1;
-        gStyleDay = day;
+    if (sStyleGrid == 0) {
+        i = ARRAY_COUNT(sStyleCueSlots) - 1;
+        slot = &sStyleCueSlots[ARRAY_COUNT(sStyleCueSlots) - 1];
+        sStyleGrid = grid;
+        sStyleStage = stage;
+        sStyleSceneRefs = sceneRefs;
+        sStyleVariant = -1;
+        sStyleDay = day;
         sStyleUnreadArg = unreadArg;
-        gStyleTickCount = 0;
+        sStyleTickCount = 0;
         do {
             *slot = 0;
             i--;
@@ -1119,8 +1125,8 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
 typedef struct StyleStageConfig {
     s8 colorMode; /* StyleConfig::colorMode */
     s8 fogLevel; /* sStyleFogNears index; STYLE_DECOR_FOG_LEVEL and up also build the decoration box */
-    s8 farColorIndex; /* gStylePalette index: StyleConfig::farColor, and the decoration box's colour */
-    s8 clearColorIndex; /* gStylePalette index: StyleConfig::clearColor */
+    s8 farColorIndex; /* sStylePalette index: StyleConfig::farColor, and the decoration box's colour */
+    s8 clearColorIndex; /* sStylePalette index: StyleConfig::clearColor */
 } StyleStageConfig;
 
 /* The fog levels whose config also gets a decoration box (ApplyStyleConfig):
@@ -1131,39 +1137,39 @@ extern StyleConfig sStyleConfig;
 extern StyleStageConfig *sStyleStageConfigs[];
 extern void *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg);
-extern u8 gStylePalette[][3];
-extern const u8 *gStyleDecorColor;
+extern u8 sStylePalette[][3];
+extern const u8 *sStyleDecorColor;
 
 /* The stage's fixed config, or with none PickStyleFallbackConfig's, into
  * sStyleConfig, whose first three words (the StageMap's light settings)
  * are fixed. */
 void *ApplyStyleConfig(void) {
-    StyleStageConfig *cfg = sStyleStageConfigs[gStyleStage];
+    StyleStageConfig *cfg = sStyleStageConfigs[sStyleStage];
 
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
     }
     FillStyleFromConfig(&sStyleConfig, cfg);
     if (cfg->fogLevel >= STYLE_DECOR_FOG_LEVEL) {
-        gStyleDecorColor = gStylePalette[cfg->farColorIndex];
+        sStyleDecorColor = sStylePalette[cfg->farColorIndex];
     }
     return &sStyleConfig;
 }
 
-/* gStylePalette is 24 RGB triples (a greyscale ramp first: 0, 64, 128, 255).
+/* sStylePalette is 24 RGB triples (a greyscale ramp first: 0, 64, 128, 255).
  * MATCHING: indexed as `u8[][3]`, for retail's `i*2 + i + base` stride-3
  * address arithmetic. sStyleFogNears is six fogNear distances, 26624 down to
  * 2048. */
 extern s32 sStyleFogNears[];
 
 void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg) {
-    style->clearColor = gStylePalette[cfg->clearColorIndex];
-    style->farColor = gStylePalette[cfg->farColorIndex];
+    style->clearColor = sStylePalette[cfg->clearColorIndex];
+    style->farColor = sStylePalette[cfg->farColorIndex];
     style->fogNear = sStyleFogNears[cfg->fogLevel];
     style->colorMode = cfg->colorMode;
 }
 
-/* What gStyleSceneRefs points at: ObjM's +0x06C..+0x07B block
+/* What sStyleSceneRefs points at: ObjM's +0x06C..+0x07B block
  * (ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
  * keeps it; include/ObjM.h). */
 typedef struct StyleSceneRefs {
@@ -1173,23 +1179,23 @@ typedef struct StyleSceneRefs {
     Viewport *viewport; /* +0x00C, ObjM::cachedViewport */
 } StyleSceneRefs;
 
-extern s32 gStyleDecorObj;           /* a BoxFill * */
+extern s32 sStyleDecorObj;           /* a BoxFill * */
 extern s32 sStyleDecorBoxSize[2];    /* 320 x 240, the screen */
 extern BoxFillPos sStyleDecorBoxPos; /* (-100, -100), as Viewport's own fade box */
 
 void ApplyStyleDecorationIfSet(void) {
     SceneNode *fadeBox;
 
-    if (gStyleDecorColor != 0) {
-        gStyleDecorObj = (s32)New_BoxFill(sStyleDecorBoxSize, (BoxFillRgb *)gStyleDecorColor, 0);
-        ((BoxFill *)gStyleDecorObj)->methods->setSemiTransOn((BoxFill *)gStyleDecorObj, 1);
-        ((BoxFill *)gStyleDecorObj)->methods->setSemiTransRate((BoxFill *)gStyleDecorObj, 0);
+    if (sStyleDecorColor != 0) {
+        sStyleDecorObj = (s32)New_BoxFill(sStyleDecorBoxSize, (BoxFillRgb *)sStyleDecorColor, 0);
+        ((BoxFill *)sStyleDecorObj)->methods->setSemiTransOn((BoxFill *)sStyleDecorObj, 1);
+        ((BoxFill *)sStyleDecorObj)->methods->setSemiTransRate((BoxFill *)sStyleDecorObj, 0);
 
-        fadeBox = ((StyleSceneRefs *)gStyleSceneRefs)
-                      ->viewport->methods->getFadeBox(((StyleSceneRefs *)gStyleSceneRefs)->viewport);
+        fadeBox = ((StyleSceneRefs *)sStyleSceneRefs)
+                      ->viewport->methods->getFadeBox(((StyleSceneRefs *)sStyleSceneRefs)->viewport);
 
-        ((BoxFillAttachToParentFn)((BoxFill *)gStyleDecorObj)->methods->attachToParent)(
-            (BoxFill *)gStyleDecorObj, fadeBox, &sStyleDecorBoxPos);
+        ((BoxFillAttachToParentFn)((BoxFill *)sStyleDecorObj)->methods->attachToParent)(
+            (BoxFill *)sStyleDecorObj, fadeBox, &sStyleDecorBoxPos);
     }
 }
 
@@ -1200,29 +1206,29 @@ void ApplyStyleDecorationIfSet(void) {
  * releases.
  *
  * RegisterStyleConfig (previous section), called by ObjM__InitStyleAndWorld
- * and a no-op until StyleTeardown clears gStyleGrid, sets the state read here: gStyleGrid (the
- * scene's StageMap), gStyleStage (ObjM's stage), gStyleSceneRefs (ObjM's
- * sound, resources and viewport; StyleSceneRefs below) and gStyleDay (the
+ * and a no-op until StyleTeardown clears sStyleGrid, sets the state read here: sStyleGrid (the
+ * scene's StageMap), sStyleStage (ObjM's stage), sStyleSceneRefs (ObjM's
+ * sound, resources and viewport; StyleSceneRefs below) and sStyleDay (the
  * DreamSys day). ApplyStyleConfig then takes the stage's fixed config or,
- * with none, PickStyleFallbackConfig's: a variant (gStyleVariant, 0..3) and
+ * with none, PickStyleFallbackConfig's: a variant (sStyleVariant, 0..3) and
  * a config record picked from day + stage.
  *
  * What TickStyle keeps, each built on the first tick:
- *  - the decoration box, gStyleDecorObj, when the config has a colour for
+ *  - the decoration box, sStyleDecorObj, when the config has a colour for
  *    it (ApplyStyleDecorationIfSet builds it, StyleFlushDecoration releases it);
- *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (gStyleDecorSlots)
- *    coloured from gStyleDecorColors and attached under the viewport's fade
+ *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (sStyleDecorSlots)
+ *    coloured from sStyleDecorColors and attached under the viewport's fade
  *    box; every tick StyleUpdateDecorSet shifts their colours, their
  *    position and the viewport's clear colour by the view point's y offset
  *    from its reference point;
- *  - the effect slots: StyleEffect objects of kinds 0..3 (gStyleEffectSlots)
- *    built from one parameter block, gStyleSpawnOffsetX..gStyleSpawnColors,
- *    that StyleFillEffectKindN and SetupStyleSpawnParamsA/B fill in; each
+ *  - the effect slots: StyleEffect objects of kinds 0..3 (sStyleEffectSlots)
+ *    built from one parameter block, sStyleSpawnOffsetX..sStyleSpawnColors,
+ *    that StyleFillEffectKindN and SetupStyleSpawnParamsRandom/B fill in; each
  *    tick updates them with the target position;
- *  - two positional sound cues (gStyleCueSlots, in gStyleCueSlotPool): a
+ *  - two positional sound cues (sStyleCueSlots, in sStyleCueSlotPool): a
  *    free slot claims the next record of the stage's cue list that lies
  *    within its cue's distance of the target and starts the record's
- *    SoundCueSet callback (gStyleCueCallbacks, next section); a claimed
+ *    SoundCueSet callback (sStyleCueCallbacks, next section); a claimed
  *    slot is serviced while the target stays in range and flushed when it
  *    leaves.
  * StyleScrollVramStrips also rotates a VRAM strip one column per tick on
@@ -1253,29 +1259,29 @@ void ApplyStyleDecorationIfSet(void) {
 #define STYLE_VARIANT2_EFFECTS 16
 
 /* The palette entry that, as a variant-0 config's decor colour, selects
- * gStyleDecorColorsB instead of gStyleDecorColorsA (PickStyleFallbackConfig). */
+ * sStyleDecorColorsB instead of sStyleDecorColorsA (PickStyleFallbackConfig). */
 #define STYLE_DECOR_B_PALETTE_INDEX 18
 
 /* Releases the decoration box, if ApplyStyleDecorationIfSet made one. */
 void StyleFlushDecoration(void) {
-    if (gStyleDecorColor != 0) {
-        ((BoxFill *)gStyleDecorObj)->methods->release((BoxFill *)gStyleDecorObj);
-        gStyleDecorColor = 0;
+    if (sStyleDecorColor != 0) {
+        ((BoxFill *)sStyleDecorObj)->methods->release((BoxFill *)sStyleDecorObj);
+        sStyleDecorColor = 0;
     }
 }
 
-extern s8 gStyleVariantPicks[];
-extern s8 gStyleVariantConfigCounts[];
-extern s32 gStyleConfigIndex;
-extern s8 *gStyleVariantConfigs[];
-extern const u8 *gStyleClearColor;
-extern u8 gStyleDecorColorsB[];
-extern const u8 *gStyleDecorColors;
-extern u8 gStyleDecorColorsA[];
-extern s32 gStyleDecorVariant;
+extern s8 sStyleVariantPicks[];
+extern s8 sStyleVariantConfigCounts[];
+extern s32 sStyleConfigIndex;
+extern s8 *sStyleVariantConfigs[];
+extern const u8 *sStyleClearColor;
+extern u8 sStyleDecorColorsB[];
+extern const u8 *sStyleDecorColors;
+extern u8 sStyleDecorColorsA[];
+extern s32 sStyleDecorVariant;
 
 /* The config for a stage without a fixed one: the variant from
- * gStyleVariantPicks[(day + stage) & 0xF], then record (day + stage) % count
+ * sStyleVariantPicks[(day + stage) & 0xF], then record (day + stage) % count
  * of that variant's table. For variant 0 it also sets the clear colour, the
  * band colours and, for records 0..5, the decor variant (1, or 2 for 4..5). */
 void *PickStyleFallbackConfig(void) {
@@ -1288,38 +1294,38 @@ void *PickStyleFallbackConfig(void) {
     s32 decorIndex;
     u8 *decorColors;
 
-    seed = gStyleDay + gStyleStage;
-    variant = gStyleVariantPicks[seed & 0xF];
-    gStyleVariant = variant;
-    count = gStyleVariantConfigCounts[variant];
+    seed = sStyleDay + sStyleStage;
+    variant = sStyleVariantPicks[seed & 0xF];
+    sStyleVariant = variant;
+    count = sStyleVariantConfigCounts[variant];
     index = seed % count;
-    gStyleConfigIndex = index;
-    config = gStyleVariantConfigs[variant] + index * 4;
+    sStyleConfigIndex = index;
+    config = sStyleVariantConfigs[variant] + index * 4;
     if (variant == 0) {
         clearIndex = config[3];
-        gStyleClearColor = gStylePalette[clearIndex];
+        sStyleClearColor = sStylePalette[clearIndex];
         decorIndex = config[2];
-        decorColors = gStyleDecorColorsB;
+        decorColors = sStyleDecorColorsB;
         if (decorIndex != STYLE_DECOR_B_PALETTE_INDEX) {
-            decorColors = gStyleDecorColorsA;
+            decorColors = sStyleDecorColorsA;
         }
-        gStyleDecorColors = decorColors;
+        sStyleDecorColors = decorColors;
         if (index < 4) {
-            gStyleDecorVariant = 1;
+            sStyleDecorVariant = 1;
         } else if (index < 6) {
-            gStyleDecorVariant = 2;
+            sStyleDecorVariant = 2;
         }
     }
     return config;
 }
 
-extern s32 gStyleDecorPosX;
-extern s32 gStyleDecorPosY;
-extern s32 gStyleDecorSizeW;
-extern s32 gStyleDecorSizeH;
-extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
+extern s32 sStyleDecorPosX;
+extern s32 sStyleDecorPosY;
+extern s32 sStyleDecorSizeW;
+extern s32 sStyleDecorSizeH;
+extern BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
 
-/* gStyleDecorPosX/Y and gStyleDecorSizeW/H are adjacent word pairs.
+/* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs.
  * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
  * drop cached memory values; scalar copies lose retail's reloads). */
 typedef struct PairXY PairXY;
@@ -1329,7 +1335,7 @@ struct PairXY {
     s32 y; /* +0x004 */
 };
 
-/* Builds the bands: band 0 in gStyleDecorColors' first colour, bands 1..17
+/* Builds the bands: band 0 in sStyleDecorColors' first colour, bands 1..17
  * attached under it, each 3 pixels lower and 7 shorter than the one before;
  * band 0 then goes under the viewport's fade box. */
 void StyleBuildDecorSet(void) {
@@ -1340,28 +1346,28 @@ void StyleBuildDecorSet(void) {
     Viewport *viewport;
     SceneNode *parent;
 
-    if (gStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == 0) {
         return;
     }
-    pos = *(PairXY *)&gStyleDecorPosX;
-    if (gStyleDecorVariant == 2) {
+    pos = *(PairXY *)&sStyleDecorPosX;
+    if (sStyleDecorVariant == 2) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
-    size = *(PairXY *)&gStyleDecorSizeW;
-    gStyleDecorSlots[0] = New_BoxFill(&size, (void *)gStyleDecorColors, STYLE_DECOR_PRI);
+    size = *(PairXY *)&sStyleDecorSizeW;
+    sStyleDecorSlots[0] = New_BoxFill(&size, (void *)sStyleDecorColors, STYLE_DECOR_PRI);
     for (i = 1; i < STYLE_DECOR_BANDS; i++) {
-        band = New_BoxFill(&size, (void *)(gStyleDecorColors + i * 3), STYLE_DECOR_PRI);
-        gStyleDecorSlots[i] = band;
+        band = New_BoxFill(&size, (void *)(sStyleDecorColors + i * 3), STYLE_DECOR_PRI);
+        sStyleDecorSlots[i] = band;
         ((BoxFillAttachToParentFn)band->methods->attachToParent)(
-            band, (SceneNode *)gStyleDecorSlots[0], (BoxFillPos *)&pos);
+            band, (SceneNode *)sStyleDecorSlots[0], (BoxFillPos *)&pos);
         pos.y += 3;
         size.y -= 7;
     }
 
-    viewport = ((StyleSceneRefs *)gStyleSceneRefs)->viewport;
+    viewport = ((StyleSceneRefs *)sStyleSceneRefs)->viewport;
     parent = viewport->methods->getFadeBox(viewport);
-    ((BoxFillAttachToParentFn)gStyleDecorSlots[0]->methods->attachToParent)(
-        gStyleDecorSlots[0], parent, (BoxFillPos *)&pos);
+    ((BoxFillAttachToParentFn)sStyleDecorSlots[0]->methods->attachToParent)(
+        sStyleDecorSlots[0], parent, (BoxFillPos *)&pos);
 }
 
 void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta);
@@ -1381,25 +1387,25 @@ void StyleUpdateDecorSet(void) {
     BoxFill **slot;
     BoxFill *band;
 
-    if (gStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == 0) {
         return;
     }
-    viewport = ((StyleSceneRefs *)gStyleSceneRefs)->viewport;
+    viewport = ((StyleSceneRefs *)sStyleSceneRefs)->viewport;
     height = viewport->refView.vp.y - viewport->refView.vr.y;
     fade = (height / STYLE_DECOR_FADE_HEIGHT) * 3;
     if (fade <= 0) {
         return;
     }
-    pos = *(PairXY *)&gStyleDecorPosX;
+    pos = *(PairXY *)&sStyleDecorPosX;
     i = 0;
-    if (gStyleDecorVariant == 2) {
+    if (sStyleDecorVariant == 2) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
-    slot = gStyleDecorSlots;
+    slot = sStyleDecorSlots;
     colorOfs = 0;
     pos.y += fade * 3;
     do {
-        AdjustRgbByDelta(rgb, (u8 *)(colorOfs + gStyleDecorColors), fade);
+        AdjustRgbByDelta(rgb, (u8 *)(colorOfs + sStyleDecorColors), fade);
         band = *slot;
         band->methods->setColor(band, 1, rgb);
         band = *slot;
@@ -1409,7 +1415,7 @@ void StyleUpdateDecorSet(void) {
         pos.y += 3;
         slot++;
     } while (i < STYLE_DECOR_BANDS);
-    AdjustRgbByDelta(rgb, (u8 *)gStyleClearColor, fade);
+    AdjustRgbByDelta(rgb, (u8 *)sStyleClearColor, fade);
     viewport->methods->setClearColor(viewport, (ViewportRgb *)rgb);
 }
 
@@ -1422,22 +1428,22 @@ void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
 
 /* Releases the bands, if StyleBuildDecorSet made them. */
 void StyleReleaseDecorSet(void) {
-    if (gStyleDecorVariant != 0) {
-        ReleaseBasicClassArray((BasicClass **)gStyleDecorSlots, ARRAY_COUNT(gStyleDecorSlots));
-        gStyleDecorVariant = 0;
+    if (sStyleDecorVariant != 0) {
+        ReleaseBasicClassArray((BasicClass **)sStyleDecorSlots, ARRAY_COUNT(sStyleDecorSlots));
+        sStyleDecorVariant = 0;
     }
 }
 
-extern s8 gStyleKind0Counts[];
-extern s32 gStyleEffectSlotCount;
-extern StyleEffect *gStyleEffectSlots[];
+extern s8 sStyleKind0Counts[];
+extern s32 sStyleEffectSlotCount;
+extern StyleEffect *sStyleEffectSlots[];
 extern StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos);
 extern StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos);
 extern StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos);
 extern StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos);
 
 /* Hands the variant and ObjM's resources to SetStyleEffectSources, then builds
- * the effect slots for the variant: gStyleKind0Counts' pick of
+ * the effect slots for the variant: sStyleKind0Counts' pick of
  * kind 0, kind 1 up to STYLE_VARIANT2_EFFECTS for variant 2, then one kind-3
  * (variant 0) or kind-2 (variant 2). */
 void StyleBuildEffectSlots(LongVec3 *pos) {
@@ -1446,25 +1452,25 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
     s32 kind1Count;
     StyleEffect **next;
 
-    if (gStyleVariant < 0) {
+    if (sStyleVariant < 0) {
         return;
     }
-    refs = (StyleSceneRefs *)gStyleSceneRefs;
-    SetStyleEffectSources(gStyleVariant, (Actor *)refs->dreamerTmd, (s32)refs->etcTim,
+    refs = (StyleSceneRefs *)sStyleSceneRefs;
+    SetStyleEffectSources(sStyleVariant, (Actor *)refs->dreamerTmd, (s32)refs->etcTim,
                           (s32)refs->viewport);
-    kind0Count = gStyleKind0Counts[rand() & 3];
-    kind1Count = (gStyleVariant == 2) ? STYLE_VARIANT2_EFFECTS - kind0Count : 0;
-    gStyleEffectSlotCount = kind0Count + kind1Count;
-    next = StyleFillEffectKind0(gStyleEffectSlots, kind0Count, pos);
+    kind0Count = sStyleKind0Counts[rand() & 3];
+    kind1Count = (sStyleVariant == 2) ? STYLE_VARIANT2_EFFECTS - kind0Count : 0;
+    sStyleEffectSlotCount = kind0Count + kind1Count;
+    next = StyleFillEffectKind0(sStyleEffectSlots, kind0Count, pos);
     next = StyleFillEffectKind1(next, kind1Count, pos);
-    if (gStyleVariant == 0) {
+    if (sStyleVariant == 0) {
         StyleFillEffectKind3(next, pos);
-    } else if (gStyleVariant == 2) {
+    } else if (sStyleVariant == 2) {
         StyleFillEffectKind2(next, pos);
     } else {
         return;
     }
-    gStyleEffectSlotCount = gStyleEffectSlotCount + 1;
+    sStyleEffectSlotCount = sStyleEffectSlotCount + 1;
 }
 
 /* Each slot's +0x0EC is StyleEffect__Update, called with the position
@@ -1473,24 +1479,24 @@ void StyleUpdateEffectSlots(LongVec3 *pos) {
     s32 i;
     StyleEffect *slot;
 
-    if (gStyleVariant < 0) {
+    if (sStyleVariant < 0) {
         return;
     }
-    for (i = 0; i < gStyleEffectSlotCount; i++) {
-        slot = gStyleEffectSlots[i];
+    for (i = 0; i < sStyleEffectSlotCount; i++) {
+        slot = sStyleEffectSlots[i];
         ((StyleEffectUpdateFn)slot->methods->setPendingExtra)(slot, pos);
     }
 }
 
 /* Releases the effect slots, if StyleBuildEffectSlots ran. */
 void StyleReleaseEffectSlots(void) {
-    if (gStyleVariant >= 0) {
-        ReleaseBasicClassArray((BasicClass **)gStyleEffectSlots, gStyleEffectSlotCount);
+    if (sStyleVariant >= 0) {
+        ReleaseBasicClassArray((BasicClass **)sStyleEffectSlots, sStyleEffectSlotCount);
     }
 }
 
-/* A cue record's view here: `cue` is its cue index (the gStyleCueCallbacks
- * and gStyleCueDistanceTable row, InitSoundCueSet's tag), negated while a
+/* A cue record's view here: `cue` is its cue index (the sStyleCueCallbacks
+ * and sStyleCueDistanceTable row, InitSoundCueSet's tag), negated while a
  * slot holds the record. EntrySlot, below, is the whole 8-byte record. */
 typedef struct StyleCueEntryView StyleCueEntryView;
 
@@ -1517,81 +1523,81 @@ void StyleTeardown(void) {
     StyleFlushDecoration();
     StyleReleaseDecorSet();
     StyleReleaseEffectSlots();
-    for (i = 0; i < ARRAY_COUNT(gStyleCueSlots); i++) {
-        gStyleCueSlots[i] = FlushStyleCue(gStyleCueSlots[i]);
+    for (i = 0; i < ARRAY_COUNT(sStyleCueSlots); i++) {
+        sStyleCueSlots[i] = FlushStyleCue(sStyleCueSlots[i]);
     }
-    if (gStyleGrid != 0) {
-        gStyleGrid = 0; /* RegisterStyleConfig registers only while this is 0 */
+    if (sStyleGrid != 0) {
+        sStyleGrid = 0; /* RegisterStyleConfig registers only while this is 0 */
     }
 }
 
-extern Ratio16 gStyleSpawnScales[][3];
-extern s32 gStyleSpawnYChoices[];
-extern Ratio16 *gStyleSpawnScale;
-extern s32 gStyleSpawnTableIndex;
+extern Ratio16 sStyleSpawnScales[][3];
+extern s32 sStyleSpawnYChoices[];
+extern Ratio16 *sStyleSpawnScale;
+extern s32 sStyleSpawnTableIndex;
 /* The first word of the StyleEffectParams block every effect is built from
- * (gStyleSpawnOffsetX .. gStyleSpawnColors, separate symbols in the image). */
-extern s32 gStyleSpawnOffsetX;
-extern void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY);
-extern void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY);
+ * (sStyleSpawnOffsetX .. sStyleSpawnColors, separate symbols in the image). */
+extern s32 sStyleSpawnOffsetX;
+extern void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY);
+extern void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY);
 
 /* Fills `count` slots with kind-0 effects: a table index and scale for all
  * of them, an offset y (0: each setup picks one; a pick of 4 reads the word
- * after gStyleSpawnYChoices, as retail does), and per slot
- * SetupStyleSpawnParamsA, or B on every seventh day. Returns the next slot. */
+ * after sStyleSpawnYChoices, as retail does), and per slot
+ * SetupStyleSpawnParamsRandom, or B on every seventh day. Returns the next slot. */
 StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
     void (*setup)(LongVec3 *, s32);
 
-    gStyleSpawnTableIndex = rand() % 7;
-    gStyleSpawnScale = gStyleSpawnScales[(u32)rand() % 5];
+    sStyleSpawnTableIndex = rand() % 7;
+    sStyleSpawnScale = sStyleSpawnScales[(u32)rand() % 5];
     offsetY = (u32)rand() % 5;
     if (offsetY != 0) {
-        offsetY = gStyleSpawnYChoices[offsetY];
+        offsetY = sStyleSpawnYChoices[offsetY];
     }
-    setup = SetupStyleSpawnParamsB;
-    if (gStyleDay % 7 != 0) {
-        setup = SetupStyleSpawnParamsA;
+    setup = SetupStyleSpawnParamsDayMod7;
+    if (sStyleDay % 7 != 0) {
+        setup = SetupStyleSpawnParamsRandom;
     }
     for (i = 0; i < count; i++) {
         setup(pos, offsetY);
         *slots =
-            New_StyleEffect(0, (StyleEffectParams *)&gStyleSpawnOffsetX, (SceneNode *)gStyleGrid, pos);
+            New_StyleEffect(0, (StyleEffectParams *)&sStyleSpawnOffsetX, (SceneNode *)sStyleGrid, pos);
         slots++;
     }
     return slots;
 }
 
-extern s32 gStyleSpawnYChoice2;
-extern Ratio16 gStyleKind1Scale[];
+extern s32 sStyleSpawnYChoice2;
+extern Ratio16 sStyleKind1Scale[];
 
-/* Fills `count` slots with kind-1 effects: gStyleKind1Scale, offset y
- * gStyleSpawnYChoice2. */
+/* Fills `count` slots with kind-1 effects: sStyleKind1Scale, offset y
+ * sStyleSpawnYChoice2. */
 StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
 
-    offsetY = gStyleSpawnYChoice2;
-    gStyleSpawnScale = gStyleKind1Scale;
+    offsetY = sStyleSpawnYChoice2;
+    sStyleSpawnScale = sStyleKind1Scale;
     for (i = 0; i < count; i++) {
-        SetupStyleSpawnParamsA(pos, offsetY);
+        SetupStyleSpawnParamsRandom(pos, offsetY);
         *slots =
-            New_StyleEffect(1, (StyleEffectParams *)&gStyleSpawnOffsetX, (SceneNode *)gStyleGrid, pos);
+            New_StyleEffect(1, (StyleEffectParams *)&sStyleSpawnOffsetX, (SceneNode *)sStyleGrid, pos);
         slots++;
     }
     return slots;
 }
 
-extern s32 gStyleSpawnColors[];
-extern Ratio16 *gStyleSpawnRotation;
-extern Ratio16 gStyleSpawnRotations[][3];
-extern s32 gStyleSpawnOffsetY;
-extern s32 gStyleSpawnOffsetZ;
-extern u8 gStyleKind3Colors[][3];
+extern s32 sStyleSpawnColors[];
+extern Ratio16 *sStyleSpawnRotation;
+extern Ratio16 sStyleSpawnRotations[][3];
+extern s32 sStyleSpawnOffsetY;
+extern s32 sStyleSpawnOffsetZ;
+extern u8 sStyleKind3Colors[][3];
 
 /* MATCHING: the rotation store goes through a one-field struct, so the
- * gStyleGrid load may schedule above it (a plain pointer store blocks it). */
+ * sStyleGrid load may schedule above it (a plain pointer store blocks it). */
 typedef struct PtrBoxK3 {
     Ratio16 *p; /* +0x000 */
 } PtrBoxK3;
@@ -1603,43 +1609,43 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     s32 *offsetZ;
     PtrBoxK3 *rotation;
 
-    SetupStyleSpawnParamsA(pos, gStyleSpawnYChoice2);
-    if (gStyleDecorVariant != 0 && gStyleDecorColors == gStyleDecorColorsB) {
-        gStyleSpawnOffsetX = -45056;
-        gStyleSpawnOffsetY = -8192;
-        gStyleSpawnOffsetZ = 0;
-        gStyleSpawnColors[0] = (s32)gStyleKind3Colors[1];
+    SetupStyleSpawnParamsRandom(pos, sStyleSpawnYChoice2);
+    if (sStyleDecorVariant != 0 && sStyleDecorColors == sStyleDecorColorsB) {
+        sStyleSpawnOffsetX = -45056;
+        sStyleSpawnOffsetY = -8192;
+        sStyleSpawnOffsetZ = 0;
+        sStyleSpawnColors[0] = (s32)sStyleKind3Colors[1];
     } else {
-        offsetZ = &gStyleSpawnOffsetZ;
+        offsetZ = &sStyleSpawnOffsetZ;
         if (*offsetZ > 0) {
             *offsetZ = -*offsetZ;
         }
         if (*offsetZ < -30720) {
             *offsetZ = -30720;
         }
-        gStyleSpawnColors[0] = (s32)gStyleKind3Colors[(u32)rand() % 3];
+        sStyleSpawnColors[0] = (s32)sStyleKind3Colors[(u32)rand() % 3];
     }
-    rotation = (PtrBoxK3 *)&gStyleSpawnRotation;
-    rotation->p = gStyleSpawnRotations[0];
+    rotation = (PtrBoxK3 *)&sStyleSpawnRotation;
+    rotation->p = sStyleSpawnRotations[0];
     /* MATCHING: the block's address is taken back from its rotation member */
     *slots = New_StyleEffect(
         3, (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
-        (SceneNode *)gStyleGrid, pos);
+        (SceneNode *)sStyleGrid, pos);
     slots++;
     return slots;
 }
 
-extern s32 gStyleKind2AltColor;
-extern u8 gStyleKind2Colors[][3];
+extern s32 sStyleKind2AltColor;
+extern u8 sStyleKind2Colors[][3];
 
 /* MATCHING: the first colour store goes through a one-field struct, as
- * PtrBoxK3's does, so the gStyleDay load may schedule above it. */
+ * PtrBoxK3's does, so the sStyleDay load may schedule above it. */
 typedef struct S32BoxK2 {
     s32 v; /* +0x000 */
 } S32BoxK2;
 
 /* Appends one kind-2 effect with a random colour and, except on every
- * twentieth day, gStyleKind2AltColor as its alternate colour. */
+ * twentieth day, sStyleKind2AltColor as its alternate colour. */
 StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     s32 r;
     s32 altColor;
@@ -1647,79 +1653,80 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     Ratio16 **rotation;
 
     r = rand();
-    color = (S32BoxK2 *)gStyleSpawnColors;
-    color->v = (s32)gStyleKind2Colors[(u32)r % 3];
+    color = (S32BoxK2 *)sStyleSpawnColors;
+    color->v = (s32)sStyleKind2Colors[(u32)r % 3];
     color++;
-    altColor = (gStyleDay / 20) * 20; /* MATCHING: not `% 20`, which jump.c folds */
-    if (gStyleDay != altColor) {
-        altColor = gStyleKind2AltColor;
+    altColor = (sStyleDay / 20) * 20; /* MATCHING: not `% 20`, which jump.c folds */
+    if (sStyleDay != altColor) {
+        altColor = sStyleKind2AltColor;
     } else {
         altColor = 0;
     }
     color->v = altColor;
-    SetupStyleSpawnParamsA(pos, gStyleSpawnYChoice2);
-    rotation = &gStyleSpawnRotation;
-    *rotation = gStyleSpawnRotations[0];
-    gStyleSpawnTableIndex = rand() % 6;
+    SetupStyleSpawnParamsRandom(pos, sStyleSpawnYChoice2);
+    rotation = &sStyleSpawnRotation;
+    *rotation = sStyleSpawnRotations[0];
+    sStyleSpawnTableIndex = rand() % 6;
     /* MATCHING: the block's address is taken back from its rotation member */
     *slots = New_StyleEffect(
         2, (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
-        (SceneNode *)gStyleGrid, pos);
+        (SceneNode *)sStyleGrid, pos);
     slots++;
     return slots;
 }
 
-extern s32 gStyleSpawnModelLayout;
+extern s32 sStyleSpawnModelLayout;
 
 /* Randomises the spawn parameters: offset y (offsetY, or a random choice
  * when 0), x and z offsets of 0..22 steps of 2048 either side, a rotation
  * and a model layout. `pos` is unused.
- * MATCHING: gStyleSpawnOffsetX is declared a scalar, not an array (an array
+ * MATCHING: sStyleSpawnOffsetX is declared a scalar, not an array (an array
  * decay is kept in a saved register across the rand() calls). */
-void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY) {
+void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
     if (offsetY == 0) {
-        offsetY = gStyleSpawnYChoices[rand() & 3];
+        offsetY = sStyleSpawnYChoices[rand() & 3];
     }
-    gStyleSpawnOffsetY = offsetY;
-    gStyleSpawnOffsetX = (rand() % 23) << 11;
+    sStyleSpawnOffsetY = offsetY;
+    sStyleSpawnOffsetX = (rand() % 23) << 11;
     if (rand() & 1) {
-        gStyleSpawnOffsetX = -gStyleSpawnOffsetX;
+        sStyleSpawnOffsetX = -sStyleSpawnOffsetX;
     }
-    gStyleSpawnOffsetZ = (rand() % 23) << 11;
+    sStyleSpawnOffsetZ = (rand() % 23) << 11;
     if (rand() & 1) {
-        gStyleSpawnOffsetZ = -gStyleSpawnOffsetZ;
+        sStyleSpawnOffsetZ = -sStyleSpawnOffsetZ;
     }
-    gStyleSpawnRotation = gStyleSpawnRotations[(u32)rand() % 7];
-    gStyleSpawnModelLayout = rand() % 5;
+    sStyleSpawnRotation = sStyleSpawnRotations[(u32)rand() % 7];
+    sStyleSpawnModelLayout = rand() % 5;
 }
 
-extern s32 gStyleSpawnYChoice1;
+extern s32 sStyleSpawnYChoice1;
 
 /* The every-seventh-day setup: fixed offset y, x of 0..19 steps of 2048, z
  * by day % 3 (40960, -40960, 2048), then the same rotation and layout
- * picks as A. Both parameters are unused; it has A's signature because
- * StyleFillEffectKind0 calls either through one pointer.
+ * picks as SetupStyleSpawnParamsRandom. Both parameters are unused; it has
+ * that function's signature because StyleFillEffectKind0 calls either
+ * through one pointer.
  * MATCHING: each rand() is used inline; one local for all three adds a move
  * after every call. */
-void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY) {
+void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     s32 dayMod3;
 
     rand();
-    gStyleSpawnOffsetY = gStyleSpawnYChoice1;
-    gStyleSpawnOffsetX = (rand() % 20) << 11;
-    dayMod3 = gStyleDay % 3;
-    gStyleSpawnOffsetZ = 40960;
+    sStyleSpawnOffsetY = sStyleSpawnYChoice1;
+    sStyleSpawnOffsetX = (rand() % 20) << 11;
+    dayMod3 = sStyleDay % 3;
+    sStyleSpawnOffsetZ = 40960;
     if (dayMod3 == 1) {
-        gStyleSpawnOffsetZ = -40960;
+        sStyleSpawnOffsetZ = -40960;
     } else if (dayMod3 == 2) {
-        gStyleSpawnOffsetZ = 2048;
+        sStyleSpawnOffsetZ = 2048;
     }
-    gStyleSpawnRotation = gStyleSpawnRotations[(u32)rand() % 7];
-    gStyleSpawnModelLayout = rand() % 5;
+    sStyleSpawnRotation = sStyleSpawnRotations[(u32)rand() % 7];
+    sStyleSpawnModelLayout = rand() % 5;
 }
 
 extern void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target);
-extern SoundCueCallbackFn gStyleCueCallbacks[];
+extern SoundCueCallbackFn sStyleCueCallbacks[];
 
 /* Claims the next record in range for `slot` and starts its cue. A started
  * cue equal to *lastCue is reported back negated. Returns the slot, or NULL. */
@@ -1729,8 +1736,8 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
     entry = (StyleCueEntryView *)FindNextStyleCueInRange(&slot->pos, &slot->lastDist, target);
     if (entry != 0) {
         slot->entry = entry;
-        InitSoundCueSet(((StyleSceneRefs *)gStyleSceneRefs)->sound, &slot->cueSet, entry->cue, slot,
-                        gStyleCueCallbacks[entry->cue]);
+        InitSoundCueSet(((StyleSceneRefs *)sStyleSceneRefs)->sound, &slot->cueSet, entry->cue, slot,
+                        sStyleCueCallbacks[entry->cue]);
         if (entry->cue == *lastCue) {
             *lastCue = -entry->cue;
         }
@@ -1740,12 +1747,12 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
     return 0;
 }
 
-extern s32 gStyleCueRecordIndex;
-extern u8 *gStyleCueRecordLists[];
-extern u8 gStyleCueRecordCounts[];
-extern s32 gStyleCueDistanceTable[];
+extern s32 sStyleCueRecordIndex;
+extern u8 *sStyleCueRecordLists[];
+extern u8 sStyleCueRecordCounts[];
+extern s32 sStyleCueDistanceTable[];
 
-/* The cell-key halves: a record's four cell bytes and gStyleCueOffsets' s16
+/* The cell-key halves: a record's four cell bytes and sStyleCueOffsets' s16
  * x/y/z, copied whole into a 10-byte cell key (StageMap's Descriptor10
  * shape) for computeCellOffsets. */
 typedef struct Pos4 Pos4;
@@ -1762,7 +1769,7 @@ struct TabEntry {
     s16 tail;
 };
 
-extern TabEntry gStyleCueOffsets[];
+extern TabEntry sStyleCueOffsets[];
 
 typedef struct EntrySlot EntrySlot;
 
@@ -1781,7 +1788,7 @@ struct LocalBuf {
     TabEntry tab;
 };
 
-/* From gStyleCueRecordIndex on, the first free record of the stage's list
+/* From sStyleCueRecordIndex on, the first free record of the stage's list
  * whose X+Z distance from the target is under its cue's distance; each
  * record looked at advances the index, so the next slot's search this tick
  * goes on from there.
@@ -1797,15 +1804,15 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
     if (target == 0) {
         goto fail;
     }
-    records = gStyleCueRecordLists[gStyleStage];
-    remaining = gStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
-    entry = (EntrySlot *)(gStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
+    records = sStyleCueRecordLists[sStyleStage];
+    remaining = sStyleCueRecordCounts[sStyleStage] - sStyleCueRecordIndex;
+    entry = (EntrySlot *)(sStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
     for (j = 0; j < remaining; j++, entry++) {
-        gStyleCueRecordIndex++;
+        sStyleCueRecordIndex++;
         if (entry->cue > 0) {
             buf.pos = entry->pos;
-            buf.tab = gStyleCueOffsets[entry->offsetIndex];
-            grid = (StageMap *)gStyleGrid;
+            buf.tab = sStyleCueOffsets[entry->offsetIndex];
+            grid = (StageMap *)sStyleGrid;
             grid->methods->computeCellOffsets(grid, pos, &buf);
             dx = pos->x - target->x;
             if (dx < 0) {
@@ -1818,7 +1825,7 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
                 dist = dx - dz;
             }
             *outDist = dist;
-            if (dist < gStyleCueDistanceTable[entry->cue]) {
+            if (dist < sStyleCueDistanceTable[entry->cue]) {
                 return entry;
             }
         }
@@ -1829,7 +1836,7 @@ fail:
 
 /* Stops the slot's cue and frees its record. Returns NULL for the slot. */
 StyleCueSlot *FlushStyleCue(StyleCueSlot *slot) {
-    FlushSoundCueSet(((StyleSceneRefs *)gStyleSceneRefs)->sound, &slot->cueSet);
+    FlushSoundCueSet(((StyleSceneRefs *)sStyleSceneRefs)->sound, &slot->cueSet);
     slot->entry->cue = -slot->entry->cue;
     return 0;
 }
@@ -1839,7 +1846,7 @@ extern s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target);
 /* One service pass of the slot's cue while the target is in range; 0 otherwise. */
 s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused) {
     if (IsStyleCueNear(slot, target) != 0) {
-        ServiceSoundCueSet(((StyleSceneRefs *)gStyleSceneRefs)->sound, &slot->cueSet);
+        ServiceSoundCueSet(((StyleSceneRefs *)sStyleSceneRefs)->sound, &slot->cueSet);
         return 1;
     }
     return 0;
@@ -1865,7 +1872,7 @@ s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
     }
     slot->lastDist = dist;
     cue = slot->entry->cue;
-    if (dist < gStyleCueDistanceTable[-cue]) {
+    if (dist < sStyleCueDistanceTable[-cue]) {
         dist = 1; /* MATCHING: not `return 1` (jump.c folds that to slt) */
         return dist;
     }
@@ -1876,7 +1883,7 @@ extern void ApplyStyleDecorationIfSet(void); /* previous section */
 extern void StyleBuildDecorSet(void);
 extern void StyleUpdateDecorSet(void);
 extern void StyleScrollVramStrips(void);
-extern StyleCueSlot gStyleCueSlotPool[];
+extern StyleCueSlot sStyleCueSlotPool[];
 extern StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *target, void *unused);
 extern s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused);
 
@@ -1891,9 +1898,9 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     target = 0;
     if (cell != 0) {
         target = &targetPos;
-        ((StageMap *)gStyleGrid)->methods->computeCellOffsets((StageMap *)gStyleGrid, target, cell);
+        ((StageMap *)sStyleGrid)->methods->computeCellOffsets((StageMap *)sStyleGrid, target, cell);
     }
-    if (gStyleTickCount++ == 0) {
+    if (sStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();
         StyleBuildDecorSet();
         StyleBuildEffectSlots(target);
@@ -1901,26 +1908,26 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     StyleUpdateDecorSet();
     StyleUpdateEffectSlots(target);
     StyleScrollVramStrips();
-    gStyleCueRecordIndex = 0;
-    for (i = 0; i < ARRAY_COUNT(gStyleCueSlots); i++) {
-        if (gStyleCueSlots[i] != 0) {
-            if (ServiceStyleCueIfNear(gStyleCueSlots[i], target, unused) == 0) {
-                gStyleCueSlots[i] = FlushStyleCue(gStyleCueSlots[i]);
+    sStyleCueRecordIndex = 0;
+    for (i = 0; i < ARRAY_COUNT(sStyleCueSlots); i++) {
+        if (sStyleCueSlots[i] != 0) {
+            if (ServiceStyleCueIfNear(sStyleCueSlots[i], target, unused) == 0) {
+                sStyleCueSlots[i] = FlushStyleCue(sStyleCueSlots[i]);
             }
             /* MATCHING: a no-op pair that gives target/i retail's registers */
             i++;
             i--;
         } else {
-            gStyleCueSlots[i] = TryStartStyleCue(&gStyleCueSlotPool[i], &lastCue, target, unused);
+            sStyleCueSlots[i] = TryStartStyleCue(&sStyleCueSlotPool[i], &lastCue, target, unused);
         }
     }
     return lastCue;
 }
 
-extern DrawRect gStyleStripRectA;
-extern DrawPoint gStyleStripScratchA;
-extern DrawRect gStyleStripRectB;
-extern DrawPoint gStyleStripScratchB;
+extern DrawRect sStyleStripRectA;
+extern DrawPoint sStyleStripScratchA;
+extern DrawRect sStyleStripRectB;
+extern DrawPoint sStyleStripScratchB;
 
 /* One step of RotateVramRectRight's one-column VRAM rotation: stage 2 on the
  * strip at y 496, stages 3..5 on the one at y 504. */
@@ -1929,14 +1936,14 @@ void StyleScrollVramStrips(void) {
     DrawPoint *scratch;
     s32 count;
 
-    if (gStyleStage == 2) {
-        rect = &gStyleStripRectA;
-        scratch = &gStyleStripScratchA;
+    if (sStyleStage == 2) {
+        rect = &sStyleStripRectA;
+        scratch = &sStyleStripScratchA;
         count = 1; /* MATCHING: a local set in each branch, not a literal argument */
-    } else if ((u32)(gStyleStage - 3) < 3) {
+    } else if ((u32)(sStyleStage - 3) < 3) {
         count = 1;
-        rect = &gStyleStripRectB;
-        scratch = &gStyleStripScratchB;
+        rect = &sStyleStripRectB;
+        scratch = &sStyleStripScratchB;
     } else {
         return;
     }
@@ -1947,7 +1954,7 @@ void StyleScrollVramStrips(void) {
  *
  * Two groups, with one predicate between them:
  *
- *  - StyleCue00..StyleCue13, the 14 rows of gStyleCueCallbacks, and their
+ *  - StyleCue00..StyleCue13, the 14 rows of sStyleCueCallbacks, and their
  *    helper ComputeStyleCueFalloff. Each is a SoundCueSet callback
  *    (include/SoundCueSet.h): TryStartStyleCue (previous section) starts a
  *    style-cue slot's embedded set with the claimed cue record's index as the
@@ -1958,7 +1965,7 @@ void StyleScrollVramStrips(void) {
  *    requests VAB programs on the three voices; most restart the pattern by
  *    setting `tick` to -1 once it passes a limit.
  *  - IsStyleVariantEven: whether the variant PickStyleFallbackConfig chose
- *    (gStyleVariant) is even.
+ *    (sStyleVariant) is even.
  *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style layer
  *    keeps at an offset from its target: its ctor, finalize, reset
  *    (StyleEffect__SetParams) and update slot occupants, and the
@@ -1967,7 +1974,7 @@ void StyleScrollVramStrips(void) {
  */
 
 /* ------------------------------------------------------------------ *
- * gStyleCueCallbacks's 14 slots (StyleCue00..StyleCue13) plus the shared
+ * sStyleCueCallbacks's 14 slots (StyleCue00..StyleCue13) plus the shared
  * helper ComputeStyleCueFalloff they all call first.
  * ------------------------------------------------------------------ */
 
@@ -1980,9 +1987,9 @@ typedef struct StyleCueParam StyleCueParam;
 /* The cue-table record the slot claimed (`StyleCueEntryView`, above). */
 typedef struct StyleCueParamMethods {
     u8 pad0[0x6];
-    s8 cue; /* +0x006, the record's cue index (its gStyleCueCallbacks row
+    s8 cue; /* +0x006, the record's cue index (its sStyleCueCallbacks row
              * and InitSoundCueSet tag), negated while a slot has it
-             * claimed; ComputeStyleCueFalloff indexes gStyleCueDistanceTable
+             * claimed; ComputeStyleCueFalloff indexes sStyleCueDistanceTable
              * with its negative. */
 } StyleCueParamMethods;
 
@@ -2215,14 +2222,14 @@ void StyleCue13(StyleCueParam *ctx, SoundCueSet *set) {
  * tests the slot's distance against the same row. */
 
 s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
-    s32 range = gStyleCueDistanceTable[-ctx->entry->cue];
+    s32 range = sStyleCueDistanceTable[-ctx->entry->cue];
     s32 stepDist = range / ctx->cueSet.attenuationSteps;
 
     return ctx->lastDist / stepDist;
 }
 
 s32 IsStyleVariantEven(void) {
-    return (gStyleVariant & 1) ^ 1;
+    return (sStyleVariant & 1) ^ 1;
 }
 
 /* ------------------------------------------------------------------ *
@@ -2293,11 +2300,11 @@ void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
 /* The class and its children: include/StyleEffect.h (the owner),
  * include/Actor.h (modelChildren) and include/VariantSprite.h (sprites). */
 
-extern s32 gSpriteShiftX[];
-extern Ratio16 gSpriteScaleLarge[3];
-extern Ratio16 gSpriteScaleHalf[3];
-extern Ratio16 gSpriteScaleSmall[3];
-extern LongVec3 gSpriteShiftScratch;
+extern s32 sSpriteShiftX[];
+extern Ratio16 sSpriteScaleLarge[3];
+extern Ratio16 sSpriteScaleHalf[3];
+extern Ratio16 sSpriteScaleSmall[3];
+extern LongVec3 sSpriteShiftScratch;
 
 void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b);
 void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, void *scale);
@@ -2315,18 +2322,18 @@ extern void NoOpIgnoreArgs();
  * with the same types: the DREAMER.TMD Actor the model kinds fetch their
  * model from (setBackClip), the TIM image New_VariantSprite is handed, and
  * the scene's Viewport, whose viewpoint y (refView.vp.y) InitByKind
- * snapshots into gStyleEffectBaseViewY and UpdateByKind follows. The
+ * snapshots into sStyleEffectBaseViewY and UpdateByKind follows. The
  * viewport stays `void *` because that is how the next section declares it. */
-extern Actor *gStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
-extern void *gStyleEffectTim;
-extern Viewport *gStyleEffectViewport;
-extern s32 gStyleEffectBaseViewY;
-extern s32 gStyleEffectModelIds[3];
+extern Actor *sStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
+extern void *sStyleEffectTim;
+extern Viewport *sStyleEffectViewport;
+extern s32 sStyleEffectBaseViewY;
+extern s32 sStyleEffectModelIds[3];
 
 /* Called once, from the class's ctor (StyleEffect__StyleEffect): snapshot the
  * viewpoint y, place self under `parent` at pos + offset, then build the
  * per-kind parts. The two model kinds link a model fetched from
- * gStyleEffectTmd by gStyleEffectModelIds[kind], and STYLE_EFFECT_MODEL_ROW
+ * sStyleEffectTmd by sStyleEffectModelIds[kind], and STYLE_EFFECT_MODEL_ROW
  * also gets its two model children; STYLE_EFFECT_SPRITES gets five
  * randomised sprites, STYLE_EFFECT_JITTER_SPRITES five plain ones
  * (StyleEffect__SpawnPlainSprites is StyleEffect__SpawnSprites(self, 0, 0,
@@ -2335,13 +2342,13 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
     LongVec3 placed;
     s32 kind;
 
-    gStyleEffectBaseViewY = gStyleEffectViewport->refView.vp.y;
+    sStyleEffectBaseViewY = sStyleEffectViewport->refView.vp.y;
     AddVec3(&placed, pos, &self->params.offset);
     AttachWithRotScale((Actor *)self, parent, &placed, self->params.rotation, self->params.scale);
 
     kind = self->pendingExtra;
     if (kind <= STYLE_EFFECT_MODEL) {
-        s32 model = gStyleEffectTmd->methods->setBackClip(gStyleEffectTmd, gStyleEffectModelIds[kind]);
+        s32 model = sStyleEffectTmd->methods->setBackClip(sStyleEffectTmd, sStyleEffectModelIds[kind]);
         SceneNode__LinkModel((SceneNode *)self, (void *)model);
         kind = self->pendingExtra;
     }
@@ -2370,7 +2377,7 @@ void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
     LongVec3 placed;
 
     AddVec3(&placed, pos, &self->params.offset);
-    placed.y += gStyleEffectViewport->refView.vp.y - gStyleEffectBaseViewY;
+    placed.y += sStyleEffectViewport->refView.vp.y - sStyleEffectBaseViewY;
     self->methods->setTranslation(self, &placed);
 
     switch (self->pendingExtra) {
@@ -2400,7 +2407,7 @@ void StyleEffect__ReleaseByKind(StyleEffect *self) {
             StyleEffect__ReleaseSprites(self);
             break;
         case STYLE_EFFECT_JITTER_SPRITES:
-            StyleEffect__ReleaseSpritesB(self);
+            StyleEffect__ReleaseJitterSprites(self);
             break;
         default:
             break;
@@ -2423,12 +2430,12 @@ void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, 
 }
 
 /* Lay the two model children out in a row: child i sits at (i + 1) *
- * gModelChildSpacing[modelChildLayout], along x (scaled by scale's x
+ * sModelChildSpacing[modelChildLayout], along x (scaled by scale's x
  * numerator) for layouts 1-2 and along y for 3-4. reuse = 0 creates them
  * (New_Actor, sharing the owner's model, attached to the owner);
  * reuse = 1 only resets their translation (setTranslation). */
-extern LongVec3 gModelChildOffsetInit;
-extern s32 gModelChildSpacing[];
+extern LongVec3 sModelChildOffsetInit;
+extern s32 sModelChildSpacing[];
 
 void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
     LongVec3 childPos;
@@ -2439,13 +2446,13 @@ void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
     if (layout == 0) {
         return;
     }
-    childPos = gModelChildOffsetInit;
+    childPos = sModelChildOffsetInit;
     slot = self->modelChildren;
     for (i = 0; i < ARRAY_COUNT(self->modelChildren); i++, slot++) {
         if (layout < 3) {
-            childPos.x += self->params.scale[0].num * gModelChildSpacing[layout];
+            childPos.x += self->params.scale[0].num * sModelChildSpacing[layout];
         } else {
-            childPos.y += gModelChildSpacing[layout];
+            childPos.y += sModelChildSpacing[layout];
         }
         if (reuse) {
             Actor *child = *slot;
@@ -2461,22 +2468,22 @@ void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
 
 /* Per-`tableIndex` z step for the model children (0 = no drift), also the
  * divisor of MODEL_CHILD_DRIFT_RANGE for the reset period below. Same index space as
- * gSpriteShiftX. */
-extern s32 gModelChildDriftZ[];
+ * sSpriteShiftX. */
+extern s32 sModelChildDriftZ[];
 /* All-zero LongVec3, the start value of each child's per-frame z delta. */
-extern LongVec3 gModelChildDriftInit;
+extern LongVec3 sModelChildDriftInit;
 /* Ratio triple {0/1, 1/10, 0/1}: the per-frame rotation increment
  * updateRotation(.., 0, ..) adds to self and to each model child. */
-extern Ratio16 gSpinRotStep[3];
+extern Ratio16 sSpinRotStep[3];
 
 /* Ticks (StyleEffect::tick) before the model children start to drift. */
 #define MODEL_CHILD_DRIFT_DELAY 500
 /* The z distance a child drifts before it snaps back: the reset period is
- * this over the child's per-tick step, gModelChildDriftZ[tableIndex]. */
+ * this over the child's per-tick step, sModelChildDriftZ[tableIndex]. */
 #define MODEL_CHILD_DRIFT_RANGE 24500
 
 /* Once tick passes MODEL_CHILD_DRIFT_DELAY, for a layout with model
- * children and a nonzero gModelChildDriftZ step: spin self and both
+ * children and a nonzero sModelChildDriftZ step: spin self and both
  * children, move child i along z by step + 3 * i, and every
  * MODEL_CHILD_DRIFT_RANGE / step ticks (the period's magnitude, whatever
  * the step's sign) snap them back to their layout. Always marks self's
@@ -2491,26 +2498,26 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
     s32 *stepZ;
 
     tableIndex = self->params.tableIndex;
-    if (self->params.modelChildLayout != 0 && gModelChildDriftZ[tableIndex] != 0 &&
+    if (self->params.modelChildLayout != 0 && sModelChildDriftZ[tableIndex] != 0 &&
         (u32)self->tick > MODEL_CHILD_DRIFT_DELAY) {
         slot = self->modelChildren;
-        self->methods->updateRotation(self, 0, gSpinRotStep);
+        self->methods->updateRotation(self, 0, sSpinRotStep);
         i = 0;
         /* MATCHING: the guard reads the step from the table and the pointer
          * is taken only here, after the call; either held earlier in a
          * local swaps two registers. */
-        stepZ = &gModelChildDriftZ[tableIndex];
+        stepZ = &sModelChildDriftZ[tableIndex];
         extraZ = 0;
         for (; i < ARRAY_COUNT(self->modelChildren); i++) {
-            LongVec3 delta = gModelChildDriftInit;
+            LongVec3 delta = sModelChildDriftInit;
             delta.z += extraZ + *stepZ;
             (*slot)->methods->addTranslation(*slot, &delta);
             extraZ += 3;
-            (*slot)->methods->updateRotation(*slot, 0, gSpinRotStep);
+            (*slot)->methods->updateRotation(*slot, 0, sSpinRotStep);
             slot++;
         }
 
-        period = MODEL_CHILD_DRIFT_RANGE / gModelChildDriftZ[tableIndex];
+        period = MODEL_CHILD_DRIFT_RANGE / sModelChildDriftZ[tableIndex];
         tick = self->tick;
         if (period >= 0) {
             if ((u32)tick % (u32)period == 0) {
@@ -2533,13 +2540,13 @@ void StyleEffect__ReleaseModelChildren(StyleEffect *self) {
     }
 }
 
-/* Kind 2's init: five sprites, all scaled by gSpriteScaleHalf on an even
+/* Kind 2's init: five sprites, all scaled by sSpriteScaleHalf on an even
  * rand(); then sprites[1] is either shifted along x by
- * gSpriteShiftX[tableIndex] and recoloured (tableIndex >= 2) or made
+ * sSpriteShiftX[tableIndex] and recoloured (tableIndex >= 2) or made
  * semi-transparent (rate 0) and rescaled, and sprites[2] is hidden. */
 void StyleEffect__BuildRandomSprites(StyleEffect *self) {
     s32 parity = rand() % 2;
-    void *scale = parity ? NULL : gSpriteScaleHalf;
+    void *scale = parity ? NULL : sSpriteScaleHalf;
     VariantSprite *sprite;
     SpriteRgb *color;
 
@@ -2549,11 +2556,11 @@ void StyleEffect__BuildRandomSprites(StyleEffect *self) {
         VariantSpriteMethods *methods;
 
         sprite = self->sprites[1];
-        gSpriteShiftScratch.x = gSpriteShiftX[self->params.tableIndex];
+        sSpriteShiftScratch.x = sSpriteShiftX[self->params.tableIndex];
         /* Called directly, not through the sprite's table: a VariantSprite
          * is a Sprite, not an Actor, and the function only touches the
          * SceneNode coord2 both share. */
-        Actor__AddTranslation((Actor *)sprite, &gSpriteShiftScratch);
+        Actor__AddTranslation((Actor *)sprite, &sSpriteShiftScratch);
         methods = sprite->methods;
         color = (self->params.altColor != NULL) ? self->params.altColor : self->params.color;
         methods->setColor(sprite, color);
@@ -2561,7 +2568,7 @@ void StyleEffect__BuildRandomSprites(StyleEffect *self) {
         sprite = self->sprites[1];
         sprite->methods->setSemiTransOn(sprite, 1);
         sprite->methods->setSemiTransRate(sprite, 0);
-        sprite->methods->updateScale(sprite, 1, (parity != 0) ? gSpriteScaleLarge : gSpriteScaleSmall);
+        sprite->methods->updateScale(sprite, 1, (parity != 0) ? sSpriteScaleLarge : sSpriteScaleSmall);
     }
 
     self->sprites[2]->methods->setDisplay(self->sprites[2], 0);
@@ -2578,7 +2585,7 @@ void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale)
     s32 i;
 
     for (i = 0; i < ARRAY_COUNT(((StyleEffect *)self)->sprites); i++, slot++) {
-        sprite = New_VariantSprite(variant, 0, gStyleEffectTim);
+        sprite = New_VariantSprite(variant, 0, sStyleEffectTim);
         *slot = sprite;
         sprite->methods->attachToParent(sprite, self, 0);
         (*slot)->methods->setColor(*slot, ((StyleEffect *)self)->params.color);
@@ -2597,7 +2604,7 @@ void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale)
  *    sprite kinds that StyleEffect__UpdateByKind and ReleaseByKind
  *    (previous section) call. SpawnPlainSprites builds the five sprites,
  *    RandomizeSprites re-shapes four of them every frame, NoOpIgnoreArgs is
- *    the empty per-frame step, and ReleaseSprites / ReleaseSpritesB are two
+ *    the empty per-frame step, and ReleaseSprites / ReleaseJitterSprites are two
  *    identical functions that release them. Behind them, by address, sit the
  *    class's table getter and SetStyleEffectSources, which records the
  *    TMD resource, TIM image and viewport every StyleEffect draws from.
@@ -2620,9 +2627,9 @@ void NoOpIgnoreArgs(void) {}
 /* Six scale tables, each three Ratio16s (x, y, z), for the jittering
  * sprites: a thin streak along y or along x, {1/16, 7/1}, {7/1, 1/16}, then
  * the same with 3 and 2; z is 1/1. VariantSprite__UpdateScale reads x and y. */
-extern Ratio16 gStyleEffectJitterScales[6][3];
+extern Ratio16 sStyleEffectJitterScales[6][3];
 
-/* Kind 2's release; ReleaseSpritesB, kind 3's, is the same body. */
+/* Kind 2's release; ReleaseJitterSprites, kind 3's, is the same body. */
 void StyleEffect__ReleaseSprites(StyleEffect *self) {
     ReleaseBasicClassArray((BasicClass **)self->sprites, ARRAY_COUNT(self->sprites));
 }
@@ -2642,12 +2649,12 @@ void StyleEffect__RandomizeSprites(StyleEffect *self) {
         u32 pick = rand();
 
         (*sprite)->methods->updateScale(
-            *sprite, 1, gStyleEffectJitterScales[pick % ARRAY_COUNT(gStyleEffectJitterScales)]);
+            *sprite, 1, sStyleEffectJitterScales[pick % ARRAY_COUNT(sStyleEffectJitterScales)]);
         (*sprite)->sprite.rotate = (rand() % 360) * ONE; /* 4096ths of a degree */
     }
 }
 
-void StyleEffect__ReleaseSpritesB(StyleEffect *self) {
+void StyleEffect__ReleaseJitterSprites(StyleEffect *self) {
     ReleaseBasicClassArray((BasicClass **)self->sprites, ARRAY_COUNT(self->sprites));
 }
 
@@ -2660,21 +2667,21 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
  * globals) draw from: the scene's TMD resource, its TIM image and the
  * viewport. The TMD resource's getModel slot sits where Actor has
  * setBackClip, hence the Actor view. */
-extern s16 gStyleEffectClutPos[2];
+extern s16 sStyleEffectClutPos[2];
 
 /* Records the three sources, then points the first primitive of the TMD's
- * models 0 and 2 (gStyleEffectModelIds) at the CLUT at gStyleEffectClutPos. */
+ * models 0 and 2 (sStyleEffectModelIds) at the CLUT at sStyleEffectClutPos. */
 void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
     s32 i;
     TmdModel *model;
 
-    gStyleEffectTmd = tmd;
-    gStyleEffectTim = (void *)tim;
-    gStyleEffectViewport = (Viewport *)viewport;
+    sStyleEffectTmd = tmd;
+    sStyleEffectTim = (void *)tim;
+    sStyleEffectViewport = (Viewport *)viewport;
     i = 0;
     do {
-        model = (TmdModel *)tmd->methods->setBackClip(tmd, gStyleEffectModelIds[i]);
-        TmdModel__SetFirstPrimClut(model, gStyleEffectClutPos);
+        model = (TmdModel *)tmd->methods->setBackClip(tmd, sStyleEffectModelIds[i]);
+        TmdModel__SetFirstPrimClut(model, sStyleEffectClutPos);
         i++;
     } while (i < 2);
 }
@@ -2833,12 +2840,12 @@ void Actor__AddLocalTranslation(Actor *self, s16 *local) {
     self->methods->addTranslation(self, &delta);
 }
 
-/* The z of the s16 local move vector whose x and y are gActorLocalMove
+/* The z of the s16 local move vector whose x and y are sActorLocalMove
  * (next section, with MoveLocalX/Y and MoveAlongLocalAxis). */
-extern s16 gActorLocalMoveZ;
+extern s16 sActorLocalMoveZ;
 
 void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
-    Actor__MoveAlongLocalAxis(self, &gActorLocalMoveZ, val, notify, ACTOR_EVENT_MOVED_Z);
+    Actor__MoveAlongLocalAxis(self, &sActorLocalMoveZ, val, notify, ACTOR_EVENT_MOVED_Z);
 }
 
 /* ---- Actor's movement and link search; VariantSprite's ctor -------------
@@ -2848,7 +2855,7 @@ void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
  * allocator and ctor.
  *
  *  - Local-axis moves. Actor__MoveLocalX/Y put `val` into one component of
- *    the local move vector gActorLocalMove, apply it through
+ *    the local move vector sActorLocalMove, apply it through
  *    addLocalTranslation and clear it again (Actor__MoveAlongLocalAxis;
  *    MoveLocalZ is in the previous section).
  *  - Move, else find a link. Actor__MoveLocalZOrFindLink/XOrFindLink clear
@@ -2865,28 +2872,28 @@ void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
  *    class (include/VariantSprite.h) that happens to follow in ROM.
  */
 
-/* The local move vector's x and y (s16; the z, gActorLocalMoveZ, is the next
+/* The local move vector's x and y (s16; the z, sActorLocalMoveZ, is the next
  * halfword, previous section). All three stay 0 between moves: a move sets
  * one component, addLocalTranslation rotates the whole vector by the
  * actor's orientation, and the component is cleared again. */
-extern s16 gActorLocalMove[2];
+extern s16 sActorLocalMove[2];
 
 void Actor__MoveLocalX(Actor *self, s32 val, void *notify) {
-    Actor__MoveAlongLocalAxis(self, &gActorLocalMove[0], val, notify, ACTOR_EVENT_MOVED_X);
+    Actor__MoveAlongLocalAxis(self, &sActorLocalMove[0], val, notify, ACTOR_EVENT_MOVED_X);
 }
 
 void Actor__MoveLocalY(Actor *self, s32 val, void *notify) {
-    Actor__MoveAlongLocalAxis(self, &gActorLocalMove[1], val, notify, ACTOR_EVENT_MOVED_Y);
+    Actor__MoveAlongLocalAxis(self, &sActorLocalMove[1], val, notify, ACTOR_EVENT_MOVED_Y);
 }
 
 /* Moves the actor by `val` along one local axis (`axis` is that component of
- * gActorLocalMove), keeps `val` in lastOffsetValue and, when `notify` is
+ * sActorLocalMove), keeps `val` in lastOffsetValue and, when `notify` is
  * non-NULL, sends `event` (6, 7, 8 for z, x, y) through notifyWithHull. */
 void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, s32 event) {
     s16 val16 = (s16)val; /* MATCHING: truncating at each store does not match */
     *axis = val16;
     self->lastOffsetValue = val16;
-    self->methods->addLocalTranslation(self, &gActorLocalMove[0]);
+    self->methods->addLocalTranslation(self, &sActorLocalMove[0]);
     *axis = 0;
     if (notify != NULL) {
         self->methods->notifyWithHull(self, event);
@@ -3151,14 +3158,14 @@ VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture) {
 /* VariantSprite's two texture cells, forwarded as the Sprite ctor's `rect`
  * (Sprite__Reset copies it into Sprite.rect): u,v = (0x00,0x20) and
  * (0x10,0x20), 16x16. */
-extern SpriteRect gVariantSpriteCells[2];
+extern SpriteRect sVariantSpriteCells[2];
 
 /* Sprite's ctor with the variant's cell, then this class's table, and the
  * reset slot (VariantSprite__SetVariantClut) with the variant, through
  * VariantSpriteResetFn. Returns nothing: it ends in that call and sets no
  * $v0. */
 void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetArg, void *texture) {
-    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &gVariantSpriteCells[variant], resetArg, 0);
+    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &sVariantSpriteCells[variant], resetArg, 0);
     self->methods = GetVariantSpriteMethods();
     self->unkA4 = 0;
     ((VariantSpriteResetFn)self->methods->reset)(self, variant);
@@ -3183,22 +3190,22 @@ void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetA
  * {976, 511} and {992, 511}, adjacent 16-colour rows on the bottom line.
  * MATCHING: two externs, as retail takes one %hi/%lo base for x, one for y.
  */
-extern const s16 gVariantSpriteClutX[];
-extern const s16 gVariantSpriteClutY[];
+extern const s16 sVariantSpriteClutX[];
+extern const s16 sVariantSpriteClutY[];
 
 /* One {x, y} entry of that table, in s16s: the stride both lookups index by. */
 #define VARIANT_CLUT_STRIDE 2
 
 void VariantSprite__SetVariantClut(VariantSprite *self, s32 variant) {
     self->variant = variant;
-    self->sprite.cx = gVariantSpriteClutX[variant * VARIANT_CLUT_STRIDE];
-    self->sprite.cy = gVariantSpriteClutY[variant * VARIANT_CLUT_STRIDE];
+    self->sprite.cx = sVariantSpriteClutX[variant * VARIANT_CLUT_STRIDE];
+    self->sprite.cy = sVariantSpriteClutY[variant * VARIANT_CLUT_STRIDE];
 }
 
 /*
  * Overrides SceneNode__UpdateScale. `ratios` is two num/den pairs, x then y
- * (the callers' tables hold three, gSpriteScaleLarge's {6,5} and
- * gSpriteScaleSmall's {4,6}; the third is not read), each turned into 20.12
+ * (the callers' tables hold three, sSpriteScaleLarge's {6,5} and
+ * sSpriteScaleSmall's {4,6}; the third is not read), each turned into 20.12
  * by the split division RatioToFixed12 uses. The ratios go to the GsSPRITE's
  * scalex/scaley, or, while Sprite's accumulateScale is set, multiply accumScaleX/Y
  * instead. `set` is not read.
@@ -3242,16 +3249,16 @@ void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
  * a day's two signed mood bytes, times 10, are its dot's centre, the upper
  * axis pointing up the screen. The newest dot is red and blinks while
  * inputMode is 1; the others fade from white. ScoreDayLog checks, once per
- * save, that four fixed moods (gGraphScoreMoods) all appear among the
+ * save, that four fixed moods (sGraphScoreMoods) all appear among the
  * plotted days, and TickHighlight then turns each one's dot green, one
  * every 24 frames once frameCounter passes 30.
  */
 
-/* gGraphScoreMoods' length: ScoreDayLog's targets, one matchedDayIndices
+/* sGraphScoreMoods' length: ScoreDayLog's targets, one matchedDayIndices
  * byte and one highlight each. */
 #define GRAPH_SCORE_MOOD_COUNT 4
 
-/* A plotted dot's side, gGraphPointSize's {10, 10}: PopulateGraphPoints
+/* A plotted dot's side, sGraphPointSize's {10, 10}: PopulateGraphPoints
  * subtracts half of it so each dot is centred on its mood. */
 #define GRAPH_POINT_SIZE 10
 
@@ -3275,7 +3282,7 @@ VariantSpriteMethods *GetVariantSpriteMethods(void) {
 }
 
 /* GraphRoom's object, table and methods: include/GraphRoom.h. The base
- * implementations are reached through Get_vtable_TaskCore() with `self`
+ * implementations are reached through GetTaskCoreMethods() with `self`
  * upcast. */
 
 /* DreamSaveBlock, the save block GraphRoom plots, is include/DreamSys.h's. */
@@ -3292,7 +3299,7 @@ GraphRoom *New_GraphRoom(struct DreamSys *dreamSys) {
 extern char sGraphSoundBankPath[];
 
 void GraphRoom__GraphRoom(GraphRoom *self, struct DreamSys *dreamSys) {
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, NULL, sGraphSoundBankPath, NULL);
+    GetTaskCoreMethods()->ctor((TaskCore *)self, NULL, sGraphSoundBankPath, NULL);
     self->methods = GetGraphRoomMethods();
     ((VabStreamObj *)self->sound)->methods->setPitchOffset((VabStreamObj *)self->sound, -1); /* TaskCore::sound is a VabStreamObj */
     self->dreamSys = dreamSys;
@@ -3310,7 +3317,7 @@ void GraphRoom__Reset(GraphRoom *self) {
 }
 
 void GraphRoom__Update(GraphRoom *self, BasicClass *sender, s32 event) {
-    Get_vtable_TaskCore()->update((TaskCore *)self, sender, event);
+    GetTaskCoreMethods()->update((TaskCore *)self, sender, event);
     if (self->inputMode == 1) {
         DreamSaveBlock *save =
             (DreamSaveBlock *)self->dreamSys->methods->getSaveBlock(self->dreamSys, 0);
@@ -3324,7 +3331,7 @@ void GraphRoom__Update(GraphRoom *self, BasicClass *sender, s32 event) {
 void GraphRoom__OnPadConfirm(GraphRoom *self) {
     if (self->scored == 0) {
         self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
-        self->methods->refreshViewValue(self);
+        self->methods->exit(self);
     }
 }
 
@@ -3332,20 +3339,20 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
  * (include/BoxFill.h).
  * MATCHING: signed, and exactly three bytes -- the whole-struct copy of `rgb`
  * below is three lb/sb pairs. */
-extern s32 gGraphPointSize[2];
-extern BoxFillRgb gGraphPointNewestColor;
-extern BoxFillRgb gGraphPointBaseColor;
+extern s32 sGraphPointSize[2];
+extern BoxFillRgb sGraphPointNewestColor;
+extern BoxFillRgb sGraphPointBaseColor;
 
 void GraphRoom__BuildGraphPoints(GraphRoom *self) {
     BoxFillRgb rgb;
     s32 i;
 
-    self->points[0] = New_BoxFill(gGraphPointSize, &gGraphPointNewestColor, 0);
-    rgb = gGraphPointBaseColor;
+    self->points[0] = New_BoxFill(sGraphPointSize, &sGraphPointNewestColor, 0);
+    rgb = sGraphPointBaseColor;
     for (i = 1; i < ARRAY_COUNT(self->points); i++) {
         s32 step;
 
-        self->points[i] = New_BoxFill(gGraphPointSize, &rgb, 0);
+        self->points[i] = New_BoxFill(sGraphPointSize, &rgb, 0);
         step = 1;
         if (i < 7) {
             step = 20;
@@ -3364,12 +3371,12 @@ void GraphRoom__ReleaseGraphPoints(GraphRoom *self) {
     for (i = 0; i < ARRAY_COUNT(self->points); i++) {
         self->points[i]->methods->release(self->points[i]);
     }
-    Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
+    GetTaskCoreMethods()->releaseTarget((TaskCore *)self);
 }
 
 s32 GraphRoom__Init(GraphRoom *self, IntermediateBaseInitArgs *args, s32 mode) {
     s32 result;
-    Get_vtable_TaskCore()->init((TaskCore *)self, args, mode);
+    GetTaskCoreMethods()->init((TaskCore *)self, args, mode);
     result = 2;
     if (self->scored == 0) {
         result = self->result;
@@ -3386,7 +3393,7 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
     BoxFillPos point;
     BoxFillPos firstPoint;
 
-    Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
+    GetTaskCoreMethods()->updateSlotElements((TaskCore *)self, parent);
     save = (DreamSaveBlock *)self->dreamSys->methods->getSaveBlock(self->dreamSys, 0);
     self->scored = GraphRoom__ScoreDayLog(self, save);
 
@@ -3431,15 +3438,15 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
 
 /* The four moods ScoreDayLog looks for, as (dynamic, upper): (-1, 1),
  * (1, 1), (0, 0), (0, -3). */
-extern MoodGraphPoint gGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT];
+extern MoodGraphPoint sGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT];
 
-/* Whether every gGraphScoreMoods entry appears among the plotted days (the
+/* Whether every sGraphScoreMoods entry appears among the plotted days (the
  * window PopulateGraphPoints walks, newest first), recording in
  * matchedDayIndices the oldest dot holding each. Fails at once when
  * graphScored is set, and sets it on success.
  * MATCHING: the `targets`/`days` caches, the dead else branch and the
  * chained assignment are all inert; without any one, cc1 strength-reduces
- * gGraphScoreMoods[i] into a pointer hoisted across the outer loop. */
+ * sGraphScoreMoods[i] into a pointer hoisted across the outer loop. */
 s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
     u32 i;
     MoodGraphPoint *days;
@@ -3469,9 +3476,9 @@ s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
             if (day < 0) {
                 day = DAYS_PER_YEAR - 1;
             } else {
-                targets = gGraphScoreMoods;
+                targets = sGraphScoreMoods;
             }
-            targets = (days = gGraphScoreMoods);
+            targets = (days = sGraphScoreMoods);
             days = log->moodPreviousDays;
             if (targets[i].value == days[day].value) {
                 self->matchedDayIndices[i] = dot;
@@ -3492,7 +3499,7 @@ fail:
     return 0;
 }
 
-extern BoxFillRgb gGraphPointHighlightColor;
+extern BoxFillRgb sGraphPointHighlightColor;
 
 void GraphRoom__TickHighlight(GraphRoom *self) {
     if (self->scored != 0) {
@@ -3500,7 +3507,7 @@ void GraphRoom__TickHighlight(GraphRoom *self) {
             if (self->highlightCount < GRAPH_SCORE_MOOD_COUNT) {
                 if (((u32)self->frameCounter % 24) == 0) {
                     s8 dot = self->matchedDayIndices[self->highlightCount];
-                    self->points[dot]->methods->setColor(self->points[dot], 1, &gGraphPointHighlightColor);
+                    self->points[dot]->methods->setColor(self->points[dot], 1, &sGraphPointHighlightColor);
                     self->highlightCount += 1;
                 }
             }

@@ -11,7 +11,7 @@
  *
  * main() builds the one instance (New_DrawSystem) and hands it to
  * Application__InitSystems (Application), which stores it as the singleton
- * (SetDrawSystem -> gDrawSystem) and calls its initGraph (GsInitGraph and
+ * (SetDrawSystem -> sDrawSystem) and calls its initGraph (GsInitGraph and
  * GsDefDispBuff for the screen size). Every other unit reaches it through
  * GetDrawSystem(): TimImage and the movie player upload through loadImage,
  * the movie player clears its frame through clearImage, the CD driver
@@ -34,12 +34,12 @@ typedef struct DrawSystemMethods DrawSystemMethods;
 #define DRAWSYSTEM_CLASS_ID 0x1
 
 /* The command runLoop passes its parents on every VSync pass
- * (notifyParents(self, 2)); StageMap__OnNotifyTag1 acts only on it. */
+ * (notifyParents(self, 2)); StageMap__OnDrawSystemEvent acts only on it. */
 #define DRAWSYSTEM_EVENT_VSYNC 2
 
 /* A {width, height} pair: the screen size initGraph hands to GsInitGraph
  * and getDims returns. Application keeps one (its default is
- * gDefaultScreenDims = {320, 240}) and passes it to initGraph. */
+ * sDefaultScreenDims = {320, 240}) and passes it to initGraph. */
 typedef struct ScreenDims {
     /* +0x0 */ s32 w;
     /* +0x4 */ s32 h;
@@ -95,9 +95,9 @@ struct DrawSystem {
 };
 
 extern DrawSystemMethods gDrawSystemMethods; /* DrawSystem's method table */
-extern DrawSystemMethods *Get_vtable_DrawSystem(void);
+extern DrawSystemMethods *GetDrawSystemMethods(void);
 
-DrawSystem *GetDrawSystem(void); /* returns gDrawSystem, the singleton */
+DrawSystem *GetDrawSystem(void); /* returns sDrawSystem, the singleton */
 void SetDrawSystem(DrawSystem *obj);
 
 DrawSystem *New_DrawSystem(void);

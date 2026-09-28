@@ -24,7 +24,7 @@ vtable is `gCdDriverMethods` (29 slots, header word `0x13`, resolved with
 Compared against `gFileResourceMethods` (`include/GameApplicationFileResource.h`'s
 `FileResourceMethods`) with `classtable.py gCdDriverMethods --vs gFileResourceMethods`:
 `FileResource__Release` at `+0x004` and `FileResource__FreeBuffer`/`NoOp`/
-`FileResource__SetFlag` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
+`FileResource__OnRequestDone` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
 between the two tables, strongly suggesting `gCdDriverMethods`'s class is a
 subclass or close sibling of `gFileResourceMethods`'s, inheriting the same BasicClass
 slot block and several of the same concrete method implementations.
@@ -76,8 +76,8 @@ says why.** What the class IS, is now well evidenced: every method reachable
 from this table bottoms out in Psy-Q libcd (`CdSearchFile`, `CdRead`,
 `CdControlF`, `CdSync`, `CdFlush`, `CdPosToInt`/`CdIntToPos`), its objects
 cache a disc position and a byte size, and `GameApplicationFileResource.c` selects this
-class's module functions only when `gActiveDataSource == 0x13`, this table's own
-header word -- the other value that gate takes, `0x23`, is `gVabDriverMethods`, the
+class's module functions only when `sActiveDataSource == 0x13`, this table's own
+header word -- the other value that gate takes, `0x23`, is `gNullDriverMethods`, the
 SPU/VAB streamer in `PlacementGridVabSound.c`. So the two are interchangeable data
 sources behind one dispatch layer, and this one is the CD-ROM source.
 
@@ -101,7 +101,7 @@ worse than a placeholder" bites hardest is exactly here, and the existing
 placeholder CLASS, evidence-based METHOD.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `GetClass6D4E8Methods` -> `GetCdDriverMethods` by rename.py. Now returns `CdDriverMethods *` (`&gCdDriverMethods`), not `s32 *`.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `GetClass6D4E8Methods` -> `GetCdDriverMethods` by rename.py. Now returns `CdDriverMethods *` (`&gCdDriverMethods`), not `s32 *`.
 
 ## Round 96 (track 6, echo): unit comment moved here
 

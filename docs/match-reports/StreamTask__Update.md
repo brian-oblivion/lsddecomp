@@ -12,7 +12,7 @@ Three sequential early-return guards.
 
 ```c
 void StreamTask__Update(StreamTaskObj *self, s32 a1, s32 a2) {
-    Get_vtable_TaskCore()->slot5C(self, a1, a2);
+    GetTaskCoreMethods()->slot5C(self, a1, a2);
     if (self->unkA4 != 0) {
         return;
     }
@@ -29,7 +29,7 @@ void StreamTask__Update(StreamTaskObj *self, s32 a1, s32 a2) {
 
 ## Evidence
 
-- `Get_vtable_TaskCore()->slot5C`: `TaskCoreMethods` slot `+0x05C`, occupied by
+- `GetTaskCoreMethods()->slot5C`: `TaskCoreMethods` slot `+0x05C`, occupied by
   `TaskCore__Update` (a different unit, not touched here). Takes `(self, a1,
   a2)` matching this function's own two forwarded parameters; result
   discarded, typed `void`.
@@ -62,7 +62,7 @@ actually represents in the game, so left `Class__func_xxxxx`.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87)
 

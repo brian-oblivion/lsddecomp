@@ -12,7 +12,7 @@
 `Viewport__Viewport`'s ctor: dispatches `slot90`, `slot74`, releases `self->unkAC`
 (inherited BasicClass "release", corroborating and extending
 `Viewport__Viewport`'s earlier discovery of that field), dispatches `slotA8`
-with a literal `0`, then runs `Get_vtable_BasicClass()->slot0C` (BasicClass's own
+with a literal `0`, then runs `GetBasicClassMethods()->slot0C` (BasicClass's own
 `finalize`, `BasicClass__Finalize`).
 
 ## The C
@@ -24,7 +24,7 @@ void Viewport__Finalize(Unk18Obj *self)
     self->methods->slot74(self);
     self->unkAC->methods->slot4(self->unkAC);
     self->methods->slotA8(self, 0);
-    Get_vtable_BasicClass()->slot0C(self);
+    GetBasicClassMethods()->slot0C(self);
 }
 ```
 
@@ -75,7 +75,7 @@ first build.
 alpha). Tier A: calls its own teardown steps (`slot90`, `slot74`, releases
 `self->unkAC` via `Unk18AcObjMethods::release` (renamed from
 `slot4`, exclusive to this unit, tier A), `slotA8(self, 0)`) and THEN forwards to
-`Get_vtable_BasicClass()->finalize` (that base slot's own confirmed name,
+`GetBasicClassMethods()->finalize` (that base slot's own confirmed name,
 matching `include/code_8220.h`'s canonical `BasicClassMethods::finalize`
 at the identical offset `+0x00C`) -- the standard "derived finalize does
 its own cleanup, then calls the base finalize" idiom, which is what

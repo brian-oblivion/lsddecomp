@@ -5,8 +5,8 @@
 > Renamed from `func_8005C76C` on 2026-09-21 (tools/rename.py). Address 0x8005c76c.
 
 Unit `DreamAux` (was `code_4cd08`). 26/26 words, `0x4CF6C`-`0x4CFD4`. Whole-image
-`build-and-verify.sh` green. Same shape as `ReleaseDreamAuxModels`, over `gDreamAuxSlots2`
-instead of `gDreamAuxSlots` (see that report for the object/vtable/loop-shape
+`build-and-verify.sh` green. Same shape as `ReleaseDreamAuxModels`, over `sDreamAuxSlots2`
+instead of `sDreamAuxSlots` (see that report for the object/vtable/loop-shape
 derivation -- not repeated here).
 
 ```c
@@ -16,7 +16,7 @@ void ReleaseDreamAuxEntities(void)
     DreamAuxSlot *slot;
 
     done = 0;
-    slot = gDreamAuxSlots2;
+    slot = sDreamAuxSlots2;
 
     for (; done < 1; done++) {
         DreamAuxObj *obj = slot->obj;
@@ -33,7 +33,7 @@ void ReleaseDreamAuxEntities(void)
 ## Residue: prologue spill/init INTERLEAVING, not just store order
 
 The first, direct port of `ReleaseDreamAuxModels`'s shape (`DreamAuxSlot *slot =
-gDreamAuxSlots2; u32 done;`, initializers at declaration) built clean but only
+sDreamAuxSlots2; u32 done;`, initializers at declaration) built clean but only
 21/26 -- the two callee-save spills and their register inits were emitted in
 the wrong relative order:
 
@@ -56,7 +56,7 @@ from C; use a bare `__asm__("")` as the first statement), I checked whether
 this is the same class of residue before reshaping further:
 
 - Swapping the *declaration* order alone (`u32 done;` before
-  `DreamAuxSlot *slot = gDreamAuxSlots2;`, both still initialized in their
+  `DreamAuxSlot *slot = sDreamAuxSlots2;`, both still initialized in their
   declarators) made **no difference** -- still 21/26, byte-identical to the
   unswapped version. Confirms declaration order alone does not reach
   whatever pass decides this, same finding as the broadcast.
@@ -67,7 +67,7 @@ this is the same class of residue before reshaping further:
   residue.
 - What worked: splitting the declarations from their initialization into
   separate STATEMENTS, in the order retail wants (`done = 0;` before
-  `slot = gDreamAuxSlots2;`), with the declarations themselves left in either
+  `slot = sDreamAuxSlots2;`), with the declarations themselves left in either
   order. This is a genuinely different C shape from an initializer at the
   declarator (not just cosmetically -- GCC 2.6.3 apparently schedules
   spill/init pairs for straight assignment statements as a unit, in
@@ -91,7 +91,7 @@ this is the same class of residue before reshaping further:
 ## Naming
 
 **ReleaseDreamAuxEntities** — tier A. Identical mechanics to `ReleaseDreamAuxModels`,
-over `gDreamAuxSlots2` instead of `gDreamAuxSlots` (see that report/entry for
+over `sDreamAuxSlots2` instead of `sDreamAuxSlots` (see that report/entry for
 the shared derivation). Tier A for the same reason: the tick pass over the
 slot family IS the function's purpose. Called from `ObjM__TeardownStyle`
 (`ObjMStyleActor.c`) alongside other per-frame-looking calls, consistent with
@@ -104,7 +104,7 @@ this unit's own queue).
 ## Naming (round 100)
 
 **ReleaseDreamAuxEntities** (was TickDreamAuxSlots2) -- tier A.
-gDreamAuxSlots2 (0x80088D2C) is gDreamAuxSlots one word in, so the word each
+sDreamAuxSlots2 (0x80088D2C) is sDreamAuxSlots one word in, so the word each
 element's first field reads is the slot's `entity`, the Entity
 SetDreamAuxWorld made; slot +0x004 is `release`. Its only caller is
 ObjM__TeardownStyle (onDeinit, src/world/ObjMStyleActor.c), mirroring ObjM's scene

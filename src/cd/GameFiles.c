@@ -6,11 +6,11 @@
  * LbdFile__SetAutoLoadData and GetLbdFileMethods, the loader for one stage
  * map chunk, STGnn\Mnnn.LBD.
  *
- * gRecordTable is an array of 0x1C-byte records (FilePathRecord), each a file path
+ * sRecordTable is an array of 0x1C-byte records (FilePathRecord), each a file path
  * padded with zeros; DayTaskStageMap.c's RegisterRecordTableFiles hands them to
  * the CD driver. In order:
  *  - the seven sound banks' SND\name.VH/VB pairs and SND\SE.VH/VB;
- *  - each stage's files, from gStageFirstRecord[stage]: its four textures
+ *  - each stage's files, from sStageFirstRecord[stage]: its four textures
  *    (TEXA..TEXD.TIX), five BGM sequences (BGA..BGE.SEQ) and map chunks
  *    (Mnnn.LBD, laid out as StageGrid.h's grid);
  *  - from RECORD_TABLE_COUNT, the movies (ETC\OPENINGA..G.STR,
@@ -19,7 +19,7 @@
  * The stage getters return a record, used as a path: PickStageBgm's goes to
  * the WBgm's setSeq, PickStageTexture's to New_TimBlockSrc, and a map
  * chunk's to an LbdFile. The movie getters also hand back a movie id, the
- * movie's index in gMovieFrameCounts, whose value GetMovieFrameCount gives
+ * movie's index in sMovieFrameCounts, whose value GetMovieFrameCount gives
  * GameApplicationFileResource.c's StreamTasks as the MoviePlayer's frame count.
  *
  * The random pickers draw through SeedAndRandom; SetPickOverrides forces
@@ -33,7 +33,7 @@
 #include <rand.h>
 #include "GameApplicationFileResource.h"
 
-/* gRecordTable's record indices. The first RECORD_TABLE_COUNT are the
+/* sRecordTable's record indices. The first RECORD_TABLE_COUNT are the
  * sound banks (SND\*.VH/VB) and then each stage's files; the movie records
  * follow. */
 enum RecordIndex {
@@ -44,7 +44,7 @@ enum RecordIndex {
     RECORD_SPECIAL_DAYS = 574    /* SPECIAL_DAY_RECORD_COUNT per special day */
 };
 
-/* A stage's records, from gStageFirstRecord[stage]: TEXA..TEXD.TIX, then
+/* A stage's records, from sStageFirstRecord[stage]: TEXA..TEXD.TIX, then
  * BGA..BGE.SEQ, then its Mnnn.LBD map chunks. */
 #define STAGE_TEXTURE_COUNT 4
 #define STAGE_BGM_COUNT 5
@@ -55,10 +55,10 @@ enum RecordIndex {
  * DAYS_PER_TEXTURE days, repeating every STAGE_TEXTURE_COUNT of those. */
 #define DAYS_PER_TEXTURE 10
 
-/* The seven gSoundBankPaths entries, SND\AMBIENT .. SND\STANDERD. */
+/* The seven sSoundBankPaths entries, SND\AMBIENT .. SND\STANDERD. */
 #define SOUND_BANK_COUNT 7
 
-/* Movie ids: a movie record's index in gMovieFrameCounts, handed back
+/* Movie ids: a movie record's index in sMovieFrameCounts, handed back
  * through the movie getters' movieIdOut. */
 enum MovieId {
     MOVIE_OPENING_FIRST = 0,      /* OPENING_MOVIE_COUNT, A to G */
@@ -111,7 +111,7 @@ void LbdFile__Finalize(LbdFile *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* slot +0x064 of gLbdFileMethods (setFlag) */
+/* slot +0x064 of gLbdFileMethods (onRequestDone) */
 void LbdFile__AdvanceLoadState(LbdFile *self) {
     if (self->loadState == LBDFILE_LOAD_HEADER) {
         if (self->flags & CD_FLAG_READ_DONE) {
@@ -128,7 +128,7 @@ void LbdFile__AdvanceLoadState(LbdFile *self) {
             self->loadState = LBDFILE_LOAD_IDLE;
         }
     }
-    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
+    GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
 }
 
 /* slot +0x074 of gLbdFileMethods (cancelRequests) */
@@ -190,15 +190,15 @@ void LbdFile__ReleaseDataBlock(LbdFile *self) {
     }
 }
 
-extern char *gDefaultDataDirectory; /* "CDI\\" (sdata) */
-extern s32 gForcedSoundBank;
-extern s32 gForcedStageBgm;
-extern u8 gSoundBankPaths[];
-extern u8 gRecordTable[];
-extern char *gSoundEffectDirPtr; /* -> "SND\\SE" */
+extern char *sDefaultDataDirectory; /* "CDI\\" (sdata) */
+extern s32 sForcedSoundBank;
+extern s32 sForcedStageBgm;
+extern u8 sSoundBankPaths[];
+extern u8 sRecordTable[];
+extern char *sSoundEffectDirPtr; /* -> "SND\\SE" */
 extern const char sAsmkMoviePath[];
-extern s16 gMovieFrameCounts[];
-extern s16 gStageFirstRecord[];
+extern s16 sMovieFrameCounts[];
+extern s16 sStageFirstRecord[];
 
 /* slot +0x088 of gLbdFileMethods */
 void LbdFile__SetAutoLoadData(LbdFile *self, s32 value) {
@@ -210,7 +210,7 @@ LbdFileMethods *GetLbdFileMethods(void) {
 }
 
 char *GetDefaultDataDirectory(void) {
-    return gDefaultDataDirectory;
+    return sDefaultDataDirectory;
 }
 
 /* rand(), after srand(seed) when seed is nonzero. */
@@ -225,10 +225,10 @@ s32 SeedAndRandom(s32 seed, s32 unused) {
  * random); a negative argument leaves that one as it was. */
 void SetPickOverrides(s32 soundBank, s32 stageBgm) {
     if (soundBank >= 0) {
-        gForcedSoundBank = soundBank;
+        sForcedSoundBank = soundBank;
     }
     if (stageBgm >= 0) {
-        gForcedStageBgm = stageBgm;
+        sForcedStageBgm = stageBgm;
     }
 }
 
@@ -236,11 +236,11 @@ void *GetRecordTable(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = RECORD_TABLE_COUNT;
     }
-    return gRecordTable;
+    return sRecordTable;
 }
 
 void *GetSoundBankPaths(void) {
-    return gSoundBankPaths;
+    return sSoundBankPaths;
 }
 
 /* One of the SND\name paths WBgm opens as its VAB, forced or random. */
@@ -249,8 +249,8 @@ char *PickSoundBank(s32 unused) {
     char **table = GetSoundBankPaths();
     char **entry;
     s32 index;
-    if (gForcedSoundBank != 0) {
-        index = gForcedSoundBank - 1;
+    if (sForcedSoundBank != 0) {
+        index = sForcedSoundBank - 1;
         entry = &table[index];
     } else {
         entry = &table[r];
@@ -259,7 +259,7 @@ char *PickSoundBank(s32 unused) {
 }
 
 char **GetSoundEffectDirRef(void) {
-    return &gSoundEffectDirPtr;
+    return &sSoundEffectDirPtr;
 }
 
 char *GetSoundEffectDir(void) {
@@ -267,7 +267,7 @@ char *GetSoundEffectDir(void) {
 }
 
 FilePathRecord *GetStageRecords(s32 stage) {
-    return &((FilePathRecord *)GetRecordTable(NULL))[gStageFirstRecord[stage]];
+    return &((FilePathRecord *)GetRecordTable(NULL))[sStageFirstRecord[stage]];
 }
 
 FilePathRecord *GetStageTextureRecords(s32 stage) {
@@ -295,12 +295,12 @@ FilePathRecord *PickStageBgm(s32 stage, s32 unused) {
         if (r == 2) {
             r = 3;
         }
-        if (gForcedStageBgm == 3) {
-            gForcedStageBgm = 4;
+        if (sForcedStageBgm == 3) {
+            sForcedStageBgm = 4;
         }
     }
     rec = GetStageBgmRecords(stage);
-    return &rec[gForcedStageBgm != 0 ? gForcedStageBgm - 1 : r];
+    return &rec[sForcedStageBgm != 0 ? sForcedStageBgm - 1 : r];
 }
 
 FilePathRecord *GetStageMapChunkRecords(s32 stage) {
@@ -403,7 +403,7 @@ FilePathRecord *GetSpecialDayOrEventRecord(s32 *movieIdOut, RecPick pick) {
 }
 
 s32 GetMovieFrameCount(s32 movieId) {
-    return gMovieFrameCounts[movieId];
+    return sMovieFrameCounts[movieId];
 }
 
 /* The first movie of special day `day`; *frameTotal is the frame count of
@@ -419,7 +419,7 @@ FilePathRecord *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount) {
     start = firstMovieId;
     dayCount += start;
     for (movieId = start; movieId < dayCount; movieId++) {
-        *frameTotal += gMovieFrameCounts[movieId] + MOVIE_SPAN_GAP_FRAMES;
+        *frameTotal += sMovieFrameCounts[movieId] + MOVIE_SPAN_GAP_FRAMES;
     }
     *frameTotal -= MOVIE_SPAN_GAP_FRAMES;
     return rec;

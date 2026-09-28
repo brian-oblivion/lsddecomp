@@ -36,7 +36,7 @@
 
 ```c
 s32 Entity__GetLinkStage(Entity *this) {
-    s32 linkStage = gEntityLinkStageTable[this->moodIndex * 0x10];
+    s32 linkStage = sEntityLinkStageTable[this->moodIndex * 0x10];
 
     if (linkStage < 0) {
         return ~linkStage;
@@ -77,7 +77,7 @@ does not produce it.
 ## What it does
 
 ```c
-s32 v = gEntityLinkStageTable[this->moodIndex * 0x10];  /* signed byte */
+s32 v = sEntityLinkStageTable[this->moodIndex * 0x10];  /* signed byte */
 if (v < 0) {
     return ~v;
 }
@@ -102,8 +102,8 @@ reproducer there) — the table load is 1 word short, everything else
 (including the branch and both return paths) matches:
 
 ```
-retail:  lui $at,%hi(gEntityLinkStageTable) / addiu $at,$at,%lo(gEntityLinkStageTable) / addu $at,$at,$v0 / lb $v0,0x0($at)
-built:   lui $at,%hi(gEntityLinkStageTable) / addu $at,$at,$v0 / lb $v0,%lo(gEntityLinkStageTable)($at)
+retail:  lui $at,%hi(sEntityLinkStageTable) / addiu $at,$at,%lo(sEntityLinkStageTable) / addu $at,$at,$v0 / lb $v0,0x0($at)
+built:   lui $at,%hi(sEntityLinkStageTable) / addu $at,$at,$v0 / lb $v0,%lo(sEntityLinkStageTable)($at)
 ```
 
 ## Preserved body
@@ -113,7 +113,7 @@ built:   lui $at,%hi(gEntityLinkStageTable) / addu $at,$at,$v0 / lb $v0,%lo(gEnt
 s32 Entity__GetLinkStage(Entity *this) {
     s32 v;
 
-    v = gEntityLinkStageTable[this->moodIndex * 0x10];
+    v = sEntityLinkStageTable[this->moodIndex * 0x10];
     if (v < 0) {
         return ~v;
     }
@@ -134,7 +134,7 @@ TOOLCHAIN rather than re-attempted as a reshaping problem.
 ## Naming
 
 **Tier A, pre-existing (round 2026-08-30-a), confirmed this round.** A pure
-getter over `gEntityLinkStageTable` (named this round), `abs(x) - 1` written
+getter over `sEntityLinkStageTable` (named this round), `abs(x) - 1` written
 as an explicit two-arm form. This round's `Entity__NotifyLinkStage` and the
 `Entity__Activate`/`Entity__UpdateActivationState` naming reasoning both cite
 this function's "Link" vocabulary as the reason NOT to reuse "Link" for the
@@ -146,13 +146,13 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Polish (round 96, bravo, track 7)
 
-- Step 2: The flat mood-row "tables" this body read are columns of gEntityMoodTable's
+- Step 2: The flat mood-row "tables" this body read are columns of sEntityMoodTable's
 16-byte row (their symbols are the row base 0x80089EA4 plus the column
-offset: gEntityUnlockKindTable +0x02, gEntityLinkStageTable +0x07,
-gEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
+offset: gEntityUnlockKindTable +0x02, sEntityLinkStageTable +0x07,
+sEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
 gEntityMoodHandlerTable +0x0C), now EntityMoodRow fields; byte-identical.
 Entity.h's old claim that they were "SEPARATE global arrays (own base
-symbols, own lui/addiu) ... not sub-fields of the gEntityMoodTable row" was
+symbols, own lui/addiu) ... not sub-fields of the sEntityMoodTable row" was
 wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.
 

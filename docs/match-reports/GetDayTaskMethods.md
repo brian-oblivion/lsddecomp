@@ -13,7 +13,7 @@
 The `Get_vtable_X`-shaped accessor for the class implemented by most of this
 unit's remaining functions: returns `&gDayTaskMethods`, a 33-slot method table
 (`tools/classtable.py 0x800865C8`). No parameters, matching the
-`Get_vtable_DreamSys` / `GetGameApplicationMethods` shape from
+`GetDreamSysMethods` / `GetGameApplicationMethods` shape from
 `docs/research/class-framework.md`.
 
 ## Derivation
@@ -44,7 +44,7 @@ None beyond what's already documented.
 
 ## Naming
 
-`GetDayTaskMethods` -- tier A. Plain accessor, `return &gDayTaskMethods;` -- matches the established `GetXMethods`/`Get_vtable_X` accessor convention used site-wide for vtable getters (e.g. `GetTimedTaskMethods`, `Get_vtable_IntermediateBase`).
+`GetDayTaskMethods` -- tier A. Plain accessor, `return &gDayTaskMethods;` -- matches the established `GetXMethods`/`Get_vtable_X` accessor convention used site-wide for vtable getters (e.g. `GetTimedTaskMethods`, `GetIntermediateBaseMethods`).
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 

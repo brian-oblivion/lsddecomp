@@ -10,7 +10,7 @@
 
 Stores three of its own arguments (plus a fourth, stack-spilled one) into
 `self`'s fields, then delegates to the sibling class `gTaskCoreMethods`
-(`Get_vtable_TaskCore()`, `LoaderTaskMethods` in `GameApplication.h`) at slot `+0x044`,
+(`GetTaskCoreMethods()`, `LoaderTaskMethods` in `GameApplication.h`) at slot `+0x044`,
 passing `self` and its own first argument, hardcoding the third argument to
 0. Occupies `gStreamTaskMethods` slot `+0x044` itself.
 
@@ -31,7 +31,7 @@ derivations consistent.
 lw    $v0, 0x30($sp)          ; 5th arg (stack)
 sw    $a2, 0xB8($s0)          ; self->unkB8 = arg2
 sw    $a3, 0xBC($s0)          ; self->unkBC = typeLookup
-jal   Get_vtable_TaskCore
+jal   GetTaskCoreMethods
  sw   $v0, 0xC0($s0)          ; self->unkC0 = flag (delay slot, independent store)
 addu  $a0, $s0, zero
 addu  $a1, $s1, zero
@@ -46,7 +46,7 @@ void StreamTask__Init(StreamTaskObj *self, s32 a1, s32 arg2, s32 typeLookup, s32
     self->unkB8 = arg2;
     self->unkBC = typeLookup;
     self->unkC0 = flag;
-    Get_vtable_TaskCore()->slot44(self, a1, 0);
+    GetTaskCoreMethods()->slot44(self, a1, 0);
 }
 ```
 
@@ -91,7 +91,7 @@ supported yet.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). This function occupies +0x044 with five parameters where TASKCORE_SLOTS (IntermediateBase) types the slot init(args, mode): a contradiction left for StreamTaskObj's own job.
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). This function occupies +0x044 with five parameters where TASKCORE_SLOTS (IntermediateBase) types the slot init(args, mode): a contradiction left for StreamTaskObj's own job.
 
 ## Track 4 (2026-09-26, round 87)
 

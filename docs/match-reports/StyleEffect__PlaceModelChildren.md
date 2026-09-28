@@ -19,8 +19,8 @@ through the pointer each time.
 ## Body
 
 ```c
-extern Vec3S gModelChildOffsetInit;
-extern s32 gModelChildSpacing[];
+extern Vec3S sModelChildOffsetInit;
+extern s32 sModelChildSpacing[];
 
 void StyleEffect__PlaceModelChildren(LinkNode *self, s32 reuse) {
     Vec3S accum;
@@ -31,13 +31,13 @@ void StyleEffect__PlaceModelChildren(LinkNode *self, s32 reuse) {
     if (count == 0) {
         return;
     }
-    accum = gModelChildOffsetInit;
+    accum = sModelChildOffsetInit;
     p = self->arr7C;
     for (i = 0; i < 2; i++, p++) {
         if (count < 3) {
-            accum.x += *(s16 *)self->unk68 * gModelChildSpacing[count];
+            accum.x += *(s16 *)self->unk68 * sModelChildSpacing[count];
         } else {
-            accum.y += gModelChildSpacing[count];
+            accum.y += sModelChildSpacing[count];
         }
         if (reuse) {
             LinkNode *child = *p;
@@ -68,7 +68,7 @@ instead of retail's `-0x48`) because two fewer registers needed saving.
 Caching `count = self->unk6C` up front and using `count` everywhere else
 fixed it outright -- one word.
 
-The three-word residue seen along the way (`gModelChildOffsetInit`'s/`gModelChildSpacing`'s own
+The three-word residue seen along the way (`sModelChildOffsetInit`'s/`sModelChildSpacing`'s own
 `%lo` immediates and one `jal` target, all off by exactly 4) was pure address
 drift from `StyleEffect__BuildRandomSprites` (this unit's sixth function this round) not yet
 being byte-exact -- not a real defect in this function. `./build-and-verify.sh`
@@ -94,13 +94,13 @@ Two callers: StyleEffect__InitByKind with reuse = 0 (creates both children:
 New_Actor, SceneNode__LinkModel with the owner's `model`,
 AttachWithRotScale under the owner) and StyleEffect__DriftModelChildren with
 reuse = 1 (only slotB8 = Actor__SetTranslation, set translation). Both place
-child i at (i+1) * gModelChildSpacing[modelChildLayout] along x (layouts 1-2,
+child i at (i+1) * sModelChildSpacing[modelChildLayout] along x (layouts 1-2,
 scaled by the scale triple's first s16) or y (3-4). "Place" covers both
 paths; B because the layout's purpose on screen is not known.
 
 Globals named in this pass (only this unit references them, tier B):
-`gModelChildOffsetInit` (was D_800877EC, all-zero Vec3S, the accumulator's
-start value) and `gModelChildSpacing` (was D_800877F8, s32[5] = {0, -0x80,
+`sModelChildOffsetInit` (was D_800877EC, all-zero Vec3S, the accumulator's
+start value) and `sModelChildSpacing` (was D_800877F8, s32[5] = {0, -0x80,
 0x80, -0x100, 0x40}, indexed by modelChildLayout).
 
 ## Track 4 (2026-09-26, round 88, charlie)
@@ -110,7 +110,7 @@ ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: 
 ## Naming (track 7, round 101)
 
 - `count` -> `layout`: it is `params.modelChildLayout`, an index into
-  gModelChildSpacing (0 = none), not a count. `accum` -> `childPos`,
+  sModelChildSpacing (0 = none), not a count. `accum` -> `childPos`,
   `p` -> `slot`.
 - `*(s16 *)self->params.scale` is `self->params.scale[0].num` (scale is a
   `Ratio16 *`; num is its first s16).

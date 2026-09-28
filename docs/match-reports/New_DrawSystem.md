@@ -5,7 +5,7 @@
 Round 81, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
 
 - **Where:** allocator (slots resolved with `tools/classtable.py gDrawSystemMethods`).
-- **What:** allocates 0x34 bytes with BMemPMgrAlloc and runs the ctor through the class table (Get_vtable_DrawSystem()->ctor); the broadcast alloc-then-ctor shape `if (p != NULL) { ctor; return p; } return NULL;`.
+- **What:** allocates 0x34 bytes with BMemPMgrAlloc and runs the ctor through the class table (GetDrawSystemMethods()->ctor); the broadcast alloc-then-ctor shape `if (p != NULL) { ctor; return p; } return NULL;`.
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
   20/20 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
   green (`OK: build matches retail`).
@@ -17,7 +17,7 @@ Class6C070 *New_DrawSystem(void) {
     Class6C070 *p = BMemPMgrAlloc(0x34);
 
     if (p != NULL) {
-        Get_vtable_DrawSystem()->ctor(p);
+        GetDrawSystemMethods()->ctor(p);
         return p;
     }
     return NULL;
@@ -82,7 +82,7 @@ project's own convention (`BasicClass.h`; matches `New_WBgm`, round 81).
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `gDrawSystem` (rename.py). Byte-identical.
+The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
 
 ## History: the `src/code_10ee0.c` unit banner (moved here in round 101, track 7)
 

@@ -34,7 +34,7 @@ Tier A. `CdStream__StartRead` -- slot +0x050. Evidence: only fires from the seek
 void CdStream__StartRead(CdStreamObj *self, u32 startFrame, s32 arg2) {
     u32 mode;
 
-    if (self->unk2C == 1 && gActiveCdStream == self) {
+    if (self->unk2C == 1 && sActiveCdStream == self) {
         mode = 0x140;
         if (self->unk34 < 4) {
             mode = 0x1C0;

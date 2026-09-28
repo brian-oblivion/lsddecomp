@@ -25,7 +25,7 @@
  *    rotation and scale follow SceneNode's ratio tables.
  *  - MoviePlayer, CD-streamed and MDEC-decoded FMV (CdStream frames,
  *    DecDCTvlc, then DecDCTin/DecDCTout in 16-pixel strips uploaded as they
- *    finish), one movie at a time (gActiveMoviePlayer).
+ *    finish), one movie at a time (sActiveMoviePlayer).
  * The ctors take include/FileResource.h's ResourceSource; the build steps
  * that make them fill one as a ResourceRequest's `src`. The unit's own
  * types: UnprototypedCtorTable, the view the allocators call a ctor slot
@@ -62,6 +62,11 @@
 #include "BMemPMgr.h"
 #include "GameApplicationFileResource.h"
 #include "CdDriver.h"
+
+extern MoviePlayer *sActiveMoviePlayer; /* the playing movie, or NULL (play sets it, pollActive clears it) */
+extern s32 sMdecInitialized;            /* set by the first ctor, which DecDCTReset(0)s the MDEC */
+extern s32 sMoviePollCounter;           /* pollActive's call count */
+extern u8 sMovieClearColor[4];          /* a zero word: play's clearImage color, black */
 
 /* The fade CLUTs: 256-colour rows from VRAM y 480. TimBlockSrc lays its
  * four ramps out there and TimArraySrc maps an image's CLUT row back to
@@ -142,9 +147,9 @@ typedef struct TimBlockHeader {
     /* +0x14 */ u32 sizes[4];
 } TimBlockHeader;
 
-extern s16 gTimBlockClutShift;
+extern s16 sTimBlockClutShift;
 
-/* ctor (+0x008): lay out the four fade ramps (2^gTimBlockClutShift rows
+/* ctor (+0x008): lay out the four fade ramps (2^sTimBlockClutShift rows
  * each, one after another from CLUT_FADE_Y), then open `name` and read its
  * first sector, whose header TIMBLOCK_LOAD_HEADER takes. */
 void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
@@ -163,8 +168,8 @@ void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
     self->sector = NULL;
     self->sectorSize = 0;
     addr = 0;
-    mask = 1 << gTimBlockClutShift;
-    shift = gTimBlockClutShift;
+    mask = 1 << sTimBlockClutShift;
+    shift = sTimBlockClutShift;
     for (i = 0; i < ARRAY_COUNT(self->entries); i++) {
         e = &self->entries[i];
         e->shift = shift;
@@ -198,7 +203,7 @@ void TimBlockSrc__Finalize(TimBlockSrc *self) {
 
 u32 FindMaxTimBlockSize(FileResource *self);
 
-/* setFlag (+0x064), run when a read completes: once the header sector is
+/* onRequestDone (+0x064), run when a read completes: once the header sector is
  * in, keep the header and read the first block into a buffer the size of
  * the largest; once a block is in, build a TimArraySrc over it (its images
  * take their CLUTs from `entries`), upload it, and read the next, until the
@@ -240,7 +245,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 (*p)->bufferSize = 0;
                 (*p)->clutBase = (s32)self->entries;
                 n++;
-                (*p)->methods->setFlag(*p);
+                (*p)->methods->onRequestDone(*p);
                 ((TimArraySrcUploadFn)(*p)->methods->processBuffer)(*p);
                 self->blockCount = n;
                 if (n < ((TimBlockHeader *)self->buffer)->count) {
@@ -253,7 +258,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                     self->sectorSize = 0;
                     self->loadState = TIMBLOCK_LOAD_IDLE;
                     self->loaded = 1;
-                    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
+                    GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
                 }
             }
             break;
@@ -335,7 +340,7 @@ void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
     src.x = 0;
     src.w = CLUT_COLORS;
     src.h = 1;
-    src.y = (index << gTimBlockClutShift) + CLUT_FADE_Y;
+    src.y = (index << sTimBlockClutShift) + CLUT_FADE_Y;
     StoreImage(&src, (u32 *)in);
     DrawSync(0);
     dst.h = 1;
@@ -400,7 +405,7 @@ void *LinkResource__LinkResource(LinkResource *self, ResourceSource *src) {
         if (src->buffer != NULL) {
             self->buffer = src->buffer;
             self->bufferSize = 0;
-            if (((LinkResourceBuildModelsFn)self->methods->setFlag)(self)) {
+            if (((LinkResourceBuildModelsFn)self->methods->onRequestDone)(self)) {
                 goto fail;
             }
         } else {
@@ -424,7 +429,7 @@ void LinkResource__Finalize(LinkResource *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* setFlag (+0x064): map the TMD, then build a NULL-ended array of one
+/* onRequestDone (+0x064): map the TMD, then build a NULL-ended array of one
  * TmdModel per TMD object. 1 when an allocation fails, with everything
  * built so far released; else 0. */
 s32 LinkResource__BuildModels(LinkResource *self) {
@@ -451,7 +456,7 @@ s32 LinkResource__BuildModels(LinkResource *self) {
         models++;
     }
     *models = NULL;
-    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
+    GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
     return 0;
 }
 
@@ -508,7 +513,7 @@ void TimArraySrc__Finalize(TimArraySrc *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-extern s16 gTimClutRowShift;
+extern s16 sTimClutRowShift;
 
 /* A TimArraySrc's buffer: an image count, then each image's byte offset
  * from the start of the buffer. */
@@ -517,7 +522,7 @@ typedef struct TimArrayBuf {
     /* +0x04 */ s32 offsets[1];
 } TimArrayBuf;
 
-/* setFlag (+0x064): once the buffer is in, build one TimImage over each of
+/* onRequestDone (+0x064): once the buffer is in, build one TimImage over each of
  * its images, in place, each with the fade ramp (`clutBase`'s entries) its
  * CLUT row falls in. */
 void TimArraySrc__BuildImages(TimArraySrc *self) {
@@ -538,13 +543,13 @@ void TimArraySrc__BuildImages(TimArraySrc *self) {
                 (*objs)->bufferSize = 0;
                 (*objs)->methods->getTimInfo(*objs, &info);
                 (*objs)->clutBase =
-                    ((info.cy - CLUT_FADE_Y) >> gTimClutRowShift) * sizeof(TimBlockSrcEntry) +
+                    ((info.cy - CLUT_FADE_Y) >> sTimClutRowShift) * sizeof(TimBlockSrcEntry) +
                     self->clutBase;
                 offs++;
                 objs++;
             }
             self->ready = 1;
-            GetActiveDataSourceMethods()->setFlag((FileResource *)self);
+            GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
         }
     }
 }
@@ -582,7 +587,7 @@ void Tod__Tod(Tod *self, ResourceSource *src) {
     if (src->buffer != NULL) {
         self->buffer = src->buffer;
         self->bufferSize = 0;
-        self->methods->setFlag(self);
+        self->methods->onRequestDone(self);
     } else {
         self->methods->requestLoadFile(self, src->name);
     }
@@ -706,7 +711,7 @@ void BgLayer__BgLayer(BgLayer *self, TileMap *src, s32 mode) {
 /* reset (+0x040): lay the GsBG over `src`'s map, sized to the map (mode 0,
  * 8-bit CLUT) or to the screen (mode 1, 15-bit), at the origin, unscaled,
  * unrotated, pivoting on its centre. */
-extern BgLayerRgb gBgLayerDefaultColor;
+extern BgLayerRgb sBgLayerDefaultColor;
 
 void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
     if (mode == 0) {
@@ -722,7 +727,7 @@ void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
     self->y = 0;
     self->scrollx = 0;
     self->scrolly = 0;
-    self->color = gBgLayerDefaultColor;
+    self->color = sBgLayerDefaultColor;
     self->map = &src->map;
     self->scalex = ONE;
     self->scaley = ONE;
@@ -850,7 +855,7 @@ void *ModelData__ModelData(ModelData *self, ResourceSource *src, s32 owns) {
     if (src->buffer != NULL) {
         self->buffer = src->buffer;
         self->bufferSize = 0;
-        if (((s32 (*)())self->methods->setFlag)(self)) {
+        if (((s32 (*)())self->methods->onRequestDone)(self)) {
             goto fail;
         }
     } else {
@@ -867,9 +872,9 @@ void ModelData__Finalize(ModelData *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* setFlag (+0x064): the driver's, then BuildResources. */
+/* onRequestDone (+0x064): the driver's, then BuildResources. */
 void ModelData__Load(ModelData *self) {
-    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
+    GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
     ((s32 (*)())self->methods->processBuffer)(self);
 }
 
@@ -955,7 +960,7 @@ void *TriggerWorld__TriggerWorld(TriggerWorld *self, ResourceSource *src) {
     ((UnprototypedCtorTable *)GetModelDataMethods())->ctor(self, src, 0);
     self->methods = GetTriggerWorldMethods();
     if (src->buffer != NULL) {
-        if (((s32 (*)())self->methods->setFlag)(self)) {
+        if (((s32 (*)())self->methods->onRequestDone)(self)) {
             return NULL;
         }
     }
@@ -968,7 +973,7 @@ void TriggerWorld__Finalize(TriggerWorld *self) {
     GetModelDataMethods()->finalize((ModelData *)self);
 }
 
-/* setFlag (+0x064): BuildResources. */
+/* onRequestDone (+0x064): BuildResources. */
 void TriggerWorld__Load(TriggerWorld *self) {
     ((s32 (*)())self->methods->processBuffer)(self);
 }
@@ -1046,7 +1051,7 @@ void TileMap__TileMap(TileMap *self, s32 source, TileAtlas *atlas) {
     if (source == 0) {
         self->defaultGrid = 1;
         self->loadState = 0;
-        self->methods->setFlag(self);
+        self->methods->onRequestDone(self);
     }
 }
 
@@ -1056,7 +1061,7 @@ void TileMap__Finalize(TileMap *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* setFlag (+0x064): when idle, BuildMap. */
+/* onRequestDone (+0x064): when idle, BuildMap. */
 void TileMap__Load(TileMap *self) {
     if (self->loadState == 0) {
         ((TileMapBuildMapFn)self->methods->processBuffer)(); /* MATCHING: retail passes no argument */
@@ -1118,7 +1123,7 @@ void TileAtlas__TileAtlas(TileAtlas *self, s32 source) {
     if (source == 0) {
         self->defaultCells = 1;
         self->loadState = 0;
-        self->methods->setFlag(self);
+        self->methods->onRequestDone(self);
     }
 }
 
@@ -1130,7 +1135,7 @@ void TileAtlas__Finalize(TileAtlas *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* setFlag (+0x064): when idle, BuildCells. */
+/* onRequestDone (+0x064): when idle, BuildCells. */
 void TileAtlas__Load(TileAtlas *self) {
     s32 unused[8]; /* MATCHING: retail's 0x38-byte frame */
 
@@ -1210,7 +1215,7 @@ void *TodSet__TodSet(TodSet *self, ResourceSource *src) {
     GetTodMethods()->ctor((Tod *)self, src);
     self->methods = GetTodSetMethods();
     if (src->buffer != NULL) {
-        if (((s32 (*)())self->methods->setFlag)(self)) {
+        if (((s32 (*)())self->methods->onRequestDone)(self)) {
             return NULL;
         }
     }
@@ -1225,7 +1230,7 @@ void TodSet__Finalize(TodSet *self) {
     GetTodMethods()->finalize((Tod *)self);
 }
 
-/* setFlag (+0x064): build a Tod over each of the buffer's sub-blocks, in
+/* onRequestDone (+0x064): build a Tod over each of the buffer's sub-blocks, in
  * place of its offset; 1, with those built released, when one fails. */
 s32 TodSet__BuildTods(TodSet *self) {
     ResourceRequest req;
@@ -1283,18 +1288,18 @@ MoviePlayer *New_MoviePlayer(DrawRect *frame, s32 cdSpeed, s32 external) {
 
 /* ctor (+0x008): a CdStream and the decode buffers (1 when either cannot be
  * had), the MDEC reset by the first player built, its output callback
- * OnMdecFrameReady, and auto-play on. */
+ * OnMdecStripDone, and auto-play on. */
 s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 cdSpeed, s32 external) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetMoviePlayerMethods();
     self->stream = New_CdStream(cdSpeed, MOVIE_FPS, 0);
     if (self->stream != NULL) {
         if (MoviePlayer__InitFrame(self, frame, external) == 0) {
-            if (gMdecInitialized == 0) {
+            if (sMdecInitialized == 0) {
                 DecDCTReset(0);
             }
-            gMdecInitialized = 1;
-            DecDCToutCallback(OnMdecFrameReady);
+            sMdecInitialized = 1;
+            DecDCToutCallback(OnMdecStripDone);
             self->stream->methods->setRing(self->stream, self->ring, MOVIE_RING_SIZE);
             self->pendingStart = 0;
             self->methods->setAutoPlay(self, 1);
@@ -1311,7 +1316,7 @@ void MoviePlayer__Finalize(MoviePlayer *self) {
     DecDCToutCallback(NULL);
     DecDCTReset(0);
     MoviePlayer__FreeFrameBuffers(self);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 /* Unless `external` (the caller's buffers), allocate the two frame
@@ -1367,13 +1372,13 @@ void MoviePlayer__FreeFrameBuffers(MoviePlayer *self) {
 s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 keepActive, s32 loops) {
     DrawSystem *ds;
 
-    if (gActiveMoviePlayer == NULL) {
+    if (sActiveMoviePlayer == NULL) {
         if (self->autoPlay != 0) {
-            MoviePlayer__MarkPlaying(self);
+            MoviePlayer__RequestStart(self);
         }
         self->frameCount = frameCount;
         if (self->stream->methods->open(self->stream, name, MOVIE_OPEN_TRIES) == 0) {
-            gActiveMoviePlayer = self;
+            sActiveMoviePlayer = self;
             self->haveFrame = 0;
             self->frameIndex = 0;
             self->frameDone = 1;
@@ -1382,7 +1387,7 @@ s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 keepAct
             self->keepActive = keepActive;
             self->loops = loops;
             ds = GetDrawSystem();
-            ds->methods->clearImage(ds, gMovieClearColor, &self->frame);
+            ds->methods->clearImage(ds, sMovieClearColor, &self->frame);
             return 0;
         }
         return 1;
@@ -1390,14 +1395,14 @@ s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 keepAct
     return 0;
 }
 
-void MoviePlayer__MarkPlaying(MoviePlayer *self) {
+void MoviePlayer__RequestStart(MoviePlayer *self) {
     self->pendingStart = 1;
 }
 
-/* stop (+0x044): when active, reset the frame state and restart the stream
- * (its slot7C, handed MarkStopped, is empty). */
-void MoviePlayer__Stop(MoviePlayer *self) {
-    MoviePlayer *cur = gActiveMoviePlayer;
+/* rewind (+0x044): when active, reset the frame state and restart the stream
+ * (its slot7C, handed RequestRestart, is empty). */
+void MoviePlayer__Rewind(MoviePlayer *self) {
+    MoviePlayer *cur = sActiveMoviePlayer;
 
     if (cur == self) {
         cur->haveFrame = 0;
@@ -1405,13 +1410,13 @@ void MoviePlayer__Stop(MoviePlayer *self) {
         cur->frameDone = 1;
         cur->streamEnded = 0;
         cur->finished = 0;
-        cur->stream->methods->slot7C(cur->stream, MoviePlayer__MarkStopped, cur);
+        cur->stream->methods->slot7C(cur->stream, MoviePlayer__RequestRestart, cur);
         cur->started = 0;
         cur->stream->methods->restart(cur->stream);
     }
 }
 
-void MoviePlayer__MarkStopped(MoviePlayer *self) {
+void MoviePlayer__RequestRestart(MoviePlayer *self) {
     self->pendingStart = -1;
 }
 
@@ -1419,7 +1424,7 @@ void MoviePlayer__MarkStopped(MoviePlayer *self) {
  * stream reading on a pending start (on a restart, muting it once `loops`
  * runs out), else decode once started. */
 s32 MoviePlayer__Advance(MoviePlayer *self) {
-    MoviePlayer *cur = gActiveMoviePlayer;
+    MoviePlayer *cur = sActiveMoviePlayer;
 
     if (cur == self) {
         if (cur->pendingStart == 0) {
@@ -1444,7 +1449,7 @@ out:; /* MATCHING: retail returns no value on this path */
 
 /* abort (+0x04C): when active, close the stream and finish. */
 void MoviePlayer__Abort(MoviePlayer *self) {
-    MoviePlayer *cur = gActiveMoviePlayer;
+    MoviePlayer *cur = sActiveMoviePlayer;
 
     if (cur == self) {
         cur->streamEnded = 1;
@@ -1513,24 +1518,24 @@ void MoviePlayer__DrawStrip(MoviePlayer *self) {
 }
 
 /* pollActive (+0x064), once the movie has finished: with keepActive, stay
- * active, stopping the stream every MOVIE_KEEP_ACTIVE_POLLS calls (0);
+ * active, rewinding the stream every MOVIE_KEEP_ACTIVE_POLLS calls (0);
  * otherwise no movie is active any more (1). */
 s32 MoviePlayer__PollActive(MoviePlayer *self) {
     if (self->keepActive != 0) {
-        if (gMoviePollCounter++ > MOVIE_KEEP_ACTIVE_POLLS) {
-            gMoviePollCounter = 1;
-            self->methods->stop(self);
+        if (sMoviePollCounter++ > MOVIE_KEEP_ACTIVE_POLLS) {
+            sMoviePollCounter = 1;
+            self->methods->rewind(self);
         }
         return 0;
     }
-    gActiveMoviePlayer = NULL;
+    sActiveMoviePlayer = NULL;
     return 1;
 }
 
 /* decodeFrame (+0x068): when active and not finished, hand the pulled
  * frame to the MDEC once the last one is drawn, and pull the next. */
 s32 MoviePlayer__DecodeFrame(MoviePlayer *self) {
-    MoviePlayer *cur = gActiveMoviePlayer;
+    MoviePlayer *cur = sActiveMoviePlayer;
 
     if (cur == self) {
         if (cur->finished == 0) {
@@ -1550,11 +1555,11 @@ s32 MoviePlayer__DecodeFrame(MoviePlayer *self) {
     }
 } /* MATCHING: no return when another player is active, as retail */
 
-/* The MDEC's DecDCTout callback: drawStrip of gActiveMoviePlayer, when
+/* The MDEC's DecDCTout callback: drawStrip of sActiveMoviePlayer, when
  * there is one. */
-void OnMdecFrameReady(void) {
-    if (gActiveMoviePlayer != NULL) {
-        gActiveMoviePlayer->methods->drawStrip(gActiveMoviePlayer);
+void OnMdecStripDone(void) {
+    if (sActiveMoviePlayer != NULL) {
+        sActiveMoviePlayer->methods->drawStrip(sActiveMoviePlayer);
     }
 }
 

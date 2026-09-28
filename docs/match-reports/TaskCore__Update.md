@@ -16,7 +16,7 @@ void TaskCore__Update(Obj86B60 *self, s32 a1, s32 a2)
     Obj86B60Methods *methods;
 
     methods = self->methods;
-    Get_vtable_IntermediateBase()->slot5C(self, a1, a2);
+    GetIntermediateBaseMethods()->slot5C(self, a1, a2);
     if (self->unk3C != 0) {
         u32 bound;
 
@@ -43,12 +43,12 @@ void TaskCore__Update(Obj86B60 *self, s32 a1, s32 a2)
 ```
 
 First forwards to the shared "IntermediateBase" utility class
-(`Get_vtable_IntermediateBase()->slot5C(self, a1, a2)`, same idiom already used in
+(`GetIntermediateBaseMethods()->slot5C(self, a1, a2)`, same idiom already used in
 `src/app/Task.c`/`src/world/DayTaskStageMap.c`). Then, if `unk3C` is set and
 `unk40` is (unsigned) less than `unk1C`, calls `slot60` with reason `6`.
 Finally switches on `unk20` and forwards to one of four more vtable slots
 depending on its value -- two of which (`slotAC`/`slotC0`) ARE this unit's
-own `TaskCore__TickFadeCallback`/`TaskCore__TickFadeOutCallback`.
+own `TaskCore__TickFadeInCallback`/`TaskCore__TickFadeOutCallback`.
 
 ## Residues found, and what closed each
 
@@ -70,15 +70,15 @@ is CALLER-saved and the intervening call (`slot60` itself) is free to
 clobber it, so whatever value reaches `slotAC`/`slotC0` is NOT a
 meaningful forwarded argument, just physically-whatever's-left-in-the-
 register. **Fix: call `slotAC(self)`/`slotC0(self)` with ONE argument**,
-and retype the shared vtable slots (and `TaskCore__TickFadeCallback`'s own definition,
+and retype the shared vtable slots (and `TaskCore__TickFadeInCallback`'s own definition,
 already matched earlier this round) down to `s32 (*)(Obj86B60*)` -- this
-does not change `TaskCore__TickFadeCallback`'s own compiled bytes (it never read the
+does not change `TaskCore__TickFadeInCallback`'s own compiled bytes (it never read the
 parameter either way) so the earlier match stays intact.
 
 **Residue 2: `self->methods` must be cached into a local BEFORE the
-`Get_vtable_IntermediateBase()` call, or every `self->methods->slotNN` after it reloads
+`GetIntermediateBaseMethods()` call, or every `self->methods->slotNN` after it reloads
 from memory instead of reusing retail's single early `lw $s3,0($s2)`.**
-Same lesson as `TaskCore__SetFadeCallbackEnabled`'s report, but here the stakes are an entire
+Same lesson as `TaskCore__SetFadeInCallbackEnabled`'s report, but here the stakes are an entire
 missing callee-saved register (`s3`) and hence a wrong stack-frame size
 (`-0x20` instead of `-0x28`) rather than one extra word -- GCC cannot
 prove `self->methods` is unchanged across an opaque call, so without an
@@ -86,7 +86,7 @@ explicit local it reloads at every use site after the call, using MORE
 total instructions and needing FEWER saved registers, which is why this
 residue manifests as widespread structural drift rather than a narrow
 diff. Fix: `Obj86B60Methods *methods = self->methods;` before the
-`Get_vtable_IntermediateBase()` call, then `methods->slotNN(...)` everywhere after.
+`GetIntermediateBaseMethods()` call, then `methods->slotNN(...)` everywhere after.
 
 **Residue 3: `sltu` (unsigned) where a plain `<` on two `s32` fields gives
 `slt` (signed).** `self->unk40 < self->unk1C` compiles to signed `slt`;
@@ -114,7 +114,7 @@ residues 1-2 were already fixed.
 - `Obj86B60Methods::slotAC`/`::slotC0` RETYPED from `(Obj86B60*, s32)` to
   `(Obj86B60*)` -- the `s32 a1` parameter in the original signature was
   never a real argument at this (their only) call site, just a leftover
-  caller-saved register value. `TaskCore__TickFadeCallback`'s own C definition updated
+  caller-saved register value. `TaskCore__TickFadeInCallback`'s own C definition updated
   to match (no effect on its already-matched bytes).
 - `Obj86B60::unk20` (s32, +0x020) -- confirmed as a real dispatch/state
   value (previously only known as "set to 5" by `TaskCore__SetState`, STALL).
@@ -125,7 +125,7 @@ Two generalizable levers, both already present in the codebase but easy to
 under-apply on a function this size:
 1. **A shared "cache the vtable pointer" local is not optional once ANY
    call happens between two `self->methods->slotNN` uses** -- it is not
-   just a word-count nicety (as it looked in `TaskCore__SetFadeCallbackEnabled`, a 14-insn
+   just a word-count nicety (as it looked in `TaskCore__SetFadeInCallbackEnabled`, a 14-insn
    function) but can cost an entire callee-saved register and a wrong
    frame size on a larger function, which then reads as "everything after
    word 6 differs" rather than a narrow diff. Screen for this FIRST on any

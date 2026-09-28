@@ -156,7 +156,7 @@ OK: build matches retail SLPS_015.56
 ```
 
 No permuter search was run and none was needed. `Obj80027480`, `Methods80027480`,
-`Node8008A894`, `gCdIdle`, `GetCdFileEntry` and `FreeCdRequestNode` are unchanged from
+`Node8008A894`, `sCdIdle`, `GetCdFileEntry` and `FreeCdRequestNode` are unchanged from
 round 47; no struct was edited, so the shared-struct oracle re-run is the same green
 whole-image build above.
 
@@ -207,10 +207,10 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 
 **Evidence.** Called every service tick through the class table by
 `ServiceCdDriver` (CdDriver), whose local view already names the slot
-`runRequestQueue`. It takes the head of `gCdRequestQueue`: if the node is
+`runRequestQueue`. It takes the head of `sCdRequestQueue`: if the node is
 not yet active it raises `owner->inQueueDispatch` and calls the owner's
 slot for `node->op` (open/close/seek/read/loadFile, the CD_OP_* values the
-five methods above enqueue); once `gCdIdle` says the drive finished, it
+five methods above enqueue); once `sCdIdle` says the drive finished, it
 decrements `owner->pendingRequests`, ORs `CD_FLAG_DONE`, `CD_FLAG_NONE_PENDING`
 (when the count hits 0) and the op's own completion bit into `owner->flags`,
 calls `setFlag`, frees the node, and calls `stopCdService` when the queue
@@ -233,7 +233,7 @@ For the head to apply by type scope (out of unit):
 | include/GameApplicationFileResource.h | `FileResource` | `unk22` | `pendingRequests` | B | the base ctor zeroes it; EnqueueCdRequest/this function count it |
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__RunRequestQueue` -> `CdDriver__RunRequestQueue` by rename.py. The +0x070 call passes `self` through the StopServiceSelfFn cast (FileResource's stopService slot takes no arguments; retail loads $a0): without it 150/151 words.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__RunRequestQueue` -> `CdDriver__RunRequestQueue` by rename.py. The +0x070 call passes `self` through the StopServiceSelfFn cast (FileResource's stopService slot takes no arguments; retail loads $a0): without it 150/151 words.
 
 ## History (moved from code_179d8_s.c, round 100)
 

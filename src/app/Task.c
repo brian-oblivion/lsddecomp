@@ -34,13 +34,35 @@
 #include "FrameClock.h"
 #include <strings.h>
 
+/* {x 640, y 0, w 320, h 240}: the default movie frame. TaskCore__OnInit clears
+ * it to baseColor when the task has no sub handle. The same three words are
+ * StreamTask's default initData and its MoviePlayer's frame, through
+ * GetDefaultMovieFrame. */
+extern DrawRect sDefaultMovieFrame;
+
+/* Viewport's ctor data: sViewportFadeBoxSize is the (320, 240) it passes
+ * New_FadeBox; sFadeBoxAttachPos the (-100, -100) screen position the ctor
+ * and SetSubHandle attach the sub handle at; sDefaultViewTwist ({0, 1}) is
+ * Viewport__AttachViewChild's twist when its own is NULL. */
+extern u8 sViewportFadeBoxSize[];
+extern u8 sFadeBoxAttachPos[];
+extern Ratio16 sDefaultViewTwist;
+
+/* resetCounters' colours for setColors, three RGB triples back to back:
+ * baseColor {0, 0, 0}, the clear colour {0, 0, 0}, the third {128, 128, 128}. */
+extern u8 sTaskCoreDefaultColors[3][3];
+
+/* {0, 0, 0}: TaskCore__OnInit attaches the view with it as both the
+ * viewpoint and the reference point. */
+extern LongVec3 sTaskCoreViewOrigin;
+
 StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound,
                            DrawRect *initData) {
     StreamTask *self;
 
     self = BMemPMgrAlloc(sizeof(StreamTask));
     if (self != NULL) {
-        Get_vtable_StreamTask()->ctor(self, target, soundBankPath, sound, initData);
+        GetStreamTaskMethods()->ctor(self, target, soundBankPath, sound, initData);
         return self;
     }
     return NULL;
@@ -48,8 +70,8 @@ StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicCla
 
 void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soundBankPath,
                             BasicClass *sound, DrawRect *initData) {
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, target, soundBankPath, sound);
-    self->methods = Get_vtable_StreamTask();
+    GetTaskCoreMethods()->ctor((TaskCore *)self, target, soundBankPath, sound);
+    self->methods = GetStreamTaskMethods();
     if (initData != NULL) {
         self->initData = *initData;
     } else {
@@ -62,7 +84,7 @@ void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soun
 
 void StreamTask__Finalize(StreamTask *self) {
     self->player->methods->release(self->player);
-    Get_vtable_TaskCore()->finalize((TaskCore *)self);
+    GetTaskCoreMethods()->finalize((TaskCore *)self);
 }
 
 void StreamTask__Reset(StreamTask *self) {
@@ -78,13 +100,13 @@ void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, s32 stre
     self->streamName = streamName;
     self->streamGroup = streamGroup;
     self->autoPlay = autoPlay;
-    Get_vtable_TaskCore()->init((TaskCore *)self, args, 0);
+    GetTaskCoreMethods()->init((TaskCore *)self, args, 0);
 }
 
 void StreamTask__OnInit(StreamTask *self) {
     /* IntermediateBase's onInit slot names init's (0, 0, 0); TaskCore__OnInit
      * takes self alone, and this up-call passes nothing else. */
-    ((void (*)(TaskCore *))Get_vtable_TaskCore()->onInit)((TaskCore *)self);
+    ((void (*)(TaskCore *))GetTaskCoreMethods()->onInit)((TaskCore *)self);
     self->playDone = 0;
     self->player->methods->setAutoPlay(self->player, self->autoPlay);
     if (self->player->methods->play(self->player, (char *)self->streamName, self->streamGroup,
@@ -94,7 +116,7 @@ void StreamTask__OnInit(StreamTask *self) {
 }
 
 void StreamTask__Update(StreamTask *self, BasicClass *sender, s32 event) {
-    Get_vtable_TaskCore()->update((TaskCore *)self, sender, event);
+    GetTaskCoreMethods()->update((TaskCore *)self, sender, event);
     if (self->playDone != 0) {
         return;
     }
@@ -109,7 +131,7 @@ void StreamTask__Update(StreamTask *self, BasicClass *sender, s32 event) {
 }
 
 void StreamTask__SetState(StreamTask *self, s32 state) {
-    Get_vtable_TaskCore()->setState((TaskCore *)self, state);
+    GetTaskCoreMethods()->setState((TaskCore *)self, state);
     switch (state) {
         case TASKCORE_STATE_ACTIVE:
             self->fadingOut = 0;
@@ -123,7 +145,7 @@ void StreamTask__SetState(StreamTask *self, s32 state) {
             }
             break;
         case STREAMTASK_STATE_SKIPPED:
-            self->methods->refreshViewValue(self);
+            self->methods->exit(self);
             break;
     }
 }
@@ -136,7 +158,7 @@ void StreamTask__SetFrameBound(StreamTask *self, s32 bound) {
 }
 
 void StreamTask__OnPadConfirm(StreamTask *self) {
-    Get_vtable_TaskCore()->onPadConfirm((TaskCore *)self);
+    GetTaskCoreMethods()->onPadConfirm((TaskCore *)self);
     if (self->skipOnConfirm != 0) {
         self->result = STREAMTASK_RESULT_SKIPPED;
         self->methods->setState(self, STREAMTASK_STATE_SKIPPED);
@@ -144,18 +166,18 @@ void StreamTask__OnPadConfirm(StreamTask *self) {
 }
 
 void StreamTask__OnPadPrev(StreamTask *self) {
-    Get_vtable_TaskCore()->onPadPrev((TaskCore *)self);
+    GetTaskCoreMethods()->onPadPrev((TaskCore *)self);
 }
 
 void StreamTask__OnPadNext(StreamTask *self) {
-    Get_vtable_TaskCore()->onPadNext((TaskCore *)self);
+    GetTaskCoreMethods()->onPadNext((TaskCore *)self);
 }
 
 void StreamTask__NoOpSlot88(void) {}
 
 void StreamTask__NoOpSlot8C(void) {}
 
-void StreamTask__RefreshViewValue(StreamTask *self) {
+void StreamTask__Exit(StreamTask *self) {
     if (self->abortBeforeFade != 0) {
         self->player->methods->abort(self->player);
     } else {
@@ -183,7 +205,7 @@ void StreamTask__SetAbortBeforeFade(StreamTask *self, s32 enable) {
     self->abortBeforeFade = enable;
 }
 
-StreamTaskMethods *Get_vtable_StreamTask(void) {
+StreamTaskMethods *GetStreamTaskMethods(void) {
     return &gStreamTaskMethods;
 }
 
@@ -192,7 +214,7 @@ TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *
 
     self = BMemPMgrAlloc(sizeof(TaskCore));
     if (self != NULL) {
-        Get_vtable_TaskCore()->ctor(self, target, soundBankPath, sound);
+        GetTaskCoreMethods()->ctor(self, target, soundBankPath, sound);
         return self;
     }
     return NULL;
@@ -203,9 +225,9 @@ void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankP
     struct TileMap *tileMap;
     TaskCoreMethods *methods;
 
-    Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
-    /* MATCHING: one Get_vtable_TaskCore() call; a second one for setTarget adds a jal. */
-    methods = Get_vtable_TaskCore();
+    GetIntermediateBaseMethods()->ctor((IntermediateBase *)self);
+    /* MATCHING: one GetTaskCoreMethods() call; a second one for setTarget adds a jal. */
+    methods = GetTaskCoreMethods();
     self->methods = methods;
     methods->setTarget(self, target);
     if (soundBankPath != NULL) {
@@ -234,7 +256,7 @@ void TaskCore__Finalize(TaskCore *self) {
         self->subHandle->methods->release(self->subHandle);
     }
     self->methods->releaseTarget(self);
-    Get_vtable_IntermediateBase()->finalize((IntermediateBase *)self);
+    GetIntermediateBaseMethods()->finalize((IntermediateBase *)self);
 }
 
 void TaskCore__Reset(TaskCore *self) {
@@ -243,20 +265,20 @@ void TaskCore__Reset(TaskCore *self) {
     methods->setFrameBound(self, -1);
     methods->setColors(self, sTaskCoreDefaultColors[0], sTaskCoreDefaultColors[1],
                        sTaskCoreDefaultColors[2]);
-    methods->setFadeCallbackEnabled(self, 1);
+    methods->setFadeInCallbackEnabled(self, 1);
     methods->setFadeOutCallbackEnabled(self, 1);
     self->fadeRate = 9;
     self->otLength = 3;
     self->unk2C = 300;
     self->packetSize = 64;
-    self->viewCallback = NULL;
-    self->viewCallbackCtx = NULL;
+    self->exitCallback = NULL;
+    self->exitCallbackCtx = NULL;
     self->unk34 = 1;
     self->inputMode = TASKCORE_INPUT_NONE;
 }
 
 s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
-    Get_vtable_IntermediateBase()->init((IntermediateBase *)self, args, mode);
+    GetIntermediateBaseMethods()->init((IntermediateBase *)self, args, mode);
     return self->result;
 }
 
@@ -272,8 +294,8 @@ void TaskCore__OnInit(TaskCore *self) {
     /* MATCHING: retail loads both before the first call and keeps them to the end. */
     viewport = (Viewport *)self->viewport;
     viewportMethods = viewport->methods;
-    self->methods->updateSlotElements(self, self->unk14);
-    self->bgLayer->methods->attachToParent(self->bgLayer, (SceneNode *)self->unk14, NULL);
+    self->methods->updateSlotElements(self, self->lightRig);
+    self->bgLayer->methods->attachToParent(self->bgLayer, (SceneNode *)self->lightRig, NULL);
     if (self->fadeInCallback != NULL) {
         self->methods->broadcastToSlots(self, self->baseColor);
         self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)self->baseColor);
@@ -281,14 +303,14 @@ void TaskCore__OnInit(TaskCore *self) {
     if (self->subHandle == NULL) {
         ((DrawSystem *)self->initArgs->drawSystem)
             ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor,
-                                  &gDefaultMovieFrame);
+                                  &sDefaultMovieFrame);
     }
     ((DrawSystem *)self->initArgs->drawSystem)
         ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor, NULL);
     viewportMethods->setOtLength(viewport, self->otLength);
     viewportMethods->setMaxPackets(viewport, self->unk2C);
     viewportMethods->setPacketSize(viewport, self->packetSize);
-    viewportMethods->attachViewChild(viewport, self->unk14, &sTaskCoreViewOrigin,
+    viewportMethods->attachViewChild(viewport, self->lightRig, &sTaskCoreViewOrigin,
                                      &sTaskCoreViewOrigin, NULL);
     viewportMethods->initOt(viewport);
     self->result = 0;
@@ -319,7 +341,7 @@ void TaskCore__OnDeinit(TaskCore *self) {
  * Input: while inputMode is not NONE, onPadEvent maps a press to a handler;
  * each handler plays the button tone (or moves a cursor) and reports what
  * happened as a state, which setState passes to the parents and then folds
- * back into ACTIVE. Fades: tickColorFade adds frameCounter * fadeRate to
+ * back into ACTIVE. Fades: tickFadeIn adds frameCounter * fadeRate to
  * baseColor and pushes the result to every slot widget and the BgLayer,
  * until it passes TASKCORE_FADE_FULL.
  */
@@ -354,7 +376,7 @@ void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event) {
     TaskCoreMethods *methods;
 
     methods = self->methods;
-    Get_vtable_IntermediateBase()->update((IntermediateBase *)self, sender, event);
+    GetIntermediateBaseMethods()->update((IntermediateBase *)self, sender, event);
     if (self->inputMode != TASKCORE_INPUT_NONE) {
         u32 frames;
 
@@ -369,7 +391,7 @@ void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event) {
             methods->setState(self, TASKCORE_STATE_FADE_IN);
             break;
         case TASKCORE_STATE_FADE_IN:
-            methods->tickFadeCallback(self);
+            methods->tickFadeInCallback(self);
             break;
         case TASKCORE_STATE_FADE_OUT:
             methods->tickFadeOutCallback(self);
@@ -384,7 +406,7 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
     TaskCoreMethods *methods;
 
     methods = self->methods;
-    Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, state);
+    GetIntermediateBaseMethods()->setState((IntermediateBase *)self, state);
     switch (state) {
         case TASKCORE_STATE_ACTIVE:
             methods->broadcastToSlots(self, self->target->unselectedColor);
@@ -394,7 +416,7 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
             break;
         case TASKCORE_STATE_TIMED_OUT:
             self->result = 1;
-            methods->refreshViewValue(self);
+            methods->exit(self);
             break;
         case TASKCORE_STATE_FADE_IN:
         case TASKCORE_STATE_FADE_OUT:
@@ -415,7 +437,7 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
             self->frameCounter = 0;
             switch (state) {
                 case TASKCORE_STATE_SLOT_CONFIRMED:
-                    methods->tick(self);
+                    methods->confirmSlot(self);
                     break;
                 case TASKCORE_STATE_ITEM_CONFIRMED:
                     methods->commitElementScroll(self);
@@ -503,7 +525,7 @@ void TaskCore__OnPadNext(TaskCore *self) {
     handler(self);
 }
 
-void TaskCore__Tick(TaskCore *self) {
+void TaskCore__ConfirmSlot(TaskCore *self) {
     TaskCoreTarget *target;
     s32 slot;
 
@@ -512,23 +534,23 @@ void TaskCore__Tick(TaskCore *self) {
     if (target->unk24[slot] != NULL) {
         self->methods->beginElementScroll(self);
     } else if (slot == target->exitSlot) {
-        self->methods->refreshViewValue(self);
+        self->methods->exit(self);
     }
 }
 
-void TaskCore__RefreshViewValue(TaskCore *self) {
-    if (self->viewCallback != NULL) {
-        self->viewCallback(self->viewCallbackCtx);
+void TaskCore__Exit(TaskCore *self) {
+    if (self->exitCallback != NULL) {
+        self->exitCallback(self->exitCallbackCtx);
     }
     self->methods->setState(self, TASKCORE_STATE_FADE_OUT);
 }
 
-void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx) {
-    self->viewCallback = callback;
-    self->viewCallbackCtx = ctx;
+void TaskCore__SetExitCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx) {
+    self->exitCallback = callback;
+    self->exitCallbackCtx = ctx;
 }
 
-void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable) {
+void TaskCore__SetFadeInCallbackEnabled(TaskCore *self, s32 enable) {
     TaskCoreMethods *methods;
 
     methods = self->methods; /* MATCHING: loaded before the switch, on every path */
@@ -537,7 +559,7 @@ void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable) {
             self->fadeInCallback = NULL;
             break;
         case 1:
-            self->fadeInCallback = methods->tickColorFade;
+            self->fadeInCallback = methods->tickFadeIn;
             break;
     }
 }
@@ -551,7 +573,7 @@ void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable) {
             self->fadeOutCallback = NULL;
             break;
         case 1:
-            self->fadeOutCallback = methods->tickFadeColor;
+            self->fadeOutCallback = methods->tickFadeOut;
             break;
     }
 }
@@ -569,7 +591,7 @@ void TaskCore__SetFadeRate(TaskCore *self, s32 rate) {
     self->fadeRate = rate;
 }
 
-s32 TaskCore__TickFadeCallback(TaskCore *self) {
+s32 TaskCore__TickFadeInCallback(TaskCore *self) {
     s32 done;
 
     done = 1;
@@ -582,7 +604,7 @@ s32 TaskCore__TickFadeCallback(TaskCore *self) {
     return done;
 }
 
-s32 TaskCore__TickColorFade(TaskCore *self) {
+s32 TaskCore__TickFadeIn(TaskCore *self) {
     s32 level;
     u8 color[3];
 
@@ -619,11 +641,11 @@ epilogue:
  *
  * The first level is the slots. setTarget makes one TextRow per
  * target->names entry (slotElements); findNextFreeSlot/findPrevFreeSlot step,
- * wrapping, to the next slot whose registrationSlots entry is NULL; and
+ * wrapping, to the next slot whose hiddenSlots entry is NULL; and
  * setActiveSlot moves the highlight from unselectedColor to selectedColor.
  * A slot whose target->unk24 entry is non-NULL also has a list of items,
  * described by a SlotEntry: createSlotElements makes its rows (itemLists,
- * itemCounts) and starts its cursor (slotCounts) at savedCursor.
+ * itemCounts) and starts its cursor (itemCursors) at savedCursor.
  *
  * The second level scrolls that list. beginElementScroll (inputMode
  * CHOOSING_SLOT to SCROLLING) shows every row with listView's frame behind
@@ -672,7 +694,7 @@ typedef struct SrcDesc {
     char **itemNames; /* +0x018 NULL-terminated; one New_TextRow per name */
 } SrcDesc;
 
-s32 TaskCore__TickFadeColor(TaskCore *self) {
+s32 TaskCore__TickFadeOut(TaskCore *self) {
     s32 level = TASKCORE_FADE_FULL - (self->frameCounter * self->fadeRate);
     u8 color[3];
 
@@ -721,7 +743,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *target) {
     widget = BMemPMgrAlloc(size);
     self->slotElements = (BasicClass **)widget;
     self->itemCounts = BMemPMgrAlloc(size);
-    self->slotCounts = BMemPMgrAlloc(size);
+    self->itemCursors = BMemPMgrAlloc(size);
     self->itemLists = BMemPMgrAlloc(size);
     self->slotCount = count;
 
@@ -780,7 +802,7 @@ void TaskCore__ReleaseTarget(TaskCore *self) {
         i++;
     }
     BMemPMgrFree(self->itemLists);
-    BMemPMgrFree(self->slotCounts);
+    BMemPMgrFree(self->itemCursors);
     BMemPMgrFree(self->itemCounts);
     BMemPMgrFree(self->slotElements);
 }
@@ -794,9 +816,9 @@ void TaskCore__UpdateSlotElements(TaskCore *self, void *parent) {
         return;
     }
     widget = (TextRow **)self->slotElements;
-    position = (SlotPos *)self->target->externalRecords;
+    position = (SlotPos *)self->target->slotPositions;
     for (i = 0; i < self->slotCount; i++, widget++, position++) {
-        if (self->target->registrationSlots[i] == NULL) {
+        if (self->target->hiddenSlots[i] == NULL) {
             TextRow *row = *widget;
 
             row->methods->attachToParent(row, parent, (LongVec3 *)position);
@@ -853,7 +875,7 @@ void TaskCore__FindNextFreeSlot(TaskCore *self) {
         if (i == self->activeSlot) {
             break;
         }
-        if (self->target->registrationSlots[i++] != NULL) {
+        if (self->target->hiddenSlots[i++] != NULL) {
             continue;
         }
         i--;
@@ -877,7 +899,7 @@ void TaskCore__FindPrevFreeSlot(TaskCore *self) {
         if (i == self->activeSlot) {
             break;
         }
-        if (self->target->registrationSlots[i--] != NULL) {
+        if (self->target->hiddenSlots[i--] != NULL) {
             continue;
         }
         i++;
@@ -926,7 +948,7 @@ void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *texture) {
     }
     item = BMemPMgrAlloc(count * sizeof(TextRow *));
     self->itemLists[slot] = (void *)item;
-    self->slotCounts[slot] = ((SrcDesc *)desc)->savedCursor;
+    self->itemCursors[slot] = ((SrcDesc *)desc)->savedCursor;
     self->itemCounts[slot] = count;
 
     names = ((SrcDesc *)desc)->itemNames;
@@ -975,7 +997,7 @@ void TaskCore__RefreshSlotView(TaskCore *self, void *parent, s32 show) {
         s32 size[2];
 
         ((BoxFillAttachToParentFn)((BoxFill *)self->listView)->methods->attachToParent)(
-            (BoxFill *)self->listView, (SceneNode *)self->unk14, (BoxFillPos *)&pos);
+            (BoxFill *)self->listView, (SceneNode *)self->lightRig, (BoxFillPos *)&pos);
         size[0] = SLOT_LIST_FRAME_WIDTH;
         size[1] = count * SLOT_LIST_FRAME_ROW_HEIGHT;
         ((BoxFill *)self->listView)->methods->setSize((BoxFill *)self->listView, size);
@@ -1017,8 +1039,8 @@ void TaskCore__BeginElementScroll(TaskCore *self) {
         return;
     }
     slot = self->activeSlot;
-    self->methods->refreshSlotView(self, self->unk14, 1);
-    item = ((TextRow **)self->itemLists[slot])[self->slotCounts[slot]];
+    self->methods->refreshSlotView(self, self->lightRig, 1);
+    item = ((TextRow **)self->itemLists[slot])[self->itemCursors[slot]];
     cursorColor = &((SlotEntry *)self->target->unk24[slot])->cursorColor;
     item->methods->setColor(item, cursorColor);
     self->inputMode = TASKCORE_INPUT_SCROLLING;
@@ -1037,7 +1059,7 @@ void TaskCore__CommitElementScroll(TaskCore *self) {
         return;
     }
     slot = self->activeSlot;
-    cursor = self->slotCounts[slot];
+    cursor = self->itemCursors[slot];
     pos = ((SlotEntry *)self->target->unk24[slot])->pos;
     pos.y -= cursor * SLOT_LIST_ROW_PITCH;
 
@@ -1077,13 +1099,13 @@ void TaskCore__CancelElementScroll(TaskCore *self) {
         return;
     }
     slot = self->activeSlot;
-    cursor = self->slotCounts[slot];
-    self->methods->refreshSlotView(self, self->unk14, 0);
+    cursor = self->itemCursors[slot];
+    self->methods->refreshSlotView(self, self->lightRig, 0);
     items = (TextRow **)self->itemLists[slot];
     prevItem = items[cursor];
     prevItem->methods->setColor(prevItem, (SpriteRgb *)self->target->unselectedColor);
     saved = ((SlotEntry *)self->target->unk24[slot])->savedCursor;
-    self->slotCounts[slot] = saved;
+    self->itemCursors[slot] = saved;
     savedItem = items[saved];
     savedItem->methods->setDisplay(savedItem, 1);
     self->inputMode = TASKCORE_INPUT_CHOOSING_SLOT;
@@ -1092,7 +1114,7 @@ void TaskCore__CancelElementScroll(TaskCore *self) {
 
 void TaskCore__AdvanceSlotCursor(TaskCore *self) {
     s32 slot = self->activeSlot;
-    s32 cursor = self->slotCounts[slot];
+    s32 cursor = self->itemCursors[slot];
 
     cursor++;
     if (cursor >= self->itemCounts[slot]) {
@@ -1103,7 +1125,7 @@ void TaskCore__AdvanceSlotCursor(TaskCore *self) {
 
 void TaskCore__RetreatSlotCursor(TaskCore *self) {
     s32 slot = self->activeSlot;
-    s32 cursor = self->slotCounts[slot];
+    s32 cursor = self->itemCursors[slot];
 
     cursor--;
     if (cursor < 0) {
@@ -1121,14 +1143,14 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
     SpriteRgb *cursorColor;
 
     slot = self->activeSlot;
-    prev = self->slotCounts[slot];
+    prev = self->itemCursors[slot];
     items = (TextRow **)self->itemLists[slot];
     prevItem = items[prev];
     nextItem = items[cursor];
     prevItem->methods->setColor(prevItem, (SpriteRgb *)self->target->unselectedColor);
     cursorColor = &((SlotEntry *)self->target->unk24[slot])->cursorColor;
     nextItem->methods->setColor(nextItem, cursorColor);
-    self->slotCounts[slot] = cursor;
+    self->itemCursors[slot] = cursor;
     if (withSound != NULL) {
         self->methods->playSound(self, TASKCORE_TONE_CURSOR);
     }
@@ -1138,7 +1160,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
 /* Section 3. IntermediateBase's methods, the start of Viewport's, and
  * three accessors ahead of them.
  *
- * TaskCore__GetActiveSlotCount, Get_vtable_TaskCore and
+ * TaskCore__GetActiveItemCursor, GetTaskCoreMethods and
  * GetDefaultMovieFrame come first: one TaskCore method and two plain
  * accessors for data used far more widely (Task.c, ObjMStyleActor.c).
  *
@@ -1155,31 +1177,31 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
  * of Viewport's table.
  */
 
-s32 TaskCore__GetActiveSlotCount(TaskCore *self) {
-    return self->slotCounts[self->activeSlot];
+s32 TaskCore__GetActiveItemCursor(TaskCore *self) {
+    return self->itemCursors[self->activeSlot];
 }
 
-TaskCoreMethods *Get_vtable_TaskCore(void) {
+TaskCoreMethods *GetTaskCoreMethods(void) {
     return &gTaskCoreMethods;
 }
 
 DrawRect *GetDefaultMovieFrame(void) {
-    return &gDefaultMovieFrame;
+    return &sDefaultMovieFrame;
 }
 
 void IntermediateBase__IntermediateBase(IntermediateBase *self) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_IntermediateBase();
+    GetBasicClassMethods()->ctor((BasicClass *)self);
+    self->methods = GetIntermediateBaseMethods();
     self->methods->resetCounters(self);
 }
 
 void IntermediateBase__OnNotify(IntermediateBase *self, BasicClass *sender, s32 event) {
     s32 rootClass;
 
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
     rootClass = sender->methods->header & CLASS_ID_ROOT_MASK;
     if (rootClass == DRAWSYSTEM_CLASS_ID) {
-        self->methods->onTag1Notify(self, sender, event);
+        self->methods->onDrawSystemEvent(self, sender, event);
     } else if (rootClass == PAD_CLASS_ID) {
         self->methods->onPadEvent(self, sender, event);
     } else if (rootClass == FRAMECLOCK_CLASS_ID) {
@@ -1198,14 +1220,14 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
 
     methods = self->methods;
     if (args->frameClock != NULL) {
-        self->unk10 = args->frameClock;
+        self->frameClock = args->frameClock;
     } else {
-        self->unk10 = (BasicClass *)New_FrameClock();
+        self->frameClock = (BasicClass *)New_FrameClock();
     }
     if (args->lightRig != NULL) {
-        self->unk14 = args->lightRig;
+        self->lightRig = args->lightRig;
     } else {
-        self->unk14 = (BasicClass *)New_LightRig();
+        self->lightRig = (BasicClass *)New_LightRig();
     }
     if (args->viewport != NULL) {
         self->viewport = args->viewport;
@@ -1216,14 +1238,14 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
     viewport = self->viewport;
     methods->addChild(self, args->drawSystem);
     methods->addChild(self, args->pad);
-    methods->addChild(self, self->unk10);
+    methods->addChild(self, self->frameClock);
     methods->onInit(self, 0, 0, 0);
     self->initMode = mode;
     if (mode == 0) {
         viewport->methods->addChild(viewport, args->drawSystem);
-        viewport->methods->addChild(viewport, self->unk10);
-        self->unk14->methods->addChild(self->unk14, self->unk10);
-        methods->setState(self, 2);
+        viewport->methods->addChild(viewport, self->frameClock);
+        self->lightRig->methods->addChild(self->lightRig, self->frameClock);
+        methods->setState(self, INTERMEDIATEBASE_STATE_START);
         methods->deinit(self);
     }
 }
@@ -1236,29 +1258,29 @@ void IntermediateBase__Deinit(IntermediateBase *self) {
     methods->onDeinit(self);
     viewport = self->viewport;
     if (self->initMode == 0) {
-        self->unk14->methods->removeChild(self->unk14, self->unk10);
-        viewport->methods->removeChild(viewport, self->unk10);
+        self->lightRig->methods->removeChild(self->lightRig, self->frameClock);
+        viewport->methods->removeChild(viewport, self->frameClock);
         viewport->methods->removeChild(viewport, self->initArgs->drawSystem);
     }
-    methods->removeChild(self, self->unk10);
+    methods->removeChild(self, self->frameClock);
     methods->removeChild(self, self->initArgs->pad);
     methods->removeChild(self, self->initArgs->drawSystem);
     if (self->initArgs->viewport != viewport) {
         self->viewport = viewport->methods->release(viewport);
     }
-    if (self->initArgs->lightRig != self->unk14) {
-        self->unk14 = self->unk14->methods->release(self->unk14);
+    if (self->initArgs->lightRig != self->lightRig) {
+        self->lightRig = self->lightRig->methods->release(self->lightRig);
     }
-    if (self->initArgs->frameClock != self->unk10) {
-        self->unk10 = self->unk10->methods->release(self->unk10);
+    if (self->initArgs->frameClock != self->frameClock) {
+        self->frameClock = self->frameClock->methods->release(self->frameClock);
     }
 }
 
-void IntermediateBase__OnTag1Notify(IntermediateBase *self, BasicClass *sender, s32 event) {
+void IntermediateBase__OnDrawSystemEvent(IntermediateBase *self, BasicClass *sender, s32 event) {
     Pad *pad;
 
     if (event == DRAWSYSTEM_EVENT_VSYNC) {
-        ((FrameClock *)self->unk10)->methods->tick((FrameClock *)self->unk10);
+        ((FrameClock *)self->frameClock)->methods->tick((FrameClock *)self->frameClock);
         pad = (Pad *)self->initArgs->pad;
         pad->methods->updateMasks(pad);
         pad->methods->dispatchEvents(pad);
@@ -1278,17 +1300,17 @@ void IntermediateBase__SetState(IntermediateBase *self, s32 state) {
     methods = self->methods;
     self->state = state;
     methods->notifyParents(self, state);
-    if (state == 2) {
-        fn = methods->onState2;
-    } else if (state == 3) {
-        fn = methods->onState3;
+    if (state == INTERMEDIATEBASE_STATE_START) {
+        fn = methods->onStart;
+    } else if (state == INTERMEDIATEBASE_STATE_STOP) {
+        fn = methods->onStop;
     } else {
         return;
     }
     fn(self);
 }
 
-void IntermediateBase__OnState2(IntermediateBase *self) {
+void IntermediateBase__OnStart(IntermediateBase *self) {
     DrawSystem *drawSystem;
 
     self->frameCounter = 0;
@@ -1296,7 +1318,7 @@ void IntermediateBase__OnState2(IntermediateBase *self) {
     drawSystem->methods->start(drawSystem);
 }
 
-void IntermediateBase__OnState3(IntermediateBase *self) {
+void IntermediateBase__OnStop(IntermediateBase *self) {
     DrawSystem *drawSystem;
 
     drawSystem = (DrawSystem *)self->initArgs->drawSystem;
@@ -1304,7 +1326,7 @@ void IntermediateBase__OnState3(IntermediateBase *self) {
     self->frameCounter = 0;
 }
 
-IntermediateBaseMethods *Get_vtable_IntermediateBase(void) {
+IntermediateBaseMethods *GetIntermediateBaseMethods(void) {
     return &gIntermediateBaseMethods;
 }
 
@@ -1322,14 +1344,14 @@ Viewport *New_Viewport(void) {
 void Viewport__Viewport(Viewport *self) {
     SceneNode *fadeBox;
 
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetViewportMethods();
     self->drawSystem = NULL;
     self->viewNode = NULL;
     self->sceneRoot = New_SceneNode();
-    fadeBox = (SceneNode *)New_FadeBox(gViewportFadeBoxSize, 0, 0);
+    fadeBox = (SceneNode *)New_FadeBox(sViewportFadeBoxSize, 0, 0);
     self->fadeBox = fadeBox;
-    fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)gFadeBoxAttachPos);
+    fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)sFadeBoxAttachPos);
     self->methods->initDefaults(self);
 }
 
@@ -1338,13 +1360,13 @@ void Viewport__Finalize(Viewport *self) {
     self->methods->detachViewChild(self);
     self->sceneRoot->methods->release(self->sceneRoot);
     self->methods->setFadeBox(self, 0);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void Viewport__AddChild(Viewport *self, BasicClass *child) {
     s32 rootClass;
 
-    Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
+    GetBasicClassMethods()->addChild((BasicClass *)self, child);
     rootClass = child->methods->header & CLASS_ID_ROOT_MASK;
     if (rootClass == SCENENODE_CLASS_ID) {
         self->viewNode = (SceneNode *)child;
@@ -1364,7 +1386,7 @@ void Viewport__RemoveChild(Viewport *self, BasicClass *child) {
     } else if (rootClass == DRAWSYSTEM_CLASS_ID) {
         self->drawSystem = NULL;
     }
-    Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
+    GetBasicClassMethods()->removeChild((BasicClass *)self, child);
 }
 
 /* Viewport's removeAllChildren override (+0x018 of gViewportMethods and of
@@ -1374,7 +1396,7 @@ void Viewport__RemoveAllChildren(Viewport *self) {
     self->refView.super = NULL;
     self->viewNode = NULL;
     self->drawSystem = NULL;
-    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
+    GetBasicClassMethods()->removeAllChildren((BasicClass *)self);
 }
 
 /*
@@ -1406,27 +1428,27 @@ void Viewport__RemoveAllChildren(Viewport *self) {
  */
 
 /* Forwards to the base onNotify, then dispatches on the sender's class-id
- * nibble: a FrameClock to onNotifyTag5, the DrawSystem to onNotifyTag1,
+ * nibble: a FrameClock to onFrameClockEvent, the DrawSystem to onDrawSystemEvent,
  * anything else nowhere. */
 void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
     s32 tag;
 
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
 
     tag = sender->methods->header & CLASS_ID_ROOT_MASK;
     if (tag == FRAMECLOCK_CLASS_ID) {
-        self->methods->onNotifyTag5(self, sender, event);
+        self->methods->onFrameClockEvent(self, sender, event);
     } else if (tag == DRAWSYSTEM_CLASS_ID) {
-        self->methods->onNotifyTag1(self, sender, event);
+        self->methods->onDrawSystemEvent(self, sender, event);
     }
 }
 
-extern s32 gDefaultViewportWidth;
-extern s32 gDefaultViewportHeight;
-extern ViewportRgb gDefaultViewportColor;
+extern s32 sDefaultViewportWidth;
+extern s32 sDefaultViewportHeight;
+extern ViewportRgb sDefaultViewportColor;
 /* MATCHING: a second name for the same symbol, so cc1 cannot share one
  * address computation between the two copies; retail loads it twice. */
-extern ViewportRgb gDefaultViewportColorAlias __asm__("gDefaultViewportColor");
+extern ViewportRgb sDefaultViewportColorAlias __asm__("sDefaultViewportColor");
 
 /* InitDefaults' values. The OT has 1 << VIEWPORT_DEFAULT_OT_LENGTH (8192)
  * tags; with the near and far defaults Update's zDiv comes out 8. The packet
@@ -1439,14 +1461,14 @@ extern ViewportRgb gDefaultViewportColorAlias __asm__("gDefaultViewportColor");
 #define VIEWPORT_DEFAULT_FAR_Z 65536
 #define VIEWPORT_DEFAULT_FOG_NEAR 20000
 
-/* Every field's default; both colours start black (gDefaultViewportColor). */
+/* Every field's default; both colours start black (sDefaultViewportColor). */
 void Viewport__InitDefaults(Viewport *self) {
     self->clockEventCount = 0;
     self->otReady = 0;
     /* MATCHING: without it both loads hoist above the two zero stores. */
     __asm__("");
-    self->screenSize.width = gDefaultViewportWidth;
-    self->screenSize.height = gDefaultViewportHeight;
+    self->screenSize.width = sDefaultViewportWidth;
+    self->screenSize.height = sDefaultViewportHeight;
     /* MATCHING: without it both stores sink below the constant stores. */
     __asm__("");
     self->otLength = VIEWPORT_DEFAULT_OT_LENGTH;
@@ -1457,8 +1479,8 @@ void Viewport__InitDefaults(Viewport *self) {
     self->farZ = VIEWPORT_DEFAULT_FAR_Z;
     self->lightMode = GsLMODE_NORMAL;
     self->fogNear = VIEWPORT_DEFAULT_FOG_NEAR;
-    self->farColor = gDefaultViewportColor;
-    self->clearColor = gDefaultViewportColorAlias;
+    self->farColor = sDefaultViewportColor;
+    self->clearColor = sDefaultViewportColorAlias;
     self->extraSwap = 0;
     self->drawEnabled = 1;
 }
@@ -1511,7 +1533,7 @@ void Viewport__SetFogNear(Viewport *self, s32 fogNear) {
 
 /* One-time init, skipped once a view node is set: adds `node` as a child
  * (addChild caches it as viewNode), sets the viewpoint, reference point and
- * twist (gDefaultViewTwist when `twist` is NULL), then hands refView to
+ * twist (sDefaultViewTwist when `twist` is NULL), then hands refView to
  * GsSetRefView2. */
 void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr,
                                Ratio16 *twist) {
@@ -1523,7 +1545,7 @@ void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, L
     methods->addChild(self, node);
     methods->setViewPoint(self, vp);
     methods->setViewRef(self, vr);
-    methods->setTwist(self, twist != NULL ? twist : &gDefaultViewTwist);
+    methods->setTwist(self, twist != NULL ? twist : &sDefaultViewTwist);
     GsSetRefView2((GsRVIEW2 *)&self->refView);
 }
 
@@ -1618,8 +1640,8 @@ void Viewport__DeinitOt(Viewport *self) {
 
 /* A FrameClock event: counts every one in clockEventCount, and runs update
  * on a tick whether the clock is running or paused (not on
- * FRAMECLOCK_EVENT_FLAG14). */
-void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event) {
+ * FRAMECLOCK_EVENT_STOPPED). */
+void Viewport__OnFrameClockEvent(Viewport *self, BasicClass *sender, s32 event) {
     self->clockEventCount = self->clockEventCount + 1;
     if (event == FRAMECLOCK_EVENT_RUNNING || event == FRAMECLOCK_EVENT_PAUSED) {
         self->methods->update(self);
@@ -1627,7 +1649,7 @@ void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event) {
 }
 
 /* A DrawSystem event: its per-VSync event runs flip. */
-void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event) {
+void Viewport__OnDrawSystemEvent(Viewport *self, BasicClass *sender, s32 event) {
     if (event == DRAWSYSTEM_EVENT_VSYNC) {
         self->methods->flip(self);
     }
@@ -1720,7 +1742,7 @@ tail_check:
 }
 
 /* Only while no view node is set: releases the current fade box, installs
- * `fadeBox`, and attaches it under sceneRoot at gFadeBoxAttachPos
+ * `fadeBox`, and attaches it under sceneRoot at sFadeBoxAttachPos
  * (-100, -100). A FadeBox's attachToParent (BoxFill__AttachToParent) takes a
  * screen position where SceneNode's slot types a LongVec3 offset, hence the
  * cast (include/Viewport.h, "Not settled here"). */
@@ -1735,7 +1757,7 @@ void Viewport__SetFadeBox(Viewport *self, SceneNode *fadeBox) {
 
     self->fadeBox = fadeBox;
     if (fadeBox != NULL) {
-        fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)gFadeBoxAttachPos);
+        fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)sFadeBoxAttachPos);
     }
 }
 

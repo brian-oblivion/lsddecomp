@@ -15,7 +15,7 @@ return of `New_SceneNode` (a `New_SceneNode` allocator, already matched
 elsewhere as `SceneNode.c`) into `unkAC`, constructs a `SubHandleObj` via
 `New_FadeBox` (already known elsewhere as `include/Entity.h`'s own
 `Unk100Obj`/`New_FadeBox`) into `unkB0`, dispatches that object's own
-`slot4C` with `(obj, self->unkAC, &gFadeBoxAttachPos)`, then runs its own freshly
+`slot4C` with `(obj, self->unkAC, &sFadeBoxAttachPos)`, then runs its own freshly
 installed `slot40`.
 
 ## The C
@@ -25,14 +25,14 @@ void Viewport__Viewport(Unk18Obj *self)
 {
     SubHandleObj *obj;
 
-    Get_vtable_BasicClass()->ctor(self);
+    GetBasicClassMethods()->ctor(self);
     self->methods = GetViewportMethods();
     self->unkC = 0;
     self->unk10 = 0;
     self->unkAC = New_SceneNode();
-    obj = New_FadeBox(gViewportFadeBoxSize, 0, 0);
+    obj = New_FadeBox(sViewportFadeBoxSize, 0, 0);
     self->unkB0 = obj;
-    obj->methods->slot4C(obj, self->unkAC, gFadeBoxAttachPos);
+    obj->methods->slot4C(obj, self->unkAC, sFadeBoxAttachPos);
     self->methods->slot40(self);
 }
 ```
@@ -65,14 +65,14 @@ before the byte-level score did.
   gViewportMethods`), not `IntermediateBase__ResetCounters`. Two unrelated tables, same offset,
   different occupants -- ordinary vtable-layout coincidence, not evidence
   of a shared ancestor at this slot (contrast with the GENUINELY shared
-  slots this unit has documented elsewhere, e.g. `IntermediateBase__OnState2`).
+  slots this unit has documented elsewhere, e.g. `IntermediateBase__OnStart`).
 - New type `SubHandleObj`/`SubHandleObjMethods` (`slot4C`) -- this unit's own
   local view of `include/Entity.h`'s `Unk100Obj`/`New_FadeBox`, per this
   project's independent-local-views convention.
 - `New_SceneNode`: local view added, returning `void *` (this unit never
   dereferences it) -- `include/SceneNode.h`'s own view types it
   `SceneNodeObj *`, unaffected since it's a separate header.
-- `gViewportFadeBoxSize`/`gFadeBoxAttachPos`: two new address-taken-only globals.
+- `sViewportFadeBoxSize`/`sFadeBoxAttachPos`: two new address-taken-only globals.
 
 ## Head-broadcast levers (round 13): applicability check
 
@@ -92,13 +92,13 @@ alpha). Tier A: the `Class__Class` constructor convention (matching
 `BasicClass__BasicClass`) -- confirmed as `Unk18ObjMethods::ctor`'s
 occupant (called by `New_Viewport` via `GetViewportMethods()->ctor(self)`,
 `GetViewportMethods` being this class's own vtable getter, Task.c).
-Chains `Get_vtable_BasicClass()->ctor` first, then installs its own vtable
+Chains `GetBasicClassMethods()->ctor` first, then installs its own vtable
 and sets up `self->unkAC`/`self->unkB0` -- the standard base-then-derived
 construction shape.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__Unk18Obj`. The +0x008 ctor. Chains to BasicClass's ctor first (Get_vtable_BasicClass()->ctor); NodeGuardedViewport__NodeGuardedViewport chains to this one, so the id tree 0x0 -> 0x7 -> 0x17 is the ctor chain. Fields: +0x00C drawSystem, +0x010 viewNode, +0x0AC sceneRoot (New_SceneNode), +0x0B0 subHandle (New_FadeBox, attached under sceneRoot through SceneNode's attachToParent slot with gFadeBoxAttachPos cast to LongVec3 *, because the occupant, BoxFill__AttachToParent, takes a screen position), then the +0x040 initDefaults slot. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__Unk18Obj`. The +0x008 ctor. Chains to BasicClass's ctor first (GetBasicClassMethods()->ctor); NodeGuardedViewport__NodeGuardedViewport chains to this one, so the id tree 0x0 -> 0x7 -> 0x17 is the ctor chain. Fields: +0x00C drawSystem, +0x010 viewNode, +0x0AC sceneRoot (New_SceneNode), +0x0B0 subHandle (New_FadeBox, attached under sceneRoot through SceneNode's attachToParent slot with sFadeBoxAttachPos cast to LongVec3 *, because the occupant, BoxFill__AttachToParent, takes a screen position), then the +0x040 initDefaults slot. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Unit banner history (round 98, echo, track 7)
 
@@ -110,7 +110,7 @@ pass, the round 82/85 track-4 unification of Viewport) moved to
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_8008A90C` | `gViewportFadeBoxSize` | A | Its only reader is this ctor, which passes it as New_FadeBox's `size`; FadeBox's ctor hands it to BoxFill__Reset, which reads `size->x`/`size->y` into boxW/boxH. The words are (320, 240), the full screen. splat's symbol runs 24 bytes (then (10, 10), (-10, -10)); nothing here reads past the first two words. |
+| `D_8008A90C` | `sViewportFadeBoxSize` | A | Its only reader is this ctor, which passes it as New_FadeBox's `size`; FadeBox's ctor hands it to BoxFill__Reset, which reads `size->x`/`size->y` into boxW/boxH. The words are (320, 240), the full screen. splat's symbol runs 24 bytes (then (10, 10), (-10, -10)); nothing here reads past the first two words. |
 
 Local `obj` -> `fadeBox` (it is stored in `self->fadeBox`); pointer
 stores of 0 spelled NULL. Byte-identical.

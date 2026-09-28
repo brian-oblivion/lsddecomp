@@ -9,9 +9,9 @@
 ## Source
 
 ```c
-extern s32 gCdReadSectorCount; /* CdRead sector count */
-extern void *gCdReadBuffer; /* CdRead target buffer */
-extern s32 gCdTickStep;
+extern s32 sCdReadSectorCount; /* CdRead sector count */
+extern void *sCdReadBuffer; /* CdRead target buffer */
+extern s32 sCdTickStep;
 
 extern void ReadCdFile(Obj80027480 *self, void *arg1, s32 arg2);
 extern s32 CdRead(s32 sectors, void *buf, s32 mode);
@@ -21,18 +21,18 @@ extern void ResetCdStateMachine(void);
 s32 CdDriver__Read(Obj80027480 *self, void *buf, u32 size) {
     s32 v1;
 
-    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
+    if (sCdAsyncEnabled == 0 && sCdSyncQueueMode == 0) {
         ReadCdFile(self, buf, size);
         return 0;
     }
     LockCd();
     if (self->unk28 != 0) {
-        if (gCdBusy == 0 && self->unk0C != 0) {
+        if (sCdBusy == 0 && self->unk0C != 0) {
             StartCdOperation(3, 7);
-            if (gCdAsyncEnabled != 0) {
-                gCdReadSectorCount = size >> 11;
-                gCdReadBuffer = buf;
-                gCdTickStep = 1;
+            if (sCdAsyncEnabled != 0) {
+                sCdReadSectorCount = size >> 11;
+                sCdReadBuffer = buf;
+                sCdTickStep = 1;
             } else {
             retry:
                 CdRead(size >> 11, buf, 0x80);
@@ -53,20 +53,20 @@ s32 CdDriver__Read(Obj80027480 *self, void *buf, u32 size) {
 }
 ```
 
-(`Obj80027480`, `gCdAsyncEnabled`, `gCdSyncQueueMode`, `gCdBusy`, `LockCd`,
+(`Obj80027480`, `sCdAsyncEnabled`, `sCdSyncQueueMode`, `sCdBusy`, `LockCd`,
 `StartCdOperation`, `EnqueueCdRequest`, `UnlockCd` are all declared earlier in
 the unit, ahead of `CdDriver__Close`.)
 
 ## What it took, in order
 
 1. **The nested-if-vs-if/else-if polarity lever from `CdDriver__Close` applied
-   again unchanged**: `if (self->unk28 != 0) { if (gCdBusy==0 && ...) {...}
+   again unchanged**: `if (self->unk28 != 0) { if (sCdBusy==0 && ...) {...}
    } else { EnqueueCdRequest(...); }`, not the flattened else-if form. Same
    reasoning as that report.
 2. **`size >> 11` must be an UNSIGNED shift.** Retail's `srl` (logical) vs an
    initial `s32 size` parameter, which produces `sra` (arithmetic) for a
    right-shift of a negative-capable type. Declaring the parameter `u32 size`
-   fixed all three `>>11` sites at once (`gCdReadSectorCount` store, the two `CdRead`
+   fixed all three `>>11` sites at once (`sCdReadSectorCount` store, the two `CdRead`
    calls).
 3. **The real find: GCC 2.6.3's loop-invariant code motion hoists a
    loop-carried literal comparison (`v1 == -1`) out of a `do { ... } while
@@ -124,7 +124,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 **Evidence.** `(self, buf, size)`. Sync mode forwards to `ReadCdFile`;
 otherwise it enqueues op 5 with `buf`/`size`, or inside a queue dispatch on
 an open file reads `size >> 11` sectors into `buf` (CdRead + CdReadSync
-retry loop, or hands `gCdReadSectorCount`/`gCdReadBuffer` to the state
+retry loop, or hands `sCdReadSectorCount`/`sCdReadBuffer` to the state
 machine). `FileResource__LoadFile` calls this slot with the buffer it just
 allocated and its size, between the rewind and the close.
 
@@ -134,4 +134,4 @@ siblings already use); `tools/classtable.py gCdDriverMethods` lists this functio
 at slot `+0x054`. The prefix names the table, not the developers' class.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Read` -> `CdDriver__Read` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Read` -> `CdDriver__Read` by rename.py.

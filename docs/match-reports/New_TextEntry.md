@@ -11,7 +11,7 @@ Unit `TextEntryItemList`, carved round 14.
 0x4C-byte instance and dispatches its own ctor (slot 0x008, `TextEntry__TextEntry`,
 itself a STALLED gp_rel-blocked function in this same unit -- see its own
 report). `GetTextEntryMethods` (`TextEntryItemList`, still `INCLUDE_ASM`) is this
-class's own table getter, mirroring `Get_vtable_BasicClass`'s no-argument shape;
+class's own table getter, mirroring `GetBasicClassMethods`'s no-argument shape;
 its return type only needed naming here (`Obj86ED0Methods *`), not a body.
 
 ```c

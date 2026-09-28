@@ -8,8 +8,8 @@ the first build of the real body; whole-image SHA1 green.
 
 - **Where:** not a slot: a libcd `CdSyncCallback` handler installed by `CdStream__Seek`.
 - **What:** when the active object exists and the sync status is 2 (CdlComplete), uninstall the callback and call the active object's +0x54 callback with its +0x44 argument.
-- **Levers:** `u8 status` parameter gives the `andi 0xFF`; re-read the global `gActiveCdStream` after the call (no local).
-- **Context:** round 82 extended the unit's local `CdStreamObj` view: `loc` (+0x0C, the seek location passed to slot +0x4C), `s32 muted` (+0x30), `void *cbArg` (+0x44), callbacks `cb48`/`cb4C`/`cb54` (+0x48/+0x4C/+0x54, each called with `cbArg`), object size 0x5C (the allocator's request); method slots +0x040..+0x070 typed; ctor slot takes `(self, s32, s32, s32)`. The active stream object is the sdata global `gActiveCdStream` (`CdStreamObj *`). libcd externs `CdSyncCallback`, `CdControl`, `CdControlF` declared in the unit from the Psy-Q prototypes.
+- **Levers:** `u8 status` parameter gives the `andi 0xFF`; re-read the global `sActiveCdStream` after the call (no local).
+- **Context:** round 82 extended the unit's local `CdStreamObj` view: `loc` (+0x0C, the seek location passed to slot +0x4C), `s32 muted` (+0x30), `void *cbArg` (+0x44), callbacks `cb48`/`cb4C`/`cb54` (+0x48/+0x4C/+0x54, each called with `cbArg`), object size 0x5C (the allocator's request); method slots +0x040..+0x070 typed; ctor slot takes `(self, s32, s32, s32)`. The active stream object is the sdata global `sActiveCdStream` (`CdStreamObj *`). libcd externs `CdSyncCallback`, `CdControl`, `CdControlF` declared in the unit from the Psy-Q prototypes.
 
 ## Naming
 
@@ -19,10 +19,10 @@ Tier A. `OnCdSeekComplete` -- free function, the `CdSyncCallback` handler instal
 
 ```c
 void OnCdSeekComplete(u8 status, u8 *result) {
-    if (gActiveCdStream != NULL && status == 2) {
+    if (sActiveCdStream != NULL && status == 2) {
         CdSyncCallback(NULL);
-        if (gActiveCdStream->cb54 != NULL) {
-            gActiveCdStream->cb54(gActiveCdStream->cbArg);
+        if (sActiveCdStream->cb54 != NULL) {
+            sActiveCdStream->cb54(sActiveCdStream->cbArg);
         }
     }
 }

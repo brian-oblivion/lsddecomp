@@ -25,7 +25,7 @@ by round 13's `Viewport__AddChild`).
 void Viewport__OnNotify(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
     s32 tag;
 
-    Get_vtable_BasicClass()->slot38(self, arg1, arg2);
+    GetBasicClassMethods()->slot38(self, arg1, arg2);
 
     tag = arg1->methods->header & 0xF;
     if (tag == 5) {
@@ -57,13 +57,13 @@ finding.
 ## Header changes
 
 `include/Task.h`: `Unk18ObjMethods` gains `slot94`/`slot98` (both
-`void (*)(Unk18Obj*, GenericObj*, s32)`, occupants `Viewport__OnNotifyTag5`/
-`Viewport__OnNotifyTag1`, still queued as of this report) plus the corrective
+`void (*)(Unk18Obj*, GenericObj*, s32)`, occupants `Viewport__OnFrameClockEvent`/
+`Viewport__OnDrawSystemEvent`, still queued as of this report) plus the corrective
 `pad09C` gap described above.
 
 ## Naming
 
-`Unk18Obj__OnNotify` -- tier A. Body is a supercall to `Get_vtable_BasicClass()->onNotify` followed by dispatch on the sender's dynamic-class tag nibble (5 -> slot94, 1 -> slot98) -- the exact override shape already established and named for `BasicClass__OnNotify`/`SceneNode__OnNotify` (`include/code_8220.h`, `src/graphics/SceneNode.c`). Matching an adopted, cross-class convention rather than a fresh guess.
+`Unk18Obj__OnNotify` -- tier A. Body is a supercall to `GetBasicClassMethods()->onNotify` followed by dispatch on the sender's dynamic-class tag nibble (5 -> slot94, 1 -> slot98) -- the exact override shape already established and named for `BasicClass__OnNotify`/`SceneNode__OnNotify` (`include/code_8220.h`, `src/graphics/SceneNode.c`). Matching an adopted, cross-class convention rather than a fresh guess.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 

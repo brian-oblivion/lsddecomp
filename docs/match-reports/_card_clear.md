@@ -199,7 +199,7 @@ report recommending a permuter budget on Sony's code.
 >   zero-extends, so a negative constant CANNOT be an `ori` and maspsx
 >   correctly emits `addiu`.
 > - **4 have a positive immediate, and all four are spurious** -- they are
->   attributed to the data symbol `gDreamAuxSpawnInfo`, i.e. data words being read as
+>   attributed to the data symbol `sDreamAuxSpawnInfo`, i.e. data words being read as
 >   instructions by the extent walk, not code.
 >
 > So the rule is exact: **positive constant -> `ori`, always; negative
@@ -668,7 +668,7 @@ instead of `maspsx`'s ASPSX-2.34 emulation:
 value, while `maspsx`'s ASPSX-emulation picks `ORI` — and retail's own bytes
 agree with the native assembler, not with `maspsx`'s model, for this one
 instruction.** This does NOT mean `maspsx`'s ori-for-positive rule is simply
-wrong — `docs/match-reports/TaskCore__TickFadeColor.md` already proves the opposite: a
+wrong — `docs/match-reports/TaskCore__TickFadeOut.md` already proves the opposite: a
 DIFFERENT function's retail bytes use `ori $s0,$zero,0x80` for a positive
 `0x80`, exactly matching `maspsx`'s current model. **Both are real, in two
 different already-examined functions of the same executable — retail is

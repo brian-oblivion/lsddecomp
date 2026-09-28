@@ -11,7 +11,7 @@ out-of-range drift.
 
 ## What it does
 
-Weekly table pick: `r = (u32)SeedAndRandom(0, arg) % 7` (unsigned: retail's multu/mfhi magic 0x24924925), `table = GetSoundBankPaths()` (gSoundBankPaths, words); returns `table[gForcedSoundBank - 1]` when the override global gForcedSoundBank is set, else `table[r]`.
+Weekly table pick: `r = (u32)SeedAndRandom(0, arg) % 7` (unsigned: retail's multu/mfhi magic 0x24924925), `table = GetSoundBankPaths()` (sSoundBankPaths, words); returns `table[sForcedSoundBank - 1]` when the override global sForcedSoundBank is set, else `table[r]`.
 
 ## Source
 
@@ -24,8 +24,8 @@ s32 PickSoundBank(s32 arg) {
     s32 *table = GetSoundBankPaths();
     s32 *entry;
     s32 index;
-    if (gForcedSoundBank != 0) {
-        index = gForcedSoundBank - 1;
+    if (sForcedSoundBank != 0) {
+        index = sForcedSoundBank - 1;
         entry = &table[index];
     } else {
         entry = &table[r];
@@ -72,7 +72,7 @@ shift.
 
 - **Name:** `PickSoundBank`
 - **Tier:** A
-- **Evidence:** returns gSoundBankPaths[gForcedSoundBank - 1] or a random one of the seven (`% SOUND_BANK_COUNT`); its one caller, DayTask__DayTask, hands the path to New_WBgm as the VAB base (include/WBgm.h). gForcedWeeklyGroup was renamed gForcedSoundBank with it.
+- **Evidence:** returns sSoundBankPaths[sForcedSoundBank - 1] or a random one of the seven (`% SOUND_BANK_COUNT`); its one caller, DayTask__DayTask, hands the path to New_WBgm as the VAB base (include/WBgm.h). gForcedWeeklyGroup was renamed sForcedSoundBank with it.
 
 ## Naming history
 

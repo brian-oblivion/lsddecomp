@@ -59,6 +59,82 @@
 #include <stdio.h>
 #include <convert.h>
 
+/* Per TaskObjF::events slot: the event spec TaskObjF__OpenEvents passes to
+ * OpenEvent, and the value WaitForReadyEvent returns for that slot.
+ * Unsized: only the four slots are read. */
+extern s32 sCardEventSpecs[];
+
+extern McDevicePath sMcDevicePath1; /* "bu10:" */
+extern McDevicePath sMcDevicePath0; /* "bu00:" */
+
+/* TaskObjF__TaskObjF's construction count: InitCARD/StartCARD/_bu_init run
+ * only on the first construction, when it was 0 before the increment. */
+extern s32 sTaskObjFCount;
+
+/* TitleMenu's menu description, a TaskCoreTarget: TitleMenu__TitleMenu
+ * passes &sTitleMenuTarget as TaskCore's ctor's `target` and again to setTarget. */
+extern TaskCoreTarget sTitleMenuTarget;
+
+/* "ETC\ETCSE", TitleMenu__TitleMenu's soundBankPath for TaskCore's ctor
+ * (the ctor casts away the const for its `char *`). */
+extern const char sTitleMenuSoundBankPath[];
+
+/* "ETC\TITLE.TIM", TitleMenu__Reset's path for setSubHandle. */
+extern const char sTitleTimPath[];
+
+/* "CARD\FILEICN1.TIM", TitleMenu__BeginCardAccess's path for New_TimImage.
+ * A string splat already emitted as a symbol: a literal would emit a
+ * second copy. */
+extern const char sSaveIconTimPath[];
+
+/* The two 320 x 240 display buffers, stacked in VRAM at y 0 and y 240:
+ * TitleMenu__OnDeinit clears each with the DrawSystem's clearImage. */
+extern DrawRect sDisplayBufferRects[2];
+
+/* TitleMenu__AttachSaveTitle's position for the save title's attachToParent
+ * (-4, -23: percent of half the screen from the centre). A TextRow's
+ * position is a ScreenSpritePos (include/TextRow.h), passed through
+ * SceneNode's LongVec3 slot. */
+extern struct ScreenSpritePos sSaveTitleOffset;
+
+/*
+ * The save file's name and title, as TaskObjF's beginSave/beginLoad take
+ * them (`fileName`, `title`): TitleMenu__SaveToCard and
+ * TitleMenu__LoadFromCard pass both. The ROM image points them into the
+ * rodata block at D_80011434: sSaveFileName at "BISLPS-01556xxx", which
+ * SaveToCard empties on a new game; sSaveTitle at the full-width
+ * "LSD   Day001" followed by 19 full-width spaces, which
+ * TitleMenu__CreateSaveTitle reblanks from its 12th character on a new game
+ * and StampSaveTitleDay writes the day into.
+ */
+extern char *sSaveFileName;
+extern char *sSaveTitle;
+
+/* The buffer StampSaveTitleDay formats the day into
+ * (FormatFullWidthNumber) before copying it into sSaveTitle's title. The
+ * ROM image points it at the "7654321" string D_8008AA1C. */
+extern void *sDayDigits;
+
+/* 19 full-width spaces, the tail TitleMenu__CreateSaveTitle copies over
+ * sSaveTitle's on a new game (the ROM image points it just past
+ * sSaveFileName's string). */
+extern char *sSaveTitleBlanks;
+
+/* TaskObjF's init `namePrefix` (TitleMenu__BeginCardAccess): the ROM image
+ * points it at the product code "BISLPS-01556" in D_80011434. */
+extern char *sCardFilePrefix;
+
+/* TaskObjF's init `nameSuffixes` (TitleMenu__BeginCardAccess): the 15 file
+ * suffixes "-01" (D_8008AA0C) to "-15" (D_8008A9D4), then NULL. */
+extern char *sSaveFileSuffixes[];
+
+/* TitleMenu__CycleSaveTitleColor's index (0, 1, 2) into its 3-byte colour.
+ * The storage is a word; every access is a byte (lbu/sb). */
+extern u8 sSaveTitleColorChannel;
+
+/* TitleMenu__CycleSaveTitleColor's frame counter (wraps to 0 at 0x101). */
+extern s32 sSaveTitleColorFrame;
+
 NodeGuardedViewport *New_NodeGuardedViewport(void) {
     NodeGuardedViewport *self;
 
@@ -160,8 +236,7 @@ TitleMenu *New_TitleMenu(struct DreamSys *dreamSys) {
 void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     VabStreamObj *sound;
 
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, &sTitleMenuTarget,
-                                (char *)sTitleMenuSoundBankPath, NULL);
+    GetTaskCoreMethods()->ctor((TaskCore *)self, &sTitleMenuTarget, (char *)sTitleMenuSoundBankPath, NULL);
     self->methods = GetTitleMenuMethods();
     sound = (VabStreamObj *)self->sound;
     sound->methods->setPitchOffset(sound, -1); /* 36 semitones down */
@@ -184,11 +259,11 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSy
     DreamSaveBlock *save = (DreamSaveBlock *)self->saveBlock;
     s32 locked = 1;
 
-    if (save->totalFlasbackUnlockScore > FLASHBACK_UNLOCK_SCORE) {
+    if (save->totalFlashbackUnlockScore > FLASHBACK_UNLOCK_SCORE) {
         locked = (save->amountFlashbacksAvailable == 0);
     }
     /* A NULL entry is one the cursor can stop on. */
-    target->registrationSlots[TITLEMENU_FLASHBACK] = (void *)locked;
+    target->hiddenSlots[TITLEMENU_FLASHBACK] = (void *)locked;
 }
 
 /* The save title's day number, full-width characters 9..11 of
@@ -200,7 +275,7 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSy
  * copies them into the save title's day number, characters 9..11. */
 void StampSaveTitleDay(s32 day) {
     FormatFullWidthNumber(sDayDigits, day, SAVE_TITLE_DAY_DIGITS, 0);
-    *(FullWidthChars3 *)&((FullWidthChar *)gSaveTitle)[SAVE_TITLE_DAY] = *(FullWidthChars3 *)sDayDigits;
+    *(FullWidthChars3 *)&((FullWidthChar *)sSaveTitle)[SAVE_TITLE_DAY] = *(FullWidthChars3 *)sDayDigits;
 }
 
 /*
@@ -210,13 +285,13 @@ void StampSaveTitleDay(s32 day) {
  *
  * TitleMenu is the TaskCore menu between days: START, FLASHBACK, SAVE, LOAD,
  * GRAPH and SHAKE over ETC\TITLE.TIM. In ROM order here: finalize, onNotify,
- * reset, onDeinit, setState and tick (which acts on the chosen entry),
- * refreshViewValue (stores SHAKE's setting), the four overrides that manage
+ * reset, onDeinit, setState and confirmSlot (which acts on the chosen entry),
+ * exit (stores SHAKE's setting), the four overrides that manage
  * the save-title TextRow in place of TaskCore's slot widgets, refreshMenu,
  * and the memory-card methods that drive `saveCtrl`, a TaskObjF, for SAVE
  * and LOAD. The header's banner describes the class.
  *
- * The data they share is in include/TitleMenu.h: gSaveTitle, the
+ * The data they share is in include/TitleMenu.h: sSaveTitle, the
  * full-width save title the TextRow shows and the card save carries;
  * sSaveFileName; the card's name prefix and suffix table; and the colour
  * cycle's channel and frame counters.
@@ -227,11 +302,11 @@ void TitleMenu__Finalize(TitleMenu *self) {
         self->saveCtrl->methods->release(self->saveCtrl);
         self->saveIcon->methods->release(self->saveIcon);
     }
-    Get_vtable_TaskCore()->finalize((TaskCore *)self);
+    GetTaskCoreMethods()->finalize((TaskCore *)self);
 }
 
 void TitleMenu__OnNotify(TitleMenu *self, BasicClass *sender, s32 event) {
-    Get_vtable_TaskCore()->onNotify((TaskCore *)self, sender, event);
+    GetTaskCoreMethods()->onNotify((TaskCore *)self, sender, event);
     if ((sender->methods->header & 0xF) == TASKOBJF_CLASS_ID) {
         self->methods->onCardEvent(self, sender, event);
     }
@@ -261,26 +336,26 @@ void TitleMenu__OnDeinit(TitleMenu *self) {
 }
 
 void TitleMenu__SetState(TitleMenu *self, s32 state) {
-    Get_vtable_TaskCore()->setState((TaskCore *)self, state);
-    if (state == 5) {
+    GetTaskCoreMethods()->setState((TaskCore *)self, state);
+    if (state == TASKCORE_STATE_ACTIVE) {
         self->methods->refreshMenu(self, 0);
     }
-    if (state == 0xA) {
+    if (state == TASKCORE_STATE_START_PRESSED) {
         self->methods->onPadCancel(self);
         self->methods->setActiveSlot(self, self->target->unk8, 1);
         self->methods->onPadConfirm(self);
     }
 }
 
-void TitleMenu__Tick(TitleMenu *self) {
+void TitleMenu__ConfirmSlot(TitleMenu *self) {
     void (*fn)(TitleMenu *);
 
-    Get_vtable_TaskCore()->tick((TaskCore *)self);
+    GetTaskCoreMethods()->confirmSlot((TaskCore *)self);
     switch (self->activeSlot) {
         case TITLEMENU_FLASHBACK:
             self->result = 0;
             self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 1);
-            fn = self->methods->refreshViewValue;
+            fn = self->methods->exit;
             break;
         case TITLEMENU_SAVE:
             fn = self->methods->saveToCard;
@@ -290,7 +365,7 @@ void TitleMenu__Tick(TitleMenu *self) {
             break;
         case TITLEMENU_GRAPH:
             self->result = TITLEMENU_RESULT_GRAPH;
-            fn = self->methods->refreshViewValue;
+            fn = self->methods->exit;
             break;
         default:
             return;
@@ -298,15 +373,15 @@ void TitleMenu__Tick(TitleMenu *self) {
     fn(self);
 }
 
-void TitleMenu__RefreshViewValue(TitleMenu *self) {
+void TitleMenu__Exit(TitleMenu *self) {
     s32 shake;
 
-    Get_vtable_TaskCore()->refreshViewValue((TaskCore *)self);
-    shake = self->slotCounts[TITLEMENU_SHAKE];
+    GetTaskCoreMethods()->exit((TaskCore *)self);
+    shake = self->itemCursors[TITLEMENU_SHAKE];
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
 }
 
-/* gSaveTitle is 2-byte full-width characters; the characters from here on
+/* sSaveTitle is 2-byte full-width characters; the characters from here on
  * are padding after "LSD   Day001". */
 #define SAVE_TITLE_PADDING 12
 /* beginSave's titleEditPos: the player's text goes in from the character
@@ -326,13 +401,13 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
         return;
     }
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
-        strcpy(gSaveTitle + SAVE_TITLE_PADDING * 2, sSaveTitleBlanks);
-        StampSaveTitleFileLetter(gSaveTitle, NULL);
+        strcpy(sSaveTitle + SAVE_TITLE_PADDING * 2, sSaveTitleBlanks);
+        StampSaveTitleFileLetter(sSaveTitle, NULL);
     }
-    cellCount = strlen(gSaveTitle);
+    cellCount = strlen(sSaveTitle);
     cellCount = (cellCount >> 1) + 4;
     text = BMemPMgrAlloc(cellCount);
-    DecodeFullWidthSjis(text, gSaveTitle);
+    DecodeFullWidthSjis(text, sSaveTitle);
     self->saveTitle = New_TextRow(target->handle, cellCount, text);
     self->saveTitle->visibleCount = 8;
     self->saveTitle->firstVisible = 4;
@@ -342,11 +417,11 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
 
 void TitleMenu__DestroySaveTitle(TitleMenu *self) {
     self->saveTitle->methods->release(self->saveTitle);
-    Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
+    GetTaskCoreMethods()->releaseTarget((TaskCore *)self);
 }
 
 void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
-    Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
+    GetTaskCoreMethods()->updateSlotElements((TaskCore *)self, parent);
     self->saveTitle->methods->attachToParent(self->saveTitle, (SceneNode *)parent,
                                              (LongVec3 *)&sSaveTitleOffset);
 }
@@ -368,7 +443,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
     u8 *channels;
 
     channels = (u8 *)&rgb;
-    Get_vtable_TaskCore()->broadcastToSlots((TaskCore *)self, (u8 *)color);
+    GetTaskCoreMethods()->broadcastToSlots((TaskCore *)self, (u8 *)color);
     if (self->inputMode != 0) {
         channels[0] = 0;
         channels[1] = 0;
@@ -405,11 +480,11 @@ void TitleMenu__RefreshMenu(TitleMenu *self) {
     cellCount = self->saveTitle->cellCount;
     origSlot = self->activeSlot;
     text = BMemPMgrAlloc(cellCount);
-    DecodeFullWidthSjis(text, gSaveTitle);
+    DecodeFullWidthSjis(text, sSaveTitle);
     self->saveTitle->methods->setText(self->saveTitle, text);
     BMemPMgrFree(text);
     UpdateFlashbackLock(self, self->target, self->dreamSys);
-    self->methods->updateSlotElements(self, self->unk14);
+    self->methods->updateSlotElements(self, self->lightRig);
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
     self->activeSlot = TITLEMENU_SHAKE;
     self->methods->setState(self, 0xB);
@@ -424,17 +499,17 @@ void TitleMenu__BeginCardAccess(TitleMenu *self) {
         self->saveIcon = New_TimImage((char *)sSaveIconTimPath);
         self->saveCtrl = New_TaskObjF(1, 0);
     }
-    self->saveCtrl->methods->init(self->saveCtrl, sCardFilePrefix, sSaveFileSuffixes,
-                                  self->initArgs->pad, self->unk10, (struct SceneNode *)self->unk14,
-                                  (struct VabStreamObj *)self->sound);
+    self->saveCtrl->methods->init(
+        self->saveCtrl, sCardFilePrefix, sSaveFileSuffixes, self->initArgs->pad, self->frameClock,
+        (struct SceneNode *)self->lightRig, (struct VabStreamObj *)self->sound);
     self->methods->addChild(self, (BasicClass *)self->saveCtrl);
     self->methods->removeChild(self, self->initArgs->pad);
-    self->methods->removeChild(self, self->unk10);
+    self->methods->removeChild(self, self->frameClock);
 }
 
 void TitleMenu__EndCardAccess(TitleMenu *self) {
     self->methods->addChild(self, self->initArgs->pad);
-    self->methods->addChild(self, self->unk10);
+    self->methods->addChild(self, self->frameClock);
     self->methods->removeChild(self, (BasicClass *)self->saveCtrl);
     self->saveCtrl->methods->deinit(self->saveCtrl);
 }
@@ -442,19 +517,19 @@ void TitleMenu__EndCardAccess(TitleMenu *self) {
 void TitleMenu__SaveToCard(TitleMenu *self) {
     s32 shake;
 
-    shake = self->slotCounts[TITLEMENU_SHAKE];
+    shake = self->itemCursors[TITLEMENU_SHAKE];
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
     self->methods->beginCardAccess(self);
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
         sSaveFileName[0] = '\0';
     }
-    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, gSaveTitle, SAVE_TITLE_EDIT_POS,
+    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, sSaveTitle, SAVE_TITLE_EDIT_POS,
                                        3, self->saveIcon, self->saveBlock, self->saveBlockSize);
 }
 
 void TitleMenu__LoadFromCard(TitleMenu *self) {
     self->methods->beginCardAccess(self);
-    self->saveCtrl->methods->beginLoad(self->saveCtrl, sSaveFileName, gSaveTitle, self->saveBlock,
+    self->saveCtrl->methods->beginLoad(self->saveCtrl, sSaveFileName, sSaveTitle, self->saveBlock,
                                        self->saveBlockSize);
 }
 
@@ -495,7 +570,7 @@ fail:
 void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
     s32 count;
 
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetTaskObjFMethods();
     count = sTaskObjFCount;
     sTaskObjFCount = count + 1;
@@ -519,7 +594,7 @@ void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
  *   TaskObjF__RemoveAllChildren clear them; TaskObjF__ClearLinks clears
  *   them and spriteParent at construction.
  * - The card. TaskObjF__SetCardSlot picks slot 0 or 1 and its BIOS channel.
- *   TaskObjF__OpenEvents opens one SwCARD event per gCardEventSpecs entry;
+ *   TaskObjF__OpenEvents opens one SwCARD event per sCardEventSpecs entry;
  *   TaskObjF__CloseEvents closes them.
  * - Card checks. TaskObjF__CheckCardStatus retries
  *   TaskObjF__CardInfoAndLoadStatus, which asks _card_info whether a card is
@@ -555,7 +630,7 @@ void TaskObjF__ClearLinks(TaskObjF *self) {
 }
 
 void TaskObjF__Finalize(TaskObjF *self) {
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
@@ -564,7 +639,7 @@ void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
     if (child == NULL) {
         return;
     }
-    Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
+    GetBasicClassMethods()->addChild((BasicClass *)self, child);
     classId = child->methods->header;
     if ((classId & CLASS_ID_ROOT_MASK) == PAD_CLASS_ID) {
         self->inputSource = child;
@@ -599,7 +674,7 @@ void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child) {
     } else if ((classId & 0xFF) == 0x20) {
         self->itemList = NULL;
     }
-    Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
+    GetBasicClassMethods()->removeChild((BasicClass *)self, child);
 }
 
 void TaskObjF__RemoveAllChildren(TaskObjF *self) {
@@ -608,7 +683,7 @@ void TaskObjF__RemoveAllChildren(TaskObjF *self) {
     self->spriteParent = NULL;
     self->textEntry = NULL;
     self->itemList = NULL;
-    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
+    GetBasicClassMethods()->removeAllChildren((BasicClass *)self);
 }
 
 void TaskObjF__SetCardSlot(TaskObjF *self, s32 cardSlot) {
@@ -622,7 +697,7 @@ s32 TaskObjF__OpenEvents(TaskObjF *self) {
     EnterCriticalSection();
     i = 0;
     do {
-        self->events[i] = OpenEvent(SwCARD, gCardEventSpecs[i], EvMdNOINTR, NULL);
+        self->events[i] = OpenEvent(SwCARD, sCardEventSpecs[i], EvMdNOINTR, NULL);
         i++;
     } while (i < ARRAY_COUNT(self->events));
     ExitCriticalSection();
@@ -722,7 +797,7 @@ s32 TaskObjF__FormatCard(TaskObjF *self) {
 
     retries = MEMCARD_RETRIES;
     do {
-        path = self->cardSlot != 0 ? &gMcDevicePath1 : &gMcDevicePath0;
+        path = self->cardSlot != 0 ? &sMcDevicePath1 : &sMcDevicePath0;
         result = format((char *)path); /* the device name, "bu00:" or "bu10:" */
     } while (result == 0 && retries-- != 0);
     return result;
@@ -1018,9 +1093,9 @@ char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix) {
     McDevicePath *device;
 
     if (cardSlot) {
-        device = &gMcDevicePath1;
+        device = &sMcDevicePath1;
     } else {
-        device = &gMcDevicePath0;
+        device = &sMcDevicePath0;
     }
     *dest = *device;
     strcat((char *)dest, suffix);
@@ -1070,14 +1145,14 @@ s32 TaskObjF__WaitForReadyEvent(TaskObjF *self) {
 }
 
 /* Spins until one of `count` events tests ready and returns that slot's
- * gCardEventSpecs entry: which answer the card gave. */
+ * sCardEventSpecs entry: which answer the card gave. */
 s32 WaitForReadyEvent(s32 *events, s32 count) {
     s32 i;
 
     for (;;) {
         for (i = 0; i < count; i++) {
             if (TestEvent(events[i]) != 0) {
-                return gCardEventSpecs[i];
+                return sCardEventSpecs[i];
             }
         }
     }
@@ -1257,7 +1332,7 @@ void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
     s32 kind;
 
     methods = self->methods;
-    base = Get_vtable_BasicClass();
+    base = GetBasicClassMethods();
     base->onNotify((BasicClass *)self, sender, event);
 
     /* Pad's class id is 0x2 and FrameClock's 0x5, matched with their
@@ -1357,13 +1432,13 @@ void TaskObjF__SetState(TaskObjF *self, s32 state) {
 /* The message icon's name per state, CARD\<name>.TIM ("NOCONECT" ..
  * "LOADERR" for states 2..16). Entries 0 and 1 are not names; no setState
  * call passes 0 or 1. */
-extern char *gCardIconNames[TASKOBJF_STATE_EDIT_TITLE];
-extern char gCardPathPrefix[]; /* "CARD\\" */
-extern char gCardPathSuffix[]; /* ".TIM" */
+extern char *sCardIconNames[TASKOBJF_STATE_EDIT_TITLE];
+extern char sTitleCardPathPrefix[]; /* "CARD\\" */
+extern char sCardPathSuffix[];      /* ".TIM" */
 /* {0, 0, 160, 120} */
-extern SpriteRect gCardIconRect;
+extern SpriteRect sCardIconRect;
 /* (-70, -60), percent of half the screen from the centre */
-extern ScreenSpritePos gCardIconPos;
+extern ScreenSpritePos sCardIconPos;
 
 void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
     char pathBuf[32];
@@ -1374,7 +1449,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
 
     /* MATCHING: `path` and `icon` keep the buffer and the sprite in saved
      * registers across the calls. */
-    if (index >= ARRAY_COUNT(gCardIconNames)) {
+    if (index >= ARRAY_COUNT(sCardIconNames)) {
         return;
     }
     if (self->spriteParent == 0) {
@@ -1385,18 +1460,18 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
     }
 
     path = pathBuf;
-    name = gCardIconNames[index];
+    name = sCardIconNames[index];
     path[0] = '\0';
-    strcat(path, gCardPathPrefix);
+    strcat(path, sTitleCardPathPrefix);
     strcat(path, name);
-    strcat(path, gCardPathSuffix);
+    strcat(path, sCardPathSuffix);
 
     tim = New_TimImage(path);
     ((TimImageUploadFn)tim->methods->processBuffer)(tim);
-    icon = New_ScreenSprite(tim, &gCardIconRect, 0);
+    icon = New_ScreenSprite(tim, &sCardIconRect, 0);
     self->cardIcon = icon;
     tim->methods->release(tim);
-    icon->methods->attachToParent(icon, self->spriteParent, (LongVec3 *)&gCardIconPos);
+    icon->methods->attachToParent(icon, self->spriteParent, (LongVec3 *)&sCardIconPos);
 }
 
 void TaskObjF__ReleaseCardIcon(TaskObjF *self) {
@@ -1589,27 +1664,27 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
 }
 
 /* The save title is full-width (2-byte SJIS) characters. TitleMenu's (the
- * buffer gSaveTitle points at) starts as "LSD   Day001", all full-width:
+ * buffer sSaveTitle points at) starts as "LSD   Day001", all full-width:
  * "LSD" (0..2), the letter field (3..5), "Day" (6..8), the day number
  * (9..11), then padding. */
 #define SAVE_TITLE_LETTER_FIELD 3
 #define SAVE_TITLE_LETTER 4
-/* SAVE_TITLE_PADDING (12) is defined above, with gSaveTitle. */
-/* gSaveTitleGlyphs: the full-width letters a..o (0..14), one per save file
+/* SAVE_TITLE_PADDING (12) is defined above, with sSaveTitle. */
+/* sSaveTitleGlyphs: the full-width letters a..o (0..14), one per save file
  * -01..-15, then three full-width spaces and "Day" (15..20). */
 #define SAVE_TITLE_GLYPH_SPACES 15
 /* A save file name is namePrefix ("BISLPS-01556", 12 characters) + "-NN";
  * the first digit of NN. */
 #define SAVE_FILE_NAME_NUMBER 13
 
-extern FullWidthChar *gSaveTitleGlyphs;
+extern FullWidthChar *sSaveTitleGlyphs;
 
 /* Writes a save file's letter into the full-width `title`: the letter
  * field becomes a space, the letter for the file name's -NN (a for -01 ..
  * o for -15) and a space, followed by "Day", and a space goes after the day
  * number. With no file name it only blanks the letter field. -08 and -09
  * are parsed from their second digit, which atoi would otherwise read as
- * octal. Returns a pointer into gSaveTitleGlyphs that no caller reads.
+ * octal. Returns a pointer into sSaveTitleGlyphs that no caller reads.
  * MATCHING:
  * `glyphs` is the return value, not a second read of the global. */
 s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
@@ -1622,16 +1697,16 @@ s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
         numberPos = ((u32)(fileName[SAVE_FILE_NAME_NUMBER + 1] - '8') < 2) ? SAVE_FILE_NAME_NUMBER + 1
                                                                            : SAVE_FILE_NAME_NUMBER;
 
-        title[SAVE_TITLE_PADDING] = gSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
+        title[SAVE_TITLE_PADDING] = sSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
         *(FullWidthChars6 *)&title[SAVE_TITLE_LETTER_FIELD] =
-            *(FullWidthChars6 *)&gSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
+            *(FullWidthChars6 *)&sSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
 
         letter = atoi(fileName + numberPos) - 1;
-        glyph = &gSaveTitleGlyphs[letter];
+        glyph = &sSaveTitleGlyphs[letter];
         title[SAVE_TITLE_LETTER] = *glyph;
         return (s32)glyph;
     } else {
-        FullWidthChar *glyphs = gSaveTitleGlyphs;
+        FullWidthChar *glyphs = sSaveTitleGlyphs;
 
         *(FullWidthChars3 *)&title[SAVE_TITLE_LETTER_FIELD] =
             *(FullWidthChars3 *)&glyphs[SAVE_TITLE_GLYPH_SPACES];

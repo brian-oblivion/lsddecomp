@@ -17,8 +17,8 @@
  * user is TaskCore (src/app/Task.c): TaskCore__TaskCore builds one over its
  * TileMap (New_BgLayer(tileMap, 1)) into TaskCore::bgLayer, OnInit attaches
  * it to the scene root (unk14) and sets its colour, OnDeinit detaches it,
- * Finalize releases it, and the colour fades (TaskCore__TickColorFade,
- * TaskCore__TickFadeColor) call setColor every frame.
+ * Finalize releases it, and the colour fades (TaskCore__TickFadeIn,
+ * TaskCore__TickFadeOut) call setColor every frame.
  *
  * SLOTS (`classtable.py gBgLayerMethods --vs gSceneNodeMethods`, 47 against 45):
  *  - +0x008 ctor, BgLayer__BgLayer(self, src, mode): SceneNode's, this
@@ -85,7 +85,7 @@ struct BgLayer {
     /* +0x04E */ s16 h;
     /* +0x050 */ s16 scrollx;
     /* +0x052 */ s16 scrolly;
-    /* +0x054 */ BgLayerRgb color; /* GsBG r, g, b: gBgLayerDefaultColor at reset; setColor */
+    /* +0x054 */ BgLayerRgb color; /* GsBG r, g, b: sBgLayerDefaultColor at reset; setColor */
     /* +0x057 */ u8 pad57;
     /* +0x058 */ void *map; /* GsBG.map: the source's GsMAP (&src->map, +0x02C) */
     /* +0x05C */ s16 mx;    /* the pivot: w / 2, h / 2 */

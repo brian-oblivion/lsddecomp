@@ -54,7 +54,7 @@ rather than API.
   `void **` spellings); `GetActiveDataSourceMethods` local in 4 files;
   `GetSetBitField` duplicated (Sprite.c:41, Task.h:36 vs SceneNode.h:216);
   `ApplyMatrixToLVArray` extern at ViewportDraw.c:62 though SceneNode.h is
-  included; `gHitHeightGate` declared twice in SceneNode.c. CdDriver.c
+  included; `sHitHeightGate` declared twice in SceneNode.c. CdDriver.c
   re-declares its own functions two or three times (55/60/794/795, 58/463/907,
   ...): keep one forward block.
 - **Sony names re-declared.** `ResetGraph` (Task.h:40), `rand`, `strlen`,
@@ -92,8 +92,8 @@ rather than API.
   Task.h:47/57, SceneNode.h:204-205 `sRotationZero`/`sSceneNodeScaleOne`,
   which are also typed `u8[0xC]` for `Ratio16[3]`). Move into the .c or
   rename `g`. Conversely 8 `g` symbols used by one unit only
-  (`gCdStreamAudioMixSet`, `gCdFileNotFoundFmt`, `gFileTableRegistered`, ...).
-- **Typos:** `DreamSys__InitMoodContibutors`, `totalFlasbackUnlockScore` and
+  (`sCdStreamAudioMixSet`, `sCdFileNotFoundFmt`, `sFileTableRegistered`, ...).
+- **Typos:** `DreamSys__InitMoodContributors`, `totalFlasbackUnlockScore` and
   siblings, DreamSys.h's @brief typos (flashabcks, appropiate, indicies,
   recieve, adquired, lank). `Test4*` (4 functions) for `TestFor*`.
 - **Misleading names** (rename; each quoted against its code by a reviewer):
@@ -112,13 +112,13 @@ rather than API.
     `onState2`/`onState3` are the DrawSystem event and start/stop hooks, and
     Task.c uses literal 2/3 where `INTERMEDIATEBASE_STATE_START/STOP` exist.
   - `SelectCallback80/98`, `LOOK_CALLBACK_SLOT14C/150` (named for offsets).
-  - `StageMap__GetUnk1CC`; VabDriver/`DATASOURCE_SPU` for a driver whose
+  - `StageMap__GetUnk1CC`; NullDriver/`DATASOURCE_SPU` for a driver whose
     methods are all empty; `withSound` typed `void *` in TaskCore's functions
     and `s32` in its slots.
   - Code-suffixed method families: ObjM `EnterState4..A`,
     `CloseAndNotifyC/D`, `NotifyParentsCodeB`, TodActor `TickCallbackA/B/C`,
-    `TickStaircaseCase0..3`, `SetupStyleSpawnParamsA/B`,
-    `StyleEffect__ReleaseSpritesB`, numbered `NoOp2..5`.
+    `TickStaircaseCase0..3`, `SetupStyleSpawnParamsRandom/B`,
+    `StyleEffect__ReleaseJitterSprites`, numbered `NoOp2..5`.
 
 ## Track 10 `sony-code`
 
@@ -162,7 +162,7 @@ rather than API.
 - **world:** DreamSys `func_59590`, `func_59598`, `func_5ba20` (a get/set of
   `unk_0x924`); DreamSys.h's `unk_0x*` fields (snake/hex spelling, no offset
   comments; `unknown_values_0x922` looks like padding); DreamAux's
-  `gDreamAuxSlots2` alias; `Test4StageTransition` and
+  `sDreamAuxSlots2` alias; `TestForStageTransition` and
   `EnableTeleportsForKind` goto ladders over raw stage/mood numbers with no
   MATCHING line; `*(s32 *)((u8 *)out + 4)` at DayTaskStageMap.c:1096.
 - **ui/sound:** class ids `0x10`/`0x20` and `kind == 2/5` at
@@ -194,7 +194,7 @@ rather than API.
 - Stale names inside header prose: StageMap.h's `buildRateEntries`
   (`loadChunksAround`), `ChunkSlotSpec::key`, `LbdFile::ownerKey`; Entity.h's
   merged-unit names ("(Entity, then Entity)"); IntermediateBase.h's
-  `args->unk0..unkC`; VabDriver.h and Task.h name one file twice; CdDriver.h
+  `args->unk0..unkC`; NullDriver.h and Task.h name one file twice; CdDriver.h
   "that unit still spells them as literals"; BasicClass.h "all 59 method
   tables" (60).
 - Unit-private headers (DayTaskStageMap.h, GameApplicationFileResource.h,

@@ -17,19 +17,19 @@ fresh copy (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`/
 ## New externs
 
 ```c
-extern s32 gStyleDay;         /* already s32 in ObjMStyleActor.c */
-extern s32 gStyleStage;         /* already s32 in ObjMStyleActor.c and this unit's own StyleScrollVramStrips */
-extern s8 gStyleVariantPicks[];        /* 16-entry table, indexed by (gStyleDay+gStyleStage)&0xF */
-extern s32 gStyleVariant;
-extern s8 gStyleVariantConfigCounts[];        /* divisor table, indexed by "kind" -- raw index, no scale */
-extern s32 gStyleConfigIndex;
-extern s32 gStyleVariantConfigs[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
-extern s32 gStyleClearColor;
-extern u8 gStyleDecorColorsB[];        /* address only taken */
-extern u8 gStylePalette[];        /* 3-byte-stride table, indexed by a byte field */
-extern s32 gStyleDecorColors;
-extern u8 gStyleDecorColorsA[];        /* address only taken */
-extern s32 gStyleDecorVariant;
+extern s32 sStyleDay;         /* already s32 in ObjMStyleActor.c */
+extern s32 sStyleStage;         /* already s32 in ObjMStyleActor.c and this unit's own StyleScrollVramStrips */
+extern s8 sStyleVariantPicks[];        /* 16-entry table, indexed by (sStyleDay+sStyleStage)&0xF */
+extern s32 sStyleVariant;
+extern s8 sStyleVariantConfigCounts[];        /* divisor table, indexed by "kind" -- raw index, no scale */
+extern s32 sStyleConfigIndex;
+extern s32 sStyleVariantConfigs[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
+extern s32 sStyleClearColor;
+extern u8 sStyleDecorColorsB[];        /* address only taken */
+extern u8 sStylePalette[];        /* 3-byte-stride table, indexed by a byte field */
+extern s32 sStyleDecorColors;
+extern u8 sStyleDecorColorsA[];        /* address only taken */
+extern s32 sStyleDecorVariant;
 ```
 
 ## Body
@@ -45,26 +45,26 @@ void *PickStyleFallbackConfig(void) {
     s32 b2;
     u8 *tab;
 
-    sum = gStyleDay + gStyleStage;
-    kind = gStyleVariantPicks[sum & 0xF];
-    gStyleVariant = kind;
-    divisor = gStyleVariantConfigCounts[kind];
+    sum = sStyleDay + sStyleStage;
+    kind = sStyleVariantPicks[sum & 0xF];
+    sStyleVariant = kind;
+    divisor = sStyleVariantConfigCounts[kind];
     remainder = sum % divisor;
-    gStyleConfigIndex = remainder;
-    result = (s8 *) gStyleVariantConfigs[kind] + remainder * 4;
+    sStyleConfigIndex = remainder;
+    result = (s8 *) sStyleVariantConfigs[kind] + remainder * 4;
     if (kind == 0) {
         b3 = result[3];
-        gStyleClearColor = (s32) (gStylePalette + b3 * 3);
+        sStyleClearColor = (s32) (sStylePalette + b3 * 3);
         b2 = result[2];
-        tab = gStyleDecorColorsB;
+        tab = sStyleDecorColorsB;
         if (b2 != 0x12) {
-            tab = gStyleDecorColorsA;
+            tab = sStyleDecorColorsA;
         }
-        gStyleDecorColors = (s32) tab;
+        sStyleDecorColors = (s32) tab;
         if (remainder < 4) {
-            gStyleDecorVariant = 1;
+            sStyleDecorVariant = 1;
         } else if (remainder < 6) {
-            gStyleDecorVariant = 2;
+            sStyleDecorVariant = 2;
         }
     }
     return result;
@@ -73,9 +73,9 @@ void *PickStyleFallbackConfig(void) {
 
 Notes:
 
-- `gStyleVariantConfigs[kind]` is loaded as a raw `s32` *value* (not an address-of),
+- `sStyleVariantConfigs[kind]` is loaded as a raw `s32` *value* (not an address-of),
   then used as a base address for further byte-granular pointer arithmetic
-  (`+ remainder * 4`) -- exactly the `gStyleSceneRefs` "pointer stored as a plain
+  (`+ remainder * 4`) -- exactly the `sStyleSceneRefs` "pointer stored as a plain
   scalar" idiom already established elsewhere in this unit, just for a
   different global.
 - The `sum % divisor` compiles to the standard MIPS `div`/`break 7`
@@ -84,7 +84,7 @@ Notes:
   only `%`, never `/`, on this pair -- writing an unused `quotient = sum /
   divisor;` alongside it would be wrong (and would very likely emit a
   spurious `mflo`).
-- `gStyleVariantConfigCounts[kind]` and `gStyleVariantPicks[idx]` are indexed with NO scale factor
+- `sStyleVariantConfigCounts[kind]` and `sStyleVariantPicks[idx]` are indexed with NO scale factor
   in retail (`addu $at,$at,$a0`, not `sll`+`addu`) because both are `s8`
   arrays -- plain C array indexing on a 1-byte element type already
   reproduces this without any special casting.
@@ -92,20 +92,20 @@ Notes:
 ## Lever: a ternary's branch/default assignment ORDER is not guaranteed to
 match source intent -- write it as an explicit default-then-override
 
-First attempt used `tab = (b2 == 0x12) ? gStyleDecorColorsB : gStyleDecorColorsA;`, which
+First attempt used `tab = (b2 == 0x12) ? sStyleDecorColorsB : sStyleDecorColorsA;`, which
 compiled to the OPPOSITE physical layout from retail: GCC chose
-`gStyleDecorColorsA` as the unconditional default and `gStyleDecorColorsB` as the
+`sStyleDecorColorsA` as the unconditional default and `sStyleDecorColorsB` as the
 conditional override (with the branch polarity flipped to match, `bne`
 where retail has `beq`) -- functionally identical, but two words differ
 because the *constant addresses* land in the swapped slots and the branch
 test is inverted. Retail's actual shape is imperative, not ternary-shaped:
-compute the default (`gStyleDecorColorsB`) unconditionally, then overwrite it with
-`gStyleDecorColorsA` only when `b2 != 0x12`:
+compute the default (`sStyleDecorColorsB`) unconditionally, then overwrite it with
+`sStyleDecorColorsA` only when `b2 != 0x12`:
 
 ```c
-tab = gStyleDecorColorsB;
+tab = sStyleDecorColorsB;
 if (b2 != 0x12) {
-    tab = gStyleDecorColorsA;
+    tab = sStyleDecorColorsA;
 }
 ```
 
@@ -132,10 +132,10 @@ inverted branch; second: explicit default-then-override, byte-exact).
 **`PickStyleFallbackConfig`, tier B.**
 
 Literal call site in `ApplyStyleConfig` (ObjMStyleActor.c, already matched):
-`cfg = func_80054758();`, used only when the direct per-`gStyleStage` config
-table entry (`sStyleStageConfigs[gStyleStage]`) is NULL -- i.e. this is the fallback
-path. Body hashes `gStyleDay + gStyleStage` into a 16-entry table to pick
-a `gStyleVariant` ("kind"), then a per-variant divisor/remainder select a
+`cfg = func_80054758();`, used only when the direct per-`sStyleStage` config
+table entry (`sStyleStageConfigs[sStyleStage]`) is NULL -- i.e. this is the fallback
+path. Body hashes `sStyleDay + sStyleStage` into a 16-entry table to pick
+a `sStyleVariant` ("kind"), then a per-variant divisor/remainder select a
 config row. "Fallback" is evidenced by the call site; "kind"/variant
 selection mechanics are evidenced by the body; WHY a fallback is needed, or
 what the variant means in gameplay terms, is not established (tier B, not
@@ -147,15 +147,15 @@ A).
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_800873DC` | `gStyleVariantPicks` | B | 16 bytes, each 0..3, indexed `(day + stage) & 0xF`; the byte read is stored as `gStyleVariant`. |
-| `D_800873D8` | `gStyleVariantConfigCounts` | A | 4 bytes {7, 10, 12, 5}, indexed by the variant, the divisor of the config index; they are exactly the record counts of the four tables `gStyleVariantConfigs` points at (0x80087340: 7 words, ...735C: 10, ...7384: 12, ...73B4: 5). |
-| `D_800873C8` | `gStyleVariantConfigs` | A | 4 pointers, one per variant, to arrays of 4-byte config records; the function returns `table[variant] + index * 4`, the record ApplyStyleConfig/FillStyleFromConfig read. |
-| `D_8008AC84` | `gStyleConfigIndex` | A | written with the config index `(day + stage) % count`; nothing reads it. |
-| `D_800872C4` | `gStylePalette` | A | 24 RGB triples (FillStyleFromConfig, ApplyStyleConfig and this function index it by a config byte); this function takes byte 3's entry as `gStyleClearColor`. |
-| `D_80087234`, `D_8008726C` | `gStyleDecorColorsA`, `gStyleDecorColorsB` | B | two 18-triple colour tables (one per decor band); B when config byte 2 is palette entry 18 (`STYLE_DECOR_B_PALETTE_INDEX`), A otherwise. Which look each is, is not established, hence the letters. |
-| `gStyleFlushColor` | `gStyleClearColor` | A | its only reader, StyleUpdateDecorSet, hands the adjusted copy to the viewport's setClearColor. |
-| `gStyleColorTable` | `gStyleDecorColors` | A | the current band colour table: StyleBuildDecorSet colours band i from entry i. |
-| `gStyleKind` | `gStyleStage` | A | RegisterStyleConfig stores its arg1 there, and its one caller, ObjM__InitStyleAndWorld, passes `self->stage`. |
-| `gStyleCounter` | `gStyleDay` | A | RegisterStyleConfig stores its arg3 there; its one caller passes `DreamSys__GetCurrentDayAndYear()` (`currentDay + 1`). |
+| `D_800873DC` | `sStyleVariantPicks` | B | 16 bytes, each 0..3, indexed `(day + stage) & 0xF`; the byte read is stored as `sStyleVariant`. |
+| `D_800873D8` | `sStyleVariantConfigCounts` | A | 4 bytes {7, 10, 12, 5}, indexed by the variant, the divisor of the config index; they are exactly the record counts of the four tables `sStyleVariantConfigs` points at (0x80087340: 7 words, ...735C: 10, ...7384: 12, ...73B4: 5). |
+| `D_800873C8` | `sStyleVariantConfigs` | A | 4 pointers, one per variant, to arrays of 4-byte config records; the function returns `table[variant] + index * 4`, the record ApplyStyleConfig/FillStyleFromConfig read. |
+| `D_8008AC84` | `sStyleConfigIndex` | A | written with the config index `(day + stage) % count`; nothing reads it. |
+| `D_800872C4` | `sStylePalette` | A | 24 RGB triples (FillStyleFromConfig, ApplyStyleConfig and this function index it by a config byte); this function takes byte 3's entry as `sStyleClearColor`. |
+| `D_80087234`, `D_8008726C` | `sStyleDecorColorsA`, `sStyleDecorColorsB` | B | two 18-triple colour tables (one per decor band); B when config byte 2 is palette entry 18 (`STYLE_DECOR_B_PALETTE_INDEX`), A otherwise. Which look each is, is not established, hence the letters. |
+| `gStyleFlushColor` | `sStyleClearColor` | A | its only reader, StyleUpdateDecorSet, hands the adjusted copy to the viewport's setClearColor. |
+| `gStyleColorTable` | `sStyleDecorColors` | A | the current band colour table: StyleBuildDecorSet colours band i from entry i. |
+| `gStyleKind` | `sStyleStage` | A | RegisterStyleConfig stores its arg1 there, and its one caller, ObjM__InitStyleAndWorld, passes `self->stage`. |
+| `gStyleCounter` | `sStyleDay` | A | RegisterStyleConfig stores its arg3 there; its one caller passes `DreamSys__GetCurrentDayAndYear()` (`currentDay + 1`). |
 
 Locals: `seed` (day + stage), `variant`, `count`, `index`, `config`, `clearIndex`/`decorIndex` (config bytes 3 and 2), `decorColors`.

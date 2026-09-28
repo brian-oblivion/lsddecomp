@@ -6,7 +6,7 @@ Round 81, runner echo. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** not a class slot; unit-level getter.
-- **What:** sdata getter: `lw $v0, %gp_rel(gWBgmActive)($gp)`. `gWBgmActive` is defined in `.sdata`, so maspsx `--gp-symbols` gp-relativises the load.
+- **What:** sdata getter: `lw $v0, %gp_rel(sWBgmActive)($gp)`. `sWBgmActive` is defined in `.sdata`, so maspsx `--gp-symbols` gp-relativises the load.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 0
   insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`). No levers were needed.
@@ -14,13 +14,13 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 ## Naming
 
-`IsWBgmActive`, tier A. returns `gWBgmActive`, set to 1 in `WBgm__WBgm` and 0 in `WBgm__Finalize`; its only caller (`VabStreamObj__Finalize`, PlacementGridVabSound.c) gates `SsEnd`/`SsQuit` on it being 0 -- "is a WBgm still open" is exactly the condition it tests.
+`IsWBgmActive`, tier A. returns `sWBgmActive`, set to 1 in `WBgm__WBgm` and 0 in `WBgm__Finalize`; its only caller (`VabStreamObj__Finalize`, PlacementGridVabSound.c) gates `SsEnd`/`SsQuit` on it being 0 -- "is a WBgm still open" is exactly the condition it tests.
 
 ## Source
 
 ```c
 s32 IsWBgmActive(void) {
-    return gWBgmActive;
+    return sWBgmActive;
 }
 ```
 
@@ -66,8 +66,8 @@ extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern s32 sWBgmActive;
+extern u8 sSsSizeTableBuf[];
 ```
 
 ## Track 4 (2026-09-26, round 88, alpha)

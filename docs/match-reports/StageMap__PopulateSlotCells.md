@@ -282,7 +282,7 @@ round, not just read off the disassembly.
 
 `self` (`$a0`) is never dereferenced -- confirmed again this round, matches
 the previous report's finding. `entry` (`$a1`) is an `Elem*` (matches the
-one real call site, `StageMap__OnNotifyTag1`'s `self->methods->slot104(self, e)`).
+one real call site, `StageMap__OnDrawSystemEvent`'s `self->methods->slot104(self, e)`).
 
 1. `hdr = entry->unk4` (already-established `ElemTarget*`). `target =
    entry->unk8` -- **new field**, a per-frame GPU link/load coordinator
@@ -830,7 +830,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BE54` | `StageMap__PopulateSlotCells` | B | Occupant of `gStageMapMethods` +0x104 (`slot104`), and its own identity slot -- `StageMap__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/world/DayTaskStageMap.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
+| `func_8004BE54` | `StageMap__PopulateSlotCells` | B | Occupant of `gStageMapMethods` +0x104 (`slot104`), and its own identity slot -- `StageMap__OnDrawSystemEvent` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/world/DayTaskStageMap.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
 
 ## Track 4 (2026-09-26, round 87, echo)
 

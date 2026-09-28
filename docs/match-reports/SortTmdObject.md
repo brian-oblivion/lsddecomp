@@ -504,10 +504,10 @@ position.
  * other four are this unit's own view and stay local per CLAUDE.md's
  * cross-unit-declaration rule. */
 extern s32 D_80090C18;
-extern s32 gSortUseGlobalLightMode;
-extern s32 gSortLightMode;
+extern s32 sSortUseGlobalLightMode;
+extern s32 sSortLightMode;
 extern s32 GsLIGHT_MODE;
-extern s8 gTexturedFaceColor[3];
+extern s8 sTexturedFaceColor[3];
 extern void *GsOUT_PACKET_P;
 
 extern void InitDivPolygonPtrs(void *dst, void *table, s32 count);
@@ -576,8 +576,8 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
 
     *(void **)(ctx + 0x0) = *(void **)((u8 *)otSrc + 0x4);
     *(s32 *)(ctx + 0x4) = otShift;
-    InitDivPolygonPtrs(ctx + 0x88, gDivPolygon3, 3);
-    InitDivPolygonPtrs(ctx + 0x94, gDivPolygon4, 4);
+    InitDivPolygonPtrs(ctx + 0x88, sDivPolygon3, 3);
+    InitDivPolygonPtrs(ctx + 0x94, sDivPolygon4, 4);
 
     remaining = *(s32 *)(*(u8 **)(obj + 0x8) + 0x14);
     list = *(u8 **)(*(u8 **)(obj + 0x8) + 0x10);
@@ -615,20 +615,20 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
     *(s32 *)(ctx + 0x8) = 0xA;
     D_80090C18 = (*(u32 *)obj >> 9) & 0x7;
     D_8008E248 = (*(u32 *)obj >> 6) & 0x1;
-    gSortUseGlobalLightMode = (*(u32 *)obj >> 5) & 0x1;
-    gSortLightMode = (*(u32 *)obj >> 3) & 0x3;
+    sSortUseGlobalLightMode = (*(u32 *)obj >> 5) & 0x1;
+    sSortLightMode = (*(u32 *)obj >> 3) & 0x3;
 
     {
-        s8 *tint = gTexturedFaceColor;
+        s8 *tint = sTexturedFaceColor;
 
         *(s8 *)(ctx + 0x34) = tint[0];
         *(s8 *)(ctx + 0x35) = tint[1];
         *(s8 *)(ctx + 0x36) = tint[2];
     }
 
-    if (gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) {
+    if (sSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) {
         dpShift = 9;
-    } else if (gSortLightMode != 0) {
+    } else if (sSortLightMode != 0) {
         dpShift = 9;
     } else {
         dpShift = 0x10;
@@ -1298,10 +1298,10 @@ register" above.
 #if 0
 extern void *GsOUT_PACKET_P;
 extern s32 D_80090C18;
-extern s32 gSortUseGlobalLightMode;
-extern s32 gSortLightMode;
+extern s32 sSortUseGlobalLightMode;
+extern s32 sSortLightMode;
 extern s32 GsLIGHT_MODE;
-extern s8 gTexturedFaceColor[3];
+extern s8 sTexturedFaceColor[3];
 
 extern void InitDivPolygonPtrs(void *arg0, void *arg1, s32 kind);
 extern s32 ProjectTriFace(void *arg0, u8 *prim, u16 idx0, u16 idx1, u16 idx2, void (*callback)(void *));
@@ -1349,8 +1349,8 @@ void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
 
     *(void **)(prim + 0x0) = *(void **)((u8 *)arg1 + 0x4);
     *(s32 *)(prim + 0x4) = arg2;
-    InitDivPolygonPtrs(prim + 0x88, gDivPolygon3, 3);
-    InitDivPolygonPtrs(prim + 0x94, gDivPolygon4, 4);
+    InitDivPolygonPtrs(prim + 0x88, sDivPolygon3, 3);
+    InitDivPolygonPtrs(prim + 0x94, sDivPolygon4, 4);
 
     {
         u8 *mesh = *(u8 **)(self + 0x8);
@@ -1466,16 +1466,16 @@ void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
         *(s32 *)(prim + 0x8) = 0xA;
         D_80090C18 = (raw >> 9) & 0x7;
         D_8008E248 = (raw >> 6) & 0x1;
-        gSortUseGlobalLightMode = (raw >> 5) & 0x1;
-        gSortLightMode = (raw >> 3) & 0x3;
+        sSortUseGlobalLightMode = (raw >> 5) & 0x1;
+        sSortLightMode = (raw >> 3) & 0x3;
     }
-    prim[0x34] = gTexturedFaceColor[0];
-    prim[0x35] = gTexturedFaceColor[1];
-    prim[0x36] = gTexturedFaceColor[2];
+    prim[0x34] = sTexturedFaceColor[0];
+    prim[0x35] = sTexturedFaceColor[1];
+    prim[0x36] = sTexturedFaceColor[2];
 
-    if (gSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) {
+    if (sSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) {
         v0 = 9;
-    } else if (gSortLightMode != 0) {
+    } else if (sSortLightMode != 0) {
         v0 = 9;
     } else {
         v0 = 0x10;
@@ -2063,11 +2063,11 @@ Byte-identical after every step; the three oracles green at each commit.
   GsOUT_PACKET_P buffer and the OT. "Sort" is libgs's verb for that.
 - `D_800902E0` -> `GsLIGHT_MODE`: Sony's, pinned in `psyq-objects.ld` by eight
   libgs objects; `rename.py` names it as the only allowed rename.
-- `D_8008E24C` -> `gSortLightMode`, tier B: attribute bits 3-4 (GsFOG|GsMATE).
-- `D_8008E250` -> `gSortUseGlobalLightMode`, tier B: attribute bit 5
+- `D_8008E24C` -> `sSortLightMode`, tier B: attribute bits 3-4 (GsFOG|GsMATE).
+- `D_8008E250` -> `sSortUseGlobalLightMode`, tier B: attribute bit 5
   (GsLLMOD); the object is depth-cued when it is set and GsLIGHT_MODE is
   non-zero.
-- `D_8008A82C` -> `gTexturedFaceColor`, tier A: `.byte 0x80,0x80,0x80`,
+- `D_8008A82C` -> `sTexturedFaceColor`, tier A: `.byte 0x80,0x80,0x80`,
   copied into the context once per object and loaded as the GTE colour of
   every lit textured face (the POLY_FT3 and POLY_FT4 cases). Only reader.
 - Sony's `GsSortObject4` (disassembled from `objt2.o`) stores the same four

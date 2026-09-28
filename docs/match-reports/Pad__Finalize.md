@@ -29,7 +29,7 @@ void *Pad__Finalize(Pad *self) {
     if (--sPadRefCount == 0) {
         PadStop();
     }
-    return Get_vtable_BasicClass()->dtor(self);
+    return GetBasicClassMethods()->dtor(self);
 }
 ```
 
@@ -52,7 +52,7 @@ right but the specific callee name (`func_80025F2C` vs. the already-known
 **Tier A.** Occupies vtable slot `+0x0C`, BasicClass's `finalize`
 (`classtable.py gPadMethods --vs gBasicClassMethods`), and forwards to
 `BasicClass__Finalize` after stopping the pad library on the last instance.
-Named `Pad__Destroy` in round 77 after `VabDriver__Destroy`; renamed
+Named `Pad__Destroy` in round 77 after `NullDriver__Destroy`; renamed
 2026-09-25 (track 4, BasicClass unification) to `Pad__Finalize`, because an
 override is named for the slot it occupies (FINISHING-PLAN track 4 recipe).
 There was no convention to follow instead: of the 23 NAMED occupants of +0x00C

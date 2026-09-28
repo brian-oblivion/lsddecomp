@@ -10,7 +10,7 @@
 
 `SceneNode` vtable slot `+0x010`, one of the five BasicClass overrides
 (`tools/classtable.py gSceneNodeMethods --vs gBasicClassMethods`). Forwards unconditionally
-to the base class's own `+0x010` slot (`Get_vtable_BasicClass()->slot10`), then, if
+to the base class's own `+0x010` slot (`GetBasicClassMethods()->slot10`), then, if
 `other`'s own vtable header tag (`other->methods->header & 0xF`) is `9`,
 additionally calls `SceneNode__LinkModel(self, other)` (still uncarved, next
 slice). Its sibling `SceneNode__RemoveChild` (`+0x014`) is the mirror-image
@@ -20,7 +20,7 @@ slice). Its sibling `SceneNode__RemoveChild` (`+0x014`) is the mirror-image
 
 ```c
 void SceneNode__AddChild(SceneNodeObj *self, GenericObj_d294 *other) {
-    Get_vtable_BasicClass()->slot10(self, other);
+    GetBasicClassMethods()->slot10(self, other);
     if ((other->methods->header & 0xF) == 9) {
         SceneNode__LinkModel(self, other);
     }

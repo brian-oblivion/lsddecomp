@@ -28,7 +28,7 @@ tools/funcdiff.py GetGraphRoomMethods   # 4/4
 
 **`GetGraphRoomMethods`** -- tier A. Plain no-argument getter, `return
 &gGraphRoomMethods;`, same shape as the already-established
-`GetSceneNodeMethods`/`Get_vtable_TaskCore` precedent. `D_80087AAC` (the
+`GetSceneNodeMethods`/`GetTaskCoreMethods` precedent. `D_80087AAC` (the
 table it returns) renamed to `gGraphRoomMethods` in the same pass
 (`tools/rename.py`), following the `g<Class>Methods` convention already
 used for `gTaskCoreMethods`/`gSceneNodeMethods`.

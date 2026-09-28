@@ -87,7 +87,7 @@ set the flag.
 **Field `GameApplicationMethods.slot44` was NOT renamed** despite this
 function's clear mechanics, because `src/main.c` (`main`, another
 unit) dispatches it by field name directly
-(`gGameApplication->methods->slot44(gGameApplication, obj, pad)`) -- renaming the
+(`sGameApplication->methods->slot44(sGameApplication, obj, pad)`) -- renaming the
 struct definition here would break that unit's build, which is outside this
 runner's ownership. See `## Proposed field names` below.
 
@@ -97,13 +97,13 @@ runner's ownership. See `## Proposed field names` below.
 
 - **`GameApplicationMethods.slot44` -> `forwardToBaseUnlessOverridden`**, tier B,
   same evidence as the function name above. Only accessor outside this unit
-  is `src/main.c:60-61` (`gGameApplication->methods->slot44(gGameApplication, obj, pad)`),
+  is `src/main.c:60-61` (`sGameApplication->methods->slot44(sGameApplication, obj, pad)`),
   so the rename needs that call site updated in the same commit as the
   struct definition.
 - **`GameApplicationMethods.slot4C`** -- NOT proposing a name. Its occupant
   (`Application__RunMainLoop`) is not in this unit and was not derived this round; all
   that's observable locally is the call shape at `src/main.c:61`
-  (`gGameApplication->methods->slot4C(gGameApplication)`, no extra arguments, dispatched
+  (`sGameApplication->methods->slot4C(sGameApplication)`, no extra arguments, dispatched
   once right after `slot44` during startup). That's a call-site pattern, not
   a mechanics derivation of what the function itself does -- naming it from
   that alone would be the "guess at purpose" the naming rules warn against.

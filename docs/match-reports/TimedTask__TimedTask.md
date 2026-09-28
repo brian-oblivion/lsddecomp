@@ -18,7 +18,7 @@ sw    $s1, 0x14($sp)
 addu  $s1, $a1, $zero        ; s1 = arg1
 sw    $s2, 0x18($sp)
 sw    $ra, 0x1C($sp)
-jal   Get_vtable_IntermediateBase
+jal   GetIntermediateBaseMethods
  addu $s2, $a2, $zero        ; s2 = arg2
 lw    $v0, 0x8($v0)          ; base ctor slot
 nop
@@ -48,7 +48,7 @@ jr $ra
 
 ```c
 void TimedTask__TimedTask(Obj865C8 *self, s32 arg1, SubObjB *arg2) {
-    Get_vtable_IntermediateBase()->ctor(self);
+    GetIntermediateBaseMethods()->ctor(self);
     self->methods = (DayTaskMethods *)GetTimedTaskMethods();
     if (arg1 != 0) {
         self->subB = New_VabStreamObj(arg1);

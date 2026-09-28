@@ -43,7 +43,7 @@ round 2026-08-30-d, runner ALPHA, unit DreamSys (whole-unit, third pass).
 
 Renamed from `func_8005A0B0`.
 
-The function `DreamSys__SelectCallback98(this, 2)` installs in
+The function `DreamSys__SelectMoveCallback(this, 2)` installs in
 `callback_0x98`. Each tick, while `driftActive`, it adds the constant vector
 `sDriftStep` -- (0, 512, 0), i.e. purely vertical -- to the object's position and
 lowers `heightCurve->endValue` by 600; while `cueServiceActive`, it services the

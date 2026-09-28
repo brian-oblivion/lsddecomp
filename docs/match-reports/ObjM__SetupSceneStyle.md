@@ -24,8 +24,8 @@ struct UnkCObj_3bb8c_l {
 
 extern void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 extern void *GetStageGridDimensions(s32 index);
-extern s32 gObjMProjectionBias;
-extern s32 gObjMAcceptedClassIds;
+extern s32 sObjMProjectionBias;
+extern s32 sObjMAcceptedClassIds;
 
 void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
@@ -38,9 +38,9 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
 
     obj = *(UnkCObj_3bb8c_l **)self->unkC;
     val = *obj->methods->slot7C(obj, 0);
-    unk18->methods->slot54(unk18, val / 2 * 5 / 3 + gObjMProjectionBias);
+    unk18->methods->slot54(unk18, val / 2 * 5 / 3 + sObjMProjectionBias);
 
-    unk18->methods->slot70(unk18, self->unk3C, &gObjMViewPoint, &gObjMViewRefPoint, 0);
+    unk18->methods->slot70(unk18, self->unk3C, &sObjMViewPoint, &sObjMViewRefPoint, 0);
 
     SetDreamAuxWorld((s32)self->unk38, (s32)self->unk14, (s32)self->unk3C, self->unk34, self->unk10);
 
@@ -52,7 +52,7 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     unk14->methods->slotE0(unk14, GetStageGridDimensions((s32)self->unk38));
     self->unk3C->methods->slot4C(self->unk3C, unk14);
     unk14->methods->slotDC(unk14, self->unk48);
-    unk14->methods->slotCC(unk14, &gObjMAcceptedClassIds);
+    unk14->methods->slotCC(unk14, &sObjMAcceptedClassIds);
 }
 ```
 
@@ -174,7 +174,7 @@ call and can go the same way.
 Comment history moved from the unit's externs:
 
 > DreamAux.c's (MATCHED round 43); no header declares it. `world` is the
-> DreamSys it installs as gDreamAuxWorld (track 4, round 88).
+> DreamSys it installs as sDreamAuxWorld (track 4, round 88).
 
 > GetStageGridDimensions comes from include/StageGrid.h, through DreamSys.h.
 
@@ -183,7 +183,7 @@ Comment history moved from the unit's externs:
 
 SetDreamAuxWorld's local prototype takes its parameter names from what the
 definition does with them (stage, grid, world, sound, clock).
-`gObjMViewPoint`, `gObjMViewRefPoint` and `gObjMAcceptedClassIds` are typed
+`sObjMViewPoint`, `sObjMViewRefPoint` and `sObjMAcceptedClassIds` are typed
 (LongVec3, s32[]), dropping their casts. `/* GsFOG */` on EnterStyleSession's
 setLightMode(vp, 1): SceneNode__SetLightMode writes a 3-bit field at bit 3
 of the GsDOBJ2 attribute, where 1 is libgs's GsFOG (1<<3).

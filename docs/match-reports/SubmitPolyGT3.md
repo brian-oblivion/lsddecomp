@@ -202,7 +202,7 @@ void SubmitPolyGT3(void *arg0, void *arg1) {
         ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
-        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        FillDivPolygonHeader(sDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
         FillRVectors3((PolyVtx **)(prim + 0x88), (PolyVtx **)(prim + 0xA4),
                       (PolyUV4 *)(self + 0x8), (PolyUV4 *)(self + 0x14),
                       (PolyUV4 *)(self + 0x20));
@@ -219,7 +219,7 @@ void SubmitPolyGT3(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0x8) = *(u16 *)(self + 0x18);
         *(u16 *)(*(u8 **)(prim + 0x90) + 0x8) = *(u16 *)(self + 0x24);
 
-        RCpolyGT3(self, gDivPolygon3);
+        RCpolyGT3(self, sDivPolygon3);
     }
 }
 #endif
@@ -272,7 +272,7 @@ void SubmitPolyGT3(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
+        FillDivPolygonHeader(sDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x1A));
         FillRVectors3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x14, self + 0x20);
 
         *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u16 *)(self + 0x26);
@@ -287,7 +287,7 @@ void SubmitPolyGT3(void *arg0, void *arg1)
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0x8) = *(u16 *)(self + 0x18);
         *(u16 *)(*(u8 **)(prim + 0x90) + 0x8) = *(u16 *)(self + 0x24);
 
-        func_8001BFD4(self, gDivPolygon3);
+        func_8001BFD4(self, sDivPolygon3);
     }
 }
 #endif
@@ -428,7 +428,7 @@ own `extern void *SubmitPolyGT3(void *prim, void *ctx);` view already used.
 
 Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
 report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
-RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+RCpoly* prototype, the renamed `sDivPolygon3`/`sDivPolygon4`). Byte-identical
 on the first build. The field reads, for this primitive:
 
 `clut`/`tpage` to the header; RVECTOR `pad` from `pad2` for all three

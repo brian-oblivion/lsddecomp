@@ -27,14 +27,14 @@ typedef struct DataSrc39094 {
 } DataSrc39094;
 
 extern u8 gLbdFileMethods[];   /* method table, 34 slots */
-extern s32 gDefaultDataDirectory;
-extern s32 gForcedSoundBank;
-extern s32 gForcedStageBgm;
-extern u8 gSoundBankPaths[];
-extern u8 gRecordTable[];
-extern char *gSoundEffectDirPtr;  /* -> "SND\\SE" */
+extern s32 sDefaultDataDirectory;
+extern s32 sForcedSoundBank;
+extern s32 sForcedStageBgm;
+extern u8 sSoundBankPaths[];
+extern u8 sRecordTable[];
+extern char *sSoundEffectDirPtr;  /* -> "SND\\SE" */
 extern const char sAsmkMoviePath[];
-extern s16 gMovieFrameCounts[];
+extern s16 sMovieFrameCounts[];
 
 /* slot +0x088 of gLbdFileMethods */
 void LbdFile__SetAutoLoadData(DataSrc39094 *self, s32 value) {
@@ -69,9 +69,9 @@ loadHeader (+0x078) with each rate entry's `ptr0`, which
 StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__GetGridRecord (ObjM__AttachTarget installs it), whose
 tail call GetStageMapChunkRecord(stage, chunk) / GetStageMapChunkRecordXY leaves
-`&group[9 + chunk]` of gRecordTable in $v0. gRecordTable's 0x1C-byte records
+`&group[9 + chunk]` of sRecordTable in $v0. sRecordTable's 0x1C-byte records
 begin with a path, and record 9 of every stage group is its M000.LBD
-(stage 0: gStageFirstRecord[0] = 16, record 25 at 0x80081CC0 =
+(stage 0: sStageFirstRecord[0] = 16, record 25 at 0x80081CC0 =
 "STG00\M000.LBD"; stage 1: record 39 at 0x80081E48 = "STG01\M000.LBD").
 The same index goes into `ownerRate` and is split into column and row
 (StageMap__SplitChunkIndex). LBD is the game's own extension, and the

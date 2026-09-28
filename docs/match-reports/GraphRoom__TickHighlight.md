@@ -16,7 +16,7 @@ void GraphRoom__TickHighlight(D_80087AACObj *self);
 ## Body
 
 ```c
-extern s32 gGraphPointHighlightColor;
+extern s32 sGraphPointHighlightColor;
 
 void GraphRoom__TickHighlight(D_80087AACObj *self) {
     if (self->unk_0x238 != 0) {
@@ -24,7 +24,7 @@ void GraphRoom__TickHighlight(D_80087AACObj *self) {
             if (self->unk_0x23C < 4) {
                 if ((self->unk_0x1C % 24) == 0) {
                     s8 idx = self->unk_0x240[self->unk_0x23C];
-                    self->unk_0xA8[idx]->methods->slotB8(self->unk_0xA8[idx], 1, &gGraphPointHighlightColor);
+                    self->unk_0xA8[idx]->methods->slotB8(self->unk_0xA8[idx], 1, &sGraphPointHighlightColor);
                     self->unk_0x23C += 1;
                 }
             }
@@ -76,7 +76,7 @@ ScoreDayLog match" (in-game trigger cadence not independently confirmed).
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `highlight` (+0x0B8) is setColor(1, &gGraphPointHighlightColor): the highlight is a colour overwrite. Zero bytes.
+points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `highlight` (+0x0B8) is setColor(1, &sGraphPointHighlightColor): the highlight is a colour overwrite. Zero bytes.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__TickHighlight` -> `GraphRoom__TickHighlight`
 
@@ -84,9 +84,9 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 ## Track 7 (2026-09-27, round 97, delta)
 
-- **Naming: `D_8008ABBC` -> `gGraphPointHighlightColor`** (tier A): sdata `00 FF 00`, green; this function `setColor(1, ...)`s (overwrite) each matched dot to it. Its only user. Declared `GraphPointColor` instead of `s32`: zero bytes changed.
+- **Naming: `D_8008ABBC` -> `sGraphPointHighlightColor`** (tier A): sdata `00 FF 00`, green; this function `setColor(1, ...)`s (overwrite) each matched dot to it. Its only user. Declared `GraphPointColor` instead of `s32`: zero bytes changed.
 - Local `idx` -> `dot`; `highlightCount < GRAPH_SCORE_MOOD_COUNT`; `0x1F` is decimal 31. The 31 and 24 stay literals (one highlight every 24 frames once frameCounter passes 30): a name would only restate them.
 
 ## Track 6 (2026-09-27, round 98, delta): `GraphPointColor` -> `BoxFillRgb`
 
-The local `GraphPointColor` (round 97) is retired onto include/BoxFill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (ScreenWidgets's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `gGraphPointNewestColor`, `gGraphPointBaseColor`, `gGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.
+The local `GraphPointColor` (round 97) is retired onto include/BoxFill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (ScreenWidgets's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `sGraphPointNewestColor`, `sGraphPointBaseColor`, `sGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.

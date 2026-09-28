@@ -216,7 +216,7 @@ void SubmitPolyG4(void *arg0, void *arg1) {
         ((OtTag *)self)->addr = (*(OtTag **)(prim + 0x30))->addr;
         (*(OtTag **)(prim + 0x30))->addr = (u32)self;
     } else {
-        FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(sDivPolygon4, prim, self + 0x4, 0, 0, 0);
         FillRVectors4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10,
                       self + 0x18, self + 0x20);
 
@@ -230,7 +230,7 @@ void SubmitPolyG4(void *arg0, void *arg1) {
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0x9C) + 0xC) = *(Vec2s16_C04 *)(self + 0x14);
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0xA0) + 0xC) = *(Vec2s16_C04 *)(self + 0x1C);
 
-        RCpolyG4(self, gDivPolygon4);
+        RCpolyG4(self, sDivPolygon4);
     }
 }
 #endif
@@ -285,7 +285,7 @@ void SubmitPolyG4(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillDivPolygonHeader(gDivPolygon4, prim, self + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(sDivPolygon4, prim, self + 0x4, 0, 0, 0);
         FillRVectors4(prim + 0x94, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18, self + 0x20);
 
         *(u16 *)(*(u8 **)(prim + 0x94) + 0xA) = *(u8 *)(self + 0xF);
@@ -298,7 +298,7 @@ void SubmitPolyG4(void *arg0, void *arg1)
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0x9C) + 0xC) = *(Vec2s16_C04 *)(self + 0x14);
         *(Vec2s16_C04 *)(*(u8 **)(prim + 0xA0) + 0xC) = *(Vec2s16_C04 *)(self + 0x1C);
 
-        func_8001B164(self, gDivPolygon4);
+        func_8001B164(self, sDivPolygon4);
     }
 }
 #endif
@@ -460,7 +460,7 @@ own `extern void *SubmitPolyG4(void *prim, void *ctx);` view already used.
 
 Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
 report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
-RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+RCpoly* prototype, the renamed `sDivPolygon3`/`sDivPolygon4`). Byte-identical
 on the first build. The field reads, for this primitive:
 
 RVECTOR `pad` from `pad1`, `pad1`, `pad2`, `pad3`; `c` from `r0`..`r3`.

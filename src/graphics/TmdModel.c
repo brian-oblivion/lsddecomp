@@ -7,7 +7,7 @@
  * each packet through Sony's own <libgs.h> layouts: GPU_COM_* mode codes,
  * TMD_P_* structs, GsTMDFlagGRD), compute an axis-aligned bounding box or
  * its eight corners (TmdModel__ComputeBounds, TmdModel__GetHull, and the
- * shared buffer of gTmdModelBoundsCount boxes, TmdModel__UpdateBoundsBuffer /
+ * shared buffer of sTmdModelBoundsCount boxes, TmdModel__UpdateBoundsBuffer /
  * TmdModel__GetBoundsBuffer / TmdModel__GetBoundsCount), and ray-cast a
  * segment against every face (TmdModel__RaycastFaces) for SceneNode's own
  * collision helpers in SceneNode.c.
@@ -25,6 +25,8 @@
 #include <libgs.h>
 #include "TmdModel.h"
 #include "BMemPMgr.h"
+
+extern s32 sTmdModelBoundsCount; /* boxes in the bounds buffer: 1, set by the ctor */
 
 /* A counted box list of one: TmdModel__GetHull's local (its count is set
  * to 1, as the hull's is, and never read). */
@@ -69,21 +71,21 @@ typedef union VectorOrBox {
     TmdBox b;
 } VectorOrBox;
 
-extern TmdBox gTmdModelBoundsBuf[];
+extern TmdBox sTmdModelBoundsBuf[];
 
 TmdModel *New_TmdModel(TmdObject *object) {
     TmdModel *p = BMemPMgrAlloc(sizeof(TmdModel));
 
     if (p != NULL) {
-        Get_vtable_TmdModel()->ctor(p, object);
+        GetTmdModelMethods()->ctor(p, object);
         return p;
     }
     return NULL;
 }
 
 void TmdModel__TmdModel(TmdModel *self, TmdObject *object) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_TmdModel();
+    GetBasicClassMethods()->ctor((BasicClass *)self);
+    self->methods = GetTmdModelMethods();
     self->object = object;
     self->data = (TmdFile *)((u8 *)object - offsetof(TmdFile, objects));
     TmdModel__InitBoundsCount(self);
@@ -103,16 +105,16 @@ TmdObject *TmdModel__GetObject(TmdModel *self, s32 i) {
 
 void TmdModel__func_8001F37C(void) {}
 
-TmdModelMethods *Get_vtable_TmdModel(void) {
+TmdModelMethods *GetTmdModelMethods(void) {
     return &gTmdModelMethods;
 }
 
 void TmdModel__InitBoundsCount(TmdModel *self) {
-    gTmdModelBoundsCount = 1;
+    sTmdModelBoundsCount = 1;
 }
 
 s32 TmdModel__GetBoundsCount(TmdModel *self) {
-    return gTmdModelBoundsCount;
+    return sTmdModelBoundsCount;
 }
 
 void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box) {
@@ -151,11 +153,11 @@ void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box) {
 }
 
 void TmdModel__UpdateBoundsBuffer(TmdModel *self) {
-    TmdModel__ComputeBounds(self, gTmdModelBoundsBuf);
+    TmdModel__ComputeBounds(self, sTmdModelBoundsBuf);
 }
 
 TmdBox *TmdModel__GetBoundsBuffer(TmdModel *self, s32 i) {
-    return gTmdModelBoundsBuf;
+    return sTmdModelBoundsBuf;
 }
 
 void TmdModel__GetHull(TmdModel *self, TmdHull *out) {

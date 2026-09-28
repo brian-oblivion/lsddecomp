@@ -33,7 +33,7 @@
  * attached to. Each is typed by its class (include/DrawSystem.h,
  * include/SceneNode.h).
  *
- * The ctor chains to BasicClass's first (Get_vtable_BasicClass()->ctor),
+ * The ctor chains to BasicClass's first (GetBasicClassMethods()->ctor),
  * and gNodeGuardedViewportMethods's (0x17, include/NodeGuardedViewport.h) chains to this one,
  * so the id tree (0x0 -> 0x7 -> 0x17) is the ctor chain. NodeGuardedViewport expands
  * these macros.
@@ -41,7 +41,7 @@
  * Not settled here: fadeBox holds a FadeBox (0x164, below gBoxFillMethods,
  * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
  * position where SceneNode's attachToParent slot takes a LongVec3 offset;
- * the ctor and Viewport__SetFadeBox pass gFadeBoxAttachPos (-100, -100) through the
+ * the ctor and Viewport__SetFadeBox pass sFadeBoxAttachPos (-100, -100) through the
  * inherited slot with a pointer cast. maxPackets and packetSize multiply
  * to each buffer's packet area (InitOt; defaults 2000 and 64); which is the
  * count and which the size comes from Sony's PACKETMAX * size idiom and the
@@ -64,7 +64,7 @@ typedef struct ViewportRefView ViewportRefView;
 
 /* The screen size: drawNode reads it as the width and height the box and
  * screen-space sprite paths take percentages of. Defaults 256 x 240
- * (gDefaultViewportWidth, gDefaultViewportHeight). setScreenSize copies it whole: retail loads both
+ * (sDefaultViewportWidth, sDefaultViewportHeight). setScreenSize copies it whole: retail loads both
  * words before storing either. */
 struct ViewportSize {
     s32 width;
@@ -110,7 +110,7 @@ struct ViewportRefView {
     /* +0x064 */ void (*setClearColor)(Self *self, ViewportRgb *color); /* Viewport__SetClearColor */ \
     /* +0x068 */ void (*setFarColor)(Self *self, ViewportRgb *color);   /* Viewport__SetFarColor */ \
     /* +0x06C */ void (*setFogNear)(Self *self, s32 fogNear);      /* Viewport__SetFogNear */        \
-    /* +0x070 */ void (*attachViewChild)(Self *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr, Ratio16 *twist); /* Viewport__AttachViewChild; NULL twist: gDefaultViewTwist */ \
+    /* +0x070 */ void (*attachViewChild)(Self *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr, Ratio16 *twist); /* Viewport__AttachViewChild; NULL twist: sDefaultViewTwist */ \
     /* +0x074 */ void (*detachViewChild)(Self *self);              /* Viewport__DetachViewChild */   \
     /* +0x078 */ void (*setViewPoint)(Self *self, LongVec3 *vp);  /* Viewport__SetViewPoint */      \
     /* +0x07C */ void (*setViewRef)(Self *self, LongVec3 *vr);    /* Viewport__SetViewRef */        \
@@ -119,8 +119,8 @@ struct ViewportRefView {
     /* +0x088 */ void (*slot88)(void);                             /* Viewport__NoOpSlot88, empty */        \
     /* +0x08C */ void (*initOt)(Self *self);                       /* Viewport__InitOt */            \
     /* +0x090 */ void (*deinitOt)(Self *self);                     /* Viewport__DeinitOt */          \
-    /* +0x094 */ void (*onNotifyTag5)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag5: onNotify's class-5 (FrameClock) case */ \
-    /* +0x098 */ void (*onNotifyTag1)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag1: onNotify's DrawSystem (1) case */ \
+    /* +0x094 */ void (*onFrameClockEvent)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnFrameClockEvent: onNotify's class-5 (FrameClock) case */ \
+    /* +0x098 */ void (*onDrawSystemEvent)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnDrawSystemEvent: onNotify's DrawSystem (1) case */ \
     /* +0x09C */ void (*update)(Self *self);                       /* Viewport__Update; NodeGuardedViewport__Update */ \
     /* +0x0A0 */ void (*drawNode)(Self *self, SceneNode *node);   /* Viewport__DrawNode (ViewportDraw) */ \
     /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
@@ -154,7 +154,7 @@ struct ViewportRefView {
     /* +0x078 */ GsOT *ot[2];             /* InitOt's two GsOT headers */                          \
     /* +0x080 */ GsOT_TAG *otTags[2];     /* each header's org: its tag array */                   \
     /* +0x088 */ PACKET *workBase[2];     /* each half's packet area: GsSetWorkBase */             \
-    /* +0x090 */ s32 clockEventCount;     /* counts FrameClock notifications (OnNotifyTag5) */     \
+    /* +0x090 */ s32 clockEventCount;     /* counts FrameClock notifications (OnFrameClockEvent) */     \
     /* +0x094 */ u8 pad094[0x098 - 0x094];                                                         \
     /* +0x098 */ s32 zDiv;                /* Update: the depth per OT tag; drawNode's sprite z */  \
     /* +0x09C */ u8 pad09C[0x0AC - 0x09C];                                                         \
@@ -205,8 +205,8 @@ void Viewport__NoOpSlot84(void);
 void Viewport__NoOpSlot88(void);
 void Viewport__InitOt(Viewport *self);
 void Viewport__DeinitOt(Viewport *self);
-void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event);
-void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event);
+void Viewport__OnFrameClockEvent(Viewport *self, BasicClass *sender, s32 event);
+void Viewport__OnDrawSystemEvent(Viewport *self, BasicClass *sender, s32 event);
 void Viewport__Update(Viewport *self);
 void Viewport__Flip(Viewport *self);
 void Viewport__SetFadeBox(Viewport *self, SceneNode *handle);

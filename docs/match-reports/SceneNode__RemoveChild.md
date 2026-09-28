@@ -12,7 +12,7 @@
 If `other`'s vtable header tag is `9`, first calls `SceneNode__UnlinkModel(self)`
 (zeroes `self->unk18`/`self->unk20` -- MEASURED from its own disassembly,
 see `include/SceneNode.h`), THEN unconditionally forwards to the base
-class's own `+0x014` slot (`Get_vtable_BasicClass()->slot14`). "Detach" to
+class's own `+0x014` slot (`GetBasicClassMethods()->slot14`). "Detach" to
 `SceneNode__AddChild`'s "attach": the pre-work happens before the base call here,
 where `SceneNode__AddChild` did its post-work after.
 
@@ -23,7 +23,7 @@ void SceneNode__RemoveChild(SceneNodeObj *self, GenericObj_d294 *other) {
     if ((other->methods->header & 0xF) == 9) {
         SceneNode__UnlinkModel(self);
     }
-    Get_vtable_BasicClass()->slot14(self, other);
+    GetBasicClassMethods()->slot14(self, other);
 }
 ```
 

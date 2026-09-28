@@ -25,7 +25,7 @@
  * disarms it. update (TimedTask__CheckTimeout) runs the base update, which
  * counts frames, then calls setState(4) once frameCounter passes
  * timeoutFrames compared unsigned, so -1 never fires. setState(4)
- * (TimedTask__SetState) sets result = 1 and calls onState4. The only
+ * (TimedTask__SetState) sets result = 1 and calls onTimedOut. The only
  * setTimeout call in the game is CancelTimeout's -1: the mechanism is
  * complete but never armed.
  *
@@ -43,7 +43,7 @@ typedef struct TimedTaskMethods TimedTaskMethods;
 
 /* The state update enters once frameCounter passes timeoutFrames;
  * TimedTask__SetState answers it by setting result to
- * TIMEDTASK_RESULT_TIMED_OUT and calling onState4. */
+ * TIMEDTASK_RESULT_TIMED_OUT and calling onTimedOut. */
 enum TimedTaskState { TIMEDTASK_STATE_TIMED_OUT = 4 };
 
 #define TIMEDTASK_RESULT_TIMED_OUT 1
@@ -58,7 +58,7 @@ enum TimedTaskState { TIMEDTASK_STATE_TIMED_OUT = 4 };
     /* +0x070 */ void (*playSound)(Self *self, s32 tone);     /* TimedTask__PlaySound: sound's PlayTone(tone, 0x7F, 0x7F) */ \
     /* +0x074 */ void (*togglePause)(Self *self);                 /* NULL; ObjM__TogglePause */ \
     /* +0x078 */ void *slot78;                                /* NULL in all three tables */     \
-    /* +0x07C */ void (*onState4)(Self *self)                 /* NULL; setState(4) calls it; empty in both subclasses */
+    /* +0x07C */ void (*onTimedOut)(Self *self)                 /* NULL; setState(4) calls it; empty in both subclasses */
 /* clang-format on */
 
 /* clang-format off */

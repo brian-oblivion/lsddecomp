@@ -14,7 +14,7 @@ live): 48/56, `insertions 0 / deletions 0 (positional skeleton diffs 8)`.
 **Lever, carried unchanged from `SubmitPolyF3` (matched earlier this
 round):** the function returns the next packet pointer. The "missing filler"
 `addiu $v0, $s1, 0x18` is `return (u8 *)arg0 + 0x18` (0x18 = sizeof(POLY_F4))
-in the OT-splice arm; the other arm is `return RCpolyF4(arg0, gDivPolygon4)`
+in the OT-splice arm; the other arm is `return RCpolyF4(arg0, sDivPolygon4)`
 (through a `void *(*)(void *, void *)` cast, because `RCpolyF4` stays `void`
 in the shared header). The calls arm must come first:
 `if (x != 0) { calls; return RCpolyF4(...); } splice; return arg0 + 0x18;`.
@@ -171,10 +171,10 @@ void SubmitPolyF4(void *arg0, void *arg1) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
-        FillDivPolygonHeader(gDivPolygon4, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(sDivPolygon4, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
         FillRVectors4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8,
                       (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x14);
-        RCpolyF4(arg0, gDivPolygon4);
+        RCpolyF4(arg0, sDivPolygon4);
     }
 }
 #endif
@@ -187,7 +187,7 @@ included by the unit.)
 
 Unit: `src/graphics/TmdRenderer.c`. Quad-flavored sibling of `SubmitPolyF3` (this
 unit, also stalled at the identical residue) — same OT-splice-or-calls
-structure, `gDivPolygon4` instead of `gDivPolygon3`, `FillRVectors4` (also
+structure, `sDivPolygon4` instead of `sDivPolygon3`, `FillRVectors4` (also
 stalled this unit, 6-arg quad-flavored copy) instead of `FillRVectors3`,
 and `func_8001A8D4` (Psy-Q SDK, `asm/psyq_rcpolyf4.s`, quad-flavored
 sibling of `func_8001A564`) instead of `func_8001A564`.
@@ -219,9 +219,9 @@ void SubmitPolyF4(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)arg0 & 0xFFFFFF);
         }
     } else {
-        FillDivPolygonHeader(gDivPolygon4, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(sDivPolygon4, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
         FillRVectors4((u8 *)arg1 + 0x94, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8, (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10, (u8 *)arg0 + 0x14);
-        func_8001A8D4(arg0, gDivPolygon4);
+        func_8001A8D4(arg0, sDivPolygon4);
     }
 }
 #endif
@@ -292,7 +292,7 @@ changes above before spending anything on register-level reshaping.
 ## RUNNER PASS, round 13 continued: applied, instruction-exact, same residue class
 
 Applied both changes with this function's own offsets (quad flavor:
-`FillDivPolygonHeader`/`FillRVectors4`/`func_8001A8D4`, table `gDivPolygon4`). One
+`FillDivPolygonHeader`/`FillRVectors4`/`func_8001A8D4`, table `sDivPolygon4`). One
 attempt, 48/56 words, confirmed via `asm-differ` zero-inserted/zero-deleted.
 The `else` (calls) branch is byte-exact. Remaining residue, identical class
 to `SubmitPolyF3`:
@@ -410,8 +410,8 @@ own `extern void *SubmitPolyF4(void *prim, void *ctx);` view already used.
 
 Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
 report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
-RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+RCpoly* prototype, the renamed `sDivPolygon3`/`sDivPolygon4`). Byte-identical
 on the first build. The field reads, for this primitive:
 
-`FillDivPolygonHeader(gDivPolygon4, ...)` and `FillRVectors4` over
+`FillDivPolygonHeader(sDivPolygon4, ...)` and `FillRVectors4` over
 `ctx->quadVtx`; nothing else. Returns `prim + 1` (0x18).

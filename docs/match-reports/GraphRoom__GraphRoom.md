@@ -21,7 +21,7 @@ void *GraphRoom__GraphRoom(D_80087AACObj *self, void *arg1);
 extern char sGraphSoundBankPath[];
 
 void *GraphRoom__GraphRoom(D_80087AACObj *self, void *arg1) {
-    Get_vtable_TaskCore()->slot8(self, 0, sGraphSoundBankPath, 0);
+    GetTaskCoreMethods()->slot8(self, 0, sGraphSoundBankPath, 0);
     self->methods = GetGraphRoomMethods();
     self->unk_0x48->methods->slot9C(self->unk_0x48, -1);
     self->unk_0xA4 = arg1;
@@ -30,7 +30,7 @@ void *GraphRoom__GraphRoom(D_80087AACObj *self, void *arg1) {
 }
 ```
 
-Chains through the shared base class (`Get_vtable_TaskCore()`, this unit's own
+Chains through the shared base class (`GetTaskCoreMethods()`, this unit's own
 local view, extended with `+0x008`), then sets its own vtable
 (`self->methods = GetGraphRoomMethods()`, `&gGraphRoomMethods` -- the standard ctor
 "set my own vtable" step), dispatches through `self->unk_0x48` (a new
@@ -72,7 +72,7 @@ convention; this IS `GraphRoomObj`'s own vtable slot +0x008
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__GraphRoomObj` -> `GraphRoom__GraphRoom`
 

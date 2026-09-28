@@ -11,8 +11,8 @@ Filed round 2026-08-30-a as BLOCKED on `gp_rel` (6 references, the first to
 ## What it does
 
 The shared "static link" lookup used by
-`TestForStaticLink`/`Test4TunnelLinks`/`Test4StaircaseNodes`/
-`Test4InstantTeleporters` (all already matched or forwarding wrappers):
+`TestForStaticLink`/`TestForTunnelLinks`/`TestForStaircaseNodes`/
+`TestForInstantTeleporters` (all already matched or forwarding wrappers):
 scans `triggers[stage][0..triggerLens[stage])` for an entry whose `chunk`
 matches `currentPos->chunk` and whose `tile` either matches
 `currentPos->tile` or is a wildcard (negative `tile.value`); on a match,
@@ -25,7 +25,7 @@ empty trigger list.
 ## Attempt 1: correct algorithm, one word too long (22/79, ~130KB drift)
 
 The first translation read `trig->stage` and `trig->spawnpointIndex` TWICE
-each -- once to store into `gLinkDstStage`/`gLinkSpawnIndex` and again to index
+each -- once to store into `sLinkDstStage`/`sLinkSpawnIndex` and again to index
 `spawns[trig->stage][trig->spawnpointIndex]` -- as two textually separate
 expressions. GCC 2.6.3 did not common-subexpression-eliminate the second
 read of `trig->stage` (it kept the first in a register but re-issued an
@@ -95,18 +95,18 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
 		if (*(s16 *)&currentPos->tile != trig->tile.value && trig->tile.value >= 0)
 			continue;
 
-		gLinkSrcStage = stage;
-		gLinkTriggerIndex = i;
+		sLinkSrcStage = stage;
+		sLinkTriggerIndex = i;
 		triggerStage = trig->stage;
-		gLinkDstStage = triggerStage;
+		sLinkDstStage = triggerStage;
 		spawnIndex = *(u8 *)&trig->spawnpointIndex;
 		entry = &spawns[triggerStage][spawnIndex];
-		gLinkSpawnIndex = spawnIndex;
+		sLinkSpawnIndex = spawnIndex;
 		*(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
 		target->position = sSpawnPosAdjust[entry->adjustment];
 		if (flag != 0)
 			(*gpNavChallengesComplete)[entry->extra] = 1;
-		return gLinkDstStage;
+		return sLinkDstStage;
 	}
 	return -1;
 }
@@ -119,7 +119,7 @@ special handling needed, consistent with the already-documented
 "alignment-2 struct assignment compiles to `lwl`/`lwr`+`swl`/`swr`" pattern
 (CLAUDE.md).
 
-`gLinkTriggerIndex` was already declared in `include/DreamSys.h` from earlier
+`sLinkTriggerIndex` was already declared in `include/DreamSys.h` from earlier
 rounds' call-site analysis; no header changes needed.
 
 ## Verification

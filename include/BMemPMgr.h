@@ -84,7 +84,7 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 extern void FreeMem(void *ptr);
 
 /* The pool allocator and its free. BMemPMgr.c defines both K&R with a second
- * parameter, a fallback pool read only while gDefaultBMemPMgr is unset, that
+ * parameter, a fallback pool read only while sDefaultBMemPMgr is unset, that
  * no caller passes, so it must not see these one-argument prototypes.
  * BMemPMgrFree always returns NULL. */
 #ifndef BMEMPMGR_DEFINER
@@ -93,19 +93,11 @@ extern void *BMemPMgrFree(void *ptr); /* arity-ok: same as BMemPMgrAlloc (BMemPM
 #endif
 
 /* Makes the whole pool one free block. One argument: the body also reads a
- * fallback pool from $a1 while gDefaultBMemPMgr is unset, but BMemPMgrInit,
+ * fallback pool from $a1 while sDefaultBMemPMgr is unset, but BMemPMgrInit,
  * its only caller, never loads $a1, and a second parameter here would make it
  * load one. */
 extern void SetupBMemPMgrFreeList(BMemPMgr *pool);
 
-/* The pool SetupBMemPMgrFreeList, BMemPMgrAlloc and BMemPMgrFree work on;
- * set by SetDefaultBMemPMgr (main.c, right after BMemPMgrInit). */
-extern BMemPMgr *gDefaultBMemPMgr;
-
-/* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
- * work and back to 0 after (setter and getter in TmdRenderer.c). Nothing in
- * either waits on it. */
-extern s32 gBMemPMgrBusy;
 extern void SetBMemPMgrBusy(s32 val);
 extern s32 GetBMemPMgrBusy(void);
 

@@ -11,7 +11,7 @@ the first build of the real body; whole-image SHA1 green.
 - **Where:** the class's allocator (`New_` shape).
 - **What:** `BMemPMgrAlloc(0x5C)`, and if non-NULL run the ctor (slot +0x08, `CdStream__CdStream`) with three arguments, return the object, else NULL.
 - **Levers:** the documented `if (obj != NULL) { ctor; return obj; } return NULL;` shape. The early-return form (`if (obj == NULL) return NULL; ctor; return obj;`) measured 2 words LONG: it adds `j` + `move v0,s0` in the delay slot instead of retail's `move v0,zero` in the `beqz` delay slot.
-- **Context:** round 82 extended the unit's local `CdStreamObj` view: `loc` (+0x0C, the seek location passed to slot +0x4C), `s32 muted` (+0x30), `void *cbArg` (+0x44), callbacks `cb48`/`cb4C`/`cb54` (+0x48/+0x4C/+0x54, each called with `cbArg`), object size 0x5C (the allocator's request); method slots +0x040..+0x070 typed; ctor slot takes `(self, s32, s32, s32)`. The active stream object is the sdata global `gActiveCdStream` (`CdStreamObj *`). libcd externs `CdSyncCallback`, `CdControl`, `CdControlF` declared in the unit from the Psy-Q prototypes.
+- **Context:** round 82 extended the unit's local `CdStreamObj` view: `loc` (+0x0C, the seek location passed to slot +0x4C), `s32 muted` (+0x30), `void *cbArg` (+0x44), callbacks `cb48`/`cb4C`/`cb54` (+0x48/+0x4C/+0x54, each called with `cbArg`), object size 0x5C (the allocator's request); method slots +0x040..+0x070 typed; ctor slot takes `(self, s32, s32, s32)`. The active stream object is the sdata global `sActiveCdStream` (`CdStreamObj *`). libcd externs `CdSyncCallback`, `CdControl`, `CdControlF` declared in the unit from the Psy-Q prototypes.
 
 ## Naming
 
@@ -24,7 +24,7 @@ CdStreamObj *New_CdStream(s32 arg1, s32 arg2, s32 arg3) {
     CdStreamObj *obj = BMemPMgrAlloc(0x5C);
 
     if (obj != NULL) {
-        Get_vtable_CdStream()->ctor(obj, arg1, arg2, arg3);
+        GetCdStreamMethods()->ctor(obj, arg1, arg2, arg3);
         return obj;
     }
     return NULL;

@@ -7,7 +7,7 @@
  *    blocks (the layout is in BMemPMgr.h), and SetupBMemPMgrFreeList makes
  *    the whole pool one free block. BMemPMgrAlloc and BMemPMgrFree split and
  *    merge blocks on the pool's free list. SetupBMemPMgrFreeList,
- *    BMemPMgrAlloc and BMemPMgrFree work on gDefaultBMemPMgr
+ *    BMemPMgrAlloc and BMemPMgrFree work on sDefaultBMemPMgr
  *    (SetDefaultBMemPMgr) and fall back to their pool argument only while
  *    no default is set.
  *  - Eleven of BasicClass's methods (include/BasicClass.h), and
@@ -22,6 +22,10 @@
 #include "BMemPMgr.h"
 #include <malloc.h>
 #include <stdio.h>
+
+/* The pool SetupBMemPMgrFreeList, BMemPMgrAlloc and BMemPMgrFree work on;
+ * set by SetDefaultBMemPMgr (main.c, right after BMemPMgrInit). */
+extern BMemPMgr *sDefaultBMemPMgr;
 
 /* "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n", BMemPMgrInit's
  * malloc-failure message. */
@@ -45,7 +49,7 @@ void *BMemPMgrInit(s32 poolSize) {
 }
 
 void SetDefaultBMemPMgr(BMemPMgr *pool) {
-    gDefaultBMemPMgr = pool;
+    sDefaultBMemPMgr = pool;
 }
 
 void FreeMem(void *ptr) {
@@ -57,7 +61,7 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool) {
     BMemBlockHdr *header;
     BMemBlockHdr *sentinel;
 
-    mgr = gDefaultBMemPMgr;
+    mgr = sDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -96,7 +100,7 @@ void *BMemPMgrAlloc(size, pool)
 
     SetBMemPMgrBusy(1);
     result = NULL;
-    mgr = gDefaultBMemPMgr;
+    mgr = sDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -193,7 +197,7 @@ void *BMemPMgrFree(ptr, pool)
     u32 nextFree;
 
     SetBMemPMgrBusy(1);
-    mgr = gDefaultBMemPMgr;
+    mgr = sDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -283,7 +287,7 @@ void *BasicClass__Release(BasicClass *self) {
 }
 
 void BasicClass__BasicClass(BasicClass *self) {
-    self->methods = Get_vtable_BasicClass();
+    self->methods = GetBasicClassMethods();
     self->parentRefs = NULL;
     self->children = NULL;
 }

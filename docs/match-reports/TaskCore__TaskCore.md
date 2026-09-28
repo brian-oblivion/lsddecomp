@@ -10,7 +10,7 @@
 
 This occupies `TaskCoreMethods`'s (`gTaskCoreMethods`) own slot `+0x008` (per
 `classtable.py gTaskCoreMethods`), and is called from this unit's `StreamTask__StreamTask`
-(`StreamTaskObj`'s own ctor) as `Get_vtable_TaskCore()->slot08(self, a1, a2, a3)`.
+(`StreamTaskObj`'s own ctor) as `GetTaskCoreMethods()->slot08(self, a1, a2, a3)`.
 It is a **base-class constructor**: it briefly points `self->methods` at its
 own table (`gTaskCoreMethods`) before the derived ctor (`StreamTask__StreamTask`)
 overwrites it with the real `gStreamTaskMethods` table right after this call
@@ -22,8 +22,8 @@ void TaskCore__TaskCore(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnkB4Obj 
     StreamTaskUnkB4Obj *tmp;
     TaskCoreMethods *core;
 
-    Get_vtable_IntermediateBase()->slot08(self);
-    core = Get_vtable_TaskCore();
+    GetIntermediateBaseMethods()->slot08(self);
+    core = GetTaskCoreMethods();
     self->methods = (StreamTaskObjMethods *)core;
     core->slotD8(self, a1);
     if (a2 != 0) {
@@ -50,9 +50,9 @@ only the header's declared types.
 
 ## New structure discovered
 
-- `Get_vtable_IntermediateBase()->slot08(self)`: new `TaskUtilMethods` slot `+0x008`
+- `GetIntermediateBaseMethods()->slot08(self)`: new `TaskUtilMethods` slot `+0x008`
   (`gIntermediateBaseMethods+0x008 = IntermediateBase__IntermediateBase`, extern, void, discarded return).
-- `Get_vtable_TaskCore()->slotD8(self, a1)`: new `TaskCoreMethods` slot `+0x0D8`
+- `GetTaskCoreMethods()->slotD8(self, a1)`: new `TaskCoreMethods` slot `+0x0D8`
   (`gTaskCoreMethods+0x0D8 = TaskCore__SetTarget`, extern, void).
 - `self->methods->slotD4(self, 0, 0)`: new `StreamTaskObjMethods` slot
   `+0x0D4` (`gStreamTaskMethods+0x0D4 = TaskCore__SetSubHandle`, extern, void).
@@ -95,12 +95,12 @@ lesson — see `TaskCore__Finalize.md`'s own proposed learning.
 a `jalr`" lever
 
 **Residue 1 (caught before it cost a build cycle):** the natural first draft
-called `Get_vtable_TaskCore()` TWICE — once for `self->methods = Get_vtable_TaskCore();`
-and again for `Get_vtable_TaskCore()->slotD8(...)`. Retail calls it **once**: the
+called `GetTaskCoreMethods()` TWICE — once for `self->methods = GetTaskCoreMethods();`
+and again for `GetTaskCoreMethods()->slotD8(...)`. Retail calls it **once**: the
 delay slot after the call is a plain `move a0, s1` (not a repeat call), and
 `self->methods = v0; v0->slotD8(self, a1);` reuses the SAME register (the
 intervening `sw` doesn't clobber it). Writing `TaskCoreMethods *core =
-Get_vtable_TaskCore();` and using `core` for both the assignment and the call
+GetTaskCoreMethods();` and using `core` for both the assignment and the call
 fixed a 45-word-shifted build in one step — visible immediately in
 `asm-differ` as a genuinely duplicated `jal 3dfc0` in the built column that
 retail does not have.
@@ -120,20 +120,20 @@ intervening `jalr` needs a local, whether that value came from a struct field
 or, as here, directly from a call's return register. `self->methods` itself
 was never re-read across a call in this function (it's read fresh once,
 right before the final `slot40` call, same as `StreamTask__StreamTask`); the residue
-was entirely about the `Get_vtable_TaskCore()` return value's reuse.
+was entirely about the `GetTaskCoreMethods()` return value's reuse.
 
 ## Proposed learning
 
 **Widen the "value reused after an intervening `jalr` needs a local"
 lever explicitly to call-return values, not just `self->field` reads.**
-`Get_vtable_TaskCore()`/`Get_vtable_IntermediateBase()`-style singleton accessors are called
+`GetTaskCoreMethods()`/`GetIntermediateBaseMethods()`-style singleton accessors are called
 routinely in this unit, and a call site that both stores the returned
 pointer AND immediately dereferences it for a vtable lookup is exactly the
 shape that needs a local — the disassembly tell is a literal duplicated
 `jal` to the same target with no argument-setup difference between the two,
 which reads as obviously wrong once you see it side by side in
 `asm-differ`, but is easy to write by reflex when translating two
-back-to-back C statements that both mention `Get_vtable_TaskCore()`.
+back-to-back C statements that both mention `GetTaskCoreMethods()`.
 
 ## Naming
 

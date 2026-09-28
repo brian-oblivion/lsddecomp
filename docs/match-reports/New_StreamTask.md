@@ -19,7 +19,7 @@ StreamTaskObj *New_StreamTask(s32 a1, s32 a2, s32 a3, s32 a4)
 
     self = BMemPMgrAlloc(0xDC);
     if (self != NULL) {
-        Get_vtable_StreamTask()->slot08(self, a1, a2, a3, a4);
+        GetStreamTaskMethods()->slot08(self, a1, a2, a3, a4);
         return self;
     }
     return NULL;

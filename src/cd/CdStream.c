@@ -4,7 +4,7 @@
  * with the CD audio routed into the SPU mix. The class, its fields and its
  * slots are declared in include/CdStream.h; MoviePlayer is the one holder.
  *
- * One global, gActiveCdStream, is the stream that owns the drive: open sets
+ * One global, sActiveCdStream, is the stream that owns the drive: open sets
  * it, close clears it, and seek, startRead, stop, restart, mute and demute do
  * nothing unless `self` is that stream, so only one CdStream streams at a
  * time. `state` (enum CdStreamState) runs open -> SEEKING -> startRead ->
@@ -20,6 +20,8 @@
 #include "BMemPMgr.h"
 #include <strings.h>
 #include "GameApplicationFileResource.h"
+
+extern CdStream *sActiveCdStream; /* the stream that owns the drive, or NULL */
 
 /* The ctor: a drive speed below this is double speed. */
 #define CDSTREAM_DOUBLE_SPEED_BELOW 4
@@ -42,8 +44,8 @@
 /* getNextFrame's poll count when `tries` is negative. */
 #define CDSTREAM_NEXT_FRAME_TRIES 8388608
 
-extern s32 gCdStreamAudioMixSet;
-extern char gCdStreamVersionSuffix[]; /* ";1" */
+extern s32 sCdStreamAudioMixSet;
+extern char sCdStreamVersionSuffix[]; /* ";1" */
 
 /* MATCHING: the ctor call and return sit inside `if (obj != NULL)`; an early
  * `return NULL` adds a jump. */
@@ -51,7 +53,7 @@ CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved) {
     CdStream *obj = BMemPMgrAlloc(sizeof(CdStream));
 
     if (obj != NULL) {
-        Get_vtable_CdStream()->ctor(obj, cdSpeed, fps, reserved);
+        GetCdStreamMethods()->ctor(obj, cdSpeed, fps, reserved);
         return obj;
     }
     return NULL;
@@ -60,8 +62,8 @@ CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved) {
 /* MATCHING: the sectors-a-second choice stays an inline conditional; a local
  * lets cc1 hoist its load and reorder the stores. */
 void CdStream__CdStream(CdStream *self, u32 cdSpeed, s32 fps, s32 reserved) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_CdStream();
+    GetBasicClassMethods()->ctor((BasicClass *)self);
+    self->methods = GetCdStreamMethods();
     self->cdSpeed = cdSpeed;
     self->muted = 0;
     self->bytesPerFrame =
@@ -78,7 +80,7 @@ void CdStream__CdStream(CdStream *self, u32 cdSpeed, s32 fps, s32 reserved) {
 
 void CdStream__Finalize(CdStream *self) {
     self->methods->close(self);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void CdStream__SetRing(CdStream *self, u32 *ring, u32 size) {
@@ -103,13 +105,13 @@ s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
         if (self->ring == NULL) {
             return 1;
         }
-        if (gActiveCdStream != NULL) {
+        if (sActiveCdStream != NULL) {
             return 0;
         }
         path[0] = '\\';
         strcpy(&path[1], GetDataDirectory());
         strcat(path, name);
-        strcat(path, gCdStreamVersionSuffix);
+        strcat(path, sCdStreamVersionSuffix);
         /* CdStreamFile is CdlFILE's layout (CdStream.h). */
         while (CdSearchFile((CdlFILE *)&self->file, path) == 0) {
             if (n >= 0 && --tries < 0) {
@@ -117,8 +119,8 @@ s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
             }
         }
         self->totalFrames = self->file.size / self->bytesPerFrame;
-        gCdStreamAudioMixSet = SetupCdStreamAudio(self);
-        gActiveCdStream = self;
+        sCdStreamAudioMixSet = SetupCdStreamAudio(self);
+        sActiveCdStream = self;
         self->methods->seek(self, self->file.pos);
         return 0;
     }
@@ -144,11 +146,11 @@ void CdStream__Close(CdStream *self) {
     CdStream *cur;
 
     if (self->state != CDSTREAM_IDLE) {
-        cur = gActiveCdStream;
+        cur = sActiveCdStream;
         if (cur == self) {
             cur->methods->stop(cur);
             cur->state = CDSTREAM_IDLE;
-            gActiveCdStream = NULL;
+            sActiveCdStream = NULL;
         }
     }
 }
@@ -156,7 +158,7 @@ void CdStream__Close(CdStream *self) {
 /* With onSeekDone set the seek is asynchronous and OnCdSeekComplete reports
  * it; otherwise it blocks until the drive takes the command. */
 void CdStream__Seek(CdStream *self, u8 *pos) {
-    if (self->state != CDSTREAM_READING && gActiveCdStream == self) {
+    if (self->state != CDSTREAM_READING && sActiveCdStream == self) {
         if (self->onSeekDone != NULL) {
             CdSyncCallback(OnCdSeekComplete);
             CdControlF(CdlSeekL, pos);
@@ -169,10 +171,10 @@ void CdStream__Seek(CdStream *self, u8 *pos) {
 }
 
 void OnCdSeekComplete(u8 status, u8 *result) {
-    if (gActiveCdStream != NULL && status == CdlComplete) {
+    if (sActiveCdStream != NULL && status == CdlComplete) {
         CdSyncCallback(NULL);
-        if (gActiveCdStream->onSeekDone != NULL) {
-            gActiveCdStream->onSeekDone(gActiveCdStream->cbArg);
+        if (sActiveCdStream->onSeekDone != NULL) {
+            sActiveCdStream->onSeekDone(sActiveCdStream->cbArg);
         }
     }
 }
@@ -180,7 +182,7 @@ void OnCdSeekComplete(u8 status, u8 *result) {
 void CdStream__StartRead(CdStream *self, u32 startFrame, s32 frameCount) {
     u32 mode;
 
-    if (self->state == CDSTREAM_SEEKING && gActiveCdStream == self) {
+    if (self->state == CDSTREAM_SEEKING && sActiveCdStream == self) {
         mode = CDSTREAM_MODE_1X;
         if (self->cdSpeed < CDSTREAM_DOUBLE_SPEED_BELOW) {
             mode = CDSTREAM_MODE_2X;
@@ -199,7 +201,7 @@ void CdStream__StartRead(CdStream *self, u32 startFrame, s32 frameCount) {
 }
 
 void CdStream__Stop(CdStream *self) {
-    if (self->state == CDSTREAM_READING && gActiveCdStream == self) {
+    if (self->state == CDSTREAM_READING && sActiveCdStream == self) {
         self->methods->mute(self);
         self->methods->clearRing(self);
         self->methods->unsetRing(self);
@@ -214,7 +216,7 @@ void CdStream__Restart(CdStream *self) {
     CdStream *cur;
 
     if (self->state == CDSTREAM_STOPPED) {
-        cur = gActiveCdStream;
+        cur = sActiveCdStream;
         if (cur == self) {
             cur->state = CDSTREAM_IDLE;
             cur->methods->seek(cur, cur->file.pos);
@@ -227,7 +229,7 @@ void CdStream__NoOpSlot5C(CdStream *self) {}
 void CdStream__NoOpSlot60(CdStream *self) {}
 
 void CdStream__Mute(CdStream *self) {
-    if (self->muted == 0 && gActiveCdStream == self) {
+    if (self->muted == 0 && sActiveCdStream == self) {
         while (CdMute() == 0) {
         }
         self->muted = 1;
@@ -235,7 +237,7 @@ void CdStream__Mute(CdStream *self) {
 }
 
 void CdStream__Demute(CdStream *self) {
-    if (self->muted != 0 && gActiveCdStream == self) {
+    if (self->muted != 0 && sActiveCdStream == self) {
         while (CdDeMute() == 0) {
         }
         self->muted = 0;
@@ -310,6 +312,6 @@ int CdStream__Sync(CdStream *self, int mode) {
 
 void CdStream__NoOpSlot7C(CdStream *self) {}
 
-CdStreamMethods *Get_vtable_CdStream(void) {
+CdStreamMethods *GetCdStreamMethods(void) {
     return &gCdStreamMethods;
 }

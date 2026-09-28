@@ -15,9 +15,9 @@ calls `this->methods->slot144(this, this->unk94)` (already documented in
 `this->unk94` live in `$a1` from its first load all the way to this call --
 which is exactly what happens here). Looks up a per-mood byte,
 `gEntityProximityThresholdTable[this->moodIndex * 0x10]` (the same 16-byte-row family as
-`gEntityUnlockKindTable`/`gEntityLinkStageTable`/`gEntityEventVideoTable`/`D_80089EAF`, already documented in
+`gEntityUnlockKindTable`/`sEntityLinkStageTable`/`sEntityEventVideoTable`/`D_80089EAF`, already documented in
 `Entity.h`; `gEntityProximityThresholdTable` itself was new -- added to that list, sitting
-between `gEntityEventVideoTable` and `D_80089EAF`), shifts it left 11, and if that value
+between `sEntityEventVideoTable` and `D_80089EAF`), shifts it left 11, and if that value
 is less than the slot144 result, returns -1. Otherwise computes
 `slot144_result / (threshold / this->unkB0)` (two chained integer
 divisions, each expanding to the standard div-by-zero/`INT_MIN/-1`
@@ -198,13 +198,13 @@ would warn in each.
 
 ## Polish (round 96, bravo, track 7)
 
-- Step 2: The flat mood-row "tables" this body read are columns of gEntityMoodTable's
+- Step 2: The flat mood-row "tables" this body read are columns of sEntityMoodTable's
 16-byte row (their symbols are the row base 0x80089EA4 plus the column
-offset: gEntityUnlockKindTable +0x02, gEntityLinkStageTable +0x07,
-gEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
+offset: gEntityUnlockKindTable +0x02, sEntityLinkStageTable +0x07,
+sEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
 gEntityMoodHandlerTable +0x0C), now EntityMoodRow fields; byte-identical.
 Entity.h's old claim that they were "SEPARATE global arrays (own base
-symbols, own lui/addiu) ... not sub-fields of the gEntityMoodTable row" was
+symbols, own lui/addiu) ... not sub-fields of the sEntityMoodTable row" was
 wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.
 

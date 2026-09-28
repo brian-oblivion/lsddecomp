@@ -15,7 +15,7 @@ round 42 (`--gp-symbols`, pinned in the Makefile).
 
 ```c
 extern s32 atoi(char *s);
-extern u8 *gSaveTitleGlyphs;
+extern u8 *sSaveTitleGlyphs;
 
 typedef struct {
     s8 raw[6];
@@ -38,15 +38,15 @@ s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1)
     if (src != NULL) {
         t0 = ((u32)(src[0xE] - 0x38) < 2) ? 0xE : 0xD;
 
-        *(FullWidthChar *)(self + 0x18) = *(FullWidthChar *)(gSaveTitleGlyphs + 0x1E);
-        *(FullWidthChars6 *)(self + 0x6) = *(FullWidthChars6 *)(gSaveTitleGlyphs + 0x1E);
+        *(FullWidthChar *)(self + 0x18) = *(FullWidthChar *)(sSaveTitleGlyphs + 0x1E);
+        *(FullWidthChars6 *)(self + 0x6) = *(FullWidthChars6 *)(sSaveTitleGlyphs + 0x1E);
 
         idx = atoi((char *)(src + t0)) - 1;
-        p = gSaveTitleGlyphs + idx * 2;
+        p = sSaveTitleGlyphs + idx * 2;
         *(FullWidthChar *)(self + 0x8) = *(FullWidthChar *)p;
         return (s32)p;
     } else {
-        u8 *q = gSaveTitleGlyphs;
+        u8 *q = sSaveTitleGlyphs;
 
         *(FullWidthChars3 *)(self + 0x6) = *(FullWidthChars3 *)(q + 0x1E);
         return (s32)q;
@@ -67,26 +67,26 @@ alignment is 1, which is what makes GCC use the unaligned `lwl`/`lwr` word
 chunk(s) retail has, with any leftover non-multiple-of-4 bytes as
 individual loads/stores rather than a merged halfword.
 - `FullWidthChar` (2 bytes) — used twice: copying the raw 2-byte prefix
-  `gSaveTitleGlyphs[0x1E..0x20)` into `self[0x18..0x1A)`, and copying a 2-byte
-  entry out of a `gSaveTitleGlyphs`-relative lookup table (indexed by
+  `sSaveTitleGlyphs[0x1E..0x20)` into `self[0x18..0x1A)`, and copying a 2-byte
+  entry out of a `sSaveTitleGlyphs`-relative lookup table (indexed by
   `atoi(...)  - 1`, doubled) into `self[0x8..0xA)`.
 - `FullWidthChars6` (12 bytes, exactly 3 word chunks, no tail) — the `src !=
-  NULL` path's bulk copy `self[0x6..0x12) = gSaveTitleGlyphs[0x1E..0x2A)`.
+  NULL` path's bulk copy `self[0x6..0x12) = sSaveTitleGlyphs[0x1E..0x2A)`.
 - `FullWidthChars3` (6 bytes, one word chunk + 2 tail bytes) — the `src ==
-  NULL` path's shorter copy `self[0x6..0xC) = gSaveTitleGlyphs[0x1E..0x24)`,
+  NULL` path's shorter copy `self[0x6..0xC) = sSaveTitleGlyphs[0x1E..0x24)`,
   identical shape to `StampSaveTitleDay`'s own struct this round.
 
 **The one register-identity trap, closed on the third attempt:** the
-function's return value is a POINTER into the `gSaveTitleGlyphs` template
+function's return value is a POINTER into the `sSaveTitleGlyphs` template
 (confirmed from retail's own register content at `jr $ra` — whichever
-branch runs, `$v0` still holds a `gSaveTitleGlyphs`-derived pointer, never
-reloaded fresh at the very end). Writing `return (s32)gSaveTitleGlyphs;` as a
+branch runs, `$v0` still holds a `sSaveTitleGlyphs`-derived pointer, never
+reloaded fresh at the very end). Writing `return (s32)sSaveTitleGlyphs;` as a
 fresh expression in the `else` branch cost one extra word: the compiler
 reloads the global via a second `%gp_rel` `lw` rather than reusing the
 value already sitting in a register from the struct-copy statement just
 above it. The fix was a local pointer variable holding the SAME value,
 reused for both the copy and the return — but that variable had to be
-scoped to the `else` block alone (`u8 *q = gSaveTitleGlyphs;` declared at the top
+scoped to the `else` block alone (`u8 *q = sSaveTitleGlyphs;` declared at the top
 of that block, not the function's own top-level locals): sharing ONE
 function-wide local across both branches for two semantically different
 pointers (the template base in one branch, an indexed lookup pointer in
@@ -110,7 +110,7 @@ declared at the top of just the branch that needs it.
 ## Naming
 
 `StampSaveTitleFileLetter` (was `func_800507F8`), tier B:
-copies one or more fixed byte ranges out of the `gSaveTitleGlyphs` template into
+copies one or more fixed byte ranges out of the `sSaveTitleGlyphs` template into
 the caller's buffer, optionally selecting a table entry via
 `atoi()` on a field of the caller-supplied `src` when one is given. Named
 from its one real caller context established elsewhere in this project
@@ -118,7 +118,7 @@ from its one real caller context established elsewhere in this project
 own call site) -- a memcard save-file writer building the save's on-card
 icon/header block from a shared template. The exact semantic meaning of
 each copied range (icon pixels vs. a formatted date/glyph, per the
-sibling `gSaveTitle`/`DecodeFullWidthSjis` context nearby in
+sibling `sSaveTitle`/`DecodeFullWidthSjis` context nearby in
 `TitleMenuTaskObjF.c`) is not established, so this is named for the
 mechanism (template copy) plus its one known call context rather than a
 specific claim about pixel vs. text content.
@@ -126,11 +126,11 @@ specific claim about pixel vs. text content.
 ## Track 7 (2026-09-27, round 95)
 
 Renamed from `CopyMemcardIconTemplate` (tools/rename.py), and its data
-`gMemcardIconTemplate` -> `gSaveTitleGlyphs`. Nothing in the body is an
+`gMemcardIconTemplate` -> `sSaveTitleGlyphs`. Nothing in the body is an
 icon: measured from the executable, the pointer at 0x8008AAC4 points at
 0x80011550, the full-width SJIS string "a".."o" (15 letters, 2 bytes each)
 followed at glyph 15 by three full-width spaces and "Day". TitleMenu's
-save title (gSaveTitle -> 0x8001149C) starts as full-width "LSD   Day001",
+save title (sSaveTitle -> 0x8001149C) starts as full-width "LSD   Day001",
 and the file names are namePrefix "BISLPS-01556" + "-01".."-15"
 (sSaveFileSuffixes). So the body writes characters 3..8 as "   Day", character
 12 as a space, and character 4 as the letter for the file's number; with a
@@ -140,14 +140,14 @@ Sony's atoi (libc2/atoi.o, read from lib/) takes a leading 0 as octal, so
 
 **Naming**, tier B: `StampSaveTitleFileLetter` (evidence above; the
 mechanics are certain, that the letter identifies the file on the card
-screen is not shown by a consumer). `gSaveTitleGlyphs`, tier A, by what it
+screen is not shown by a consumer). `sSaveTitleGlyphs`, tier A, by what it
 holds.
 
 Locals: `arg0`/`arg1` -> `titleAddr`/`fileNameAddr`, `self` -> `title`
 (now `FullWidthChar *`, one full-width character per element, so the raw
 byte offsets 0x18/0x6/0x8 are indices 12/3/4), `src` -> `fileName`
 (`char *`), `t0` -> `numberPos`, `idx` -> `letter`, `p` -> `glyph`, `q` ->
-`glyphs`; `gSaveTitleGlyphs` declared `FullWidthChar *` (offset 0x1E is
+`glyphs`; `sSaveTitleGlyphs` declared `FullWidthChar *` (offset 0x1E is
 glyph 15). The positions are unit-local `#define`s: SAVE_TITLE_LETTER_FIELD
 3, SAVE_TITLE_LETTER 4, SAVE_TITLE_PADDING 12, SAVE_TITLE_GLYPH_SPACES 15,
 SAVE_FILE_NAME_NUMBER 13. Image byte-identical at every step.
@@ -161,7 +161,7 @@ Comments moved out of the source (verbatim):
 
 - on the local `atoi` extern: "Sony's, from libc2 (round 45's own local
   view -- this unit's first use)."
-- on `gSaveTitleGlyphs`: "VALUE-of `%gp_rel`, round 45's own local view --
+- on `sSaveTitleGlyphs`: "VALUE-of `%gp_rel`, round 45's own local view --
   a fixed rodata template (ROM image still-uncarved,
   `asm/data/1C34.rodata.s` region) this function copies raw byte ranges out
   of; also read by `TitleMenuTaskObjF.c`'s own (differently-typed) local view."
@@ -179,7 +179,7 @@ Comments moved out of the source (verbatim):
   matched exactly -- this unit's own definition must agree with that
   declaration since both are visible in this translation unit. Cast to `u8
   *` internally; retail's own register content at exit (`$v0` left holding
-  a pointer into the `gSaveTitleGlyphs` template in every path) confirms
+  a pointer into the `sSaveTitleGlyphs` template in every path) confirms
   the real return type is a pointer, loosely read as `s32` by the caller
   that never dereferences it." The block-scoped `glyphs` that residue
   needed keeps one line (`MATCHING: glyphs is the return value`).
@@ -192,7 +192,7 @@ this one.
 The three copy types, named for what they hold (tools/renametype.py, image
 byte-identical at every step):
 
-- `Pair2_3bb8c_g` -> `FullWidthChar`, tier A: every `gSaveTitleGlyphs`
+- `Pair2_3bb8c_g` -> `FullWidthChar`, tier A: every `sSaveTitleGlyphs`
   element and every title position is one 2-byte full-width Shift-JIS
   character (the data measured in round 95, above). Fields `a`, `b` ->
   `lead`, `trail` (the SJIS lead and trail bytes); no code accesses either,

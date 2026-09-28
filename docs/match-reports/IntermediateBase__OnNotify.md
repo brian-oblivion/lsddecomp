@@ -17,7 +17,7 @@ for header values 1/2/5 respectively; any other value is a no-op.
 
 `gTitleMenuMethods`'s own `+0x038` is this same function (verbatim inherit, no
 override) -- confirmed with `tools/classtable.py gTitleMenuMethods`, which is also
-how `slot54`/`slot58`/`slot5C`'s occupants (`IntermediateBase__OnTag1Notify`,
+how `slot54`/`slot58`/`slot5C`'s occupants (`IntermediateBase__OnDrawSystemEvent`,
 `TaskCore__OnPadEvent`, `TaskCore__Update`) were identified.
 
 ## The C
@@ -27,7 +27,7 @@ void IntermediateBase__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 {
     s32 header;
 
-    Get_vtable_BasicClass()->slot38(self, arg1, arg2);
+    GetBasicClassMethods()->slot38(self, arg1, arg2);
     header = arg1->target->header & 0xF;
     if (header == 1) {
         self->methods->slot54(self, arg1, arg2);
@@ -47,7 +47,7 @@ void IntermediateBase__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 - `Obj86B60Methods`: added `slot10` (BasicClass addChild, inherited,
   `IntermediateBase__Init`), `slot40` (`IntermediateBase__ResetCounters`, `IntermediateBase__IntermediateBase`), `slot48`
   (`IntermediateBase__Deinit`, `IntermediateBase__Init`), `slot4C` (external `TaskCore__OnInit`,
-  `IntermediateBase__Init`), `slot54` (`IntermediateBase__OnTag1Notify`), `slot58` (external
+  `IntermediateBase__Init`), `slot54` (`IntermediateBase__OnDrawSystemEvent`), `slot58` (external
   `TaskCore__OnPadEvent`, STALL in unit `Task` -- its own report confirms
   signature `(Obj86B60 *, s32 a1, s32 a2)`; this call site's `a1` is
   genuinely `EventArg *`, an independent local view of the same shared
@@ -60,9 +60,9 @@ void IntermediateBase__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 queue in one pass** -- `gIntermediateBaseMethods` (`tools/classtable.py gIntermediateBaseMethods`) is
 literally this unit's queue: `+0x008 IntermediateBase__IntermediateBase`, `+0x038 IntermediateBase__OnNotify`,
 `+0x040 IntermediateBase__ResetCounters` (already matched), `+0x044 IntermediateBase__Init`,
-`+0x048 IntermediateBase__Deinit`, `+0x054 IntermediateBase__OnTag1Notify`, `+0x05C IntermediateBase__IncrementFrameCounter`
-(already matched), `+0x060 IntermediateBase__SetState`, `+0x064 IntermediateBase__OnState2` (already
-matched), `+0x068 IntermediateBase__OnState3`. Every one of this round's 12 fresh
+`+0x048 IntermediateBase__Deinit`, `+0x054 IntermediateBase__OnDrawSystemEvent`, `+0x05C IntermediateBase__IncrementFrameCounter`
+(already matched), `+0x060 IntermediateBase__SetState`, `+0x064 IntermediateBase__OnStart` (already
+matched), `+0x068 IntermediateBase__OnStop`. Every one of this round's 12 fresh
 functions except `New_Viewport`/`Viewport__Viewport`/`Viewport__Finalize`/
 `Viewport__AddChild`/`Viewport__RemoveChild` (a SECOND, unrelated shared table,
 `gViewportMethods`, see `New_Viewport.md`) is a slot of this one table.
@@ -88,14 +88,14 @@ build.
 ## Naming
 
 **IntermediateBase__OnNotify** (renamed from `func_8003E030`, round 55, runner
-alpha). Tier A: forwards to `Get_vtable_BasicClass()->slot38` first (that
+alpha). Tier A: forwards to `GetBasicClassMethods()->slot38` first (that
 slot IS `BasicClass__OnNotify` per `include/Task.h`'s own
 `BasicClassMethodsCC8C` struct, offset-verified against
 `include/code_8220.h`'s canonical, already-named `BasicClassMethods::slot38`
 = `onNotify`), then adds its own dispatch on the incoming `EventArg`'s
 dynamic class tag -- the textbook "override calls base first, then does its
 own work" shape for a virtual method whose base identity is independently
-confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
+confirmed. `GetBasicClassMethods()->slot38` is PROPOSED for rename to
 `onNotify` in this unit's `## Proposed field names` (shared with
 `Task.c`'s own `Viewport__OnNotify`).
 
@@ -106,7 +106,7 @@ confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
   `BasicClassMethods::slot38` = `onNotify` exactly (`IS BasicClass__OnNotify`,
   TmdRenderer, per this header's own comment). NOT renamed directly:
   `Task.c`'s `Viewport__OnNotify` also calls
-  `Get_vtable_BasicClass()->slot38(self, arg1, arg2)`, so this field is
+  `GetBasicClassMethods()->slot38(self, arg1, arg2)`, so this field is
   shared within the Task family. Head applies by type scope (rename
   the field in `BasicClassMethodsCC8C`'s own definition,
   `include/Task.h`, rebuild, fix the compiler-listed accessors in

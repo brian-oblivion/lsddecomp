@@ -14,7 +14,7 @@ Slot `+0x004` of the `gFileResourceMethods` method table (see `include/GameAppli
 `FileResourceMethods`). It clears one flag, then explicitly chains
 **both** destructors available to it: the class's own (`this->methods->dtor`,
 itself `FileResource__Finalize`, resolved through the vtable rather than by name) and
-the base class's (`Get_vtable_BasicClass()->dtor`, `BasicClassMethods.dtor`), then
+the base class's (`GetBasicClassMethods()->dtor`, `BasicClassMethods.dtor`), then
 calls `BMemPMgrFree(this)` (a still-uncarved release/free routine, address
 only) before returning `NULL` unconditionally.
 
@@ -25,9 +25,9 @@ lw    $v0, 0x0($s0)      ; v0 = this->methods
 sh    $zero, 0x20($s0)   ; this->unk20 = 0
 lw    $v0, 0xC($v0)      ; v0 = methods->dtor
 jalr  $v0                ; this->methods->dtor(this)   -- return discarded
-jal   Get_vtable_BasicClass
+jal   GetBasicClassMethods
 lw    $v0, 0xC($v0)      ; v0 = (base table)->dtor
-jalr  $v0                ; Get_vtable_BasicClass()->dtor(this) -- return discarded
+jalr  $v0                ; GetBasicClassMethods()->dtor(this) -- return discarded
  addu $a0, $s0, $zero
 jal   BMemPMgrFree
  addu $a0, $s0, $zero
@@ -35,7 +35,7 @@ addu  $v0, $zero, $zero  ; explicit return 0, not derived from any callee
 ```
 
 The first pass at this function only wrote 3 calls (own dtor, base dtor via
-`Get_vtable_BasicClass()->dtor`) and used its return value directly — that produced a
+`GetBasicClassMethods()->dtor`) and used its return value directly — that produced a
 16/24-word body, 8 words short, because it silently dropped the 4th call
 (`BMemPMgrFree(this)`) and the *explicit* `addu v0,zero,zero` at the end.
 The `v0=0` at the tail is real, not incidental: nothing after the last call
@@ -55,7 +55,7 @@ disassembly.
 void *FileResource__Release(FileResource *this) {
     this->unk20 = 0;
     this->methods->dtor(this);
-    Get_vtable_BasicClass()->dtor(this);
+    GetBasicClassMethods()->dtor(this);
     BMemPMgrFree(this);
     return NULL;
 }

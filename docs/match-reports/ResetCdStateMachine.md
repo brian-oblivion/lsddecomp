@@ -8,7 +8,7 @@
 
 "Reset" bookend of the CD-read state machine -- the mirror of
 `StartCdOperation`. Zeroes the phase and context globals, marks the machine
-idle (`gCdIdle = 1`, the opposite sense of `StartCdOperation`'s `= 0`),
+idle (`sCdIdle = 1`, the opposite sense of `StartCdOperation`'s `= 0`),
 resets the timeout counter, and clears the busy flag. Called from both
 `TickCdStateMachine` and `TickCdLoadFileStateMachine` on a successful `CdReadSync`.
 
@@ -17,12 +17,12 @@ resets the timeout counter, and clears the busy flag. Called from both
 ```c
 void ResetCdStateMachine(void)
 {
-    gCdOperation = 0;
-    gCdState = 0;
-    gCdTickStep = 0;
-    gCdIdle = 1;
-    gCdTimeoutCounter = 0;
-    gCdBusy = 0;
+    sCdOperation = 0;
+    sCdState = 0;
+    sCdTickStep = 0;
+    sCdIdle = 1;
+    sCdTimeoutCounter = 0;
+    sCdBusy = 0;
 }
 ```
 
@@ -31,7 +31,7 @@ Closed on the first attempt.
 ## Naming
 
 **Tier A.** Zeroes the phase/operation/tick-step globals, marks the driver
-idle (`gCdIdle = 1`) and clears busy/timeout -- the exact mirror image of
+idle (`sCdIdle = 1`) and clears busy/timeout -- the exact mirror image of
 `StartCdOperation`, called from both tick functions on a successful
 `CdReadSync` and from `CdDriver__CancelRequests` (CdDriver.c) when
 cancelling the in-flight head request. Corroborated by that unit's own

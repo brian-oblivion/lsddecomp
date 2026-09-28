@@ -73,7 +73,7 @@ fixed it.
 
 ## Naming
 
-- `TextEntry__NextChar` -- tier B. gTextEntryMethods +0x090 (advanceCharSelect slot, classtable.py -- HandleCommand's case 18/2). Increments the character-picker index unk1C, bounded by unk14 (gNameCharTable's own length, counted by the ctor); WRAPS to 0 on overflow (unlike the cursor pair's revert), forwarding to TextEntry__SetCharAt (TextEntryItemList). Tier B: the wrap-vs-revert asymmetry is measured, exact on-screen semantics (cycling a soft-keyboard character list) is inferred.
+- `TextEntry__NextChar` -- tier B. gTextEntryMethods +0x090 (advanceCharSelect slot, classtable.py -- HandleCommand's case 18/2). Increments the character-picker index unk1C, bounded by unk14 (sNameCharTable's own length, counted by the ctor); WRAPS to 0 on overflow (unlike the cursor pair's revert), forwarding to TextEntry__SetCharAt (TextEntryItemList). Tier B: the wrap-vs-revert asymmetry is measured, exact on-screen semantics (cycling a soft-keyboard character list) is inferred.
 
 ## Track 4 (2026-09-26, round 87)
 

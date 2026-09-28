@@ -27,7 +27,7 @@ void TextEntry__RemoveChild(Obj86ED0 *self, void *arg1)
         } else if (mask == 5) {
             self->unk38 = NULL;
         }
-        Get_vtable_BasicClass()->removeChild(self, arg1);
+        GetBasicClassMethods()->removeChild(self, arg1);
     }
 }
 ```

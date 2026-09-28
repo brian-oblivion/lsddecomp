@@ -31,7 +31,7 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
         return;
     }
     self->methods->slot5C(self);
-    self->streamBuffer = gPendingVabBuffer;
+    self->streamBuffer = sPendingVabBuffer;
     result = SsUtGetVabHdr(self->vabId, &self->vabHdr);
     if (result == -1) {
         return;
@@ -59,10 +59,10 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
             pool++;
         }
     }
-    if (gVabVolumeInited == 0) {
+    if (sVabVolumeInited == 0) {
         SsStart();
         SsSetMVol(0x78, 0x78);
-        gVabVolumeInited = 1;
+        sVabVolumeInited = 1;
     }
 }
 ```
@@ -83,7 +83,7 @@ byte matters here), then walks that many `VagAtr` entries out of the pool via
 per program -- confirmed by where retail's `addiu $s2,$s2,0x20` actually sits,
 in the INNER loop's own branch-delay slot). On first successful pass through
 the whole bank, calls `SsStart` and sets the shared master volume once
-(`gVabVolumeInited` guards it from repeating).
+(`sVabVolumeInited` guards it from repeating).
 
 ## Result
 

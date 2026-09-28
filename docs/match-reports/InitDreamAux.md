@@ -9,7 +9,7 @@
 > after that fix** -- the same way `CheckDreamAuxTriggerCondition`'s report was missed by
 > round 22's sweep because it reads as a considered plateau, not a stub.
 >
-> The residue this report called unclosable (`%lo(gDreamAuxSlots)` folded into
+> The residue this report called unclosable (`%lo(sDreamAuxSlots)` folded into
 > the store's own displacement, instead of retail's full `lui`+`addiu`
 > materialize-then-`addu`) is **the exact same construct** as the switch
 > jump-table fold that blocked `CheckDreamAuxTriggerCondition` -- an indexed-global address
@@ -34,7 +34,7 @@
 > per-function window, no drift caveat, just a green `build-and-verify.sh`.
 >
 > **This is now real C in `src/world/DreamAux.c`, committed.** The rodata
-> ownership trap documented below (defining `gMomPathSymSpy`/`gMomPathSymDog` as real
+> ownership trap documented below (defining `sMomPathSymSpy`/`sMomPathSymDog` as real
 > string data ahead of the function) was exactly as described and is now
 > permanent, not a note for a future attempt.
 >
@@ -64,15 +64,15 @@ is not the gp-relative blocker, it is a residue class of its own. Restored to
 Two independent passes over unrelated tables, then a load of the "DreamAux"
 audio-stream-request object:
 
-1. For `i` in `0..13`: `gDreamAuxGroupRecords[i]` is a pointer to an array of
-   `gDreamAuxGroupCounts[i]` (signed count) 8-byte records; clear byte 0 (offset `0x0`,
+1. For `i` in `0..13`: `sDreamAuxGroupRecords[i]` is a pointer to an array of
+   `sDreamAuxGroupCounts[i]` (signed count) 8-byte records; clear byte 0 (offset `0x0`,
    named `flag`) of each.
 2. Build a request (`ResourceRequest__Set`, already matched elsewhere in
    `GameApplicationFileResource.c` as a plain 3-word field setter) with `flag=0`,
    `name="ETC\\SYMSPY.MOM"`, `mode=1`.
 3. A `for (i = 0; i < 1; i++)` loop (see the "loop that only runs once" note
    in `ReleaseDreamAuxModels`'s report -- same confirmed idiom) that calls
-   `New_ModelData((struct ResourceSource *)&req)` and stores the result into `gDreamAuxSlots[0].obj`,
+   `New_ModelData((struct ResourceSource *)&req)` and stores the result into `sDreamAuxSlots[0].obj`,
    then overwrites `req.name` with `"ETC\\SYMDOG.MOM"`. Because the loop
    only runs once, that second name write is dead in THIS retail build --
    likely a leftover of an original 2-iteration loop (SYMSPY then SYMDOG)
@@ -85,8 +85,8 @@ audio-stream-request object:
 #include "common.h"
 #include "DreamAux.h"
 
-/* const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM"; */
-/* const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM"; */
+/* const char sMomPathSymSpy[] = "ETC\\SYMSPY.MOM"; */
+/* const char sMomPathSymDog[] = "ETC\\SYMDOG.MOM"; */
 /* ^ These must be defined in this .c file (not just declared extern) when
  * this function is not INCLUDE_ASM'd -- see "Rodata ownership" below. */
 
@@ -97,31 +97,31 @@ void InitDreamAux(void)
     s32 j;
 
     for (i = 0; i < 14; i++) {
-        for (j = 0; j < gDreamAuxGroupCounts[i]; j++) {
-            gDreamAuxGroupRecords[i][j].flag = 0;
+        for (j = 0; j < sDreamAuxGroupCounts[i]; j++) {
+            sDreamAuxGroupRecords[i][j].flag = 0;
         }
     }
 
-    ResourceRequest__Set(&req, 0, gMomPathSymSpy, 1);
+    ResourceRequest__Set(&req, 0, sMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
-        gDreamAuxSlots[i].obj = New_ModelData((struct ResourceSource *)&req);
-        req.name = gMomPathSymDog;
+        sDreamAuxSlots[i].obj = New_ModelData((struct ResourceSource *)&req);
+        req.name = sMomPathSymDog;
     }
 }
 ```
 
 Needs (from `include/DreamAux.h`, added this round):
-`DreamAuxLoadReq`, `DreamAuxGroupRecord`, `gDreamAuxGroupCounts`, `gDreamAuxGroupRecords`,
-`DreamAuxSlot`, `gDreamAuxSlots`, `ResourceRequest__Set`, `New_ModelData`.
+`DreamAuxLoadReq`, `DreamAuxGroupRecord`, `sDreamAuxGroupCounts`, `sDreamAuxGroupRecords`,
+`DreamAuxSlot`, `sDreamAuxSlots`, `ResourceRequest__Set`, `New_ModelData`.
 
 ## The residue, precisely
 
-Retail, storing the call result into `gDreamAuxSlots[i].obj`:
+Retail, storing the call result into `sDreamAuxSlots[i].obj`:
 
 ```
-lui   at, %hi(gDreamAuxSlots)
-addiu at, at, %lo(gDreamAuxSlots)   ; <-- retail materializes the FULL address
+lui   at, %hi(sDreamAuxSlots)
+addiu at, at, %lo(sDreamAuxSlots)   ; <-- retail materializes the FULL address
 addu  at, at, s0                 ;     (s0 = running byte offset, i*0x14)
 sw    v0, 0(at)
 ```
@@ -129,9 +129,9 @@ sw    v0, 0(at)
 Every source shape tried here compiles to:
 
 ```
-lui   at, %hi(gDreamAuxSlots)
+lui   at, %hi(sDreamAuxSlots)
 addu  at, at, s0
-sw    v0, %lo(gDreamAuxSlots)(at)   ; <-- %lo folded into the store's own
+sw    v0, %lo(sDreamAuxSlots)(at)   ; <-- %lo folded into the store's own
                                  ;     displacement instead
 ```
 
@@ -145,8 +145,8 @@ which shows the first ~46 instructions matching before this one diverges).
 ## What was tried (all rejected, in order)
 
 1. Manually hoisted `s8 *counts` / `DreamAuxGroupRecord **groups` pointers
-   incremented by hand in loop 1, instead of indexing `gDreamAuxGroupCounts[i]` /
-   `gDreamAuxGroupRecords[i][j]` directly -- **worse** (5/56). Switching to direct
+   incremented by hand in loop 1, instead of indexing `sDreamAuxGroupCounts[i]` /
+   `sDreamAuxGroupRecords[i][j]` directly -- **worse** (5/56). Switching to direct
    array indexing and letting GCC do its own induction-variable strength
    reduction (per the head's "let GCC hoist its own invariants" broadcast)
    got loop 1 to match byte-for-byte; this part of the lever generalizes.
@@ -166,12 +166,12 @@ which shows the first ~46 instructions matching before this one diverges).
    clean but do not add the missing instruction (most made other things
    *worse*, none improved past 40/56): reordering `req.name = ...` before
    vs. after the store; splitting the call result into a named temporary
-   before storing it; declaring `gDreamAuxSlots` with an explicit bound (`[14]`)
+   before storing it; declaring `sDreamAuxSlots` with an explicit bound (`[14]`)
    vs. incomplete (`[]`) -- no difference either way; replacing the
    `u8 unk4[0x10]` padding with four named `s32` fields -- no difference;
-   `DreamAuxSlot *entry = &gDreamAuxSlots[i]; entry->obj = ...;` -- worse
+   `DreamAuxSlot *entry = &sDreamAuxSlots[i]; entry->obj = ...;` -- worse
    (36/56); explicit byte-pointer arithmetic
-   (`*(DreamAuxObj **)((u8 *)gDreamAuxSlots + i * sizeof(DreamAuxSlot))`) --
+   (`*(DreamAuxObj **)((u8 *)sDreamAuxSlots + i * sizeof(DreamAuxSlot))`) --
    worse (36/56 and 28/56 depending on exact form); a `volatile` cast on the
    array -- worse (36/56); a bare `__asm__("")` as the function's first
    statement -- worse (33/56), and per CLAUDE.md rule 6 this would need
@@ -184,20 +184,20 @@ which shows the first ~46 instructions matching before this one diverges).
 
 `config/splat.slps01556.lsdde.yaml` marks the `0x206C` rodata segment
 `.rodata, DreamAux` (dot-prefixed) for `CheckDreamAuxTriggerCondition`'s jump tables, but
-`gMomPathSymSpy`/`gMomPathSymDog` (the two MOM filenames) live in the same run and
+`sMomPathSymSpy`/`sMomPathSymDog` (the two MOM filenames) live in the same run and
 are consumed only by `InitDreamAux`. While this function is `INCLUDE_ASM`,
 its own `.s` file carries these two strings as raw (`nonmatching`) asm
 blocks and the build is green. The MOMENT this function is de-`INCLUDE_ASM`'d,
 that `.s` file is no longer pulled in by anything (it lives under
 `asm/nonmatchings/`, which per the Makefile is *only* assembled via
 `INCLUDE_ASM`), and both symbols go undefined at link time. Fix: define them
-as real C string data (`const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";` etc.)
+as real C string data (`const char sMomPathSymSpy[] = "ETC\\SYMSPY.MOM";` etc.)
 directly in `DreamAux.c`, ahead of the function -- this is "flip to the
 dot form in the same commit that writes the C" from
 `docs/DECOMPILATION_LEARNINGS.md`, just for a rodata slot that happens to
 hold strings rather than a table. Whoever re-attempts this function needs
 that definition back (commented out above, in the near-miss body) or the
-build will fail at link with `undefined reference to gMomPathSymSpy`.
+build will fail at link with `undefined reference to sMomPathSymSpy`.
 
 ## Proposed learning
 
@@ -220,7 +220,7 @@ call inside `DayTask__DayTask` (a constructor: `GetTimedTaskMethods()->ctor(self
 self->methods = GetDayTaskMethods(); InitDreamAux(); ...`), before the rest of
 that object's own fields are set up. Clears every `gDreamAuxGroupRecord`'s
 `flag` across all 14 groups and loads the initial MOM audio-stream object
-into `gDreamAuxSlots[0].obj`. "Init" fits the one-shot, construction-time
+into `sDreamAuxSlots[0].obj`. "Init" fits the one-shot, construction-time
 call site; the broader game reason (why THIS unit's state resets alongside
 that particular object's construction) is not established from this unit
 alone, hence tier B rather than A.
@@ -249,7 +249,7 @@ Findings of the pass that change what those comments said: DreamAuxGroupRecord
 is TriggerRecord (the same 8-byte records; `flag` is `triggered`), so the view
 is gone and the record is TriggerRecord.triggered; the per-stage tables are 14
 pointers each (DREAM_AUX_STAGE_COUNT, from the label spacing) and the slot
-arrays hold ONE slot (gDreamAuxPosTable starts 0x14 after gDreamAuxSlots), not
+arrays hold ONE slot (sDreamAuxPosTable starts 0x14 after sDreamAuxSlots), not
 14; a slot's first word is the ModelData New_ModelData returns (`model`), and
 the "tick" at method slot +0x004 is BasicClass's release. The MOM files are
 ModelData files (a TMD and a TodSet, include/ModelData.h), not audio. With one
@@ -266,12 +266,12 @@ The header banner:
  * `value` (CheckDreamAuxTriggerCondition) and a coordinate parity
  * (CheckTriggerParity), that on success spawns or despawns an Entity into
  * one of two 14-slot object-tracking families (SpawnDreamAuxTriggerEntity /
- * DespawnDreamAuxEntity, backed by gDreamAuxSlots / gDreamAuxSlots2) and can
+ * DespawnDreamAuxEntity, backed by sDreamAuxSlots / sDreamAuxSlots2) and can
  * gate the game's teleport flag (EnableTeleportsForKind, SetTeleportsEnabled
  * in DreamSys.c). InitDreamAux/TickDreamAuxSlots/TickDreamAuxSlots2 are the
  * construct/tick/destruct hooks a caller in DayTaskStageMap.c and
- * ObjMStyleActor.c drives this subsystem through. `gDreamAuxStage`,
- * `gDreamAuxWorld` and three sibling globals SetDreamAuxWorld installs are
+ * ObjMStyleActor.c drives this subsystem through. `sDreamAuxStage`,
+ * `sDreamAuxWorld` and three sibling globals SetDreamAuxWorld installs are
  * the shared context every other function in the unit reads.
  */
 ```
@@ -289,18 +289,18 @@ The slot and its object view (DreamAuxObj / DreamAuxTickFn, deleted):
  * result back into the same slot); an Entity at +0x4 (include/Entity.h)
  * that SetDreamAuxWorld makes with New_Entity and DespawnDreamAuxEntity
  * detaches and re-attaches (detachFromParent, attachToParent with the
- * player gDreamAuxWorld as the peer);
+ * player sDreamAuxWorld as the peer);
  * and a 3-word position vector at +0x8 that DespawnDreamAuxEntity passes as
  * `SceneNode__LocalOffsetToWorldPos`'s `src` (that function's own signature, `SceneNode.h`,
  * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
- * confirmed by SetDreamAuxWorld's walk over gDreamAuxSlots. */
+ * confirmed by SetDreamAuxWorld's walk over sDreamAuxSlots. */
 ```
 
 The group-record view (deleted; TriggerRecord):
 
 ```c
 /* A tiny fixed-size record family read by InitDreamAux: 14 (0xE) parallel
- * groups, gDreamAuxGroupCounts[i] a signed count and gDreamAuxGroupRecords[i] a pointer to an
+ * groups, sDreamAuxGroupCounts[i] a signed count and sDreamAuxGroupRecords[i] a pointer to an
  * array of count 8-byte records whose first byte InitDreamAux clears. The
  * record's remaining 7 bytes are not accessed here. */
 ```

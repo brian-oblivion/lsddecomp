@@ -119,14 +119,14 @@ extern SeqData *New_RequestedFile(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-WBgmMethods *Get_vtable_WBgm(void);
+WBgmMethods *GetWBgmMethods(void);
 
 extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern s32 sWBgmActive;
+extern u8 sSsSizeTableBuf[];
 ```
 
 ## Track 4 (2026-09-26, round 87, RequestedFile)

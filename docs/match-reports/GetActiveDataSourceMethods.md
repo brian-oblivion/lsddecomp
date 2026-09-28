@@ -19,13 +19,13 @@ An `if`/`else` mode dispatch, both arms tail-calling a function and
 returning its result:
 
 ```
-lw    $v1, %gp_rel(gActiveDataSource)($gp)
+lw    $v1, %gp_rel(sActiveDataSource)($gp)
 ori   $v0, $zero, 0x23
-beq   $v1, $v0, .L80026CD0     # gActiveDataSource == 0x23 -> the "then" arm
+beq   $v1, $v0, .L80026CD0     # sActiveDataSource == 0x23 -> the "then" arm
   jal GetCdDriverMethods             # fallthrough (not equal) -- called first in ROM order
   j .L80026CD8
 .L80026CD0:
-  jal GetVabDriverMethods             # equal-to-0x23 arm
+  jal GetNullDriverMethods             # equal-to-0x23 arm
 .L80026CD8:
   <epilogue, returns whatever $v0 holds>
 ```
@@ -35,8 +35,8 @@ direct reading `if (cond) A(); else B();` is the right mapping (not the
 inverted-condition idiom GCC sometimes uses) -- confirmed by matching, first
 try, with the straightforward `if`/`else` written in source order.
 
-`GetVabDriverMethods` is confirmed elsewhere in the repo
-(`src/sound/PlacementGridVabSound.c`: `TableD9BC *GetVabDriverMethods(void) { return &gVabDriverMethods; }`)
+`GetNullDriverMethods` is confirmed elsewhere in the repo
+(`src/sound/PlacementGridVabSound.c`: `TableD9BC *GetNullDriverMethods(void) { return &gNullDriverMethods; }`)
 to return a pointer, not void -- direct positive evidence this whole function
 is non-void per CLAUDE.md's tail-call caution. `GetCdDriverMethods` is still
 uncarved (`asm/code_179d8.s`) but is declared elsewhere in the repo
@@ -47,13 +47,13 @@ each unit's own independent local type -- this report follows the same
 ## Final body
 
 ```c
-extern s32 gActiveDataSource;
-extern void *GetVabDriverMethods(void);
+extern s32 sActiveDataSource;
+extern void *GetNullDriverMethods(void);
 extern void *GetCdDriverMethods(void);
 
 void *GetActiveDataSourceMethods(void) {
-    if (gActiveDataSource == 0x23) {
-        return GetVabDriverMethods();
+    if (sActiveDataSource == 0x23) {
+        return GetNullDriverMethods();
     } else {
         return GetCdDriverMethods();
     }
@@ -63,14 +63,14 @@ void *GetActiveDataSourceMethods(void) {
 ## Proposed learning
 
 **A second shared idiom in this unit, alongside the six-function
-`if (gActiveDataSource == 0x13) return func(); return N;` family
+`if (sActiveDataSource == 0x13) return func(); return N;` family
 (`LockActiveDataSource.md`):** an `if`/`else` mode dispatch where BOTH arms
 tail-call a function and neither sets an explicit constant. Three functions
 in this unit share this exact shape --  `GetActiveDataSourceMethods` (mode `0x23`),
 `GetActiveDataSourceDriverMode` and `GetActiveDataSourceUseVSyncCallback` (both mode `0x13`, different callees).
 Per CLAUDE.md's caution, a byte match here proves nothing about void-ness on
-its own, but `GetVabUseVSyncCallback` (the `GetActiveDataSourceUseVSyncCallback` else-arm) is independently
-confirmed non-void (`s32 GetVabUseVSyncCallback(void) { return 0; }` in
+its own, but `GetNullDriverUseVSyncCallback` (the `GetActiveDataSourceUseVSyncCallback` else-arm) is independently
+confirmed non-void (`s32 GetNullDriverUseVSyncCallback(void) { return 0; }` in
 `PlacementGridVabSound.c`), so treating all three as `s32`/`void *`-returning tail
 calls is not a guess -- it is the only reading consistent with a callee whose
 real return type is already known.
@@ -83,9 +83,9 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `GetActiveDataSourceMethods` | `GetActiveDataSourceMethods` | B |
 
-**Evidence.** `if (gActiveDataSource == DATASOURCE_SPU) return GetVabDriverMethods();
+**Evidence.** `if (sActiveDataSource == DATASOURCE_SPU) return GetNullDriverMethods();
 else return GetCdDriverMethods();` -- returns whichever of the two sibling
 data-source classes' vtables is currently active. Part of the family of
-`ActiveDataSource`-named wrappers this round derived from `gActiveDataSource`
-(the renamed `gActiveDataSource`); see that global's own naming note. Mechanics
+`ActiveDataSource`-named wrappers this round derived from `sActiveDataSource`
+(the renamed `sActiveDataSource`); see that global's own naming note. Mechanics
 fully known; which higher-level system decides the active source is not.

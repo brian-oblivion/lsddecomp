@@ -20,7 +20,7 @@ Fresh ground, carved round 45, never attempted.
 /* 4603C 8005583C 21808000 */   addu $s0, $a0, $zero
 /* 46040 80055840 07004010 */  beqz  $v0, .L80055860
 /* 46044 80055844 21100000 */   addu $v0, $zero, $zero
-/* 46048 80055848 7404828F */  lw    $v0, %gp_rel(gStyleSceneRefs)($gp)
+/* 46048 80055848 7404828F */  lw    $v0, %gp_rel(sStyleSceneRefs)($gp)
 /* 46050 80055850 0000448C */  lw    $a0, 0x0($v0)
 /* 46054 80055854 42B3000C */  jal   ServiceSoundCueSet
 /* 46058 80055858 14000526 */   addiu $a1, $s0, 0x14
@@ -36,7 +36,7 @@ own second argument. `IsStyleCueNear` (31w, not attempted this round, still
 `INCLUDE_ASM`) is only forward-declared here for its calling shape, taking
 this unit's `ObjN14 *` plus a second opaque pointer and returning an `s32`
 flag. On a nonzero result this calls `ServiceSoundCueSet` exactly the way
-`FlushStyleCue` calls its sibling `FlushSoundCueSet` -- same `gStyleSceneRefs`
+`FlushStyleCue` calls its sibling `FlushSoundCueSet` -- same `sStyleSceneRefs`
 dereference for `self`, same `&arg0->unk14` embedded sub-object -- and
 returns 1; otherwise returns 0 (retail's own `ServiceSoundCueSet` return value,
 if any, is discarded and overwritten by the explicit `ori $v0,$zero,0x1`
@@ -49,7 +49,7 @@ extern void ServiceSoundCueSet(s32 arg0, void *arg1);
 
 s32 ServiceStyleCueIfNear(ObjN14 *arg0, void *arg1) {
     if (IsStyleCueNear(arg0, arg1) != 0) {
-        ServiceSoundCueSet(*(s32 *) gStyleSceneRefs, &arg0->unk14);
+        ServiceSoundCueSet(*(s32 *) sStyleSceneRefs, &arg0->unk14);
         return 1;
     }
     return 0;
@@ -59,7 +59,7 @@ s32 ServiceStyleCueIfNear(ObjN14 *arg0, void *arg1) {
 ### Proposed learning
 
 None -- straightforward given `FlushStyleCue`'s already-established
-`gStyleSceneRefs`/`FlushSoundCueSet` shape to mirror onto `ServiceSoundCueSet`.
+`sStyleSceneRefs`/`FlushSoundCueSet` shape to mirror onto `ServiceSoundCueSet`.
 
 ## Naming
 

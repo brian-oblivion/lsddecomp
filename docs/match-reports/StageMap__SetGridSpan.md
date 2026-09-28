@@ -41,7 +41,7 @@ other reports point at it.
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B32C` | `StageMap__SetGridSpan` | B | Occupant of vtable slot `+0x0DC`. Stores its argument raw and derives two halfwords from it by arithmetic shift. Its only caller is `StageMap__Reset`, which passes `gDefaultGridSpan` = `0x0000A000`. |
+| `func_8004B32C` | `StageMap__SetGridSpan` | B | Occupant of vtable slot `+0x0DC`. Stores its argument raw and derives two halfwords from it by arithmetic shift. Its only caller is `StageMap__Reset`, which passes `sDefaultGridSpan` = `0x0000A000`. |
 
 The three numbers, and why they are not a guess:
 

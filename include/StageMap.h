@@ -40,7 +40,7 @@
  *    sChunkNeighbourDeltas, NULL when ComputeNeighbourMask puts it off the
  *    grid, else the chunk's file record from the callback);
  *  - applyChunkLoads starts each entry's LbdFile load (or cancels it);
- *    onNotifyTag1, as the reads finish, links each chunk's placements and
+ *    onDrawSystemEvent, as the reads finish, links each chunk's placements and
  *    models into its slot's cells (populateSlotCells), and sets
  *    `chunksLoaded` once none is pending.
  *
@@ -79,7 +79,7 @@
  *
  * +0x088: StageMap__OnSlotEvent takes (self, command, slot); the slot
  * keeps SceneNode's (self, event). Its four callers (Finalize,
- * UnloadAllSlots, ApplyChunkLoads, OnNotifyTag1) pass (self, 6 or 7,
+ * UnloadAllSlots, ApplyChunkLoads, OnDrawSystemEvent) pass (self, 6 or 7,
  * slot, index) through StageMapOnSlotEventFn below (no code).
  * +0x0D4 getCurrentCellKey and +0x0F8 loadChunksAround keep their CALLERS'
  * shapes: DreamSys__WallLink passes getCurrentCellKey a second word the
@@ -106,7 +106,7 @@ typedef struct ChunkSlot ChunkSlot;
  * ComputeFootprintDescriptor shifts a position's offset from its slot's
  * origin right by STAGE_CELL_SHIFT for the cell column/row. A chunk is
  * STAGE_CHUNK_CELLS cells square (the ctor's 20 x 20 lattice, 0x800 apart),
- * so STAGE_CHUNK_SIZE (0xA000, also gDefaultGridSpan) wide; odd rows sit
+ * so STAGE_CHUNK_SIZE (0xA000, also sDefaultGridSpan) wide; odd rows sit
  * STAGE_CHUNK_SIZE / 2 to -x (ComputeCellWorldOffsets). */
 #define STAGE_CELL_SHIFT 11
 #define STAGE_CELL_SIZE (1 << STAGE_CELL_SHIFT)
@@ -131,7 +131,7 @@ typedef struct ChunkSlot ChunkSlot;
  * SLOT_RELEASE before a slot is reloaded or its load cancelled
  * (ApplyChunkLoads; UnloadAllSlots and Finalize), releasing its heldObj;
  * SLOT_DATA_READY when the slot's LbdFile has read its data block
- * (OnNotifyTag1, on `dataReady`). */
+ * (OnDrawSystemEvent, on `dataReady`). */
 enum StageMapEvent {
     STAGEMAP_EVENT_CHUNK_CHANGED = 5,
     STAGEMAP_EVENT_SLOT_RELEASE = 6,
@@ -299,7 +299,7 @@ typedef struct CellBounds {
 
 /* One of the seven chunk slots, 0x1C bytes (the ctor, Finalize). */
 struct ChunkSlot {
-    /* +0x000 */ u16 loadPending; /* 1 while its load is pending (ApplyChunkLoads; OnNotifyTag1 clears it) */
+    /* +0x000 */ u16 loadPending; /* 1 while its load is pending (ApplyChunkLoads; OnDrawSystemEvent clears it) */
     /* +0x002 */ u16 neighbour; /* the ctor: its index; LoadChunksAround: the spec's neighbour, copied on into loader->elemKey */
     /* +0x004 */ struct LbdFile *loader; /* New_LbdFile(): the slot's chunk file (include/LbdFile.h) */
     /* +0x008 */ struct PlacementGrid *placements; /* New_PlacementGrid(0): its placement records (include/PlacementGrid.h) */
@@ -338,8 +338,8 @@ struct StageMapMethods {
                                          ChunkSlotSpec *specs); /* StageMap__LoadChunksAround (returns nothing; see the banner) */
     /* +0x0FC */ void (*applyChunkLoads)(StageMap *self, ChunkLoadEntry *entries,
                                          s32 count); /* StageMap__ApplyChunkLoads */
-    /* +0x100 */ void (*onNotifyTag1)(StageMap *self, void *sender,
-                                      s32 mode); /* StageMap__OnNotifyTag1; OnNotify's class-1 sender case */
+    /* +0x100 */ void (*onDrawSystemEvent)(StageMap *self, void *sender,
+                                           s32 mode); /* StageMap__OnDrawSystemEvent; OnNotify's class-1 sender case */
     /* +0x104 */ void (*populateSlotCells)(StageMap *self, ChunkSlot *slot); /* StageMap__PopulateSlotCells */
     /* +0x108 */ void (*clearSlotCells)(StageMap *self, ChunkSlot *slot); /* StageMap__ClearSlotCells */
     /* +0x10C */ Descriptor10 *(*getTargetDescriptor)(StageMap *self, Descriptor10Ext *out,
@@ -363,13 +363,13 @@ struct StageMapMethods {
 
 struct StageMap {
     LIGHTRIG_FIELDS(StageMapMethods);
-    /* +0x054 */ LongVec3 origin; /* the ctor: its argument, or gDefaultOrigin; the cellParents attach here */
+    /* +0x054 */ LongVec3 origin; /* the ctor: its argument, or sDefaultOrigin; the cellParents attach here */
     /* +0x060 */ ChunkFileFn chunkFileFn; /* setCallback */
     /* +0x064 */ void *chunkFileCtx;      /* setCallback */
     /* +0x068 */ StageGridDimensions *config; /* setConfig (ObjM: GetStageGridDimensions(stage)); NULL after Reset */
     /* +0x06C */ SceneNode *target; /* setTargetAndLoadChunks (DreamSys__SpawnAtLink passes the DreamSys); its coord2 is the tracked position */
     /* +0x070 */ s32 enabled;       /* enable/disable; gates UpdateIfEnabled */
-    /* +0x074 */ s32 gridSpan;      /* setGridSpan: gDefaultGridSpan = 0xA000 */
+    /* +0x074 */ s32 gridSpan;      /* setGridSpan: sDefaultGridSpan = 0xA000 */
     /* +0x078 */ s16 gridHalfCells; /* gridSpan >> 12 = 10 */
     /* +0x07A */ s16 gridCells;     /* gridSpan >> 11 = 20, the row stride */
     /* +0x07C */ s16 footprintCol; /* BuildFootprintRects' input: a signed column, clamped into [0,20) */
@@ -381,8 +381,8 @@ struct StageMap {
     /* +0x0BC */ Descriptor10Ext targetCell; /* UpdateFootprintTracking: the target's last descriptor; SetTargetAndLoadChunks sets .base; getTargetDescriptor returns &.base */
     /* +0x0E8 */ s32 *acceptedTags; /* setAcceptedTags: a 0-terminated list of class ids ForwardAcceptedCommand accepts */
     /* +0x0EC */ ChunkSlot slots[7];
-    /* +0x1B0 */ s32 loadsPending; /* 1 while chunk loads are pending (ApplyChunkLoads; OnNotifyTag1 clears it) */
-    /* +0x1B4 */ u16 pendingLoadCount; /* CountPendingLoads after ApplyChunkLoads; OnNotifyTag1 counts it down */
+    /* +0x1B0 */ s32 loadsPending; /* 1 while chunk loads are pending (ApplyChunkLoads; OnDrawSystemEvent clears it) */
+    /* +0x1B4 */ u16 pendingLoadCount; /* CountPendingLoads after ApplyChunkLoads; OnDrawSystemEvent counts it down */
     /* +0x1B6 */ u8 pad1B6[0x1B8 - 0x1B6];
     /* +0x1B8 */ s32 chunksLoaded; /* set when that count reaches 0; RefreshFootprint does nothing while it is 0 */
     /* +0x1BC */ ChunkSlot *lastEventSlot; /* OnSlotEvent's slot; GetLastEventSlotChunk reads it */
@@ -406,39 +406,6 @@ typedef void (*ChunkSlotFn)(StageMap *self, ChunkSlot *slot);
 
 extern StageMapMethods gStageMapMethods;
 extern StageMapMethods *GetStageMapMethods(void); /* returns &gStageMapMethods */
-
-/* The rectangle StageMap__InitFootprintRect copies into rects[index] before
- * setting its slotIndex: no slot (-1), the whole 20 x 20 cells from (0, 0). */
-extern CellRect gFullSlotRect;
-
-/* The default "enable every element" spec table SetTargetAndLoadChunks
- * passes to buildRateEntries: seven entries, every `flag` nonzero. */
-extern ChunkSlotSpec sDefaultTargetSpecs[7];
-
-/* Indexed by ChunkSlotSpec::key in StageMap__LoadChunksAround: the world
- * offset of that neighbour's cellParent from the centre position. Unsized:
- * `key` is the caller's byte. */
-extern LongVec3 sNeighbourOffsets[];
-
-/* `key`-indexed bitmask table (`1 << key`) StageMap__ComputeChunkLoadEntry
- * tests against ComputeNeighbourMask's result. */
-extern const s32 sNeighbourBits[7];
-
-/* `key`-indexed chunk-index steps to the seven chunks around a centre chunk
- * (ChunkNeighbourDelta, include/StageMap.h). */
-extern const ChunkNeighbourDelta sChunkNeighbourDeltas[7];
-
-/* LbdFile::ownerKey-indexed remap, read signed by
- * StageMap__UpdateFootprintTracking (01 02 03 00 04 05 06 00). The byte
- * (0..6) is UpdateFootprintTracking's return value and the index into
- * sFootprintResultPtrTable. */
-extern const s8 sFootprintResultRemap[8];
-
-/* 7 pointers, the first NULL, the rest to 4-word tables of ChunkSlotSpecs
- * (seven 2-byte entries, padded): UpdateFootprintTracking passes the
- * selected one to buildRateEntries as its spec table, as
- * SetTargetAndLoadChunks passes sDefaultTargetSpecs. */
-extern ChunkSlotSpec *sFootprintResultPtrTable[7];
 
 /* The class's own functions, in address order: the occupants of
  * gStageMapMethods and their non-slot helpers. */
@@ -478,7 +445,7 @@ s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *entry, s32 d
                                     s32 key); /* 0 or 1; LoadChunksAround discards it */
 void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entries, s32 count);
 s32 StageMap__CountPendingLoads(StageMap *self);
-void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 mode);
+void StageMap__OnDrawSystemEvent(StageMap *self, void *sender, s32 mode);
 void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot);
 void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *slot);
 Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *out, void **outPos);

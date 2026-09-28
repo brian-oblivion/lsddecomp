@@ -41,7 +41,7 @@ void TaskCore__OnInit(StreamTaskObj *self) {
         self->unk78->methods->slotB8(self->unk78, 1, &self->unk90);
     }
     if (self->unk74 == 0) {
-        self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk90, gDefaultMovieFrame);
+        self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk90, sDefaultMovieFrame);
     }
     self->unkC->unk0->methods->slot78(self->unkC->unk0, &self->unk90, 0);
     core->slot48(unk18, self->unk28);
@@ -83,7 +83,7 @@ discovered" section with a correction note** rather than rewriting it.
 fields all torn down identically via a 1-argument `slot04`. This function
 calls `self->unk78`'s own slot `+0x04C` with **3 arguments**
 (`self->unk78->methods->slot4C(self->unk78, self->unk14, 0)`), where
-`StreamTaskUnkB4Methods::slot4C` (from the already-matched `StreamTask__RefreshViewValue`,
+`StreamTaskUnkB4Methods::slot4C` (from the already-matched `StreamTask__Exit`,
 called on `self->unkB4`) is fixed at 1 argument. Same reasoning as above:
 real arity conflict at a shared offset means these are sibling classes that
 happen to agree at `slot04` (likely via a shared base), not one class.
@@ -105,8 +105,8 @@ on any of those four, so there is no counter-evidence to act on there.
 - `TaskTextMethods::slot78`'s 3rd parameter widened from `s32 flag` to
   `u8 *flag`: `TaskCore__OnDeinit`'s call passes literal `0` (valid for either
   type, unchanged bytes there), this function's own call passes
-  `gDefaultMovieFrame`, a real rodata address.
-- Two new rodata externs, address-only: `gDefaultMovieFrame`, and `sTaskCoreViewOrigin`
+  `sDefaultMovieFrame`, a real rodata address.
+- Two new rodata externs, address-only: `sDefaultMovieFrame`, and `sTaskCoreViewOrigin`
   (passed **twice, same address**, as `TaskCoreObjMethods::slot70`'s 3rd
   AND 4th arguments -- an odd but unambiguous call-site fact, left
   unexplained).
@@ -171,7 +171,7 @@ bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj casts are g
   `DrawSystem::clearImage(self, color, rect)` (include/DrawSystem.h), which
   TitleMenu__OnDeinit already calls through `DrawSystem *`. The calls now cast
   to `DrawSystem *`; byte-identical. The two clears are therefore: the
-  default movie frame (`&gDefaultMovieFrame`, a DrawRect
+  default movie frame (`&sDefaultMovieFrame`, a DrawRect
   {640, 0, 320, 240}) to baseColor when there is no sub handle, then the whole
   screen (NULL rect) to baseColor.
 - `unk28` -> `otLength` (tier A: onInit passes it to the viewport's
@@ -211,4 +211,4 @@ to apply by type scope:
 
 ## Track 6 (2026-09-27, round 99, runner bravo)
 
-`gDefaultStreamTaskInitData` is renamed `gDefaultMovieFrame` (tier B, see GetDefaultMovieFrame.md): the rect this function clears when there is no sub handle is the frame StreamTask builds its MoviePlayer with. That the clear is FOR the movie area is not established; the name records where else the rect goes.
+`gDefaultStreamTaskInitData` is renamed `sDefaultMovieFrame` (tier B, see GetDefaultMovieFrame.md): the rect this function clears when there is no sub handle is the frame StreamTask builds its MoviePlayer with. That the clear is FOR the movie area is not established; the name records where else the rect goes.

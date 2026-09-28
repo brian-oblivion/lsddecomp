@@ -74,7 +74,7 @@ typedef struct TagCheckArg {
  * the TodActor itself rather than to another part. */
 #define TOD_PARENT_ROOT 0xFFFF
 
-/* TickCallbackA's move along local Z each tick (Actor's moveLocalZ). */
+/* TickMoveZ's move along local Z each tick (Actor's moveLocalZ). */
 #define TODACTOR_STEP_Z (-30)
 
 /* PlayTone's volume, both arguments of the bank's playTone (vol, endVol). */
@@ -247,7 +247,7 @@ void TodActor__Update(TodActor *self, void *sender, s32 event) {
     if (event == FRAMECLOCK_EVENT_RUNNING) {
         self->methods->tick(self);
     }
-    if (event == FRAMECLOCK_EVENT_FLAG14) {
+    if (event == FRAMECLOCK_EVENT_STOPPED) {
         self->methods->release(self);
     }
 }
@@ -417,7 +417,7 @@ void TodActor__Tick(TodActor *self) {
 void TodActor__SelectTickCallback(TodActor *self, s32 which) {
     switch ((u8)which) {
         case TICK_CALLBACK_A:
-            self->tickCallback = self->methods->tickCallbackA;
+            self->tickCallback = self->methods->tickMoveZ;
             break;
         case TICK_CALLBACK_B:
             self->tickCallback = self->methods->tickCallbackB;
@@ -436,7 +436,7 @@ void TodActor__DisableTickCallback(TodActor *self) {
     self->tickCallbackEnabled = 0;
 }
 
-void TodActor__TickCallbackA(TodActor *self) {
+void TodActor__TickMoveZ(TodActor *self) {
     self->methods->moveLocalZ(self, TODACTOR_STEP_Z, 0);
     if (self->mainPartNotifies == 1 && self->mainPart != NULL) {
         self->mainPart->methods->notifyWithHull(self->mainPart, ACTOR_EVENT_MOVED_Z);

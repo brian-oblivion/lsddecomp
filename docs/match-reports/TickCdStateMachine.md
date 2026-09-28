@@ -6,14 +6,14 @@
 
 ## What it does
 
-One tick of a small CD-read state machine. `gCdState` holds the current
+One tick of a small CD-read state machine. `sCdState` holds the current
 phase (0 default, 1 = issue `CdControlF` seek, 2 = poll `CdSync`, 7 = issue
 `CdRead`, 8 = poll `CdReadSync`; anything else in `{3,4,5,6}` or `>8` is a
-no-op). `gCdTimeoutCounter` is a busy-wait timeout counter, reset by
+no-op). `sCdTimeoutCounter` is a busy-wait timeout counter, reset by
 `SetCdState` whenever the phase advances. Called from
-`ServiceCdDriver` (in the sibling unit `CdDriver.c`) when `gCdTickStep ==
+`ServiceCdDriver` (in the sibling unit `CdDriver.c`) when `sCdTickStep ==
 1`; `TickCdLoadFileStateMachine` is this same state machine's other tick variant
-(`gCdTickStep == 2`), differing only in what happens when `CdSync` reports
+(`sCdTickStep == 2`), differing only in what happens when `CdSync` reports
 "still the same phase" and after a successful `CdReadSync`.
 
 ## The C
@@ -29,7 +29,7 @@ void TickCdStateMachine(void)
     s32 newstate;
 
     LockCd();
-    state = gCdState;
+    state = sCdState;
 
     if (state == 2)
         goto L_state2;
@@ -45,7 +45,7 @@ void TickCdStateMachine(void)
     goto L_end;
 
 L_state1:
-    if (CdControlF(2, (u8 *)gCdSeekParam + 0x14) == 0)
+    if (CdControlF(2, (u8 *)sCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -65,14 +65,14 @@ L_state2:
     goto L_set;
 
 L_count:
-    gCdTimeoutCounter++;
-    if (gCdTimeoutCounter < 0x259)
+    sCdTimeoutCounter++;
+    if (sCdTimeoutCounter < 0x259)
         goto L_end;
     newstate = 1;
     goto L_set;
 
 L_state7:
-    if (CdRead(gCdReadSectorCount, gCdReadBuffer, 0x80) == 0)
+    if (CdRead(sCdReadSectorCount, sCdReadBuffer, 0x80) == 0)
         goto L_end;
     newstate = 8;
     goto L_set;
@@ -133,8 +133,8 @@ what reproduces the exact branch/block layout, not just the logic.
 **Tier B.** One tick of the CD-read state-machine's phase dispatch (phase 1
 = issue `CdControlF(CD_CMD_SETLOC, ...)`, 2 = poll `CdSync`, 7 = issue
 `CdRead`, 8 = poll `CdReadSync`), selected by `ServiceCdDriver`
-(CdDriver.c) when `gCdTickStep == 1`. This is the *default* of the two
-tick functions: cross-referencing every `gCdTickStep = 1` assignment in
+(CdDriver.c) when `sCdTickStep == 1`. This is the *default* of the two
+tick functions: cross-referencing every `sCdTickStep = 1` assignment in
 CdDriver.c shows it backs three different request paths --
 `CdDriver__Open` (open/resolve), `CdDriver__Seek` (explicit seek) and
 `CdDriver__Read` (straight read from the current position, which starts at
@@ -152,7 +152,7 @@ one call site that needs the other tick function.
 The goto ladder above is GCC's own decision tree for a `switch`
 (`== 2`, `< 3`, `== 1`, `== 7`, `== 8`; and on CdSync's result `== 2`,
 `< 3`, `== 0`, `== 5`). Written as the switch it compiles from -- on
-gCdState's `CD_STATE_*`, and inside it on CdSync's `CdlComplete` /
+sCdState's `CD_STATE_*`, and inside it on CdSync's `CdlComplete` /
 `CdlNoIntr` / `CdlDiskError` -- with a `newState` local and one
 `SetCdState(newState)` after the switch (the no-op paths `goto unlock`),
 the function is byte-exact. `v1 == state` was GCC substituting the known
@@ -171,8 +171,8 @@ encodings the tree node gets. The read-wait case matches either as
 `if (result == -1) {...; break;} if (result == 0) Reset...; goto unlock;`
 or with the tests nested the other way.
 
-Other changes, zero bytes: `CdControlF(CdlSetloc, (u_char *)&gCdSeekParam->pos)`
-(was `CdControlF(2, (u8 *)gCdSeekParam + 0x14)`), `CdlModeSpeed` for
+Other changes, zero bytes: `CdControlF(CdlSetloc, (u_char *)&sCdSeekParam->pos)`
+(was `CdControlF(2, (u8 *)sCdSeekParam + 0x14)`), `CdlModeSpeed` for
 CdRead's 0x80, `CD_SYNC_POLL` for CdSync/CdReadSync's mode 1,
 `CD_WAIT_TIMEOUT` as decimal 601, and the Cd* prototypes from Sony's
 `<libcd.h>` instead of local ones.

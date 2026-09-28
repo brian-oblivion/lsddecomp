@@ -41,7 +41,7 @@ plus slots +0x07C..+0x09C; `extern void *BMemPMgrAlloc(s32 size);`;
   return NULL;`); every project-wide call site (`DayTaskStageMap.c`,
   `TitleMenuTaskObjF.c`, `class_3bb8c_g.c`, `TextEntryItemList.c`, `class_3bb8c_j.c`,
   `Task.c`) builds a `"...\ .TIM"` path (via `BuildFileName` or
-  literal `sEtcTimPath`/`sSaveIconTimPath`/`sDreamerTmdPath`/`gCardPathSuffix`) and hands
+  literal `sEtcTimPath`/`sSaveIconTimPath`/`sDreamerTmdPath`/`sCardPathSuffix`) and hands
   it straight to this function, then calls the result's slot78
   (`TimImage__Upload`) and usually slot5C (`FileResource__FreeBuffer`) -- the
   exact shape the class's own methods implement. The round-81 rename was blocked by a

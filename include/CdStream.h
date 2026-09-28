@@ -11,7 +11,7 @@
  * src/graphics/GraphicsResources.c), whose ctor builds one with New_CdStream(cdSpeed, MOVIE_FPS, 0)
  * into its +0x060 and drives it through the slots below.
  *
- * One stream at a time. `gActiveCdStream` is the stream that owns the drive:
+ * One stream at a time. `sActiveCdStream` is the stream that owns the drive:
  * open sets it, close clears it, and seek/startRead/stop/restart/mute/demute
  * are no-ops for any other object. `state` runs 0 idle -> open ->
  * seek (1) -> startRead (2) -> stop (4) -> restart (back to 0 and re-seek);
@@ -24,7 +24,7 @@
  *
  * The callback words (+0x048, +0x04C, +0x054) are cleared by the ctor and
  * written nowhere else: New_CdStream's one caller is MoviePlayer's ctor and
- * gActiveCdStream is read only in CdStream, so the object reaches no other
+ * sActiveCdStream is read only in CdStream, so the object reaches no other
  * code, and MoviePlayer only calls slots. It hands its callback to slot
  * +0x07C instead, whose occupant is empty.
  *
@@ -75,8 +75,8 @@ struct CdStreamMethods {
     /* +0x074 */ void (*unsetRing)(CdStream *self);          /* CdStream__UnsetRing: StUnSetRing */
     /* +0x078 */ void (*clearRing)(CdStream *self);          /* CdStream__ClearRing: StClearRing */
     /* +0x07C: the occupant, CdStream__NoOpSlot7C, is empty and takes self
-     * only; the parameters are the callers'. MoviePlayer__Stop passes
-     * (MoviePlayer__MarkStopped, player) and MoviePlayer__Abort (0, 0), in
+     * only; the parameters are the callers'. MoviePlayer__Rewind passes
+     * (MoviePlayer__RequestRestart, player) and MoviePlayer__Abort (0, 0), in
      * $a1/$a2, so a narrower slot would drop those argument loads. */
     /* +0x07C */ void (*slot7C)(CdStream *self, void (*fn)(), void *arg);
 }; /* 31 slots, 0x80 bytes */
@@ -100,8 +100,7 @@ struct CdStream {
 }; /* 0x5C bytes: New_CdStream */
 
 extern CdStreamMethods gCdStreamMethods;
-extern CdStreamMethods *Get_vtable_CdStream(void); /* returns &gCdStreamMethods */
-extern CdStream *gActiveCdStream;                  /* the stream that owns the drive, or NULL */
+extern CdStreamMethods *GetCdStreamMethods(void); /* returns &gCdStreamMethods */
 
 CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved);
 void CdStream__CdStream(CdStream *self, u32 cdSpeed, s32 fps, s32 reserved);

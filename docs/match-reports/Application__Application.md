@@ -13,27 +13,27 @@ The gApplicationMethods constructor (slot `+0x008`). GameApplication__GameApplic
 
 1. base ctor through BasicClass's table;
 2. installs its own table (GetApplicationMethods);
-3. one-time `CdInit()`, guarded by the sdata flag gCdInitDone (gp_rel);
+3. one-time `CdInit()`, guarded by the sdata flag sCdInitDone (gp_rel);
 4. clears `initialized` (+0x18) and calls `SetActiveDataSource(source)`;
-5. calls its own `+0x040` slot with the {320, 240} default (gDefaultScreenDims).
+5. calls its own `+0x040` slot with the {320, 240} default (sDefaultScreenDims).
 
 ```c
 void Application__Application(Application *self, s32 source) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetApplicationMethods();
-    if (gCdInitDone == 0) {
+    if (sCdInitDone == 0) {
         CdInit();
-        gCdInitDone = 1;
+        sCdInitDone = 1;
     }
     self->initialized = 0;
     SetActiveDataSource(source);
-    self->methods->setDims(self, &gDefaultScreenDims, 0);
+    self->methods->setDims(self, &sDefaultScreenDims, 0);
 }
 ```
 
 Nothing needed tuning: the `sw $zero, 0x18($s0)` lands in
 SetActiveDataSource's delay slot and the table store in the `bnez` slot
-by the scheduler. `gCdInitDone` is gp-relative through
+by the scheduler. `sCdInitDone` is gp-relative through
 `--gp-symbols` (resolved blocker; ordinary extern). `CdInit`/`SsInit`/
 `GsInit3D` declared locally from the Psy-Q prototypes.
 
@@ -49,8 +49,8 @@ docs/research/class-framework.md. The body is substantive ctor work (base
 ctor, install own table, one-time CdInit, clear `initialized`,
 SetActiveDataSource, default screen dims), not a guess about purpose.
 
-Globals `gCdInitDone` (tier A: guards the one-time `CdInit()` call, mechanics
-is the purpose) and `gDefaultScreenDims` (tier B: a `{0x140, 0xF0}` = {320, 240}
+Globals `sCdInitDone` (tier A: guards the one-time `CdInit()` call, mechanics
+is the purpose) and `sDefaultScreenDims` (tier B: a `{0x140, 0xF0}` = {320, 240}
 ScreenDims constant, the "default" claim is evident from being the ctor's
 own default argument to `setDims`) renamed via `tools/rename.py`: referenced
 only from this unit (`grep -rn` over `src/`), so in this unit's ownership
@@ -64,7 +64,7 @@ function's own report for the blocker and the broadcast post.
 
 **2026-09-25, round 84 (echo).** The class is declared once, in
 `include/Application.h`. The parameter is now `dataSource`: it goes straight
-to `SetActiveDataSource`, and the one caller passes `gGameApplicationConfig`'s
+to `SetActiveDataSource`, and the one caller passes `sGameApplicationConfig`'s
 first word, 0x13 (the CD driver's class id, gCdDriverMethods). The table getter is
 `GetApplicationMethods` (renamed from `func_8003B20C`). Bytes unchanged.
 
@@ -112,7 +112,7 @@ they stand after the round-92 renames):
 Class `Class6E4F0` renamed `Application` (`tools/renametype.py`), table
 `D_8006E4F0` renamed `gApplicationMethods` (`tools/rename.py`). Tier A:
 the class's methods are the program's bring-up and outer loop and nothing
-else. The ctor runs CdInit (once per boot, gCdInitDone) and picks the data
+else. The ctor runs CdInit (once per boot, sCdInitDone) and picks the data
 source; initSystems registers main()'s DrawSystem, opens the display
 (GsInitGraph through DrawSystem's initGraph), then SsInit and GsInit3D, and
 allocates the argument block every task receives; runMainLoop never returns

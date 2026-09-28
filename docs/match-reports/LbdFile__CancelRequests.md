@@ -33,7 +33,7 @@ void LbdFile__CancelRequests(DataSrc39094 *self) {
 
 ## Notes
 
-- GetRecordTable (already matched) returns gRecordTable and writes 0x230 to
+- GetRecordTable (already matched) returns sRecordTable and writes 0x230 to
   `*out`; every `+0x70`/`+0xFC`/`+0x3D40`/`+0x3E04`/`+0x3E20` offset in this
   unit is a whole number of 0x1C-byte records into that table, so the unit
   types the table as `FilePathRecord` (size only). The record's fields are unknown.
@@ -68,9 +68,9 @@ loadHeader (+0x078) with each rate entry's `ptr0`, which
 StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__GetGridRecord (ObjM__AttachTarget installs it), whose
 tail call GetStageMapChunkRecord(stage, chunk) / GetStageMapChunkRecordXY leaves
-`&group[9 + chunk]` of gRecordTable in $v0. gRecordTable's 0x1C-byte records
+`&group[9 + chunk]` of sRecordTable in $v0. sRecordTable's 0x1C-byte records
 begin with a path, and record 9 of every stage group is its M000.LBD
-(stage 0: gStageFirstRecord[0] = 16, record 25 at 0x80081CC0 =
+(stage 0: sStageFirstRecord[0] = 16, record 25 at 0x80081CC0 =
 "STG00\M000.LBD"; stage 1: record 39 at 0x80081E48 = "STG01\M000.LBD").
 The same index goes into `ownerRate` and is split into column and row
 (StageMap__SplitChunkIndex). LBD is the game's own extension, and the

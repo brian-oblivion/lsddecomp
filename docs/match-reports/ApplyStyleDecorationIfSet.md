@@ -7,14 +7,14 @@ before this round.
 
 ## What it does
 
-Takes no arguments; gated entirely on the global `gStyleDecorColor` (set by
+Takes no arguments; gated entirely on the global `sStyleDecorColor` (set by
 `ApplyStyleConfig`, matched earlier this round). If it's non-NULL: builds an
-object via `New_BoxFill(&sStyleDecorBoxSize, gStyleDecorColor, 0)` (already known
+object via `New_BoxFill(&sStyleDecorBoxSize, sStyleDecorColor, 0)` (already known
 elsewhere as returning `ClassEAC0Obj *` from `include/Task.h`, a header
-this unit doesn't own -- see below), stashes it in `gStyleDecorObj`, and
+this unit doesn't own -- see below), stashes it in `sStyleDecorObj`, and
 dispatches three method calls on it (`slot64(obj,1)`, `slot68(obj,0)`,
 `slot4C(obj,tmp,&sStyleDecorBoxPos)`) plus one call on a completely different
-object reached through `gStyleSceneRefs->unkC` (`slotAC(sub)`, whose return
+object reached through `sStyleSceneRefs->unkC` (`slotAC(sub)`, whose return
 feeds the `slot4C` call's middle argument).
 
 ```c
@@ -49,7 +49,7 @@ typedef struct FieldAC7CHolder {
     LocalSubObj *unkC;
 } FieldAC7CHolder;
 
-extern s32 gStyleDecorObj;
+extern s32 sStyleDecorObj;
 extern s32 sStyleDecorBoxSize;
 extern s32 sStyleDecorBoxPos;
 extern LocalM4D0Obj *New_BoxFill(void *a0, void *a1, s32 a2);
@@ -57,15 +57,15 @@ extern LocalM4D0Obj *New_BoxFill(void *a0, void *a1, s32 a2);
 void ApplyStyleDecorationIfSet(void) {
     s32 tmp;
 
-    if (gStyleDecorColor != 0) {
-        gStyleDecorObj = (s32) New_BoxFill(&sStyleDecorBoxSize, (void *) gStyleDecorColor, 0);
-        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot64((LocalM4D0Obj *) gStyleDecorObj, 1);
-        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot68((LocalM4D0Obj *) gStyleDecorObj, 0);
+    if (sStyleDecorColor != 0) {
+        sStyleDecorObj = (s32) New_BoxFill(&sStyleDecorBoxSize, (void *) sStyleDecorColor, 0);
+        ((LocalM4D0Obj *) sStyleDecorObj)->methods->slot64((LocalM4D0Obj *) sStyleDecorObj, 1);
+        ((LocalM4D0Obj *) sStyleDecorObj)->methods->slot68((LocalM4D0Obj *) sStyleDecorObj, 0);
 
-        tmp = ((FieldAC7CHolder *) gStyleSceneRefs)->unkC->methods->slotAC(
-                ((FieldAC7CHolder *) gStyleSceneRefs)->unkC);
+        tmp = ((FieldAC7CHolder *) sStyleSceneRefs)->unkC->methods->slotAC(
+                ((FieldAC7CHolder *) sStyleSceneRefs)->unkC);
 
-        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot4C((LocalM4D0Obj *) gStyleDecorObj, tmp, &sStyleDecorBoxPos);
+        ((LocalM4D0Obj *) sStyleDecorObj)->methods->slot4C((LocalM4D0Obj *) sStyleDecorObj, tmp, &sStyleDecorBoxPos);
     }
 }
 ```
@@ -76,7 +76,7 @@ First attempt used the obvious local-variable idiom:
 
 ```c
 LocalM4D0Obj *obj = New_BoxFill(...);
-gStyleDecorObj = (s32) obj;
+sStyleDecorObj = (s32) obj;
 obj->methods->slot64(obj, 1);
 ```
 
@@ -90,15 +90,15 @@ retail's first load off the freshly-returned object (`lw v1,0(v0)`, reading
 and that `move` lands in the FIRST load's delay slot, for free. Every
 local-variable version instead emitted `move a0,v0` FIRST, then dereferenced
 through `a0`, leaving the first load's delay slot with nothing to fill but
-an explicit `nop`. Moving `gStyleDecorObj`'s assignment or the method lookup
+an explicit `nop`. Moving `sStyleDecorObj`'s assignment or the method lookup
 earlier/later in the C never changed which register got promoted first --
 GCC 2.6.3's allocator had already picked `a0` as `obj`'s home the moment a
 named local variable existed for it, independent of source statement order.
 
 **The fix was to never name it.** Storing the call's return value straight
-into the global (`gStyleDecorObj = (s32) New_BoxFill(...);`) and then
-re-deriving the pointer from `gStyleDecorObj` at every subsequent use point
-(`((LocalM4D0Obj *) gStyleDecorObj)->methods->...`) let the compiler's local
+into the global (`sStyleDecorObj = (s32) New_BoxFill(...);`) and then
+re-deriving the pointer from `sStyleDecorObj` at every subsequent use point
+(`((LocalM4D0Obj *) sStyleDecorObj)->methods->...`) let the compiler's local
 value-numbering recognize that the gp-relative load it would otherwise need
 for the FIRST use is redundant right after the store (the value is still in
 `$v0`), so it read `$v0` directly there and only introduced the `a0` copy
@@ -126,20 +126,20 @@ logic, only a different way of naming the same values.
 
 ## Naming
 
-**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `gStyleDecorColor` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_BoxFill`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`gStyleSceneRefs`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.
+**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `sStyleDecorColor` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_BoxFill`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`sStyleSceneRefs`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-gStyleDecorObj is a BoxFill (include/BoxFill.h); the deleted `LocalM4D0Obj` view's slots are setSemiTrans (+0x064, 1), setSemiTransRate (+0x068, 0) and attachToParent (+0x04C, cast to BoxFillAttachToParentFn). Zero bytes.
+sStyleDecorObj is a BoxFill (include/BoxFill.h); the deleted `LocalM4D0Obj` view's slots are setSemiTrans (+0x064, 1), setSemiTransRate (+0x068, 0) and attachToParent (+0x04C, cast to BoxFillAttachToParentFn). Zero bytes.
 
 ## Track 6 (2026-09-27, round 96, charlie)
 
 `FieldAC7CHolder`, `LocalSubObj` and `LocalSubMethods` are retired; the
-function now reads `((StyleSceneRefs *)gStyleSceneRefs)->viewport->methods->getFadeBox(...)`
+function now reads `((StyleSceneRefs *)sStyleSceneRefs)->viewport->methods->getFadeBox(...)`
 into a `SceneNode *fadeBox` and passes that to attachToParent without a cast.
 Zero bytes (whole-image SHA1 green, 0 new typeview warnings).
 
-Evidence: `gStyleSceneRefs` (0x8008AC7C, an `s32` in every unit) is
+Evidence: `sStyleSceneRefs` (0x8008AC7C, an `s32` in every unit) is
 RegisterStyleConfig's third argument, which ObjM__InitStyleAndWorld
 (ObjMStyleActor) passes as `&self->ctorSound`: it points at ObjM's
 +0x06C..+0x07B block (include/ObjM.h's banner). The holder's +0x00C is
@@ -153,7 +153,7 @@ is, established from the one writer); the name is ObjMStyleActor's, not new.
 
 Not applied (outside the edit set): hoisting `StyleSceneRefs` into one
 shared header (ObjM.h, beside the block it views) and dropping both unit
-copies; retyping the `gStyleSceneRefs` global from `s32` to
+copies; retyping the `sStyleSceneRefs` global from `s32` to
 `StyleSceneRefs *` (track 4b, it would remove every cast in _m and _n).
 
 ## Track 7 (2026-09-27, round 98, delta)
@@ -163,7 +163,7 @@ copies; retyping the `gStyleSceneRefs` global from `s32` to
 | `D_8008AB58` | `sStyleDecorBoxPos` | A | (-100, -100), the box's attachToParent position; now declared `BoxFillPos`, no cast (Viewport places its own fade box there) |
 | `D_8008AB60` | `sStyleDecorBoxSize` | A | (320, 240), New_BoxFill's size pair; now `s32[2]` |
 
-The colour goes in as `(BoxFillRgb *)gStyleDecorColor` (BoxFill.h's
+The colour goes in as `(BoxFillRgb *)sStyleDecorColor` (BoxFill.h's
 record, this round) instead of `(void *)`. Zero bytes. The comment "(track
-4b's to retype)" on gStyleDecorObj is gone; the declaration says it holds
+4b's to retype)" on sStyleDecorObj is gone; the declaration says it holds
 a BoxFill *.

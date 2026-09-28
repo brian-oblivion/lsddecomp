@@ -44,7 +44,7 @@ jr $ra
 
 `GetTimedTaskMethods()->slot48` is gTimedTaskMethods's own +0x048, which is
 `TimedTask__Deinit` (this unit, already matched:
-`void TimedTask__Deinit(Obj865C8 *self) { Get_vtable_IntermediateBase()->slot48(self); }`) —
+`void TimedTask__Deinit(Obj865C8 *self) { GetIntermediateBaseMethods()->slot48(self); }`) —
 i.e. this function forwards to the SIBLING class's slot48 override
 explicitly, not to its own (`DayTask__Deinit` itself occupies `gDayTaskMethods`'s
 +0x048 slot — this is a self-referential-looking but actually cross-class
@@ -66,7 +66,7 @@ void DayTask__Deinit(Obj865C8 *self) {
 ## New struct knowledge (`include/DayTaskStageMap.h`)
 
 - `Obj865C8::unk0C` retyped from `s32` (its only other use so far,
-  `DayTask__StartObjM`'s forwarded arg to `Get_vtable_IntermediateBase()->slot44`, a plain
+  `DayTask__StartObjM`'s forwarded arg to `GetIntermediateBaseMethods()->slot44`, a plain
   register-passthrough that never dereferences it) to `Obj0C *` — this
   function dereferences it (`->unk4`) directly. Updated `DayTask__StartObjM`'s
   call site with an explicit `(s32)` cast; same register value either way,

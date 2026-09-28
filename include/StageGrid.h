@@ -1,5 +1,5 @@
-#ifndef STAGE_GRID
-#define STAGE_GRID
+#ifndef STAGEGRID_H
+#define STAGEGRID_H
 
 #include "common.h"
 

@@ -7,7 +7,7 @@
  * LbdFile -- one of the stage's map-chunk files, STGnn\Mnnn.LBD, loaded for
  * one element of the grid manager (class id 0x903, method table
  * gLbdFileMethods, parent FileResource; methods in src/cd/GameFiles.c; no
- * subclasses). The files it is handed are the gRecordTable records
+ * subclasses). The files it is handed are the sRecordTable records
  * GetStageMapChunkRecord(stage, chunk) returns: StageMap__ComputeChunkLoadEntry takes
  * each entry's name from the grid's callback, ObjM__GetGridRecord, whose
  * tail call leaves that record in $v0, and the record's first bytes are the
@@ -16,7 +16,7 @@
  * The file is streamed in two stages. loadHeader (+0x078, FileResource's
  * processBuffer slot) opens the file and reads its first 0xB358 bytes into
  * the ctor's fixed `buffer` (loadState 9); that block starts with an
- * LbdFileHeader. When the CD driver reports the read done (setFlag, +0x064,
+ * LbdFileHeader. When the CD driver reports the read done (onRequestDone, +0x064,
  * LbdFile__AdvanceLoadState, bit 0x80 of `flags`), `headerReady` is set and,
  * unless setAutoLoadData turned it off, loadDataBlock (+0x080) reads the
  * optional data block the header locates into a second allocation,
@@ -24,8 +24,8 @@
  * releaseHeader and releaseDataBlock free the two halves.
  *
  * Like every FileResource client it runs on the active driver: the ctor,
- * finalize, setFlag and cancelRequests chain to GetActiveDataSourceMethods()'s
- * first, and GetLbdFileMethods is in gDataSourceClientGetters, so
+ * finalize, onRequestDone and cancelRequests chain to GetActiveDataSourceMethods()'s
+ * first, and GetLbdFileMethods is in sDataSourceClientGetters, so
  * SetActiveDataSource rebinds this table's file-I/O slots.
  *
  * Its one user is the grid manager (StageMap), which makes one per grid
@@ -51,7 +51,7 @@
 typedef struct LbdFile LbdFile;
 typedef struct LbdFileMethods LbdFileMethods;
 
-/* `headerReady` once StageMap__OnNotifyTag1 has linked the header's
+/* `headerReady` once StageMap__OnDrawSystemEvent has linked the header's
  * placements into the slot's cells (1 is "read, not yet consumed"). */
 #define LBDFILE_HEADER_CONSUMED 2
 
@@ -89,8 +89,8 @@ struct LbdFileMethods {
 
 struct LbdFile {
     FILERESOURCE_FIELDS(LbdFileMethods); /* buffer: the 0xB358 header block (LbdFileHeader); loadState: 0 idle, 9 header, 10 data block */
-    /* +0x02C */ s16 headerReady; /* 1 when the header is read; StageMap__OnNotifyTag1 sets 2 once consumed */
-    /* +0x02E */ s16 dataReady; /* 1 when the data block is read; cleared by StageMap__OnNotifyTag1 */
+    /* +0x02C */ s16 headerReady; /* 1 when the header is read; StageMap__OnDrawSystemEvent sets 2 once consumed */
+    /* +0x02E */ s16 dataReady; /* 1 when the data block is read; cleared by StageMap__OnDrawSystemEvent */
     /* +0x030 */ s16 chunkIndex; /* the loaded chunk's record index in its stage (ApplyRateEntries); -1 when none (ctor, ReleaseHeader) */
     /* +0x032 */ s16 elemKey; /* the owner's element key: StageMap's ctor (the index) and BuildRateEntries; zeroed by the ctor */
     /* +0x034 */ void *dataBuffer; /* the data block, BMemPMgrAlloc(dataSize); freed by ReleaseDataBlock */

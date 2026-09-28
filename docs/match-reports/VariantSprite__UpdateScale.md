@@ -95,7 +95,7 @@ executable by 4 (found because `build-and-verify.sh` still went green
 with `INCLUDE_ASM` at this point in the debugging session, but a manual
 per-function `funcdiff.py` run on the wrong intermediate C showed a
 145-KB "outside range" drift and a `build/lsdde.map` symbol,
-`gVariantSpriteClutX`, landing 4 bytes off its documented address). Hoisting the
+`sVariantSpriteClutX`, landing 4 bytes off its documented address). Hoisting the
 truncation to right after each ratio's computation reproduces the extra
 `move` and closes the drift to zero.
 
@@ -127,7 +127,7 @@ set, s16 *ratios)` with `spriteScaleX`/`spriteScaleY`, byte-identical.
 
 | name | tier | evidence |
 | --- | --- | --- |
-| `VariantSprite__UpdateScale` (was `func_80057DF4`) | A | Slot `+0x048` of `gVariantSpriteMethods`; `tools/classtable.py gVariantSpriteMethods --vs gSceneNodeMethods` shows it overriding `SceneNode__UpdateScale`, and the name follows the slot. Every caller agrees it is a scale: ObjMStyleActor.c calls it through `updateScale` on the sprites with `gSpriteScaleLarge` ({6,5},{6,5},{1,1}) / `gSpriteScaleSmall` ({4,6},{4,6},{1,1}) or a caller-supplied table (`StyleEffect__SpawnSprites`), always `set = 1`. The body turns two num/den ratios into 20.12 and (unk58 == 0) stores them at `+0x80`/`+0x82`, which are GsSPRITE.scalex/scaley at `+0x64` (layout evidence in `VariantSprite__SetVariantClut`'s report). |
+| `VariantSprite__UpdateScale` (was `func_80057DF4`) | A | Slot `+0x048` of `gVariantSpriteMethods`; `tools/classtable.py gVariantSpriteMethods --vs gSceneNodeMethods` shows it overriding `SceneNode__UpdateScale`, and the name follows the slot. Every caller agrees it is a scale: ObjMStyleActor.c calls it through `updateScale` on the sprites with `sSpriteScaleLarge` ({6,5},{6,5},{1,1}) / `sSpriteScaleSmall` ({4,6},{4,6},{1,1}) or a caller-supplied table (`StyleEffect__SpawnSprites`), always `set = 1`. The body turns two num/den ratios into 20.12 and (unk58 == 0) stores them at `+0x80`/`+0x82`, which are GsSPRITE.scalex/scaley at `+0x64` (layout evidence in `VariantSprite__SetVariantClut`'s report). |
 | param `set` | A | The base method's name for `$a1` (1 = assign, 0 = accumulate); this override never reads it. |
 | param `ratios` | A | Two s16 {num, den} pairs, x then y. The round-47 description "`{s16 whole; s16 frac;}`" was wrong: the body computes `num / den` in 20.12, and the caller tables hold {6,5} and {4,6}. |
 | fields `spriteScaleX` / `spriteScaleY` (`+0x80`/`+0x82`) | A | GsSPRITE.scalex/scaley. Unit-local struct: renamed in place. |
@@ -151,8 +151,8 @@ The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
 `python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
-(`gVariantSpriteCells`) and the CLUT row the reset slot sets
-(`gVariantSpriteClutX/Y`). What the sprites are in the game is not
+(`sVariantSpriteCells`) and the CLUT row the reset slot sets
+(`sVariantSpriteClutX/Y`). What the sprites are in the game is not
 established (their only builder is StyleEffect, kinds 2 and 3, and every
 path passes variant 0), which is why it is not tier A. The table, getter,
 allocator, methods and the three data tables followed the class name.

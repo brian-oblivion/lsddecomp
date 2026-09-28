@@ -25,7 +25,7 @@ void GraphRoom__ReleaseGraphPoints(D_80087AACObj *self) {
     for (i = 0; i < 100; i++) {
         self->unk_0xA8[i]->methods->slot4(self->unk_0xA8[i]);
     }
-    Get_vtable_TaskCore()->slotDC(self);
+    GetTaskCoreMethods()->slotDC(self);
 }
 ```
 
@@ -46,12 +46,12 @@ tools/funcdiff.py GraphRoom__ReleaseGraphPoints   # 34/34
 **`GraphRoom__ReleaseGraphPoints`** -- tier A. Own vtable slot +0x0DC, confirmed
 via `tools/classtable.py gGraphRoomMethods` as the class's dtor slot, and
 its body's final act is chaining to the base class's own dtor
-(`Get_vtable_TaskCore()->slotDC(self)`) after tearing down every `points`
+(`GetTaskCoreMethods()->slotDC(self)`) after tearing down every `points`
 entry -- the standard dtor shape.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-25, round 85, charlie)
 

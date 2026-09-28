@@ -32,6 +32,6 @@ Kept the tier-C `Class__func_xxxxx` form -- same reasoning as
 Renamed to `VabStreamObj__NoOpSlot98` with `rename.py`: it was
 the old `Class__func_xxxxx` name, a tier-C placeholder. The name now says what the
 body is, an empty body in the class's own slot +0x098 (`slot98` in
-`include/VabStreamObj.h`). This follows `VabDriver__NoOpSlot40`. No caller
+`include/VabStreamObj.h`). This follows `NullDriver__NoOpSlot40`. No caller
 reaches the slot, so the slot's purpose is still unknown. The "Kept the
 tier-C form" sentence above describes the old name.

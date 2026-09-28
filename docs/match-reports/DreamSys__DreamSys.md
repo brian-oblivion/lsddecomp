@@ -18,7 +18,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, void *arg1, s32 arg2, s32 arg3)
 	void *val;
 
 	GetActorMethods()->ctor(this);
-	this->vt = Get_vtable_DreamSys();
+	this->vt = GetDreamSysMethods();
 	this->unk_0x58 = arg2;
 	this->unk_0x5C = (DreamSysUnk5C *)arg3;
 	this->unk_0x64 = 0;
@@ -122,7 +122,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
  *    dreamTimeLimit, either loads the next flashback or ends the dream;
  *    below the limit it runs DreamSys__UpdateTickState and
  *    DreamSys__RunTickCallbacks, which call the two callback slots
- *    DreamSys__SelectCallback80/98 install. Slot 80's mode 1 is
+ *    DreamSys__SelectLookCallback/98 install. Slot 80's mode 1 is
  *    DreamSys__StepLook (the two spring-with-decay "look" accumulators:
  *    DreamSys__StepLookOffset moves the height curve, DreamSys__StepLookYaw
  *    turns the object +-45 degrees a tick up to +-181 and springs back).

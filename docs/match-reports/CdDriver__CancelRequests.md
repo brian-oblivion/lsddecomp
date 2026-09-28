@@ -23,7 +23,7 @@ carries the evidence for each one.
  * FreeCdRequestNode (CdDriver) unlinks and frees -- only the fields this
  * call site itself reads are typed here. `active` is the flag StartCdOperation
  * (CdDriver) sets on the head node when it starts an operation on it;
- * AllocCdRequestNode clears it at allocation. The list head is gCdRequestQueue. */
+ * AllocCdRequestNode clears it at allocation. The list head is sCdRequestQueue. */
 typedef struct CdRequest_D70 CdRequest_D70;
 struct CdRequest_D70 {
     /* +0x00 */ s32 active;
@@ -40,10 +40,10 @@ struct Obj6D4E8_D70 {
     /* +0x24 */ s32 flags;
 };
 
-extern s32 gCdRequestQueue;
-extern s32 gCdIdle;
-extern s32 gCdSavedSeekParam;
-extern s32 gCdSeekParam;
+extern s32 sCdRequestQueue;
+extern s32 sCdIdle;
+extern s32 sCdSavedSeekParam;
+extern s32 sCdSeekParam;
 extern void CdFlush(void);
 extern void ResetCdStateMachine(void); /* CdDriver: reset the state machine */
 extern void FreeCdRequestNode(CdRequest_D70 *req); /* CdDriver: unlink+free */
@@ -57,20 +57,20 @@ void CdDriver__CancelRequests(Obj6D4E8_D70 *self)
 
     LockCd();
 
-    entry = (CdRequest_D70 *)gCdRequestQueue;
+    entry = (CdRequest_D70 *)sCdRequestQueue;
 
     if (entry != NULL && self->pendingRequests != 0) {
         self->flags = 0;
 
-        if (entry->owner == (s32)self && entry->active != 0 && gCdIdle == 0) {
+        if (entry->owner == (s32)self && entry->active != 0 && sCdIdle == 0) {
             CdFlush();
             ResetCdStateMachine();
-            saved = gCdSavedSeekParam;
-            gCdSavedSeekParam = 0;
-            gCdSeekParam = saved;
+            saved = sCdSavedSeekParam;
+            sCdSavedSeekParam = 0;
+            sCdSeekParam = saved;
         }
 
-        for (node = (CdRequest_D70 *)gCdRequestQueue; node != NULL; node = next) {
+        for (node = (CdRequest_D70 *)sCdRequestQueue; node != NULL; node = next) {
             next = node->next;
             if (node->owner == (s32)self) {
                 FreeCdRequestNode(node);
@@ -87,16 +87,16 @@ void CdDriver__CancelRequests(Obj6D4E8_D70 *self)
 
 Reads as "flush a pending CD queue's entries belonging to `self`, then
 unlink and free them." Two guards gate the ENTIRE body (not just the
-`CdFlush` block): the pending-list head (`gCdRequestQueue`) must be non-NULL and
+`CdFlush` block): the pending-list head (`sCdRequestQueue`) must be non-NULL and
 `self->pendingRequests` (spelled `unk22` when this was written) must be non-zero — if either fails, the
 function does nothing but the latch dance. Inside that, an inner
 three-condition guard (head node's owner is `self`, head node's `active` flag (`unk00` when this was written)
-flag is set, and `gCdIdle == 0`) triggers `CdFlush()` +
+flag is set, and `sCdIdle == 0`) triggers `CdFlush()` +
 `ResetCdStateMachine()` (both cross-unit — `ResetCdStateMachine` from foxtrot's
-`CdDriver`) and a load-clear-store handoff between `gCdSavedSeekParam` and
-`gCdSeekParam` (needs an explicit temp: the store order is `gCdSavedSeekParam`
-cleared BEFORE the old value lands in `gCdSeekParam`, not the natural-looking
-`gCdSeekParam = gCdSavedSeekParam; gCdSavedSeekParam = 0;`, which would store in the
+`CdDriver`) and a load-clear-store handoff between `sCdSavedSeekParam` and
+`sCdSeekParam` (needs an explicit temp: the store order is `sCdSavedSeekParam`
+cleared BEFORE the old value lands in `sCdSeekParam`, not the natural-looking
+`sCdSeekParam = sCdSavedSeekParam; sCdSavedSeekParam = 0;`, which would store in the
 opposite order). Then, regardless of that inner guard, a loop walks the
 whole list unlinking every node whose `owner == self` via
 `FreeCdRequestNode` (also `CdDriver`) and decrementing `self->pendingRequests` per
@@ -117,7 +117,7 @@ that still diffed:
    call needs it in — with no copy.
 2. **The initial guard's list-head read and the loop's OWN list-head reread
    are different C locals, not the same variable reused.** Both statements
-   are literally `X = gCdRequestQueue;`, and reusing a single `node` variable for
+   are literally `X = sCdRequestQueue;`, and reusing a single `node` variable for
    both is semantically identical — but it made GCC keep the value in `$a0`
    for BOTH sites, while retail's actual register choice is `$v1` for the
    first (guard) read and `$a0` for the second (loop-entry) read. A second,
@@ -146,7 +146,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80027D70` | `CdDriver__CancelRequests` | A |
 
-**Evidence.** Slot `+0x074` of `gCdDriverMethods`. It walks the `gCdRequestQueue`
+**Evidence.** Slot `+0x074` of `gCdDriverMethods`. It walks the `sCdRequestQueue`
 request list and, for every node whose `owner` is this object, calls
 `FreeCdRequestNode` (CdDriver: unlink + free) and decrements the object's own
 pending count. Before that, if the HEAD node is this object's and is already
@@ -188,14 +188,14 @@ which is the procedure working in the direction where it can work.
 
 The CD driver's shared globals and records are now declared once, in
 `include/CdDriver.h`, and this body uses that one reading: the node is `CdRequestNode` (was the local `CdRequest_D70` view), `owner` is compared as a `struct Class6D4E8 *`, and the saved seek target is a `CdFileEntry *`. The
-global's type comes from its accessors (`gFileTable` is walked at the 0x1C
-`CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
+global's type comes from its accessors (`sFileTable` is walked at the 0x1C
+`CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__CancelRequests` -> `CdDriver__CancelRequests` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__CancelRequests` -> `CdDriver__CancelRequests` by rename.py.
 
 ## Track 7 (round 101, echo): comments moved here, and names
 
-Local `entry` -> `head`: it is `gCdRequestQueue`, the head node, whose
+Local `entry` -> `head`: it is `sCdRequestQueue`, the head node, whose
 owner and `active` decide whether the running request is stopped.

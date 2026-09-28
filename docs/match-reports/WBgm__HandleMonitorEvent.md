@@ -32,15 +32,15 @@ still matches after the change.
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern s32 sWBgmActive;
+extern u8 sSsSizeTableBuf[];
 
 WBgm *New_WBgm(s32 vabArg, s32 seqArg, s32 autoPlay) {
     WBgm *self;
 
     self = BMemPMgrAlloc(0x24);
     if (self != NULL) {
-        Get_vtable_WBgm()->ctor(self, vabArg, seqArg, autoPlay);
+        GetWBgmMethods()->ctor(self, vabArg, seqArg, autoPlay);
         return self;
     }
     return NULL;
@@ -116,14 +116,14 @@ extern SeqData *New_RequestedFile(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-WBgmMethods *Get_vtable_WBgm(void);
+WBgmMethods *GetWBgmMethods(void);
 
 extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern s32 sWBgmActive;
+extern u8 sSsSizeTableBuf[];
 ```
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)

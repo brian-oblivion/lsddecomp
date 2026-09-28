@@ -26,7 +26,7 @@ FilePathRecord *GetStageMapChunkRecords(s32 index) {
 
 ## Notes
 
-- GetRecordTable (already matched) returns gRecordTable and writes 0x230 to
+- GetRecordTable (already matched) returns sRecordTable and writes 0x230 to
   `*out`; every `+0x70`/`+0xFC`/`+0x3D40`/`+0x3E04`/`+0x3E20` offset in this
   unit is a whole number of 0x1C-byte records into that table, so the unit
   types the table as `FilePathRecord` (size only). The record's fields are unknown.
@@ -38,7 +38,7 @@ FilePathRecord *GetStageMapChunkRecords(s32 index) {
 
 - **Name:** `GetStageMapChunkRecords`
 - **Tier:** A
-- **Evidence:** &GetStageRecords(stage)[9]: records 9 on are the stage's Mnnn.LBD files (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100); LbdFile loads them (include/LbdFile.h).
+- **Evidence:** &GetStageRecords(stage)[9]: records 9 on are the stage's Mnnn.LBD files (the record paths are retail's sRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100); LbdFile loads them (include/LbdFile.h).
 
 ## Naming history
 

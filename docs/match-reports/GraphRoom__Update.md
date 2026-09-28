@@ -17,7 +17,7 @@ void GraphRoom__Update(D_80087AACObj *self, void *arg1, void *arg2);
 
 ```c
 void GraphRoom__Update(D_80087AACObj *self, void *arg1, void *arg2) {
-    Get_vtable_TaskCore()->slot5C(self, arg1, arg2);
+    GetTaskCoreMethods()->slot5C(self, arg1, arg2);
     if (self->unk_0x3C == 1) {
         D_80087AACUnkA4Result *result = self->unk_0xA4->methods->slot1B0(self->unk_0xA4, 0);
         if (result->unk_0x4 != 0 || result->unk_0x8 != 0) {
@@ -57,7 +57,7 @@ body alone).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-25, round 85, charlie)
 

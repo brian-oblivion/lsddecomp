@@ -19,7 +19,7 @@
 #include "DrawSystem.h"
 #include "BMemPMgr.h"
 
-extern DrawSystem *gDrawSystem; /* sdata: the singleton GetDrawSystem returns */
+extern DrawSystem *sDrawSystem; /* sdata: the singleton GetDrawSystem returns */
 
 void ConvertRect(RECT *dst, DrawRect *src);
 
@@ -27,15 +27,15 @@ DrawSystem *New_DrawSystem(void) {
     DrawSystem *obj = BMemPMgrAlloc(sizeof(DrawSystem));
 
     if (obj != NULL) {
-        Get_vtable_DrawSystem()->ctor(obj);
+        GetDrawSystemMethods()->ctor(obj);
         return obj;
     }
     return NULL;
 }
 
 void DrawSystem__DrawSystem(DrawSystem *self) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_DrawSystem();
+    GetBasicClassMethods()->ctor((BasicClass *)self);
+    self->methods = GetDrawSystemMethods();
     self->methods->init(self);
 }
 
@@ -180,14 +180,14 @@ void DrawSystem__SetCallback(DrawSystem *self, void (*callback)(void)) {
     self->callback = callback;
 }
 
-DrawSystemMethods *Get_vtable_DrawSystem(void) {
+DrawSystemMethods *GetDrawSystemMethods(void) {
     return &gDrawSystemMethods;
 }
 
 DrawSystem *GetDrawSystem(void) {
-    return gDrawSystem;
+    return sDrawSystem;
 }
 
 void SetDrawSystem(DrawSystem *obj) {
-    gDrawSystem = obj;
+    sDrawSystem = obj;
 }

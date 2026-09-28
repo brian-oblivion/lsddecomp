@@ -52,7 +52,7 @@ void FadeBox__StartFadeDown(FadeBoxObj *self, s32 a1, s32 a2, s32 a3) {
         return;
     }
     idx = ((Configure6E99CFn)self->methods->configure)(self, a1, a2, a3);
-    self->methods->slotB8(self, 1, &gFadeBoxMaskColors[idx * 3]);
+    self->methods->slotB8(self, 1, &sFadeBoxMaskColors[idx * 3]);
     self->state = 1;
     self->step = -self->step;
 }
@@ -187,7 +187,7 @@ void FadeBox__StartFadeDown(FadeBoxObj *self) {
         return;
     }
     idx = self->methods->configure(self);
-    self->methods->slotB8(self, 1, &gFadeBoxMaskColors[idx * 3]);
+    self->methods->slotB8(self, 1, &sFadeBoxMaskColors[idx * 3]);
     self->state = 1;
     self->step = -self->step;
 }
@@ -207,7 +207,7 @@ Same total instruction count, same registers, purely reordered.
 ## Attempts (4)
 
 1. Base body above: 29/35, the "li a1,1 late" residue.
-2. Materialize the table address into a named local (`entry = &gFadeBoxMaskColors[...]; slotB8(self, 1, entry);`)
+2. Materialize the table address into a named local (`entry = &sFadeBoxMaskColors[...]; slotB8(self, 1, entry);`)
    before the call: no change.
 3. Materialize the literal into a named local (`one = 1;`) assigned
    immediately after `idx = ...`, before computing the table address: no
@@ -255,10 +255,10 @@ branch. `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
 **`FadeBox__StartFadeDown`** -- tier B (STALL, preserved body
 unchanged by this rename). `FadeBoxMethods::startFadeToIndex` (`+0x0D4`). Guards
 on `state == 0` (idle), looks up an index via `configure`, dispatches the
-`slotB8` color-set slot with `&gFadeBoxMaskColors[idx * 3]` (an INDEXED table
+`slotB8` color-set slot with `&sFadeBoxMaskColors[idx * 3]` (an INDEXED table
 entry), sets `state = 1`, and negates `step`. Named opposite
 `FadeBox__StartFadeUp` (`startFadeDefault`, `state = 2`, the FIXED
-`gFadeBoxBlackColors` table) -- the two are a matched pair distinguished by which
+`sFadeBoxBlackColors` table) -- the two are a matched pair distinguished by which
 color source they select. "Fade" is inferred from `step` accumulating into
 color-channel bytes over time in `FadeBox__Update`; "index" from this
 function's own `idx`-based table lookup versus its sibling's fixed one.
@@ -268,11 +268,11 @@ Game-level purpose (what is fading, and why) is not established.
 
 Renamed from `FadeBox__StartFadeToIndex` to `FadeBox__StartFadeDown`.
 "ToIndex" said the fade goes TO the indexed colour; the body does the
-opposite. It sets the box colour to `gFadeBoxMaskColors[channels]` (overwrite, via
+opposite. It sets the box colour to `sFadeBoxMaskColors[channels]` (overwrite, via
 `setColor`) and NEGATES `step`, and `FadeBox__Update` then adds `(u8)step`
 to each selected channel byte once per tick for `0x100 / step` ticks: the
 channels count DOWN from the table colour (0xFF over 25 ticks at the
-default step of 10). `gFadeBoxMaskColors` is eight 3-byte RGB entries indexed by a
+default step of 10). `sFadeBoxMaskColors` is eight 3-byte RGB entries indexed by a
 channel mask (1 = 0000FF, 2 = 00FF00, 4 = FF0000, 7 and 0 = FFFFFF; read
 from the retail bytes), the same mask `Update` tests (4 = r, 2 = g, 1 = b).
 Its sibling counts up; see `FadeBox__StartFadeUp`. The arguments are

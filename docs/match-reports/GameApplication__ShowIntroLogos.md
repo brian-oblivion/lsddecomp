@@ -31,7 +31,7 @@ addiu $a0, $sp, 0x18
 jal  GetAsmkMovie                          ; writes 0x31 to local, returns &sAsmkMoviePath
  (delay: s1 = v0, i.e. the PRECEDING call's return = task)
 lw   $a0, 0x18($sp)                          ; reload the type code (0x31) GetAsmkMovie just wrote
-jal  GetMovieFrameCount(a0=0x31)                    ; halfword lookup in gMovieFrameCounts
+jal  GetMovieFrameCount(a0=0x31)                    ; halfword lookup in sMovieFrameCounts
  (delay: s0 = v0, i.e. the PRECEDING call's return = streamName, &sAsmkMoviePath)
 move $a0, $s1                                    ; a0 = task
 move $a2, $s0                                     ; a2 = streamName

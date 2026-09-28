@@ -7,13 +7,13 @@
  * VabStreamObj -- one VAB sound bank, loaded from disc through the active
  * data source and played through Sony's libsnd (class id 0xA03, method table
  * gVabStreamObjMethods). It is a FileResource subclass and a sibling of the
- * drivers (VabDriver 0x23, the CD driver 0x13), not derived from either. Like
+ * drivers (NullDriver 0x23, the CD driver 0x13), not derived from either. Like
  * every data source, its ctor and finalize chain to the ACTIVE driver's
  * (GetActiveDataSourceMethods). Methods in src/sound/PlacementGridVabSound.c.
  *
  * Loading. The ctor copies the base path (`baseFilename`) and asks the
  * driver for "<base>.VH" (requestLoadFile, +0x06C), with `loadState` set to
- * VABSTREAM_LOAD_HEADER. The driver calls setFlag (+0x064,
+ * VABSTREAM_LOAD_HEADER. The driver calls onRequestDone (+0x064,
  * VabStreamObj__AdvanceLoadState) when a request completes. In the header
  * state, with CD_FLAG_LOAD_FILE_DONE (0x200) in `flags`, it opens the
  * header (SsVabOpenHead) and loads "<base>.VB" (loadFile, +0x058) in
@@ -22,7 +22,7 @@
  * runs loadVagAttrs (+0x07C), which caches the bank's VagAtr records per
  * program. +0x058 and +0x06C are NULL in the static table.
  * SetActiveDataSource fills them from the active driver
- * (GetVabStreamObjMethods is in gDataSourceClientGetters).
+ * (GetVabStreamObjMethods is in sDataSourceClientGetters).
  *
  * Playing. playTone(index, vol, endVol) keys on program index >> 4, tone
  * index & 0xF, at the tone's centre note plus `pitchOffset`. It returns the
