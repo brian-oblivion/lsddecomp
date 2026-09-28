@@ -239,7 +239,7 @@ void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32
         ItemList__FormatRowText(self, buf, i, top, column);
         *row = New_TextRow(font, ITEMLIST_ROW_CHARS, buf);
         (*row)->methods->attachToParent(*row, parent, (LongVec3 *)&pos);
-        (*row)->methods->setColor(*row, &gItemListRowColor);
+        (*row)->methods->setColor(*row, &sItemListRowColor);
         pos.y += ITEMLIST_ROW_SPACING;
         row++;
     }
@@ -340,7 +340,7 @@ void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 notify) {
     }
     idx = self->cursorIndex - self->topIndex;
     row = &self->rows[idx]; /* MATCHING: one address, stepped, as retail */
-    (*row)->methods->setColor(*row, &gItemListRowColor);
+    (*row)->methods->setColor(*row, &sItemListRowColor);
     if (dir) {
         self->cursorIndex++;
         row++;

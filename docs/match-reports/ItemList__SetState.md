@@ -89,7 +89,7 @@ Globals (`tools/rename.py`):
 | `D_80086F88` | `gItemListMethods` | A | the class's method table (39 slots, header word 0x20), returned by GetItemListMethods |
 | `D_8008AB00` | `gItemListRowOriginX` | B | sdata word -0x5C, row 0's x in ItemList__CreateRows's `pos` |
 | `D_8008AB04` | `gItemListRowOriginY` | B | sdata word -0xF, row 0's y; each further row +0xA |
-| `D_8008AB0C` | `gItemListRowColor` | A | bytes 50 50 50 00, passed to the rows' +0x0B8 (TextRow__SetColor in gTextRowMethods) for every non-cursor row |
+| `D_8008AB0C` | `sItemListRowColor` | A | bytes 50 50 50 00, passed to the rows' +0x0B8 (TextRow__SetColor in gTextRowMethods) for every non-cursor row |
 | `D_8008AB10` | `sItemListCursorColor` | A | bytes 80 80 00 00, the same colour slot for the cursor row |
 
 Fields and slots (`include/class_3bb8c.h`, renamed definition-first; every

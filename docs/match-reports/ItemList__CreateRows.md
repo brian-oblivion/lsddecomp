@@ -51,7 +51,7 @@ void ItemList__CreateRows(ItemList *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4
         ItemList__FormatRowText(self, buf, i, arg3, (char *)arg4);
         *p = (ItemListElem *)New_TextRow((void *)arg2, 0x1A, buf);
         (*p)->methods->slot4C(*p, arg1, &local);
-        (*p)->methods->slotB8(*p, &gItemListRowColor);
+        (*p)->methods->slotB8(*p, &sItemListRowColor);
         local.b += 0xA;
         p++;
     }
@@ -122,7 +122,7 @@ shifts register allocation across the whole function").
 
 Round 75 (bravo, track 3). `func_80052644` -> `ItemList__CreateRows`, **tier A**.
 
-Slot +0x08C (`tools/classtable.py gItemListMethods`). Called by ItemList__LoadResources (TextEntryItemList) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (gItemListRowOriginX, gItemListRowOriginY + 0xA*i), colours it gItemListRowColor, then SetView(..., highlight=1).
+Slot +0x08C (`tools/classtable.py gItemListMethods`). Called by ItemList__LoadResources (TextEntryItemList) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (gItemListRowOriginX, gItemListRowOriginY + 0xA*i), colours it sItemListRowColor, then SetView(..., highlight=1).
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
 
