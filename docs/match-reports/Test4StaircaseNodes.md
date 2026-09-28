@@ -38,3 +38,16 @@ function before trusting the "natural" phrasing.
 ## Provenance
 
 round 2026-08-30-d, runner ALPHA, unit DreamSys (whole-unit, third pass).
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* Called by DreamSys__TryStaircaseLink (round 2026-09-06) as (&this->linkCoordinates,
+   currentPos, this->currentStage) -- same forwarding shape as
+   Test4TunnelLinks/TestForStaticLink above. Defined later in this unit's own
+   ROM order (`src/DreamSys.c`); this is a forward declaration for that
+   earlier call site, not a cross-unit prototype. */
+```

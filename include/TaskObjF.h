@@ -6,8 +6,7 @@
 /*
  * TaskObjF -- the memory-card save/load controller (class id 0xB, method
  * table gTaskObjFMethods): BasicClass's direct subclass, no class below it.
- * The name is the old unit view's (FINISHING-PLAN track 4 step 2); what the
- * class does is measured below. Methods: the allocator and ctor,
+ * Methods: the allocator and ctor,
  * BasicClass's overrides and the card primitives (+0x00C..+0x060), the file
  * I/O, events, buffers and the two operations (+0x064..+0x078, +0x038) in
  * src/TitleMenuTaskObjF.c, the state machine (+0x07C..+0x0B0) in

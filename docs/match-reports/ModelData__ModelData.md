@@ -57,3 +57,12 @@ First build, using the `goto fail` lever just found on LinkResource__LinkResourc
 ## Track 4
 
 2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. +0x034 is `ownsResources` (was `unk34`). Callers settle what it means: New_ModelData passes 1 and TriggerWorld__TriggerWorld passes 0, and only while it is set do BuildResources build, and ReleaseResources release, the two sub-sources. The ctor's first call is `GetActiveDataSourceMethods()->ctor`, the same call TimBlockSrc__TimBlockSrc makes, which is the evidence that the class sits under FileResource and not under TimBlockSrc (whose id, 0xF03, 0x5F03 extends). Image byte-identical.
+
+## History (moved from include/ModelData.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * The name is round 83's, kept on this evidence: its own methods build a
+```

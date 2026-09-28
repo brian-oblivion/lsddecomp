@@ -54,3 +54,17 @@ its caller in Task passes an `s32 size[2]`).
 The banner's note that FadeBox was "unified in include/FadeBox.h, round 87"
 now lives here: FadeBox, BoxFill's one subclass, got its single header in
 round 87 (track 4). The banner keeps the pointer to the header.
+
+## History (moved from include/BoxFill.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * slot's type (FINISHING-PLAN track 4 step 6); a caller reaching the
+```
+
+```c
+ * FadeBox (gFadeBoxMethods, 0x164, a colour fade over the box; unified in
+ * include/FadeBox.h), whose ctor
+```

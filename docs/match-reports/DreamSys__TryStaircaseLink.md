@@ -558,3 +558,34 @@ Replaced in the source by a comment that says what the code does; kept here as w
    staircaseGridPos/staircaseOrigin is ONE whole-PlayerSpawnPoint copy
    (load-all-then-store-all), hence the local cast. */
 ```
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* The `chunk`+`tile` half of a PlayerSpawnPoint (4 bytes), reinterpreted as
+   one struct so a single whole-struct assignment reproduces retail's
+   unaligned 4-byte `lwl`/`lwr` + `swl`/`swr` copy -- DreamSys__TryStaircaseLink (round
+   2026-09-06) copies a `PlayerSpawnPoint *currentPos` piecewise into
+   DreamSys::staircaseGridPos (this type) and DreamSys::staircaseOrigin (a plain
+   `struct RelativePos`, the `position` half) rather than as one 10-byte
+   copy, matching retail's own two separate unaligned-copy instruction
+   groups. */
+```
+
+```c
+    /* Function pointer, called as `staircaseTickFn(this)` and its `s32` result
+	   used as a truth value (DreamSys__TryStaircaseLink, round 2026-09-06); set from
+	   `STAIRCASE_TICK_FNS[GetLastSpawnExtra()]` (both MATCHED) or NULLed --
+	   0 is a valid state, tested with a plain `!= 0`/`== 0` before ever
+	   being called through. */
+```
+
+```c
+/* 4-entry table of `s32 (DreamSys *this)` functions (DreamSys__TickStaircaseCase0,
+   DreamSys__TickStaircaseCase1, DreamSys__TickStaircaseCase2, DreamSys__TickStaircaseCase3, all already matched with
+   exactly that signature), indexed by GetLastSpawnExtra()'s return value and
+   stashed into DreamSys::staircaseTickFn by DreamSys__TryStaircaseLink (round 2026-09-06). */
+```

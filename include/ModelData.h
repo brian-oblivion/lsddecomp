@@ -12,7 +12,7 @@
  * ctor calls this class's first (TriggerWorld__TriggerWorld:
  * GetModelDataMethods()->ctor(self, arg, 0)).
  *
- * The name is round 83's, kept on this evidence: its own methods build a
+ * What its own methods do: build a
  * TMD model source and a TOD set over one buffer (ModelData__BuildResources:
  * New_LinkResource over the sub-block at the buffer's third word, New_TodSet
  * over the buffer past +0x0C) and forward TOD packet decoding to the set

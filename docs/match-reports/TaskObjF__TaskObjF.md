@@ -120,3 +120,13 @@ libcard, linked SDK objects (config/psyq-objects.txt: libcard/a74,
 libcard/a75, libcard/c112), declared locally rather than in the shared
 header, the same policy as malloc/free/printf (CLAUDE.md, "To include/
 has one exception").
+
+## History (moved from include/TaskObjF.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * The name is the old unit view's (FINISHING-PLAN track 4 step 2); what the
+ * class does is measured below. Methods:
+```

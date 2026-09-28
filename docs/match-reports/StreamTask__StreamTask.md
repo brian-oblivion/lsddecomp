@@ -123,3 +123,23 @@ The player is a MoviePlayer (`include/MoviePlayer.h`); Task.h's StreamTaskUnkB4O
 ## Track 6 (2026-09-27, round 99, runner bravo)
 
 `StreamTaskInitData` was a local spelling of DrawSystem.h's `DrawRect` (the same three words, and `gDefaultMovieFrame`, the fallback, was already `extern DrawRect` in both units that name it); it is deleted. `initData` (+0x0A8), the fifth parameter and `GetDefaultMovieFrame()` are `DrawRect`, so the allocation is `New_MoviePlayer(GetDefaultMovieFrame(), 0, 0)` with no cast. The struct copy is unchanged (both types are 12 bytes, 4-aligned). Byte-identical; `typeviews.py --warnings` 0 new. The getter and the data were renamed this round from `GetDefaultStreamTaskInitData`/`gDefaultStreamTaskInitData` (see GetDefaultMovieFrame.md).
+
+## History (moved from include/StreamTask.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * The name is the table's stem with its `Obj` dropped (track 4 step 2);
+ * include/GameApplication.h's view already called it StreamTask. What it does,
+ * measured: it owns
+```
+
+```c
+ * +0x044's contradiction, settled by track 4 step 6 (round 85's TodActor
+ * +0x04C rule): StreamTask__Init takes
+```
+
+```c
+ * (no caller reads it), as the round-84 `configure` view had it.
+```

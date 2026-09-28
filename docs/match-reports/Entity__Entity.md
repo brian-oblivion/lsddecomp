@@ -87,3 +87,18 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Polish (round 96, bravo, track 7)
 
 - Step 3: parameter arg2 -> sound: it is TodActor's ctor's second argument, the sound bank TodActor keeps in `sound` (TodActor.h). Also in Entity.h's prototype and ctor slot.
+
+## History (moved from include/Entity.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * typed TodActor *) to DreamSys *; the Unk94Obj view that stood here was
+ * deleted in track 4 (round 88). Entity's attachToParent keeps its `parent` argument in
+```
+
+```c
+/* The motion templates (.data, 0x80089C58..0x80089E97, in address order):
+ * the constant triples the MoodCue handlers in Entity..Entity pass to
+```

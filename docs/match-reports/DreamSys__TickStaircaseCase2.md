@@ -110,3 +110,20 @@ error away from losing all of it.** See PARALLEL-RUNS §4b/§4c.
 ## Naming
 
 - **Tier B.** Table index 2 of the same STAIRCASE_TICK_FNS family, against STAIRCASE_OFFSET_2; same evidence and caveat.
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+    /* A retry/attempt counter (round 2026-09-02, DreamSys__TickStaircaseCase2): read as a
+	   whole word, compared against several literal bands, and incremented
+	   by 1 at that function's normal exit. */
+```
+
+```c
+    /* A `struct RelativePos`, address-taken and passed to DreamSys__ApplyRelativeOffset as
+	   its `b` argument (round 2026-09-02, DreamSys__TickStaircaseCase2) -- carved out of
+	   what was raw padding in the same 0x10-byte block as staircaseFrame above. */
+```

@@ -82,3 +82,17 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 - **Naming: `D_8001176C` -> `sGraphSoundBankPath`** (tier A): the rodata string `"ETC\ETCSE"`, passed as TaskCore's ctor's `soundBankPath` (include/TaskCore.h). This ctor is its only user; `s` for data only this unit reads, like `sTitleTimPath`. TitleMenu's ctor passes its own copy of the same string (`sTitleMenuSoundBankPath`, class_3bb8c.h).
 - The pointer zeros (TaskCore ctor's `target` and `sound`, `setTarget`'s target) are written `NULL`. Zero bytes changed.
+
+## History (moved from include/GraphRoom.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * The name is round 75's reading, kept: reset loads "ETC\HGRAPH.TIM" as the
+```
+
+```c
+ * nothing: INTERMEDIATEBASE_SLOTS's ctor type is kept (the round-75 view
+ * had it return the tail call's value; the bytes are the same either way).
+```

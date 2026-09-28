@@ -8,8 +8,8 @@
 #include "DrawSystem.h"
 
 /*
- * class_3bb8c.h -- the data and shared helper declarations of the units
- * carved from the old class_3bb8c segment. The classes those units hold
+ * class_3bb8c.h -- the data and shared helper declarations of the four
+ * units below. The classes those units hold
  * each have their own header, and nothing here redefines them:
  *
  *   DayTaskStageMap.c    StageMap (include/StageMap.h), the chunk grid manager

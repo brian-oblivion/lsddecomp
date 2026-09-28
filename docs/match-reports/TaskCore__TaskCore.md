@@ -170,3 +170,32 @@ now two typed locals, `atlas` (`struct TileAtlas *`) and `tileMap`
 (`struct TileMap *`), and `core` (the TaskCoreMethods) is `methods`.
 Byte-identical: the result of each call is still stored and passed on from
 a local, which is what the match needed; one local reused for both was not.
+
+## History (moved from include/TaskCore.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * StreamTask (include/StreamTask.h, round 87) expands these macros; its
+ * +0x044 override StreamTask__Init takes (args, streamName, streamGroup,
+ * autoPlay) where IntermediateBase's init takes (args, mode): the table
+ * keeps the inherited slot and GameApplicationFileResource's callers cast to
+ * StreamTaskInitFn. TitleMenu (include/TitleMenu.h, round 88) expands
+ * these macros too; its ctor's resetCounters call passes dreamSys and casts
+ * the slot to TitleMenuResetCallFn, as GraphRoom's does. GraphRoom
+ * (include/GraphRoom.h, round 87) expands these macros; its ctor is void
+ * like every other.
+```
+
+```c
+ * The objects TaskCore holds from classes with no header yet (VabStreamObj,
+ * the slot and list widgets) are `BasicClass *`,
+ * the parent every one of them has; a unit that calls one past BasicClass's
+ * slots casts to its own view of it. The viewport (IntermediateBase's field)
+ * is a Viewport, unified in include/Viewport.h in round 85; its callers cast
+ * to that type. bgLayer is a `struct BgLayer *` (include/BgLayer.h, round 88),
+ * by tag, so a unit that calls it includes BgLayer.h. tileMap likewise is
+ * a `struct TileMap *` (include/TileMap.h, round 88), and tileAtlas a
+ * `struct TileAtlas *` (include/TileAtlas.h, round 88).
+```

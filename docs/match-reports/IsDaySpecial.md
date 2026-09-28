@@ -174,3 +174,14 @@ simply stops one step earlier, before the `nop`s were traced to
 Worth noting for its own sake: **two independent runners converged on the
 `(u32)i` comparison cast.** That is the strongest evidence available that the
 cast is the right reading and not an artifact of one session's search order.
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* The fixed "special day" mood, returned by IsDaySpecial on a match
+   (round 2026-09-02); only ever address-taken there, never dereferenced by
+   this unit's queued functions. */
+```

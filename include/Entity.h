@@ -31,8 +31,7 @@
  * DreamSys__ProjectPointAtDistance, DreamSys__GetCurrentDayAndYear,
  * DreamSys__GetDreamColor and DreamSys__ResetFlashbackList. The units that
  * call it include include/DreamSys.h and cast `peer` (TodActor's field,
- * typed TodActor *) to DreamSys *; the Unk94Obj view that stood here was
- * deleted in track 4 (round 88). Entity's attachToParent keeps its `parent` argument in
+ * typed TodActor *) to DreamSys *. Entity's attachToParent keeps its `parent` argument in
  * Actor's `grid` field (+0x04C).
  *
  * Sound cues. startSoundCue calls InitSoundCueSet on `soundCueSet` with
@@ -164,7 +163,7 @@ struct EntityMoodRow {
     s8 nearTolerance; /* +0x09, Entity__IsNearTarget's tolerance for every range test on this row (activation, deactivation, proximity, cue start/stop) */
     s8 proximityThreshold; /* +0x0A, Entity__GetProximityRatio's range, in ENTITY_RANGE_UNITs */
     s8 cueRange; /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop and Entity__AttachToParent: 0 = the cue starts at attach (when the entity activated there) and never on range; magnitude (after abs) is Entity__IsNearTarget's distance arg for starting the sound cue; a NEGATIVE value also stops it again once the target leaves that range. SEPARATE field from proximityRange (+0x06) */
-    SoundCueCallbackFn handler; /* +0x0C, the Entity__MoodCueNN Entity__StartSoundCue installs (symbol gEntityMoodHandlerTable, 0x80089EB0) */
+    SoundCueCallbackFn handler; /* +0x0C, the Entity__MoodCueNN Entity__StartSoundCue installs (gEntityMoodHandlerTable) */
 };
 
 /* activateKind: when Entity__UpdateActivationState activates an inactive
@@ -247,8 +246,8 @@ void Entity__MoodCue71(Entity *self, SoundCueSet *out); /* Entity; called by Ent
 void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 windowStart,
                                             s32 deactivateTimer, s32 zStep); /* Entity; called by Entity */
 
-/* The motion templates (.data, 0x80089C58..0x80089E97, in address order):
- * the constant triples the MoodCue handlers in Entity..Entity pass to
+/* The motion templates (.data, in address order):
+ * the constant triples the MoodCue handlers in src/Entity.c pass to
  * updateRotation (+0x044) and updateScale (+0x048) -- three Ratio16s
  * (include/SceneNode.h), degrees or scale factors, {x, y, z} -- and to
  * addTranslation (+0x0BC), three s32 deltas. Named by value. The slots take

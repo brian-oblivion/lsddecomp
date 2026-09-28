@@ -12,8 +12,6 @@
  * (with a third argument 0, so ModelData's own resource build and release
  * never act on it).
  *
- * The name is round 83's (DreamAux.c had declared New_TriggerWorld's
- * result `TriggerWorld *`), kept as the only name any view gave the class.
  * What its own methods do: TriggerWorld__BuildResources (+0x078) makes one
  * ModelData per entry of the buffer's counted offset table (New_ModelData
  * over buffer + entries[i], not owning) and stores each back into the

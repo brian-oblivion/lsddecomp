@@ -22,7 +22,7 @@
  *    it and calls each parent's onNotify(parent, self, event); the base
  *    onNotify drops the sender from its children on event 1 (finalize sends 1).
  *
- * HOW A CLASS IS DECLARED (FINISHING-PLAN track 4; this header is the model).
+ * HOW A CLASS IS DECLARED (this header is the model).
  * One header per class, named for the class, holding exactly: the object
  * struct, the method-table struct, the table's extern and getter, and the
  * prototypes of the class's own methods; a class that HAS subclasses also

@@ -169,3 +169,13 @@ the active driver's `loadFile`/`requestLoadFile` there
 `D_8008A8CC = 0x3C`; see GetSsTicksPerSecond.md), `loadState =
 VABSTREAM_LOAD_HEADER`, `char vhPath[VAB_PATH_SIZE]`. `New_VabStreamObj`
 allocates `sizeof(VabStreamObj)` (0x64). Byte-exact.
+
+## History (moved from include/VabStreamObj.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * VabStreamObj__OnBodyReady, is called through this typedef. That takes no
+ * code (FINISHING-PLAN track 4 step 6). */
+```

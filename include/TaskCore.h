@@ -44,29 +44,29 @@
  * call playSound(0x10), VabStreamObj's PlayTone on `sound`; setActiveSlot
  * and setSlotCursor call playSound(0) when their last argument is nonzero.
  *
- * StreamTask (include/StreamTask.h, round 87) expands these macros; its
+ * StreamTask (include/StreamTask.h) expands these macros; its
  * +0x044 override StreamTask__Init takes (args, streamName, streamGroup,
  * autoPlay) where IntermediateBase's init takes (args, mode): the table
  * keeps the inherited slot and GameApplicationFileResource's callers cast to
- * StreamTaskInitFn. TitleMenu (include/TitleMenu.h, round 88) expands
+ * StreamTaskInitFn. TitleMenu (include/TitleMenu.h) expands
  * these macros too; its ctor's resetCounters call passes dreamSys and casts
  * the slot to TitleMenuResetCallFn, as GraphRoom's does. GraphRoom
- * (include/GraphRoom.h, round 87) expands these macros; its ctor is void
+ * (include/GraphRoom.h) expands these macros; its ctor is void
  * like every other.
  *
  * IntermediateBase's onInit slot is (self, s32, s32, s32), from init's
  * call; TaskCore__OnInit and StreamTask's override take self alone, and
  * the one up-call that passes self alone casts the slot.
  *
- * The objects TaskCore holds from classes with no header yet (VabStreamObj,
- * the slot and list widgets) are `BasicClass *`,
- * the parent every one of them has; a unit that calls one past BasicClass's
- * slots casts to its own view of it. The viewport (IntermediateBase's field)
- * is a Viewport, unified in include/Viewport.h in round 85; its callers cast
- * to that type. bgLayer is a `struct BgLayer *` (include/BgLayer.h, round 88),
- * by tag, so a unit that calls it includes BgLayer.h. tileMap likewise is
- * a `struct TileMap *` (include/TileMap.h, round 88), and tileAtlas a
- * `struct TileAtlas *` (include/TileAtlas.h, round 88).
+ * The sound and widget objects TaskCore holds (VabStreamObj, the slot and
+ * list widgets) are declared `BasicClass *`, the parent every one of them
+ * has; a unit that calls one past BasicClass's slots casts to its own view
+ * of it. The viewport (IntermediateBase's field) is a Viewport
+ * (include/Viewport.h); its callers cast to that type. bgLayer is a
+ * `struct BgLayer *` (include/BgLayer.h), by tag, so a unit that calls it
+ * includes BgLayer.h. tileMap likewise is a `struct TileMap *`
+ * (include/TileMap.h), and tileAtlas a `struct TileAtlas *`
+ * (include/TileAtlas.h).
  */
 
 typedef struct TaskCore TaskCore;

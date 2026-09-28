@@ -291,3 +291,47 @@ Replaced in the source by a comment that says what the code does; kept here as w
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* gProjectOffsetZ is the LAST word of an unnamed 3-word (LongVec3-shaped)
+   global scratch vector; the other two words are NOT independently named
+   -- splat's dlabel boundary put them inside `VOICE_PITCH_BY_SELECT`'s dlabel as
+   unlabeled tail bytes (asm/data/783DC.data.s), because nothing took their
+   address directly until DreamSys__ProjectPointAtDistance (round 19). Do not rename/resegment
+   this round (config/ out of scope); reach the vector's start with pointer
+   arithmetic off this symbol instead: `(LongVec3 *)((s32 *)&gProjectOffsetZ
+   - 2)`.
+
+   Two independent pieces of evidence pin this down, not a guess:
+   - `DreamSys__NotifyLinkAttempt` (this unit, already matched) clamps
+     `this->voiceSelect = (this->linkTarget->flags36 & 0x7F); if (voiceSelect >=
+     0x18) voiceSelect = 0;` -- i.e. `voiceSelect` is bounded to [0, 0x18). Both
+     `VOICE_BY_SELECT` and `VOICE_PITCH_BY_SELECT` (each already-named 24+-byte byte
+     tables) are indexed by this SAME bounded value in `DreamSys__StartVoice`
+     (`VOICE_PITCH_BY_SELECT[voiceSelect]`), so `VOICE_PITCH_BY_SELECT`'s real, ever-read extent is
+     exactly 24 bytes (`0x80087EC8`-`0x80087EDF`) -- the 8 trailing zero
+     bytes splat lumped into its dlabel (`0x80087EE0`-`0x80087EE7`) are
+     never reached by that indexed access and belong to something else.
+   - `SceneNode__LocalOffsetToWorldPos` (SceneNode, already matched) forwards its own `src`
+     parameter to `ApplyMatrixToLVArray(dst, src, 1, buf)`, and `ApplyMatrixToLVArray`'s
+     own doc comment (include/SceneNode.h) confirms it treats both
+     pointers as 0xC-byte (3-word) elements. `DreamSys__ProjectPointAtDistance` passes
+     `(s32 *)&gProjectOffsetZ - 2` as that exact `src` argument, which only
+     type-checks sensibly as a 3-word vector's start -- matching the 8
+     "spare" bytes above exactly (2 words = 8 bytes immediately before
+     `gProjectOffsetZ`, which is the vector's 3rd word). */
+```
+
+```c
+/* Argument shape for InterpolateKeyframeValue: two "keyframe" points, each with a
+   value (+0x4) and a position/time (+0x8); offset +0x0 unconfirmed
+   (unread by this function). Called by still-INCLUDE_ASM DreamSys__ProjectPointAtDistance as
+   InterpolateKeyframeValue(&viewport->refView.vp, &viewport->refView.vr, dist) --
+   the viewpoint and the reference point, read as {x, y = value, z =
+   position} (round 2026-08-30-d; the Viewport identification is round 88). */
+```

@@ -7,8 +7,7 @@
  * CdDriver -- the CD-ROM data-source driver (class id 0x13 = DATASOURCE_CD,
  * method table gCdDriverMethods), a FileResource subclass and VabDriver's
  * (gVabDriverMethods, 0x23) sibling; and, below the class, the request
- * queue, the file table and the module state its units share (track 4b,
- * round 85).
+ * queue, the file table and the module state its units share.
  *
  *   src/CdDriver.c      the whole class, in five parts:
  *                       1. New_CdDriver, the ctor (FileResource's ctor, then
@@ -33,17 +32,14 @@
  * FileResource object called its own `open`/`read` (a TimImage, a TodSet,
  * ...), and a queued request's `owner` is that object. That is why the
  * fields the methods use -- isOpen, buffer, bufferSize, pos, size,
- * freeGuard, pendingRequests, flags, inQueueDispatch -- are all FileResource's
- * (pos and size, +0x018/+0x01C, were its pad18 until round 88), and the
- * object has no own fields: New_CdDriver allocates 0x2C bytes, FileResource's
- * size.
+ * freeGuard, pendingRequests, flags, inQueueDispatch -- are all FileResource's,
+ * and the object has no own fields: New_CdDriver allocates 0x2C bytes,
+ * FileResource's size.
  *
  * Every own method is named for its slot (`classtable.py gCdDriverMethods
- * --vs gFileResourceMethods`); the slot names are FileResource's, which were named for
- * these occupants. Slot types are FileResource's too. Where the old local
- * views disagreed (open/close/loadFile/setFlag/stopService returning s32,
- * read's buf as s32), the occupants return void / take void * and the
- * bytes did not move when the views were replaced.
+ * --vs gFileResourceMethods`); the slot names and types are FileResource's:
+ * open/close/loadFile/setFlag/stopService return void and read's buf is
+ * void *.
  *
  * NO FIELDS/SLOTS MACROS: no class lies below 0x13 (`typeviews.py --tree`).
  */
@@ -153,10 +149,8 @@ typedef struct CdRequestNode {
  * "File not found" and give up (OpenCdFile, ResolveFileEntries). */
 #define CD_SEARCH_ATTEMPTS 101
 
-/* The module state. Every global here was declared in two or more of the
- * units above, with up to three different types; the types below are the
- * ones their accessors need. A global only one unit touches stays a local
- * extern in that unit (track 4b, round 85). */
+/* The module state: the globals two or more of the units above share. A
+ * global only one unit touches is a local extern in that unit. */
 extern s32 gCdAsyncEnabled;
 extern s32 gCdSyncQueueMode; /* nonzero with gCdAsyncEnabled 0: requests queue, then run blocking */
 extern s32 gCdBusy;          /* 0/1 */

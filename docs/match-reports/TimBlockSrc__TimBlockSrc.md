@@ -116,3 +116,13 @@ Occupant of +0x008. Fields now named: +0x2C `blockCount`, +0x30 `blocks`, +0x38 
 | `0x800` | `CD_SECTOR_SIZE` (2048) | A | the first read of the file, whose first 36 bytes are the header |
 | `9` | `TIMBLOCK_LOAD_HEADER` | A | set before the header-sector read; AdvanceLoadState's branch for it parses the header |
 | `4` | `ARRAY_COUNT(self->entries)` | A | the loop fills `entries[4]` |
+
+## History (moved from include/TimBlockSrc.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * carries a byte of this class's layout, so they expand FILERESOURCE's macros
+ * directly (round 83).
+```

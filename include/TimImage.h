@@ -28,8 +28,7 @@
  * into its own block and sets `clutBase`.
  *
  * +0x078 is FileResource's `void *slot78` (NULL there); this table's occupant
- * is TimImage__Upload, called through TimImageUploadFn (no code; FINISHING-
- * PLAN track 4 step 6).
+ * is TimImage__Upload, called through TimImageUploadFn (no code).
  *
  * `tim` is <libgs.h>'s GsIMAGE, so an includer takes Sony's headers first
  * (`common.h`, <libgte.h>, <libgpu.h>, <libgs.h>).

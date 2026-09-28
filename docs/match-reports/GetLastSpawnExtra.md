@@ -47,3 +47,21 @@ round 43, runner ALPHA, unit DreamSys.
 ## Naming
 
 - **Tier A.** Pure leaf: returns the already-named `.extra` field of the last static spawn point found via the gLinkDstStage/C8 scratch indices; its return value indexes the DreamSys__TickStaircaseCase0..3 dispatch table.
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* Called by DreamSys__TryStaircaseLink with NO explicit argument setup (the disassembly's
+   call site leaves `$a0` holding an unrelated leftover value from the
+   preceding statement, same "empty delay slot, no a0-a3 setup" shape as
+   GetStageLinkAngle above); return value used as STAIRCASE_TICK_FNS's index. MATCHED
+   round 43 (2026-09-15) -- both the gp-relative and addiu_at blockers it was
+   filed under are resolved (see docs/research/gp-relative-blocker.md and
+   docs/research/addiu-at-blocker.md), and the one-line body
+   `STAIRCASE_SPAWNS[gLinkDstStage][gLinkSpawnIndex].extra` matched on the first rebuild
+   (docs/match-reports/GetLastSpawnExtra.md). Still declared here to type
+   DreamSys__TryStaircaseLink's call site, which remains INCLUDE_ASM in this unit. */
+```

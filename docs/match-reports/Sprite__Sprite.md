@@ -23,3 +23,13 @@ void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, voi
 ## Track 7 (round 99, charlie)
 
 `arg4`/`arg5` are `resetArg`/`resetWord` (see New_Sprite's report), in the local `SpriteResetFn` too. Byte-exact.
+
+## History (moved from include/Sprite.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * reset reads three, where SceneNode's reset takes none (VariantSprite's
+ * ctor, round 87, is void: its +0x040 occupant sets no $v0). The slot keeps
+```

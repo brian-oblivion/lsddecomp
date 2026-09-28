@@ -120,3 +120,17 @@ ParamM, Obj14/StyleWorldObj/RegistrantObj_3bb8c_l); those objects are the
 unified StageMap, NodeGuardedViewport, FadeBox, TimBlockSrc, VabStreamObj,
 FrameClock, WBgm and TextRow. Round 94 renamed the styleConfig record
 `Unk50Struct_3bb8c_l` to `StyleConfig` and named its fields.
+
+## History (moved from include/ObjM.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * A day's play loop is the reading the evidence invites, but none of it
+ * names the class, so the name stays round 15's.
+```
+
+```c
+ * slot's type (FINISHING-PLAN track 4 step 6):
+```

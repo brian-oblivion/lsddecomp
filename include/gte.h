@@ -26,8 +26,7 @@
  * open-coding the instruction at the call site (docs/MATCHING-GUIDE.md,
  * step 2). Everything around the macros is ordinary C: TransformAndCullPoly in
  * src/TmdRenderer.c is the worked example of a branching function over
- * eight of them, and it was carried as a whole-function __asm__ for twenty
- * rounds before anyone checked.
+ * eight of them.
  */
 
 /* Load vertex 0 / all three vertices into the GTE input registers. */

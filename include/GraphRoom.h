@@ -10,7 +10,7 @@
  * src/ObjMStyleActor.c holds the whole class: allocator, ctor, every
  * override, ScoreDayLog, and the getter.
  *
- * The name is round 75's reading, kept: reset loads "ETC\HGRAPH.TIM" as the
+ * The name is a reading of its data: reset loads "ETC\HGRAPH.TIM" as the
  * sub-handle, and the object owns 100 BoxFill dots (`points`) plotted from
  * the DreamSys's 365-day mood ring. What it is in the game (the graph
  * screen) is that reading; the mechanics below are measured.
@@ -30,8 +30,7 @@
  * That last call passes dreamSys as a second argument the slot does not
  * have and Reset does not read ($a1 is loaded in the retail bytes), so the
  * ctor casts the slot to GraphRoomResetCallFn below. The ctor returns
- * nothing: INTERMEDIATEBASE_SLOTS's ctor type is kept (the round-75 view
- * had it return the tail call's value; the bytes are the same either way).
+ * nothing: INTERMEDIATEBASE_SLOTS's ctor type is kept.
  *
  * Overrides, each named for its slot unless the body does something else:
  *   +0x008 ctor           GraphRoom__GraphRoom

@@ -48,3 +48,14 @@ First build; the same shape as TodSet__TodSet (gTodSetMethods's ctor). The alloc
 ## Track 4 (2026-09-26, round 88, bravo)
 
 Now `void *TriggerWorld__TriggerWorld(TriggerWorld *self, struct ResourceSource *src)`: the `s32 *arg` was ModelData's descriptor, so `*arg != 0` reads `src->buffer != NULL`. The parent ctor is still called through UnprototypedCtorTable (it takes a third argument, 0, that the void-typed slot has no room for) and +0x064 through an `s32 (*)()` cast (setFlag is void; TriggerWorld__Load returns nothing, but the ctor tests $v0, as retail does). Bytes unchanged.
+
+## History (moved from include/TriggerWorld.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * The name is round 83's (DreamAux.c had declared New_TriggerWorld's
+ * result `TriggerWorld *`), kept as the only name any view gave the class.
+ * What its own methods do:
+```

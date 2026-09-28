@@ -197,3 +197,14 @@ that byte-matched; `tagLen` is `unk3`/`unk14` renamed in place.
 TmdRenderer submit wrappers route to RCpoly* subdivision. The comment's
 history (splat's "handwritten" tag, the whole-function `__asm__` of earlier
 rounds) is this report's own table above.
+
+## History (moved from include/gte.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * src/TmdRenderer.c is the worked example of a branching function over
+ * eight of them, and it was carried as a whole-function __asm__ for twenty
+ * rounds before anyone checked.
+```

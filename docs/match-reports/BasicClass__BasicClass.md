@@ -71,3 +71,12 @@ match anyway and the order shown compiled correctly on the first attempt.
 ## Provenance
 
 round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve).
+
+## History (moved from include/BasicClass.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * HOW A CLASS IS DECLARED (FINISHING-PLAN track 4; this header is the model).
+```

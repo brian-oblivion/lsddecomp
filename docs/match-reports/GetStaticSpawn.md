@@ -147,3 +147,22 @@ Two independent lessons, both worth generalizing:
 
 round 43, runner ALPHA, unit DreamSys (stretch pick beyond the assigned
 queue).
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* Shared by TestForStaticLink/Test4TunnelLinks/Test4StaircaseNodes/
+   Test4InstantTeleporters, each of which forwards its own three args
+   straight through and appends a fixed trailing quadruple (length table,
+   trigger table, spawn table, literal 1). Defined later in this unit's own
+   ROM order; this is a forward declaration for the earlier call sites
+   above, not a cross-unit prototype. MATCHED (the gp-relative/addiu_at
+   blockers this was once filed under are resolved, see CLAUDE.md); return
+   type is confirmed s32 by every call site's `bltz` check, not just a guess
+   -- CLAUDE.md's tail-call-wrapper warning no longer applies once a
+   function is its own real C body, only while it is still INCLUDE_ASM
+   (round 2026-08-30-c note superseded). */
+```

@@ -130,3 +130,20 @@ the mechanism.
   `return` statement (even where a shared merge point is equally valid C)
   before reaching for a barrier. Cost is one line; it fully resolved this
   residue on the first try.
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+    /* u8, not s8 (round 2026-09-08, GenerateInitialSpawn): retail reads it
+	   with `lbu` -- it indexes SPAWN_POS_ADJUST, so must zero-extend. */
+```
+
+```c
+/* Retyped u8 (round 2026-09-08, GenerateInitialSpawn): retail reads it with
+   `lbu`, and the surrounding loop guard (`count != 0` implying `count > 0`,
+   a single `beqz`) only holds if it can't be negative -- a signed `s8` here
+   forces GCC to add a second `blez` check that retail does not have. */
+```

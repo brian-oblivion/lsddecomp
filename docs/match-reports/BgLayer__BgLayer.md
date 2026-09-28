@@ -59,3 +59,20 @@ void BgLayer__BgLayer(Obj6F2C4 *self, s32 arg1, s32 arg2) {
 Class unified in `include/BgLayer.h`. `self` is `BgLayer *` (was the unit-local `Obj6F2C4`), the parameters are `(struct Map44294 *src, s32 mode)` (were `s32 arg1, arg2`), and reset is called through `BgLayerResetFn`, a typedef of BgLayer__Reset's own parameter list (was an unprototyped `void (*)()` cast): the inherited +0x040 slot takes self alone (FINISHING-PLAN track 4 step 6). Byte-identical.
 
 Later the same round (alpha, second class): TileMap unified too (`include/TileMap.h`, same round): `src` is `TileMap *` (was `struct Map44294 *`). Byte-identical.
+
+## History (moved from include/BgLayer.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * The name is round 83's, and the evidence is the GsBG: Viewport__DrawNode
+```
+
+```c
+casts to BgLayerResetFn (FINISHING-PLAN track 4 step 6);
+```
+
+```c
+ * The map source is a TileMap (gTileMapMethods, include/TileMap.h, round 88),
+```

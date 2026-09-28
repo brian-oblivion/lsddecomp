@@ -10,9 +10,8 @@
 #include "common.h"
 #include "FileResource.h"
 
-/* The game's allocator, in the uncarved BMemPMgr block. Returns void *
- * rather than a typed pointer because every New_X in the game calls it
- * (one argument, confirmed by New_GameApplication.md). */
+/* The game's pool allocator (src/BMemPMgr.c), as every New_X calls it:
+ * one argument, returning void *. */
 extern void *BMemPMgrAlloc(s32 size);
 extern void BMemPMgrFree(void *arg);
 extern s32 strlen(char *s);

@@ -29,3 +29,13 @@ No iteration needed.
 ## Naming
 
 `FlatLightObj__FlatLightObj`, tier A. The constructor called through the ctor vtable slot: chains the BasicClass base ctor, installs the class's own method table, then delegates to `setLightId`. `Class__Class` convention (`include/Pad.h`'s `Pad__Pad` is the same shape: base ctor, install own table, call a slot).
+
+## History (moved from include/FlatLightObj.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * BasicClass * to FlatLightObj * and its s32 sources to the slots' types
+ * (track 4, round 89).
+```

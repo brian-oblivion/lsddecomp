@@ -53,3 +53,13 @@ views are gone. The field this ctor clears at +0x04C, `unk4C`, is now
 `((info.cy - 0x1E0) >> gTimClutRowShift) * 16 + base` there for each
 TimImage it makes, which its own view already called `clutBase`. Image
 byte-identical.
+
+## History (moved from include/TimImage.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * is TimImage__Upload, called through TimImageUploadFn (no code; FINISHING-
+ * PLAN track 4 step 6).
+```
