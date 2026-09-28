@@ -136,7 +136,7 @@ Renamed `func_8004DB18` -> `TitleMenu__CreateSaveTitle`. **Tier B**: SJIS-decode
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The setTarget override (+0x0D8). Its argument is the TaskCoreTarget the ctor passes (&sTitleMenuTarget); the one field read, +0x004, is `handle`, New_TextRow's texture. Arg1DB18_3bb8c_d is gone. `nameField` is a `struct TextRow *` now: unkAB/unkAC/unkAA are visibleCount/firstVisible/gapIndex; the New_TextRow cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The setTarget override (+0x0D8). Its argument is the TaskCoreTarget the ctor passes (&sTitleMenuTarget); the one field read, +0x004, is `handle`, New_TextRow's texture. Arg1DB18_3bb8c_d is gone. `nameField` is a `struct TextRow *` now: unkAB/unkAC/unkAA are visibleCount/firstVisible/gapIndex; the New_TextRow cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 

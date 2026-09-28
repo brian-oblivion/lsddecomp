@@ -1105,7 +1105,7 @@
         "gTitleMenuMethods": {
           "class": "TitleMenu",
           "date": "2026-09-26",
-          "header": "include/TitleMenu.h"
+          "header": "include/title_menu.h"
         },
         "gTmdModelMethods": {
           "class": "TmdModel",

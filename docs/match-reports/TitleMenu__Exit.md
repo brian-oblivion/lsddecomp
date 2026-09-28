@@ -54,7 +54,7 @@ Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through 
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `unk60->unk14` is TaskCore's `slotCounts[5]` (s32 *, +0x060); the TitleMenuUnk60Obj_3bb8c_d view is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `unk60->unk14` is TaskCore's `slotCounts[5]` (s32 *, +0x060); the TitleMenuUnk60Obj_3bb8c_d view is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 

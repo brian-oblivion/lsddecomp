@@ -33,4 +33,4 @@ Renamed `func_8004E2D0` -> `GetTitleMenuMethods`. **Tier A**: Pure getter, retur
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Its extern is in include/TitleMenu.h; the class_3bb8c.h one is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Its extern is in include/title_menu.h; the class_3bb8c.h one is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).

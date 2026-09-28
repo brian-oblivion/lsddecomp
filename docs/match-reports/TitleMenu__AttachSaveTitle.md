@@ -51,7 +51,7 @@ Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through 
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The updateSlotElements override (+0x0E0). Its argument is typed as the slot's `void *parent`; the name field's +0x04C is TextRow's attachToParent (SceneNode's), so the call casts parent to SceneNode * and &sSaveTitleOffset to LongVec3 * (its offset). No code from either cast. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The updateSlotElements override (+0x0E0). Its argument is typed as the slot's `void *parent`; the name field's +0x04C is TextRow's attachToParent (SceneNode's), so the call casts parent to SceneNode * and &sSaveTitleOffset to LongVec3 * (its offset). No code from either cast. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 

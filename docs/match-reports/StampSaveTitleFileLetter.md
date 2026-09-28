@@ -213,12 +213,12 @@ Sjis/FullWidth/Glyph), so these are new and stay unit-local.
 copied into the same title at +0x12, characters 9..11) is the same record
 as `FullWidthChars3`: a later job, left untouched here. If a second unit
 takes these types they move to the header that owns the save title
-(proposed: `include/TitleMenu.h`, which describes the SJIS title buffer).
+(proposed: `include/title_menu.h`, which describes the SJIS title buffer).
 
 **Update, same round (alpha, the Buf6_3bb8c_c job):** the second unit took
 them. `FullWidthChar`, `FullWidthChars3` and `FullWidthChars6` now live in
-`include/TitleMenu.h` (the save title is TitleMenu's buffer; see
+`include/title_menu.h` (the save title is TitleMenu's buffer; see
 StampSaveTitleDay.md's track 6 section), unchanged in layout, with the
 `MATCHING:` line kept once there; title_menu.c's local definitions are
-deleted and it includes TitleMenu.h. title_menu's `Buf6_3bb8c_c` is
+deleted and it includes title_menu.h. title_menu's `Buf6_3bb8c_c` is
 retired for `FullWidthChars3`. Image byte-identical.

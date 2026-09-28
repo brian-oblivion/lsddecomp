@@ -144,7 +144,7 @@ Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through 
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The body now reads at TaskCore's names: `unk48` is TaskCore's `sound`, called at +0x09C through VabStreamObj (setPitchOffset, as GraphRoom's ctor does); `slotD8` is setTarget, with sTitleMenuTarget retyped TaskCoreTarget; `onConstruct` (+0x040) is resetCounters, called through TitleMenuResetCallFn because the call passes dreamSys and the slot (and TitleMenu__Reset) take self alone; `unkBC`/`unkC0` are `saveBlock` (`s32 *`, getSaveBlock's result, no cast now) and `saveBlockSize`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The body now reads at TaskCore's names: `unk48` is TaskCore's `sound`, called at +0x09C through VabStreamObj (setPitchOffset, as GraphRoom's ctor does); `slotD8` is setTarget, with sTitleMenuTarget retyped TaskCoreTarget; `onConstruct` (+0x040) is resetCounters, called through TitleMenuResetCallFn because the call passes dreamSys and the slot (and TitleMenu__Reset) take self alone; `unkBC`/`unkC0` are `saveBlock` (`s32 *`, getSaveBlock's result, no cast now) and `saveBlockSize`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 6 (2026-09-26, round 93, delta): the class is TitleMenu
 

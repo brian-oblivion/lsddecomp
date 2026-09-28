@@ -151,7 +151,7 @@ Renamed `func_8004DE08` -> `TitleMenu__RefreshMenu`. **Tier B**: Allocates/fills
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `nameField->unkA9` is TextRow's cellCount and +0x0CC its setText; `state` is TaskCore's activeSlot; slotE0 updateSlotElements, slot60 setState, slot11C setSlotCursor, slotF0 setActiveSlot (origSlot is s32 now, no cast); `unk4C` is TaskCore's `target`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `nameField->unkA9` is TextRow's cellCount and +0x0CC its setText; `state` is TaskCore's activeSlot; slotE0 updateSlotElements, slot60 setState, slot11C setSlotCursor, slotF0 setActiveSlot (origSlot is s32 now, no cast); `unk4C` is TaskCore's `target`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 

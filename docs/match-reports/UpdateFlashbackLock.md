@@ -150,7 +150,7 @@ Renamed `CheckObj866E8CountFlag` -> `UpdateFlashbackLock` with tools/rename.py
 while unifying StageMap (include/stage_map.h). The old name claimed the
 object it reads is a StageMap; it is not. Its one caller,
 `TitleMenu__RefreshMenu`, passes its own `self` as `ctx`, so
-`ctx->+0x0BC` is `TitleMenu::saveBlock` (include/TitleMenu.h: the DreamSys's
+`ctx->+0x0BC` is `TitleMenu::saveBlock` (include/title_menu.h: the DreamSys's
 `getSaveBlock` result, `&saveMagic`), and a StageMap is only 0x1E8 bytes
 while this reads +0x2F4. From `saveMagic`, +0x00C is DreamSys's
 `totalFlasbackUnlockScore` (include/dream_sys.h: saveMagic, currentYear,
@@ -193,5 +193,5 @@ refresh. Tier B because both DreamSys field names are inherited hypotheses.
 The old name described a flag, not what the flag is.
 
 Constants: `FLASHBACK_UNLOCK_SCORE` (9999999, unit-local `#define`; no
-other code has the literal) and `TITLEMENU_FLASHBACK` (include/TitleMenu.h's
+other code has the literal) and `TITLEMENU_FLASHBACK` (include/title_menu.h's
 enum, already defined) for the slot index 1.

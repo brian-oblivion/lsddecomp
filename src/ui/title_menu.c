@@ -12,7 +12,7 @@
  * calls the ctor through the class's table; the ctor chains the parent's
  * ctor, then installs its own table.
  *
- * TitleMenu (include/TitleMenu.h, a TaskCore) is the menu between days:
+ * TitleMenu (include/title_menu.h, a TaskCore) is the menu between days:
  * its allocator and ctor with two save-title helpers, then its methods and
  * getter, each run introduced below. Two free functions serve it:
  * UpdateFlashbackLock (called from TitleMenu__RefreshMenu) locks or unlocks
@@ -41,7 +41,7 @@
 #include "Viewport.h"
 #include "node_guarded_viewport.h"
 #include "grid_cell.h"
-#include "TitleMenu.h"
+#include "title_menu.h"
 #include "VabStreamObj.h"
 #include "text_row.h"
 #include "tim_image.h"
@@ -279,7 +279,7 @@ void StampSaveTitleDay(s32 day) {
 }
 
 /*
- * TitleMenu's methods (include/TitleMenu.h; its allocator and ctor are
+ * TitleMenu's methods (include/title_menu.h; its allocator and ctor are
  * above) and its getter, then TaskObjF's allocator and ctor
  * (include/task_objf.h).
  *
@@ -291,7 +291,7 @@ void StampSaveTitleDay(s32 day) {
  * and the memory-card methods that drive `saveCtrl`, a TaskObjF, for SAVE
  * and LOAD. The header's banner describes the class.
  *
- * The data they share is in include/TitleMenu.h: sSaveTitle, the
+ * The data they share is in include/title_menu.h: sSaveTitle, the
  * full-width save title the TextRow shows and the card save carries;
  * sSaveFileName; the card's name prefix and suffix table; and the colour
  * cycle's channel and frame counters.

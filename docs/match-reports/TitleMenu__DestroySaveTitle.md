@@ -46,4 +46,4 @@ Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through 
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The releaseTarget override (+0x0DC). `nameField` is a TextRow; its release is BasicClass's. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The releaseTarget override (+0x0DC). `nameField` is a TextRow; its release is BasicClass's. Byte-identical (whole image green, 0 new warnings, nonmatching green).

@@ -53,7 +53,7 @@ Renamed `func_8004E054` -> `TitleMenu__EndCardAccess`. **Tier B**: Mirror-image 
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). slot10/slot14 are BasicClass's addChild/removeChild: this undoes BeginMemcardSave's child swap (initArgs->unk4 and unk10 back in, saveCtrl out) before saveCtrl's +0x070. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). slot10/slot14 are BasicClass's addChild/removeChild: this undoes BeginMemcardSave's child swap (initArgs->unk4 and unk10 back in, saveCtrl out) before saveCtrl's +0x070. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 

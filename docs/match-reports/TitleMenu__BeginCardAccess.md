@@ -113,7 +113,7 @@ Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `handlerTable->unk4` is TaskCore's `initArgs->unk4`, `unk48` its `sound`; slot10/slot14 are BasicClass's addChild/removeChild (saveCtrl upcast to BasicClass *); iconHandle is a `struct TimImage *`, so the New_TimImage cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `handlerTable->unk4` is TaskCore's `initArgs->unk4`, `unk48` its `sound`; slot10/slot14 are BasicClass's addChild/removeChild (saveCtrl upcast to BasicClass *); iconHandle is a `struct TimImage *`, so the New_TimImage cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
 

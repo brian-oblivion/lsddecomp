@@ -76,7 +76,7 @@ Renamed `func_8004E230` -> `TitleMenu__OnCardEvent`. **Tier B**: The exclusive d
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The occupant of this class's own +0x138, `onTagBValue`, which TitleMenu__OnNotify calls with its (sender, event): the parameters are retyped `BasicClass *sender, s32 event`. slot12C is endMemcardSave, slot124 commitNameEntry. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The occupant of this class's own +0x138, `onTagBValue`, which TitleMenu__OnNotify calls with its (sender, event): the parameters are retyped `BasicClass *sender, s32 event`. slot12C is endMemcardSave, slot124 commitNameEntry. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 

@@ -65,7 +65,7 @@ are unique symbols, tree-wide by construction, so that call site now reads
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Its parameter is now `struct DreamSys *dreamSys` (the ctor's; GameApplication__RunTitleMenu passes self->dreamSys). game_shell's local `PollTask *` extern is gone; it casts to PollTaskCtor as for New_GraphRoom. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Its parameter is now `struct DreamSys *dreamSys` (the ctor's; GameApplication__RunTitleMenu passes self->dreamSys). game_shell's local `PollTask *` extern is gone; it casts to PollTaskCtor as for New_GraphRoom. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Constants (round 100, track 7)
 

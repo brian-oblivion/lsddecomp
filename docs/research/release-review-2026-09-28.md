@@ -90,7 +90,7 @@ rather than API.
   FileResource methods in game_shell.c, dream_sys.h's
   prototypes; `self` everywhere else.
 - **Guards:** dream_sys.h `CLASS_DREAMSYS`, stage_grid.h `STAGE_GRID`.
-- **`s` externs in headers:** 24 (stage_map.h:416-441, TitleMenu.h:147-170,
+- **`s` externs in headers:** 24 (stage_map.h:416-441, title_menu.h:147-170,
   task.h:47/57, scene_node.h:204-205 `sRotationZero`/`sSceneNodeScaleOne`,
   which are also typed `u8[0xC]` for `Ratio16[3]`). Move into the .c or
   rename `g`. Conversely 8 `g` symbols used by one unit only
@@ -230,7 +230,7 @@ reads them, so nothing names them).
   or to the report): register and ABI notes (`$a0`-`$v0`) in scene_node.h,
   task_core.h, text_entry.h, text_row.h, tile_atlas.h, tile_map.h, sprite.h,
   task.h, item_list.h, stream_task.h; lwl/lwr and "retail reloads" in
-  stage_map.h, TitleMenu.h, task_objf.h, tmd_model.h, sprite.h, style_effect.h,
+  stage_map.h, title_menu.h, task_objf.h, tmd_model.h, sprite.h, style_effect.h,
   Viewport.h, movie_player.h, graph_room.h, lbd_file.h, common.h; GCC and splat
   notes in entity.h:46-51, 102-107, 148-153; about 120 lines in gte.h; 32
   pointers at `tools/` commands and `docs/` files; "(no code)" jargon (8).
