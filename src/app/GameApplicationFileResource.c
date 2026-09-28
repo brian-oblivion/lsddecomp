@@ -92,7 +92,7 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
     req.src.name = sModelPathDreamE5;
     self->dreamSys = New_DreamSys(New_LinkResource(&req.src), 0, 0);
     self->skipGraphRoomPoll = 0;
-    self->dreamSys->methods->slot228(self->dreamSys, config->dreamSysConfigOption);
+    self->dreamSys->methods->getSetConfigOption(self->dreamSys, config->dreamSysConfigOption);
     ((GameApplicationSeedRandomFn)self->methods->setScreenDims)(self);
 }
 
@@ -234,7 +234,7 @@ void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        moviePath = (const char *)GetSpecialDayMovieSpan(&buf.frameTotal, 0, 10);
+        moviePath = GetSpecialDayMovieSpan(&buf.frameTotal, 0, 10)->name;
         task->methods->setFrameBound(task, (u32)buf.frameTotal / STREAMTASK_FRAMES_PER_SECOND);
         task->methods->setSkipOnConfirm(task, 0);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
@@ -284,27 +284,22 @@ s32 GameApplication__RunDayTask(GameApplication *self) {
 void GameApplication__PlayCinematic(GameApplication *self) {
     CinematicCall cc;
 
-    /* MATCHING: the frame keeps 12 bytes here, movieId in the first 4. */
-    struct {
-        s32 movieId;
-        u8 pad04[8];
-    } idBuf;
+    s32 movieId;
 
     const char *path;
     s32 frameCount;
     TaskCore *task;
 
     cc = self->dreamSys->methods->getCinematic(self->dreamSys);
-    path = (const char *)GetSpecialDayOrEventRecord(&idBuf.movieId,
-                                                    (u16)cc.bank | ((u32)(u16)cc.entry << 16));
+    path = GetSpecialDayOrEventRecord(&movieId, cc)->name;
     SetActiveDataSourceDriverMode(0, 0, 0);
 
-    if (idBuf.movieId != -1) {
+    if (movieId != -1) {
         if (self->config->playStreams != 0) {
             StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
             streamTask->methods->setSkipOnConfirm(streamTask, 0);
-            frameCount = GetMovieFrameCount(idBuf.movieId);
+            frameCount = GetMovieFrameCount(movieId);
             ((StreamTaskInitFn)streamTask->methods->init)(
                 streamTask, (IntermediateBaseInitArgs *)self->aux, path, frameCount, 1);
             streamTask->methods->release(streamTask);
@@ -329,7 +324,7 @@ void GameApplication__PlayEndingMovie(GameApplication *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
         task->methods->setSkipOnConfirm(task, 0);
-        moviePath = (const char *)GetEndingMovie(&movieId, 0);
+        moviePath = GetEndingMovie(&movieId, 0)->name;
         frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 moviePath, frameCount, 1);

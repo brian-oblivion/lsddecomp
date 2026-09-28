@@ -429,8 +429,8 @@ struct DreamSys {
        its `b` argument (DreamSys__TickStaircaseYawPlus45). */
     struct RelativePos staircaseOrigin;
     u8 pad922[2];
-    /* GameApplication's config word +0x14, through DreamSys__GetSetConfigOption
-       (slot228); ResetSessionState clears it. Nothing reads it. */
+    /* GameApplication's config word +0x14, through getSetConfigOption
+       (DreamSys__GetSetConfigOption); ResetSessionState clears it. Nothing reads it. */
     s32 configOption;
 };
 
@@ -582,7 +582,7 @@ struct DreamSysMethods {
     /* +0x21C */ void (*resetFlashbackList)(DreamSys *self); /* DreamSys__ResetFlashbackList */
     /* +0x220 */ void (*saveLinkSnapshot)(DreamSys *self); /* DreamSys__SaveLinkSnapshot: coord2 and its param into the snapshot fields */
     /* +0x224 */ void (*restoreLinkSnapshot)(DreamSys *self); /* DreamSys__RestoreLinkSnapshot */
-    /* +0x228 */ s32 (*slot228)(DreamSys *self, s32 value); /* DreamSys__GetSetConfigOption: get/set; GameApplication__GameApplication calls it */
+    /* +0x228 */ s32 (*getSetConfigOption)(DreamSys *self, s32 value); /* DreamSys__GetSetConfigOption: get/set; GameApplication__GameApplication calls it */
 }; /* 139 slots, 0x22C bytes */
 
 /* reset (+0x040) as DreamSys__DreamSys calls it (see above). */

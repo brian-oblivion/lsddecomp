@@ -35,9 +35,6 @@
 typedef struct FlatLightObj FlatLightObj;
 typedef struct FlatLightObjMethods FlatLightObjMethods;
 
-/* The spelling StageMap__SetChildParams (DayTaskStageMap.c) still uses. */
-typedef ColorRgb FlatLightColor;
-
 /* == LIBGS.H GsF_LIGHT: the direction, then the colour. */
 typedef struct {
     /* +0x000 */ s32 vx, vy, vz;

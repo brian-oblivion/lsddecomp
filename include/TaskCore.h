@@ -21,13 +21,13 @@
  *
  * init/deinit (IntermediateBase's) call onInit/onDeinit: onInit hangs the
  * slot widgets and the BgLayer under +0x014, sets the colours, configures
- * the viewport (setOtLength/setMaxPackets/setPacketSize take otLength/unk2C/packetSize) and opens
+ * the viewport (setOtLength/setMaxPackets/setPacketSize take otLength/maxPackets/packetSize) and opens
  * its OT; onDeinit closes it. TaskCore__Init returns `result`.
  *
  * The state machine (setState, update). IntermediateBase's update counts
  * frames; TaskCore's then steps the state: 2 -> 4 (fade in: tickFadeInCallback
  * runs fadeInCallback, TickFadeIn, until it reports done) -> 5 (active:
- * the target's slot unk8 selected, inputMode 1) ... 7 (fade out:
+ * the target's initialSlot selected, inputMode 1) ... 7 (fade out:
  * tickFadeOutCallback, TickFadeOut) -> 8 -> 3 (IntermediateBase's
  * onStop). While inputMode is nonzero, frameCounter passing frameBound
  * is setState(6): result = 1, then exit, which calls
@@ -80,7 +80,7 @@ typedef struct TaskCoreItemList TaskCoreItemList; /* defined in src/app/Task.c, 
  * START_PRESSED); every one of them returns the menu to ACTIVE. */
 enum TaskCoreState {
     TASKCORE_STATE_FADE_IN = 4, /* update from START: tickFadeInCallback until the fade-in is done */
-    TASKCORE_STATE_ACTIVE = 5,  /* the target's unk8 slot selected, inputMode CHOOSING_SLOT */
+    TASKCORE_STATE_ACTIVE = 5,  /* the target's initialSlot selected, inputMode CHOOSING_SLOT */
     TASKCORE_STATE_TIMED_OUT = 6,       /* update: frameCounter passed frameBound; result 1, exit */
     TASKCORE_STATE_FADE_OUT = 7,        /* exit: tickFadeOutCallback until the fade-out is done */
     TASKCORE_STATE_FADED_OUT = 8,       /* update goes on to IntermediateBase's STOP */
@@ -122,7 +122,7 @@ enum TaskCoreInputMode {
 struct TaskCoreTarget {
     /* +0x000 */ const char *path; /* non-NULL: setTarget loads `handle` from it (New_TimImage) and releaseTarget releases that */
     /* +0x004 */ BasicClass *handle; /* New_TimImage(path), or the caller's own when path is NULL; the slot widgets' first argument */
-    /* +0x008 */ s32 unk8; /* setState(5): setActiveSlot(unk8, 0) */
+    /* +0x008 */ s32 initialSlot; /* setState(5): setActiveSlot(initialSlot, 0) */
     /* +0x00C */ s32 exitSlot; /* confirmSlot: confirming this slot (one with no item list) runs exit, which fades the menu out */
     /* +0x010 */ u8 unselectedColor[3]; /* broadcastToSlots at state 5; the colour a slot or item loses focus to */
     /* +0x013 */ u8 selectedColor[3]; /* setActiveSlot's colour for the new slot */
@@ -191,9 +191,9 @@ struct TaskCoreTarget {
 #define TASKCORE_FIELDS(Methods)                                                                   \
     INTERMEDIATEBASE_FIELDS(Methods);                                                              \
     /* +0x028 */ s32 otLength;          /* reset: 3; onInit: the viewport's setOtLength (+0x048) */ \
-    /* +0x02C */ s32 unk2C;             /* reset: 300 (TitleMenu, GraphRoom: 400); onInit: the viewport's setMaxPackets */ \
+    /* +0x02C */ s32 maxPackets;        /* reset: 300 (TitleMenu, GraphRoom: 400); onInit: the viewport's setMaxPackets */ \
     /* +0x030 */ s32 packetSize;        /* reset: 64; onInit: the viewport's setPacketSize */      \
-    /* +0x034 */ s32 unk34;             /* reset: 1 (TitleMenu 0); nonzero: onDeinit clears the screen to unk93 */ \
+    /* +0x034 */ s32 clearOnDeinit;     /* reset: 1 (TitleMenu 0); nonzero: onDeinit clears the screen to clearColor */ \
     /* +0x038 */ s32 result;            /* TaskCore__Init returns it; onInit 0, setState(6) 1 */   \
     /* +0x03C */ s32 inputMode;         /* 0 none, 1 choosing a slot, 2 scrolling its items; onPadEvent needs nonzero */ \
     /* +0x040 */ s32 frameBound;        /* setFrameBound; update: frameCounter past it is setState(6) */ \
@@ -217,7 +217,7 @@ struct TaskCoreTarget {
     /* +0x088 */ s32 (*fadeInCallback)(TaskCore *self);  /* setFadeInCallbackEnabled: NULL or tickFadeIn; nonzero: onInit sets baseColor */ \
     /* +0x08C */ s32 (*fadeOutCallback)(TaskCore *self); /* setFadeOutCallbackEnabled: NULL or tickFadeOut */ \
     /* +0x090 */ u8 baseColor[3];       /* setColors; the fade-in's start colour */                \
-    /* +0x093 */ u8 unk93[3];           /* setColors; onDeinit (unk34 set) and TitleMenu's clear the screen to it */                                            \
+    /* +0x093 */ u8 clearColor[3];      /* setColors; onDeinit (clearOnDeinit set) and TitleMenu's clear the screen to it */                                            \
     /* +0x096 */ u8 unk96[3];           /* setColors (reset: 128 grey); no code reads it */                                            \
     /* +0x099 */ u8 pad099[3];                                                                     \
     /* +0x09C */ void (*exitCallback)(void *ctx); /* setExitCallback; exit calls it */     \

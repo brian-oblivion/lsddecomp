@@ -751,3 +751,7 @@ names that TMD id, and that part becomes `mainPart`. Measured: `tmdId[1]` turns
 the image red, so the `[4]` carries a `MATCHING:` line. The `& 0xFF` on the
 first scan's result is dropped: the slot returns `u8`, and the image stays
 `OK` without it. `count * 4` is `count * sizeof(Actor *)`.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+Pointer types in place of `s32`: `New_TimBlockSrc(char *name)` returning `TimBlockSrc *`, ModelData's `scanPackets(self, u8 *out, u32 *tmdId)` and `decodePacketWord(self, u32 *packet, u8 *objId, u8 *type, u8 *flag, u8 *len)` slots and their forwarders, so the `(s32)` casts at the callers (ObjM__InitStyleAndWorld, TodActor__CreateParts, TodActor__ApplyTodPacket) and the forwarders' casts back are gone; CreateParts' `tmdId` buffer is `u32[4]` to match. Byte-identical, no new compiler warnings (full rebuild, 37 before and after).

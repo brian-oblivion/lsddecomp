@@ -95,3 +95,7 @@ bgLayer is a `BgLayer *` (include/BgLayer.h): the `Unk78Obj` view is gone and +0
 ## Track 7 (2026-09-27, round 98, bravo)
 
 `0x80 - frameCounter * fadeRate` and `(u8)c >= 0x81` are now `TASKCORE_FADE_FULL - ...` and `(u8)level > TASKCORE_FADE_FULL` (TaskCore.h, alpha's constant: 128, the colour that draws a texture at its own brightness). `>= 129` and `> 128` compile to the same sltiu, byte-exact. c -> level, buf -> color.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

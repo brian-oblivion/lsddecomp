@@ -49,9 +49,9 @@ void DrawSystem__Init(DrawSystem *self) {
 
 void DrawSystem__InitGraph(DrawSystem *self, ScreenDims *size, s32 vramMode) {
     /* Non-interlaced, GTE offsets; the 1 turns dithering on. */
-    GsInitGraph(size->w, size->h, GsOFSGTE | GsNONINTER, 1, vramMode);
-    /* The two display buffers stacked in VRAM: (0, 0) and (0, h). */
-    GsDefDispBuff(0, 0, 0, size->h);
+    GsInitGraph(size->width, size->height, GsOFSGTE | GsNONINTER, 1, vramMode);
+    /* The two display buffers stacked in VRAM: (0, 0) and (0, height). */
+    GsDefDispBuff(0, 0, 0, size->height);
     self->size = *size;
     self->vramMode = vramMode;
 }
@@ -166,8 +166,8 @@ ScreenDims *DrawSystem__GetDims(DrawSystem *self, DrawRect *out) {
     if (out != NULL) {
         out->x = 0;
         out->y = 0;
-        out->w = self->size.w;
-        out->h = self->size.h * 2;
+        out->w = self->size.width;
+        out->h = self->size.height * 2;
     }
     return &self->size;
 }

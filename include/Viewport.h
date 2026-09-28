@@ -58,21 +58,7 @@
 
 typedef struct Viewport Viewport;
 typedef struct ViewportMethods ViewportMethods;
-typedef struct ViewportSize ViewportSize;
 typedef struct ViewportRefView ViewportRefView;
-
-/* The screen size: drawNode reads it as the width and height the box and
- * screen-space sprite paths take percentages of. Defaults 256 x 240
- * (sDefaultViewportWidth, sDefaultViewportHeight). setScreenSize copies it whole: retail loads both
- * words before storing either. */
-struct ViewportSize {
-    s32 width;
-    s32 height;
-};
-
-/* The spelling Task.c, ObjMStyleActor.c and Entity.c still use; Task.c
- * defines SetClearColor and SetFarColor with it, so their prototypes keep it. */
-typedef ColorRgb ViewportRgb;
 
 /* libgs GsRVIEW2, 0x20 bytes, field for field: the argument GsSetRefView2
  * takes. Kept local rather than Sony's GsRVIEW2 because the game uses vp and
@@ -94,7 +80,7 @@ struct ViewportRefView {
 #define VIEWPORT_SLOTS(Self, CtorParams)                                                           \
     BASICCLASS_SLOTS(Self, CtorParams);                                                            \
     /* +0x040 */ void (*initDefaults)(Self *self);                  /* Viewport__InitDefaults; NodeGuardedViewport: NodeGuardedViewport__InitDefaults, empty */ \
-    /* +0x044 */ void (*setScreenSize)(Self *self, ViewportSize *size); /* Viewport__SetScreenSize */ \
+    /* +0x044 */ void (*setScreenSize)(Self *self, ScreenDims *size); /* Viewport__SetScreenSize */ \
     /* +0x048 */ void (*setOtLength)(Self *self, s32 length);      /* Viewport__SetOtLength */       \
     /* +0x04C */ void (*setMaxPackets)(Self *self, s32 n);         /* Viewport__SetMaxPackets, before InitOt only */ \
     /* +0x050 */ void (*setPacketSize)(Self *self, s32 n);         /* Viewport__SetPacketSize, before InitOt only */ \
@@ -131,7 +117,7 @@ struct ViewportRefView {
     /* +0x00C */ DrawSystem *drawSystem;  /* the class-1 child (AddChild); Flip's getActiveBuffer/swapBuffers */ \
     /* +0x010 */ SceneNode *viewNode;    /* the class-4 child (AddChild); refView.super is its coord2 */ \
     /* +0x014 */ ViewportRefView refView; /* GsSetRefView2's argument */                          \
-    /* +0x034 */ ViewportSize screenSize;                                                          \
+    /* +0x034 */ ScreenDims screenSize;                                                          \
     /* +0x03C */ s32 otLength;            /* GsOT length: 1 << otLength tags; drawNode's priority range */ \
     /* +0x040 */ s32 projH;               /* GsSetProjection's h; drawNode's sprite projection */  \
     /* +0x044 */ s32 maxPackets;          /* maxPackets * packetSize: each buffer's packet area */  \
@@ -179,7 +165,7 @@ void Viewport__RemoveChild(Viewport *self, BasicClass *child);
 void Viewport__RemoveAllChildren(Viewport *self);
 void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event);
 void Viewport__InitDefaults(Viewport *self);
-void Viewport__SetScreenSize(Viewport *self, ViewportSize *size);
+void Viewport__SetScreenSize(Viewport *self, ScreenDims *size);
 void Viewport__SetOtLength(Viewport *self, s32 length);
 void Viewport__SetMaxPackets(Viewport *self, s32 value);
 void Viewport__SetPacketSize(Viewport *self, s32 value);
@@ -187,8 +173,8 @@ void Viewport__SetProjection(Viewport *self, s32 h);
 void Viewport__NoOpSlot58(void);
 void Viewport__NoOpSlot5C(void);
 void Viewport__SetLightMode(Viewport *self, s32 mode);
-void Viewport__SetClearColor(Viewport *self, ViewportRgb *color);
-void Viewport__SetFarColor(Viewport *self, ViewportRgb *color);
+void Viewport__SetClearColor(Viewport *self, ColorRgb *color);
+void Viewport__SetFarColor(Viewport *self, ColorRgb *color);
 void Viewport__SetFogNear(Viewport *self, s32 fogNear);
 void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr,
                                Ratio16 *twist);

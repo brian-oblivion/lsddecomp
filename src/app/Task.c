@@ -269,11 +269,11 @@ void TaskCore__Reset(TaskCore *self) {
     methods->setFadeOutCallbackEnabled(self, 1);
     self->fadeRate = 9;
     self->otLength = 3;
-    self->unk2C = 300;
+    self->maxPackets = 300;
     self->packetSize = 64;
     self->exitCallback = NULL;
     self->exitCallbackCtx = NULL;
-    self->unk34 = 1;
+    self->clearOnDeinit = 1;
     self->inputMode = TASKCORE_INPUT_NONE;
 }
 
@@ -298,7 +298,7 @@ void TaskCore__OnInit(TaskCore *self) {
     self->bgLayer->methods->attachToParent(self->bgLayer, (SceneNode *)self->lightRig, NULL);
     if (self->fadeInCallback != NULL) {
         self->methods->broadcastToSlots(self, self->baseColor);
-        self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)self->baseColor);
+        self->bgLayer->methods->setColor(self->bgLayer, 1, (ColorRgb *)self->baseColor);
     }
     if (self->subHandle == NULL) {
         ((DrawSystem *)self->initArgs->drawSystem)
@@ -308,7 +308,7 @@ void TaskCore__OnInit(TaskCore *self) {
     ((DrawSystem *)self->initArgs->drawSystem)
         ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor, NULL);
     viewportMethods->setOtLength(viewport, self->otLength);
-    viewportMethods->setMaxPackets(viewport, self->unk2C);
+    viewportMethods->setMaxPackets(viewport, self->maxPackets);
     viewportMethods->setPacketSize(viewport, self->packetSize);
     viewportMethods->attachViewChild(viewport, self->lightRig, &sTaskCoreViewOrigin,
                                      &sTaskCoreViewOrigin, NULL);
@@ -317,16 +317,16 @@ void TaskCore__OnInit(TaskCore *self) {
 }
 
 /* Closes the viewport's OT, detaches the view and the BgLayer, and clears the
- * screen to unk93 while unk34 is set. */
+ * screen to clearColor while clearOnDeinit is set. */
 void TaskCore__OnDeinit(TaskCore *self) {
     /* MATCHING: without the local, self->viewport is reloaded and the frame shrinks. */
     Viewport *viewport = (Viewport *)self->viewport;
     viewport->methods->deinitOt(viewport);
     viewport->methods->detachViewChild(viewport);
     self->bgLayer->methods->detachFromParent(self->bgLayer);
-    if (self->unk34 != 0) {
+    if (self->clearOnDeinit != 0) {
         ((DrawSystem *)self->initArgs->drawSystem)
-            ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->unk93, NULL);
+            ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->clearColor, NULL);
     }
 }
 
@@ -410,7 +410,7 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
     switch (state) {
         case TASKCORE_STATE_ACTIVE:
             methods->broadcastToSlots(self, self->target->unselectedColor);
-            methods->setActiveSlot(self, self->target->unk8, 0);
+            methods->setActiveSlot(self, self->target->initialSlot, 0);
             self->frameCounter = 0;
             self->inputMode = TASKCORE_INPUT_CHOOSING_SLOT;
             break;
@@ -578,13 +578,13 @@ void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable) {
     }
 }
 
-/* baseColor is where the fade-in starts; unk93 is what onDeinit clears the
+/* baseColor is where the fade-in starts; clearColor is what onDeinit clears the
  * screen to (TaskCore__Reset's defaults: black, black, 128 grey).
- * MATCHING: each colour is copied as a BgLayerRgb (signed bytes: lb/sb). */
+ * MATCHING: whole-ColorRgb copies are three lb then three sb; per-byte copies load with lbu. */
 void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *clear, u8 *color96) {
-    *(BgLayerRgb *)self->baseColor = *(BgLayerRgb *)base;
-    *(BgLayerRgb *)self->unk93 = *(BgLayerRgb *)clear;
-    *(BgLayerRgb *)self->unk96 = *(BgLayerRgb *)color96;
+    *(ColorRgb *)self->baseColor = *(ColorRgb *)base;
+    *(ColorRgb *)self->clearColor = *(ColorRgb *)clear;
+    *(ColorRgb *)self->unk96 = *(ColorRgb *)color96;
 }
 
 void TaskCore__SetFadeRate(TaskCore *self, s32 rate) {
@@ -614,7 +614,7 @@ s32 TaskCore__TickFadeIn(TaskCore *self) {
     color[1] = level + self->baseColor[1];
     color[2] = level + self->baseColor[2];
     self->methods->broadcastToSlots(self, color);
-    self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)color);
+    self->bgLayer->methods->setColor(self->bgLayer, 1, (ColorRgb *)color);
     return (u8)level > TASKCORE_FADE_FULL;
 }
 
@@ -658,7 +658,7 @@ epilogue:
 
 /* New_BoxFill's size and colour for listView: (320, 240), (32, 32, 64). */
 extern s32 sListViewSize[2];
-extern BoxFillRgb sListViewColor;
+extern ColorRgb sListViewColor;
 
 /* The scrolled list's layout (RefreshSlotView, CommitElementScroll): item
  * rows are SLOT_LIST_ROW_PITCH apart, and listView, the frame behind them,
@@ -691,7 +691,7 @@ s32 TaskCore__TickFadeOut(TaskCore *self) {
     color[1] = level;
     color[2] = level;
     self->methods->broadcastToSlots(self, color);
-    self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)color);
+    self->bgLayer->methods->setColor(self->bgLayer, 1, (ColorRgb *)color);
     return (u8)level > TASKCORE_FADE_FULL;
 }
 
@@ -1434,10 +1434,10 @@ void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
 
 extern s32 sDefaultViewportWidth;
 extern s32 sDefaultViewportHeight;
-extern ViewportRgb sDefaultViewportColor;
+extern ColorRgb sDefaultViewportColor;
 /* MATCHING: a second name for the same symbol, so cc1 cannot share one
  * address computation between the two copies; retail loads it twice. */
-extern ViewportRgb sDefaultViewportColorAlias __asm__("sDefaultViewportColor");
+extern ColorRgb sDefaultViewportColorAlias __asm__("sDefaultViewportColor");
 
 /* InitDefaults' values. The OT has 1 << VIEWPORT_DEFAULT_OT_LENGTH (8192)
  * tags; with the near and far defaults Update's zDiv comes out 8. The packet
@@ -1474,7 +1474,7 @@ void Viewport__InitDefaults(Viewport *self) {
     self->drawEnabled = 1;
 }
 
-void Viewport__SetScreenSize(Viewport *self, ViewportSize *size) {
+void Viewport__SetScreenSize(Viewport *self, ScreenDims *size) {
     self->screenSize = *size;
 }
 
@@ -1508,11 +1508,11 @@ void Viewport__SetLightMode(Viewport *self, s32 mode) {
     self->lightMode = mode;
 }
 
-void Viewport__SetClearColor(Viewport *self, ViewportRgb *color) {
+void Viewport__SetClearColor(Viewport *self, ColorRgb *color) {
     self->clearColor = *color;
 }
 
-void Viewport__SetFarColor(Viewport *self, ViewportRgb *color) {
+void Viewport__SetFarColor(Viewport *self, ColorRgb *color) {
     self->farColor = *color;
 }
 

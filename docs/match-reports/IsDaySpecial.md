@@ -189,3 +189,7 @@ what the code is.
 ## History: track 10, debt-world
 
 sSpecialDays is declared with its 42 entries and the loop runs to `(u32)i < ARRAY_COUNT(sSpecialDays)`. The (u32) stays: ARRAY_COUNT is s32 in common.h, and without the cast the compare is signed (51/52).
+
+## Track 10 (2026-09-28, round 104, echo)
+
+`rand() % 6` is `rand() % SPECIAL_DAY_RECORD_COUNT`: the entry it picks is the index GetSpecialDayOrEventRecord takes into the special day's six records (`&rec[pick.entry]`), the count GetSpecialDayRecords strides by. The define (with SPECIAL_DAY_MOVIE_COUNT beside it) moved from GameFiles.c to include/GameFiles.h. The `% 12` stays literal: no GameFiles constant counts the special days. Byte-identical.

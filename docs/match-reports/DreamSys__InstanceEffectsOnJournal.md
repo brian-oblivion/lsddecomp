@@ -618,3 +618,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
 ## History: track 10, debt-world
 
 The Entity view DreamSysEntityObj/DreamSysEntityMethods was merged into Entity: DreamSys.c now includes Entity.h (the SoundCueSet prototype conflict that kept the view no longer exists) and calls through `((Entity *)entity)->methods`; cases 9..12 are ENTITY_EFFECT_*. getMoodEffect's EntityMoodRow * is cast to the MoodGraphPoint * logInstanceMood takes. Byte-identical.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+The link-event literals are spelled with their enums: 4 is `SCENENODE_EVENT_LINKED`, 2 and 3 `SCENENODE_EVENT_HULL_FIRST`/`HULL_LAST` (include/SceneNode.h), 5 to 8 `ACTOR_EVENT_UNSWEPT`..`ACTOR_EVENT_MOVED_Y` (include/Actor.h). Every function tested here receives the event through a DispatchLinkCommand/onActorLinkCommand/onGridCellLinkCommand chain from SceneNode's link protocol, so the numbers are that enum's. Byte-identical (`event < 9` spelled `event <= ACTOR_EVENT_MOVED_Y` compiles the same).

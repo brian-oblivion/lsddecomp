@@ -127,3 +127,7 @@ Locals `ret` -> `timer`, `sel` -> `colorMode`; the failure path's `0x1E`
 is 30 (seconds, getSetDreamTimeLimit's unit per DreamSys.h's
 DREAM_TICKS_PER_SECOND). colorMode's values (1, 2) stay literals:
 StyleConfig belongs to include/class_3bb8c.h, proposed there as an enum.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

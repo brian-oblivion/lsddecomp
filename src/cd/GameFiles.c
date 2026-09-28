@@ -6,7 +6,7 @@
  * LbdFile__SetAutoLoadData and GetLbdFileMethods, the loader for one stage
  * map chunk, STGnn\Mnnn.LBD.
  *
- * sRecordTable is an array of 0x1C-byte records (FilePathRecord), each a file path
+ * sRecordTable is an array of 0x1C-byte records (CdFileEntry), each a file path
  * padded with zeros; DayTaskStageMap.c's RegisterRecordTableFiles hands them to
  * the CD driver. In order:
  *  - the seven sound banks' SND\name.VH/VB pairs and SND\SE.VH/VB;
@@ -69,11 +69,6 @@ enum MovieId {
 };
 
 #define OPENING_MOVIE_COUNT 7
-
-/* Each special day's six records: FILM\SPDAYnnA/B.STR (its two movies),
- * then IMG1\SPDAYnnC..F.TIM. Special day 0 is SPDAY01. */
-#define SPECIAL_DAY_RECORD_COUNT 6
-#define SPECIAL_DAY_MOVIE_COUNT 2
 
 /* GetSpecialDayMovieSpan adds this to every movie's frame count but the
  * last. What the frames are for is not established. */
@@ -194,7 +189,7 @@ extern char *sDefaultDataDirectory; /* "CDI\\" (sdata) */
 extern s32 sForcedSoundBank;
 extern s32 sForcedStageBgm;
 extern u8 sSoundBankPaths[];
-extern u8 sRecordTable[];
+extern CdFileEntry sRecordTable[];
 extern char *sSoundEffectDirPtr; /* -> "SND\\SE" */
 extern const char sAsmkMoviePath[];
 extern s16 sMovieFrameCounts[];
@@ -232,7 +227,7 @@ void SetPickOverrides(s32 soundBank, s32 stageBgm) {
     }
 }
 
-void *GetRecordTable(s32 *countOut) {
+CdFileEntry *GetRecordTable(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = RECORD_TABLE_COUNT;
     }
@@ -266,31 +261,31 @@ char *GetSoundEffectDir(void) {
     return *GetSoundEffectDirRef();
 }
 
-FilePathRecord *GetStageRecords(s32 stage) {
-    return &((FilePathRecord *)GetRecordTable(NULL))[sStageFirstRecord[stage]];
+CdFileEntry *GetStageRecords(s32 stage) {
+    return &GetRecordTable(NULL)[sStageFirstRecord[stage]];
 }
 
-FilePathRecord *GetStageTextureRecords(s32 stage) {
+CdFileEntry *GetStageTextureRecords(s32 stage) {
     return GetStageRecords(stage);
 }
 
 /* A random texture record among the first one to four of the stage's,
  * one more every DAYS_PER_TEXTURE days. */
-FilePathRecord *PickStageTexture(s32 stage, s32 unused, s32 day) {
+CdFileEntry *PickStageTexture(s32 stage, s32 unused, s32 day) {
     s32 textureCount = ((day - 1) % (STAGE_TEXTURE_COUNT * DAYS_PER_TEXTURE)) / DAYS_PER_TEXTURE + 1;
     s32 r = SeedAndRandom(0, unused) % textureCount;
     return &GetStageTextureRecords(stage)[r];
 }
 
-FilePathRecord *GetStageBgmRecords(s32 stage) {
+CdFileEntry *GetStageBgmRecords(s32 stage) {
     return &GetStageRecords(stage)[STAGE_RECORD_BGM];
 }
 
 /* A random or forced BGM record. Stage 9 never plays BGC.SEQ: a random
  * pick of it (2) becomes BGD, and a forced 3 becomes 4. */
-FilePathRecord *PickStageBgm(s32 stage, s32 unused) {
+CdFileEntry *PickStageBgm(s32 stage, s32 unused) {
     u32 r = (u32)SeedAndRandom(0, unused) % STAGE_BGM_COUNT;
-    FilePathRecord *rec;
+    CdFileEntry *rec;
     if (stage == 9) {
         if (r == 2) {
             r = 3;
@@ -303,16 +298,16 @@ FilePathRecord *PickStageBgm(s32 stage, s32 unused) {
     return &rec[sForcedStageBgm != 0 ? sForcedStageBgm - 1 : r];
 }
 
-FilePathRecord *GetStageMapChunkRecords(s32 stage) {
+CdFileEntry *GetStageMapChunkRecords(s32 stage) {
     return &GetStageRecords(stage)[STAGE_RECORD_MAP_CHUNKS];
 }
 
-FilePathRecord *GetStageMapChunkRecord(s32 stage, s32 chunk) {
+CdFileEntry *GetStageMapChunkRecord(s32 stage, s32 chunk) {
     return &GetStageMapChunkRecords(stage)[chunk];
 }
 
 /* The chunk at column x, row y of the stage's grid. */
-FilePathRecord *GetStageMapChunkRecordXY(s32 stage, s32 x, s32 y) {
+CdFileEntry *GetStageMapChunkRecordXY(s32 stage, s32 x, s32 y) {
     return GetStageMapChunkRecord(stage, x + GetStageGridDimensions(stage)->columns * y);
 }
 
@@ -323,57 +318,57 @@ const char *GetAsmkMovie(s32 *movieIdOut) {
     return sAsmkMoviePath;
 }
 
-FilePathRecord *GetOpeningMovieRecords(s32 *movieIdOut) {
+CdFileEntry *GetOpeningMovieRecords(s32 *movieIdOut) {
     if (movieIdOut != NULL) {
         *movieIdOut = MOVIE_OPENING_FIRST;
     }
-    return &((FilePathRecord *)GetRecordTable(NULL))[RECORD_OPENING_MOVIES];
+    return &GetRecordTable(NULL)[RECORD_OPENING_MOVIES];
 }
 
-FilePathRecord *PickOpeningMovie(s32 *movieIdOut, s32 unused) {
+CdFileEntry *PickOpeningMovie(s32 *movieIdOut, s32 unused) {
     u32 r = (u32)SeedAndRandom(0, unused) % OPENING_MOVIE_COUNT;
     s32 firstMovieId;
-    FilePathRecord *rec = GetOpeningMovieRecords(&firstMovieId);
+    CdFileEntry *rec = GetOpeningMovieRecords(&firstMovieId);
     if (movieIdOut != NULL) {
         *movieIdOut = r + firstMovieId;
     }
     return &rec[r];
 }
 
-FilePathRecord *GetEndingMovieRecord(s32 *movieIdOut) {
+CdFileEntry *GetEndingMovieRecord(s32 *movieIdOut) {
     if (movieIdOut != NULL) {
         *movieIdOut = MOVIE_ENDING;
     }
-    return &((FilePathRecord *)GetRecordTable(NULL))[RECORD_ENDING_MOVIE];
+    return &GetRecordTable(NULL)[RECORD_ENDING_MOVIE];
 }
 
-FilePathRecord *GetEndingMovie(s32 *movieIdOut) {
+CdFileEntry *GetEndingMovie(s32 *movieIdOut) {
     s32 movieId;
-    FilePathRecord *rec = GetEndingMovieRecord(&movieId);
+    CdFileEntry *rec = GetEndingMovieRecord(&movieId);
     if (movieIdOut != NULL) {
         *movieIdOut = movieId;
     }
     return rec;
 }
 
-FilePathRecord *GetEventMovieRecords(s32 *movieIdOut) {
+CdFileEntry *GetEventMovieRecords(s32 *movieIdOut) {
     if (movieIdOut != NULL) {
         *movieIdOut = MOVIE_EVENT_FIRST;
     }
-    return &((FilePathRecord *)GetRecordTable(NULL))[RECORD_EVENT_MOVIES];
+    return &GetRecordTable(NULL)[RECORD_EVENT_MOVIES];
 }
 
-FilePathRecord *GetEventMovie(s32 *movieIdOut, s32 event) {
+CdFileEntry *GetEventMovie(s32 *movieIdOut, s32 event) {
     s32 firstMovieId;
-    FilePathRecord *rec = GetEventMovieRecords(&firstMovieId);
+    CdFileEntry *rec = GetEventMovieRecords(&firstMovieId);
     if (movieIdOut != NULL) {
         *movieIdOut = event + firstMovieId;
     }
     return &rec[event];
 }
 
-FilePathRecord *GetSpecialDayRecords(s32 *movieIdOut, s32 day) {
-    FilePathRecord *rec = &((FilePathRecord *)GetRecordTable(NULL))[RECORD_SPECIAL_DAYS];
+CdFileEntry *GetSpecialDayRecords(s32 *movieIdOut, s32 day) {
+    CdFileEntry *rec = &GetRecordTable(NULL)[RECORD_SPECIAL_DAYS];
     if (movieIdOut != NULL) {
         *movieIdOut = day * SPECIAL_DAY_MOVIE_COUNT + MOVIE_SPECIAL_DAY_FIRST;
     }
@@ -382,9 +377,9 @@ FilePathRecord *GetSpecialDayRecords(s32 *movieIdOut, s32 day) {
 
 /* A special day's record or an event movie; *movieIdOut is -1 for a
  * special day's TIM images. */
-FilePathRecord *GetSpecialDayOrEventRecord(s32 *movieIdOut, CinematicCall pick) {
+CdFileEntry *GetSpecialDayOrEventRecord(s32 *movieIdOut, CinematicCall pick) {
     s32 firstMovieId;
-    FilePathRecord *rec;
+    CdFileEntry *rec;
     if (pick.bank >= 0) {
         rec = GetSpecialDayRecords(&firstMovieId, pick.bank);
         if (movieIdOut != NULL) {
@@ -402,11 +397,11 @@ s32 GetMovieFrameCount(s32 movieId) {
 /* The first movie of special day `day`; *frameTotal is the frame count of
  * the movies of dayCount special days from it, MOVIE_SPAN_GAP_FRAMES
  * between each. */
-FilePathRecord *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount) {
+CdFileEntry *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount) {
     s32 firstMovieId;
     s32 movieId;
     s32 start;
-    FilePathRecord *rec = GetSpecialDayRecords(&firstMovieId, day);
+    CdFileEntry *rec = GetSpecialDayRecords(&firstMovieId, day);
     dayCount *= SPECIAL_DAY_MOVIE_COUNT; /* MATCHING: one variable; becomes the end movie id */
     *frameTotal = 0;
     start = firstMovieId;

@@ -105,3 +105,7 @@ slot +0x050 and does not call the base).
 TaskCore's `unk93` (include/TaskCore.h; Task.c and TaskViewport.c
 access it) -> `clearColor`: both TaskCore__OnDeinit and this override
 pass it as the colour to the DrawSystem's clear.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+TaskCore fields renamed (include/TaskCore.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.

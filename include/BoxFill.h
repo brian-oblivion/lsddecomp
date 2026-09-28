@@ -78,8 +78,8 @@ typedef struct BoxFillPos BoxFillPos;
  * size argument, setSize's and FadeBox's pushPosition's. Each word is stored
  * into the u16 boxW/boxH, which reads only its low halfword (lhu at +0x000
  * and +0x004). The callers pass two-word arrays and pairs of their own
- * (sListViewSize, sGraphPointSize, sStyleDecorBoxSize, ObjMStyleActor's
- * PairXY), so New_BoxFill and the ctor slot take `void *` and setSize
+ * (sListViewSize, sGraphPointSize, sStyleDecorBoxSize, and ObjMStyleActor's
+ * BoxFillSize copied from sStyleDecorSizeW), so New_BoxFill and the ctor slot take `void *` and setSize
  * `s32 *`. The same layout as BoxFillPos, which is a position. */
 struct BoxFillSize {
     s32 w; /* +0x000 */
@@ -96,13 +96,11 @@ struct BoxFillPos {
     s32 y; /* +0x004 */
 };
 
-/* The box's colour, GsBOXF r, g, b, a ColorRgb (include/DrawSystem.h):
+/* The box's colour, GsBOXF r, g, b, is a ColorRgb (include/DrawSystem.h):
  * what setColor copies into `color` (or adds to it when overwrite is 0), and
  * the ctor's (and Reset's) colour argument. A whole-struct copy is three
  * lb/sb pairs (BoxFill__ApplyColor, GraphRoom__BuildGraphPoints). The field
- * and the slot parameter stay `u8 color[3]` and `void *rgb`. This spelling
- * is the one ScreenWidgets.c, Task.c and ObjMStyleActor.c still use. */
-typedef ColorRgb BoxFillRgb;
+ * and the slot parameter stay `u8 color[3]` and `void *rgb`. */
 
 /* SceneNode's slots, then this class's own. `tools/classtable.py
  * gBoxFillMethods --vs gSceneNodeMethods` lists the overrides of the
@@ -135,7 +133,7 @@ typedef ColorRgb BoxFillRgb;
     /* +0x062 */ u16 boxH;         /* GsBOXF.h */                                                  \
     /* +0x064 */ u8 color[3];      /* GsBOXF.r, g, b: setColor (Reset's default sBoxFillDefaultColor) */     \
     /* +0x067 */ u8 pad67;                                                                         \
-    /* +0x068 */ s32 mask          /* setMask. The object is 0x6C bytes (New_BoxFill) */
+    /* +0x068 */ s32 mask          /* setMask; read only by FadeBox's configure (maskPerTick). The object is 0x6C bytes (New_BoxFill) */
 /* clang-format on */
 
 struct BoxFillMethods {

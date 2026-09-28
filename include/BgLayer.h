@@ -59,9 +59,6 @@ typedef struct BgLayerMethods BgLayerMethods;
  * (Viewport__DrawNode). */
 #define BGLAYER_CLASS_ID 0x54
 
-/* The spelling TaskCore's colour code (src/app/Task.c) still uses. */
-typedef ColorRgb BgLayerRgb;
-
 struct BgLayerMethods {
     SCENENODE_SLOTS(BgLayer, (BgLayer * self, struct TileMap *src, s32 mode));
     /* +0x0B8 */ void (*setColor)(BgLayer *self, s32 enable, ColorRgb *rgb); /* BgLayer__SetColor */

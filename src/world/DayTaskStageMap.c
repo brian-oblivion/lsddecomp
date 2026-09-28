@@ -197,12 +197,11 @@ void DayTask__OnInit(DayTask *self) {
     DrawSystem *drawSystem;
     Viewport *vp;
     SceneNode *fadeBox;
-    ViewportSize *size;
+    ScreenDims *size;
 
     drawSystem = (DrawSystem *)self->initArgs->drawSystem;
     vp = (Viewport *)self->viewport;
-    /* ScreenDims and ViewportSize are both {s32 width, s32 height}. */
-    size = (ViewportSize *)drawSystem->methods->getDims(drawSystem, NULL);
+    size = drawSystem->methods->getDims(drawSystem, NULL);
     vp->methods->setScreenSize(vp, size);
     fadeBox = vp->methods->getFadeBox(vp);
     fadeBox->methods->setDisplay(fadeBox, 1);
@@ -312,7 +311,7 @@ extern s32 sRecordFirstBatchCount;
  * registers nothing. */
 s32 RegisterRecordTableFiles(s32 all) {
     s32 count;
-    void *table;
+    CdFileEntry *table;
     s32 prev;
     s32 result;
 
@@ -676,8 +675,8 @@ void StageMap__SetChildParams(StageMap *self, s32 count, s32 dirs, s32 colors) {
 
     for (i = 0; i < count; i++) {
         light = (FlatLightObj *)self->methods->getLight(self, i);
-        light->methods->setColor(light, 1, (FlatLightColor *)colors);
-        colors += sizeof(FlatLightColor);
+        light->methods->setColor(light, 1, (ColorRgb *)colors);
+        colors += sizeof(ColorRgb);
         light->methods->setDirection(light, 1, (s16 *)dirs);
         dirs += 3 * sizeof(s16);
     }
@@ -697,12 +696,12 @@ void StageMap__ForwardAcceptedCommand(StageMap *self, void *sender, s32 command)
     u8 unused[24]; /* MATCHING: retail's frame is 24 bytes larger than the locals need */
 
     switch (command) {
-        case 2:
-        case 3:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
+        case SCENENODE_EVENT_HULL_FIRST:
+        case SCENENODE_EVENT_HULL_LAST:
+        case ACTOR_EVENT_UNSWEPT:
+        case ACTOR_EVENT_MOVED_Z:
+        case ACTOR_EVENT_MOVED_X:
+        case ACTOR_EVENT_MOVED_Y:
             break;
         default:
             return;

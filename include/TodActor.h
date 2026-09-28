@@ -121,7 +121,7 @@ struct VabStreamObj; /* include/VabStreamObj.h: the sound bank the ctor's second
     /* +0x07C */ s32 todIndex;             /* the current TOD's index in the TodSet */             \
     /* +0x080 */ s32 todFrameCount;        /* the current TOD's frame count (setTod) */            \
     /* +0x084 */ s32 todFrame;             /* the current frame number; wraps at todFrameCount */  \
-    /* +0x088 */ u8 *todFramePtr;          /* the next frame to apply */                           \
+    /* +0x088 */ void *todFramePtr;        /* the next frame to apply */                           \
     /* +0x08C */ s32 tickCallbackEnabled;  /* enableTickCallback / disableTickCallback */          \
     /* +0x090 */ s32 todPlaying;           /* playTod / stopTod; gates frame advance in tick */    \
     /* +0x094 */ TodActor *peer           /* linkPeer's other, NULL after unlinkPeer. The object is 0x98 bytes (New_TodActor) */

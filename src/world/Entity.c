@@ -223,13 +223,13 @@ void Entity__NotifyLinkStage(Entity *self, void *sender, s32 event) {
     s32 linkStage;
 
     linkStage = sEntityMoodTable[self->moodIndex].linkStage;
-    if (event >= 2 && event <= 8) {
+    if (event >= SCENENODE_EVENT_HULL_FIRST && event <= ACTOR_EVENT_MOVED_Y) {
         if (linkStage <= 0) {
             return;
         }
     }
     GetTodActorMethods()->onActorLinkCommand((TodActor *)self, sender, event);
-    if (event != 4) {
+    if (event != SCENENODE_EVENT_LINKED) {
         return;
     }
     if (linkStage <= 0) {
@@ -248,7 +248,7 @@ void Entity__NotifyLinkStage(Entity *self, void *sender, s32 event) {
 
 void Entity__OnGridCellLinkCommand(Entity *self, void *sender, s32 event) {
     GetTodActorMethods()->onGridCellLinkCommand((TodActor *)self, sender, event);
-    if (event == 4) {
+    if (event == SCENENODE_EVENT_LINKED) {
         self->methods->deactivate(self);
     }
 }
@@ -2002,7 +2002,7 @@ void Entity__MoodCue73(Entity *self, SoundCueSet *out) {
 }
 
 /* {0, 100, 190}: the clear colour Entity__MoodCue74 gives the peer's viewport. */
-extern ViewportRgb sMoodCue74ClearColor;
+extern ColorRgb sMoodCue74ClearColor;
 
 void Entity__MoodCue74(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {

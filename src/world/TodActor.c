@@ -44,18 +44,6 @@
  * allocates and TodActor.modelData points at. */
 #define MODEL_DATA_CLASS_HEADER 0x5F03
 
-/* TOD packet types and coordinate-packet flag bits, as
- * TodActor__ApplyTodPacket decodes them (the decoded header is
- * {object id, type, flag, length in words}). */
-#define TOD_PACKET_ATTRIBUTE 0
-#define TOD_PACKET_COORDINATE 1
-#define TOD_PACKET_MODEL_ID 2
-#define TOD_PACKET_PARENT 3
-#define TOD_COORD_DIFFERENTIAL 1
-#define TOD_COORD_ROTATE 2
-#define TOD_COORD_SCALE 4
-#define TOD_COORD_TRANSLATE 8
-
 /* A TOD rotation is in 1/4096 degree; divided by 360 it is a GTE angle
  * (ONE to the turn), which ApplyTodPacket then wraps with % ONE. */
 #define TOD_ROTATE_PER_ANGLE 360
@@ -69,32 +57,6 @@
 
 /* PlayTone's volume, both arguments of the bank's playTone (vol, endVol). */
 #define TODACTOR_TONE_VOLUME 110
-
-/* A TOD packet's header word, as decodePacketWord writes it out byte by
- * byte. */
-typedef struct TodPacketHeader {
-    u8 objectId; /* +0x000 the low byte of the object id */
-    u8 type;     /* +0x001 TOD_PACKET_* */
-    u8 flag;     /* +0x002 TOD_COORD_* for a coordinate packet */
-    u8 length;   /* +0x003 the packet's length in words, header included */
-} TodPacketHeader;
-
-/* A TOD file's header (Sony's TOD format: id, version, resolution, then the
- * frame count), then its frames. */
-typedef struct TodHeader {
-    u8 pad00[0x04]; /* +0x000 id, version, resolution: not read */
-    s32 frameCount; /* +0x004 */
-    u8 frames[1];   /* +0x008 the first frame (a TodFrame) */
-} TodHeader;
-
-/* A TOD frame's header (Sony's TOD format: size in words, packet count,
- * frame number), then its packets. */
-typedef struct TodFrame {
-    u8 pad00[0x02];  /* +0x000 size in words: not read */
-    u16 packetCount; /* +0x002 */
-    u8 pad04[0x04];  /* +0x004 frame number: not read */
-    u8 packets[1];   /* +0x008 the first packet */
-} TodFrame;
 
 /* A TodSet's buffer once TodSet__BuildTods has run: a word, a count, then
  * the table whose each entry (an offset into the buffer) it replaced with
@@ -334,12 +296,12 @@ void TodActor__TeardownParts(TodActor *self) {
  * second fills partIds and turns tmdId[0] into the index of the object drawn
  * with that TMD id, which becomes mainPart. 0, or 1 with the parts released. */
 s32 TodActor__CreateParts(TodActor *self) {
-    s32 tmdId[4]; /* MATCHING: [1] changes the frame; only [0] is used */
+    u32 tmdId[4]; /* MATCHING: [1] changes the frame; only [0] is used */
     s32 count;
     s32 i;
     Actor **p;
 
-    count = self->modelData->methods->scanPackets(self->modelData, 0, (s32)tmdId);
+    count = self->modelData->methods->scanPackets(self->modelData, NULL, tmdId);
     self->parts = BMemPMgrAlloc(count * sizeof(Actor *));
     if (self->parts == NULL) {
         goto alloc_fail;
@@ -348,7 +310,7 @@ s32 TodActor__CreateParts(TodActor *self) {
     if (self->partIds == NULL) {
         goto alloc_fail;
     }
-    self->modelData->methods->scanPackets(self->modelData, (s32)self->partIds, (s32)tmdId);
+    self->modelData->methods->scanPackets(self->modelData, self->partIds, tmdId);
 
     p = self->parts;
     i = 0;
@@ -398,7 +360,7 @@ void TodActor__Tick(TodActor *self) {
         if (self->todFrame >= self->todFrameCount) {
             self->todFrame = 0;
             self->todFramePtr =
-                ((TodHeader *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer)->frames;
+                ((TodFile *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer)->frames;
         }
     }
     self->coord2->flg = 0;
@@ -448,9 +410,8 @@ void TodActor__PlayTone(TodActor *self, s32 index) {
 
 void TodActor__SetTod(TodActor *self, s32 index) {
     self->todIndex = index;
-    self->todFrameCount = ((TodHeader *)TODSET_TOD(self->modelData->todSet, index)->buffer)->frameCount;
-    self->todFramePtr =
-        ((TodHeader *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer)->frames;
+    self->todFrameCount = ((TodFile *)TODSET_TOD(self->modelData->todSet, index)->buffer)->frameCount;
+    self->todFramePtr = ((TodFile *)TODSET_TOD(self->modelData->todSet, self->todIndex)->buffer)->frames;
     self->todFrame = 0;
     self->methods->applyTodFrame(self, self->todFramePtr, 0);
 }
@@ -490,9 +451,8 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
     GsCOORD2PARAM *param;
     s32 i;
 
-    data = self->modelData->methods->decodePacketWord(self->modelData, (s32)packet,
-                                                      (s32)&head.objectId, (s32)&head.type,
-                                                      (s32)&head.flag, (s32)&head.length);
+    data = self->modelData->methods->decodePacketWord(self->modelData, packet, &head.objectId,
+                                                      &head.type, &head.flag, &head.length);
     partIndex = TodActor__FindPartIndex(self, head.objectId);
     if (partIndex < 0) {
         goto end;

@@ -124,11 +124,11 @@ typedef struct UnprototypedCtorTable {
 } UnprototypedCtorTable;
 
 /* Allocate a TimBlockSrc and construct it over the file `name`. */
-void *New_TimBlockSrc(s32 name) {
-    void *obj = BMemPMgrAlloc(sizeof(TimBlockSrc));
+TimBlockSrc *New_TimBlockSrc(char *name) {
+    TimBlockSrc *obj = BMemPMgrAlloc(sizeof(TimBlockSrc));
 
     if (obj != NULL) {
-        GetTimBlockSrcMethods()->ctor(obj, (char *)name);
+        GetTimBlockSrcMethods()->ctor(obj, name);
         return obj;
     }
     return NULL;
@@ -604,23 +604,13 @@ u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *tmdId) {
     return self->methods->scanTodPackets(self, out, tmdId, ((TodFile *)self->buffer)->frames);
 }
 
-/* A TOD frame's header: its size in words, its packet count and its frame
- * number, then the packets. */
-typedef struct TodFrame {
-    /* +0x00 */ u8 pad0[2];
-    /* +0x02 */ u16 packetCount;
-} TodFrame;
-
 /* scanTodPackets (+0x07C, both tables): walk the TOD frame at `data`.
  * Returns the number of object-create packets, whose object ids go to `out`
  * when there is one. With `out`, a model-id packet naming TMD `*tmdId`
  * sets `*tmdId` to the index in `out` of the object it belongs to; without,
  * `*tmdId` becomes the number of model-id packets. */
 u8 ScanTodPackets(Tod *self, u8 *out, u32 *tmdId, u32 *data) {
-    u8 objId;
-    u8 type;
-    u8 flag;
-    u8 len;
+    TodPacketHeader head;
     u32 packetCount;
     u32 i;
     s32 j;
@@ -633,17 +623,17 @@ u8 ScanTodPackets(Tod *self, u8 *out, u32 *tmdId, u32 *data) {
     created = 0;
     index = 0;
     for (; i < packetCount; i++) {
-        DecodeTodPacketWord(self, data, &objId, &type, &flag, &len);
-        if (type == TOD_PACKET_OBJECT_CONTROL && flag == TOD_OBJECT_CREATE) {
+        DecodeTodPacketWord(self, data, &head.objectId, &head.type, &head.flag, &head.length);
+        if (head.type == TOD_PACKET_OBJECT_CONTROL && head.flag == TOD_OBJECT_CREATE) {
             created++;
             if (out != NULL) {
-                *out++ = objId;
+                *out++ = head.objectId;
             }
-        } else if (type == TOD_PACKET_MODEL_ID) {
+        } else if (head.type == TOD_PACKET_MODEL_ID) {
             if (out != NULL) {
                 if (tmdId != NULL && ((TodPacket *)data)->tmdId == *tmdId) {
                     for (j = 0, out -= created; j < created; j++) {
-                        if (*out++ == objId) {
+                        if (*out++ == head.objectId) {
                             index = j;
                             break;
                         }
@@ -653,7 +643,7 @@ u8 ScanTodPackets(Tod *self, u8 *out, u32 *tmdId, u32 *data) {
                 index++;
             }
         }
-        data += len;
+        data += head.length;
     }
     if (tmdId != NULL) {
         *tmdId = index;
@@ -911,15 +901,14 @@ void ModelData__ReleaseResources(ModelData *self) {
 }
 
 /* scanPackets (+0x080): the TodSet's +0x078 (TodSet__ScanPackets). */
-u8 ModelData__ForwardScanPackets(ModelData *self, s32 out, s32 tmdId) {
+u8 ModelData__ForwardScanPackets(ModelData *self, u8 *out, u32 *tmdId) {
     return ((s32 (*)())self->todSet->methods->processBuffer)(self->todSet, out, tmdId);
 }
 
 /* decodePacketWord (+0x084): the TodSet's. */
-void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 packet, s32 objId, s32 type, s32 flag,
-                                         s32 len) {
-    return self->todSet->methods->decodePacketWord(self->todSet, (u32 *)packet, (u8 *)objId,
-                                                   (u8 *)type, (u8 *)flag, (u8 *)len);
+void *ModelData__ForwardDecodePacketWord(ModelData *self, u32 *packet, u8 *objId, u8 *type,
+                                         u8 *flag, u8 *len) {
+    return self->todSet->methods->decodePacketWord(self->todSet, packet, objId, type, flag, len);
 }
 
 ModelDataMethods *GetModelDataMethods(void) {

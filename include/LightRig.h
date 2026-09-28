@@ -41,9 +41,6 @@
 typedef struct LightRig LightRig;
 typedef struct LightRigMethods LightRigMethods;
 
-/* The spelling ObjMStyleActor.c's setAmbientColor call still casts to. */
-typedef ColorRgb LightRigRgb;
-
 /* SceneNode's slots, then this class's own. `tools/classtable.py
  * gLightRigMethods --vs gSceneNodeMethods` lists the overrides of the
  * inherited ones (LightRig__LightRig, __Finalize, __Reset,

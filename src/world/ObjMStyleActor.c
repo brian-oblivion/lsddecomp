@@ -463,8 +463,8 @@ void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dr
 
 /* The StageMap's chunkFileFn: a chunk's file record, by linear cell index,
  * or by x/y when the index is negative. */
-FilePathRecord *ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y) {
-    FilePathRecord *record;
+CdFileEntry *ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y) {
+    CdFileEntry *record;
 
     if (cell >= 0) {
         record = GetStageMapChunkRecord(self->stage, cell);
@@ -500,18 +500,18 @@ extern CellBounds sStage0Bounds;
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 initOption) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
-    FilePathRecord *record;
+    CdFileEntry *record;
     s32 day;
     s32 flag;
 
     vp->methods->detachViewChild(vp);
     self->timBlockPending = 1;
     record = PickStageBgm(self->stage, 0);
-    self->bgm->methods->setSeq(self->bgm, (char *)record);
+    self->bgm->methods->setSeq(self->bgm, record->name);
 
     day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     record = PickStageTexture(self->stage, 0, day);
-    self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc((s32)record);
+    self->timBlockSrc = New_TimBlockSrc(record->name);
 
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sObjMViewPoint,
                                  &sObjMViewRefPoint, 0);
@@ -585,7 +585,7 @@ void ObjM__OnDrawSystemEvent(ObjM *self, void *sender, s32 event) {
 void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
     s32 timer;
     s32 colorMode;
-    TimBlockSrcColor *color;
+    ColorRgb *color;
     TimBlockSrcMethods *m;
 
     if (self->timBlockPending != 0) {
@@ -706,7 +706,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     vp->methods->detachViewChild(vp);
 
     drawSystem = (DrawSystem *)self->initArgs->drawSystem;
-    width = drawSystem->methods->getDims(drawSystem, NULL)->w;
+    width = drawSystem->methods->getDims(drawSystem, NULL)->width;
     vp->methods->setProjection(vp, width / 2 * 5 / 3 + sObjMProjectionBias);
 
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sObjMViewPoint,
@@ -718,7 +718,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     rig = (StageMap *)self->lightRig;
     self->methods->addChild(self, (BasicClass *)rig);
 
-    rig->methods->setAmbientColor(rig, (LightRigRgb *)style->ambientColor, 0);
+    rig->methods->setAmbientColor(rig, (ColorRgb *)style->ambientColor, 0);
     rig->methods->setChildParams(rig, 3, style->lightDirs, style->lightColors);
     rig->methods->setConfig(rig, GetStageGridDimensions(self->stage));
     ((DreamSysAttachToParentFn)self->dreamSys->methods->attachToParent)(self->dreamSys, rig);
@@ -974,7 +974,7 @@ void ObjM__OnFadeNotify(ObjM *self, FadeBox *sender, s32 event) {
             self->methods->removeChild(self, (BasicClass *)sender);
             color = sender->methods->getColor(sender);
             ((NodeGuardedViewport *)self->viewport)
-                ->methods->setClearColor((NodeGuardedViewport *)self->viewport, (ViewportRgb *)color);
+                ->methods->setClearColor((NodeGuardedViewport *)self->viewport, (ColorRgb *)color);
             /* MATCHING: the two dead `!=` tests are retail's compares. */
             if (self->state != OBJM_STATE_LINK_DYNAMIC && self->state != OBJM_STATE_LINK_TUNNEL &&
                 self->state == OBJM_STATE_LINK_STAGE_TIMER) {
@@ -1182,7 +1182,7 @@ void ApplyStyleDecorationIfSet(void) {
     SceneNode *fadeBox;
 
     if (sStyleDecorColor != 0) {
-        sStyleDecorObj = (s32)New_BoxFill(sStyleDecorBoxSize, (BoxFillRgb *)sStyleDecorColor, 0);
+        sStyleDecorObj = (s32)New_BoxFill(sStyleDecorBoxSize, (ColorRgb *)sStyleDecorColor, 0);
         ((BoxFill *)sStyleDecorObj)->methods->setSemiTransOn((BoxFill *)sStyleDecorObj, 1);
         ((BoxFill *)sStyleDecorObj)->methods->setSemiTransRate((BoxFill *)sStyleDecorObj, 0);
 
@@ -1239,8 +1239,8 @@ void ApplyStyleDecorationIfSet(void) {
 /* The decoration set: this many BoxFill bands, stacked 3 pixels apart. */
 #define STYLE_DECOR_BANDS 18
 
-/* Every band's draw priority: the largest value BoxFill's default 13-bit
- * priority mask admits (BoxFill__Reset calls setMask(13)). */
+/* Every band's draw priority, which Viewport__DrawNode hands to
+ * GsSortBoxFill unmasked. */
 #define STYLE_DECOR_PRI 0x1FFF
 
 /* How far down (pixels) decor variant 2 draws the set. */
@@ -1406,7 +1406,7 @@ void StyleUpdateDecorSet(void) {
         slot++;
     } while (i < STYLE_DECOR_BANDS);
     AdjustRgbByDelta(rgb, (u8 *)sStyleClearColor, fade);
-    viewport->methods->setClearColor(viewport, (ViewportRgb *)rgb);
+    viewport->methods->setClearColor(viewport, (ColorRgb *)rgb);
 }
 
 /* dst = src with red and green less `delta`, blue more. */
@@ -3059,8 +3059,8 @@ void *AcceptGridElem(void *cell, void *offset, void *pos) {
  * event): SceneNode's slot declares self alone, hence the cast. */
 void Actor__OnActorLinkCommand(Actor *self, void *sender, s32 event) {
     GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
-    if (event < 9) {
-        if (event >= 5) { /* MATCHING: nested, as && folds to one unsigned test */
+    if (event <= ACTOR_EVENT_MOVED_Y) {
+        if (event >= ACTOR_EVENT_UNSWEPT) { /* MATCHING: nested, as && folds to one unsigned test */
             ((void (*)(Actor *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
         }
     }
@@ -3252,7 +3252,7 @@ extern char sGraphTimPath[];
 
 void GraphRoom__Reset(GraphRoom *self) {
     self->fadeRate = 5;
-    self->unk2C = 400;
+    self->maxPackets = 400;
     self->methods->setSubHandle(self, sGraphTimPath, NULL);
     self->methods->setFrameBound(self, 10);
 }
@@ -3276,16 +3276,16 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
     }
 }
 
-/* A graph point's colour is New_BoxFill's colour argument, a BoxFillRgb
+/* A graph point's colour is New_BoxFill's colour argument, a ColorRgb
  * (include/BoxFill.h).
- * MATCHING: signed, and exactly three bytes -- the whole-struct copy of `rgb`
- * below is three lb/sb pairs. */
+ * MATCHING: exactly three bytes, so the whole-struct copy of `rgb` below is
+ * three lb/sb pairs. */
 extern s32 sGraphPointSize[2];
-extern BoxFillRgb sGraphPointNewestColor;
-extern BoxFillRgb sGraphPointBaseColor;
+extern ColorRgb sGraphPointNewestColor;
+extern ColorRgb sGraphPointBaseColor;
 
 void GraphRoom__BuildGraphPoints(GraphRoom *self) {
-    BoxFillRgb rgb;
+    ColorRgb rgb;
     s32 i;
 
     self->points[0] = New_BoxFill(sGraphPointSize, &sGraphPointNewestColor, 0);
@@ -3440,7 +3440,7 @@ fail:
     return 0;
 }
 
-extern BoxFillRgb sGraphPointHighlightColor;
+extern ColorRgb sGraphPointHighlightColor;
 
 void GraphRoom__TickHighlight(GraphRoom *self) {
     if (self->scored != 0) {

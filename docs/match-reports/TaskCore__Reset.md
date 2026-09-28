@@ -103,3 +103,7 @@ The colour table was first declared as "a rodata table reached only by
 ADDRESS (`lui`/`addiu`, no `lw`/`sw` here), passed as three pointers 3 bytes
 apart, never decoded further, so typed as a plain byte array". It is in
 .data (asm/data/5E140.data.s), not rodata.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+TaskCore fields renamed (include/TaskCore.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.

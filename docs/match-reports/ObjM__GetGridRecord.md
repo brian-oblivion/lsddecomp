@@ -96,3 +96,7 @@ although GameFiles.c defines it returning `FilePathRecord *`, so the record is
 returned only because it is still in $v0. Proposed for the head: that
 prototype returns `FilePathRecord *` (or `void *`), after which this body can
 `return` both calls.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into CdDriver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes CdDriver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

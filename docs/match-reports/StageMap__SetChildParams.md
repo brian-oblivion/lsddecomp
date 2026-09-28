@@ -97,3 +97,7 @@ an operator decision; not hand-reverted).
 ## Track 7 (2026-09-27, round 98, charlie)
 
 `colors += 3` -> `colors += sizeof(FlatLightColor)`, `dirs += 6` -> `dirs += 3 * sizeof(s16)` (an r,g,b and an s16 vx,vy,vz per light, include/FlatLightObj.h). Zero bytes. The `s32` source parameters stay (the slot's type in StageMap.h; proposed to the head as `FlatLightColor *` / `s16 *`, which would drop the casts and let the steps be `++` / `+= 3`).
+
+## Track 10 (2026-09-28, round 104, echo)
+
+The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

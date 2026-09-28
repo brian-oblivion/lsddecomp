@@ -202,13 +202,13 @@ void GridCell__DispatchLinkCommand(GridCell *self, BasicClass *sender, s32 event
     }
 }
 
-/* SceneNode's handling, then tryAttachNearby for events 5..8, the body of
+/* SceneNode's handling, then tryAttachNearby for the Actor move events (ACTOR_EVENT_UNSWEPT..MOVED_Y), the body of
  * Actor__OnActorLinkCommand. tryAttachNearby keeps SceneNode's one-parameter
  * slot type; this caller passes the sender and event too. */
 void GridCell__OnActorLinkCommand(GridCell *self, void *sender, s32 event) {
     GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
-    if (event < 9) {
-        if (event >= 5) { /* MATCHING: nested, as && folds to one unsigned test */
+    if (event <= ACTOR_EVENT_MOVED_Y) {
+        if (event >= ACTOR_EVENT_UNSWEPT) { /* MATCHING: nested, as && folds to one unsigned test */
             ((void (*)(GridCell *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
         }
     }
@@ -313,15 +313,15 @@ void TitleMenu__OnNotify(TitleMenu *self, BasicClass *sender, s32 event) {
 }
 
 void TitleMenu__Reset(TitleMenu *self) {
-    self->unk34 = 0;
-    self->unk2C = 400;
+    self->clearOnDeinit = 0;
+    self->maxPackets = 400;
     self->methods->setSubHandle(self, sTitleTimPath, 0);
     self->methods->setFrameBound(self, 10);
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 0);
 }
 
 /* Replaces TaskCore's onDeinit: clears both display buffers to the colour
- * unk93. */
+ * clearColor. */
 void TitleMenu__OnDeinit(TitleMenu *self) {
     u32 i;
     DrawRect *rect;
@@ -330,7 +330,7 @@ void TitleMenu__OnDeinit(TitleMenu *self) {
     rect = sDisplayBufferRects;
     for (; i < 2; i++) {
         ((DrawSystem *)self->initArgs->drawSystem)
-            ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->unk93, rect);
+            ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->clearColor, rect);
         rect++;
     }
 }
@@ -342,7 +342,7 @@ void TitleMenu__SetState(TitleMenu *self, s32 state) {
     }
     if (state == TASKCORE_STATE_START_PRESSED) {
         self->methods->onPadCancel(self);
-        self->methods->setActiveSlot(self, self->target->unk8, 1);
+        self->methods->setActiveSlot(self, self->target->initialSlot, 1);
         self->methods->onPadConfirm(self);
     }
 }

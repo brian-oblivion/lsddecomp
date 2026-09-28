@@ -180,3 +180,7 @@ The call-site view `SubObjE` (a method table padded to +0x07C getDims) was
 merged into DrawSystem: the init args' drawSystem is cast to `DrawSystem *`
 and its getDims result, a ScreenDims, to the `ViewportSize *` setScreenSize
 takes (both `{s32, s32}`). Byte-identical (`./build-and-verify.sh` OK).
+
+## Track 10 (2026-09-28, round 104, echo)
+
+Viewport's `ViewportSize` merged into DrawSystem.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.

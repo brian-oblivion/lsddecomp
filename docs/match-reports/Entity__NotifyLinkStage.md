@@ -154,3 +154,7 @@ wrong: GCC spells a constant-offset field of a global array as
 - Step 4: 0x7F -> ENTITY_LINK_STAGE_END_DREAM (127), 0xA/0xB/0xC -> the existing ENTITY_EFFECT_LINK_STAGE/EVENT_VIDEO/END_DREAM; `(u32)(event - 2) < 7` -> `event >= 2 && event <= 8`, byte-identical. The events 2..8 and 4 stay literal: no link-command event is named anywhere in the project yet.
 
 - Step 5: a function comment says what a row without a link stage drops; MATCHING line for the reuse of `event`.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+The link-event literals are spelled with their enums: 4 is `SCENENODE_EVENT_LINKED`, 2 and 3 `SCENENODE_EVENT_HULL_FIRST`/`HULL_LAST` (include/SceneNode.h), 5 to 8 `ACTOR_EVENT_UNSWEPT`..`ACTOR_EVENT_MOVED_Y` (include/Actor.h). Every function tested here receives the event through a DispatchLinkCommand/onActorLinkCommand/onGridCellLinkCommand chain from SceneNode's link protocol, so the numbers are that enum's. Byte-identical (`event < 9` spelled `event <= ACTOR_EVENT_MOVED_Y` compiles the same).

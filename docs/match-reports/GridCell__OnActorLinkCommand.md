@@ -335,3 +335,7 @@ The literals 5 and 9 stay: include/Actor.h's `ActorMoveEvent` names 5..8 as
 the events an Actor's moves send through notifyWithHull, but that the link
 commands this receives use the same numbering is not shown by any body here,
 and Actor__OnActorLinkCommand leaves them as literals too.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+The link-event literals are spelled with their enums: 4 is `SCENENODE_EVENT_LINKED`, 2 and 3 `SCENENODE_EVENT_HULL_FIRST`/`HULL_LAST` (include/SceneNode.h), 5 to 8 `ACTOR_EVENT_UNSWEPT`..`ACTOR_EVENT_MOVED_Y` (include/Actor.h). Every function tested here receives the event through a DispatchLinkCommand/onActorLinkCommand/onGridCellLinkCommand chain from SceneNode's link protocol, so the numbers are that enum's. Byte-identical (`event < 9` spelled `event <= ACTOR_EVENT_MOVED_Y` compiles the same).

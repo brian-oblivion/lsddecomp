@@ -252,3 +252,7 @@ extern const char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD", asm/data/FA4.rodata
 ## Track 10 (2026-09-28, round 104, alpha)
 
 `GameApplicationConfig::unk14` is `dreamSysConfigOption`, the name charlie gave the DreamSys word it lands in (DreamSys +0x924, `configOption`, set through slot228). Tier B: stored once here (sGameApplicationConfig passes 1); no code reads the word back. Proposed, not applied (DreamSys.h is world's): slot228 -> `getSetConfigOption`.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+DreamSysMethods `slot228` -> `getSetConfigOption`, the slot's occupant being DreamSys__GetSetConfigOption (`classtable.py gDreamSysMethods`, +0x228); the ctor's call now reads `methods->getSetConfigOption`, and GameApplicationConfig::dreamSysConfigOption's comment names the slot, its occupant and the field it stores to. Byte-identical.
