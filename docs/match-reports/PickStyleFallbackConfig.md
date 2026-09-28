@@ -23,7 +23,7 @@ extern s8 gStyleVariantPicks[];        /* 16-entry table, indexed by (sStyleDay+
 extern s32 sStyleVariant;
 extern s8 sStyleVariantConfigCounts[];        /* divisor table, indexed by "kind" -- raw index, no scale */
 extern s32 sStyleConfigIndex;
-extern s32 gStyleVariantConfigs[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
+extern s32 sStyleVariantConfigs[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
 extern s32 sStyleClearColor;
 extern u8 sStyleDecorColorsB[];        /* address only taken */
 extern u8 sStylePalette[];        /* 3-byte-stride table, indexed by a byte field */
@@ -51,7 +51,7 @@ void *PickStyleFallbackConfig(void) {
     divisor = sStyleVariantConfigCounts[kind];
     remainder = sum % divisor;
     sStyleConfigIndex = remainder;
-    result = (s8 *) gStyleVariantConfigs[kind] + remainder * 4;
+    result = (s8 *) sStyleVariantConfigs[kind] + remainder * 4;
     if (kind == 0) {
         b3 = result[3];
         sStyleClearColor = (s32) (sStylePalette + b3 * 3);
@@ -73,7 +73,7 @@ void *PickStyleFallbackConfig(void) {
 
 Notes:
 
-- `gStyleVariantConfigs[kind]` is loaded as a raw `s32` *value* (not an address-of),
+- `sStyleVariantConfigs[kind]` is loaded as a raw `s32` *value* (not an address-of),
   then used as a base address for further byte-granular pointer arithmetic
   (`+ remainder * 4`) -- exactly the `sStyleSceneRefs` "pointer stored as a plain
   scalar" idiom already established elsewhere in this unit, just for a
@@ -148,8 +148,8 @@ A).
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_800873DC` | `gStyleVariantPicks` | B | 16 bytes, each 0..3, indexed `(day + stage) & 0xF`; the byte read is stored as `sStyleVariant`. |
-| `D_800873D8` | `sStyleVariantConfigCounts` | A | 4 bytes {7, 10, 12, 5}, indexed by the variant, the divisor of the config index; they are exactly the record counts of the four tables `gStyleVariantConfigs` points at (0x80087340: 7 words, ...735C: 10, ...7384: 12, ...73B4: 5). |
-| `D_800873C8` | `gStyleVariantConfigs` | A | 4 pointers, one per variant, to arrays of 4-byte config records; the function returns `table[variant] + index * 4`, the record ApplyStyleConfig/FillStyleFromConfig read. |
+| `D_800873D8` | `sStyleVariantConfigCounts` | A | 4 bytes {7, 10, 12, 5}, indexed by the variant, the divisor of the config index; they are exactly the record counts of the four tables `sStyleVariantConfigs` points at (0x80087340: 7 words, ...735C: 10, ...7384: 12, ...73B4: 5). |
+| `D_800873C8` | `sStyleVariantConfigs` | A | 4 pointers, one per variant, to arrays of 4-byte config records; the function returns `table[variant] + index * 4`, the record ApplyStyleConfig/FillStyleFromConfig read. |
 | `D_8008AC84` | `sStyleConfigIndex` | A | written with the config index `(day + stage) % count`; nothing reads it. |
 | `D_800872C4` | `sStylePalette` | A | 24 RGB triples (FillStyleFromConfig, ApplyStyleConfig and this function index it by a config byte); this function takes byte 3's entry as `sStyleClearColor`. |
 | `D_80087234`, `D_8008726C` | `sStyleDecorColorsA`, `sStyleDecorColorsB` | B | two 18-triple colour tables (one per decor band); B when config byte 2 is palette entry 18 (`STYLE_DECOR_B_PALETTE_INDEX`), A otherwise. Which look each is, is not established, hence the letters. |

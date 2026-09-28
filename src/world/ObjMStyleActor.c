@@ -1297,7 +1297,7 @@ extern s8 gStyleVariantPicks[];
 extern s32 sStyleVariant;
 extern s8 sStyleVariantConfigCounts[];
 extern s32 sStyleConfigIndex;
-extern s8 *gStyleVariantConfigs[];
+extern s8 *sStyleVariantConfigs[];
 extern const u8 *sStyleClearColor;
 extern u8 sStyleDecorColorsB[];
 extern u8 sStylePalette[][3];
@@ -1325,7 +1325,7 @@ void *PickStyleFallbackConfig(void) {
     count = sStyleVariantConfigCounts[variant];
     index = seed % count;
     sStyleConfigIndex = index;
-    config = gStyleVariantConfigs[variant] + index * 4;
+    config = sStyleVariantConfigs[variant] + index * 4;
     if (variant == 0) {
         clearIndex = config[3];
         sStyleClearColor = sStylePalette[clearIndex];
