@@ -115,7 +115,7 @@ void Pad__LoadButtonTable(void) {
     }
 }
 
-void Pad__func_80025E94(void) {}
+void Pad__NoOpSlot54(void) {}
 
 PadMethods *Get_vtable_Pad(void) {
     return &gPadMethods;

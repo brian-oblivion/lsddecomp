@@ -36,7 +36,7 @@ void Pad__Init(Pad *self, s32 port) {
   loop-condition artifact, not an authored return value (see
   `Pad__LoadButtonTable`'s report). Declared `init` and `loadButtonTable` both
   `void` in `PadMethods` -- consistent with the two already-matched no-op
-  slots in this same table (`Pad__NoOpSlot4C`/`Pad__func_80025E94`, `+0x4C`/`+0x54`,
+  slots in this same table (`Pad__NoOpSlot4C`/`Pad__NoOpSlot54`, `+0x4C`/`+0x54`,
   both `void`). First-try full match with this typing; no register or
   reshaping fight needed.
 - Confirms field zeroing order (`heldMask`, `releasedMask`, `pressedMask` --

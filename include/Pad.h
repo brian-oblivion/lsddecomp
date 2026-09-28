@@ -61,7 +61,7 @@ struct PadMethods {
     /* +0x048 */ void (*dispatchEvents)(Pad *self); /* Pad__DispatchEvents */
     /* +0x04C */ void (*slot4C)(void);              /* Pad__NoOpSlot4C, empty, never called */
     /* +0x050 */ void (*loadButtonTable)(void);     /* Pad__LoadButtonTable */
-    /* +0x054 */ void (*slot54)(void);              /* Pad__func_80025E94, empty, never called */
+    /* +0x054 */ void (*slot54)(void);              /* Pad__NoOpSlot54, empty, never called */
 };
 
 struct Pad {

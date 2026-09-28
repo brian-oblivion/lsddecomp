@@ -1,4 +1,6 @@
-# Pad__func_80025E94
+# Pad__NoOpSlot54
+
+> Renamed from `Pad__func_80025E94` on 2026-09-28 (tools/rename.py). Address 0x80025e94.
 
 **Unit:** `src/class_16334.c` (naming pass, round 77, `runner/echo`)
 **Status:** MATCHED (2/2 words, full build verified byte-exact)
@@ -6,7 +8,7 @@
 
 ## What it does
 
-An empty function body (`void Pad__func_80025E94(void) { }`) compiling to
+An empty function body (`void Pad__NoOpSlot54(void) { }`) compiling to
 retail's `jr $ra; nop` at this slot. Trivially matched -- splat's own
 extraction already produced the correct bytes for an empty C function, no
 derivation was needed. Identical shape to `Pad__NoOpSlot4C` at `+0x4C`
