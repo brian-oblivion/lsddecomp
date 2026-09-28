@@ -53,7 +53,7 @@ void StyleBuildDecorSet(void) {
     if (gStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
-    paramB = *(PairXY *) &gStyleDecorSizeW;
+    paramB = *(PairXY *) &sStyleDecorSizeW;
     gStyleDecorSlots[0] = New_BoxFill(&paramB, (void *) sStyleDecorColors, 0x1FFF);
     for (i = 1; i < 0x12; i++) {
         obj = New_BoxFill(&paramB, (void *) (sStyleDecorColors + i * 3), 0x1FFF);
@@ -117,7 +117,7 @@ paramA = *(PairXY *) &sStyleDecorPosX;      /* NOT paramA[0] = ..; paramA[1] = .
 if (gStyleDecorVariant == 2) {
     paramA.y += 0x1E;
 }
-paramB = *(PairXY *) &gStyleDecorSizeW;
+paramB = *(PairXY *) &sStyleDecorSizeW;
 ```
 
 **Mechanism.** A struct assignment is a BLKmode `set`. gcc 2.6.3's `cse.c`
@@ -221,7 +221,7 @@ side effect of the image moving. The honest figures are the two in the title:
 ## Preserved near-miss body (1 word short, `#if 0` in `src/world/ObjMStyleActor.c`)
 
 Needs, already present earlier in the unit in strict ROM order:
-`extern s32 gStyleDecorVariant, sStyleDecorPosX, sStyleDecorPosY, gStyleDecorSizeW, sStyleDecorSizeH,
+`extern s32 gStyleDecorVariant, sStyleDecorPosX, sStyleDecorPosY, sStyleDecorSizeW, sStyleDecorSizeH,
 gStyleSceneRefs, sStyleDecorColors;`, `extern void *gStyleDecorSlots[];`,
 `extern void *New_BoxFill(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
@@ -252,7 +252,7 @@ void StyleBuildDecorSet(void) {
     if (gStyleDecorVariant == 2) {
         paramA.y += 0x1E;
     }
-    paramB = *(PairXY *) &gStyleDecorSizeW;
+    paramB = *(PairXY *) &sStyleDecorSizeW;
     i = 1;
     s1 = 3;
     obj = New_BoxFill(&paramB, (void *) sStyleDecorColors, 0x1FFF);
@@ -333,7 +333,7 @@ gStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` vi
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `gStyleDecorPosAX`/`AY` | `sStyleDecorPosX`/`Y` | A | copied whole and passed as attachToParent's third argument, BoxFill's screen position (BoxFillPos). |
-| `gStyleDecorPosBX`/`BY` | `gStyleDecorSizeW`/`H` | A | copied whole and passed as New_BoxFill's first argument, the size (BoxFill.h: BoxFillSize, width then height); `h` drops by 7 per band. |
+| `gStyleDecorPosBX`/`BY` | `sStyleDecorSizeW`/`H` | A | copied whole and passed as New_BoxFill's first argument, the size (BoxFill.h: BoxFillSize, width then height); `h` drops by 7 per band. |
 | `gStyleCueSelf` | `gStyleGrid` | A | RegisterStyleConfig stores its arg0; its one caller passes ObjM's `unk14`, the StageMap (IntermediateBase.h, ObjM.h); this unit calls StageMap's computeCellOffsets on it and parents every effect under it. |
 | `0x12` | `STYLE_DECOR_BANDS` (18) | A | the band count: New_BoxFill loop bound, ReleaseBasicClassArray count, the colour tables' 18 triples. |
 | `0x1FFF` | `STYLE_DECOR_PRI` | A | New_BoxFill's pri argument; 13 bits, the mask BoxFill__Reset's setMask(13) sets. Hex: a mask-shaped value. |
@@ -346,7 +346,7 @@ Local views replaced by the real classes: the `+0x0AC` slot on `gStyleSceneRefs`
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 
 ```c
-/* Local view: sStyleDecorPosX/sStyleDecorPosY and gStyleDecorSizeW/sStyleDecorSizeH are two
+/* Local view: sStyleDecorPosX/sStyleDecorPosY and sStyleDecorSizeW/sStyleDecorSizeH are two
  * adjacent 8-byte pairs, and this unit copies each into a local pair as a
  * WHOLE-STRUCT assignment rather than field by field.  That is not a style
  * choice -- it is load-bearing.  A BLKmode set makes gcc 2.6.3's cse.c call

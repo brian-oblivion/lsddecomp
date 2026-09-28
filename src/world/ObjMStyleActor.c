@@ -1346,12 +1346,12 @@ void *PickStyleFallbackConfig(void) {
 
 extern s32 sStyleDecorPosX;
 extern s32 sStyleDecorPosY;
-extern s32 gStyleDecorSizeW;
+extern s32 sStyleDecorSizeW;
 extern s32 sStyleDecorSizeH;
 extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
 extern s32 gStyleSceneRefs; /* a StyleSceneRefs * */
 
-/* sStyleDecorPosX/Y and gStyleDecorSizeW/H are adjacent word pairs.
+/* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs.
  * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
  * drop cached memory values; scalar copies lose retail's reloads). */
 typedef struct PairXY PairXY;
@@ -1379,7 +1379,7 @@ void StyleBuildDecorSet(void) {
     if (gStyleDecorVariant == 2) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
-    size = *(PairXY *)&gStyleDecorSizeW;
+    size = *(PairXY *)&sStyleDecorSizeW;
     gStyleDecorSlots[0] = New_BoxFill(&size, (void *)sStyleDecorColors, STYLE_DECOR_PRI);
     for (i = 1; i < STYLE_DECOR_BANDS; i++) {
         band = New_BoxFill(&size, (void *)(sStyleDecorColors + i * 3), STYLE_DECOR_PRI);
