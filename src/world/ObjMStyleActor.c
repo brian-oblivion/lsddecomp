@@ -2401,12 +2401,12 @@ extern Actor *gStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
 extern void *gStyleEffectTim;
 extern Viewport *gStyleEffectViewport;
 extern s32 sStyleEffectBaseViewY;
-extern s32 gStyleEffectModelIds[];
+extern s32 sStyleEffectModelIds[];
 
 /* Called once, from the class's ctor (StyleEffect__StyleEffect): snapshot the
  * viewpoint y, place self under `parent` at pos + offset, then build the
  * per-kind parts. The two model kinds link a model fetched from
- * gStyleEffectTmd by gStyleEffectModelIds[kind], and STYLE_EFFECT_MODEL_ROW
+ * gStyleEffectTmd by sStyleEffectModelIds[kind], and STYLE_EFFECT_MODEL_ROW
  * also gets its two model children; STYLE_EFFECT_SPRITES gets five
  * randomised sprites, STYLE_EFFECT_JITTER_SPRITES five plain ones
  * (StyleEffect__SpawnPlainSprites is StyleEffect__SpawnSprites(self, 0, 0,
@@ -2421,7 +2421,7 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
 
     kind = self->pendingExtra;
     if (kind <= STYLE_EFFECT_MODEL) {
-        s32 model = gStyleEffectTmd->methods->setBackClip(gStyleEffectTmd, gStyleEffectModelIds[kind]);
+        s32 model = gStyleEffectTmd->methods->setBackClip(gStyleEffectTmd, sStyleEffectModelIds[kind]);
         SceneNode__LinkModel((SceneNode *)self, (void *)model);
         kind = self->pendingExtra;
     }
@@ -2745,13 +2745,13 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
 extern Actor *gStyleEffectTmd;
 extern void *gStyleEffectTim;
 extern Viewport *gStyleEffectViewport;
-extern s32 gStyleEffectModelIds[3];
+extern s32 sStyleEffectModelIds[3];
 extern s16 sStyleEffectClutPos[2];
 
 extern void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy);
 
 /* Records the three sources, then points the first primitive of the TMD's
- * models 0 and 2 (gStyleEffectModelIds) at the CLUT at sStyleEffectClutPos. */
+ * models 0 and 2 (sStyleEffectModelIds) at the CLUT at sStyleEffectClutPos. */
 void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
     s32 i;
     TmdModel *model;
@@ -2761,7 +2761,7 @@ void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
     gStyleEffectViewport = (Viewport *)viewport;
     i = 0;
     do {
-        model = (TmdModel *)tmd->methods->setBackClip(tmd, gStyleEffectModelIds[i]);
+        model = (TmdModel *)tmd->methods->setBackClip(tmd, sStyleEffectModelIds[i]);
         TmdModel__SetFirstPrimClut(model, sStyleEffectClutPos);
         i++;
     } while (i < 2);

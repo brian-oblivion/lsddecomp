@@ -62,7 +62,7 @@ deleted.
 - **`Outer_fa50` -> `TmdModel`** (`inner` -> `object`). The one caller,
   `SetStyleEffectSources` (ObjMStyleActor.c), passes the value
   `gStyleEffectTmd`'s slot +0x080 returns for a model id; the same slot's
-  result for the same `gStyleEffectModelIds[]` is what
+  result for the same `sStyleEffectModelIds[]` is what
   `StyleEffect__InitByKind` (ObjMStyleActor.c) hands to
   `SceneNode__LinkModel`, which reads it as a `TmdModel` (`->object`,
   `->data->objects`). TmdModel's +0x010 is `object`.

@@ -32,7 +32,7 @@
  *            (+0x054), then reset(params), then InitByKind: attach under
  *            `parent` at pos + offset with the params' rotation and scale,
  *            snapshot the viewpoint y (sStyleEffectBaseViewY), link a model
- *            from gStyleEffectTmd (kinds 0 and 1, gStyleEffectModelIds[kind])
+ *            from gStyleEffectTmd (kinds 0 and 1, sStyleEffectModelIds[kind])
  *            and build the kind's children.
  *   reset (+0x040)
  *            SetParams: copy the whole params block into `params`, zero

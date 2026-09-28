@@ -35,7 +35,7 @@ void StyleEffect__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
 
     state = self->unk54;
     if (state < 2) {
-        s32 ret = gStyleEffectTmd->methods->slot80(gStyleEffectTmd, gStyleEffectModelIds[state]);
+        s32 ret = gStyleEffectTmd->methods->slot80(gStyleEffectTmd, sStyleEffectModelIds[state]);
         SceneNode__LinkModel(self, ret);
         state = self->unk54;
     }
@@ -71,7 +71,7 @@ extern D_8008ACA4Obj *gStyleEffectTmd;
 extern void *gStyleEffectTim;
 extern void *gStyleEffectViewport;
 extern s32 sStyleEffectBaseViewY;
-extern s32 gStyleEffectModelIds[];
+extern s32 sStyleEffectModelIds[];
 ```
 
 `LinkNode`'s `pad58[0xC]` was renamed `Vec3S unk58` (same size, offset and
@@ -138,7 +138,7 @@ Only caller is the class's ctor `StyleEffect__StyleEffect` (ObjMStyleActor.c), w
 ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(gStyleEffectViewport + 0x18)`
 into sStyleEffectBaseViewY; `AttachWithRotScale(self, parent, pos + offset,
 rotation, scale)`; for kind < 2, `SceneNode__LinkModel(self,
-gStyleEffectTmd->slot80(gStyleEffectModelIds[kind]))`; then kind 0 ->
+gStyleEffectTmd->slot80(sStyleEffectModelIds[kind]))`; then kind 0 ->
 StyleEffect__PlaceModelChildren(self, 0), 2 -> StyleEffect__BuildRandomSprites,
 3 -> StyleEffect__SpawnPlainSprites (= StyleEffect__SpawnSprites(self, 0, 0, NULL)).
 "Init" rests on the one ctor caller, so B.
@@ -217,7 +217,7 @@ ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: 
 
 Globals renamed with rename.py: D_8008ACA4 -> gStyleEffectTmd (the
 DREAMER.TMD LinkResource SetStyleEffectSources stores; kinds 0 and 1 take
-their model from it), D_8008AB98 -> gStyleEffectModelIds (the model index per
+their model from it), D_8008AB98 -> sStyleEffectModelIds (the model index per
 kind), D_8008ACAC -> gStyleEffectViewport (ObjM's cached Viewport; the +0x018
 word read here is refView.vp.y, the viewpoint y), gTrackedYSnapshot ->
 sStyleEffectBaseViewY (that y, snapshotted at build). PROPOSED for track 7:
