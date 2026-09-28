@@ -31,11 +31,11 @@ project's `_0xNNN` naming convention is reliable for this struct.
 
 ```c
 extern void *memset(unsigned char *dst, unsigned char c, int n);
-extern s32 SAVE_MAGIC;
+extern s32 sSaveMagic;
 
 void DreamSys__InitNewGame(DreamSys *this)
 {
-	this->unknown_sdata_0x178 = SAVE_MAGIC;
+	this->unknown_sdata_0x178 = sSaveMagic;
 	this->currentYear = 0;
 	this->currentDay = 0;
 	this->totalFlasbackUnlockScore = 0;

@@ -835,10 +835,10 @@ void DreamSys__SoundCueCallback(void *owner, SoundCueSet *set) {
 }
 
 /* The word every save block starts with. */
-extern s32 SAVE_MAGIC;
+extern s32 sSaveMagic;
 
 void DreamSys__InitNewGame(DreamSys *this) {
-    this->saveMagic = SAVE_MAGIC;
+    this->saveMagic = sSaveMagic;
     this->currentYear = 0;
     this->currentDay = 0;
     this->totalFlasbackUnlockScore = 0;
