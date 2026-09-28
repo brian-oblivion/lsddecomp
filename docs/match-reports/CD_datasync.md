@@ -10,7 +10,7 @@ Polls `func_80025900(-1)` against a deadline (`D_8008B3E4 = now + 0x1E0`) and
 a retry counter (`D_8008B3E8`, capped at `0x1E0000`) in a loop; on
 timeout/overflow it prints a diagnostic (`func_80025AE4` + `func_80012C20`
 with four values pulled from `D_8006D8D8[0..1]`, `D_8006D6A0[]` and
-`D_8006D620[D_8006D61D]`), calls `CD_flush()`, and returns -1. On
+`D_8006D620[CD_com]`), calls `CD_flush()`, and returns -1. On
 success it checks a hardware status bit through `D_8006D934`; if clear it
 returns 0, if set and `arg0 == 0` it loops again, otherwise returns 1.
 
@@ -49,7 +49,7 @@ s32 CD_datasync(s32 arg0)
         if (!ok) {
             puts(D_80010984);
             printf(D_80010994, p8D8[0], p6A0[p8D8[1]],
-                          p620[D_8006D61D], p6A0[p8D8[0]]);
+                          p620[CD_com], p6A0[p8D8[0]]);
             CD_flush();
             return -1;
         }
@@ -296,7 +296,7 @@ unit siblings reverted.
 
 `CD_readsync.md` (this same unit) recorded an "anomaly spotted in passing":
 this report's diagnostic call, `func_80012C20(D_80010994, p8D8[0],
-p6A0[p8D8[1]], p620[D_8006D61D], p6A0[p8D8[0]])`, looked structurally wrong
+p6A0[p8D8[1]], p620[CD_com], p6A0[p8D8[0]])`, looked structurally wrong
 compared to `CD_readsync`'s own byte-verified analog of the same block
 (which uses `D_8008B3EC` -- not `p8D8[0]` -- as the first `%s` argument).
 **Tried the direct fix first** (swap the first argument to `D_8008B3EC`,
@@ -327,7 +327,7 @@ iterations, best found **1605** (five successive improvements: 1895, 1770,
 this same round's `cb_read` experience that a lower permuter score is a
 LEAD, not a result). The winning mutation is a single, narrow change: the
 diagnostic `printf` call's last argument becomes an assignment expression,
-`printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D], ok =
+`printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[CD_com], ok =
 p6A0[p8D8[0]])`, reusing the ALREADY-LIVE `ok` flag variable as a throwaway
 sink for the same value that was already being computed there (`ok` is
 reassigned again on the next loop iteration before its old value is ever
@@ -402,7 +402,7 @@ s32 CD_datasync(s32 arg0)
              * the register target for this last argument's value -- a fresh
              * local here compiles worse (45/91 vs 49/91); see this report's
              * round-36 entry. */
-            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D],
+            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[CD_com],
                    ok = p6A0[p8D8[0]]);
             CD_flush();
             return -1;
@@ -544,7 +544,7 @@ pairing") but then declines to spend the budget on them. Spent it here:
    does not affect this class" finding from round 19.
 3. **One genuinely new axis**: hoisting the four diagnostic-call values
    into locals evaluated in a fixed order before the call (`t0 = p8D8[0];
-   t1 = p6A0[p8D8[1]]; t2 = p620[D_8006D61D]; printf(..., t0, t1, t2, ok =
+   t1 = p6A0[p8D8[1]]; t2 = p620[CD_com]; printf(..., t0, t1, t2, ok =
    p6A0[p8D8[0]]);`) -- **regressed with drift** (294938 bytes
    outside-range). Reverted.
 

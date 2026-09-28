@@ -32,7 +32,7 @@ of three ALREADY-MATCHED siblings in this unit, plus one new tail:
 1. Two debug prints (`func_80025AE4(D_80010A94)`,
    `func_80012C20(D_80010AA0, D_8006D90C)`).
 2. The zero-loop + thread-start sequence from `CD_initintr`, prefixed with
-   `D_8006D61D = 0; CD_mode = 0;`.
+   `CD_com = 0; CD_mode = 0;`.
 3. The link-wait loop + "close port" tail from `CD_flush`, followed by
    one extra `CD_cw(1, 0, 0, 0)` call this function adds on top.
 4. A conditional `CD_cw(1, 0, 0, 0)` guarded by `CD_status & 0x10`.
@@ -58,7 +58,7 @@ s32 CD_init(void)
     puts(D_80010A94);
     printf(D_80010AA0, D_8006D90C);
 
-    D_8006D61D = 0;
+    CD_com = 0;
     CD_mode = 0;
     CD_cbready = 0;
     CD_cbsync = 0;
@@ -518,7 +518,7 @@ s32 CD_init(void)
     puts(D_80010A94);
     printf(D_80010AA0, D_8006D90C);
 
-    D_8006D61D = 0;
+    CD_com = 0;
     CD_mode = 0;
     CD_cbready = 0;
     CD_cbsync = 0;

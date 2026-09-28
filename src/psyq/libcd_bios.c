@@ -28,7 +28,7 @@
  * as C instead.  Declarations are this unit's own view. */
 extern s32 CD_status1;
 extern s32 CD_nopen;
-extern u8 D_8006D61D;
+extern u8 CD_com;
 extern s32 D_8006D6C0[]; /* 0/1 flag table, selector 0..0x1B, same index family as D_8006D620 */
 extern s32 D_8006D7C0[]; /* 0/1 flag table, selector 0..0x1B */
 
@@ -98,7 +98,7 @@ s32 getintr(void) {
     *D_8006D8CC = 7;
     *D_8006D8C8 = 7;
 
-    if (cause != 3 || D_8006D7C0[D_8006D61D] != 0) {
+    if (cause != 3 || D_8006D7C0[CD_com] != 0) {
         if (!(CD_status & 0x10) && (resp[0] & 0x10)) {
             CD_nopen++;
         }
@@ -113,7 +113,7 @@ s32 getintr(void) {
     if (cause == 5) {
         puts(D_800109B0);
         if (CD_debug > 0) {
-            printf(D_800109BC, D_8006D620[D_8006D61D], CD_status, CD_status1);
+            printf(D_800109BC, D_8006D620[CD_com], CD_status, CD_status1);
         }
     }
 
@@ -124,7 +124,7 @@ s32 getintr(void) {
                 copy8(D_8008B3CC, resp);
                 return 2;
             }
-            if (D_8006D6C0[D_8006D61D] != 0) {
+            if (D_8006D6C0[CD_com] != 0) {
                 *(volatile u8 *)D_8006D8D8 = 3;
                 copy8(D_8008B3CC, resp);
                 return 1;
@@ -177,7 +177,7 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_sync);
  * (docs/match-reports/CD_ready.md). */
 #if 0
 extern s32 CD_debug;
-extern u8 D_8006D61D;
+extern u8 CD_com;
 extern const char *D_8006D620[];
 extern const char *D_8006D6A0[];
 
@@ -236,7 +236,7 @@ s32 CD_ready(s32 arg0, s32 arg1)
         }
 timeout:
         puts(D_80010984);
-        printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
+        printf(D_80010994, D_8008B3EC, D_8006D620[CD_com],
                       table[state[0]], table[state[1]]);
         CD_flush();
         result = -1;
@@ -319,7 +319,7 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_ready);
 #if 0
 extern s32 CD_debug;
 extern u8 CD_mode;
-extern u8 D_8006D61D;
+extern u8 CD_com;
 extern const char *D_8006D620[];
 extern const char *D_8006D6A0[];
 extern u8 CD_pos[4];               /* 4-byte record, written here for cmd == 2 */
@@ -403,7 +403,7 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
         }
     }
 
-    D_8006D61D = (u8)arg0;
+    CD_com = (u8)arg0;
     *D_8006D8C4 = (u8)arg0;
 
     if (arg3 != 0) {
@@ -430,7 +430,7 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
 timeout3:
             puts(D_80010984);
             src = table[state[1]];
-            printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
+            printf(D_80010994, D_8008B3EC, D_8006D620[CD_com],
                           table[state[0]], src);
             CD_flush();
             result = -1;
@@ -496,7 +496,7 @@ extern u8 CD_pos;
 extern u8 D_8006D619;
 extern u8 D_8006D61A;
 extern u8 CD_mode;
-extern u8 D_8006D61D;
+extern u8 CD_com;
 extern s32 D_8006D6A0[]; /* lookup table, indexed by a byte field << 2 */
 
 extern volatile u8 *D_8006D8C0;
@@ -684,7 +684,7 @@ s32 CD_init(void) {
     puts(D_80010A94);
     printf(D_80010AA0, D_8006D90C);
 
-    D_8006D61D = 0;
+    CD_com = 0;
     CD_mode = 0;
     CD_cbready = 0;
     CD_cbsync = 0;
@@ -965,7 +965,7 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
         /* MATCHING: &D_8008B3EC through a local pointer keeps retail's
          * unfolded lui/addiu for this argument; a plain reference folds. */
         pEC = &D_8008B3EC;
-        printf(D_80010994, *pEC, D_8006D620[D_8006D61D], p6A0[idx0], p6A0[idx1]);
+        printf(D_80010994, *pEC, D_8006D620[CD_com], p6A0[idx0], p6A0[idx1]);
         CD_flush();
         result = -1;
         goto after_diag;
@@ -1062,7 +1062,7 @@ s32 CD_datasync(s32 arg0) {
             puts(D_80010984);
             /* NON_MATCHING: the last argument reuses the dead `ok` as its
              * register target; a fresh local compiles further from retail. */
-            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D], ok = p6A0[p8D8[0]]);
+            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[CD_com], ok = p6A0[p8D8[0]]);
             CD_flush();
             return -1;
         }

@@ -90,7 +90,7 @@ missed condition or wrong constant anywhere):
    "data ready" flag (bit `0x20`) is set on `D_8006D8C0`, zero-filling the
    rest of an 8-byte stack buffer if fewer than 8 arrived.
 3. Re-arm the ports (write 1/7/7 to `D_8006D8C0`/`CC`/`C8`).
-4. Unless cause==3 with a false `D_8006D7C0[D_8006D61D]` lookup (a per-mode
+4. Unless cause==3 with a false `D_8006D7C0[CD_com]` lookup (a per-mode
    flag table, same selector family as `D_8006D620`/`D_6006D6A0`), update
    an error counter (`CD_nopen`) when a flag bit turns on across the
    read, latch the two response bytes into `CD_status`/`CD_status1`, and

@@ -44,7 +44,7 @@ Two block-order fixes DID matter and are already folded into the body below (doc
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80024E64 -> CheckCallback, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
 extern s32 CD_debug;                 /* verbosity level; libcd_bios.c's func_80028CE0 accessor */
 extern u8 CD_mode;
-extern u8 D_8006D61D;                  /* selector into D_8006D620 for the "name" of the current wait */
+extern u8 CD_com;                  /* selector into D_8006D620 for the "name" of the current wait */
 extern const char *D_8006D620[];       /* string table, selector 0..0x1B -- shared reading, libcd_bios.c */
 extern const char *D_8006D6A0[];       /* string table, selector 0..0x6 -- shared reading, libcd_bios.c */
 
@@ -105,7 +105,7 @@ s32 CD_sync(s32 arg0, s32 arg1)
         }
 timeout:
         puts(D_80010984);
-        printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
+        printf(D_80010994, D_8008B3EC, D_8006D620[CD_com],
                       table[state[0]], table[state[1]]);
         CD_flush();
         result = -1;
@@ -238,7 +238,7 @@ saved (`output-1250-1` through `output-2143-1`); best score **1250**
 **Translated the best candidate (1250) and verified through the real
 oracle -- the result is genuinely mixed, not a clean win, and was NOT
 adopted.** The candidate combines two changes: (1) hoisting
-`D_8006D620[D_8006D61D]` into a named local before the timeout `printf`
+`D_8006D620[CD_com]` into a named local before the timeout `printf`
 call, and (2) routing the literal `2` through an assignment embedded in
 the `st == 2` comparison itself (`if (st == (new_var2 = 2))`) rather than
 declaring it earlier -- a different POSITION for the same

@@ -284,7 +284,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
         idx0 = p8D8[0];
         idx1 = p8D9[0];
         __asm__("");
-        func_80012C20(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
+        func_80012C20(D_80010994, D_8008B3EC, D_8006D620[CD_com],
                       p6A0[idx0], p6A0[idx1]);
         CD_flush();
         result = -1;
@@ -439,12 +439,12 @@ one of this pass's assigned targets) but worth flagging since it could
 mislead whoever picks that stall back up: the report's preserved body has
 
 ```c
-func_80012C20(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D], p6A0[p8D8[0]]);
+func_80012C20(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[CD_com], p6A0[p8D8[0]]);
 ```
 
 but `asm/nonmatchings/libcd_bios/CD_datasync.s` (lines ~50-70) shows the
 EXACT same instruction shape as this function's own diagnostic block: `a1 =
-D_8008B3EC` (not `p8D8[0]`), `a2 = D_6006D620[D_8006D61D]`, `a3 =
+D_8008B3EC` (not `p8D8[0]`), `a2 = D_6006D620[CD_com]`, `a3 =
 D_8006D6A0[D_8006D8D8[0]]`, stack-arg = `D_8006D6A0[D_8006D8D8[1]]` —
 confirmed by reading the raw `.s` directly and cross-checking against this
 function's own byte-identical-shaped block. `D_80010994`'s format string
@@ -697,7 +697,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
          * a plain `D_8008B3EC` reference here compiles FOLDED instead.
          * See this report's round-36 entry. */
         pEC = &D_8008B3EC;
-        printf(D_80010994, *pEC, D_8006D620[D_8006D61D],
+        printf(D_80010994, *pEC, D_8006D620[CD_com],
                p6A0[idx0], p6A0[idx1]);
         CD_flush();
         result = -1;
@@ -920,7 +920,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
          * unfolded lui/addiu addressing retail uses for this argument;
          * a plain `D_8008B3EC` reference here compiles FOLDED instead. */
         pEC = &D_8008B3EC;
-        printf(D_80010994, *pEC, D_8006D620[D_8006D61D],
+        printf(D_80010994, *pEC, D_8006D620[CD_com],
                p6A0[idx0], p6A0[idx1]);
         CD_flush();
         result = -1;
@@ -992,7 +992,7 @@ cannot score this function because its symbol is absolute, so the evidence is
 `objdump -d -r` of `build/src/libcd_bios.c.o` with and without it): retail
 issues `lbu a0,0(s3)` and `lbu v0,1(s3)` (the two `p8D8` bytes) directly after
 the `puts` call; without the barrier the `p8D8[0]` load sinks below the
-`D_8008B3EC` and `D_8006D61D` loads for the `printf` arguments, and the index
+`D_8008B3EC` and `CD_com` loads for the `printf` arguments, and the index
 arithmetic reshuffles around it. Instruction order.
 
 ## History (moved from src/libcd_bios.c, comments pass)
