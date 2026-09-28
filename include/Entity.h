@@ -288,7 +288,7 @@ extern LongVec3 TRANSLATE_Z_MINUS256[];
 extern Ratio16 SCALE_QUARTER[];
 extern Ratio16 sScaleHalf[];
 extern Ratio16 SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS[]; /* {4/5, 6/5, 5/5} */
-extern Ratio16 SCALE_DOUBLE[];
+extern Ratio16 sScaleDouble[];
 extern Ratio16 SCALE_MINUS_SIXTY_FOURTH[];
 extern Ratio16 SCALE_EIGHT_SEVENTHS[];
 extern Ratio16 SCALE_UNIT[]; /* {1/1, 1/1, 1/1}, a .data copy of SceneNode.h's SCALE_ONE */

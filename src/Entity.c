@@ -617,7 +617,7 @@ void Entity__MoodCue07(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue08(Entity *this) {
-    this->methods->updateScale(this, 1, SCALE_DOUBLE);
+    this->methods->updateScale(this, 1, sScaleDouble);
     this->methods->addTranslation(this, sTranslateYMinus64);
 }
 
@@ -897,7 +897,7 @@ void Entity__MoodCue24(Entity *this, SoundCueSet *out) {
         out->slots[0].program = 7;
         out->slots[0].octave = -2;
     }
-    this->methods->updateScale(this, 1, SCALE_DOUBLE);
+    this->methods->updateScale(this, 1, sScaleDouble);
     this->methods->updateRotation(this, 0, sRotationYawPlus2);
     this->methods->moveLocalZ(this, -512, 0);
 }
@@ -994,7 +994,7 @@ void Entity__MoodCue30(Entity *this) {
     }
 
     if (this->state == 12) {
-        this->methods->updateScale(this, 1, SCALE_DOUBLE);
+        this->methods->updateScale(this, 1, sScaleDouble);
         this->methods->moveLocalY(this, -30, 0);
     } else {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
@@ -1115,7 +1115,7 @@ void Entity__MoodCue36(Entity *this) {
         roll = rand();
         scaleTemplate = SCALE_SIX;
         if ((roll & 1) != 0) {
-            scaleTemplate = SCALE_DOUBLE;
+            scaleTemplate = sScaleDouble;
         }
         this->methods->updateScale(this, 1, scaleTemplate);
         this->state = 11;

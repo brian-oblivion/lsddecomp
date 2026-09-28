@@ -13,7 +13,7 @@ void Entity__MoodCue24(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 7;
         out->unk20 = -2;
     }
-    this->methods->slot48(this, 1, SCALE_DOUBLE);
+    this->methods->slot48(this, 1, sScaleDouble);
     this->methods->slot44(this, 0, sRotationYawPlus2);
     this->methods->slotC4(this, -0x200, 0);
 }

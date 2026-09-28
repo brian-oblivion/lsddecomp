@@ -38,7 +38,7 @@ exactly with no manual constant derivation needed.
   an already-known field (`unk1C`/`unk30`/`unk44` respectively), splitting
   the existing padding runs.
 - `sRotationYawPlus2` — a fourth `D_8008xxxx` opaque data row, same convention as
-  `sScaleHalf`/`SCALE_DOUBLE`/`sTranslateYMinus64` already declared at the top of this
+  `sScaleHalf`/`sScaleDouble`/`sTranslateYMinus64` already declared at the top of this
   file.
 
 ## Final C

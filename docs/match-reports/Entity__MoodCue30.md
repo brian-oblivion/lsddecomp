@@ -22,7 +22,7 @@ void Entity__MoodCue30(Entity *this) {
     }
 
     if (this->unk44 == 0xC) {
-        this->methods->slot48(this, 1, SCALE_DOUBLE);
+        this->methods->slot48(this, 1, sScaleDouble);
         this->methods->slotCC(this, -0x1E, 0);
     } else {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
