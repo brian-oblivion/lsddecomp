@@ -58,4 +58,4 @@ nothing -- named by the project's empty-slot convention
 `StreamTask__NoOpSlot88`): the class and the table offset it fills
 (gTimImageMethods +0x080, `tools/classtable.py gTimImageMethods`). What the
 slot is for in the class tree is not established; no C calls it. The table
-field stays `slot80`, as the other empty slots' fields do (`include/CdStream.h`).
+field stays `slot80`, as the other empty slots' fields do (`include/cd_stream.h`).

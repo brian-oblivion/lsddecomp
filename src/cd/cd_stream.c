@@ -2,7 +2,7 @@
  * CdStream's methods: one streamed CD file (an FMV's sectors) read through
  * libcd's streaming library (StSetRing, StSetStream, StGetNext, StFreeRing)
  * with the CD audio routed into the SPU mix. The class, its fields and its
- * slots are declared in include/CdStream.h; MoviePlayer is the one holder.
+ * slots are declared in include/cd_stream.h; MoviePlayer is the one holder.
  *
  * One global, sActiveCdStream, is the stream that owns the drive: open sets
  * it, close clears it, and seek, startRead, stop, restart, mute and demute do
@@ -15,7 +15,7 @@
 #include <libcd.h>
 #include <libspu.h>
 #include "basic_class.h"
-#include "CdStream.h"
+#include "cd_stream.h"
 #include "cd_driver.h" /* CD_SECTOR_SHIFT */
 #include "bmem_pmgr.h"
 #include <strings.h>

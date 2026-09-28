@@ -10,7 +10,7 @@ Line numbers are as of commit b23bdf545 and drift; search for the name.
 
 **Verdict.** The function bodies are in good shape: one-line `MATCHING:`
 notes, Sony types under Sony's names, few raw casts. DrawSystem.c,
-FlatLightObj.c, TimImage.c, Pad.c, CdStream.c, application.c, StageGrid.c,
+FlatLightObj.c, TimImage.c, Pad.c, cd_stream.c, application.c, StageGrid.c,
 TodActor.c, DayTaskStageMap.c, WBgm.c and ScreenWidgets.c's FadeBox code
 are close to release quality. The debt is in declarations, a few
 conventions, names the code has outgrown, and headers written as analysis
@@ -72,7 +72,7 @@ rather than API.
   SJIS bytes make grep treat it as binary (`grep -a` finds them).
 - **Duplicate types.** `RotationRatio(s)` (DreamSys.h:172) is `Ratio16`;
   `SubObjE` (DayTaskStageMap.h:18) is a DrawSystem view; `SlotEntry`/`SrcDesc`
-  (Task.c:658, 670) are one record; `CdStreamFile` (CdStream.h:44) is
+  (Task.c:658, 670) are one record; `CdStreamFile` (cd_stream.h:44) is
   `CdlFILE`; a signed 3-byte colour is defined six times (`BgLayerRgb`,
   `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `ColorRgb`, `ViewportRgb`):
   one type. `FIX12_SHIFT` and `CD_SECTOR_SIZE` redefined at
@@ -182,7 +182,7 @@ by the debt item that owns it. A duplicate type is a MERGE, not a rename:
 so merge by hand, one commit per type, the accessors from the compiler.
 
 - **app/cd:** `SlotEntry`/`SrcDesc` (Task.c) into one record;
-  `CdStreamFile` (CdStream.h) into `CdlFILE`; TaskCore's `withSound` is
+  `CdStreamFile` (cd_stream.h) into `CdlFILE`; TaskCore's `withSound` is
   `void *` in its functions and `s32` in its slots; `SetTickCallbacks`'
   header prototype still names its parameters `arg1`/`arg2`.
 - **graphics:** the six signed 3-byte colour types (`BgLayerRgb`,

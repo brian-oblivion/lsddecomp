@@ -2,7 +2,7 @@
 #define MOVIEPLAYER_H
 
 #include "basic_class.h"
-#include "CdStream.h"
+#include "cd_stream.h"
 #include "DrawSystem.h"
 
 /*

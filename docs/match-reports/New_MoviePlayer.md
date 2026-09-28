@@ -53,4 +53,4 @@ Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | the size literal | `sizeof(MoviePlayer)` | A | each equals the object size the class header records (and the allocation retail makes); the image is byte-identical |
-| `speed` | `cdSpeed` | A | New_CdStream's speed argument (CdStream.h: < 4 means double speed) |
+| `speed` | `cdSpeed` | A | New_CdStream's speed argument (cd_stream.h: < 4 means double speed) |

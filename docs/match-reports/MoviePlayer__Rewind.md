@@ -76,7 +76,7 @@ First build. Written through a local copy of the global (`cur`) -- retail keeps 
 
 ## Track 4 (2026-09-26, round 87)
 
-The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Sub458B8`/`Methods458B8` are deleted; `unk60` is `CdStream *`; slot58 is `restart`, slot7C stays `slot7C` (empty occupant, typed from this call's arguments). MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+The +0x060 object is a CdStream (include/cd_stream.h, unified this round). `Sub458B8`/`Methods458B8` are deleted; `unk60` is `CdStream *`; slot58 is `restart`, slot7C stays `slot7C` (empty occupant, typed from this call's arguments). MoviePlayer's own view and field names are unchanged. Zero bytes changed.
 
 ## Track 4 (2026-09-26, round 89)
 

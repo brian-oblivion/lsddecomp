@@ -101,7 +101,7 @@ state before these renames.
 **Evidence.** Round 52 found no caller. There are three now, and they agree:
 
 - **Readers.** `BuildCdFilePath` (CdDriver) and `CdStream__Open`
-  (src/cd/CdStream.c) both build `"\\" + GetDataDirectory() + name + ";1"` and
+  (src/cd/cd_stream.c) both build `"\\" + GetDataDirectory() + name + ";1"` and
   pass the result to the CD file lookup. So the value is the directory
   part of an ISO9660 path, and it sits between the root `\` and the file
   name.
@@ -120,5 +120,5 @@ state before these renames.
 The pair is a plain setter and getter, which is tier A by definition, and
 the readers agree on what the value is for. `char *` is the true type. The
 unit's own declarations say `char *` since round 99. GameApplicationFileResource still
-declares `SetDataDirectory(s32)` and CdStream.c declares
+declares `SetDataDirectory(s32)` and cd_stream.c declares
 `void *GetDataDirectory(void)`. Both are left to their owners and proposed.

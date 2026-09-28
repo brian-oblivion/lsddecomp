@@ -57,7 +57,7 @@
 #include "TmdModel.h"
 #include "LinkResource.h"
 #include "DrawSystem.h"
-#include "CdStream.h"
+#include "cd_stream.h"
 #include "MoviePlayer.h"
 #include "bmem_pmgr.h"
 #include "GameApplicationFileResource.h"

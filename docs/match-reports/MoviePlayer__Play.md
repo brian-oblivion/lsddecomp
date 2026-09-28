@@ -109,7 +109,7 @@ The `DrawSys457C0` view is gone; the call goes through `include/DrawSystem.h`. D
 
 ## Track 4 (2026-09-26, round 87)
 
-The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Stream457C0`/`StreamMethods457C0` are deleted; `unk60` is `CdStream *`, the call is `open`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+The +0x060 object is a CdStream (include/cd_stream.h, unified this round). `Stream457C0`/`StreamMethods457C0` are deleted; `unk60` is `CdStream *`, the call is `open`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
 
 ## Track 4 (2026-09-26, round 89)
 

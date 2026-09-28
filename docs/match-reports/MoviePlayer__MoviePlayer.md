@@ -81,7 +81,7 @@ s32 MoviePlayer__MoviePlayer(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
 
 ## Notes
 
-First build, written straight away in the nested success-path shape (`if (stream != NULL) { if (MoviePlayer__InitFrame(...) == 0) { ...; return 0; } } return 1;`) that this session's MoviePlayer__Play/MoviePlayer__PullFrame established: retail's two failure exits share one `return 1` block, whose `li v0,1` reorg stole into the second branch's delay slot. Local views `Obj454C4`/`Methods454C4`/`Stream454C4` just above; New_CdStream (CdStream.c) is prototyped locally with void * return. DecDCTReset/DecDCToutCallback are Sony's (LIBPRESS), extern only.
+First build, written straight away in the nested success-path shape (`if (stream != NULL) { if (MoviePlayer__InitFrame(...) == 0) { ...; return 0; } } return 1;`) that this session's MoviePlayer__Play/MoviePlayer__PullFrame established: retail's two failure exits share one `return 1` block, whose `li v0,1` reorg stole into the second branch's delay slot. Local views `Obj454C4`/`Methods454C4`/`Stream454C4` just above; New_CdStream (cd_stream.c) is prototyped locally with void * return. DecDCTReset/DecDCToutCallback are Sony's (LIBPRESS), extern only.
 
 ## Naming
 
@@ -89,7 +89,7 @@ First build, written straight away in the nested success-path shape (`if (stream
 
 ## Track 4 (2026-09-26, round 87)
 
-The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Stream454C4`/`StreamMethods454C4` and the local New_CdStream extern are deleted; +0x060 `stream` is `CdStream *` and slot40 is `setRing`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+The +0x060 object is a CdStream (include/cd_stream.h, unified this round). `Stream454C4`/`StreamMethods454C4` and the local New_CdStream extern are deleted; +0x060 `stream` is `CdStream *` and slot40 is `setRing`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
 
 ## Track 4 (2026-09-26, round 89)
 
@@ -102,7 +102,7 @@ Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `speed` | `cdSpeed` | A | as New_MoviePlayer's |
-| `15` | `MOVIE_FPS` | A | New_CdStream's fps parameter (include/CdStream.h) |
+| `15` | `MOVIE_FPS` | A | New_CdStream's fps parameter (include/cd_stream.h) |
 | `0x12000` | `MOVIE_RING_SIZE` (`36 * CD_SECTOR_SIZE`) | A | setRing hands StSetRing size / 2048 sectors; 0x12000 is 36 of them |
 | `unk50` | `pendingStart` (include/MoviePlayer.h) | B | cleared here; MarkPlaying 1, MarkStopped -1; Advance starts the stream read while it is nonzero, counting loops down when negative, then clears it |
 | DecDCTReset/DecDCToutCallback prototypes | <libpress.h> | A | local copies deleted |

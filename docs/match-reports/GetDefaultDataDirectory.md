@@ -38,5 +38,5 @@ address of the sdata string `"CDI\\"` (`D_8008A958`). Its one caller,
 GameApplication's ctor, passes it straight to `SetDataDirectory`
 (GameApplicationFileResource.c), which installs the directory BuildCdFilePath and
 CdStream__Open put between the root `\` and a file name. Retyped `char *`
-here, in GameApplicationFileResource.c's externs, and in CdStream.c's `GetDataDirectory`
+here, in GameApplicationFileResource.c's externs, and in cd_stream.c's `GetDataDirectory`
 prototype; zero bytes. Proposed by charlie's GameApplicationFileResource pass.

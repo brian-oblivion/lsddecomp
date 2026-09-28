@@ -86,7 +86,7 @@ Fifth build. Early-return shape (`if (self->unk48 != 0) return 1; ... if (r == 0
 
 ## Track 4 (2026-09-26, round 87)
 
-The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Stream45AD8`/`StreamMethods45AD8` are deleted; `unk60` is `CdStream *`; slot6C is `getNextFrame`, slot70 `freeRing`, slot54 `stop`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+The +0x060 object is a CdStream (include/cd_stream.h, unified this round). `Stream45AD8`/`StreamMethods45AD8` are deleted; `unk60` is `CdStream *`; slot6C is `getNextFrame`, slot70 `freeRing`, slot54 `stop`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
 
 ## Track 4 (2026-09-26, round 89)
 

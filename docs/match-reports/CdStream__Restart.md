@@ -4,7 +4,7 @@
 
 > Renamed from `func_80047574` on 2026-09-25 (tools/rename.py). Address 0x80047574.
 
-Round 82, runner delta. Unit `src/cd/CdStream.c` (carved from psyq_3770c in
+Round 82, runner delta. Unit `src/cd/cd_stream.c` (carved from psyq_3770c in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build of the real body; whole-image SHA1 green.
 
@@ -35,10 +35,10 @@ void CdStream__Restart(CdStreamObj *self) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
+Class unified as `CdStream` (include/cd_stream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
 
 Renamed from CdStreamObj__Restart (tools/rename.py), the class rename only.
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-CdStream.h's own `CdStreamFile` is gone: `CdStream::file` is Sony's `CdlFILE` (CdStream.h includes <libcd.h>; every unit that sees the header builds with it), and the seek slot takes `CdlLOC *`. CdSearchFile no longer needs a cast; CdControl/CdControlF take the location as `u_char *`, Sony's parameter type, as in cd_driver.c. Byte-identical.
+cd_stream.h's own `CdStreamFile` is gone: `CdStream::file` is Sony's `CdlFILE` (cd_stream.h includes <libcd.h>; every unit that sees the header builds with it), and the seek slot takes `CdlLOC *`. CdSearchFile no longer needs a cast; CdControl/CdControlF take the location as `u_char *`, Sony's parameter type, as in cd_driver.c. Byte-identical.
