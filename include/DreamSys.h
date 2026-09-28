@@ -848,7 +848,7 @@ extern StageSpawn *sStageSpawnPoints[];
 extern u8 sStageSpawnPointsCount[];
 
 extern StageSpawn *sStagePermalinkSpawns[];
-extern StaticLinkTrigger *STAGE_PERMALINK_TRIGGERS[];
+extern StaticLinkTrigger *sStagePermalinkTriggers[];
 extern s8 LEN_STAGE_PERMALINK_TRIGGERS[];
 
 extern s16 SPECIAL_DAYS[];

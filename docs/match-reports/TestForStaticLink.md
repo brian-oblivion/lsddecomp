@@ -7,7 +7,7 @@
 A pure forwarding wrapper: passes its own three arguments straight through
 to `GetStaticSpawn` (still `INCLUDE_ASM`) and appends a fixed trailing
 quadruple identifying which permalink table set to search
-(`LEN_STAGE_PERMALINK_TRIGGERS`, `STAGE_PERMALINK_TRIGGERS`,
+(`LEN_STAGE_PERMALINK_TRIGGERS`, `sStagePermalinkTriggers`,
 `sStagePermalinkSpawns`, literal `1`).
 
 ## The C
@@ -16,7 +16,7 @@ quadruple identifying which permalink table set to search
 s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
 {
 	return GetStaticSpawn(target, currentPos, stage, LEN_STAGE_PERMALINK_TRIGGERS,
-	                       STAGE_PERMALINK_TRIGGERS, sStagePermalinkSpawns, 1);
+	                       sStagePermalinkTriggers, sStagePermalinkSpawns, 1);
 }
 ```
 
