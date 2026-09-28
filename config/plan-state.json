@@ -367,6 +367,16 @@
           "note": "item runners: prototypes (alpha), conventions (bravo), sony-code (charlie), all ticked; libapi.h was a false premise (kernel.h declares the calls); duplicate types moved to the debt items (revision 43)",
           "round": 103,
           "runners": 3
+        },
+        {
+          "attempts": 4,
+          "calibration": false,
+          "date": "2026-09-28",
+          "matches": 4,
+          "model": "opus",
+          "note": "item runners: debt-app-cd (alpha), debt-graphics (bravo), debt-world (charlie), debt-ui-sound (delta), all ticked; their cross-area proposals applied by a fifth runner (echo) after the four merged; IntermediateBase frameClock/lightRig retype measured wrong (adds casts) and dropped; head moved BasicClass's tail from TmdRenderer.c to BMemPMgr.c (one yaml boundary)",
+          "round": 104,
+          "runners": 5
         }
       ],
       "status": "auto"
