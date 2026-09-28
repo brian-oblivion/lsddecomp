@@ -9,7 +9,7 @@
  * Application -- the program's application shell: it brings up the console's
  * subsystems and runs the game's outer loop, and leaves what the loop does to
  * its subclass. Class id 0x60, method table gApplicationMethods, a direct
- * BasicClass subclass. Methods in src/code_2b78c.c.
+ * BasicClass subclass. Methods in src/Application.c.
  *
  * Lifecycle. It is abstract and never built on its own: its one subclass,
  * GameApplication (include/GameApplication.h), is the object main() (src/main.c)

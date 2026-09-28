@@ -10,7 +10,7 @@
  * slots). Methods in src/DrawSystem.c; no class derives from it.
  *
  * main() builds the one instance (New_DrawSystem) and hands it to
- * Application__InitSystems (code_2b78c), which stores it as the singleton
+ * Application__InitSystems (Application), which stores it as the singleton
  * (SetDrawSystem -> gDrawSystem) and calls its initGraph (GsInitGraph and
  * GsDefDispBuff for the screen size). Every other unit reaches it through
  * GetDrawSystem(): TimImage and the movie player upload through loadImage,

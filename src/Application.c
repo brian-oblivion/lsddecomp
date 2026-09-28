@@ -1,5 +1,5 @@
 /*
- * code_2b78c -- Application (include/Application.h), the application shell:
+ * Application -- Application (include/Application.h), the application shell:
  * its ctor (CD init, data source, default screen), its finalize, the screen
  * size setter, initSystems (display, sound and 3D bring-up, and the shared
  * task argument block), a no-op slot, the never-returning main loop that
