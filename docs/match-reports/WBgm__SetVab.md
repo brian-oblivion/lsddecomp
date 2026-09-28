@@ -126,7 +126,7 @@ s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern u8 sSsSizeTableBuf[];
 ```
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)

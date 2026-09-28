@@ -20,7 +20,7 @@ extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEve
 
 extern s32 GetSsTicksPerSecond(void);
 
-extern u8 gSsSizeTableBuf[];
+extern u8 sSsSizeTableBuf[];
 
 /* The volume, left and right, a SEQ gets when it opens and again on every
  * play (libsnd's range is 0 to 127). */
@@ -196,5 +196,5 @@ s32 IsWBgmActive(void) {
 }
 
 void *GetSsSizeTableBuf(void) {
-    return &gSsSizeTableBuf;
+    return &sSsSizeTableBuf;
 }

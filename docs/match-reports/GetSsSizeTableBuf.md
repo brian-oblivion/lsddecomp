@@ -6,7 +6,7 @@ Round 81, runner echo. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** not a class slot; unit-level getter.
-- **What:** address getter `return &gSsSizeTableBuf;` (an undefined-auto bss symbol, `lui`/`addiu`).
+- **What:** address getter `return &sSsSizeTableBuf;` (an undefined-auto bss symbol, `lui`/`addiu`).
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 0
   insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`). No levers were needed.
@@ -14,13 +14,13 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 ## Naming
 
-`GetSsSizeTableBuf`, tier B. returns `&gSsSizeTableBuf`; its only caller (`VabStreamObj__VabStreamObj`, PlacementGridVabSound.c) passes it straight to Sony's `SsSetTableSize`. The buffer's role in libsnd's own bookkeeping is established; why this WBgm-owning file holds it (rather than the VAB-streaming unit that consumes it) is not.
+`GetSsSizeTableBuf`, tier B. returns `&sSsSizeTableBuf`; its only caller (`VabStreamObj__VabStreamObj`, PlacementGridVabSound.c) passes it straight to Sony's `SsSetTableSize`. The buffer's role in libsnd's own bookkeeping is established; why this WBgm-owning file holds it (rather than the VAB-streaming unit that consumes it) is not.
 
 ## Source
 
 ```c
 void *GetSsSizeTableBuf(void) {
-    return &gSsSizeTableBuf;
+    return &sSsSizeTableBuf;
 }
 ```
 
@@ -67,5 +67,5 @@ s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern u8 sSsSizeTableBuf[];
 ```

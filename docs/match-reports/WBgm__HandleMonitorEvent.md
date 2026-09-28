@@ -33,7 +33,7 @@ s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern u8 sSsSizeTableBuf[];
 
 WBgm *New_WBgm(s32 vabArg, s32 seqArg, s32 autoPlay) {
     WBgm *self;
@@ -123,7 +123,7 @@ s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
 extern s32 gWBgmActive;
-extern u8 gSsSizeTableBuf[];
+extern u8 sSsSizeTableBuf[];
 ```
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
