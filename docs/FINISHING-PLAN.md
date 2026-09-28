@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 37 (2026-09-27, premium session after round 98: the
-rename tools share one history rule, and replay stages its edits).
+Plan revision: 38 (2026-09-28, round 101's premium head: a files job
+never glues a region onto a batch it would take past its unit limit).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
