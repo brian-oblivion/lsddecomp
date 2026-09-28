@@ -68,8 +68,8 @@ not what the slot means). Kept the tier-C `Class__func_xxxxx` form.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__func_5748c`. Occupant of +0x0C4: Actor__MoveAlongLocalAxis(self, &sActorLocalMoveZ, val, notify, 6). sActorLocalMove is an s16 vector passed whole to addLocalTranslation (RotateLocalVector reads src[0..2]), so ABA4/ABA6/ABA8 are x/y/z and this is the z move. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__func_5748c`. Occupant of +0x0C4: Actor__MoveAlongLocalAxis(self, &sActorLocalMoveZ, val, notify, 6). sActorLocalMove is an s16 vector passed whole to addLocalTranslation (RotateLocalVector reads src[0..2]), so ABA4/ABA6/ABA8 are x/y/z and this is the z move. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 99, alpha)
 
-`python3 tools/rename.py D_8008ABA8 sActorLocalMoveZ`, **tier A**: the s16 at 0x8008ABA8, right after sActorLocalMove's x (ABA4) and y (ABA6), used as the axis here as they are in MoveLocalX/Y. The event is ACTOR_EVENT_MOVED_Z (enum ActorMoveEvent, include/Actor.h).
+`python3 tools/rename.py D_8008ABA8 sActorLocalMoveZ`, **tier A**: the s16 at 0x8008ABA8, right after sActorLocalMove's x (ABA4) and y (ABA6), used as the axis here as they are in MoveLocalX/Y. The event is ACTOR_EVENT_MOVED_Z (enum ActorMoveEvent, include/actor.h).

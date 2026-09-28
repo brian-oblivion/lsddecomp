@@ -55,7 +55,7 @@
 #include "pad.h"
 #include "FrameClock.h"
 #include "tmd_model.h"
-#include "Actor.h"
+#include "actor.h"
 #include "bmem_pmgr.h"
 
 /* The identity inputs SceneNode__Reset hands to updateRotation and

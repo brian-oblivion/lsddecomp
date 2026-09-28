@@ -865,7 +865,7 @@
         "gActorMethods": {
           "class": "Actor",
           "date": "2026-09-25",
-          "header": "include/Actor.h"
+          "header": "include/actor.h"
         },
         "gApplicationMethods": {
           "class": "Application",

@@ -111,4 +111,4 @@ an operator decision; not hand-reverted).
 
 ## Track 7 (2026-09-27, round 98, charlie)
 
-`(u8)header == 0x34` -> `ACTOR_CLASS_ID`, new in include/Actor.h (tier A: gActorMethods word +0x000 is 0x34, `classtable.py --scan`; the byte compare also passes TodActor, 0x234). Zero bytes.
+`(u8)header == 0x34` -> `ACTOR_CLASS_ID`, new in include/actor.h (tier A: gActorMethods word +0x000 is 0x34, `classtable.py --scan`; the byte compare also passes TodActor, 0x234). Zero bytes.

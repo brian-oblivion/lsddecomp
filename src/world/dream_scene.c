@@ -16,7 +16,7 @@
  *    to StyleScrollVramStrips) and its sound cues (StyleCue00..13);
  *  - StyleEffect (include/StyleEffect.h), whole, the Actor the style layer
  *    keeps at an offset from its target, then SetStyleEffectSources;
- *  - Actor (include/Actor.h), whole, the base of TodActor, DreamSys and
+ *  - Actor (include/actor.h), whole, the base of TodActor, DreamSys and
  *    StyleEffect;
  *  - VariantSprite (include/VariantSprite.h), whole;
  *  - GraphRoom (include/GraphRoom.h), whole, the mood graph screen.
@@ -45,7 +45,7 @@
 #include "LbdFile.h"
 #include "BoxFill.h"
 #include "FrameClock.h"
-#include "Actor.h"
+#include "actor.h"
 #include "StyleEffect.h"
 #include "Viewport.h"
 #include "SoundCueSet.h"
@@ -2239,7 +2239,7 @@ void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
  */
 
 /* The class and its children: include/StyleEffect.h (the owner),
- * include/Actor.h (modelChildren) and include/VariantSprite.h (sprites). */
+ * include/actor.h (modelChildren) and include/VariantSprite.h (sprites). */
 
 extern s32 sSpriteShiftX[];
 extern Ratio16 sSpriteScaleLarge[3];
@@ -2549,7 +2549,7 @@ void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale)
  *    identical functions that release them. Behind them, by address, sit the
  *    class's table getter and SetStyleEffectSources, which records the
  *    TMD resource, TIM image and viewport every StyleEffect draws from.
- *  - Actor (include/Actor.h), the base of TodActor, DreamSys and
+ *  - Actor (include/actor.h), the base of TodActor, DreamSys and
  *    StyleEffect: New_Actor and the constructor, the child bookkeeping that
  *    keeps the grid manager and the frame clock in `grid` and `ticker`,
  *    Reset, NotifyMove (the hull sweep sent after a move),
@@ -2791,7 +2791,7 @@ void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
 
 /* ---- Actor's movement and link search; VariantSprite's ctor -------------
  *
- * Actor's movement and link-search methods (include/Actor.h, occupants of
+ * Actor's movement and link-search methods (include/actor.h, occupants of
  * the base table gActorMethods, +0x0C8..+0x0EC), and VariantSprite's
  * allocator and ctor.
  *

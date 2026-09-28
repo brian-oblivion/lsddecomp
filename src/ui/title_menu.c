@@ -37,7 +37,7 @@
 #include <strings.h>
 #include "dream_sys.h"
 #include "scene_node.h"
-#include "Actor.h"
+#include "actor.h"
 #include "Viewport.h"
 #include "NodeGuardedViewport.h"
 #include "GridCell.h"

@@ -19,7 +19,7 @@
  * file record, GetStageMapChunkRecord), setGridSpan, setAcceptedTags,
  * setChildParams, setBounds, and enables it.
  * DreamSys__SpawnAtLink hands it the target (setTargetAndLoadChunks);
- * Actor keeps it as `grid` (include/Actor.h) when addChild sees a
+ * Actor keeps it as `grid` (include/actor.h) when addChild sees a
  * class-0x114 child. Disable unloads every slot; Finalize releases them.
  *
  * The chunk grid. A stage is `columns` x `rows` chunks (StageGridDimensions),

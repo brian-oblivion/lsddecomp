@@ -64,7 +64,7 @@ typedef struct SceneNodeMethods SceneNodeMethods;
  * parents with its hull in notifyVerts on an event in HULL_FIRST..HULL_LAST,
  * which SceneNode treats alike; a receiver whose model the hull touches
  * answers the sender with LINKED. Actor adds its move events after these
- * (include/Actor.h). */
+ * (include/actor.h). */
 enum SceneNodeLinkEvent {
     SCENENODE_EVENT_HULL_FIRST = 2,
     SCENENODE_EVENT_HULL_LAST = 3,

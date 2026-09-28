@@ -58,7 +58,7 @@ commit), all read only by this unit:
 
 Tier A for all six: each name says what the data is and where it goes,
 read from the bytes and the one site that uses it. `sStagePendingExtras`
-names the slot it feeds, not what pendingExtra means in the game (Actor.h:
+names the slot it feeds, not what pendingExtra means in the game (actor.h:
 NotifyMove adds it to |lastOffsetValue|).
 
 ## History (moved from src/ObjMStyleActor.c, comments pass)

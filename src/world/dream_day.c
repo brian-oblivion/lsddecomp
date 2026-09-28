@@ -44,7 +44,7 @@
 #include "dream_sys.h"
 #include "LinkResource.h"
 #include "ObjM.h"
-#include "Actor.h"
+#include "actor.h"
 #include "LightRig.h"
 #include "TimedTask.h"
 #include "draw_system.h"

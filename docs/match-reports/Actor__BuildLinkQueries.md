@@ -374,7 +374,7 @@ tools/check-nonmatching.sh # OK: 45 NON_MATCHING bodies in 15 units
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__BuildLinkQueries`. Helper of Actor__FindNearbyLink; `self->linkMgr` is now `self->grid` (cast to the DreamSysUnk4CObj view). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__BuildLinkQueries`. Helper of Actor__FindNearbyLink; `self->linkMgr` is now `self->grid` (cast to the DreamSysUnk4CObj view). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 

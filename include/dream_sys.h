@@ -4,7 +4,7 @@
 /*
  * DreamSys -- the dream in progress (class id 0x1F34, method table
  * gDreamSysMethods, getter GetDreamSysMethods): an Actor subclass
- * (include/Actor.h); no class derives from it. The ctor calls Actor's first
+ * (include/actor.h); no class derives from it. The ctor calls Actor's first
  * (DreamSys__DreamSys: GetActorMethods()->ctor), so the id parent is the
  * ctor-chain parent. Every method is in src/world/dream_sys.c. One instance, made
  * by GameApplication__GameApplication (src/app/game_shell.c, New_DreamSys) and kept in
@@ -42,7 +42,7 @@
  */
 
 #include "common.h"
-#include "Actor.h"
+#include "actor.h"
 #include "game_files.h"
 /* For StageChunk / GetMoodFromStageChunk, used by DreamSys__LogChunkMood. */
 #include "stage_grid.h"
@@ -230,10 +230,10 @@ struct TimImage;
 /* Actor::grid is the grid manager, StageMap (include/StageMap.h);
    dream_sys.c includes that header and calls it directly. */
 
-/* DreamSys's base class is Actor (include/Actor.h): DreamSys's own methods
+/* DreamSys's base class is Actor (include/actor.h): DreamSys's own methods
    reach the base implementations through GetActorMethods() and upcast. */
 
-/* The object. Actor's fields (include/Actor.h) run to +0x058; DreamSys's
+/* The object. Actor's fields (include/actor.h) run to +0x058; DreamSys's
  * own start there. New_DreamSys allocates 0x928 bytes. */
 struct DreamSys {
     ACTOR_FIELDS(DreamSysMethods);

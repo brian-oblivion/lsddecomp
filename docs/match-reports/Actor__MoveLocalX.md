@@ -59,7 +59,7 @@ tools/funcdiff.py Actor__MoveLocalX   # 14/14
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__ApplyOffsetSlot0`. Occupant of +0x0C8 in gActorMethods (the BASE table, so the method is Actor's, not DreamSys's): writes sActorLocalMove[0], the x of the local move vector (see Actor__MoveLocalZ), event 7. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__ApplyOffsetSlot0`. Occupant of +0x0C8 in gActorMethods (the BASE table, so the method is Actor's, not DreamSys's): writes sActorLocalMove[0], the x of the local move vector (see Actor__MoveLocalZ), event 7. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 
@@ -74,7 +74,7 @@ holds. The old one, verbatim:
 /*
  * dream_scene -- vram 0x800574C4..0x80057DBC, carved round 17
  * (2026-09-04), immediately behind dream_scene. Actor methods
- * (include/Actor.h; before round 82 they carried DreamSys's name, but they
+ * (include/actor.h; before round 82 they carried DreamSys's name, but they
  * are occupants of the BASE table gActorMethods, +0x0C8..+0x0EC) plus one
  * unrelated constructor:
  *
@@ -108,7 +108,7 @@ holds. The old one, verbatim:
   Evident from the bodies: MoveLocalX/Y write element 0/1, the shared
   Actor__MoveAlongLocalAxis passes `&sActorLocalMove[0]` to
   addLocalTranslation (which rotates a local s16 vector by the actor's
-  orientation, Actor.h) and clears the element again; dream_scene's
+  orientation, actor.h) and clears the element again; dream_scene's
   MoveLocalZ does the same through the next halfword, `sActorLocalMoveZ` (not
   renamed here: not this unit's; proposed as `sActorLocalMoveZ`).
 

@@ -155,7 +155,7 @@ rather than API.
   `APPLICATION_LOOP_SLOT5C`; CdDriver's "part N" notes are off by one.
 - **graphics:** `TmdModel__NoOpSlot4C`, `BasicClass__NoOpSlot34`,
   `sSortLightOff`, `sSortNdiv`; `TimImage flag48`; SceneNode link events 2/3/4
-  as literals (Actor.h names 5-8); `New_TimBlockSrc(s32 name)` and
+  as literals (actor.h names 5-8); `New_TimBlockSrc(s32 name)` and
   `ModelData__ForwardScan*` take pointers as `s32`; the `+ 0x5C` at
   tmd_renderer.c:1194 is `offsetof(PolyDrawCtx, sxy) - sizeof(DVECTOR)`;
   stale `unk2A` in TimBlockSrc.h/TileMap.h/TileAtlas.h (now `loadState`);

@@ -1,7 +1,7 @@
 #ifndef STYLEEFFECT_H
 #define STYLEEFFECT_H
 
-#include "Actor.h"
+#include "actor.h"
 #include "VariantSprite.h"
 
 /*
@@ -12,7 +12,7 @@
  * StyleEffectKind): a model, the same model with two copies in a row, or a
  * cluster of five sprites. Class id 0xEF34, method table
  * gStyleEffectMethods, getter GetStyleEffectMethods. Its ctor chains to
- * Actor's (include/Actor.h); no class derives from it.
+ * Actor's (include/actor.h); no class derives from it.
  *
  * Who builds it. StyleBuildEffectSlots, on the style layer's first tick,
  * first calls SetStyleEffectSources with the scene's DREAMER.TMD resource,

@@ -678,7 +678,7 @@ NON_MATCHING body promoted, round 69
 Renamed `SceneNode__NotifyTaggedParents` -> `SceneNode__AddToActorParents`
 (tier B), slot +0x0B4 `notifyTaggedParents` -> `addToActorParents`. Evidence,
 from the body: it walks `node`'s parent refs and, for each whose class id's
-low byte is 0x34 (ACTOR_CLASS_ID, include/Actor.h: Actor and every class
+low byte is 0x34 (ACTOR_CLASS_ID, include/actor.h: Actor and every class
 below it), calls that parent's addChild (+0x010) with self. It notifies
 nothing. Nothing calls the slot in C, so why a node joins another's Actor
 parents is not established (tier B).
