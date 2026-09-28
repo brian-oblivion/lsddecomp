@@ -13,7 +13,7 @@ still positive, calls `CD_getsector(D_8006D8E8, D_8006D8F0)`, advances
 sets `D_8006D8F4 = -1`. Records `D_8006D8F8 = func_80025900(-1)`. If
 `D_8006D8F4 < 0` and `D_8006D8DC > 0`, calls `cd_read_retry()`. If
 `D_8006D8F4 <= 0`, restores the `CD_cbsync`/`CD_cbready` callback pair from
-`D_8006D8FC`/`D_8006D900` and dispatches `D_8006D604(2 or 5, arg1)`.
+`D_8006D8FC`/`D_8006D900` and dispatches `CD_cbread(2 or 5, arg1)`.
 
 ## Best C reached (17/91 words -- restored to INCLUDE_ASM)
 
@@ -45,13 +45,13 @@ void cb_read(s32 arg0, s32 arg1)
         CD_cbsync = D_8006D8FC;
         CD_cbready = D_8006D900;
         CD_cw(9, 0, 0, 0);
-        if (D_8006D604 != 0) {
+        if (CD_cbread != 0) {
             if (D_8006D8F4 != 0) {
                 code = 5;
             } else {
                 code = 2;
             }
-            ((void (*)(s32, s32))D_8006D604)(code, arg1);
+            ((void (*)(s32, s32))CD_cbread)(code, arg1);
         }
     }
 }
@@ -138,13 +138,13 @@ shared:
         CD_cbsync = D_8006D8FC;
         CD_cbready = D_8006D900;
         CD_cw(9, 0, 0, 0);
-        if (D_8006D604 != 0) {
+        if (CD_cbread != 0) {
             if (D_8006D8F4 != 0) {
                 code = 5;
             } else {
                 code = 2;
             }
-            ((void (*)(s32, s32))D_8006D604)(code, arg1);
+            ((void (*)(s32, s32))CD_cbread)(code, arg1);
         }
     }
 }
@@ -378,13 +378,13 @@ shared:
         CD_cbsync = D_8006D8FC;
         CD_cbready = D_8006D900;
         CD_cw(9, 0, 0, 0);
-        if (D_8006D604 != 0) {
+        if (CD_cbread != 0) {
             if (D_8006D8F4 == 0) {
                 code = 2;
             } else {
                 code = 5;
             }
-            ((void (*)(s32, s32))D_8006D604)(code, arg1);
+            ((void (*)(s32, s32))CD_cbread)(code, arg1);
         }
     }
 }
@@ -585,13 +585,13 @@ shared:
         CD_cbsync = D_8006D8FC;
         CD_cbready = D_8006D900;
         CD_cw(9, 0, 0, 0);
-        if (D_8006D604 != 0) {
+        if (CD_cbread != 0) {
             if (D_8006D8F4 == 0) {
                 code = 2;
             } else {
                 code = 5;
             }
-            ((void (*)(s32, s32))D_8006D604)(code, arg1);
+            ((void (*)(s32, s32))CD_cbread)(code, arg1);
         }
     }
 }
@@ -747,13 +747,13 @@ if ((*(new_var = &D_8006D8F4)) <= 0) {
     CD_cbsync = D_8006D8FC;
     CD_cbready = D_8006D900;
     CD_cw(9, 0, 0, 0);
-    if (D_8006D604 != 0) {
+    if (CD_cbread != 0) {
         if ((*new_var) == 0) {
             code = 2;
         } else {
             code = 5;
         }
-        ((void (*)(s32, s32))D_8006D604)(code, arg1);
+        ((void (*)(s32, s32))CD_cbread)(code, arg1);
     }
 }
 ```
@@ -859,13 +859,13 @@ shared:
         CD_cbsync = D_8006D8FC;
         CD_cbready = D_8006D900;
         CD_cw(9, 0, 0, 0);
-        if (D_8006D604 != 0) {
+        if (CD_cbread != 0) {
             if ((*new_var) == 0) {
                 code = 2;
             } else {
                 code = 5;
             }
-            ((void (*)(s32, s32))D_8006D604)(code, arg1);
+            ((void (*)(s32, s32))CD_cbread)(code, arg1);
         }
     }
 }

@@ -293,7 +293,7 @@ down from 4.
 attempt does not repeat it:** enabling this change made `funcdiff.py`'s
 "differs outside this range" byte count go UP (298262 bytes, vs 253209
 before), and `build/lsdde.map` showed several unrelated data symbols
-(`D_8006D604`, `D_8006D608`, the whole `CD_cbsync.. D_8006D8D9` cluster)
+(`CD_cbread`, `D_8006D608`, the whole `CD_cbsync.. D_8006D8D9` cluster)
 linked 4 bytes earlier than their expected addresses. This LOOKED exactly
 like CLAUDE.md's "a struct edit for one function's sake silently breaks a
 different, already-matched function" hazard, and cost a real diagnostic

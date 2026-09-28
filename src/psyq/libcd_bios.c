@@ -488,7 +488,7 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_cw);
 extern s32 D_8006D8A4;
 extern s32 CD_cbsync;
 extern s32 CD_cbready;
-extern s32 D_8006D604;
+extern s32 CD_cbread;
 extern s32 D_8006D60C;
 extern s32 D_8006D610;
 extern s32 D_8006D614;
@@ -1172,13 +1172,13 @@ shared: {
         CD_cbsync = D_8006D8FC;
         CD_cbready = D_8006D900;
         CD_cw(9, 0, 0, 0);
-        if (D_8006D604 != 0) {
+        if (CD_cbread != 0) {
             if ((*new_var) == 0) {
                 code = 2;
             } else {
                 code = 5;
             }
-            ((void (*)(s32, s32))D_8006D604)(code, arg1);
+            ((void (*)(s32, s32))CD_cbread)(code, arg1);
         }
     }
 }
