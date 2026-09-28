@@ -51,4 +51,4 @@ tier-C placeholder stays.
 
 ## Name (track 10, debt-world): kept tier C
 
-The body clears one word (+0x78, `unk78`) and nothing else. No code calls the slot (slot128), and no code reads the word or sets it nonzero: ResetSessionState and ResetLinkState clear +0x78 too, and those are its only other accessors. The accessors show a cleared flag and nothing about what it flags, so the placeholder stays; the field went from `unk_0x78` to the `unk78` spelling.
+The body clears one word (+0x78, `unk78`) and nothing else. No code calls the slot (slot128), and no code reads the word or sets it nonzero: ResetSessionState and ResetLinkState clear it too, and those are its only other accessors. The accessors show a cleared flag and nothing about what it flags, so the placeholder stays; the field went from `unk_0x78` to the `unk78` spelling.
