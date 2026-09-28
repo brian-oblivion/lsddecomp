@@ -73,7 +73,7 @@ typedef struct TagCheckArg {
  * the TodActor itself rather than to another part. */
 #define TOD_PARENT_ROOT 0xFFFF
 
-/* TickCallbackA's move along local Z each tick (Actor's moveLocalZ). */
+/* TickMoveZ's move along local Z each tick (Actor's moveLocalZ). */
 #define TODACTOR_STEP_Z (-30)
 
 /* PlayTone's volume, both arguments of the bank's playTone (vol, endVol). */
@@ -419,7 +419,7 @@ void TodActor__Tick(TodActor *self) {
 void TodActor__SelectTickCallback(TodActor *self, s32 which) {
     switch ((u8)which) {
         case TICK_CALLBACK_A:
-            self->tickCallback = self->methods->tickCallbackA;
+            self->tickCallback = self->methods->tickMoveZ;
             break;
         case TICK_CALLBACK_B:
             self->tickCallback = self->methods->tickCallbackB;
