@@ -12,7 +12,7 @@ runner BRAVO. Matched on the first attempt — no residue.
 ## What it does
 
 A "retry/attempt band" gate, the same family as the already-matched
-`DreamSys__TickStaircaseYawPlus90`/`DreamSys__TickStaircaseYawPlus45`/`DreamSys__TickStaircaseCase3` a few functions earlier in
+`DreamSys__TickStaircaseYawPlus90`/`DreamSys__TickStaircaseYawPlus45`/`DreamSys__TickStaircaseYawMinus90` a few functions earlier in
 this unit (all four share the identical skeleton: on the first call,
 initialize `this->unk_0x91C` via `DreamSys__ApplyRelativeOffset` with a per-function
 `struct RelativePos` constant; branch on `this->unk_0xAC != 4`; in each
@@ -21,7 +21,7 @@ half-open `[lo, lo+len)` band tests on `this->unk_0x914` to conditionally
 set a flag/fire a call; finish by conditionally setting `this->unk_0x88`,
 unconditionally setting `this->unk_0xA0 = 1;`, bumping `this->unk_0x914`,
 and returning 0). This one has THREE bands per arm (its siblings have two),
-and reuses `sRotationYawMinus45` (already named, by `DreamSys__TickStaircaseCase3`) for its
+and reuses `sRotationYawMinus45` (already named, by `DreamSys__TickStaircaseYawMinus90`) for its
 `SceneNode__UpdateRotation` call in the `unk_0xAC == 4` arm.
 
 Both blocker screens are clean: no `gp_rel` hit and no
@@ -76,9 +76,9 @@ s32 DreamSys__TickStaircaseYawMinus135(DreamSys *this)
 
 Read the disassembly cold first (before checking for siblings) and derived
 the band boundaries directly from the `addiu`/`sltiu` immediates. Then
-found `DreamSys__TickStaircaseYawPlus90`/`DreamSys__TickStaircaseCase3` already in this same file just above
+found `DreamSys__TickStaircaseYawPlus90`/`DreamSys__TickStaircaseYawMinus90` already in this same file just above
 the `INCLUDE_ASM` line and confirmed the template — critically, that
-`DreamSys__TickStaircaseCase3` already answers the one real design question this shape
+`DreamSys__TickStaircaseYawMinus90` already answers the one real design question this shape
 poses: whether to cache `this->unk_0x914` in a local across the multiple
 band tests, or re-mention `this->unk_0x914` directly each time. The
 sibling's answer is "re-mention it, every time, including within the same
@@ -93,7 +93,7 @@ confirming the sibling's derivation rather than needing to re-derive it.
 **When a function's disassembly closely resembles an ALREADY-MATCHED
 function elsewhere in the SAME file, check for it and copy its exact idiom
 (local-variable-vs-repeated-field-access choices especially) before
-deriving from first principles.** `DreamSys__TickStaircaseCase3`'s C, sitting a few dozen
+deriving from first principles.** `DreamSys__TickStaircaseYawMinus90`'s C, sitting a few dozen
 lines above this function's own `INCLUDE_ASM` line, answered in advance
 the exact "cache in a local or re-read the field" question that has cost
 other functions in this unit multiple attempts (see

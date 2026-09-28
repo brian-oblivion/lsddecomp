@@ -331,7 +331,7 @@ extern struct RelativePos sStaircaseOffset0;
 /* The same, for DreamSys__TickStaircaseYawMinus135. */
 extern struct RelativePos sStaircaseOffset1;
 
-/* The same, for DreamSys__TickStaircaseCase3. */
+/* The same, for DreamSys__TickStaircaseYawMinus90. */
 extern struct RelativePos sStaircaseOffset3;
 
 /* (0 deg, +45 deg, 0 deg), forwarded as vtable slot +0x044's (SceneNode__UpdateRotation)
@@ -343,7 +343,7 @@ extern RotationRatios sRotationYawPlus45;
 
 /* (0 deg, -45 deg, 0 deg) -- the mirror of sRotationYawPlus45 above
    ({0,1} {0xFFD3,1} {0,1}), used the same way by
-   DreamSys__TickStaircaseYawMinus135 and DreamSys__TickStaircaseCase3. */
+   DreamSys__TickStaircaseYawMinus135 and DreamSys__TickStaircaseYawMinus90. */
 extern RotationRatios sRotationYawMinus45;
 
 /* Argument shape for InterpolateKeyframeValue: two "keyframe" points, each with a
@@ -598,7 +598,7 @@ typedef struct DreamSaveBlock {
 extern void (*sMoveCommandDispatch[5])(DreamSys *this, s32 val, void *extra);
 
 /* 4-entry table of `s32 (DreamSys *this)` functions (DreamSys__TickStaircaseYawPlus90,
-   DreamSys__TickStaircaseYawMinus135, DreamSys__TickStaircaseYawPlus45, DreamSys__TickStaircaseCase3),
+   DreamSys__TickStaircaseYawMinus135, DreamSys__TickStaircaseYawPlus45, DreamSys__TickStaircaseYawMinus90),
    indexed by GetLastSpawnExtra()'s return value and
    stashed into DreamSys::staircaseTickFn by DreamSys__TryStaircaseLink. */
 extern s32 (*sStaircaseTickFns[4])(DreamSys *this);

@@ -268,7 +268,7 @@ All in `include/DreamSys.h`:
   field existed before this round.
 - **`extern s32 (*sStaircaseTickFns[4])(DreamSys *this)`** -- a table of the four
   already-matched `s32 (DreamSys *this)` functions `DreamSys__TickStaircaseYawPlus90`/
-  `DreamSys__TickStaircaseYawMinus135`/`DreamSys__TickStaircaseYawPlus45`/`DreamSys__TickStaircaseCase3`, confirmed by their own
+  `DreamSys__TickStaircaseYawMinus135`/`DreamSys__TickStaircaseYawPlus45`/`DreamSys__TickStaircaseYawMinus90`, confirmed by their own
   existing definitions in `src/world/DreamSys.c`.
 - **`extern s32 TestForStaircaseNodes(...)`** and **`extern s32
   DreamSys__CheckStaircaseHeading(...)`** forward/call-site prototypes added near the

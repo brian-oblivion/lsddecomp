@@ -1,4 +1,6 @@
-# DreamSys__TickStaircaseCase3
+# DreamSys__TickStaircaseYawMinus90
+
+> Renamed from `DreamSys__TickStaircaseCase3` on 2026-09-28 (tools/rename.py). Address 0x8005ae40.
 
 > Renamed from `func_8005AE40` on 2026-09-22 (tools/rename.py). Address 0x8005ae40.
 
@@ -13,7 +15,7 @@ compute a boolean "close to the next trigger" flag that (if set) bumps
 `unk_0x88` to 2 — shared tail logic neither of the other two siblings had:
 
 ```c
-s32 DreamSys__TickStaircaseCase3(DreamSys *this)
+s32 DreamSys__TickStaircaseYawMinus90(DreamSys *this)
 {
 	s32 flag;
 
