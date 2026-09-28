@@ -144,14 +144,14 @@ s32 FindCdFileIndex(char *name) {
 }
 
 void *GetCdFileEntry(s32 index) {
-    void *result;
-    CdFileEntry *base;
+    CdFileEntry *entry;
+    CdFileEntry *table;
 
-    base = gFileTable;
+    table = gFileTable;
     LockCd();
-    result = &base[index];
+    entry = &table[index];
     UnlockCd();
-    return result;
+    return entry;
 }
 
 /* forward decls -- both defined later in this unit; ROM order keeps the
@@ -161,7 +161,7 @@ extern void SetCdState(s32 state);
 
 void TickCdStateMachine(void) {
     s32 state;
-    s32 v1;
+    s32 result;
     s32 newstate;
 
     LockCd();
@@ -187,15 +187,15 @@ L_state1:
     goto L_set;
 
 L_state2:
-    v1 = CdSync(1, NULL);
-    if (v1 == state)
+    result = CdSync(1, NULL);
+    if (result == state)
         goto L_reset;
-    if (v1 < 3) {
-        if (v1 == 0)
+    if (result < 3) {
+        if (result == 0)
             goto L_count;
         goto L_end;
     }
-    if (v1 != 5)
+    if (result != 5)
         goto L_end;
     newstate = 1;
     goto L_set;
@@ -214,10 +214,10 @@ L_state7:
     goto L_set;
 
 L_state8:
-    v1 = CdReadSync(1, 0);
-    if (v1 == -1)
+    result = CdReadSync(1, 0);
+    if (result == -1)
         goto L_pending;
-    if (v1 != 0)
+    if (result != 0)
         goto L_end;
 
 L_reset:
@@ -237,9 +237,9 @@ L_end:
 
 void TickCdLoadFileStateMachine(void) {
     s32 state;
-    s32 v1;
+    s32 result;
     s32 newstate;
-    void *tmp;
+    CdFileEntry *saved;
 
     LockCd();
     state = gCdState;
@@ -264,16 +264,16 @@ L_state1:
     goto L_set;
 
 L_state2:
-    v1 = CdSync(1, NULL);
-    if (v1 == state)
+    result = CdSync(1, NULL);
+    if (result == state)
         goto L_busy;
-    if (v1 < 3) {
-        if (v1 == 0)
+    if (result < 3) {
+        if (result == 0)
             goto L_count;
         goto L_end;
     }
     newstate = 1;
-    if (v1 == 5)
+    if (result == 5)
         goto L_set;
     goto L_end;
 
@@ -295,17 +295,17 @@ L_state7:
     goto L_set;
 
 L_state8:
-    v1 = CdReadSync(1, 0);
-    if (v1 == -1) {
+    result = CdReadSync(1, 0);
+    if (result == -1) {
         newstate = 1;
         goto L_set;
     }
-    if (v1 != 0)
+    if (result != 0)
         goto L_end;
     ResetCdStateMachine();
-    tmp = gCdSavedSeekParam;
+    saved = gCdSavedSeekParam;
     gCdSavedSeekParam = NULL;
-    gCdSeekParam = tmp;
+    gCdSeekParam = saved;
     goto L_end;
 
 L_set:
