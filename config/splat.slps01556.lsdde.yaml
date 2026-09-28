@@ -380,7 +380,7 @@ segments:
       # standalone rodata object resolves it by symbol. (PARALLEL-RUNS.md
       # Gate 2 previously listed 0xA8C as a text-pointer slot needing
       # attachment; that was wrong, and the carve links green without it.)
-      - [0x8220, c, BMemPMgr]
+      - [0x8220, c, app/BMemPMgr]
       # code_8220_b: second 20-function slice, 0x8A88..0x9F74.
       # 0x9F74 (func_80019774) is a real boundary -- func_8001974C is a
       # 10-word frameless leaf that ends in its own `jr $ra; nop`, and

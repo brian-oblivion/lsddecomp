@@ -234,7 +234,7 @@ whether the function itself matched)
   a retype, just an ordinary new-field insertion with a forgotten pad, and
   it still broke a sibling unit silently until the full-image oracle was
   re-run. See Proposed learning below.
-- `BasicClass__GetNextParentRef` (already matched, `src/BMemPMgr.c`) is called
+- `BasicClass__GetNextParentRef` (already matched, `src/app/BMemPMgr.c`) is called
   directly here (not through a vtable) — same "verbatim inherited BasicClass
   method, called by symbol" pattern already established for
   `BasicClass__Release` etc. Declared locally with this unit's own
