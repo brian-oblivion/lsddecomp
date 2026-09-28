@@ -100,7 +100,7 @@ ctor calls its parent's first) is the real inheritance, and
 table starts with its slots (release, ctor, finalize, a child list, a list of
 parent back-references, and `notifyParents`/`onNotify` events, which is how
 objects talk to each other). Each class has exactly one header,
-`include/<Class>.h`, holding its object struct, its method-table struct and
+`include/<class>.h` (the class's name in snake_case, `include/scene_node.h`), holding its object struct, its method-table struct and
 its prototypes; a class with subclasses exports `FIELDS`/`SLOTS` macros its
 children expand first. Each header's banner says what the class does, which
 units hold its methods and who builds it.
@@ -123,8 +123,8 @@ python3 tools/classtable.py <table> --vs <parent-table>   # what a subclass over
 | `src/app/` | the application shell and the object framework: the `BMemPMgr` pool allocator and the first half of `BasicClass`, `Application` and `GameApplication`, `FileResource`, the task classes (`TaskCore`, `IntermediateBase`, `StreamTask`) with `Viewport`, and `Pad` |
 | `src/cd/` | CD access and the game's files: `CdDriver`, `CdStream` streaming, `LbdFile` and the table of file names |
 | `src/graphics/` | the screen, the scene graph and rendering: `DrawSystem`, `SceneNode`, the sprites, `FrameClock`, the lights, `TmdModel` and the TMD renderer (after the rest of `BasicClass`), the Viewport's draw pass, and the loaders that turn TIM, TMD and TOD files into graphics objects (with the tile-map layer and the FMV player) |
-| `src/world/` | the dream world and its actors: `DreamSys`, `DayTask` and `StageMap`, the stage grid, `dream_aux`'s triggers, `Actor`, `TodActor` and `Entity`, and `ObjM` with the style layer and `GraphRoom` (after the second half of `ItemList`) |
-| `src/sound/` | the game's sound: `WBgm` background music and the VAB backend (`VabDriver`, `VabStreamObj`, sound cues), with the map chunks' `PlacementGrid` at the head of its file |
+| `src/world/` | the dream world and its actors: `DreamSys`, `DayTask` and `StageMap`, the stage grid, the dream's trigger entities, `Actor`, `TodActor` and `Entity`, and `ObjM` with the style layer and `GraphRoom` (after the second half of `ItemList`) |
+| `src/sound/` | the game's sound: `WBgm` background music and the VAB backend (`NullDriver`, `VabStreamObj`, sound cues), with the map chunks' `PlacementGrid` at the head of its file |
 | `src/ui/` | menus and 2D widgets: `TitleMenu` and the `TaskObjF` memory-card saves (after `NodeGuardedViewport` and `GridCell`, which the day's code uses), `TextEntry` and the first half of `ItemList`, `FadeBox`, `BoxFill` and `TextRow` |
 | `src/psyq/` | Sony library modules not linked from `lib/`, carried in `src/` as C or `INCLUDE_ASM` instead (`libsnd_*`, `libcd_bios`, `libgs_*`, `libspu_s_ih`, `libcard_card`), each file named for its Sony module; `libsnd_vmanager.c` opens with one game function, `ServiceSoundCueSet` |
 
@@ -154,8 +154,8 @@ Read each named class's header first; its banner points to the units.
   dream clock, the player's movement, the mood record that picks the next
   day's dream, and the "link" teleport that ends one stage and starts
   another. `Entity` (`src/world/entity.c`, over `TodActor`, `src/world/tod_actor.c`) is a TOD-animated
-  actor driven by per-mood tables. `stage_grid` maps mood-graph values to
-  stage chunks (`src/world/stage_grid.c`); `dream_aux` (`src/world/dream_aux.c`) spawns the
+  actor driven by per-mood tables. The stage grid maps mood-graph values to
+  stage chunks (`src/world/stage_grid.c`), and `src/world/dream_aux.c` spawns the
   dream's trigger entities;
   `StageMap` keeps the seven map chunks around its target loaded, each
   chunk's `PlacementGrid` linked into a lattice of `GridCell`s. `DayTask` runs one day around the
@@ -180,12 +180,12 @@ Read each named class's header first; its banner points to the units.
   from a file; its file interface is bound at run time to the active driver: `CdDriver`
   (`src/cd/cd_driver.c`: blocking file access, the CD request queue, its state
   machines and the file table)
-  or `VabDriver`. `TimImage` (`src/graphics/tim_image.c`), `TimArraySrc`, `TimBlockSrc`, `TileMap` and
+  or `NullDriver`. `TimImage` (`src/graphics/tim_image.c`), `TimArraySrc`, `TimBlockSrc`, `TileMap` and
   `TileAtlas` load and build textures.
 - **Movies.** `MoviePlayer` (`src/graphics/graphics_resources.c`) decodes MDEC FMV from a
   `CdStream` (`src/cd/cd_stream.c`, over libcd streaming).
 - **Sound.** `VabStreamObj` loads VAB banks, `WBgm` plays background music
-  (`src/sound/wbgm.c`), `src/sound/vab_sound.c` holds `VabDriver`, `VabStreamObj` and
+  (`src/sound/wbgm.c`), `src/sound/vab_sound.c` holds `NullDriver`, `VabStreamObj` and
   the sound-cue set beside the map chunks' `PlacementGrid`, and
   `src/psyq/libsnd_vmanager.c` is Sony's libsnd voice manager, carried in
   `src/` after the game's `ServiceSoundCueSet`.
