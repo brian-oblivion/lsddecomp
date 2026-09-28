@@ -121,3 +121,17 @@ CdDriver__NoOpSlot40 +0x040); and the allocation's `CDDRIVER_SIZE 0x2C`
 define, now `sizeof(CdDriver)`. The two externs' comments were also corrected:
 `BMemPMgrAlloc` is the game's own pool allocator (src/BMemPMgr.c), not a Psy-Q
 one.
+
+## History (moved from src/CdDriver.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> What decided its edges (tools/tuboundary.py, round 101). The rodata makes
+> parts 3, 4 and 5 one file with part 2: each was a carve unit whose start
+> edge is IMPOSSIBLE, because part 2's jump tables (0x80010810,
+> 0x80010828) lie after the strings of parts 3 and 5 (0x800107D8,
+> 0x800107F4). The edge between parts 1 and 2 is "boundary possible", and
+> the one forced boundary near it (tables 0x80010354 / 0x80010810) is
+> already met by the Sony objects before part 1, so content (one class)
+> joins them. The file starts after libc2/strcat and ends where
+> libcd_bios, Sony's libcd, begins.
