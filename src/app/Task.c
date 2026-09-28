@@ -522,7 +522,7 @@ void TaskCore__Exit(TaskCore *self) {
     self->methods->setState(self, TASKCORE_STATE_FADE_OUT);
 }
 
-void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx) {
+void TaskCore__SetExitCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx) {
     self->viewCallback = callback;
     self->viewCallbackCtx = ctx;
 }

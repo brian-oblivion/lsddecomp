@@ -22,14 +22,14 @@ void TaskCore__Exit(Obj86B60 *self)
 
 `self->unk9C` is a callback taking one opaque argument (`self->unkA0`,
 itself passed through unchanged); both are set together by
-`TaskCore__SetCallback` (see that report, next in ROM order below this one but
+`TaskCore__SetExitCallback` (see that report, next in ROM order below this one but
 established first since it is the 3-instruction setter). The `slot60(self,
 7)` call is unconditional -- happens whether or not the callback fired.
 
 ## Struct knowledge established
 
 - `Obj86B60::unk9C` (`void (*)(void*)`, +0x09C) and `::unkA0` (`void *`,
-  +0x0A0) -- OBSERVED here as call targets; set by `TaskCore__SetCallback`.
+  +0x0A0) -- OBSERVED here as call targets; set by `TaskCore__SetExitCallback`.
 
 ## Provenance
 
@@ -42,7 +42,7 @@ in `gTaskCoreMethods`; `gTitleMenuMethods` overrides the same slot with
 `TitleMenu__Exit`, same evidence shape as `Tick`/`SetState`
 above. Corroborated independently: this function's own body invokes
 `self->unk9C(self->unkA0)` when set, which is exactly the callback+ctx pair
-`TaskCore__SetCallback` installs -- see that report.
+`TaskCore__SetExitCallback` installs -- see that report.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

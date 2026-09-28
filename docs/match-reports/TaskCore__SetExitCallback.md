@@ -1,4 +1,6 @@
-# TaskCore__SetCallback — MATCH (3/3 words)
+# TaskCore__SetExitCallback — MATCH (3/3 words)
+
+> Renamed from `TaskCore__SetCallback` on 2026-09-28 (tools/rename.py). Address 0x8003caec.
 
 > Renamed from `Obj86B60__SetCallback` on 2026-09-25 (tools/rename.py). Address 0x8003caec.
 
@@ -9,7 +11,7 @@
 ## What it does
 
 ```c
-void TaskCore__SetCallback(Obj86B60 *self, void (*a1)(void *ctx), void *a2)
+void TaskCore__SetExitCallback(Obj86B60 *self, void (*a1)(void *ctx), void *a2)
 {
     self->unk9C = a1;
     self->unkA0 = a2;
