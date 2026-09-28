@@ -44,3 +44,9 @@ register) and the extern cannot drop the argument: the caller's
 - **Name:** `GetSoundEffectDir`
 - **Tier:** A
 - **Evidence:** dereferences GetSoundEffectDirRef(); its one cross-unit caller (DayTask__DayTask in dream_day.c) passes the result straight into a data-source ctor's base-path argument.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/game_files.h`:
+
+include/game_files.h carried the justification on the declaration line: "MATCHING: unprototyped, DayTask's ctor passes a dead argument retail loads (arity-ok: dead argument)". The header keeps an `arity-ok:` note for tools/externcheck.py and tools/declcheck.py; the `MATCHING:` line moved above the definition in src/cd/game_files.c.

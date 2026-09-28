@@ -146,3 +146,56 @@ apply by type scope.
   points the element's PlacementGrid (a 20x20 grid of placement records) at
   header + gridOffset and builds its LinkResource from header + gridOffset +
   gridSize, i.e. right after the placements. Accessor: dream_day.c only.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/lbd_file.h`:
+
+The class banner in include/lbd_file.h read, before it became the header's Doxygen class documentation:
+
+> /*
+>  * LbdFile -- one of the stage's map-chunk files, STGnn\Mnnn.LBD, loaded for
+>  * one element of the grid manager (class id 0x903, method table
+>  * gLbdFileMethods, parent FileResource; methods in src/cd/game_files.c; no
+>  * subclasses). The files it is handed are the sRecordTable records
+>  * GetStageMapChunkRecord(stage, chunk) returns: StageMap__ComputeChunkLoadEntry takes
+>  * each entry's name from the grid's callback, ObjM__GetGridRecord, whose
+>  * tail call leaves that record in $v0, and the record's first bytes are the
+>  * path ("STG00\M000.LBD" is record 9 of stage 0's group).
+>  *
+>  * The file is streamed in two stages. loadHeader (+0x078, FileResource's
+>  * processBuffer slot) opens the file and reads its first 0xB358 bytes into
+>  * the ctor's fixed `buffer` (loadState 9); that block starts with an
+>  * LbdFileHeader. When the CD driver reports the read done (onRequestDone, +0x064,
+>  * LbdFile__AdvanceLoadState, bit 0x80 of `flags`), `headerReady` is set and,
+>  * unless setAutoLoadData turned it off, loadDataBlock (+0x080) reads the
+>  * optional data block the header locates into a second allocation,
+>  * `dataBuffer` (loadState 10), setting `dataReady` when that read completes.
+>  * releaseHeader and releaseDataBlock free the two halves.
+>  *
+>  * Like every FileResource client it runs on the active driver: the ctor,
+>  * finalize, onRequestDone and cancelRequests chain to GetActiveDataSourceMethods()'s
+>  * first, and GetLbdFileMethods is in sDataSourceClientGetters, so
+>  * SetActiveDataSource rebinds this table's file-I/O slots.
+>  *
+>  * Its one user is the grid manager (StageMap), which makes one per grid
+>  * element (New_LbdFile in StageMap__StageMap, with freeGuard set so
+>  * freeBuffer keeps the fixed buffer), loads each element's chunk through it
+>  * (StageMap__ApplyChunkLoads), links the header block's placements and
+>  * models into the element's cells (StageMap__PopulateSlotCells), then
+>  * marks the header consumed (headerReady 2). ObjM__CheckAuxTrigger hands
+>  * the data block to TryDreamAuxTrigger and releases it when that returns 0.
+>  *
+>  * Three callers do not use their occupant's parameter list and cast through
+>  * a typedef below (no code):
+>  *  - +0x078 is FileResource's untyped processBuffer; ApplyRateEntries calls
+>  *    it as LbdFileLoadHeaderFn.
+>  *  - AdvanceLoadState calls +0x080 and LoadDataBlock calls +0x084 with no
+>  *    argument (retail sets no $a0; it still holds self):
+>  *    LbdFileLoadDataBlockNoArgFn and LbdFileReleaseDataBlockNoArgFn.
+>  *  - StageMap__ClearSlotCells passes +0x07C a second argument, the
+>  *    element, that LbdFile__ReleaseHeader never reads:
+>  *    LbdFileReleaseHeaderElemFn.
+>  */
+
+Two names in it, and in the field comments, were stale: `ApplyRateEntries` is StageMap__ApplyChunkLoads (the only caller through LbdFileLoadHeaderFn, and the writer of `chunkIndex`) and `BuildRateEntries` is StageMap__UpdateFootprintTracking (the second writer of `elemKey`); the class doc and fields now use the current names. The register detail ("retail sets no $a0; it still holds self") stays in src/cd/game_files.c as the two `MATCHING:` lines at the no-argument calls.
