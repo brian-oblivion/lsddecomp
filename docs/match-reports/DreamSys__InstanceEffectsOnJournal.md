@@ -614,3 +614,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
    in place on $a2 -- the "switch-index register" and "case-4 delay slot"
    residues were both this missing argument. */
 ```
+
+## History: track 10, debt-world
+
+The Entity view DreamSysEntityObj/DreamSysEntityMethods was merged into Entity: DreamSys.c now includes Entity.h (the SoundCueSet prototype conflict that kept the view no longer exists) and calls through `((Entity *)entity)->methods`; cases 9..12 are ENTITY_EFFECT_*. getMoodEffect's EntityMoodRow * is cast to the MoodGraphPoint * logInstanceMood takes. Byte-identical.

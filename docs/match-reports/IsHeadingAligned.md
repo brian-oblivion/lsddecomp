@@ -122,3 +122,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
    bare u16 for arithmetic while the other is only ever address-taken and
    handed to SceneNode__UpdateRotation as a rotation. */
 ```
+
+## History: track 10, debt-world
+
+The argument views DirectionCheckArg (the rotation's yaw at +4, u16) and DirectionTableEntry (sCardinalAngles, the table 4 bytes in) were merged into Ratio16: the body reads `rotation[1].num - sCardinalRotations[heading][1].num`, and cc1 still emits both loads as retail does (funcdiff 26/26, whole image OK). No cast is needed: the result goes through the s16 `diff` either way.
