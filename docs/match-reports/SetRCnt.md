@@ -169,3 +169,17 @@ identically by `GetRCnt`/`ResetRCnt`.
 ## Identification (round 69, head)
 
 Sony's `SetRCnt`, `libapi/counter`: the five functions at 0x80032B18 are that module's exports in its own order (SetRCnt, GetRCnt, StartRCnt, StopRCnt, ResetRCnt), with the first three offsets exact against the 3.5/3.6 `counter.o` and the last two 4 and 8 bytes later (a library build the discs do not carry, so no object can be linked); `KERNEL.H` prototypes agree on arity. Two evidence kinds per FINISHING-PLAN track 2. 
+
+## History (moved from src/libsnd_ssinit_libapi_counter.c, comments pass)
+
+The comment on the root-counter shadow table, above SetRCnt, ended:
+
+> The three hardware fields are `volatile` because they ARE memory-mapped
+> registers, and that is load-bearing for matching as well as correct:
+> without it GCC reorders the table load against the index arithmetic and
+> hoists stores into unconditional-jump delay slots retail leaves as `nop`.
+> It closed GetRCnt and ResetRCnt in round 32 -- the first of
+> which had been filed for three rounds as an unfixable register-identity
+> residue -- and it SUBSUMES the `__asm__("")` barrier SetRCnt used to
+> carry (removed in the same round; SetRCnt still verifies 40/40).
+> See docs/match-reports/ResetRCnt.md for the mechanism.

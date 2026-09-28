@@ -13,17 +13,6 @@
  *
  * libapi/counter: SetRCnt, GetRCnt, StartRCnt, StopRCnt, ResetRCnt, the
  * root-counter and interrupt-mask accessors the clock above is built on.
- *
- * What decided its edges (python3 tools/tuboundary.py): the placed object
- * libsnd/sstable precedes it ("start edge possible"), and the placed object
- * libsnd/vs_vh follows it. Inside, every edge is "boundary possible": the
- * binary neither proves nor forbids a file boundary. PARKED: the content
- * says the file splits between _SsSeqCalledTbyT_1per2 and SetRCnt (two Sony
- * modules), but that split is a new carve, not a merge or rename, so the
- * file keeps its carve edges and is named for both modules.
- *
- * The carve history is in docs/match-reports/SsSetTickMode.md, "File
- * history".
  */
 #include "common.h"
 
@@ -162,8 +151,8 @@ void SsQuit(void) {
     SpuQuit();
 }
 
-/* Sony's `SsSeqCalledTbyT` (`libsnd/sscall`), linked from the SDK object
- * since round 34. Local view, never a shared header. */
+/* Sony's `SsSeqCalledTbyT` (`libsnd/sscall`). Local view, never a shared
+ * header. */
 extern void SsSeqCalledTbyT(void);
 extern void (*_snd_vsync_cb)(void);
 
@@ -190,15 +179,10 @@ void _SsSeqCalledTbyT_1per2(void) {
  * 0x1F801100/0x1F801110/0x1F801120 hardware spacing). D_8006DCB0 is a
  * pointer to this table, not the table itself.
  *
- * The three hardware fields are `volatile` because they ARE memory-mapped
- * registers, and that is load-bearing for matching as well as correct:
- * without it GCC reorders the table load against the index arithmetic and
- * hoists stores into unconditional-jump delay slots retail leaves as `nop`.
- * It closed GetRCnt and ResetRCnt in round 32 -- the first of
- * which had been filed for three rounds as an unfixable register-identity
- * residue -- and it SUBSUMES the `__asm__("")` barrier SetRCnt used to
- * carry (removed in the same round; SetRCnt still verifies 40/40).
- * See docs/match-reports/ResetRCnt.md for the mechanism. */
+ * The three hardware fields are `volatile` because they are memory-mapped
+ * registers. MATCHING: without it GCC reorders the table load against the
+ * index arithmetic and hoists stores into unconditional-jump delay slots
+ * retail leaves as `nop` (docs/match-reports/ResetRCnt.md). */
 typedef struct {
     volatile u16 count; /* 0x0 */
     u8 pad2[0x4 - 0x2];

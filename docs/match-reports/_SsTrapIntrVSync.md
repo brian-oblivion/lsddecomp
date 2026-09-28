@@ -53,3 +53,10 @@ sequencer, chaining to whatever handler was previously installed. Tier B:
 the ISR-chaining mechanism is directly evident from the body and the call
 site; "drives the sequencer" rests on `SsSeqCalledTbyT`'s own name (Sony's,
 per round 34's SDK linkage), not re-derived here.
+
+## History (moved from src/libsnd_ssinit_libapi_counter.c, comments pass)
+
+The declaration above _SsTrapIntrVSync carried:
+
+> Sony's `SsSeqCalledTbyT` (`libsnd/sscall`), linked from the SDK object
+> since round 34. Local view, never a shared header.

@@ -285,3 +285,18 @@ banner is moved here verbatim, as it stood before the rename.
  * their merges collide.
  */
 ```
+
+## History (moved from src/libsnd_ssinit_libapi_counter.c, comments pass)
+
+The file's banner carried its edge evidence and the reason it is parked:
+
+> What decided its edges (python3 tools/tuboundary.py): the placed object
+> libsnd/sstable precedes it ("start edge possible"), and the placed object
+> libsnd/vs_vh follows it. Inside, every edge is "boundary possible": the
+> binary neither proves nor forbids a file boundary. PARKED: the content
+> says the file splits between _SsSeqCalledTbyT_1per2 and SetRCnt (two Sony
+> modules), but that split is a new carve, not a merge or rename, so the
+> file keeps its carve edges and is named for both modules.
+>
+> The carve history is in docs/match-reports/SsSetTickMode.md, "File
+> history".
