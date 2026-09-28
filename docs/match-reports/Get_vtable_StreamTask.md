@@ -67,7 +67,7 @@ second accessor and calls straight through it.
 **Get_vtable_StreamTask** -- tier A. The class's own "GetMethods"
 accessor (returns `&gStreamTaskMethods`, no other side effect), matching
 the established `Get_vtable_<Class>` convention exactly
-(`GetEntityMethods`, `Get_vtable_TaskCore`, `Get_vtable_IntermediateBase`).
+(`GetEntityMethods`, `Get_vtable_TaskCore`, `GetIntermediateBaseMethods`).
 
 ## Track 4 (2026-09-26, round 87)
 

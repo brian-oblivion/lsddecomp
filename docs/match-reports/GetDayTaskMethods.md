@@ -44,7 +44,7 @@ None beyond what's already documented.
 
 ## Naming
 
-`GetDayTaskMethods` -- tier A. Plain accessor, `return &gDayTaskMethods;` -- matches the established `GetXMethods`/`Get_vtable_X` accessor convention used site-wide for vtable getters (e.g. `GetTimedTaskMethods`, `Get_vtable_IntermediateBase`).
+`GetDayTaskMethods` -- tier A. Plain accessor, `return &gDayTaskMethods;` -- matches the established `GetXMethods`/`Get_vtable_X` accessor convention used site-wide for vtable getters (e.g. `GetTimedTaskMethods`, `GetIntermediateBaseMethods`).
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 

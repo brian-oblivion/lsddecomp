@@ -10,14 +10,14 @@ This IS `gIntermediateBaseMethods`'s own +0x008 slot -- the "IntermediateBase" s
 utility class's constructor (`tools/classtable.py gIntermediateBaseMethods` shows
 `+0x008 IntermediateBase__IntermediateBase`). Runs the BasicClass ctor through `GetBasicClassMethods()`,
 installs this class's own vtable (`&gIntermediateBaseMethods`, via the already-matched
-getter `Get_vtable_IntermediateBase`), then dispatches its own freshly-installed slot40
+getter `GetIntermediateBaseMethods`), then dispatches its own freshly-installed slot40
 (`IntermediateBase__ResetCounters`, already matched, void-returning) once.
 
 Same self-typing convention as this unit's other already-matched siblings
 from the same shared table (`IntermediateBase__ResetCounters`, `IntermediateBase__IncrementFrameCounter`, `IntermediateBase__OnState2`):
 `Obj86B60 *self`, even though the class is generically shared across many
 unrelated tables (`Task.h`'s `TaskUtilMethods` names the same function
-`gIntermediateBaseMethods+0x008`, called there as `Get_vtable_IntermediateBase()->slot08(self)` on a
+`gIntermediateBaseMethods+0x008`, called there as `GetIntermediateBaseMethods()->slot08(self)` on a
 `StreamTaskObj *self`).
 
 ## The C
@@ -26,7 +26,7 @@ unrelated tables (`Task.h`'s `TaskUtilMethods` names the same function
 void IntermediateBase__IntermediateBase(Obj86B60 *self)
 {
     GetBasicClassMethods()->ctor(self);
-    self->methods = (Obj86B60Methods *)Get_vtable_IntermediateBase();
+    self->methods = (Obj86B60Methods *)GetIntermediateBaseMethods();
     self->methods->slot40(self);
 }
 ```
@@ -40,7 +40,7 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
 - Added `slot40` to `Obj86B60Methods` (`Obj86B60 *self`), the slot this
   function calls through after installing its own vtable -- it IS
   `IntermediateBase__ResetCounters`, already matched elsewhere in this unit.
-- The explicit cast `(Obj86B60Methods *)Get_vtable_IntermediateBase()` mirrors
+- The explicit cast `(Obj86B60Methods *)GetIntermediateBaseMethods()` mirrors
   `src/world/DayTaskStageMap.c`'s own `self->methods = (DayTaskMethods *)
   GetTimedTaskMethods();` -- assigning a shared/generic table getter's return
   into a locally-typed `methods` field is an established idiom in this
@@ -72,7 +72,7 @@ unit).
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. The ctor (+0x008). `self->methods = Get_vtable_IntermediateBase()` needs no cast now.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. The ctor (+0x008). `self->methods = GetIntermediateBaseMethods()` needs no cast now.
 
 ## Unit banner history (round 98, echo, track 7)
 

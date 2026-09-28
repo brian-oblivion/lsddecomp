@@ -22,7 +22,7 @@ return -- sets a flag and notifies through the class's own +0x07C slot.
 ## Derivation
 
 ```
-jal   Get_vtable_IntermediateBase
+jal   GetIntermediateBaseMethods
  move $s0, $a1              ; s0 = original arg1, saved across the call
 move  $a0, $s1               ; a0 = self
 lw    $v0, 0x60($v0)
@@ -43,7 +43,7 @@ Written as:
 
 ```c
 void TimedTask__SetState(Obj865C8 *self, s32 arg1) {
-    Get_vtable_IntermediateBase()->slot60(self, arg1);
+    GetIntermediateBaseMethods()->slot60(self, arg1);
     if (arg1 == 4) {
         self->unk28 = 1;
         self->methods->noop7C(self);

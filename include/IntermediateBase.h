@@ -89,7 +89,7 @@ struct IntermediateBase {
 };
 
 extern IntermediateBaseMethods gIntermediateBaseMethods;
-extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void); /* returns &gIntermediateBaseMethods */
+extern IntermediateBaseMethods *GetIntermediateBaseMethods(void); /* returns &gIntermediateBaseMethods */
 
 void IntermediateBase__IntermediateBase(IntermediateBase *self);
 void IntermediateBase__OnNotify(IntermediateBase *self, BasicClass *sender, s32 event);

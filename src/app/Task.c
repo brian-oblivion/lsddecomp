@@ -202,7 +202,7 @@ void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankP
     struct TileMap *tileMap;
     TaskCoreMethods *methods;
 
-    Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
+    GetIntermediateBaseMethods()->ctor((IntermediateBase *)self);
     /* MATCHING: one Get_vtable_TaskCore() call; a second one for setTarget adds a jal. */
     methods = Get_vtable_TaskCore();
     self->methods = methods;
@@ -233,7 +233,7 @@ void TaskCore__Finalize(TaskCore *self) {
         self->subHandle->methods->release(self->subHandle);
     }
     self->methods->releaseTarget(self);
-    Get_vtable_IntermediateBase()->finalize((IntermediateBase *)self);
+    GetIntermediateBaseMethods()->finalize((IntermediateBase *)self);
 }
 
 void TaskCore__Reset(TaskCore *self) {
@@ -255,7 +255,7 @@ void TaskCore__Reset(TaskCore *self) {
 }
 
 s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
-    Get_vtable_IntermediateBase()->init((IntermediateBase *)self, args, mode);
+    GetIntermediateBaseMethods()->init((IntermediateBase *)self, args, mode);
     return self->result;
 }
 
@@ -353,7 +353,7 @@ void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event) {
     TaskCoreMethods *methods;
 
     methods = self->methods;
-    Get_vtable_IntermediateBase()->update((IntermediateBase *)self, sender, event);
+    GetIntermediateBaseMethods()->update((IntermediateBase *)self, sender, event);
     if (self->inputMode != TASKCORE_INPUT_NONE) {
         u32 frames;
 
@@ -383,7 +383,7 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
     TaskCoreMethods *methods;
 
     methods = self->methods;
-    Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, state);
+    GetIntermediateBaseMethods()->setState((IntermediateBase *)self, state);
     switch (state) {
         case TASKCORE_STATE_ACTIVE:
             methods->broadcastToSlots(self, self->target->unselectedColor);
@@ -1175,7 +1175,7 @@ DrawRect *GetDefaultMovieFrame(void) {
 
 void IntermediateBase__IntermediateBase(IntermediateBase *self) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_IntermediateBase();
+    self->methods = GetIntermediateBaseMethods();
     self->methods->resetCounters(self);
 }
 
@@ -1310,7 +1310,7 @@ void IntermediateBase__OnState3(IntermediateBase *self) {
     self->frameCounter = 0;
 }
 
-IntermediateBaseMethods *Get_vtable_IntermediateBase(void) {
+IntermediateBaseMethods *GetIntermediateBaseMethods(void) {
     return &gIntermediateBaseMethods;
 }
 

@@ -22,7 +22,7 @@ void TaskCore__TaskCore(StreamTaskObj *self, s32 a1, s32 a2, StreamTaskUnkB4Obj 
     StreamTaskUnkB4Obj *tmp;
     TaskCoreMethods *core;
 
-    Get_vtable_IntermediateBase()->slot08(self);
+    GetIntermediateBaseMethods()->slot08(self);
     core = Get_vtable_TaskCore();
     self->methods = (StreamTaskObjMethods *)core;
     core->slotD8(self, a1);
@@ -50,7 +50,7 @@ only the header's declared types.
 
 ## New structure discovered
 
-- `Get_vtable_IntermediateBase()->slot08(self)`: new `TaskUtilMethods` slot `+0x008`
+- `GetIntermediateBaseMethods()->slot08(self)`: new `TaskUtilMethods` slot `+0x008`
   (`gIntermediateBaseMethods+0x008 = IntermediateBase__IntermediateBase`, extern, void, discarded return).
 - `Get_vtable_TaskCore()->slotD8(self, a1)`: new `TaskCoreMethods` slot `+0x0D8`
   (`gTaskCoreMethods+0x0D8 = TaskCore__SetTarget`, extern, void).
@@ -126,7 +126,7 @@ was entirely about the `Get_vtable_TaskCore()` return value's reuse.
 
 **Widen the "value reused after an intervening `jalr` needs a local"
 lever explicitly to call-return values, not just `self->field` reads.**
-`Get_vtable_TaskCore()`/`Get_vtable_IntermediateBase()`-style singleton accessors are called
+`Get_vtable_TaskCore()`/`GetIntermediateBaseMethods()`-style singleton accessors are called
 routinely in this unit, and a call site that both stores the returned
 pointer AND immediately dereferences it for a vtable lookup is exactly the
 shape that needs a local — the disassembly tell is a literal duplicated

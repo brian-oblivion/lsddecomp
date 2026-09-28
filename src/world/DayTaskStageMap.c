@@ -321,7 +321,7 @@ TimedTask *New_TimedTask(char *soundBankPath, BasicClass *sound) {
 }
 
 void TimedTask__TimedTask(TimedTask *self, char *soundBankPath, BasicClass *sound) {
-    Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
+    GetIntermediateBaseMethods()->ctor((IntermediateBase *)self);
     self->methods = GetTimedTaskMethods();
     if (soundBankPath != NULL) {
         self->sound = (BasicClass *)New_VabStreamObj(soundBankPath);
@@ -336,7 +336,7 @@ void TimedTask__Finalize(TimedTask *self) {
     if (self->soundBankPath != NULL) {
         self->sound->methods->release(self->sound);
     }
-    Get_vtable_IntermediateBase()->finalize((IntermediateBase *)self);
+    GetIntermediateBaseMethods()->finalize((IntermediateBase *)self);
 }
 
 void TimedTask__CancelTimeout(TimedTask *self) {
@@ -345,25 +345,25 @@ void TimedTask__CancelTimeout(TimedTask *self) {
 
 s32 TimedTask__Init(TimedTask *self, IntermediateBaseInitArgs *args, s32 mode) {
     self->result = 0;
-    Get_vtable_IntermediateBase()->init((IntermediateBase *)self, args, mode);
+    GetIntermediateBaseMethods()->init((IntermediateBase *)self, args, mode);
     return self->result;
 }
 
 void TimedTask__Deinit(TimedTask *self) {
-    Get_vtable_IntermediateBase()->deinit((IntermediateBase *)self);
+    GetIntermediateBaseMethods()->deinit((IntermediateBase *)self);
 }
 
 void TimedTask__NoOpSlot58(void) {}
 
 void TimedTask__CheckTimeout(TimedTask *self, BasicClass *sender, s32 event) {
-    Get_vtable_IntermediateBase()->update((IntermediateBase *)self, sender, event);
+    GetIntermediateBaseMethods()->update((IntermediateBase *)self, sender, event);
     if ((u32)self->frameCounter > (u32)self->timeoutFrames) {
         self->methods->setState(self, TIMEDTASK_STATE_TIMED_OUT);
     }
 }
 
 void TimedTask__SetState(TimedTask *self, s32 state) {
-    Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, state);
+    GetIntermediateBaseMethods()->setState((IntermediateBase *)self, state);
     if (state == TIMEDTASK_STATE_TIMED_OUT) {
         self->result = TIMEDTASK_RESULT_TIMED_OUT;
         self->methods->onState4(self);

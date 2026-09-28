@@ -24,7 +24,7 @@ void TaskCore__Finalize(StreamTaskObj *self) {
         self->unk74->methods->slot04(self->unk74);
     }
     self->methods->slotDC(self);
-    Get_vtable_IntermediateBase()->slot0C(self);
+    GetIntermediateBaseMethods()->slot0C(self);
 }
 ```
 

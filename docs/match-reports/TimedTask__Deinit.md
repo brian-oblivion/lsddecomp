@@ -10,13 +10,13 @@
 
 Method-table slot +0x048 of `gTimedTaskMethods` (the sibling class; see
 `TimedTask__Finalize.md`). Calls the BASE class's own +0x048 slot (fetched through
-`Get_vtable_IntermediateBase()`) directly on `self` -- an explicit "call the base
+`GetIntermediateBaseMethods()`) directly on `self` -- an explicit "call the base
 implementation" pattern, not a self-vtable dispatch.
 
 ## Derivation
 
 ```
-jal   Get_vtable_IntermediateBase
+jal   GetIntermediateBaseMethods
  move $s0, $a0
 lw    $v0, 0x48($v0)
 jalr  $v0
@@ -27,7 +27,7 @@ Written as:
 
 ```c
 void TimedTask__Deinit(Obj865C8 *self) {
-    Get_vtable_IntermediateBase()->slot48(self);
+    GetIntermediateBaseMethods()->slot48(self);
 }
 ```
 
@@ -37,7 +37,7 @@ None beyond what's already documented.
 
 ## Naming
 
-`TimedTask__Deinit` -- tier B. Occupies +0x048 (the mirror of TimedTask__Init): a thin wrapper forwarding to `Get_vtable_IntermediateBase()->slot48(self)`.
+`TimedTask__Deinit` -- tier B. Occupies +0x048 (the mirror of TimedTask__Init): a thin wrapper forwarding to `GetIntermediateBaseMethods()->slot48(self)`.
 
 ## Track 4
 

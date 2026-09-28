@@ -16,7 +16,7 @@ void TaskCore__Update(Obj86B60 *self, s32 a1, s32 a2)
     Obj86B60Methods *methods;
 
     methods = self->methods;
-    Get_vtable_IntermediateBase()->slot5C(self, a1, a2);
+    GetIntermediateBaseMethods()->slot5C(self, a1, a2);
     if (self->unk3C != 0) {
         u32 bound;
 
@@ -43,7 +43,7 @@ void TaskCore__Update(Obj86B60 *self, s32 a1, s32 a2)
 ```
 
 First forwards to the shared "IntermediateBase" utility class
-(`Get_vtable_IntermediateBase()->slot5C(self, a1, a2)`, same idiom already used in
+(`GetIntermediateBaseMethods()->slot5C(self, a1, a2)`, same idiom already used in
 `src/app/Task.c`/`src/world/DayTaskStageMap.c`). Then, if `unk3C` is set and
 `unk40` is (unsigned) less than `unk1C`, calls `slot60` with reason `6`.
 Finally switches on `unk20` and forwards to one of four more vtable slots
@@ -76,7 +76,7 @@ does not change `TaskCore__TickFadeCallback`'s own compiled bytes (it never read
 parameter either way) so the earlier match stays intact.
 
 **Residue 2: `self->methods` must be cached into a local BEFORE the
-`Get_vtable_IntermediateBase()` call, or every `self->methods->slotNN` after it reloads
+`GetIntermediateBaseMethods()` call, or every `self->methods->slotNN` after it reloads
 from memory instead of reusing retail's single early `lw $s3,0($s2)`.**
 Same lesson as `TaskCore__SetFadeCallbackEnabled`'s report, but here the stakes are an entire
 missing callee-saved register (`s3`) and hence a wrong stack-frame size
@@ -86,7 +86,7 @@ explicit local it reloads at every use site after the call, using MORE
 total instructions and needing FEWER saved registers, which is why this
 residue manifests as widespread structural drift rather than a narrow
 diff. Fix: `Obj86B60Methods *methods = self->methods;` before the
-`Get_vtable_IntermediateBase()` call, then `methods->slotNN(...)` everywhere after.
+`GetIntermediateBaseMethods()` call, then `methods->slotNN(...)` everywhere after.
 
 **Residue 3: `sltu` (unsigned) where a plain `<` on two `s32` fields gives
 `slt` (signed).** `self->unk40 < self->unk1C` compiles to signed `slt`;

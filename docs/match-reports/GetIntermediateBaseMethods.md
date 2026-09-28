@@ -1,4 +1,6 @@
-# Get_vtable_IntermediateBase — MATCH (4/4 words)
+# GetIntermediateBaseMethods — MATCH (4/4 words)
+
+> Renamed from `Get_vtable_IntermediateBase` on 2026-09-28 (tools/rename.py). Address 0x8003e5c8.
 
 > Renamed from `func_8003E5C8` on 2026-09-19 (tools/rename.py). Address 0x8003e5c8.
 
@@ -19,7 +21,7 @@ own independent local view per this project's established convention).
 ## The C
 
 ```c
-IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
+IntermediateBaseMethods *GetIntermediateBaseMethods(void)
 {
     return &gIntermediateBaseMethods;
 }
@@ -28,7 +30,7 @@ IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
 ## Header note
 
 `include/Task.h` already declared
-`extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void);` with a comment
+`extern IntermediateBaseMethods *GetIntermediateBaseMethods(void);` with a comment
 saying "still raw asm elsewhere in the still-uncarved Task portion
 of this segment -- not this unit's function to write". That comment is now
 stale (this round carved it into `Task.c`) and was updated in place
@@ -42,7 +44,7 @@ first build.
 
 ## Naming
 
-**Get_vtable_IntermediateBase** (renamed from `func_8003E5C8`, round 55,
+**GetIntermediateBaseMethods** (renamed from `func_8003E5C8`, round 55,
 runner alpha). Tier A: pure leaf getter, returns `&gIntermediateBaseMethods`
 (formerly `D_8006E878`), matching the `GetBasicClassMethods` naming
 precedent already established in this project for this exact shape. Called
