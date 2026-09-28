@@ -1295,7 +1295,7 @@ extern s32 sStyleDay;
 extern s32 sStyleStage;
 extern s8 gStyleVariantPicks[];
 extern s32 sStyleVariant;
-extern s8 gStyleVariantConfigCounts[];
+extern s8 sStyleVariantConfigCounts[];
 extern s32 sStyleConfigIndex;
 extern s8 *gStyleVariantConfigs[];
 extern const u8 *sStyleClearColor;
@@ -1322,7 +1322,7 @@ void *PickStyleFallbackConfig(void) {
     seed = sStyleDay + sStyleStage;
     variant = gStyleVariantPicks[seed & 0xF];
     sStyleVariant = variant;
-    count = gStyleVariantConfigCounts[variant];
+    count = sStyleVariantConfigCounts[variant];
     index = seed % count;
     sStyleConfigIndex = index;
     config = gStyleVariantConfigs[variant] + index * 4;
