@@ -56,7 +56,7 @@ Evidence considered and why it falls short of tier A/B:
   anything Sony owns" case -- but its own purpose is equally undetermined
   (round 78 did not investigate `func_80038E44`'s body; out of scope for
   this one-function unit), so there is nothing to inherit a name from.
-- **Caller**: the ONLY caller is `_SsInit` (`src/libsnd_ssinit.c`), which
+- **Caller**: the ONLY caller is `_SsInit` (`src/psyq/libsnd_ssinit.c`), which
   branches `if (arg0 == 0) SpuInit(); else SpuInitHot();` -- i.e. this is
   the alternate sound-init path taken when `_SsInit`'s own argument is
   nonzero. `_SsInit` itself is reached only through `SsInit` (calls

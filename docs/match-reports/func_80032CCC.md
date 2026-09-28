@@ -31,7 +31,7 @@ s16 func_80032CCC(void *a0, s16 a1, s32 a2)
 
 (shares the `extern s16 func_80032D34(void *a0, s16 a1, s32 a2, s32
 a3);` prototype declared above `func_80032C98` in
-`src/libsnd_ssinit.c`.)
+`src/psyq/libsnd_ssinit.c`.)
 
 ## Provenance
 

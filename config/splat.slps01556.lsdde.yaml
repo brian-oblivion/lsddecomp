@@ -951,7 +951,7 @@ segments:
       # is a pure prefix trim: no matched C is reclassified and the unit keeps
       # its name, its remaining 19 functions and its 0x14D8 rodata attach.
       - [0x22948, o, libsnd/vm_vsu]
-      - [0x22A1C, c, libsnd_ssinit]
+      - [0x22A1C, c, psyq/libsnd_ssinit]
       # ROUND 33: func_800323A8 (120w) is Sony's `SsSetTableSize`
       # (`libsnd/sstable`, Psy-Q 3.5 -- the 3.3 disc does not carry it).
       # Text-only, 0x1E0 covering exactly that one function, and it sat in
