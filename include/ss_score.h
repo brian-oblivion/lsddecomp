@@ -15,7 +15,7 @@
  * libsnd through SsSetTableSize(table, s_max, t_max).
  *
  * The type name is derived from Sony's VARIABLE name, as SvmVoice's is from
- * _svm_voice (include/SvmData.h): no libsnd internal header ships on any SDK
+ * _svm_voice (include/svm_data.h): no libsnd internal header ships on any SDK
  * disc, so Sony's own struct tag is unknown. For the same reason the fields
  * carry no Sony names: each is named for what the libsnd functions that
  * read it (the only readers) do with it, in the SEQ format's MIDI terms.

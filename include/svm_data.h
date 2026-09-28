@@ -1,10 +1,10 @@
-#ifndef SVMDATA_H
-#define SVMDATA_H
+#ifndef SVM_DATA_H
+#define SVM_DATA_H
 
 #include "common.h"
 
 /*
- * SvmData.h -- libsnd vmanager's per-voice bss tables: _svm_sreg_buf,
+ * svm_data.h -- libsnd vmanager's per-voice bss tables: _svm_sreg_buf,
  * _svm_sreg_dirty and _svm_voice.
  *
  * SvmVoice -- one record of libsnd's per-voice table _svm_voice.

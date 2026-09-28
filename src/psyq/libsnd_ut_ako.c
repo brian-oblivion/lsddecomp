@@ -3,7 +3,7 @@
  * because no SDK disc carries the build retail linked.
  *
  * SsUtAllKeyOff resets every voice the voice manager owns (spuVmMaxVoice of
- * them): its _svm_voice record (include/SvmData.h), its SPU voice
+ * them): its _svm_voice record (include/svm_data.h), its SPU voice
  * registers (_svm_sreg points at them, 0x1F801C00, eight halfwords per
  * voice), and its bit in the key-off masks. It keeps Sony's name and
  * <libsnd.h>'s prototype.

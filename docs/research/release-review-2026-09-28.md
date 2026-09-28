@@ -171,7 +171,7 @@ rather than API.
   title_menu.c:589-611, 1284-1296 (PAD_/FRAMECLOCK_CLASS_ID exist),
   `setState(self, 5/0xA/0xB/0xF)` where TASKCORE_STATE_* exist;
   screen_widgets.c:103, 145 local `mask` is the channel set; GridCell `unk34`,
-  CellPlacement `unk1`/`unk2C`; ss_score.h (39) and SvmData.h (32) `unkNN`
+  CellPlacement `unk1`/`unk2C`; ss_score.h (39) and svm_data.h (32) `unkNN`
   fields are each described well enough to name.
 
 ### Left after round 103 (the debt items carry these too)

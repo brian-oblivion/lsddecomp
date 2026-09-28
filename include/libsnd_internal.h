@@ -14,7 +14,7 @@
 #include "common.h"
 #include <libsnd.h>
 #include "ss_score.h"
-#include "SvmData.h"
+#include "svm_data.h"
 
 /* libsnd/seqread: one tick of sequence _ss_score[access][seq]. */
 void SeqPlay(s16 access, s16 seq);
