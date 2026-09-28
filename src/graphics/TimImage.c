@@ -9,7 +9,7 @@
  * TimImage__GetTimInfo describes the file with Sony's GsGetTimInfo; Upload
  * sends its pixel block and, when the TIM carries one, its CLUT to the draw
  * singleton (include/DrawSystem.h) through the loadImage slot. The slots at
- * +0x07C..+0x094 are empty, and +0x098 only sets flag48, which no code reads.
+ * +0x07C..+0x094 are empty, and +0x098 only sets flag, which no code reads.
  *
  * RotateVramRectRight is not a TimImage method (no method table lists it): it
  * circularly scrolls a VRAM rectangle right, one column at a time, through the
@@ -41,7 +41,7 @@ TimImage *New_TimImage(char *name) {
 void TimImage__TimImage(TimImage *self, char *name) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTimImageMethods();
-    self->flag48 = 0;
+    self->flag = 0;
     self->clutBase = 0;
     if (name != NULL) {
         self->methods->requestLoadFile(self, name);
@@ -100,9 +100,9 @@ void TimImage__NoOpSlot90(void) {}
 /* TimImage +0x094: empty. */
 void TimImage__NoOpSlot94(void) {}
 
-/* TimImage +0x098: sets flag48 (the ctor clears it); no code reads it. */
+/* TimImage +0x098: sets flag (the ctor clears it); no code reads it. */
 void TimImage__SetFlag(TimImage *self) {
-    self->flag48 = 1;
+    self->flag = 1;
 }
 
 /* TimImage +0x09C: describe the TIM held in the buffer (past its id word). */

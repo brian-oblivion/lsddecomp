@@ -63,3 +63,12 @@ Renamed `TimImage__func_8003B5E4` -> `TimImage__SetFlag` with `tools/rename.py`
 found in `src/` (the eleven TimImage.h includers and GraphicsResources.c's
 TimArraySrc, which builds TimImages), and no C calls +0x098, so what the flag
 gates is not established: the field name says only that it is a flag.
+
+## Naming (track 10 debt pass, round 104, bravo)
+
+`TimImage__SetFlag48` -> `TimImage__SetFlag` (`tools/rename.py`), and by hand
+in `include/TimImage.h` the field `flag48` -> `flag` and the slot
+`setFlag48` -> `setFlag`: the offset in the name said nothing the offset
+comment does not. The accessor set is unchanged, this unit only (the ctor
+clears it, this setter sets it), and still nothing reads it. The body is now
+`self->flag = 1;`.
