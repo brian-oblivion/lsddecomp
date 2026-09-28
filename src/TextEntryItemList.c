@@ -1,20 +1,38 @@
 /*
- * TextEntryItemList -- TextEntry's methods from New_TextEntry to NextChar
- * (include/TextEntry.h); PrevChar .. SetCharAt and GetTextEntryMethods are
- * in class_3bb8c_j.c.
+ * TextEntryItemList -- two classes, in ROM order: TextEntry whole, then the
+ * first half of ItemList (its allocator to detachTarget). ItemList's list
+ * methods and its getter follow in ObjMStyleActor.c.
  *
- * A TextEntry edits a caller-owned string on screen. setText keeps the
- * caller's buffer and copies it into its own `editBuf` (decoding full-width
- * SJIS in TEXTENTRY_MODE_FULLWIDTH). loadCardResources makes the panel
- * (CARD\COMINPUT.TIM), the text row and the '_' cursor (CARD\FONTICON.TIM).
- * attachTarget adds a Pad and a FrameClock as children and keeps a
- * VabStreamObj to play sounds on. onNotify sends the Pad's button events to
- * handleCommand: left/right move the cursor, up/down step the character
- * under it, L1/L2 reset it/every character, Select switches between acting
- * on presses and on held buttons, circle writes the edit back and closes
- * ACCEPTED, cross closes CANCELLED. It sends the FrameClock's ticks to
- * tickState, which reports the result to the parents on the second tick
- * after the close.
+ * A TextEntry (include/TextEntry.h) edits a caller-owned string on screen.
+ * setText keeps the caller's buffer and copies it into its own `editBuf`
+ * (decoding full-width SJIS in TEXTENTRY_MODE_FULLWIDTH). loadCardResources
+ * makes the panel (CARD\COMINPUT.TIM), the text row and the '_' cursor
+ * (CARD\FONTICON.TIM). attachTarget adds a Pad and a FrameClock as children
+ * and keeps a VabStreamObj to play sounds on. onNotify sends the Pad's button
+ * events to handleCommand: left/right move the cursor, up/down step the
+ * character under it, L1/L2 reset it/every character, Select switches
+ * between acting on presses and on held buttons, circle writes the edit back
+ * and closes ACCEPTED, cross closes CANCELLED. It sends the FrameClock's
+ * ticks to tickState, which reports the result to the parents on the second
+ * tick after the close. GetTextEntryMethods ends the class.
+ *
+ * ItemList (include/ItemList.h), the list of strings the player picks one
+ * from: see the section banner below.
+ *
+ * What decided its edges (python3 tools/tuboundary.py): the placed object
+ * libcard/a80 precedes it ("start edge possible"). The old carve edge
+ * class_3bb8c_i|class_3bb8c_j cut TextEntry off PrevChar..SetCharAt and its
+ * getter ("start edge possible, soft-unlikely (0x80086f7c, 0x80086ed0)"), so
+ * the two were merged. The end edge is kept because the binary forces it: the
+ * jump tables of TextEntry__HandleCommand (0x80011628) and
+ * ItemList__HandleInputCode (0x800116f4, ObjMStyleActor.c) differ in parity,
+ * so a file boundary lies between those two functions ("a forced boundary
+ * lies in this stretch: tables 0x80011628 / 0x800116f4"), and with the
+ * first edge merged this is the one carve edge left in that stretch.
+ * PARKED: content puts that boundary inside this file, between
+ * GetTextEntryMethods and New_ItemList (the getter closes its class, and
+ * that gap is "boundary possible" between "unlikely" ones); a split is a new
+ * carve, so the file keeps ItemList's first half and is named for both.
  */
 #include "common.h"
 #include <libgte.h>
@@ -49,8 +67,7 @@ TextEntry *New_TextEntry(char *text, s32 mode) {
     return NULL;
 }
 
-/* The characters nextChar/prevChar step through, NUL-terminated
- * (class_3bb8c_j.c). */
+/* The characters nextChar/prevChar step through, NUL-terminated. */
 extern u8 *gNameCharTable;
 
 void TextEntry__TextEntry(TextEntry *self, char *text, s32 mode) {
@@ -391,25 +408,6 @@ void TextEntry__NextChar(TextEntry *self) {
     }
 }
 
-/* ---- merged from class_3bb8c_j ---- */
-
-/*
- * class_3bb8c_j -- the tail of TextEntry and the first half of ItemList.
- *  - TextEntry__PrevChar .. TextEntry__SetCharAt and GetTextEntryMethods
- *    finish TextEntry (include/TextEntry.h), the caller-owned string editor
- *    whose other methods are in TextEntryItemList.
- *  - Everything else is ItemList (include/ItemList.h), the list of strings
- *    the player picks one from: its allocator and ctor, BasicClass's
- *    overrides (finalize, child bookkeeping, onNotify), and the view and
- *    resource methods resetView, loadResources, releaseResources,
- *    attachTarget and detachTarget. Its list methods are in ObjMStyleActor.
- *
- * Both classes keep their input and tick children by kind (Pad, FrameClock)
- * and draw through a ScreenSprite panel and TextRows built from CARD\ TIMs;
- * their editing and list methods do nothing until loading has made
- * `panelSprite`.
- */
-
 void TextEntry__PrevChar(TextEntry *self) {
     s32 count;
 
@@ -491,8 +489,18 @@ TextEntryMethods *GetTextEntryMethods(void) {
     return &gTextEntryMethods;
 }
 
-/*
- * ItemList from here on. The base-class calls go through BasicClass's table
+/* ---- ItemList, first half ---------------------------------------------
+ *
+ * ItemList (include/ItemList.h), the list of strings the player picks one
+ * from: its allocator and ctor, BasicClass's overrides (finalize, child
+ * bookkeeping, onNotify), and the view and resource methods resetView,
+ * loadResources, releaseResources, attachTarget and detachTarget. Its list
+ * methods and GetItemListMethods are in ObjMStyleActor.c.
+ *
+ * Like TextEntry it keeps its input and tick children by kind (Pad,
+ * FrameClock) and draws through a ScreenSprite panel and TextRows built from
+ * CARD\ TIMs; its list methods do nothing until loading has made
+ * `panelSprite`. The base-class calls go through BasicClass's table
  * (include/BasicClass.h) and upcast `self`.
  */
 
