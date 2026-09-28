@@ -65,7 +65,7 @@ the body transfer (`SsVabTransBody`), and on success mark the object ready
 `VabStreamObj__OnBodyReady`).
 
 `sVabBodySuffix` is retail's own `.sdata` string `".VB"`, referenced not
-retyped, same as `gVabHeaderSuffix` in the sibling function.
+retyped, same as `sVabHeaderSuffix` in the sibling function.
 
 ## Result
 

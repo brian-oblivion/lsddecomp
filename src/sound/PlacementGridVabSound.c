@@ -186,7 +186,7 @@ extern char *GetSsSizeTableBuf(void);
 extern s32 IsWBgmActive(void);
 
 /* ".VH" and ".VB", in .sdata. */
-extern const char gVabHeaderSuffix[];
+extern const char sVabHeaderSuffix[];
 extern const char sVabBodySuffix[];
 
 /* SetNullDriverMode's two words, read back by GetNullDriverMode. */
@@ -289,7 +289,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
         if (buf != NULL) {
             self->baseFilename = buf;
             strcpy(buf, path);
-            BuildFileName(vhPath, buf, NULL, gVabHeaderSuffix);
+            BuildFileName(vhPath, buf, NULL, sVabHeaderSuffix);
             self->loadState = VABSTREAM_LOAD_HEADER;
             self->methods->requestLoadFile(self, vhPath);
         }

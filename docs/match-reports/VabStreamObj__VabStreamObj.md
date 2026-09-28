@@ -74,9 +74,9 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
         if (buf != NULL) {
             self->baseFilename = buf;
             strcpy(buf, arg1);
-            BuildFileName(path, buf, NULL, gVabHeaderSuffix);
+            BuildFileName(path, buf, NULL, sVabHeaderSuffix);
             self->unk2A = 1;
-            BuildFileName(path, buf, NULL, gVabHeaderSuffix);
+            BuildFileName(path, buf, NULL, sVabHeaderSuffix);
             self->loadState = 1;
             self->methods->slot6C(self, path);
         }
@@ -89,7 +89,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
 `vagAttrPool`/`progVagTable`/`vabId`/`muted`/`attrsReady`/
 `bodyTransferPending`/`baseFilename`/`loadState`; the bytes are unchanged.)
 
-`gVabHeaderSuffix` is retail's own `.sdata` string `".VH"` -- referenced, not
+`sVabHeaderSuffix` is retail's own `.sdata` string `".VH"` -- referenced, not
 retyped, per the duplicated-string-shift lesson in CLAUDE.md.
 
 ## Result
