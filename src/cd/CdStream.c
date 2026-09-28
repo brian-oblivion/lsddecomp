@@ -47,7 +47,7 @@ extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 extern void *BMemPMgrAlloc(s32 size);
 
-extern s32 gCdStreamAudioMixSet;
+extern s32 sCdStreamAudioMixSet;
 extern char gCdStreamVersionSuffix[]; /* ";1" */
 
 /* MATCHING: the ctor call and return sit inside `if (obj != NULL)`; an early
@@ -122,7 +122,7 @@ s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
             }
         }
         self->totalFrames = self->file.size / self->bytesPerFrame;
-        gCdStreamAudioMixSet = SetupCdStreamAudio(self);
+        sCdStreamAudioMixSet = SetupCdStreamAudio(self);
         sActiveCdStream = self;
         self->methods->seek(self, self->file.pos);
         return 0;

@@ -13,7 +13,7 @@ ground, no prior attempt. Byte-exact on build 4; whole-image SHA1 green.
   `"\" + GetDataDirectory() + name + ";1"` in a 0x20-byte stack buffer and retry
   `CdSearchFile(&self->loc, path)` (a negative `tries` retries forever;
   timeout returns 1). On success: +0x40 = file size (`CdlFILE.size`, +0x10)
-  / +0x38; `gCdStreamAudioMixSet = SetupCdStreamAudio(self)` (SPU CD-volume setup);
+  / +0x38; `sCdStreamAudioMixSet = SetupCdStreamAudio(self)` (SPU CD-volume setup);
   `sActiveCdStream = self`; `seek(self, &self->loc)`; return 0.
 - **Levers:** the return structure decides the block layout:
 
@@ -31,7 +31,7 @@ ground, no prior attempt. Byte-exact on build 4; whole-image SHA1 green.
   here as `*(u32 *)&self->loc[4]`, left untyped in the shared local view
   because the ten earlier methods pass `loc` as a `u8 *`. Unit-local
   externs: `CdSearchFile`, `strcpy`/`strcat` (Sony libc2, linked),
-  `GetDataDirectory` (GameApplicationFileResource.c), `gCdStreamAudioMixSet` (s32, sdata), `gCdStreamVersionSuffix`
+  `GetDataDirectory` (GameApplicationFileResource.c), `sCdStreamAudioMixSet` (s32, sdata), `gCdStreamVersionSuffix`
   (`char[]`, the rodata-style `";1"` in sdata, referenced as a symbol and
   never retyped). Added a prototype for `SetupCdStreamAudio`. Unit header comment
   updated: all 18 methods matched.
@@ -65,7 +65,7 @@ s32 CdStream__Open(CdStreamObj *self, char *name, s32 tries) {
             }
         }
         self->unk40 = *(u32 *)&self->loc[4] / self->unk38;
-        gCdStreamAudioMixSet = SetupCdStreamAudio(self);
+        sCdStreamAudioMixSet = SetupCdStreamAudio(self);
         sActiveCdStream = self;
         self->methods->seek(self, self->loc);
         return 0;
@@ -93,7 +93,7 @@ Renamed from CdStreamObj__Open (tools/rename.py), the class rename only.
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_8008A954` | `gCdStreamVersionSuffix` | A | sdata `.asciz ";1"`, strcat'd after the name to make the ISO9660 path CdSearchFile looks up; same role as `sCdFileVersionSuffix` (CdDriver.c), a separate copy |
-| `D_8008A94C` | `gCdStreamAudioMixSet` | B | written only here, with SetupCdStreamAudio's return (always 1) after the SPU CD mix is set; read nowhere in the executable (only reference in asm/ is its sdata definition) |
+| `D_8008A94C` | `sCdStreamAudioMixSet` | B | written only here, with SetupCdStreamAudio's return (always 1) after the SPU CD mix is set; read nowhere in the executable (only reference in asm/ is its sdata definition) |
 
 Constants: the path buffer is `CDSTREAM_PATH_SIZE` (32, unit-local; the CD
 driver's `CD_PATH_SIZE` is 64). The `CdlFILE *` cast on `&self->file` is
