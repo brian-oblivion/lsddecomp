@@ -92,7 +92,7 @@ This function had never been permuter-searched (per this round's own
 assignment brief). Ran all three mandated checks first.
 
 **1. Correctness / drift:** the preserved body (byte-identical to the one
-already on file) was spliced into `src/Task.c` in isolation
+already on file) was spliced into `src/app/Task.c` in isolation
 (every other INCLUDE_ASM across all four of this runner's units
 confirmed still wrapped) and rebuilt through the full oracle. Reproduces
 **exactly 21/32, no outside-range drift** -- matches this report's own
@@ -451,7 +451,7 @@ stalls the byte match.
 ## NON_MATCHING body promoted, round 62
 
 Placed the round-46 best-reached body (the `__asm__("" ::: "memory")`
-barrier variant, 23/32, zero drift) in `src/Task.c` under
+barrier variant, 23/32, zero drift) in `src/app/Task.c` under
 `#ifdef NON_MATCHING`/`#else INCLUDE_ASM`, per track 1b. Confirmed
 hand-derived from this report before promoting: round 46's own text
 tried the permuter's tempting sub-baseline candidate (`output-58-1`)

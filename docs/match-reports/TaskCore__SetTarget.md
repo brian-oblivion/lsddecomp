@@ -153,7 +153,7 @@ Renamed `func_` -> `Obj86B60__SetTarget`. **Tier B**: Stores `a1` into `self->un
 ## Proposed field names
 
 Not renamed here -- both fields are CROSS-UNIT (read by `TaskCore__SetState`/
-`TaskCore__Tick` in `src/Task.c`, verified by attempting the rename and
+`TaskCore__Tick` in `src/app/Task.c`, verified by attempting the rename and
 reading the compiler's own error list: both moved from "0 errors" to errors
 in `Task.c` specifically, none elsewhere). Proposing for the head to
 apply at merge (type scope: rename the definition, rebuild, fix exactly the

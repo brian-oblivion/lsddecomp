@@ -7,7 +7,7 @@
 ## ROUND 49 (runner delta): MATCHED -- the asm-label alias defeats the address CSE, then a second independent scheduling residue is exposed and closed by two bare barriers
 
 Re-verified the inherited stall first: spliced the round-46 body
-(unchanged) into `src/Task.c` in isolation (both of this
+(unchanged) into `src/app/Task.c` in isolation (both of this
 runner's units confirmed at their starting `INCLUDE_ASM` counts first)
 and rebuilt -- **0/41 raw, `WARNING: differs OUTSIDE this range too**,
 reproducing this report's own documented figure exactly. Not stale.
@@ -156,7 +156,7 @@ schedule too -- re-measure after the length fix before declaring victory.
 
 ## ROUND 46 (runner delta): drift-checked fresh (consistent), one new lever tried and rejected -- `volatile` on just the READ side regresses even worse than `volatile` on the declaration
 
-Re-spliced the round-44 body (unchanged) into `src/Task.c` in
+Re-spliced the round-44 body (unchanged) into `src/app/Task.c` in
 isolation and rebuilt: **0/41 raw, `WARNING: differs OUTSIDE this range
 too (176860 bytes)`** -- reproduces this report's own documented figure
 exactly (the raw 0/41 is the known-misleading window-alignment artifact

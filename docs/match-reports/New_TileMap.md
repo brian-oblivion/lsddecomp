@@ -44,7 +44,7 @@ void *New_TileMap(s32 arg0, s32 arg1) {
 
 ## Naming
 
-- **New_TileMap**, tier A. src/Task.c's TaskCore__TaskCore hands this object to New_BgLayer as its map source; this object's own fields (+0x2C..+0x30) are byte-for-byte Map44294/GsMAP's own layout (cellw/cellh/ncellw/ncellh).
+- **New_TileMap**, tier A. src/app/Task.c's TaskCore__TaskCore hands this object to New_BgLayer as its map source; this object's own fields (+0x2C..+0x30) are byte-for-byte Map44294/GsMAP's own layout (cellw/cellh/ncellw/ncellh).
 
 ## Track 4 (2026-09-26, round 88, alpha)
 

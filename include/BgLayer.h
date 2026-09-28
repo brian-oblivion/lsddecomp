@@ -14,7 +14,7 @@
  * The name is round 83's, and the evidence is the GsBG: Viewport__DrawNode
  * (src/ViewportDraw.c) passes a class-0x54 node's +0x044 to GsSortBg, and
  * BgLayer__Reset lays that GsBG over a map source's GsMAP. Its one outside
- * user is TaskCore (src/Task.c): TaskCore__TaskCore builds one over its
+ * user is TaskCore (src/app/Task.c): TaskCore__TaskCore builds one over its
  * TileMap (New_BgLayer(tileMap, 1)) into TaskCore::bgLayer, OnInit attaches
  * it to the scene root (unk14) and sets its colour, OnDeinit detaches it,
  * Finalize releases it, and the colour fades (TaskCore__TickColorFade,

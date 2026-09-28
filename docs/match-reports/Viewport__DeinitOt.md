@@ -45,7 +45,7 @@ Renamed from `Unk18Obj__DeinitOt`. Slot +0x090 `deinitOt`; frees `ot[0]`, the st
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/Task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: none: `DrawSync(0)`'s int return is ignored, as before.
+src/app/Task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: none: `DrawSync(0)`'s int return is ignored, as before.
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 

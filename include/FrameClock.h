@@ -14,7 +14,7 @@
  * notifyParents(self, event) with event 2 (running: frameCount += 1 first),
  * 3 (paused: not counted) or 4 (flag14 set: not counted, takes precedence).
  * Its tick comes from the DrawSystem's per-VSync event 2
- * (include/DrawSystem.h): IntermediateBase__Init (src/Task.c) keeps
+ * (include/DrawSystem.h): IntermediateBase__Init (src/app/Task.c) keeps
  * one at +0x010 (initArgs->unk8, or New_FrameClock()), adds it as a child of
  * itself, of the viewport and of the LightRig, and IntermediateBase__OnTag1Notify
  * calls its tick on the DrawSystem's event 2. DayTask__DayTask

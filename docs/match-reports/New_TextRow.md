@@ -31,7 +31,7 @@ established convention).
 
 `include/Task.h` already declared
 `extern Unk64Elem *New_TextRow(void *ctx, s32 len, char *name);`
-from a DIFFERENT unit's caller-side guess (`src/Task.c`, two
+from a DIFFERENT unit's caller-side guess (`src/app/Task.c`, two
 call sites: `New_TextRow(handle, len, *list)`). That guess is
 actually CORRECT at the ABI level -- `handle`/`len`/`*list` forward
 straight through to the constructor as raw register values, so typing

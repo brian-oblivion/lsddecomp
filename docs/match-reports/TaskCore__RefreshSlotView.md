@@ -200,7 +200,7 @@ as already-known, cross-function evidence rather than a fresh mystery.
 ## Round 46 (runner delta): drift-checked fresh, no new attempt -- DELIBERATE SKIP, reason recorded
 
 Re-spliced the exact preserved body below (unchanged) into
-`src/Task.c` in isolation (every other INCLUDE_ASM in all four of
+`src/app/Task.c` in isolation (every other INCLUDE_ASM in all four of
 this runner's units confirmed still wrapped first) and rebuilt through
 the full oracle: reproduces **50/145 words, with the expected
 `WARNING: differs OUTSIDE this range too (232312 bytes)`** -- exactly the
