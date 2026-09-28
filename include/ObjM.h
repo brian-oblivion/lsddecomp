@@ -186,7 +186,7 @@ void ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y);
 void ObjM__DetachTarget(ObjM *self);
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, struct StyleConfig *style, s32 arg3);
 void ObjM__TeardownStyle(ObjM *self);
-void ObjM__OnTag1Notify(ObjM *self, void *sender, s32 event);
+void ObjM__OnDrawSystemEvent(ObjM *self, void *sender, s32 event);
 void ObjM__PollTimBlockLoad(ObjM *self, struct TimBlockSrc *src);
 void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code);
 void ObjM__Update(ObjM *self);

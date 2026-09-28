@@ -1,4 +1,6 @@
-# ObjM__OnTag1Notify
+# ObjM__OnDrawSystemEvent
+
+> Renamed from `ObjM__OnTag1Notify` on 2026-09-28 (tools/rename.py). Address 0x800531a0.
 
 > Renamed from `ObjM__OnSelectTransfer` on 2026-09-26 (tools/rename.py). Address 0x800531a0.
 
@@ -10,7 +12,7 @@
 ## What it does
 
 ```c
-void ObjM__OnTag1Notify(Obj87034_3bb8c_l *self, void *arg1, s32 sel) {
+void ObjM__OnDrawSystemEvent(Obj87034_3bb8c_l *self, void *arg1, s32 sel) {
     if (sel == 2) {
         ObjM__PollTimBlockLoad(self, self->unk58);
     }
@@ -38,7 +40,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier | evidence |
 | --- | --- | --- | --- |
-| `func_800531A0` | `ObjM__OnTag1Notify` | B | see below |
+| `func_800531A0` | `ObjM__OnDrawSystemEvent` | B | see below |
 
 **Evidence.** vtable slot +0x054. A thin selector: forwards to `ObjM__PollTimBlockLoad` only when `sel == 2`, otherwise a no-op. The meaning of the other `sel` values is not established from this body alone.
 

@@ -577,7 +577,7 @@ void ObjM__TeardownStyle(ObjM *self) {
     self->bgm->methods->stop(self->bgm);
 }
 
-void ObjM__OnTag1Notify(ObjM *self, void *sender, s32 event) {
+void ObjM__OnDrawSystemEvent(ObjM *self, void *sender, s32 event) {
     if (event == DRAWSYSTEM_EVENT_VSYNC) {
         ObjM__PollTimBlockLoad(self, self->timBlockSrc);
     }

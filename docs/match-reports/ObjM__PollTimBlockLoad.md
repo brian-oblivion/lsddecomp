@@ -102,7 +102,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- | --- |
 | `func_800531CC` | `ObjM__PollTimBlockLoad` | B | see below |
 
-**Evidence.** Private helper (not itself a vtable slot), called only from `ObjM__OnTag1Notify`. The detach-from-current-target / link-to-new-target logic: `other` is confirmed to be the SAME class (`Obj87034_3bb8c_l`) by the identical field offsets both `self` and `other` are read through (`+0x0`, `+0x3C`, `+0x50`, `+0x60`, `+0x68`, `+0x80`).
+**Evidence.** Private helper (not itself a vtable slot), called only from `ObjM__OnDrawSystemEvent`. The detach-from-current-target / link-to-new-target logic: `other` is confirmed to be the SAME class (`Obj87034_3bb8c_l`) by the identical field offsets both `self` and `other` are read through (`+0x0`, `+0x3C`, `+0x50`, `+0x60`, `+0x68`, `+0x80`).
 
 
 ## Track 4 (2026-09-26, round 89, echo)
