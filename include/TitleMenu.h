@@ -26,7 +26,7 @@
  * setSubHandle, frame bound 10, the flashback session cleared).
  *
  * The menu. The six entries are TaskCore's slots, `activeSlot` their index:
- *  - 0 START is the target's confirm slot (unkC): TaskCore ends the menu with
+ *  - 0 START is the target's exitSlot: TaskCore ends the menu with
  *    exit, which this class extends to store SHAKE's setting
  *    (itemCursors[5]) through DreamSys's getSetScreenShake.
  *  - 1 FLASHBACK: result 0 and a flashback session opened; 4 GRAPH: result 2.
@@ -35,9 +35,9 @@
  *  - 5 SHAKE is the one entry with an item list (the target's unk24[5]).
  *  - FLASHBACK starts locked (hiddenSlots[1] = 1); refreshMenu clears
  *    the lock through UpdateFlashbackLock when the save block allows it.
- * setState(5), the menu becoming active, runs refreshMenu: the save title's
+ * setState(TASKCORE_STATE_ACTIVE), the menu becoming active, runs refreshMenu: the save title's
  * text reloaded, FLASHBACK's lock recomputed, the widgets re-attached and
- * SHAKE's cursor set from DreamSys. setState(0xA) cancels, reselects the
+ * SHAKE's cursor set from DreamSys. setState(TASKCORE_STATE_START_PRESSED) cancels, reselects the
  * target's first slot and confirms.
  *
  * The save title replaces TaskCore's slot widgets as what setTarget,
@@ -49,7 +49,7 @@
  * The memory card. beginCardAccess makes `saveIcon` (CARD\FILEICN1.TIM) and
  * `saveCtrl` (a TaskObjF, include/TaskObjF.h) on first use, inits saveCtrl
  * with the product code "BISLPS-01556", the file suffix table, the pad and
- * clock sources (initArgs->pad, unk10), unk14 as sprite parent and `sound`,
+ * clock sources (initArgs->pad, frameClock), lightRig as sprite parent and `sound`,
  * and hands input to it: saveCtrl is added as a child and the pad and
  * clock are removed. saveToCard stores SHAKE's setting and calls saveCtrl's beginSave
  * with the save title, `saveIcon` and the save block; loadFromCard calls
@@ -80,14 +80,14 @@ struct TaskObjF;
 struct TitleMenuMethods {
     TASKCORE_SLOTS(TitleMenu, (TitleMenu * self, struct DreamSys *dreamSys));
     /* +0x124 */ void (*refreshMenu)(TitleMenu *self, s32 arg1); /* TitleMenu__RefreshMenu; both callers pass
-                                                                     arg1 (setState: 0, onCardEvent: 0x16) and the
+                                                                     arg1 (setState: 0, onCardEvent: TASKOBJF_STATE_DONE) and the
                                                                      occupant reads self alone */
     /* +0x128 */ void (*beginCardAccess)(TitleMenu *self); /* TitleMenu__BeginCardAccess; saveToCard/loadFromCard call it first */
-    /* +0x12C */ void (*endCardAccess)(TitleMenu *self); /* TitleMenu__EndCardAccess; onCardEvent's 0x16/0x17 */
+    /* +0x12C */ void (*endCardAccess)(TitleMenu *self); /* TitleMenu__EndCardAccess; onCardEvent's TASKOBJF_STATE_DONE/ABORTED */
     /* +0x130 */ void (*saveToCard)(TitleMenu *self); /* TitleMenu__SaveToCard; confirmSlot's activeSlot 2, SAVE */
     /* +0x134 */ void (*loadFromCard)(TitleMenu *self); /* TitleMenu__LoadFromCard; confirmSlot's activeSlot 3, LOAD */
     /* +0x138 */ void (*onCardEvent)(TitleMenu *self, BasicClass *sender,
-                                     s32 event); /* TitleMenu__OnCardEvent; onNotify's class-0xB case */
+                                     s32 event); /* TitleMenu__OnCardEvent; onNotify's TASKOBJF_CLASS_ID case */
 };
 
 struct TitleMenu {
