@@ -46,7 +46,7 @@ that slice's own globals.
 Kept `func_8002C408`, tier C (superseded 2026-09-26, Track 4 below). The CLASS is now established (round 52:
 `gNullDriverMethods`, the generic driver-interface base class
 `VabStreamObj` chains its own ctor/close through when
-`gActiveDataSource == 0x23` -- see `src/sound/PlacementGridVabSound.c`'s unit header
+`sActiveDataSource == 0x23` -- see `src/sound/PlacementGridVabSound.c`'s unit header
 comment), but this SLOT's own purpose within that interface is not: the
 body is `return 0;` and nothing in this unit calls the slot directly (only
 the vtable data references it). No positive evidence for what a caller
@@ -61,7 +61,7 @@ FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
 names it `read`; the CD driver's occupant is `CdDriver__Read`).
 `SetActiveDataSource` (GameApplicationFileResource.c) copies the active driver's interface
 slots into FileResource's table and every client table, and takes this table
-(`GetNullDriverMethods()`) whenever `gActiveDataSource != DATASOURCE_CD`, so
+(`GetNullDriverMethods()`) whenever `sActiveDataSource != DATASOURCE_CD`, so
 when the SPU/VAB source is active every `methods->read(...)` in the game
 reaches this body. The purpose evidence the tier-C verdict above lacked is
 the slot's, not the body's: the body does nothing, which is what the VAB

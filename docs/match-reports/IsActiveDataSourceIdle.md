@@ -13,7 +13,7 @@ the preserved body verbatim; matched on the first build.
 
 ## What it does
 
-`s32 IsActiveDataSourceIdle(void) { if (gActiveDataSource == 0x13) return IsCdIdle(); return 1; }`
+`s32 IsActiveDataSourceIdle(void) { if (sActiveDataSource == 0x13) return IsCdIdle(); return 1; }`
 — same shape as `IsActiveDataSourceBusy`, but the "not in mode 0x13" path returns `1`
 instead of `0`. `IsCdIdle` is a still-uncarved function in
 `asm/code_179d8.s`.
@@ -24,7 +24,7 @@ instead of `0`. `IsCdIdle` is a still-uncarved function in
 extern s32 IsCdIdle(void);
 
 s32 IsActiveDataSourceIdle(void) {
-    if (gActiveDataSource == 0x13) {
+    if (sActiveDataSource == 0x13) {
         return IsCdIdle();
     }
     return 1;

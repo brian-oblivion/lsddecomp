@@ -25,7 +25,7 @@
 ## What it does
 
 A setter: `gDataDirectory = value;`. `gDataDirectory` is another slot in the same
-`.sdata` region as `gActiveDataSource` (file `0x7b008`; see
+`.sdata` region as `sActiveDataSource` (file `0x7b008`; see
 `asm/data/7B008.sdata.s`), initialized in retail to `0x8006D4A8` — a pointer
 value. `D_8006D4A8` itself sits right at the tail of the `gFileResourceMethods` method
 table as splat has that table carved (see `include/GameApplicationFileResource.h`), which may

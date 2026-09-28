@@ -40,7 +40,7 @@ extern s32 GetCdUseVSyncCallback(void);
 extern s32 GetNullDriverUseVSyncCallback(void);
 
 s32 GetActiveDataSourceUseVSyncCallback(void) {
-    if (gActiveDataSource == 0x13) {
+    if (sActiveDataSource == 0x13) {
         return GetCdUseVSyncCallback();
     } else {
         return GetNullDriverUseVSyncCallback();

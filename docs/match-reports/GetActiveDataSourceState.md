@@ -13,7 +13,7 @@ the preserved body verbatim; matched on the first build.
 
 ## What it does
 
-`s32 GetActiveDataSourceState(void) { if (gActiveDataSource == 0x13) return GetCdState(); return 0; }`
+`s32 GetActiveDataSourceState(void) { if (sActiveDataSource == 0x13) return GetCdState(); return 0; }`
 — same shape as `IsActiveDataSourceBusy`, forwarding to a different still-uncarved
 function (`GetCdState`, in `asm/code_179d8.s`).
 
@@ -23,7 +23,7 @@ function (`GetCdState`, in `asm/code_179d8.s`).
 extern s32 GetCdState(void);
 
 s32 GetActiveDataSourceState(void) {
-    if (gActiveDataSource == 0x13) {
+    if (sActiveDataSource == 0x13) {
         return GetCdState();
     }
     return 0;

@@ -19,9 +19,9 @@ An `if`/`else` mode dispatch, both arms tail-calling a function and
 returning its result:
 
 ```
-lw    $v1, %gp_rel(gActiveDataSource)($gp)
+lw    $v1, %gp_rel(sActiveDataSource)($gp)
 ori   $v0, $zero, 0x23
-beq   $v1, $v0, .L80026CD0     # gActiveDataSource == 0x23 -> the "then" arm
+beq   $v1, $v0, .L80026CD0     # sActiveDataSource == 0x23 -> the "then" arm
   jal GetCdDriverMethods             # fallthrough (not equal) -- called first in ROM order
   j .L80026CD8
 .L80026CD0:
@@ -47,12 +47,12 @@ each unit's own independent local type -- this report follows the same
 ## Final body
 
 ```c
-extern s32 gActiveDataSource;
+extern s32 sActiveDataSource;
 extern void *GetNullDriverMethods(void);
 extern void *GetCdDriverMethods(void);
 
 void *GetActiveDataSourceMethods(void) {
-    if (gActiveDataSource == 0x23) {
+    if (sActiveDataSource == 0x23) {
         return GetNullDriverMethods();
     } else {
         return GetCdDriverMethods();
@@ -63,7 +63,7 @@ void *GetActiveDataSourceMethods(void) {
 ## Proposed learning
 
 **A second shared idiom in this unit, alongside the six-function
-`if (gActiveDataSource == 0x13) return func(); return N;` family
+`if (sActiveDataSource == 0x13) return func(); return N;` family
 (`LockActiveDataSource.md`):** an `if`/`else` mode dispatch where BOTH arms
 tail-call a function and neither sets an explicit constant. Three functions
 in this unit share this exact shape --  `GetActiveDataSourceMethods` (mode `0x23`),
@@ -83,9 +83,9 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `GetActiveDataSourceMethods` | `GetActiveDataSourceMethods` | B |
 
-**Evidence.** `if (gActiveDataSource == DATASOURCE_SPU) return GetNullDriverMethods();
+**Evidence.** `if (sActiveDataSource == DATASOURCE_SPU) return GetNullDriverMethods();
 else return GetCdDriverMethods();` -- returns whichever of the two sibling
 data-source classes' vtables is currently active. Part of the family of
-`ActiveDataSource`-named wrappers this round derived from `gActiveDataSource`
-(the renamed `gActiveDataSource`); see that global's own naming note. Mechanics
+`ActiveDataSource`-named wrappers this round derived from `sActiveDataSource`
+(the renamed `sActiveDataSource`); see that global's own naming note. Mechanics
 fully known; which higher-level system decides the active source is not.

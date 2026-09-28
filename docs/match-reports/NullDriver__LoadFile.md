@@ -46,7 +46,7 @@ FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
 names it `loadFile`; the CD driver's occupant is `CdDriver__LoadFile (FileResource__LoadFile in the base table)`).
 `SetActiveDataSource` (GameApplicationFileResource.c) copies the active driver's interface
 slots into FileResource's table and every client table, and takes this table
-(`GetNullDriverMethods()`) whenever `gActiveDataSource != DATASOURCE_CD`, so
+(`GetNullDriverMethods()`) whenever `sActiveDataSource != DATASOURCE_CD`, so
 when the SPU/VAB source is active every `methods->loadFile(...)` in the game
 reaches this body. The purpose evidence the tier-C verdict above lacked is
 the slot's, not the body's: the body does nothing, which is what the VAB

@@ -20,7 +20,7 @@ function; they never change):
 
 ```
 lui $s0,%hi(SetNullDriverMode); addiu $s0,$s0,%lo(SetNullDriverMode)   # default fn
-lw $v1,%gp_rel(gActiveDataSource)($gp); ori $v0,0x13
+lw $v1,%gp_rel(sActiveDataSource)($gp); ori $v0,0x13
 bne $v1,$v0,.L80026F74
   lui $s0,%hi(SetCdDriverMode); addiu $s0,$s0,%lo(SetCdDriverMode) # override fn
 .L80026F74:
@@ -54,7 +54,7 @@ void SetActiveDataSourceDriverMode(s32 arg0, s32 arg1, s32 arg2) {
     DataSourceSetDriverModeFn fn;
 
     fn = SetNullDriverMode;
-    if (gActiveDataSource == 0x13) {
+    if (sActiveDataSource == 0x13) {
         fn = SetCdDriverMode;
     }
     do {
@@ -93,7 +93,7 @@ a 3-argument setter with a retry loop.
 | `Func80026F34Fn` | `DataSourceSetDriverModeFn` | A |
 
 **Evidence.** The typedef's only use is this function's local `fn`, and it
-has exactly two occupants, one per branch of `gActiveDataSource ==
+has exactly two occupants, one per branch of `sActiveDataSource ==
 DATASOURCE_CD`: `SetCdDriverMode` (CD driver, `CdDriver.c`, 3 args) and
 `SetNullDriverMode` (SPU/VAB driver, `PlacementGridVabSound.c`, 2 args, ignores the
 third). Both occupants agree on what they do -- set the selected data

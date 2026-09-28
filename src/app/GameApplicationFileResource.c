@@ -370,7 +370,7 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
  * (gCdDriverMethods, include/CdDriver.h) and the null driver
  * (gNullDriverMethods, include/NullDriver.h) implement.
  *
- * gActiveDataSource selects one of those two drivers. SetActiveDataSource
+ * sActiveDataSource selects one of those two drivers. SetActiveDataSource
  * installs one and copies its interface slots into FileResource's table and
  * into every client table. The Lock/Unlock, IsBusy/Idle, Get.../Set...
  * functions after it forward to the CD driver when it is active, and
@@ -386,7 +386,7 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
  * which BuildFileName calls, is Sony's libc2 object, linked after this file.
  */
 
-/* gActiveDataSource's two observed values are the header words of the two
+/* sActiveDataSource's two observed values are the header words of the two
  * sibling classes it selects between: gCdDriverMethods (the CD-ROM read driver,
  * CdDriver.c) and gNullDriverMethods (NullDriver, the null driver, include/NullDriver.h). */
 #define DATASOURCE_CD 0x13
@@ -468,10 +468,10 @@ FileResourceMethods *GetFileResourceMethods(void) {
     return &gFileResourceMethods;
 }
 
-extern s32 gActiveDataSource;
+extern s32 sActiveDataSource;
 
 void *GetActiveDataSourceMethods(void) {
-    if (gActiveDataSource == DATASOURCE_NULL) {
+    if (sActiveDataSource == DATASOURCE_NULL) {
         return GetNullDriverMethods();
     } else {
         return GetCdDriverMethods();
@@ -495,7 +495,7 @@ void SetActiveDataSource(s32 source) {
     void *(**entry)(void);
 
     entry = gDataSourceClientGetters;
-    gActiveDataSource = source;
+    sActiveDataSource = source;
     if (source == DATASOURCE_CD) {
         src = (FileResourceMethods *)GetCdDriverMethods();
     } else {
@@ -535,7 +535,7 @@ void CopyDataSourceSlots(FileResourceMethods *dst, FileResourceMethods *src) {
 extern s32 LockCd(void);
 
 void LockActiveDataSource(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         LockCd();
     }
 }
@@ -543,7 +543,7 @@ void LockActiveDataSource(void) {
 extern s32 UnlockCd(void);
 
 void UnlockActiveDataSource(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         UnlockCd();
     }
 }
@@ -551,7 +551,7 @@ void UnlockActiveDataSource(void) {
 extern s32 IsCdBusy(void);
 
 s32 IsActiveDataSourceBusy(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         return IsCdBusy();
     }
     return 0;
@@ -560,7 +560,7 @@ s32 IsActiveDataSourceBusy(void) {
 extern s32 IsCdIdle(void);
 
 s32 IsActiveDataSourceIdle(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         return IsCdIdle();
     }
     return 1;
@@ -569,7 +569,7 @@ s32 IsActiveDataSourceIdle(void) {
 extern s32 GetCdOperation(void);
 
 s32 GetActiveDataSourceOperation(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         return GetCdOperation();
     }
     return 0;
@@ -578,7 +578,7 @@ s32 GetActiveDataSourceOperation(void) {
 extern s32 GetCdState(void);
 
 s32 GetActiveDataSourceState(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         return GetCdState();
     }
     return 0;
@@ -596,7 +596,7 @@ void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     DataSourceSetDriverModeFn fn;
 
     fn = SetNullDriverMode;
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         fn = SetCdDriverMode;
     }
     /* Retry until the driver accepts: SetCdDriverMode refuses while gCdBusy. */
@@ -608,7 +608,7 @@ extern s32 GetCdDriverMode(void); /* arity-ok: the definition takes (s32 *outMod
 extern s32 GetNullDriverMode(void); /* arity-ok: the definition takes (s32 *outMode2); retail's tail call passes nothing */
 
 s32 GetActiveDataSourceDriverMode(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         return GetCdDriverMode();
     } else {
         return GetNullDriverMode();
@@ -619,7 +619,7 @@ extern s32 GetCdUseVSyncCallback(void);
 extern s32 GetNullDriverUseVSyncCallback(void);
 
 s32 GetActiveDataSourceUseVSyncCallback(void) {
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         return GetCdUseVSyncCallback();
     } else {
         return GetNullDriverUseVSyncCallback();
@@ -635,7 +635,7 @@ extern s32 ResolveFileEntries(CdFileEntry *entries, s32 count);
 s32 RegisterFileTableEntries(CdFileEntry *table, s32 count) {
     s32 first;
 
-    if (gActiveDataSource == DATASOURCE_CD) {
+    if (sActiveDataSource == DATASOURCE_CD) {
         gFileTableRegistered = 1;
         SetFileTable(table);
         first = GetFileTableCount();

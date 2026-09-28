@@ -35,7 +35,7 @@ what looks like a per-class-ID constructor dispatcher, alongside
 that name through its later rename to `GetNullDriverMethods`, but the
 CLAIM itself was never right. `GameApplicationFileResource.c`'s actual source (read in full
 this round, not just the one `.s` file) shows `func_80026FE8`'s caller
-context is: `if (gActiveDataSource == 0x13) return GetCdUseVSyncCallback(); else
+context is: `if (sActiveDataSource == 0x13) return GetCdUseVSyncCallback(); else
 return GetNullDriverUseVSyncCallback();` -- this function is the `else` arm alongside
 `GetCdUseVSyncCallback` (still unnamed), not `func_8002C438`/`GetNullDriverMethods`
 (that one is `func_80026CAC`'s own accessor pair, a different dispatcher
@@ -47,7 +47,7 @@ entirely). See the unit header comment and this unit's `GetNullDriverMode`/
 Kept `GetNullDriverUseVSyncCallback`, tier C. It's the same generic driver-mode-interface
 family as `GetNullDriverMode`/`SetNullDriverMode` (this backend's own
 implementation of whatever `func_80026FE8` needs when
-`gActiveDataSource != 0x13`), but its own counterpart `GetCdUseVSyncCallback` is
+`sActiveDataSource != 0x13`), but its own counterpart `GetCdUseVSyncCallback` is
 still unnamed, so there's no established purpose to name this AS a
 stand-in for -- naming it "GetNullDriverState" or similar would assert
 purpose from a body that's just `return 0;`.
@@ -57,7 +57,7 @@ purpose from a body that's just `return 0;`.
 The objection above ("its own counterpart is still unnamed") no longer
 holds: the counterpart is `GetCdUseVSyncCallback` (CdDriver.c, returns
 `gCdUseVSyncCallback`), and the one caller, GameApplicationFileResource.c's
-`GetActiveDataSourceUseVSyncCallback`, calls it when `gActiveDataSource` is
+`GetActiveDataSourceUseVSyncCallback`, calls it when `sActiveDataSource` is
 DATASOURCE_CD and this function otherwise. This is the VAB driver's answer
 to the same query, and the answer is a constant 0: the VAB backend never
 uses a VSync callback. Named on the `GetVab*`/`GetCd*` pattern

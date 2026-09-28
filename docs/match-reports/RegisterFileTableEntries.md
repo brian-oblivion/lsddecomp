@@ -53,7 +53,7 @@ polarity.
 
 ## What it does
 
-Mode-gated: if `gActiveDataSource == 0x13`, sets `gFileTableRegistered = 1`, forwards
+Mode-gated: if `sActiveDataSource == 0x13`, sets `gFileTableRegistered = 1`, forwards
 `arg0` to `SetFileTable`, fetches an index via `GetFileTableCount()`, adds it
 to `arg1` and forwards to `SetFileTableCount`, then tail-calls `ResolveFileEntries`
 with `arg0` advanced by `idx * 0x1C` (28 bytes -- computed by retail via
@@ -75,7 +75,7 @@ extern s32 ResolveFileEntries(void *arg0, s32 arg1);
 s32 RegisterFileTableEntries(void *arg0, s32 arg1) {
     s32 idx;
 
-    if (gActiveDataSource == 0x13) {
+    if (sActiveDataSource == 0x13) {
         gFileTableRegistered = 1;
         SetFileTable(arg0);
         idx = GetFileTableCount();

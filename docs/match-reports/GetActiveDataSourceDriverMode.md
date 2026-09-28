@@ -37,7 +37,7 @@ extern s32 GetCdDriverMode(void);
 extern s32 GetNullDriverMode(void);
 
 s32 GetActiveDataSourceDriverMode(void) {
-    if (gActiveDataSource == 0x13) {
+    if (sActiveDataSource == 0x13) {
         return GetCdDriverMode();
     } else {
         return GetNullDriverMode();

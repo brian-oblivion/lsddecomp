@@ -67,7 +67,7 @@ place.
 
 Renamed `func_8002C448` -> `GetNullDriverMode`, tier B. Evidence:
 `GameApplicationFileResource.c`'s own `func_80026FAC` calls `GetCdDriverMode()` when
-`gActiveDataSource == 0x13`, else calls this function -- a direct,
+`sActiveDataSource == 0x13`, else calls this function -- a direct,
 call-site-level substitution for a named Sony "get driver mode" accessor,
 confirming this backend's own `gNullDriverMode`/`gNullDriverModeArg` pair
 serves the same role for the SPU/VAB data source. Not tier A: the exact

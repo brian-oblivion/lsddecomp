@@ -13,7 +13,7 @@ the preserved body verbatim; matched on the first build.
 
 ## What it does
 
-`s32 IsActiveDataSourceBusy(void) { if (gActiveDataSource == 0x13) return IsCdBusy(); return 0; }`
+`s32 IsActiveDataSourceBusy(void) { if (sActiveDataSource == 0x13) return IsCdBusy(); return 0; }`
 — same region/mode gate as `LockActiveDataSource`, but forwarding the callee's
 return value (or a fixed `0` on the other path) instead of returning `void`.
 `IsCdBusy` is a still-uncarved function in `asm/code_179d8.s`.
@@ -24,7 +24,7 @@ return value (or a fixed `0` on the other path) instead of returning `void`.
 extern s32 IsCdBusy(void);
 
 s32 IsActiveDataSourceBusy(void) {
-    if (gActiveDataSource == 0x13) {
+    if (sActiveDataSource == 0x13) {
         return IsCdBusy();
     }
     return 0;
