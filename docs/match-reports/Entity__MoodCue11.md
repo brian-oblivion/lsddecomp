@@ -189,7 +189,7 @@ All of these are cross-unit (the compiler lists accessors in several Entity_* un
 
 | member | proposed | tier | evidence |
 | --- | --- | --- | --- |
-| `EntityMethods::slotC4` (+0xC4) | `moveLocalZ` | B | occupant `Actor__MoveLocalZ` = `Actor__MoveAlongLocalAxis(self, &gActorLocalMoveZ, v, extra, 6)`. gActorLocalMoveZ is element [2] of the s16 triple at gActorLocalMove that the helper hands to `Actor__AddLocalTranslation`, so it is a translation of `v` along local z. Handlers call it with small signed speeds every tick |
+| `EntityMethods::slotC4` (+0xC4) | `moveLocalZ` | B | occupant `Actor__MoveLocalZ` = `Actor__MoveAlongLocalAxis(self, &gActorLocalMoveZ, v, extra, 6)`. gActorLocalMoveZ is element [2] of the s16 triple at sActorLocalMove that the helper hands to `Actor__AddLocalTranslation`, so it is a translation of `v` along local z. Handlers call it with small signed speeds every tick |
 | `EntityMethods::slotCC` (+0xCC) | `moveLocalY` | B | occupant `Actor__MoveLocalY`: element [1] of the same triple |
 | `EntityMethods::slotD0` (+0xD0) | `moveLocalZAndLink` | B | occupant `Actor__MoveLocalZOrFindLink`: runs +0xC4 (moveLocalZ) through `Actor__MoveOrFindNearbyLink`, which falls back to `Actor__FindNearbyLink` |
 | `EntityMethods::slot144` (+0x144) | `distanceToRegion` | B | occupant `Entity__DistanceToPeer`, named after the method per the slot convention. See `Entity__IsTargetInRange.md` for why that occupant's own name may need sharpening |

@@ -2926,7 +2926,7 @@ void Actor__AddLocalTranslation(Actor *self, s16 *local) {
     self->methods->addTranslation(self, &delta);
 }
 
-/* The z of the s16 local move vector whose x and y are gActorLocalMove
+/* The z of the s16 local move vector whose x and y are sActorLocalMove
  * (next section, with MoveLocalX/Y and MoveAlongLocalAxis). */
 extern s16 gActorLocalMoveZ;
 
@@ -2941,7 +2941,7 @@ void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
  * allocator and ctor.
  *
  *  - Local-axis moves. Actor__MoveLocalX/Y put `val` into one component of
- *    the local move vector gActorLocalMove, apply it through
+ *    the local move vector sActorLocalMove, apply it through
  *    addLocalTranslation and clear it again (Actor__MoveAlongLocalAxis;
  *    MoveLocalZ is in the previous section).
  *  - Move, else find a link. Actor__MoveLocalZOrFindLink/XOrFindLink clear
@@ -2962,24 +2962,24 @@ void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
  * halfword, previous section). All three stay 0 between moves: a move sets
  * one component, addLocalTranslation rotates the whole vector by the
  * actor's orientation, and the component is cleared again. */
-extern s16 gActorLocalMove[2];
+extern s16 sActorLocalMove[2];
 
 void Actor__MoveLocalX(Actor *self, s32 val, void *notify) {
-    Actor__MoveAlongLocalAxis(self, &gActorLocalMove[0], val, notify, ACTOR_EVENT_MOVED_X);
+    Actor__MoveAlongLocalAxis(self, &sActorLocalMove[0], val, notify, ACTOR_EVENT_MOVED_X);
 }
 
 void Actor__MoveLocalY(Actor *self, s32 val, void *notify) {
-    Actor__MoveAlongLocalAxis(self, &gActorLocalMove[1], val, notify, ACTOR_EVENT_MOVED_Y);
+    Actor__MoveAlongLocalAxis(self, &sActorLocalMove[1], val, notify, ACTOR_EVENT_MOVED_Y);
 }
 
 /* Moves the actor by `val` along one local axis (`axis` is that component of
- * gActorLocalMove), keeps `val` in lastOffsetValue and, when `notify` is
+ * sActorLocalMove), keeps `val` in lastOffsetValue and, when `notify` is
  * non-NULL, sends `event` (6, 7, 8 for z, x, y) through notifyWithHull. */
 void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, s32 event) {
     s16 val16 = (s16)val; /* MATCHING: truncating at each store does not match */
     *axis = val16;
     self->lastOffsetValue = val16;
-    self->methods->addLocalTranslation(self, &gActorLocalMove[0]);
+    self->methods->addLocalTranslation(self, &sActorLocalMove[0]);
     *axis = 0;
     if (notify != NULL) {
         self->methods->notifyWithHull(self, event);
