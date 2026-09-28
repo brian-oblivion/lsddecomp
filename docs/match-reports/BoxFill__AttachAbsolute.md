@@ -231,3 +231,11 @@ From `include/box_fill.h`:
 
 > The class banner: "BoxFill__AttachAbsolute calls it [+0x04C attachToParent]
 > with FOUR arguments through an unprototyped pointer (see its match report)."
+
+From `src/ui/screen_widgets.c`:
+
+> "+0x04C is called with FOUR arguments through an unprototyped pointer: its
+> occupant reads three, and the fourth is this function's own a3, already in
+> $a3 (box_fill.h's banner)."
+> 
+> "MATCHING: without the do/while(0), GCC swaps the prologue's $ra/$s1 stores."

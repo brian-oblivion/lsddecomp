@@ -1,26 +1,15 @@
 /*
- * screen_widgets.c -- the screen widgets FadeBox, BoxFill and TextRow, and three
- * full-width Shift-JIS string helpers.
+ * screen_widgets.c -- the screen widgets FadeBox, BoxFill and TextRow, and
+ * the full-width Shift-JIS string helpers.
  *
- * FadeBox (include/fade_box.h), New_FadeBox to GetFadeBoxMethods: a BoxFill
- * whose colour steps once per FrameClock tick away from a channel mask's
- * colour (sFadeBoxMaskColors) or up from black (sFadeBoxBlackColors), with
- * semi-transparency on, and notifies its parents when the ramp runs out.
- * Viewport's fadeBox and Entity's are the two users.
- *
- * BoxFill (include/box_fill.h), New_BoxFill to GetBoxFillMethods: a
- * flat-coloured GsBOXF screen rectangle's allocator, ctor, Reset, attach,
- * attribute bits, colour, position, size, priority and mask.
- *
- * TextRow (include/text_row.h), New_TextRow to GetTextRowMethods: a row of
- * CharSprite character cells showing a string. It derives from CharSprite,
- * not from BoxFill; the two classes only sit next to each other.
- * TextRow__NoOpGetCell and TextRow__NoOpSlotD0 are empty method-table
- * occupants.
- *
- * Then DecodeFullWidthSjis, EncodeFullWidthSjis and FormatFullWidthNumber:
- * free functions over plain byte buffers, converting printable ASCII to and
- * from two-byte full-width Shift-JIS.
+ * In ROM order: FadeBox (include/fade_box.h), a BoxFill whose colour steps
+ * a tick at a time into or out of a flash or a fade to black; BoxFill
+ * (include/box_fill.h), a flat-coloured GsBOXF rectangle; TextRow
+ * (include/text_row.h), a row of CharSprite cells showing a string, which
+ * derives from CharSprite, not BoxFill. Each class runs from its New_ to
+ * its method-table getter. Then DecodeFullWidthSjis, EncodeFullWidthSjis
+ * and FormatFullWidthNumber (include/full_width_sjis.h), free functions
+ * over plain byte buffers.
  */
 #include "common.h"
 #include <libgte.h>
@@ -110,8 +99,7 @@ void FadeBox__SetStep(FadeBox *self, s32 step) {
     self->step = step;
 }
 
-/* MATCHING: both StartFade functions pass their own arguments on to
- * configure; a `(self)`-only call reorders the instructions. */
+/* MATCHING: both StartFade functions pass their arguments on to configure; a (self) call reorders them. */
 void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32 mode) {
     s32 storedChannels;
 
@@ -213,8 +201,7 @@ void *FadeBox__GetColor(FadeBox *self) {
     return &sFadeBoxMaskColors[self->channels * 3];
 }
 
-/* MATCHING: both position pairs are copied as whole structs; the block
- * copy is what moves `self` and `size` out of their incoming registers. */
+/* MATCHING: the position pairs are copied as whole structs; field copies allocate differently. */
 void FadeBox__PushPosition(FadeBox *self, BoxFillSize *size, BoxFillPos *pos) {
     if (self->parent != 0) {
         self->savedW = self->boxW;
@@ -233,8 +220,7 @@ void FadeBox__PopPosition(FadeBox *self) {
     y = self->savedPosY;
     self->posX = x;
     self->posY = y;
-    /* MATCHING: without it GCC hoists the savedW/savedH loads above the
-     * posX/posY stores. */
+    /* MATCHING: without it the savedW/savedH loads move above the posX/posY stores. */
     __asm__("");
     self->boxW = self->savedW;
     self->boxH = self->savedH;
@@ -331,14 +317,13 @@ void BoxFill__SetSize(BoxFill *self, s32 *size) {
     }
 }
 
-/* +0x04C is called with FOUR arguments through an unprototyped pointer: its
- * occupant reads three, and the fourth is this function's own a3, already in
- * $a3 (box_fill.h's banner). */
+/* attachToParent is called through an unprototyped pointer with attachArg
+ * as a fourth argument, which its occupant ignores. */
 void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, s32 attachArg) {
     void (*fn)();
 
     fn = (void (*)())self->methods->attachToParent;
-    /* MATCHING: without the do/while(0), GCC swaps the prologue's $ra/$s1 stores. */
+    /* MATCHING: without the do/while(0) the prologue's two register saves swap. */
     do {
         fn(self, parent, pos, attachArg);
         self->relative = 0;
@@ -548,10 +533,9 @@ TextRowMethods *GetTextRowMethods(void) {
 #define SJIS_TRAIL_GAP 0x7F    /* the trail value Shift-JIS skips */
 #define SJIS_TRAIL_SPACE 0x40 /* the full-width space 0x8140's trail: ' ' + SJIS_TRAIL_OFFSET + 1 */
 
-/* Full-width Shift-JIS back to ASCII: drops each lead byte and maps the trail
- * back. Returns the address of the NUL it writes.
- * MATCHING: `special` holds SJIS_TRAIL_SPACE so the constant is loaded before
- * `d` is copied from `dst`; `d` and `dst` are two cursors over one buffer. */
+/* `d` and `dst` are two cursors over one buffer; `special` holds
+ * SJIS_TRAIL_SPACE. */
+/* MATCHING: `special` gets the constant loaded before `d` is copied from `dst`. */
 u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 special;
@@ -581,10 +565,7 @@ u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     return dst;
 }
 
-/* ASCII to full-width Shift-JIS, two bytes a character. Returns the address
- * of the NUL it writes.
- * MATCHING: the `d = dst; dst++;` cursor pairs and the `trail` copy of `c`
- * give retail's register assignment. */
+/* MATCHING: the `d = dst; dst++;` cursor pairs and the `trail` copy of `c` set the register choice. */
 u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 c;
@@ -620,12 +601,10 @@ u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
     return dst;
 }
 
-/* Writes `value` in decimal, as full-width Shift-JIS, into `dst`: padded on
- * the left with '0' to `width` digits, or as it is when `unpadded` is set.
- * MATCHING: the declaration order text/fill/padded and `fill` computed in two
- * statements give retail's register assignment. */
+/* Sony's itoa (libc2): the decimal digits of `n`, in the library's own buffer. */
 extern char *itoa(int n);
 
+/* MATCHING: the declaration order text/fill/padded and `fill` in two statements set the register choice. */
 void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded) {
     char text[width + 1];
     s32 fill;

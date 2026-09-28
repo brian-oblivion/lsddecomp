@@ -295,3 +295,10 @@ this report's earlier history too (known, pending an operator decision).
 ## Track 7 (round 100, charlie)
 
 - Parameter `arg3` -> `mode` (FadeBox::mode, see FadeBox__Configure.md); local `idx` -> `mask`, configure's return, the mask it stored.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/ui/screen_widgets.c`:
+
+> "MATCHING: both StartFade functions pass their own arguments on to
+> configure; a `(self)`-only call reorders the instructions." Now one line.
