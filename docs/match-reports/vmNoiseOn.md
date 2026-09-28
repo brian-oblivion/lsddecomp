@@ -494,3 +494,10 @@ reached (309/311 built words, 2 words SHORT) preserved there in #if 0" is
 now a one-line "not yet C" pointer. It also carried the note that
 `vmNoiseOn`'s cascade globals were declared ahead of `SpuVmKeyOnNow` and
 reused; all of them are now one block at the top of the file.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vmanager.c`:
+
+> Above the function's INCLUDE_ASM: "Not yet C: the best body (309/311 words)
+> is in docs/match-reports/vmNoiseOn.md."

@@ -888,3 +888,12 @@ The comment above this function's NON_MATCHING body in src/libsnd_vmanager.c rea
 > Residue: the pan split's `else` arm -- retail copies the volume into
 > $a1 and multiplies that copy unmasked; this body masks val1 instead
 > (docs/match-reports/SetAutoPan.md).
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vmanager.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: 228/228 words, length
+> exact, 220/228 raw. This is libsnd's SetAutoPan. Residue: the pan split's
+> `else` arm: retail copies the volume into $a1 and multiplies that copy
+> unmasked; this body masks val1 instead (docs/match-reports/SetAutoPan.md)."

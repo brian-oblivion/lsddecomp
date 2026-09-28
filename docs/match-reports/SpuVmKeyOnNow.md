@@ -995,3 +995,11 @@ locals now say what they hold (`pan1`/`pan2` -> `volL`/`volR`, `prio` ->
 `masterVol`, `lvl0`/`lvl1` -> `toneVol`/`vol`, `chanIdx` -> `sregIndex`,
 the unread first parameter `unused`, the second `pitch`); the preserved
 bodies above keep the old spellings.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vmanager.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: 316/316 words, length
+> exact; the residue is the frame size (8 bytes against retail's 16) and this
+> unit's register-identity class (docs/match-reports/SpuVmKeyOnNow.md)."

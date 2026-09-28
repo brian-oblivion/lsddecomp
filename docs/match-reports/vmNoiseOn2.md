@@ -726,3 +726,14 @@ The NON_MATCHING comment said the residue was "the a0/a3 role-swap
 register-identity class (this unit's documented class)" and that the body
 was hand-derived; the parameters are now `voice`, `volL`, `volR` and the
 copy `voiceArg` (`a3` in the preserved bodies above), `v1` is `dirty`.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vmanager.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: 107/112 words, 5
+> short; the residue is a register role swap between the voice argument and
+> its copy, and an 8-byte frame retail allocates
+> (docs/match-reports/vmNoiseOn2.md, which also has the order-only __asm__("")
+> barrier this copy omits)." The parameter note said "retail's body reads
+> neither"; it now says "the body reads neither".

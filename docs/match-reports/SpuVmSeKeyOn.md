@@ -104,3 +104,16 @@ rewritten as documentation.
   `s16`) retired onto `include/SsScore.h`; the unused externs `SpuVmVSetUp`,
   `SpuVmPBVoice`, `SeAutoVol`, `SeAutoPan` (no call in any of the unit's C or
   asm) were dropped.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vmanager.c`:
+
+> The section banner above the unit's last eight functions (its per-function
+> list is now each function's own comment) said "Each volume accessor records
+> it in D_8008EA22, vmanager's current-sequence global (SpuVmGetSeqLVol
+> records only the access byte)."; SPUVM_SE_SEQ's comment said "libsnd's SE
+> paths store it in D_8008EA22 and in a voice's owner field."; and
+> SpuVmGetSeqVol's said "Returns the packed number, read back through
+> D_8008EA22." They now say "_svm_cur's score index" for D_8008EA22
+> (_svm_cur +0x16, libsnd_internal.h).

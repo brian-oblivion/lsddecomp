@@ -917,3 +917,21 @@ The comment above this function's NON_MATCHING body in src/libsnd_vmanager.c rea
 > andi); this body multiplies the volume register directly and masks
 > val1 -- same residue as SetAutoPan below
 > (docs/match-reports/SetAutoVol.md).
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vmanager.c`:
+
+> From the section banner above SetAutoVol (its per-function list is now each
+> function's own comment): "_svm_pg and _svm_tn are pinned in
+> config/psyq-objects.ld and spelled here by their D_ addresses; the per-voice
+> state is include/svm_data.h's _svm_voice/_svm_sreg_buf, and _svm_sreg points
+> at the SPU's own register block, svm_data.h's SpuRegs." and "Five functions
+> in this stretch are preserved NON_MATCHING bodies; each report gives its
+> residue."
+>
+> The NON_MATCHING body's score comment: "NON_MATCHING: 231/231 words, length
+> exact, 223/231 raw. This is libsnd's SetAutoVol. Residue: in the pan split's
+> `else` arm retail copies the volume into $a1 first and multiplies that
+> register (no andi); this body multiplies the volume register directly and
+> masks val1, as in SetAutoPan below (docs/match-reports/SetAutoVol.md)."

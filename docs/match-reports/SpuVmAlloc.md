@@ -1143,3 +1143,17 @@ t3/t0/a2/a3 family and is visible from the very first instruction. The body
 was hand-derived. The block's local `extern void SpuSetNoiseVoice(s32, s32)`
 gave way to `<libspu.h>`, and its `(0, 0xFFFFFF)` to `(SPU_OFF, SPU_ALLCH)`;
 the NON_MATCHING object's disassembly is identical before and after.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vmanager.c`:
+
+> From the file banner (shared by the unit): "Everything here is Sony's, under
+> Sony's names. Retail's build of the voice manager is on no SDK disc, so it
+> never placed as objects; the symbols file identifies each function against
+> discs 3.3/3.5 and progress.py counts them as library by address." and, at
+> its end, "No jump table and no rodata attach."
+>
+> The NON_MATCHING body's score comment: "NON_MATCHING: 167/167 words, length
+> exact; the residue is a register rotation through the whole function
+> (docs/match-reports/SpuVmAlloc.md)."
