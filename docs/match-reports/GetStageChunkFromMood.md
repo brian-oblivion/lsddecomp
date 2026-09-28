@@ -7,29 +7,29 @@ Unit: `StageGrid` · Size: 43 words (0xAC bytes) · Status: **MATCHED, byte-exac
 
 The inverse of `GetMoodFromStageChunk`: a linear search over all 14 stages'
 mood tables for the first entry equal to `*mood`, writing the found chunk
-coordinates through `ret` and returning the stage index, or `-1`.
+coordinates through `chunk` and returning the stage index, or `-1`.
 
 ```c
-s32 GetStageChunkFromMood(StageChunk *ret, MoodGraphPoint *mood) {
+s32 GetStageChunkFromMood(StageChunk *chunk, MoodGraphPoint *mood) {
     u32 stage;
     s32 row;
-    s32 col;
-    MoodGraphPoint *p;
+    s32 column;
+    MoodGraphPoint *chunkMood;
     s32 rows;
     s32 columns;
 
     for (stage = 0; stage < STAGE_GRID_DIMENSIONS_COUNT; stage++) {
-        p = sStageChunkMoods[stage];
+        chunkMood = sStageChunkMoods[stage];
         rows = sStageGridDimensions[stage].rows;
         columns = sStageGridDimensions[stage].columns;
         for (row = 0; row < rows; row++) {
-            for (col = 0; col < columns; col++) {
-                if (mood->value == p->value) {
-                    ret->column = col;
-                    ret->row = row;
+            for (column = 0; column < columns; column++) {
+                if (mood->value == chunkMood->value) {
+                    chunk->column = column;
+                    chunk->row = row;
                     return stage;
                 }
-                p++;
+                chunkMood++;
             }
         }
     }
@@ -37,9 +37,9 @@ s32 GetStageChunkFromMood(StageChunk *ret, MoodGraphPoint *mood) {
 }
 ```
 
-`p` walks each stage's table row-major and is advanced once per inner iteration
+`chunkMood` walks each stage's table row-major and is advanced once per inner iteration
 (retail puts the `addiu $t0, $t0, 2` in the backward branch's delay slot, which
-executes unconditionally, so it is an ordinary `p++` and not a conditional one).
+executes unconditionally, so it is an ordinary `chunkMood++` and not a conditional one).
 The data layout is documented in `GetMoodFromStageChunk.md`.
 
 ## Two local-type facts did all the work — the structure was right first try
@@ -106,3 +106,12 @@ mood value belongs to". Confirmed, not renamed. (`include/DreamSys.h:43`'s
 comment attributing `StageChunk`/`GetMoodFromStageChunk` usage to
 `DreamSys__LogChunkMood` is about the *other* function in this unit, not this
 one — see `GetMoodFromStageChunk.md`.)
+
+**Parameter and locals (round 101, track 7).** `ret` -> `chunk`: it is an
+out-parameter written exactly once, with the found cell's `column` and `row`,
+and DreamSys's one caller passes `&chunk`. `p` -> `chunkMood`: it points at the
+`MoodGraphPoint` of the chunk the loops are currently at, compared against
+`*mood` and advanced once per chunk. `col` -> `column`, matching the
+`StageChunk.column` field it is stored into and the `columns` bound beside it.
+Zero bytes: local names are not in the object. The header prototype still
+says `ret` (see the round 101 proposal to the head).

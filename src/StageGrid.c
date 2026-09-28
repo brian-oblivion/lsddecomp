@@ -34,30 +34,30 @@ StageGridDimensions *GetStageGridDimensionsTable(s32 *count) {
     return sStageGridDimensions;
 }
 
-StageGridDimensions *GetStageGridDimensions(s32 index) {
-    return GetStageGridDimensionsTable(NULL) + index;
+StageGridDimensions *GetStageGridDimensions(s32 stage) {
+    return GetStageGridDimensionsTable(NULL) + stage;
 }
 
-s32 GetStageChunkFromMood(StageChunk *ret, MoodGraphPoint *mood) {
+s32 GetStageChunkFromMood(StageChunk *chunk, MoodGraphPoint *mood) {
     u32 stage;
     s32 row;
-    s32 col;
-    MoodGraphPoint *p;
+    s32 column;
+    MoodGraphPoint *chunkMood;
     s32 rows;
     s32 columns;
 
     for (stage = 0; stage < STAGE_GRID_DIMENSIONS_COUNT; stage++) {
-        p = sStageChunkMoods[stage];
+        chunkMood = sStageChunkMoods[stage];
         rows = sStageGridDimensions[stage].rows;
         columns = sStageGridDimensions[stage].columns;
         for (row = 0; row < rows; row++) {
-            for (col = 0; col < columns; col++) {
-                if (mood->value == p->value) {
-                    ret->column = col;
-                    ret->row = row;
+            for (column = 0; column < columns; column++) {
+                if (mood->value == chunkMood->value) {
+                    chunk->column = column;
+                    chunk->row = row;
                     return stage;
                 }
-                p++;
+                chunkMood++;
             }
         }
     }
