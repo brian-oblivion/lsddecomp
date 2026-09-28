@@ -9,13 +9,13 @@ whole project (see `docs/research/gp-relative-blocker.md`, "RESOLVED").
 ## Derivation
 
 Same shape as `GetOpenVabCount` right next to it: retail is a single
-`lw $v0, %gp_rel(gSsTicksPerSecond)($gp)` then `jr $ra`.
+`lw $v0, %gp_rel(sSsTicksPerSecond)($gp)` then `jr $ra`.
 
 ```c
-extern s32 gSsTicksPerSecond;
+extern s32 sSsTicksPerSecond;
 
 s32 GetSsTicksPerSecond(void) {
-    return gSsTicksPerSecond;
+    return sSsTicksPerSecond;
 }
 ```
 
@@ -37,7 +37,7 @@ accessor is all `--gp-symbols` needed to reproduce the `%gp_rel` load.
 
 ## Naming
 
-Kept `GetSsTicksPerSecond` and its global `gSsTicksPerSecond`, tier C. `gSsTicksPerSecond` is
+Kept `GetSsTicksPerSecond` and its global `sSsTicksPerSecond`, tier C. `sSsTicksPerSecond` is
 set to the constant `0x3C` once, inside `VabStreamObj__VabStreamObj`'s
 second one-time-init guard (alongside an uncarved `SsSetTickMode(1)`
 call), and this function is its only reader. That establishes WHEN it's
@@ -45,12 +45,12 @@ set and that nothing else in this unit touches it, but not what `0x3C`
 configures -- `SsSetTickMode` is still unnamed/uncarved, so there's no
 positive evidence to name either the function or the global from.
 
-### Round 98 (charlie, track 7): `func_8002CC28` -> `GetSsTicksPerSecond`, `D_8008A8CC` -> `gSsTicksPerSecond`
+### Round 98 (charlie, track 7): `func_8002CC28` -> `GetSsTicksPerSecond`, `D_8008A8CC` -> `sSsTicksPerSecond`
 
 Tier A for both. The tier-C note above predates the SDK linking:
 `SsSetTickMode` is Sony's (`libsnd`, `<libsnd.h>`), and the call beside the
 store is `SsSetTickMode(SS_TICK60)` -- 1 is `SS_TICK60`, sixty sequencer
-ticks a second. The store `gSsTicksPerSecond = 60` (was `0x3C`) is that
+ticks a second. The store `sSsTicksPerSecond = 60` (was `0x3C`) is that
 rate, set in the same one-time guard, and this getter is its only reader.
 The one caller, `WBgm__Crescendo` (WBgm.c), passes
 `GetSsTicksPerSecond() * scale` as `SsSeqSetCrescendo`'s duration, which

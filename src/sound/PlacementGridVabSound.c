@@ -199,7 +199,7 @@ extern s32 gVabSizeTableInited;
 extern s32 gVabStreamInited;
 extern s32 gVabVolumeInited;
 extern s32 sOpenVabCount;     /* VabStreamObjs constructed and not yet finalized */
-extern s32 gSsTicksPerSecond; /* the SsSetTickMode rate, for callers timing in ticks */
+extern s32 sSsTicksPerSecond; /* the SsSetTickMode rate, for callers timing in ticks */
 /* The .VH buffer, kept from the header state until LoadVagAttrs takes it
  * back as the object's buffer. */
 extern void *sPendingVabBuffer;
@@ -279,7 +279,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
         SsSetTableSize(GetSsSizeTableBuf(), 2, 1); /* two scores of one track */
     }
     if (gVabStreamInited == 0) {
-        gSsTicksPerSecond = 60; /* SS_TICK60 */
+        sSsTicksPerSecond = 60; /* SS_TICK60 */
         SsSetTickMode(SS_TICK60);
         gVabStreamInited = 1;
     }
@@ -500,7 +500,7 @@ s32 GetOpenVabCount(void) {
 }
 
 s32 GetSsTicksPerSecond(void) {
-    return gSsTicksPerSecond;
+    return sSsTicksPerSecond;
 }
 
 s32 InitSoundCueSet(VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
