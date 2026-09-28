@@ -674,7 +674,7 @@ extern BoxFillRgb sListViewColor;
 struct TaskCoreItemList {
     u8 pad000[4];
     s32 savedCursor; /* +0x004 the committed item cursor: the list opens at it, commit stores it, cancel returns to it */
-    SpriteRgb cursorColor; /* +0x008 the colour of the item under the cursor while scrolling */
+    ColorRgb cursorColor; /* +0x008 the colour of the item under the cursor while scrolling */
     u8 pad00B[5];
     /* +0x010 where the cursor's row is drawn; the list starts savedCursor rows
      * above. MATCHING: a struct, so the copy is lw/lw, sw/sw, then a reload of
@@ -1092,7 +1092,7 @@ void TaskCore__CancelElementScroll(TaskCore *self) {
     self->methods->refreshSlotView(self, self->lightRig, 0);
     items = (TextRow **)self->itemLists[slot];
     prevItem = items[cursor];
-    prevItem->methods->setColor(prevItem, (SpriteRgb *)self->target->unselectedColor);
+    prevItem->methods->setColor(prevItem, (ColorRgb *)self->target->unselectedColor);
     saved = self->target->slotLists[slot]->savedCursor;
     self->itemCursors[slot] = saved;
     savedItem = items[saved];
@@ -1136,7 +1136,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, s32 withSound) {
     items = (TextRow **)self->itemLists[slot];
     prevItem = items[prev];
     nextItem = items[cursor];
-    prevItem->methods->setColor(prevItem, (SpriteRgb *)self->target->unselectedColor);
+    prevItem->methods->setColor(prevItem, (ColorRgb *)self->target->unselectedColor);
     cursorColor = &self->target->slotLists[slot]->cursorColor;
     nextItem->methods->setColor(nextItem, cursorColor);
     self->itemCursors[slot] = cursor;
