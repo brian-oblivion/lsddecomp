@@ -38,3 +38,24 @@ The class banner's note on the attachToParent cast:
 /* Header word of gModelDataMethods (tools/classtable.py), the class New_ModelData
  * allocates and TodActor.modelData points at. */
 ```
+
+### include/stage_grid.h
+
+The header carried an unused tag, removed by the pass (no reference in
+src/ or include/; the build stayed byte-exact):
+
+```c
+struct simplePair {
+    s8 x;
+    s8 y;
+};
+```
+
+Its prototype comments were plain `/* @brief */` lines, which Doxygen
+skips; the pass rewrote them as `/** */` blocks, checked against the bodies.
+
+### src/world/stage_grid.c
+
+```c
+/* The two per-stage tables (splat data), read only here. */
+```
