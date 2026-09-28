@@ -22,8 +22,7 @@
  *
  * What is here, in that order: StageMap's lookup tables and SplitCoord2,
  * the view of a slot's origin its methods read; TitleMenu's data (menu
- * description, paths, the save title's buffers, the colour cycle) and
- * DreamSaveBlock, the save-block view UpdateFlashbackLock reads; TaskObjF's
+ * description, paths, the save title's buffers, the colour cycle); TaskObjF's
  * event table, the memory-card device names (McDevicePath) and helpers;
  * ObjM's StyleConfig record and the helpers its methods call.
  *
@@ -172,18 +171,8 @@ extern s32 sTaskObjFCount;
  * TitleMenu__TitleMenu calls it with DreamSys's getCurrentDayAndYear. */
 extern void StampSaveTitleDay(s32 day);
 
-/*
- * The save block DreamSys's getSaveBlock returns (TitleMenu::saveBlock):
- * DreamSys from `saveMagic` (+0x178) on, so each field here is the DreamSys
- * field (include/DreamSys.h) 0x178 bytes further in. UpdateFlashbackLock
- * reads the two below.
- */
-typedef struct DreamSaveBlock {
-    u8 pad00[0x00C];
-    s32 totalFlasbackUnlockScore; /* +0x00C, DreamSys +0x184: FLASHBACK unlocks past 9999999 */
-    u8 pad10[0x2F4 - 0x010];
-    s32 amountFlashbacksAvailable; /* +0x2F4, DreamSys +0x46C: ... and only with one stored */
-} DreamSaveBlock;
+/* The save block DreamSys's getSaveBlock returns (TitleMenu::saveBlock),
+ * which UpdateFlashbackLock reads, is DreamSaveBlock in include/DreamSys.h. */
 
 /* ---- TaskObjF ---------------------------------------------------- */
 

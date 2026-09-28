@@ -14,7 +14,7 @@
  * the screen-space path ScreenSprite takes. Method table
  * gVariantSpriteMethods, getter GetVariantSpriteMethods. Methods in
  * src/class_3bb8c_k.c (New_, ctor), src/class_3bb8c_k.c (SetVariantClut,
- * UpdateScale) and src/class_3bb8c_t.c (Update, the three no-ops, the
+ * UpdateScale) and src/class_3bb8c_k.c (Update, the three no-ops, the
  * getter). No class derives from it.
  *
  * Who makes it: only StyleEffect (include/StyleEffect.h), five per instance of

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80058228` on 2026-09-24 (tools/rename.py). Address 0x80058228.
 
-Unit `class_3bb8c_t`. Byte-exact. History below in arrival order.
+Unit `class_3bb8c_k`. Byte-exact. History below in arrival order.
 
 ## Correction to this round's staffing: this was NOT fresh ground
 
@@ -16,7 +16,7 @@ bodies...") with a near-complete 52/56 mid-attempt snapshot from runner
 alpha (round 17); `GraphRoom__PopulateGraphPoints` is the one with no report file at all
 (`ls docs/match-reports/` confirms only `GraphRoom__BuildGraphPoints.md` and
 `GraphRoom__ScoreDayLog.md` exist for this unit's three queued functions).
-`tools/progress.py`'s own `fresh` count for `class_3bb8c_t` (1) is
+`tools/progress.py`'s own `fresh` count for `class_3bb8c_k` (1) is
 correct — it just points at `GraphRoom__PopulateGraphPoints`, not this function. Given
 this report's near-miss was extremely close and cheap to re-attempt, it
 was worth closing before moving to the genuinely cold function; see this
@@ -32,7 +32,7 @@ values of a mutable local copy of `gGraphPointBaseColor` (also 3 bytes), decreme
 by 0x14 for the first 6 loop iterations and by 1 thereafter. Finally
 allocates a 4-byte scratch buffer into `self->unk_0x240`.
 
-## Final body (landed in `src/class_3bb8c_t.c`)
+## Final body (landed in `src/class_3bb8c_k.c`)
 
 ```c
 /* A 3-byte colour-ish triple, read/written strictly byte-for-byte in

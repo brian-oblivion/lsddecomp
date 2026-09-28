@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057F58` on 2026-09-26 (tools/rename.py). Address 0x80057f58.
 
-Unit: `src/class_3bb8c_t.c`. Class: `gVariantSpriteMethods` (49 slots) -- plain
+Unit: `src/class_3bb8c_k.c`. Class: `gVariantSpriteMethods` (49 slots) -- plain
 no-argument getter, `return &gVariantSpriteMethods;`. Not itself a vtable slot.
 
 ## Body
@@ -39,7 +39,7 @@ tools/funcdiff.py GetVariantSpriteMethods   # 4/4
 Renamed from `func_80057F58` (tools/rename.py), tier A: a plain getter for
 `&gVariantSpriteMethods` (formerly `D_800879C4`), named like
 `GetSpriteMethods` / `GetActorMethods`. It now returns `VariantSpriteMethods *`
-(`include/VariantSprite.h`); class_3bb8c_t.c's opaque `D_800879C4Table`
+(`include/VariantSprite.h`); class_3bb8c_k.c's opaque `D_800879C4Table`
 typedef and extern are gone. Its callers are the class's own allocator and
 ctor (class_3bb8c_k.c). Byte-identical.
 

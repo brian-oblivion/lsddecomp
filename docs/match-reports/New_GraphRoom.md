@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057F68` on 2026-09-24 (tools/rename.py). Address 0x80057f68.
 
-Unit: `src/class_3bb8c_t.c`. Class: `gVariantSpriteMethods` family -- plain
+Unit: `src/class_3bb8c_k.c`. Class: `gVariantSpriteMethods` family -- plain
 allocator/constructor wrapper (`New_X` shape), not a vtable slot.
 
 ## Signature
@@ -51,7 +51,7 @@ tools/funcdiff.py New_GraphRoom   # 24/24
 
 **`New_GraphRoom`** -- tier B. `New_X`-shaped allocator (allocate
 `0x244` bytes, null-check, dispatch the ctor slot) for the class named
-`GraphRoomObj` this round -- see `src/class_3bb8c_t.c`'s own header
+`GraphRoomObj` this round -- see `src/class_3bb8c_k.c`'s own header
 comment for the class-identity evidence (loads "ETC\HGRAPH.TIM", builds
 100 coloured points from a day-type ring).
 
@@ -61,7 +61,7 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 ## Track 7 (2026-09-27, round 97, delta): the unit banner, moved here
 
-The unit banner of `src/class_3bb8c_t.c` was rewritten to say what the file holds. Its history, verbatim as it stood before the pass (the class-identity reading and the round-87 correction are this class's, so they live with its allocator):
+The unit banner of `src/class_3bb8c_k.c` was rewritten to say what the file holds. Its history, verbatim as it stood before the pass (the class-identity reading and the round-87 correction are this class's, so they live with its allocator):
 
 ```c
 /*

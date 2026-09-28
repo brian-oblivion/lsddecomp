@@ -2,7 +2,7 @@
 
 > Renamed from `func_80058764` on 2026-09-24 (tools/rename.py). Address 0x80058764.
 
-Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods` -- plain no-argument
+Unit: `src/class_3bb8c_k.c`. Class: `gGraphRoomMethods` -- plain no-argument
 getter, `return &gGraphRoomMethods;`. Not itself a vtable slot; called by this
 unit's own `New_GraphRoom` (already matched) and `GraphRoom__GraphRoom` (still
 queued).

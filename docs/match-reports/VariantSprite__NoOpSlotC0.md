@@ -4,7 +4,7 @@
 
 > Renamed from `Class879C4__func_57f48` on 2026-09-26 (tools/rename.py). Address 0x80057f48.
 
-Unit: `src/class_3bb8c_t.c`. Address 0x80057f48. `jr $ra; nop`: splat
+Unit: `src/class_3bb8c_k.c`. Address 0x80057f48. `jr $ra; nop`: splat
 matched it itself, so there is no derivation.
 
 ## Naming

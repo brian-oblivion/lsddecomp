@@ -95,7 +95,7 @@ Renamed from TaskCoreObj__Reset (tools/rename.py): the class prefix. Occupant of
   leaves which is which open; this name is the reading above, not a
   measurement.
 - `unk2C` (-> `packetCount`) and `unk34` (-> `clearOnDeinit`) have accessors
-  in class_3bb8c_d.c / class_3bb8c_t.c: proposed, not renamed.
+  in class_3bb8c_d.c / class_3bb8c_k.c: proposed, not renamed.
 
 ### History moved from include/code_2c054.h
 

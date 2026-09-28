@@ -4,7 +4,7 @@
 
 > Renamed from `func_80058694` on 2026-09-24 (tools/rename.py). Address 0x80058694.
 
-Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x124`
+Unit: `src/class_3bb8c_k.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x124`
 (resolved via `tools/classtable.py gGraphRoomMethods`).
 
 ## Signature

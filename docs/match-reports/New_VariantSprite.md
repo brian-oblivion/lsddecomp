@@ -125,7 +125,7 @@ this unit, `StyleEffect__SpawnSprites` (class_3bb8c_k.c), passes its `a2`
 as the variant without a cast and casts the result to its `LinkNode *`
 view, and its local `extern` of this function is gone. The "UNCARVED
 ground" section above is history: the getter and table are
-`GetVariantSpriteMethods` / `gVariantSpriteMethods` in class_3bb8c_t.c.
+`GetVariantSpriteMethods` / `gVariantSpriteMethods` in class_3bb8c_k.c.
 Byte-identical.
 
 ## Track 6 (2026-09-26, round 93, bravo)

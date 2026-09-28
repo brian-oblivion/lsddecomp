@@ -1152,7 +1152,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
  *
  * TaskCore__GetActiveSlotCount, Get_vtable_TaskCore and
  * GetDefaultMovieFrame come first: one TaskCore method and two plain
- * accessors for data used far more widely (Task.c, class_3bb8c_t.c).
+ * accessors for data used far more widely (Task.c, class_3bb8c_k.c).
  *
  * Then IntermediateBase (include/IntermediateBase.h, whose banner says what
  * the class does): the ctor, onNotify's split by the sender's root class,
