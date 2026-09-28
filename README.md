@@ -84,8 +84,10 @@ It looks like C++ and is not (the proof is
 its method table, a flat array of function pointers that is ordinary data.
 Methods are C functions named `Class__Method` taking the object explicitly as
 their first parameter, `self`, and calls go through the table:
-`self->methods->addChild(self, child)`. Each class has an allocator
-`New_Class`, and its constructor sits in table slot +0x008.
+`self->methods->addChild(self, child)`. A class's constructor,
+`Class__Class`, sits in table slot +0x008, and a class that is built directly
+has an allocator `New_Class` that allocates the object and calls the
+constructor through the table.
 
 Word +0x000 of every table is a **nibble-path class id**: each nibble above
 the lowest is one more level of derivation. TextRow is `0x11144`, below
@@ -109,11 +111,6 @@ python3 tools/typeviews.py --tree    # the id tree from the method tables
 python3 tools/classtable.py <table>  # a table's slots and their occupants
 python3 tools/classtable.py <table> --vs <parent-table>   # what a subclass overrides
 ```
-
-A name of the form `Class<hex>` is the address of the class's method table:
-its mechanics are documented in its header, but no name for what it is has
-been established (`python3 tools/plan.py` lists any such class as a track 6
-job).
 
 ### The main subsystems
 
