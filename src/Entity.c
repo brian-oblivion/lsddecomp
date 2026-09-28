@@ -2090,7 +2090,7 @@ void Entity__MoodCue78(Entity *this, SoundCueSet *out) {
 
     if (this->state == 11 && out->tick == 510) {
         this->methods->moveLocalY(this, -380, 0);
-        this->methods->updateRotation(this, 0, ROTATION_XPLUS90);
+        this->methods->updateRotation(this, 0, sRotationXPlus90);
         this->methods->stopSoundCue(this);
         this->state = ENTITY_STATE_DONE;
         sMoodCue78TransitionDone = 1;
