@@ -920,7 +920,7 @@ The barrier's two-line comment became `/* MATCHING: keeps the rec.x/.y/.z loads 
 
 `BE54LoadReq` -> `ResourceSourceRequest` (tier A). It is the descriptor the
 body passes to `New_LinkResource`, cast to that ctor's `struct
-ResourceSource` (src/GraphicsResources.c: `{ void *buffer; char *name; }`,
+ResourceSource` (src/graphics/GraphicsResources.c: `{ void *buffer; char *name; }`,
 a buffer to adopt, or with `buffer` NULL a file name to request), and the
 body sets only `buffer`, to the chunk header's model block
 (`header + placementsOffset + placementsSize`). The name follows
@@ -951,7 +951,7 @@ at 0x0C and are left to that job.
 ## Track 6 (round 96, delta, second job): ResourceSourceRequest unified
 
 The proposal above, applied. `ResourceSource` moved from
-src/GraphicsResources.c to include/FileResource.h (the parent of the five
+src/graphics/GraphicsResources.c to include/FileResource.h (the parent of the five
 ctors that take it), and one `ResourceSourceRequest` sits beside it:
 
 ```c

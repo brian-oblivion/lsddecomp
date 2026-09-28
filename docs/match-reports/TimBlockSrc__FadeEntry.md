@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x080.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/GraphicsResources.c`.
+`src/graphics/GraphicsResources.c`.
 
 ```c
 typedef struct Vec3S8 {
@@ -56,4 +56,4 @@ First build. The three lb then three sb is whole-struct assignment of the 3 x s8
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of +0x080, now the `fadeEntry` slot; stores the colour into `entries[index].color` (`TimBlockSrcColor`, was the unit's `Vec3S8`). The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of +0x080, now the `fadeEntry` slot; stores the colour into `entries[index].color` (`TimBlockSrcColor`, was the unit's `Vec3S8`). The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

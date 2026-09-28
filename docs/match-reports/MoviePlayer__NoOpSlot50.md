@@ -24,7 +24,7 @@ void MoviePlayer__NoOpSlot50(void) {
 
 - Only `common.h` is included; no shared header was edited. Local declarations
   (the `extern s32 D_...[]` table symbol or the unit-local struct view) sit
-  directly above the function in `src/GraphicsResources.c`.
+  directly above the function in `src/graphics/GraphicsResources.c`.
 
 ## Naming
 
@@ -32,4 +32,4 @@ void MoviePlayer__NoOpSlot50(void) {
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/GraphicsResources.c` are gone; nothing in this body changed. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; nothing in this body changed. Byte-identical; `typeviews.py --warnings` 0 new.

@@ -49,7 +49,7 @@ the local-view convention `PlacementGridVabSound.c` / `_e.c` already use.
 
 TimImage is unified in `include/TimImage.h`; `src/code_2bb9c.c`'s local
 views are gone. The field this ctor clears at +0x04C, `unk4C`, is now
-`clutBase`: TimArraySrc__BuildImages (src/GraphicsResources.c) stores
+`clutBase`: TimArraySrc__BuildImages (src/graphics/GraphicsResources.c) stores
 `((info.cy - 0x1E0) >> gTimClutRowShift) * 16 + base` there for each
 TimImage it makes, which its own view already called `clutBase`. Image
 byte-identical.

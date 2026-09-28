@@ -6,7 +6,7 @@
 /*
  * TodSet -- a Tod subclass (class id 0x14F03, method table gTodSetMethods) over
  * a buffer holding several TOD animations: a counted offset table, one Tod
- * per entry, then the packet data. Methods in src/GraphicsResources.c; no
+ * per entry, then the packet data. Methods in src/graphics/GraphicsResources.c; no
  * subclasses. Its parent is its id parent: TodSet__TodSet's first call is
  * GetTodMethods()->ctor.
  *

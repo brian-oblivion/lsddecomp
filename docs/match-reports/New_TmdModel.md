@@ -67,7 +67,7 @@ first).
 
 `BMemPMgrAlloc(0x24)` -> `BMemPMgrAlloc(sizeof(TmdModel))`, the codebase-wide
 idiom once a class's allocator size matches its now-real struct (e.g.
-`src/GraphicsResources.c`'s `BMemPMgrAlloc(sizeof(TimBlockSrc))`). `sizeof(TmdModel)`
+`src/graphics/GraphicsResources.c`'s `BMemPMgrAlloc(sizeof(TimBlockSrc))`). `sizeof(TmdModel)`
 is 0x24 (`include/TmdModel.h`'s own banner already states the object is
 0x24 bytes); byte-identical, build and check-nonmatching.sh green.
 

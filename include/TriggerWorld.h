@@ -7,7 +7,7 @@
  * TriggerWorld -- a ModelData subclass (class id 0x15F03, method table
  * gTriggerWorldMethods) over a buffer holding several model files: a counted offset
  * table, one ModelData per entry, then the data. Methods in
- * src/GraphicsResources.c; no subclasses. Its parent is its id parent:
+ * src/graphics/GraphicsResources.c; no subclasses. Its parent is its id parent:
  * TriggerWorld__TriggerWorld's first call is GetModelDataMethods()->ctor
  * (with a third argument 0, so ModelData's own resource build and release
  * never act on it).

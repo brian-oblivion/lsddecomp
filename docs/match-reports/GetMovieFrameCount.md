@@ -25,7 +25,7 @@ s32 GetMovieFrameCount(s32 index) {
 
 - **Name:** `GetMovieFrameCount`
 - **Tier:** A
-- **Evidence:** returns gMovieFrameCounts[movieId] (renamed from gStreamTypeToGroupTable); every caller passes it to StreamTask__Init, which hands it to MoviePlayer__Play as `frameCount` (src/GraphicsResources.c). Its argument is always a movie id from this unit's movie getters.
+- **Evidence:** returns gMovieFrameCounts[movieId] (renamed from gStreamTypeToGroupTable); every caller passes it to StreamTask__Init, which hands it to MoviePlayer__Play as `frameCount` (src/graphics/GraphicsResources.c). Its argument is always a movie id from this unit's movie getters.
 
 ## Naming history
 

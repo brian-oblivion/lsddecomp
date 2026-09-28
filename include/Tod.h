@@ -5,7 +5,7 @@
 
 /*
  * Tod -- a FileResource data source (class id 0x4F03, method table gTodMethods)
- * over one TOD animation's packet stream. Methods in src/GraphicsResources.c; one
+ * over one TOD animation's packet stream. Methods in src/graphics/GraphicsResources.c; one
  * subclass, TodSet (gTodSetMethods, 0x14F03), whose ctor calls this class's
  * first (TodSet__TodSet: GetTodMethods()->ctor(self, arg)) and whose
  * TodSet__BuildTods makes one Tod per sub-block of its buffer (New_Tod).

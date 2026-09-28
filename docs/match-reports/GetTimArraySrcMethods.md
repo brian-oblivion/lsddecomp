@@ -26,7 +26,7 @@ void *GetTimArraySrcMethods(void) {
 ## Notes
 
 - Only `common.h` is included; no shared header was edited. Local declarations
-  sit directly above the function in `src/GraphicsResources.c`.
+  sit directly above the function in `src/graphics/GraphicsResources.c`.
 
 ## Naming
 

@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for gTimBlockSrcMethods, obj
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
 
 ```c
 /* Allocate and construct a gTimBlockSrcMethods object. */
@@ -46,7 +46,7 @@ void *New_TimBlockSrc(s32 arg0) {
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-The allocator; 0x84 is the class size the header records. It now reaches the ctor through the typed getter (`GetTimBlockSrcMethods()->ctor(obj, (char *)arg0)`) instead of the unit's `UnprototypedCtorTable` cast; its own signature is unchanged because `src/ObjMStyleActor.c` declares it `s32 New_TimBlockSrc(s32)` locally. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The allocator; 0x84 is the class size the header records. It now reaches the ctor through the typed getter (`GetTimBlockSrcMethods()->ctor(obj, (char *)arg0)`) instead of the unit's `UnprototypedCtorTable` cast; its own signature is unchanged because `src/ObjMStyleActor.c` declares it `s32 New_TimBlockSrc(s32)` locally. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Round 93 polish (charlie, track 7)
 
@@ -57,7 +57,7 @@ The allocator; 0x84 is the class size the header records. It now reaches the cto
 | `arg0` | `name` | A | passed straight to the ctor as its `char *name` (the file TimBlockSrc__TimBlockSrc opens); still `s32` because include/TimBlockSrc.h declares `New_TimBlockSrc(s32)` |
 | `0x84` | `sizeof(TimBlockSrc)` | A | each equals the object size the class header records (and the allocation retail makes); the image is byte-identical |
 
-### The unit banner, moved here from src/GraphicsResources.c
+### The unit banner, moved here from src/graphics/GraphicsResources.c
 
 Verbatim as it stood before the round-93 comment pass; the new banner says what the file holds.
 

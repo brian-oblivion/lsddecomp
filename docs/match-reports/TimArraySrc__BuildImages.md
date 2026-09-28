@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTimArraySrcMethods +0x064 (setFlag override
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/GraphicsResources.c`.
+top of / earlier in `src/graphics/GraphicsResources.c`.
 
 ```c
 /* gTimArraySrcMethods +0x064: when the buffer is there (or flag 0x200 is set),

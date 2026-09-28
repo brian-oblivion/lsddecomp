@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gLinkResourceMethods +0x064 (setFlag overrid
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/GraphicsResources.c`.
+top of / earlier in `src/graphics/GraphicsResources.c`.
 
 ```c
 /* gLinkResourceMethods +0x064: build a NULL-ended array at +0x2C of one

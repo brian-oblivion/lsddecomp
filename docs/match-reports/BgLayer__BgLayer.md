@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gBgLayerMethods +0x008 (constructor).
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
 
 ```c
 /* A three-byte vector, and the gBgLayerMethods object (a SceneNode subclass). */

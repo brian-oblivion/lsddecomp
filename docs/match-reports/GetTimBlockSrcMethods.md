@@ -27,7 +27,7 @@ void *GetTimBlockSrcMethods(void) {
 
 - Only `common.h` is included; no shared header was edited. Local declarations
   (the `extern s32 D_...[]` table symbol or the unit-local struct view) sit
-  directly above the function in `src/GraphicsResources.c`.
+  directly above the function in `src/graphics/GraphicsResources.c`.
 
 ## Naming
 
@@ -35,4 +35,4 @@ void *GetTimBlockSrcMethods(void) {
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Now `TimBlockSrcMethods *GetTimBlockSrcMethods(void) { return &gTimBlockSrcMethods; }` against `extern TimBlockSrcMethods gTimBlockSrcMethods;` in the header (was `void *` over `extern s32 gTimBlockSrcMethods[]`), byte-identical. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Now `TimBlockSrcMethods *GetTimBlockSrcMethods(void) { return &gTimBlockSrcMethods; }` against `extern TimBlockSrcMethods gTimBlockSrcMethods;` in the header (was `void *` over `extern s32 gTimBlockSrcMethods[]`), byte-identical. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
