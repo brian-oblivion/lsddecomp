@@ -1575,7 +1575,7 @@ void StyleTeardown(void) {
 
 extern Ratio16 gStyleSpawnScales[][3];
 extern s32 gStyleSpawnYChoices[];
-extern Ratio16 *gStyleSpawnScale;
+extern Ratio16 *sStyleSpawnScale;
 extern s32 gStyleSpawnTableIndex;
 /* The first word of the StyleEffectParams block every effect is built from
  * (sStyleSpawnOffsetX .. sStyleSpawnColors, separate symbols in the image). */
@@ -1593,7 +1593,7 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
     void (*setup)(LongVec3 *, s32);
 
     gStyleSpawnTableIndex = rand() % 7;
-    gStyleSpawnScale = gStyleSpawnScales[(u32)rand() % 5];
+    sStyleSpawnScale = gStyleSpawnScales[(u32)rand() % 5];
     offsetY = (u32)rand() % 5;
     if (offsetY != 0) {
         offsetY = gStyleSpawnYChoices[offsetY];
@@ -1621,7 +1621,7 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
     s32 offsetY;
 
     offsetY = gStyleSpawnYChoice2;
-    gStyleSpawnScale = sStyleKind1Scale;
+    sStyleSpawnScale = sStyleKind1Scale;
     for (i = 0; i < count; i++) {
         SetupStyleSpawnParamsRandom(pos, offsetY);
         *slots =
