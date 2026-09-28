@@ -1611,12 +1611,21 @@
           "runners": 4
         },
         {
+          "amended": [
+            {
+              "date": "2026-09-28",
+              "was": {
+                "note": "Six files jobs, eleven regions, 45 units to 32 files, track 8 done: GameApplicationFileResource (code_1677c+code_171e0, the getter-follows-class rule), TimImage, FlatLightObj, SceneNode (three slices, code_d294.h folded in), DrawSystem, Pad, WBgm, CdDriver (five slices; rodata joins s|q|r|h; the head hand-merged o since CdDriver is also a type name), Application, DayTaskStageMap and TitleMenuTaskObjF (the head moved the 0x1D7C rodata line and merged _g), TextEntryItemList, ObjMStyleActor (ten slices), DreamAux, Entity (seven slices), TodActor. Parked: b|c and j|k carve edges that content would split."
+              },
+              "why": "the note said 45 units to 32 files, unmeasured; git ls-tree says 75 to 45, and the jobs' 48 units became 18 files"
+            }
+          ],
           "attempts": 6,
           "calibration": true,
           "date": "2026-09-28",
           "matches": 6,
           "model": "opus",
-          "note": "Six files jobs, eleven regions, 45 units to 32 files, track 8 done: GameApplicationFileResource (code_1677c+code_171e0, the getter-follows-class rule), TimImage, FlatLightObj, SceneNode (three slices, code_d294.h folded in), DrawSystem, Pad, WBgm, CdDriver (five slices; rodata joins s|q|r|h; the head hand-merged o since CdDriver is also a type name), Application, DayTaskStageMap and TitleMenuTaskObjF (the head moved the 0x1D7C rodata line and merged _g), TextEntryItemList, ObjMStyleActor (ten slices), DreamAux, Entity (seven slices), TodActor. Parked: b|c and j|k carve edges that content would split.",
+          "note": "Six files jobs, eleven regions, 48 units to 18 files (src/ 75 to 45 units), track 8 done: GameApplicationFileResource (code_1677c+code_171e0, the getter-follows-class rule), TimImage, FlatLightObj, SceneNode (three slices, code_d294.h folded in), DrawSystem, Pad, WBgm, CdDriver (five slices; rodata joins s|q|r|h; the head hand-merged o since CdDriver is also a type name), Application, StageGrid unchanged, DayTaskStageMap and TitleMenuTaskObjF (the head moved the 0x1D7C rodata line and merged _g), TextEntryItemList, ObjMStyleActor (ten slices), DreamSys unchanged, DreamAux, Entity (seven slices), TodActor. Parked: b|c and j|k carve edges that content would split.",
           "round": 101,
           "runners": 6
         }
