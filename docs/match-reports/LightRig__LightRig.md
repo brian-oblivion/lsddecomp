@@ -49,3 +49,18 @@ With a counter and a pointer walking together, the order of the comma operands i
 ## Track 7 (round 99, charlie)
 
 Loop bound `3` -> `ARRAY_COUNT(self->lights)`. Byte-exact.
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments' process text here,
+verbatim; the source keeps a one-line `MATCHING:` note or the API doc.
+
+From `include/light_rig.h`:
+
+```c
+ * The ctor chains to SceneNode's (GetSceneNodeMethods()->ctor), so the id
+ * tree (0x4 -> 0x14) is the ctor chain. The ctor returns nothing, but the
+ * slot keeps SceneNode's `void *` ctor type: no caller of this class's ctor
+ * reads $v0 (New_LightRig returns the allocation, StageMap__StageMap
+ * discards it), so the two spellings compile alike.
+```
