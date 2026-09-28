@@ -206,33 +206,33 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_seqread", GetSeqData);
 #endif
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 62/70 words, length exact. Residue: register identity
- * ($t0<->$a2 for the a0 copy kept live across the two calls, $a3/$s1<->$t0
- * for the masked-a3 copy), not a logic or CFG difference
+/* NON_MATCHING: length exact (70 words), 59 equal at the same index.
+ * Residue: register identity for the a0 copy kept live across the calls
+ * and the masked velocity copy, not a logic or CFG difference
  * (docs/match-reports/NoteOn.md). */
-void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3) {
+void NoteOn(s16 a0, s16 a1, s32 note, s32 vel) {
     SsScore *rec = &_ss_score[a0][a1];
-    u8 offset = rec->channel;
-    s16 speed = rec->channelVol[offset];
-    s32 divided = ((u8)a3 * (s32)speed) / 127;
-    u16 flag = rec->volL;
-    u8 status = rec->pan[offset];
+    u8 channel = rec->channel;
+    s16 channelVol = rec->channelVol[channel];
+    s32 vol = ((u8)vel * (s32)channelVol) / 127;
+    u16 seqVolL = rec->volL;
+    u8 pan = rec->pan[channel];
 
-    speed = a3;
-    if (flag == 0) {
+    channelVol = vel;
+    if (seqVolL == 0) {
         return;
     }
-    if ((u8)a3 != 0) {
+    if ((u8)vel != 0) {
         s16 packed = (a1 << 8) | a0;
-        s16 note = rec->vabId;
-        u8 vol = rec->program[offset];
-        SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status);
-        rec->lastVelocity = (u8)speed;
+        s16 vabId = rec->vabId;
+        u8 program = rec->program[channel];
+        SpuVmKeyOn(packed, vabId, program, (u8)note, (u16)vol, pan);
+        rec->lastVelocity = (u8)channelVol;
     } else {
         s16 packed = (a1 << 8) | a0;
-        s16 note = rec->vabId;
-        u8 vol = rec->program[offset];
-        SpuVmKeyOff(packed, note, vol, (u8)a3);
+        s16 vabId = rec->vabId;
+        u8 program = rec->program[channel];
+        SpuVmKeyOff(packed, vabId, program, (u8)note);
     }
 }
 #else
