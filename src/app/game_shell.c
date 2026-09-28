@@ -40,7 +40,7 @@
 #include "TitleMenu.h"
 #include "day_task.h"
 #include "data_source.h"
-#include "NullDriver.h"
+#include "null_driver.h"
 #include "cd_driver.h"
 #include "bmem_pmgr.h"
 #include "game_files.h"
@@ -345,7 +345,7 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
  * (FileResource__LoadFile reads a whole named file into it, FreeBuffer
  * releases it) and declaring the file-I/O interface that the CD driver
  * (gCdDriverMethods, include/cd_driver.h) and the null driver
- * (gNullDriverMethods, include/NullDriver.h) implement.
+ * (gNullDriverMethods, include/null_driver.h) implement.
  *
  * sActiveDataSource selects one of those two drivers. SetActiveDataSource
  * installs one and copies its interface slots into FileResource's table and
@@ -365,7 +365,7 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
 
 /* sActiveDataSource's two observed values are the header words of the two
  * sibling classes it selects between: gCdDriverMethods (the CD-ROM read driver,
- * cd_driver.c) and gNullDriverMethods (NullDriver, the null driver, include/NullDriver.h). */
+ * cd_driver.c) and gNullDriverMethods (NullDriver, the null driver, include/null_driver.h). */
 #define DATASOURCE_CD 0x13
 #define DATASOURCE_NULL 0x23
 

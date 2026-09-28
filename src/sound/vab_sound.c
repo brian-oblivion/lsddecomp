@@ -18,7 +18,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "NullDriver.h"
+#include "null_driver.h"
 #include "PlacementGrid.h"
 #include "link_resource.h"
 #include "StageMap.h"
@@ -149,7 +149,7 @@ void NullDriver__NoOpSlot50(void) {}
  * active data source and played through libsnd), and the SoundCueSet
  * start/flush pair.
  *
- * NullDriver (include/NullDriver.h, class id 0x23 = DATASOURCE_NULL) is the
+ * NullDriver (include/null_driver.h, class id 0x23 = DATASOURCE_NULL) is the
  * data source game_shell.c selects when it is not reading the CD; the CD
  * driver (include/cd_driver.h, 0x13) is the other. Its Read, LoadFile,
  * RunRequestQueue, RequestLoadFile, StopService and CancelRequests slots do

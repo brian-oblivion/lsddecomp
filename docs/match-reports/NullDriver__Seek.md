@@ -41,4 +41,4 @@ slots into FileResource's table and every client table, and takes this table
 when the SPU/VAB source is active every `methods->seek(...)` in the game
 reaches this body. The purpose evidence the tier-C verdict above lacked is
 the slot's, not the body's: the body does nothing, which is what the VAB
-driver does for that interface call. Unified into `include/NullDriver.h`.
+driver does for that interface call. Unified into `include/null_driver.h`.

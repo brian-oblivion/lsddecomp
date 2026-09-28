@@ -1,5 +1,5 @@
-#ifndef NULLDRIVER_H
-#define NULLDRIVER_H
+#ifndef NULL_DRIVER_H
+#define NULL_DRIVER_H
 
 #include "file_resource.h"
 
