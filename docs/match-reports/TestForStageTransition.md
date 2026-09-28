@@ -161,3 +161,14 @@ what the code is.
    cross-unit prototype (the gp-relative blocker this was once filed under is
    resolved; see docs/match-reports/Test4StageTransition.md). */
 ```
+
+## History: the goto ladder replaced by ifs (track 10, debt-world)
+
+The body is now one `!= 3 && != 1 && != 5 && != 9 && != 12` early return,
+then `if (stage == 5) ... else if (stage == 9) ...`: cc1's jump threading
+produces the same 46 words as the goto ladder (stage 5's first test jumps
+straight past the second `== 5`), `funcdiff.py TestForStageTransition`
+46/46 and `./build-and-verify.sh` OK. A `switch` over the five stages does
+not match: it becomes a jump table over 1..12. The stage numbers and the y
+thresholds (-4095, 2048) stay literal; the function comment says what each
+one gates, and no stage names are established.

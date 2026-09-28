@@ -109,3 +109,12 @@ Parameter `kind` -> `moodIndex`: ProcessDreamAuxTriggerRecord passes the
 record's moodIndex, the same byte it passes New_Entity as its mood row. The
 literals are written decimal (78, 79, 11, 56, 93): they are mood-row
 indices. Left unnamed: nothing shows what those rows are. Byte-identical.
+
+## History: the goto ladder replaced by a switch (track 10, debt-world)
+
+The ladder (`== 78`, `< 79`, `== 11`, `== 56`, `!= 93`) is cc1's binary
+decision tree for a four-case `switch`: `switch (moodIndex) { case 11: case
+56: case 78: case 93: ... }` compiles to the same 22 words
+(`funcdiff.py EnableTeleportsForKind` 22/22, `./build-and-verify.sh` OK), so
+the source is the switch and carries no MATCHING line. The mood rows stay
+literal: no name for them is established.
