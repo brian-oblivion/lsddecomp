@@ -63,7 +63,7 @@ typedef struct LongVec3 {
 } LongVec3;
 
 /* A ratio of two s16s, num / den, which RatioToFixed12 turns into 20.12
- * fixed point. updateRotation and updateScale take three (ROTATION_ZERO,
+ * fixed point. updateRotation and updateScale take three (sRotationZero,
  * SCALE_ONE); every producer in the class sets den to 1. */
 typedef struct Ratio16 Ratio16;
 
@@ -201,7 +201,7 @@ extern s32 RatioToFixed12(void *pair);
 
 /* The identity inputs SceneNode__Reset hands to updateRotation and
  * updateScale: three Ratio16s each, {0/1, 0/1, 0/1} and {1/1, 1/1, 1/1}. */
-extern u8 ROTATION_ZERO[0xC];
+extern u8 sRotationZero[0xC];
 extern u8 SCALE_ONE[0xC];
 
 /* dst[i] = m * src[i] over `count` elements, through Sony's ApplyMatrixSV

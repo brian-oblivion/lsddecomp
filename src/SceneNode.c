@@ -136,7 +136,7 @@ void SceneNode__Reset(SceneNode *self) {
     self->tick = 0;
     self->attribute = 0;
     GsInitCoordinate2(NULL, self->coord2);
-    self->methods->updateRotation(self, 1, ROTATION_ZERO);
+    self->methods->updateRotation(self, 1, sRotationZero);
     self->methods->updateScale(self, 1, SCALE_ONE);
     self->coord2->flg = 1;
 }

@@ -1448,7 +1448,7 @@ SceneNode__SetSemiTransRate = 0x8001D3A0; // type:func
 SceneNode__SetLighting = 0x8001D3CC; // type:func
 SceneNode__SetLightMode = 0x8001D3F8; // type:func
 gSceneNodeMethods = 0x8006B5CC;
-ROTATION_ZERO = 0x8006B684;
+sRotationZero = 0x8006B684;
 SCALE_ONE = 0x8006B690;
 // libcd/bios getintr, identified: shape 0.92 vs the 3.5/3.6 bios.o getintr (masked
 // 0.00, a build no disc carries); position right after libcd/sys and before the
