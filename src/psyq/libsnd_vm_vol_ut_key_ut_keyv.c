@@ -137,11 +137,11 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     }
                     pan2sq = pan2 * pan2;
 
-                    _svm_sreg_buf[i].unk0 = (u16)(pan1sq / 16383);
-                    _svm_sreg_buf[i].unk2 = (u16)(pan2sq / 16383);
+                    _svm_sreg_buf[i].volL = (u16)(pan1sq / 16383);
+                    _svm_sreg_buf[i].volR = (u16)(pan2sq / 16383);
 
                     result++;
-                    _svm_sreg_dirty[i] |= 3;
+                    _svm_sreg_dirty[i] |= SVM_SREG_DIRTY_VOL;
                 }
             }
             i++;

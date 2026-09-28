@@ -69,22 +69,34 @@ extern SvmVoice _svm_voice[]; /* 24 voices */
  * SvmSreg -- one record of libsnd's _svm_sreg_buf, the per-voice shadow
  * of the SPU voice registers that SpuVmFlush copies out through
  * _svm_sreg (the SPU voice register block) for every voice whose
- * _svm_sreg_dirty byte has bits set. Same provenance and naming rule as
- * SvmVoice: libsnd/vmanager.o bss +0x000, 24 voices x 0x10;
- * fields by offset only.
+ * _svm_sreg_dirty byte has bits set. Same provenance as SvmVoice:
+ * libsnd/vmanager.o bss +0x000, 24 voices x 0x10. Each field is named for
+ * the SpuVoiceRegs register SpuVmFlush copies it to.
  */
 typedef struct SvmSreg {
-    s16 unk0; /* +0x0 -- SpuVmFlush copies +0x0/+0x2 out when dirty bit 0x1 is set */
-    s16 unk2; /* +0x2 */
-    u16 unk4; /* +0x4 -- note2pitch2 result (SePitchBend, SpuVmPBVoice); copied out on dirty bit 0x4 */
-    u16 unk6; /* +0x6 -- copied out on dirty bit 0x8 */
-    s16 unk8; /* +0x8 -- SsUtChangeADSR stores its p4; +0x8/+0xA copied out on dirty bit 0x10 */
-    s16 unkA; /* +0xA -- SsUtChangeADSR stores its p5 */
+    s16 volL;  /* +0x0 -- SpuVoiceRegs.volL's shadow */
+    s16 volR;  /* +0x2 -- volR's */
+    u16 pitch; /* +0x4 -- pitch's: note2pitch2's result (SePitchBend, SpuVmPBVoice) */
+    u16 addr;  /* +0x6 -- addr's */
+    s16 adsr1; /* +0x8 -- adsr1's: SsUtChangeADSR stores its p4 */
+    s16 adsr2; /* +0xA -- adsr2's: SsUtChangeADSR stores its p5 */
     u8 padC[0x10 - 0xC];
 } SvmSreg; /* 0x10 */
 
 extern SvmSreg _svm_sreg_buf[]; /* 24 voices */
 extern u8 _svm_sreg_dirty[];    /* 24 voices: which _svm_sreg_buf fields SpuVmFlush must copy out */
+
+/* _svm_sreg_dirty's bits, one per SvmSreg field. SpuVmFlush tests VOL_L
+ * (and copies volL and volR), PITCH, ADDR and ADSR1 (copying adsr1 and
+ * adsr2); VOL_R and ADSR2 are set with their pair but never tested. */
+#define SVM_SREG_DIRTY_VOL_L 0x01
+#define SVM_SREG_DIRTY_VOL_R 0x02
+#define SVM_SREG_DIRTY_PITCH 0x04
+#define SVM_SREG_DIRTY_ADDR 0x08
+#define SVM_SREG_DIRTY_ADSR1 0x10
+#define SVM_SREG_DIRTY_ADSR2 0x20
+#define SVM_SREG_DIRTY_VOL (SVM_SREG_DIRTY_VOL_L | SVM_SREG_DIRTY_VOL_R)
+#define SVM_SREG_DIRTY_ADSR (SVM_SREG_DIRTY_ADSR1 | SVM_SREG_DIRTY_ADSR2)
 
 /*
  * SpuVoiceRegs, SpuRegs -- the PS1 SPU's own register block at 0x1F801C00,

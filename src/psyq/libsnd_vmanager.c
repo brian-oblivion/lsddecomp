@@ -188,7 +188,7 @@ void SpuVmKeyOnNow(s32 unused, s32 pitch) {
     ((s16 *)_svm_sreg_buf)[(u16)sregIndex] = outL;
     ((s16 *)_svm_sreg_buf)[(u16)sregIndex + 1] = (s16)(volRSq / 16383);
 
-    _svm_sreg_dirty[KEYON_VOICE] |= 7;
+    _svm_sreg_dirty[KEYON_VOICE] |= SVM_SREG_DIRTY_VOL | SVM_SREG_DIRTY_PITCH;
     _svm_voice[KEYON_VOICE].unk04 = (s16)pitch;
     _svm_voice[KEYON_VOICE].unk1B = 1;
 
@@ -248,10 +248,10 @@ void vmNoiseOn2(s32 voice, s32 volL, s32 volR, s32 unusedAdsr1, s32 unusedAdsr2)
 
     voiceArg = voice;
     voice = (u8)voice;
-    _svm_sreg_buf[voice].unk2 = volR;
+    _svm_sreg_buf[voice].volR = volR;
     dirty = _svm_sreg_dirty[voice];
-    _svm_sreg_buf[voice].unk0 = volL;
-    dirty |= 3;
+    _svm_sreg_buf[voice].volL = volL;
+    dirty |= SVM_SREG_DIRTY_VOL;
     _svm_sreg_dirty[voice] = dirty;
     if ((u32)voice < 16) {
         lowBit = 1 << voice;
@@ -380,7 +380,7 @@ void SePitchBend(s32 chan, s32 bend) {
             fine = q + 127;
         }
         ((u16 *)_svm_sreg_buf)[sregIndex + 2] = note2pitch2((u16)note, (u16)fine);
-        _svm_sreg_dirty[(chan & 0xFF)] |= 4;
+        _svm_sreg_dirty[(chan & 0xFF)] |= SVM_SREG_DIRTY_PITCH;
     }
 }
 
@@ -523,7 +523,7 @@ void SetAutoVol(s16 voice) {
 
     ((s16 *)_svm_sreg_buf)[off + 1] = val2;
     ((s16 *)_svm_sreg_buf)[off] = val1;
-    _svm_sreg_dirty[v] |= 3;
+    _svm_sreg_dirty[v] |= SVM_SREG_DIRTY_VOL;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SetAutoVol);
@@ -630,7 +630,7 @@ void SetAutoPan(s16 voice) {
 
     ((s16 *)_svm_sreg_buf)[off + 1] = val2;
     ((s16 *)_svm_sreg_buf)[off] = val1;
-    _svm_sreg_dirty[v] |= 3;
+    _svm_sreg_dirty[v] |= SVM_SREG_DIRTY_VOL;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SetAutoPan);
@@ -850,8 +850,8 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     byteVal = *(u8 *)&_svm_voice[a0].unk14;
     D_8008EA26 = a0;
     D_8008EA18 = byteVal;
-    _svm_sreg_buf[a0].unk4 = note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF);
-    _svm_sreg_dirty[a0] |= 4;
+    _svm_sreg_buf[a0].pitch = note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF);
+    _svm_sreg_dirty[a0] |= SVM_SREG_DIRTY_PITCH;
     return 1;
 }
 #else
@@ -963,19 +963,19 @@ void SpuVmFlush(void) {
         SvmSreg *p7F0 = _svm_sreg_buf;
 
         for (i = 0; i < 0x18; i++) {
-            if (_svm_sreg_dirty[i] & 1) {
-                _svm_sreg->voice[i].volL = p7F0->unk0;
-                _svm_sreg->voice[i].volR = p7F0->unk2;
+            if (_svm_sreg_dirty[i] & SVM_SREG_DIRTY_VOL_L) {
+                _svm_sreg->voice[i].volL = p7F0->volL;
+                _svm_sreg->voice[i].volR = p7F0->volR;
             }
-            if (_svm_sreg_dirty[i] & 4) {
-                _svm_sreg->voice[i].pitch = _svm_sreg_buf[i].unk4;
+            if (_svm_sreg_dirty[i] & SVM_SREG_DIRTY_PITCH) {
+                _svm_sreg->voice[i].pitch = _svm_sreg_buf[i].pitch;
             }
-            if (_svm_sreg_dirty[i] & 8) {
-                _svm_sreg->voice[i].addr = _svm_sreg_buf[i].unk6;
+            if (_svm_sreg_dirty[i] & SVM_SREG_DIRTY_ADDR) {
+                _svm_sreg->voice[i].addr = _svm_sreg_buf[i].addr;
             }
-            if (_svm_sreg_dirty[i] & 0x10) {
-                _svm_sreg->voice[i].adsr1 = p7F0->unk8;
-                _svm_sreg->voice[i].adsr2 = p7F0->unkA;
+            if (_svm_sreg_dirty[i] & SVM_SREG_DIRTY_ADSR1) {
+                _svm_sreg->voice[i].adsr1 = p7F0->adsr1;
+                _svm_sreg->voice[i].adsr2 = p7F0->adsr2;
             }
 
             _svm_sreg_dirty[i] = 0;
