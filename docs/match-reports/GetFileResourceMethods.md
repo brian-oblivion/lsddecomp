@@ -37,7 +37,7 @@ are `FileResource__LoadFile`..`FileResource__OnRequestDone`, also this unit. So 
 of `GameApplicationFileResource`'s remaining queue — worth knowing for whoever picks up
 `FileResource__Release`, `FileResource__FileResource`, `FileResource__Finalize`, `FileResource__LoadFile`, or
 `FileResource__FreeBuffer` next: they all dispatch through this same table (see
-`include/GameApplicationFileResource.h` for the full slot map, and the constructor-called-via
+`include/data_source.h` for the full slot map, and the constructor-called-via
 BasicClass base (`gBasicClassMethods`, resolved with `--vs`) for the inherited slots).
 
 ## Proposed learning
@@ -107,7 +107,7 @@ the declaration's parameter list is free and must agree with the definition.
 `extern BaseCtorTable6D4E8 *GetFileResourceMethods();`. Return type untouched
 (this unit's own local view of the table, used for `->ctor` at +0x008); the
 call site is untouched. The other two declarations
-(`src/app/GameApplicationFileResource.c`'s definition and `include/GameApplicationFileResource.h`'s `(void)`) were
+(`src/app/GameApplicationFileResource.c`'s definition and `include/data_source.h`'s `(void)`) were
 already correct.
 
 **Stale comment corrected on the same line:** it read "still INCLUDE_ASM in the

@@ -31,7 +31,7 @@
 #include "bmem_pmgr.h"
 #include "game_files.h"
 #include <rand.h>
-#include "GameApplicationFileResource.h"
+#include "data_source.h"
 
 /* sRecordTable's record indices. The first RECORD_TABLE_COUNT are the
  * sound banks (SND\*.VH/VB) and then each stage's files; the movie records

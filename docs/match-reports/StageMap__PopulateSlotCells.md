@@ -945,7 +945,7 @@ common parent of the five ctors that take it, once ResourceSource itself
 moves out of graphics_resources.c) would retire all three; field renames
 `type` -> `buffer`, `path` -> `name`. The three-word ResourceRequest__Set descriptors
 (graphics_resources.c `ResourceSourceArgs`, include/dream_aux.h
-`DreamAuxLoadReq`, include/GameApplicationFileResource.h `ResourceRequest`) are the same family
+`DreamAuxLoadReq`, include/data_source.h `ResourceRequest`) are the same family
 at 0x0C and are left to that job.
 
 ## Track 6 (round 96, delta, second job): ResourceSourceRequest unified

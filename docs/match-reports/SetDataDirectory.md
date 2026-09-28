@@ -28,7 +28,7 @@ A setter: `sDataDirectory = value;`. `sDataDirectory` is another slot in the sam
 `.sdata` region as `sActiveDataSource` (file `0x7b008`; see
 `asm/data/7B008.sdata.s`), initialized in retail to `0x8006D4A8` — a pointer
 value. `D_8006D4A8` itself sits right at the tail of the `gFileResourceMethods` method
-table as splat has that table carved (see `include/GameApplicationFileResource.h`), which may
+table as splat has that table carved (see `include/data_source.h`), which may
 mean the table's boundary was drawn one word short and `sDataDirectory` actually
 points at the start of a separate, still-unidentified global — not resolved
 here.

@@ -16,11 +16,11 @@ void FileResource__InstallCdReadDriver(FileResource *self) {
 }
 ```
 
-(`self->unk0C` above was `GameApplicationFileResource.h`'s own field, renamed to
+(`self->unk0C` above was `data_source.h`'s own field, renamed to
 `pendingGeneration` by that unit's owner before this round; this report's
 code sample was stale and is corrected here, round 64.)
 
-with `#include "GameApplicationFileResource.h"` (already-established header, reused
+with `#include "data_source.h"` (already-established header, reused
 UNCHANGED -- not copied or redefined) and a new local
 `extern FileResourceMethods *GetCdDriverMethods(void);`.
 
@@ -47,7 +47,7 @@ member 'ctor' in something not a structure or union`.
 
 ### Proposed learning
 
-`GameApplicationFileResource.h`'s `FileResource`/`FileResourceMethods` describe a
+`data_source.h`'s `FileResource`/`FileResourceMethods` describe a
 class that OTHER units' functions construct/chain into, not just
 `GameApplicationFileResource.c`'s own methods -- worth checking this header before
 redefining a local struct whenever a function dispatches through

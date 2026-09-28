@@ -27,7 +27,7 @@ extern void VSyncCallback(void (*cb)(void));
 
 /* The class's method table down to +0x068 (see GetCdDriverMethods's
  * class-map comment above); only the one slot this call site dispatches is
- * typed, following the pad-to-offset convention include/GameApplicationFileResource.h uses
+ * typed, following the pad-to-offset convention include/data_source.h uses
  * for gFileResourceMethods's own table. tools/classtable.py resolves +0x068 to
  * CdDriver__RunRequestQueue (CdDriver), which walks the sCdRequestQueue request list,
  * dispatches each request through its owner's own slots and frees it with

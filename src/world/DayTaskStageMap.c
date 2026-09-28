@@ -54,7 +54,7 @@
 #include "flat_light_obj.h"
 #include "bmem_pmgr.h"
 #include "game_files.h"
-#include "GameApplicationFileResource.h"
+#include "data_source.h"
 #include "dream_aux.h"
 
 /* The rectangle StageMap__InitFootprintRect copies into rects[index] before

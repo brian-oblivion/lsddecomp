@@ -14,7 +14,7 @@
 #include <libgs.h>
 #include "application.h"
 #include "bmem_pmgr.h"
-#include "GameApplicationFileResource.h"
+#include "data_source.h"
 
 extern s32 sCdInitDone;               /* CdInit has been called */
 extern ScreenDims sDefaultScreenDims; /* {320, 240} */

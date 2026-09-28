@@ -14,7 +14,7 @@
 `this->unk10` is already set, it's a no-op; otherwise it calls four more of
 this class's own slots (`+0x044`, `+0x04C` twice, `+0x054`) — all four are
 null at `gFileResourceMethods`'s own level (verified by reading the table's raw words
-directly out of `disk/SLPS_015.56`; see `include/GameApplicationFileResource.h`), so they only
+directly out of `disk/SLPS_015.56`; see `include/data_source.h`), so they only
 resolve to real code for whichever subclass overrides them — sizes a new
 allocation via `BMemPMgrAlloc`, and on success installs the new pointer/size
 into `this->unk10`/`this->unk14` and restores a temporarily-zeroed field
@@ -101,7 +101,7 @@ argument — for the same function. **The two-argument signature in
 `include/pad.h` (`s32 size, s32 zone`) is wrong**; it was never
 exercised against a call site where the phantom second argument's register
 happened to differ from whatever was already sitting in `$a1`, so the bug was
-invisible there. `include/GameApplicationFileResource.h` now declares the one-argument form
+invisible there. `include/data_source.h` now declares the one-argument form
 locally with a comment pointing at `New_GameApplication.md` as the confirming
 evidence; `pad.h` is out of this unit's scope to fix, but is flagged
 below as a proposed learning / spawn candidate.
@@ -166,7 +166,7 @@ lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
-`FileResource` (`include/GameApplicationFileResource.h`) is included by `src/cd/cd_driver.c`
+`FileResource` (`include/data_source.h`) is included by `src/cd/cd_driver.c`
 and `src/cd/cd_driver.c` too, and `code_179d8_h.c`'s `FileResource__InstallCdReadDriver`
 genuinely reads/writes `self->unk0C` on this exact type (not a same-named
 field on a different struct), so per track 3's ownership rule these are

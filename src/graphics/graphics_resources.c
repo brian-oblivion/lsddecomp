@@ -60,7 +60,7 @@
 #include "cd_stream.h"
 #include "MoviePlayer.h"
 #include "bmem_pmgr.h"
-#include "GameApplicationFileResource.h"
+#include "data_source.h"
 #include "cd_driver.h"
 
 extern MoviePlayer *sActiveMoviePlayer; /* the playing movie, or NULL (play sets it, pollActive clears it) */

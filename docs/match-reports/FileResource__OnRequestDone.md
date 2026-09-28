@@ -27,7 +27,7 @@ jr    $ra
 
 Read-modify-write on a single word, no other fields touched. `$a0` is treated
 as `struct-pointer + 0x24`, so it gets a minimal local struct (`FileResource`
-in `include/GameApplicationFileResource.h`) with padding up to that offset — following
+in `include/data_source.h`) with padding up to that offset — following
 CLAUDE.md's guidance to name a field rather than write raw pointer arithmetic,
 while being honest that nothing earlier than `0x24` is known yet:
 
@@ -65,7 +65,7 @@ Mechanics fully known (sets bit 0); what bit 0 signals in the game is not
 established, so named for the mechanic only.
 
 **Field renamed alongside it.** `unknown_value_0x24` -> `flags` (in
-`include/GameApplicationFileResource.h`'s `FileResource`): `grep -rn -- '->unknown_value_0x24\b'
+`include/data_source.h`'s `FileResource`): `grep -rn -- '->unknown_value_0x24\b'
 src/` had zero hits outside `GameApplicationFileResource.c`, so unlike almost every other
 field in this struct (see `## Proposed field names
 

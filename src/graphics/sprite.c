@@ -36,7 +36,7 @@
 #include "FrameClock.h"
 #include "bmem_pmgr.h"
 #include <strings.h>
-#include "GameApplicationFileResource.h"
+#include "data_source.h"
 #include "scene_node.h"
 
 /* Defined in other units. */

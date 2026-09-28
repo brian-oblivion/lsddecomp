@@ -19,7 +19,7 @@
 #include "cd_driver.h" /* CD_SECTOR_SHIFT */
 #include "bmem_pmgr.h"
 #include <strings.h>
-#include "GameApplicationFileResource.h"
+#include "data_source.h"
 
 extern CdStream *sActiveCdStream; /* the stream that owns the drive, or NULL */
 

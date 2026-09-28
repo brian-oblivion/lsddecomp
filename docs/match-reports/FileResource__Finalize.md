@@ -50,7 +50,7 @@ Two attempts. The first (correct call sequence) showed 19/21 in-range, with
 both mismatches at `lw $v0, N($v0)` instructions where `N` was wrong (`0x14`
 and `0x20` instead of `0x48` and `0x5C`) — not a control-flow or register
 problem at all, but a **struct-layout bug**: `FileResourceMethods` in
-`include/GameApplicationFileResource.h` declared `slot44`/`slot48`/`slot4C`/`slot54`/`slot5C`
+`include/data_source.h` declared `slot44`/`slot48`/`slot4C`/`slot54`/`slot5C`
 immediately after `dtor` with no padding, so the C struct actually placed
 `slot44` at byte offset `0x10`, not the intended `0x44` — the `/* +0x44 */`
 comments were fiction the compiler never saw. Adding explicit `u8 padN[...]`

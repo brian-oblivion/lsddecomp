@@ -40,7 +40,7 @@ SDK-object conversion reclassified it as Sony's (`lib/libc2/strcpy.o`), so
 the "defined later in ROM order" clause is stale -- it is declared LOCAL
 here (per-call-site typed) the same way `CdSearchFile`/`printf` are
 elsewhere in this unit, never defined in this file. `strcat` is already
-declared identically in `GameApplicationFileResource.h` (included for
+declared identically in `data_source.h` (included for
 `FileResource__InstallCdReadDriver`), so the local `extern` here is a
 harmless duplicate, not a conflict.
 

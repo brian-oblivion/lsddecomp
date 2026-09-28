@@ -45,7 +45,7 @@
 #include <libetc.h>
 #include "draw_system.h"
 #include <strings.h>
-#include "GameApplicationFileResource.h"
+#include "data_source.h"
 #include "bmem_pmgr.h"
 #include <stdio.h>
 
@@ -762,7 +762,7 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
 /* Polls of CdSync that answer CdlNoIntr before the seek is issued again. */
 #define CD_WAIT_TIMEOUT 601
 
-/* BMemPMgrFree is GameApplicationFileResource.h's, included above. */
+/* BMemPMgrFree is data_source.h's, included above. */
 
 extern s32 sCdTimeoutCounter; /* CD_STATE_SETLOC_WAIT's polls; SetCdState clears it */
 
@@ -1025,7 +1025,7 @@ void SetCdState(s32 state) {
  * Nothing in the executable calls the install/destroy pair or NoOp2, NoOp3
  * and NoOp4 (no jal, stored pointer or built address reaches them).
  */
-/* FileResource and its table come from include/FileResource.h, through GameApplicationFileResource.h. */
+/* FileResource and its table come from include/FileResource.h, through data_source.h. */
 
 extern char sCdFileNotFoundFmt[];   /* "File not found. path = %s\n" */
 extern char sCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix */

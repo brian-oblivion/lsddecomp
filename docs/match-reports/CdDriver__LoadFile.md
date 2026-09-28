@@ -237,10 +237,10 @@ methods named here.
 
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
-| include/GameApplicationFileResource.h | `FileResourceMethods` | `configureBuffer` (+0x44) | `open` | A | called with the file name first; override is `CdDriver__Open` |
-| include/GameApplicationFileResource.h | `FileResourceMethods` | `bufferControl` (+0x4C) | `seek` | B | called `(0, 2)` for the size and `(0, 0)` to rewind; override is `CdDriver__Seek` |
-| include/GameApplicationFileResource.h | `FileResourceMethods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `CdDriver__Read` |
-| include/GameApplicationFileResource.h | `FileResource` | `pendingGeneration` (+0x0C) | `isOpen` | B | same offset as `Class6D4E8::isOpen`; AllocBuffer zeroes it before calling `open` (which opens only when it is 0) and restores it after `close` |
+| include/data_source.h | `FileResourceMethods` | `configureBuffer` (+0x44) | `open` | A | called with the file name first; override is `CdDriver__Open` |
+| include/data_source.h | `FileResourceMethods` | `bufferControl` (+0x4C) | `seek` | B | called `(0, 2)` for the size and `(0, 0)` to rewind; override is `CdDriver__Seek` |
+| include/data_source.h | `FileResourceMethods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `CdDriver__Read` |
+| include/data_source.h | `FileResource` | `pendingGeneration` (+0x0C) | `isOpen` | B | same offset as `Class6D4E8::isOpen`; AllocBuffer zeroes it before calling `open` (which opens only when it is 0) and restores it after `close` |
 
 Also noted for whoever names GameApplicationFileResource again: `FileResource__LoadFile`
 opens, sizes, allocates for, reads and closes a named file, i.e. it is the

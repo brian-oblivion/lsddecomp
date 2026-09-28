@@ -1,5 +1,5 @@
-#ifndef GAMEAPPLICATIONFILERESOURCE_H
-#define GAMEAPPLICATIONFILERESOURCE_H
+#ifndef DATA_SOURCE_H
+#define DATA_SOURCE_H
 
 /* The data-source layer of src/app/GameApplicationFileResource.c: the free
  * functions that route FileResource's I/O to the active driver, the CD

@@ -21,7 +21,7 @@ rather than API.
 - **Allocator.** `BMemPMgrAlloc` is re-declared locally in about 20 units
   and in dream_sys.h:376, entity.h:308, DayTaskStageMap.h:30, task.h:27.
   `BMemPMgrFree` returns `void` in entity.h:309 and
-  GameApplicationFileResource.h:16 but `void *` in bmem_pmgr.h:83 and task.h:28,
+  data_source.h:16 but `void *` in bmem_pmgr.h:83 and task.h:28,
   so any unit including two of them fails with conflicting types. main.c:28
   declares `BMemPMgrInit`/`SetDefaultBMemPMgr` because bmem_pmgr.h omits them.
   bmem_pmgr.h:82 leaves Alloc unprototyped on purpose (arity); keep that as one
@@ -240,7 +240,7 @@ reads them, so nothing names them).
   `args->unk0..unkC`; NullDriver.h and task.h name one file twice; cd_driver.h
   "that unit still spells them as literals"; basic_class.h "all 59 method
   tables" (60).
-- Unit-private headers (DayTaskStageMap.h, GameApplicationFileResource.h,
+- Unit-private headers (DayTaskStageMap.h, data_source.h,
   dream_aux.h) fold into their .c files or become real class headers first,
   so the pass documents public API only.
 - `types.h:4` `typedef char int8_t` is unsigned under `-funsigned-char`

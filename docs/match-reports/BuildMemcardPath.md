@@ -40,7 +40,7 @@ already documented for `Descriptor10` in `include/class_3bb8c.h`.
   ("bu10:") / `sMcDevicePath0` ("bu00:").
 - `extern char *strcat(char *dest, char *src);` — **an extern for a
   function outside this unit** (matched in `src/app/GameApplicationFileResource.c`, declared in
-  `include/GameApplicationFileResource.h`; this header had no prior declaration of it, so
+  `include/data_source.h`; this header had no prior declaration of it, so
   this is a fresh, independent one, not an edit to an existing
   declaration).
 

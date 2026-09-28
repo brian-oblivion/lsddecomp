@@ -23,7 +23,7 @@
 #include "draw_system.h"
 #include "tim_image.h"
 #include "bmem_pmgr.h"
-#include "GameApplicationFileResource.h"
+#include "data_source.h"
 
 /* new TimImage(name). */
 TimImage *New_TimImage(char *name) {

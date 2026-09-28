@@ -296,7 +296,7 @@ scheduling barriers.
 
 ```c
 #if 0
-/* include/GameApplicationFileResource.h already declares:  extern s32 func_80013348(char *s); */
+/* include/data_source.h already declares:  extern s32 func_80013348(char *s); */
 
 char *strcat(char *dest, char *src) {
     char *origDest;

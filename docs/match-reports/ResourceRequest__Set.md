@@ -8,7 +8,7 @@
 
 ## What it does
 
-Fills a `ResourceRequest` (`include/GameApplicationFileResource.h`) -- `buffer`, `name`,
+Fills a `ResourceRequest` (`include/data_source.h`) -- `buffer`, `name`,
 `mode` -- and returns the pointer. That is the descriptor the LinkResource,
 Tod, TodSet, ModelData and TriggerWorld ctors take (graphics_resources.c's
 `ResourceSource` declares only its first two words).
@@ -105,7 +105,7 @@ them is a head decision (proposed below), not a rename.
 - `include/dream_aux.h`'s comment above `DreamAuxLoadReq` still quotes the
   old body (`this->x=x; ...`) and calls the record "physically the same shape"
   as the vector; it now reads as the same descriptor as `ResourceRequest`.
-- `ResourceRequest__Set`'s prototype is not in `include/GameApplicationFileResource.h`: three
+- `ResourceRequest__Set`'s prototype is not in `include/data_source.h`: three
   units declare their own (typed to their local view), and dream_aux.h's
   would conflict with it in any file including both.
 
@@ -113,7 +113,7 @@ them is a head decision (proposed below), not a rename.
 
 `ResourceRequest` now lives in `include/FileResource.h`, beside the
 `ResourceSource` it extends, as `{ ResourceSource src; s32 mode; }`, with
-`ResourceRequest__Set`'s one prototype under it. `include/GameApplicationFileResource.h` no
+`ResourceRequest__Set`'s one prototype under it. `include/data_source.h` no
 longer defines it. The body reads `this->src.buffer = buffer;
 this->src.name = name; this->mode = mode;`. Retired onto it:
 graphics_resources.c's `ResourceSourceArgs` (ModelData__BuildResources,

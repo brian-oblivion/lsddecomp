@@ -28,7 +28,7 @@
 #include "bmem_pmgr.h"
 #include <strings.h>
 #include "wbgm.h"
-#include "GameApplicationFileResource.h"
+#include "data_source.h"
 
 /* What `buffer` points at: 8 bytes nothing here reads, then each cell's
  * first record, one per cell of the chunk's 20 x 20 lattice, row-major. A

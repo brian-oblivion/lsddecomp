@@ -39,7 +39,7 @@
 #include "GraphRoom.h"
 #include "TitleMenu.h"
 #include "DayTask.h"
-#include "GameApplicationFileResource.h"
+#include "data_source.h"
 #include "NullDriver.h"
 #include "cd_driver.h"
 #include "bmem_pmgr.h"

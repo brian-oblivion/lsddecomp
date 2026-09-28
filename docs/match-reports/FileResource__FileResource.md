@@ -9,7 +9,7 @@
 ## What it does
 
 The constructor for the `gFileResourceMethods` class (its own vtable slot `+0x008`,
-per `include/GameApplicationFileResource.h`'s `FileResourceMethods`). Chains the base
+per `include/data_source.h`'s `FileResourceMethods`). Chains the base
 class's constructor first (`GetBasicClassMethods()->ctor(this)`), then installs
 this class's own vtable pointer (fetched via the already-matched
 `GetFileResourceMethods`, which just returns `&gFileResourceMethods`), then zeroes every field

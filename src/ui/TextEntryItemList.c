@@ -35,7 +35,7 @@
 #include "ScreenSprite.h"
 #include "bmem_pmgr.h"
 #include "FullWidthSjis.h"
-#include "GameApplicationFileResource.h"
+#include "data_source.h"
 
 /* The cursor sprite's position at index 0, (-62, -12): loadCardResources
  * attaches the cursor there, setCursorPos moves it to x + index * 7, y. */

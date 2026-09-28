@@ -68,7 +68,7 @@ Matched on the first attempt.
 ## Proposed learning
 
 None new. Straightforward confirmation that `strcat`'s prototype
-(`char *strcat(char *dest, char *src);`, declared in `include/GameApplicationFileResource.h`
+(`char *strcat(char *dest, char *src);`, declared in `include/data_source.h`
 so this forward reference to a later-defined-in-file function resolves) is
 right in shape even though `strcat`'s own body is still stalled — the two
 are independent findings.
