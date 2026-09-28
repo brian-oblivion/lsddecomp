@@ -282,7 +282,7 @@ s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
     return self->result;
 }
 
-/* Hangs the slot widgets and the BgLayer under the light rig (unk14), sets the
+/* Hangs the slot widgets and the BgLayer under the light rig, sets the
  * fade-in colour, clears the default movie frame (no sub handle) and then the
  * screen to baseColor, and configures and opens the viewport's OT.
  * initArgs->drawSystem and the viewport are `BasicClass *` fields, cast to
@@ -332,7 +332,7 @@ void TaskCore__OnDeinit(TaskCore *self) {
 
 /* Section 1. TaskCore's own methods from +0x058 to +0x0C0: the pad
  * dispatch and its five button handlers, the state machine (update and
- * setState), the frame bound, the sound call, the view callback and the
+ * setState), the frame bound, the sound call, the exit callback and the
  * fade-in/fade-out pair. Each is the default for its slot in
  * gTaskCoreMethods, which StreamTask, TitleMenu and GraphRoom inherit or
  * override; include/task_core.h's banner describes the class and its states.

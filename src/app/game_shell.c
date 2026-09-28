@@ -110,7 +110,7 @@ void GameApplication__ShowIntroLogos(GameApplication *self) {
     }
 }
 
-/* Shows the TIM at `path` in a TaskCore (frame bound 0); its view callback,
+/* Shows the TIM at `path` in a TaskCore (frame bound 0); its exit callback,
  * run as the image ends, registers the game's files. */
 void GameApplication__ShowImage(GameApplication *self, const char *path) {
     TaskCore *task = New_TaskCore(0, 0, 0);
@@ -123,7 +123,7 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
     task->methods->release(task);
 }
 
-/* ShowImage's view callback: registers sRecordTable's files with the CD
+/* ShowImage's exit callback: registers sRecordTable's files with the CD
  * driver. */
 s32 GameApplication__RegisterFilesCallback(void) {
     return RegisterRecordTableFiles(0);
