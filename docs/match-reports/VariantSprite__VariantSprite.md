@@ -81,7 +81,7 @@ The base class is unified as `Sprite` (`include/sprite.h`, table `gSpriteMethods
 ## Track 4 (2026-09-26, round 87, alpha)
 
 Renamed from `D800879C4__D800879C4` (tools/rename.py). The class is unified
-as `VariantSprite` (`include/VariantSprite.h`, table `gVariantSpriteMethods`,
+as `VariantSprite` (`include/variant_sprite.h`, table `gVariantSpriteMethods`,
 formerly `D_800879C4`), the `ClassXXXXX` convention of StyleEffect and
 FadeBox: the sprites' role in the game is not established, so no
 descriptive name. The unit-local `D800879C4Obj` / `D800879C4Methods` views
@@ -114,7 +114,7 @@ void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *arg2, 
 
 ## Track 6 (2026-09-26, round 93, bravo)
 
-The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
+The class `Class879C4` is now `VariantSprite` (`include/variant_sprite.h`,
 `python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds

@@ -2,7 +2,7 @@
 #define STYLE_EFFECT_H
 
 #include "actor.h"
-#include "VariantSprite.h"
+#include "variant_sprite.h"
 
 /*
  * StyleEffect -- an Actor the style layer (src/world/dream_scene.c) places at an

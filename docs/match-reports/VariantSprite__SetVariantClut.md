@@ -116,7 +116,7 @@ below, byte-identical.
 ## Track 4 (2026-09-26, round 87, alpha)
 
 Renamed from `D800879C4__SetVariantClut` (tools/rename.py); the class is
-`VariantSprite` (`include/VariantSprite.h`). It occupies the inherited `reset`
+`VariantSprite` (`include/variant_sprite.h`). It occupies the inherited `reset`
 slot (+0x040) and keeps its own name: the body does something narrower and
 different from Sprite__Reset (it never binds a texture; it records the
 variant and repoints the CLUT), so the slot-name rule's exception applies.
@@ -129,7 +129,7 @@ now `sprite.cx` / `sprite.cy` (sprite.h's SpriteGs, the same s16 at
 
 ## Track 6 (2026-09-26, round 93, bravo)
 
-The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
+The class `Class879C4` is now `VariantSprite` (`include/variant_sprite.h`,
 `python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds

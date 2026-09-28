@@ -39,13 +39,13 @@ tools/funcdiff.py GetVariantSpriteMethods   # 4/4
 Renamed from `func_80057F58` (tools/rename.py), tier A: a plain getter for
 `&gVariantSpriteMethods` (formerly `D_800879C4`), named like
 `GetSpriteMethods` / `GetActorMethods`. It now returns `VariantSpriteMethods *`
-(`include/VariantSprite.h`); dream_scene.c's opaque `D_800879C4Table`
+(`include/variant_sprite.h`); dream_scene.c's opaque `D_800879C4Table`
 typedef and extern are gone. Its callers are the class's own allocator and
 ctor (dream_scene.c). Byte-identical.
 
 ## Track 6 (2026-09-26, round 93, bravo)
 
-The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
+The class `Class879C4` is now `VariantSprite` (`include/variant_sprite.h`,
 `python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds

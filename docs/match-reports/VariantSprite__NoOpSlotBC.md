@@ -19,7 +19,7 @@ The body is empty. Nothing in `src/` calls through the slot, so the placeholder 
 
 ## Track 6 (2026-09-26, round 93, bravo)
 
-The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
+The class `Class879C4` is now `VariantSprite` (`include/variant_sprite.h`,
 `python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds

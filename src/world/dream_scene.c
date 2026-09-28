@@ -18,7 +18,7 @@
  *    keeps at an offset from its target, then SetStyleEffectSources;
  *  - Actor (include/actor.h), whole, the base of TodActor, DreamSys and
  *    StyleEffect;
- *  - VariantSprite (include/VariantSprite.h), whole;
+ *  - VariantSprite (include/variant_sprite.h), whole;
  *  - GraphRoom (include/graph_room.h), whole, the mood graph screen.
  *
  * The game's own files most likely ended after each class's table getter;
@@ -49,7 +49,7 @@
 #include "style_effect.h"
 #include "Viewport.h"
 #include "sound_cue_set.h"
-#include "VariantSprite.h"
+#include "variant_sprite.h"
 #include <rand.h>
 #include "tmd_model.h"
 #include "grid_cell.h"
@@ -2239,7 +2239,7 @@ void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
  */
 
 /* The class and its children: include/style_effect.h (the owner),
- * include/actor.h (modelChildren) and include/VariantSprite.h (sprites). */
+ * include/actor.h (modelChildren) and include/variant_sprite.h (sprites). */
 
 extern s32 sSpriteShiftX[];
 extern Ratio16 sSpriteScaleLarge[3];
@@ -2257,7 +2257,7 @@ void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, 
  * (next section, empty) is declared the same way here. */
 extern void NoOpIgnoreArgs();
 
-/* New_VariantSprite: include/VariantSprite.h. */
+/* New_VariantSprite: include/variant_sprite.h. */
 
 /* What SetStyleEffectSources (next section) recorded, declared there
  * with the same types: the DREAMER.TMD Actor the model kinds fetch their
@@ -2810,7 +2810,7 @@ void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
  *    for an Actor sender's events 5..8, tryAttachNearby.
  *  - Actor__SetLastOffsetValue/SetPendingExtra and GetActorMethods.
  *  - New_VariantSprite and VariantSprite__VariantSprite, of an unrelated
- *    class (include/VariantSprite.h) that happens to follow in ROM.
+ *    class (include/variant_sprite.h) that happens to follow in ROM.
  */
 
 /* The local move vector's x and y (s16; the z, sActorLocalMoveZ, is the next
@@ -3112,7 +3112,7 @@ void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetA
     ((VariantSpriteResetFn)self->methods->reset)(self, variant);
 }
 
-/* ---- VariantSprite (include/VariantSprite.h) ---------------------------
+/* ---- VariantSprite (include/variant_sprite.h) ---------------------------
  *
  * A Sprite whose variant, 0 or 1, picks its texture cell and CLUT. Its ctor
  * and allocator are just above, the empty leaves and the table getter at the
@@ -3206,7 +3206,7 @@ void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
 /* Screen pixels per step of a mood axis (PopulateGraphPoints). */
 #define GRAPH_PIXELS_PER_MOOD 10
 
-/* VariantSprite's (include/VariantSprite.h) four empty leaves and its table
+/* VariantSprite's (include/variant_sprite.h) four empty leaves and its table
  * getter. VariantSprite__Update is the +0x098 update override of
  * Sprite__Update, typed as that slot; the other three occupy the class's own
  * slots +0x0BC/+0x0C0/+0x0C4, which nothing calls. */

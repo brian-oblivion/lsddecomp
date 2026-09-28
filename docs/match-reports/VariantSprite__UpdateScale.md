@@ -138,7 +138,7 @@ Could not name: `unk58`/`unk5C`/`unk60`, above.
 ## Track 4 (2026-09-26, round 87, alpha)
 
 Renamed from `D800879C4__UpdateScale` (tools/rename.py); the class is
-`VariantSprite` (`include/VariantSprite.h`). The override is named for its slot
+`VariantSprite` (`include/variant_sprite.h`). The override is named for its slot
 (+0x048 `updateScale`), which it already was. The slot keeps SceneNode's
 `void *table`; the occupant reads it as `s16 *ratios` (two num/den pairs).
 The local view's `spriteScaleX/Y` are now `sprite.scalex` /
@@ -147,7 +147,7 @@ Sprite's fields (SPRITE_FIELDS). Byte-identical.
 
 ## Track 6 (2026-09-26, round 93, bravo)
 
-The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
+The class `Class879C4` is now `VariantSprite` (`include/variant_sprite.h`,
 `python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
@@ -170,7 +170,7 @@ class's track 7 pass (see `VariantSprite__SetVariantClut`'s report).
 | name | tier | evidence |
 | --- | --- | --- |
 | Sprite fields `accumScaleX` / `accumScaleY` (were `unk5C` / `unk60`, `+0x05C` / `+0x060`) | B | Mechanics only: while `unk58` is non-zero this method multiplies each by its axis's 20.12 ratio (`(ratio * v) >> 12`) and stores it back, in place of writing `sprite.scalex/scaley`, so the ratios accumulate into them. Renaming them in `SPRITE_FIELDS` (include/sprite.h) broke only this unit in the default build and under `-DNON_MATCHING`, so this is their whole accessor set: nothing else reads or writes them, `Viewport__DrawNode` included. What the accumulated value is for is not established (nothing found sets `unk58` non-zero), hence B. |
-| param `ratios`: `s16 *` -> `Ratio16 *` | A | The body reads `[0]/[1]` and `[2]/[3]` as num/den, two scene_node.h `Ratio16`s (x, y), the type `Sprite__UpdateRotation` and `BgLayer__UpdateScale` already take; round 93's proposal. A type change, so the oracle decided: byte-identical. The prototype in include/VariantSprite.h changed with it; nothing calls it directly (only `gVariantSpriteMethods`' slot). |
+| param `ratios`: `s16 *` -> `Ratio16 *` | A | The body reads `[0]/[1]` and `[2]/[3]` as num/den, two scene_node.h `Ratio16`s (x, y), the type `Sprite__UpdateRotation` and `BgLayer__UpdateScale` already take; round 93's proposal. A type change, so the oracle decided: byte-identical. The prototype in include/variant_sprite.h changed with it; nothing calls it directly (only `gVariantSpriteMethods`' slot). |
 | locals `xWhole`/`xRem`/`xFrac`/`xRatio`, `y...` (were `q1`/`r1`/`q2`/`ratio1`, `q3`/`r3`/`q4`/`ratio2`) | A | The split division: whole part `num / den`, remainder, the remainder's 12 fractional bits, and their 20.12 sum. |
 | locals `xScale` / `yScale` (were `short1` / `short2`) | A | The 16-bit truncations stored into `sprite.scalex` / `.scaley`. |
 
@@ -202,6 +202,6 @@ the source keeps one `MATCHING:` line on `xScale`.
   No writer of a non-zero value found. Not applied: `Sprite__Reset` is
   outside this job. The rename touches `self->unk58` in src/graphics/sprite.c and
   src/world/dream_scene.c, plus the comments on the two fields after it and
-  VariantSprite.h's banner line that names it.
+  variant_sprite.h's banner line that names it.
 
 Applied by the round 101 head at merge: `unk58` is `accumulateScale` (tier B), in `SPRITE_FIELDS`, `Sprite__Reset` and this method; zero bytes.

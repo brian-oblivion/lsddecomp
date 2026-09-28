@@ -1,5 +1,5 @@
-#ifndef VARIANTSPRITE_H
-#define VARIANTSPRITE_H
+#ifndef VARIANT_SPRITE_H
+#define VARIANT_SPRITE_H
 
 #include "sprite.h"
 

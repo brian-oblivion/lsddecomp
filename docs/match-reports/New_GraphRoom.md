@@ -76,7 +76,7 @@ The unit banner of `src/world/dream_scene.c` was rewritten to say what the file 
  *
  * - Four empty leaves plus the table getter (VariantSprite__Update,
  *   VariantSprite__NoOpSlotBC/C0/C4, GetVariantSpriteMethods) of the
- *   unrelated VariantSprite (include/VariantSprite.h; its ctor is in
+ *   unrelated VariantSprite (include/variant_sprite.h; its ctor is in
  *   `dream_scene`, two more methods in `class_3bb8c_q`).
  * - The WHOLE of `GraphRoom` (round 75 name; table `gGraphRoomMethods`,
  *   73 slots), a TaskCore subclass, unified in include/graph_room.h (track 4,

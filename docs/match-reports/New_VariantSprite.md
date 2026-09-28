@@ -116,7 +116,7 @@ further work (that one).
 ## Track 4 (2026-09-26, round 87, alpha)
 
 Renamed from `New_D800879C4` (tools/rename.py); the class is `VariantSprite`
-(`include/VariantSprite.h`). The prototype is now
+(`include/variant_sprite.h`). The prototype is now
 `VariantSprite *New_VariantSprite(s32 variant, void *arg2, void *texture)`: the
 three arguments are forwarded unchanged to the ctor, whose parameters they
 name (see `VariantSprite__VariantSprite`'s report), and the result is the object.
@@ -130,7 +130,7 @@ Byte-identical.
 
 ## Track 6 (2026-09-26, round 93, bravo)
 
-The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
+The class `Class879C4` is now `VariantSprite` (`include/variant_sprite.h`,
 `python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
@@ -152,9 +152,9 @@ comment pass, i.e. with this round's renames already applied (the
 `LinkQueryBuf` one as it stood before step 2).
 
 - `BMemPMgrAlloc(0xA8)` became `sizeof(VariantSprite)` (0xA8,
-  VariantSprite.h), byte-identical.
+  variant_sprite.h), byte-identical.
 - Parameter `arg2` -> `resetArg` (tier B), here, in the ctor and in
-  VariantSprite.h's prototypes and CtorParams: it is forwarded to Sprite's
+  variant_sprite.h's prototypes and CtorParams: it is forwarded to Sprite's
   ctor as its `arg4`, which Sprite__Sprite hands on to reset, and
   Sprite__Reset does not read it; the one caller (StyleEffect__SpawnSprites)
   passes 0.
@@ -162,6 +162,6 @@ comment pass, i.e. with this round's renames already applied (the
 The function comment, verbatim:
 
 ```c
-/* VariantSprite (include/VariantSprite.h, track 4, round 87): its allocator and
+/* VariantSprite (include/variant_sprite.h, track 4, round 87): its allocator and
  * ctor. The other methods are in dream_scene.c and class_3bb8c_t.c. */
 ```

@@ -1140,7 +1140,7 @@
         "gVariantSpriteMethods": {
           "class": "VariantSprite",
           "date": "2026-09-26",
-          "header": "include/VariantSprite.h"
+          "header": "include/variant_sprite.h"
         },
         "gViewportMethods": {
           "class": "Viewport",

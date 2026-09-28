@@ -119,7 +119,7 @@ is the same rotate. The D800879C4 class itself is still unnamed, so B.
 
 ## Track 4 (2026-09-26, round 87)
 
-The sprites' class is unified as VariantSprite (`include/VariantSprite.h`,
+The sprites' class is unified as VariantSprite (`include/variant_sprite.h`,
 formerly `D_800879C4` / `New_D800879C4`). This unit's local
 `extern void *New_D800879C4(void *, void *, void *)` was a view of it and
 is gone; the header's `VariantSprite *New_VariantSprite(s32 variant, void *arg2,
