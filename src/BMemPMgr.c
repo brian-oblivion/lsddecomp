@@ -14,17 +14,6 @@
  *    PushBasicClassListNode/RemoveBasicClassListNode, the pool-backed list
  *    primitives its `children` and `parentRefs` lists share. The rest of its
  *    methods are at the head of TmdRenderer.c.
- *
- * What decided its edges (python3 tools/tuboundary.py --unit): the placed
- * object libgte/smp_00 precedes it ("start edge possible"), and every edge
- * inside it and on to TmdRenderer.c is "boundary possible": the binary
- * neither proves nor forbids a file boundary. The content says the original
- * file runs on past this one's end, through the BasicClass tail and the pool
- * allocator's busy-flag accessors, to the renderer's first function
- * SortTmdObject; that tail is parked in TmdRenderer.c (see its banner),
- * because moving it is a split, which no tool does. Named for the
- * allocator: BasicClass.c would collide with the class's header,
- * include/BasicClass.h, and the rest of the class is in the other file.
  */
 
 #include "common.h"
