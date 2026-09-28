@@ -199,7 +199,7 @@ report recommending a permuter budget on Sony's code.
 >   zero-extends, so a negative constant CANNOT be an `ori` and maspsx
 >   correctly emits `addiu`.
 > - **4 have a positive immediate, and all four are spurious** -- they are
->   attributed to the data symbol `gDreamAuxSpawnInfo`, i.e. data words being read as
+>   attributed to the data symbol `sDreamAuxSpawnInfo`, i.e. data words being read as
 >   instructions by the extent walk, not code.
 >
 > So the rule is exact: **positive constant -> `ori`, always; negative

@@ -185,7 +185,7 @@ stride), so the kind-2 recursion, `record + 1` of a 0x38-byte struct, is
 records on. Fields: sel -> condition, parity -> modelIndex (it is
 TriggerWorld getModelData's index; CheckTriggerDayParity reads a different
 struct), kind -> moodIndex (New_Entity's mood row), entries -> spawnIndices
-(gDreamAuxSpawnInfo indices). Locals: value -> day, ctx -> trigger (typed),
+(sDreamAuxSpawnInfo indices). Locals: value -> day, ctx -> trigger (typed),
 callResult -> model (ModelData *), scratch -> desc, p -> spawn. Byte-identical.
 
 The header comments, as they stood:

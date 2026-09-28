@@ -406,7 +406,7 @@ typedef struct {
     s8 offsetIndex;
 } DreamAuxSpawnInfo;
 
-extern DreamAuxSpawnInfo gDreamAuxSpawnInfo[];
+extern DreamAuxSpawnInfo sDreamAuxSpawnInfo[];
 
 /* MATCHING: x and y are one struct so the copy is one lwl/lwr pair */
 typedef struct {
@@ -441,7 +441,7 @@ bool SpawnDreamAuxTriggerEntity(s32 moodIndex, void *desc, DreamAuxTriggerEntry 
         s32 worldPos[4];
 
         cellDesc.chunk = trigger->key;
-        spawn = &gDreamAuxSpawnInfo[spawnIndex];
+        spawn = &sDreamAuxSpawnInfo[spawnIndex];
         cellDesc.cell = spawn->cell;
         cellDesc.offset = sDreamAuxPosTable[spawn->offsetIndex];
 

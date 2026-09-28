@@ -28,7 +28,7 @@ typedef struct {
     s8 posIndex;
 } DreamAuxSpawnInfo;
 
-extern DreamAuxSpawnInfo gDreamAuxSpawnInfo[];
+extern DreamAuxSpawnInfo sDreamAuxSpawnInfo[];
 
 typedef struct {
     s16 x;
@@ -61,7 +61,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
         DreamAuxObj *obj;
 
         coords.ctxVal = *(u16 *)ctx;
-        rec = &gDreamAuxSpawnInfo[entry];
+        rec = &sDreamAuxSpawnInfo[entry];
         coords.recordVal0 = rec->val0;
         coords.pos = sDreamAuxPosTable[rec->posIndex];
 
@@ -79,7 +79,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 `SetDreamAuxWorld`'s call: `(kind, out, sDreamAuxSound)`, where `out` is THIS
 function's own `void *out` parameter, itself a 4-word caller-provided
 scratch buffer per the header's existing comment on this function's
-signature (`ProcessDreamAuxTriggerRecord`'s `scratch[4]`). `gDreamAuxSpawnInfo`/`sDreamAuxPosTable` are two
+signature (`ProcessDreamAuxTriggerRecord`'s `scratch[4]`). `sDreamAuxSpawnInfo`/`sDreamAuxPosTable` are two
 more small unit-owned lookup tables (a 4-byte "spawn info" record indexed by
 `entry`, and a 6-byte position record indexed by that record's `posIndex`
 field, named round 63). `entity->vtable[0x13]` is the SAME slot `PlaceDreamAuxEntityByPlayer` (matched
@@ -158,7 +158,7 @@ handled at the wrong granularity" issue.
 
 **SpawnDreamAuxTriggerEntity** — tier B. Spawns an `Entity` via `New_Entity`
 for a trigger `entry`; on success, fills a local coordinate buffer from
-`gDreamAuxSpawnInfo`/`sDreamAuxPosTable` and dispatches it through three
+`sDreamAuxSpawnInfo`/`sDreamAuxPosTable` and dispatches it through three
 vtable calls (two through the new entity, one through `gDreamAuxStageMap`); on
 `New_Entity` failure returns `true` (treated as "handled" by callers) rather
 than `false`. Named for the mechanic that dominates the body (spawn +

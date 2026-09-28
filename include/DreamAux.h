@@ -71,7 +71,7 @@ enum TriggerCondition {
  * stride). `triggered` latches once `condition` has passed; InitDreamAux
  * clears every latch. `modelIndex` picks the ModelData of the chunk's
  * TriggerWorld, and each of `spawnIndices` (-1 ends the list) one
- * gDreamAuxSpawnInfo placement for an Entity of mood row `moodIndex`. A
+ * sDreamAuxSpawnInfo placement for an Entity of mood row `moodIndex`. A
  * record whose moodIndex is 2 is followed by the one seven records on. */
 typedef struct TriggerRecord {
     s8 triggered;
