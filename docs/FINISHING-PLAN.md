@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 39 (2026-09-28, premium session after round 101: track 9
-`globals`; edge evidence is history; unitfile moves type-named files).
+Plan revision: 40 (2026-09-28, round 102, premium head: an orphaned
+placeholder header is a track 8 job; track 9 stays open once opened).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -317,10 +317,15 @@ rule). **Head at merge:** `make extract`, then delete `build/src` and rebuild,
 because unit names changed. **Park rule:** a region the evidence and content
 cannot settle, or that content alone would split (no tool splits a unit),
 keeps its carve edges, content-named, with the reason in each banner.
+A placeholder-named header whose unit a merge absorbed belongs to no region;
+`plan.py` lists it as a job of its own (its edit set: it and every unit
+including it), done by moving each section into the header that owns its
+subject, or by a rename for what it holds (round 102: `class_3bb8c.h`).
 
 ### Track 9: close-out
 
-Opens when tracks 6 to 8 are done. Items, ticked with `plan.py check --item`:
+Opens when tracks 6 to 8 are done, and stays open once an item is ticked
+even if one of them reopens. Items, ticked with `plan.py check --item`:
 `layout` (subsystem directories under `src/`, chosen from what the files hold:
 `unitfile.py rename <unit> <dir>/<unit>`; README's code map says what lives
 where), `readme`, `comments` (readability history 0, headers too; a
