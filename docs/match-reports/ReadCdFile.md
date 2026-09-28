@@ -113,14 +113,14 @@ field names used unchanged; the lever was control flow and block layout).
 > and code below this note PREDATES the rename and uses the old field names
 > throughout (it is historical narrative, left as written); the
 > `## Result` block's actual function body has been updated to compile
-> against the CURRENT struct definitions in `src/CdDriver.c` -- that is
+> against the CURRENT struct definitions in `src/cd/CdDriver.c` -- that is
 > the one to splice if you pick this function up again.
 
 > **ROUND 54 (2026-09-18), runner charlie -- rebuilt, then one more
 > structural reshape, negative.**
 >
 > **Rebuild-before-trusting-the-score.** Spliced the preserved (round-36)
-> body into `src/CdDriver.c` in place of the `INCLUDE_ASM` unchanged and
+> body into `src/cd/CdDriver.c` in place of the `INCLUDE_ASM` unchanged and
 > ran the real oracle: `build exit=2`, no compile-error grep hits,
 > `funcdiff.py` reads 8/56, identical to the recorded figure; `build/lsdde.map`
 > confirms the function is still one word (4 bytes) long. Restored
@@ -204,11 +204,11 @@ field names used unchanged; the lever was control flow and block layout).
 > (`func_80028DF0`->`CdControl`, `func_80028D68`->`CdSync`,
 > `func_80029274`->`CdRead`, `func_80029254`->`CdReadSync`; all confirmed in
 > `config/symbols.slps01556.lsdde.txt` and already declared, per-call-site
-> typed, in `src/CdDriver.c` itself). The preserved body below still
+> typed, in `src/cd/CdDriver.c` itself). The preserved body below still
 > spelled the old names and was never rebuilt under the new ones, so its
 > 8/56 figure was carried forward UNVERIFIED (flagged by
 > `tools/stalesyms.py`). Corrected the four names, spliced the body into
-> `src/CdDriver.c` in place of the `INCLUDE_ASM`, and ran the real
+> `src/cd/CdDriver.c` in place of the `INCLUDE_ASM`, and ran the real
 > oracle: `build exit=0`; the function compiles one word (4 bytes) longer
 > than retail's 56, and `asm-differ` confirms it is the IDENTICAL
 > structural residue this report already documents -- retail places the
@@ -258,7 +258,7 @@ which case retry the whole outer loop again).
 ```c
 #if 0
 /* MethodsA34_179D8H and ObjA34_179D8H are ALREADY declared earlier in
- * src/CdDriver.c (current names: MethodsA34_179D8H::onError,
+ * src/cd/CdDriver.c (current names: MethodsA34_179D8H::onError,
  * ObjA34_179D8H::isOpen/pos) -- do not re-paste this typedef when splicing,
  * only the function body below. Shown here again only so this block reads
  * standalone. */
@@ -268,7 +268,7 @@ typedef struct MethodsA34_179D8H {
 } MethodsA34_179D8H;
 /* ObjA34_179D8H gets a `MethodsA34_179D8H *methods;` field at +0x000,
  * with the leading padding through +0xC unchanged in total size -- see
- * the struct definition already landed in src/CdDriver.c. */
+ * the struct definition already landed in src/cd/CdDriver.c. */
 
 /* CdControl/CdSync/CdRead/CdReadSync (was func_80028DF0/func_80028D68/
  * func_80029274/func_80029254): Sony's, linked from lib/libcd/sys.o since
@@ -388,7 +388,7 @@ order) needs more work, not that the first attempt was closer to done.
 ## Round 47 (2026-09-16), runner delta -- rebuilt in-tree, then permuter DECLINED on check (b)
 
 **Rebuild-before-trusting-the-score.** Spliced the preserved (round-36)
-body into `src/CdDriver.c` in place of the `INCLUDE_ASM` and ran the
+body into `src/cd/CdDriver.c` in place of the `INCLUDE_ASM` and ran the
 real oracle: `build exit=2`, no compile-error grep hits, `funcdiff.py`
 reads **8/56 raw word-match**, identical to the recorded figure.
 `build/lsdde.map` (`NoOp4 - ReadCdFile = 0xE4` = 57 words)
@@ -435,22 +435,22 @@ from check (b)), not as a spent, failed search.
 - **`func_80028A84` -> `ReadCdFile`, tier B.** Mechanics: if not open,
   dispatches the object's own error/failure slot and returns; otherwise
   loops issuing `CdControl`/`CdSync` then `CdRead`/`CdReadSync` to fill the
-  caller's buffer. Confirmed by `src/CdDriver.c`'s `CdDriver__Read`,
+  caller's buffer. Confirmed by `src/cd/CdDriver.c`'s `CdDriver__Read`,
   which calls this function directly when CD-async mode is off and
   otherwise reimplements the identical `CdRead`/`CdReadSync` retry loop for
   its async path. Paired with `OpenCdFile`/`CloseCdFile`/`GetCdFileSize`
   (also this unit) as an Open/Close/Size/Read quad.
 - `MethodsA34_179D8H::slot48` -> `onError` (tier B): the slot NUMBER (+0x48)
-  matches `src/CdDriver.c`'s own independent view
+  matches `src/cd/CdDriver.c`'s own independent view
   (`Methods80027480::slot48`), dispatched there on an unrelated
   allocation-failure path (`CdDriver__LoadFile`) -- two unrelated give-up paths
   at the identical offset. Not applied in `CdDriver.c` (out of unit);
   PROPOSED there under the same name. Recorded in full in
-  `src/CdDriver.c`'s own field comment and in `OpenCdFile.md`.
+  `src/cd/CdDriver.c`'s own field comment and in `OpenCdFile.md`.
 
 ## Proposed field names
 
-- `src/CdDriver.c`'s `Methods80027480::slot48` (its own independent
+- `src/cd/CdDriver.c`'s `Methods80027480::slot48` (its own independent
   local view of what appears to be the SAME table this unit calls through
   `MethodsA34_179D8H`) -> `onError`, tier B. Same evidence as above: two
   unrelated give-up paths (this unit's `ReadCdFile` on "not open",
@@ -489,7 +489,7 @@ CdSync result buffer `buf` is `syncResult`).
 ## Naming (round 99, echo, track 7)
 
 - Parameters `arg1`/`arg2` -> `buf`/`size`, tier A: `CdDriver__Read`
-  (`src/CdDriver.c`) passes its own `buf`/`size` straight through, and
+  (`src/cd/CdDriver.c`) passes its own `buf`/`size` straight through, and
   the body hands `buf` to `CdRead` and shifts `size` down to a sector count.
   `buf` is `void *`, as the caller's declaration has it (was `char *`; zero
   bytes changed).

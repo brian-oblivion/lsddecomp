@@ -18,7 +18,7 @@ the six assigned before `CdDriver__RunRequestQueue`.
 extern void FileResource__LoadFile(void);
 extern void *gCdSavedSeekParam;
 
-/* generic doubly-linked-list node, 0x24 bytes (src/CdDriver.c's own
+/* generic doubly-linked-list node, 0x24 bytes (src/cd/CdDriver.c's own
  * reading); only offset 0x0 is touched here -- declared LOCAL, per the
  * project's multiple-local-views convention. */
 typedef struct Node8008A894 {

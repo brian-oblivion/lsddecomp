@@ -54,7 +54,7 @@ source. Three independent pieces of evidence, two of them new this round:
    with `SetBMemPMgrBusy(1)` on entry and `SetBMemPMgrBusy(0)` on exit --
    visible as two `jal func_8001844C` in
    `asm/nonmatchings/BMemPMgr/BMemPMgrAlloc.s`.
-2. **New this round:** `func_800280EC` in `src/CdDriver.c` reads it
+2. **New this round:** `func_800280EC` in `src/cd/CdDriver.c` reads it
    through the getter and BAILS OUT -- `if (GetBMemPMgrBusy() != 0) return
    0;` -- before doing `VSyncCallback` work. So the flag is read by
    interrupt-time code specifically to avoid running while the allocator is

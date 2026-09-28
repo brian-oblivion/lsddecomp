@@ -11,7 +11,7 @@ diverge; second attempt (after fixing an if/else-if inversion) matched.
 
 ```c
 /* Local view of the object CdDriver__Close/EnqueueCdRequest/CloseCdFile read
- * through -- the real struct is ObjA34_179D8H (src/CdDriver.c), but that
+ * through -- the real struct is ObjA34_179D8H (src/cd/CdDriver.c), but that
  * type is that unit's own local reading, not a shared header, so this unit
  * carries its own minimal view of the two offsets it actually touches. */
 typedef struct Obj80027480 {
@@ -75,7 +75,7 @@ sibling blocks the compiler places first, driven purely by which one is the
 
 ## Struct note
 
-`self` is `ObjA34_179D8H` (see `src/CdDriver.c`), which this unit does
+`self` is `ObjA34_179D8H` (see `src/cd/CdDriver.c`), which this unit does
 not include -- that type is `CdDriver`'s own local reading, not a shared
 header. This unit's local view (`Obj80027480`) only names the two offsets
 this function touches (`unk0C` at +0xC, a `s32`; `unk28` at +0x28, a `u16`,

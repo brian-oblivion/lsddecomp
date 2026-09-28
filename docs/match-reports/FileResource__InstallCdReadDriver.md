@@ -66,10 +66,10 @@ letter-for-letter ("methods `Class__Method`, where `Class` is the struct's
 type name"). The rest of the name describes only confirmed MECHANICS: chain
 to `FileResource`'s own ctor, then overwrite `self->methods` with
 `GetCdDriverMethods()`'s table -- `gCdDriverMethods`, independently named
-elsewhere in the tree (`src/CdDriver.c`'s own header comment) as "the
+elsewhere in the tree (`src/cd/CdDriver.c`'s own header comment) as "the
 CD-ROM read driver", not a guess coined here. WHICH broader class or game
 subsystem this function itself belongs to (why a `FileResource` instance gets
-reclassified this way here, distinct from `src/CdDriver.c`'s own
+reclassified this way here, distinct from `src/cd/CdDriver.c`'s own
 confirmed ctor `CdDriver__CdDriver` for the same `gCdDriverMethods` class) is NOT
 established -- no caller is visible yet (only referenced from the
 still-uncarved `code_179d8` remainder) and this is flagged as such rather

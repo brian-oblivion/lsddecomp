@@ -10,7 +10,7 @@
  * queue, the file table and the module state its units share (track 4b,
  * round 85).
  *
- *   src/CdDriver.c      the whole class, in five parts:
+ *   src/cd/CdDriver.c      the whole class, in five parts:
  *                       1. New_CdDriver, the ctor (FileResource's ctor, then
  *                       InitCdDrive), Finalize, NoOpSlot40
  *                       2. Open, Close, Seek, NoOpSlot50, Read, LoadFile,
