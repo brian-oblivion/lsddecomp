@@ -619,3 +619,15 @@ four cases).
  * byte-exactness, not because it means anything; see the report for the
  * hand-lever history this replaced. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments' process text here,
+verbatim; the source keeps a one-line `MATCHING:` note or the API doc.
+
+From `src/graphics/scene_node.c`:
+
+```c
+ * MATCHING: the final `if (mid.y)` returns the same value on both arms; it
+ * is what makes the second recursive result be tested in $v0. */
+```

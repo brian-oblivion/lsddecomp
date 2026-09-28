@@ -893,3 +893,18 @@ Parameters `arg1`/`d` -> `corners`/`delta`. Locals: `list` -> `hull`, `v`/`end`
  * (retail stores every field every iteration), and the source compares
  * with `>` for a min so the slt operands load in retail's order. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments' process text here,
+verbatim; the source keeps a one-line `MATCHING:` note or the API doc.
+
+From `src/graphics/scene_node.c`:
+
+```c
+/* Moves every corner of the hull by `delta`, in place, and returns whether
+ * the box around the moved corners overlaps the box around all of the
+ * model's bounds records. MATCHING: every min/max is a ternary stored back
+ * each iteration, and a min compares with `>`: retail stores every field
+ * every time and loads the slt operands in this order. */
+```

@@ -1,51 +1,18 @@
 /*
- * SceneNode (include/scene_node.h): every method of the class, the table
- * getter, and the free vector and clipping helpers its methods call by
- * symbol, in ROM order: the occupants of gSceneNodeMethods' slots +0x000 to
- * +0x0B4, the getter, then the methods that sit in no slot and the helpers.
+ * SceneNode's methods (include/scene_node.h documents each), in the order
+ * of gSceneNodeMethods' slots +0x008 to +0x0B4, then the table getter, the
+ * methods in no slot, and the free vector, bit-field and box-clipping
+ * helpers they call.
  *
- * Lifecycle: New_SceneNode, the ctor (which allocates the node's
- * GsCOORDINATE2 and its GsCOORD2PARAM, and fails when either allocation
- * does) and Finalize (detach from parent and children, free both).
- *
- * Children: the BasicClass child-list overrides, which also link a TmdModel
- * child into the node's GsDOBJ2 when it is added and unlink it when it is
- * removed; OnNotify, which dispatches on the sender's class id; and the
- * walk over the children attached to this node (GetNextAttachedChild).
- *
- * Transform: Reset (identity), UpdateRotation and UpdateScale (set or add
- * three Ratio16s into the GsCOORD2PARAM), attach to and detach from a
- * parent's coordinate, and GetRotMatrix (the node's rotation, or its
- * negation, as a MATRIX).
- *
- * Attribute: nine setters over GsDOBJ2.attribute, SetDisplay to
- * SetBackClip, each replacing one libgs field through GetSetBitField and
- * returning its old value.
- *
- * The link test, both sides. A sender, on SCENENODE_EVENT_HULL_FIRST or
- * _LAST, fetches its model's hull (NotifyWithHull, GetModelHull), rotates it
- * by its world matrix and notifies its parents with it in notifyVerts
- * (TransformAndNotifyParents). A SceneNode receiving that runs
- * TryAttachNearby on the sender (DispatchLinkCommand): the hull, brought
- * into the receiver's frame (ComposeAndApplyRotation), must overlap the
- * model's bounds (CheckBoundsOverlap) and hit one of its faces
- * (RaycastHullAgainstFaces). On a hit the two record each other as
- * linkTarget, the sender through the SCENENODE_EVENT_LINKED the receiver
- * sends back. ClipSegmentToBox and BisectSegmentToBox clip a segment
- * against a box for it.
- *
- * Methods in no slot: RotateLocalVector and LocalOffsetToWorldPos (an
- * offset in the node's own frame, rotated into its parent's, or made a world
- * position), RaycastVertical (a vertical ray against the node's model),
- * GetRotationDegrees and FaceTarget (the rotation read, and aimed at another
- * node, as Ratio16 degrees), LinkModel and UnlinkModel (the TmdModel whose
- * TMD GsLinkObject4 links to the node's embedded GsDOBJ2).
- *
- * Helpers: SubVec3S16, RatioToFixed12 (a Ratio16 as 20.12 fixed point),
- * CalcBoxOutcode (ClipSegmentToBox's outcodes), GetSetBitField (behind the
- * attribute setters), ApplyMatrixToSVArray and ApplyMatrixToLVArray (a matrix
- * over an array of vectors), IsVec3WithinRange, and GetSetHitHeightGate (the
- * switch RaycastHullAgainstFaces reads).
+ * The link test runs across several of them. A sender, on a hull event,
+ * fetches its model's hull, rotates it by its world matrix and notifies its
+ * parents with it (NotifyWithHull, GetModelHull, TransformAndNotifyParents).
+ * A SceneNode receiving that runs TryAttachNearby on the sender
+ * (DispatchLinkCommand): the hull, brought into the receiver's frame
+ * (ComposeAndApplyRotation), must overlap the model's bounds
+ * (CheckBoundsOverlap) and hit one of its faces (RaycastHullAgainstFaces,
+ * over ClipSegmentToBox and BisectSegmentToBox). On a hit the two record
+ * each other as linkTarget.
  */
 #include "common.h"
 #include <libgte.h>
@@ -443,7 +410,7 @@ void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
     LongVec3 offset;
     TmdVec3 delta;
     s32 mag;
-    MATRIX unused; /* MATCHING: never read; retail's frame has these 32 bytes */
+    MATRIX unused; /* MATCHING: never read; it gives the stack frame these 32 bytes */
     TmdHull hull;
 
     if (self->model == NULL) {
@@ -507,7 +474,7 @@ z_done:
     delta.z = offset.z;
 
     hull.count = other->notifyVerts->count;
-    { /* MATCHING: the cached pointer orders the two loads as retail does */
+    { /* MATCHING: the cached pointer sets the order of the two loads */
         TmdHull *otherHull = other->notifyVerts;
         self->methods->composeAndApplyRotation(self, &delta, hull.v, otherHull->v,
                                                hull.count * HULL_BOX_CORNERS);
@@ -551,9 +518,8 @@ void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *vec, void *dst, v
 
 /* Moves every corner of the hull by `delta`, in place, and returns whether
  * the box around the moved corners overlaps the box around all of the
- * model's bounds records. MATCHING: every min/max is a ternary stored back
- * each iteration, and a min compares with `>`: retail stores every field
- * every time and loads the slt operands in this order. */
+ * model's bounds records. */
+/* MATCHING: every min/max a ternary stored back each iteration; a min compares with `>` */
 s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, TmdVec3 *delta) {
     TmdHull *hull;
     TmdVec3 *corner;
@@ -621,10 +587,8 @@ extern s32 sHitHeightGate;
  * of each box's first face to the second face are cast: a hit above
  * HIT_HEIGHT_THRESHOLD sets bit i of hitMask and bit k of *hullHits for box
  * k. Returns whether anything was hit. TmdModel__RaycastFaces writes the
- * nearest hit point to hitPoint.
- *
- * MATCHING: `hit` is only ever 0, but retail still tests it; the gate is
- * two arms that each set the bit; the centre loop walks pointers. */
+ * nearest hit point to hitPoint. */
+/* MATCHING: the test of the always-0 `hit`, the gate's two bit-setting arms, the centre loop's pointers */
 s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *hitPoint, TmdHull *hull) {
     TmdVec3 center[2];
     TmdVec3 *c;
@@ -639,7 +603,7 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *
     s32 j;
     s32 nearest;
     s32 height;
-    u8 pad[24]; /* MATCHING: never read; retail's frame has 24 bytes here */
+    u8 pad[24]; /* MATCHING: never read; it gives the stack frame these 24 bytes */
 
     nearest = DIST_NONE;
 
@@ -707,9 +671,8 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *
 /* Clips p1..p2 against `box` (enum ClipResult). With one end inside,
  * BisectSegmentToBox writes the crossing to `out` when it is non-NULL. With
  * both ends outside and not on the same side of any face, the segment is
- * halved and each half tried in turn, until it can no longer be halved.
- * MATCHING: the final `if (mid.y)` returns the same value on both arms; it
- * is what makes the second recursive result be tested in $v0. */
+ * halved and each half tried in turn, until it can no longer be halved. */
+/* MATCHING: the final if (mid.y) with two identical arms; a plain return adds a register move */
 s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2) {
     u8 code1;
     u8 code2;
@@ -831,8 +794,8 @@ void BisectSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *near, TmdVec3 *far) 
 void SceneNode__NoOpSlotB0(void) {}
 
 /* Adds this node as a child (addChild) to every parent of `node` that is
- * an Actor. MATCHING: the two nested do/while loops, not gotos: loop.c
- * then hoists SCENENODE_CLASS_ID into a saved register, as retail does. */
+ * an Actor. */
+/* MATCHING: two nested do/while loops, not gotos, so SCENENODE_CLASS_ID is hoisted out of them */
 void SceneNode__AddToActorParents(SceneNode *self, void *node) {
     SceneNode *parent;
     void *cursor;
@@ -877,8 +840,8 @@ void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src) {
 
 /* dst = `src` rotated by the node's rotation (as RotateLocalVector) plus the
  * node's world position, coord2->workm.t. A node with no parent reads the
- * position through NULL.
- * MATCHING: the parent test is repeated per axis; hoisting it changes the code. */
+ * position through NULL. */
+/* MATCHING: the parent test is repeated per axis; hoisting it changes the code */
 void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 unused) {
     MATRIX rot;
     long *worldPos;
@@ -898,8 +861,8 @@ void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 u
 
 /* out[i] = GsCOORD2PARAM.rotate's angle i (ONE to the turn) in degrees, over
  * 1: `* 45 >> 9` is `* 360 / ONE` reduced by 8, rounding down. The Ratio16[3]
- * shape FaceTarget builds and updateRotation takes.
- * MATCHING: num is written before den; retail's den-first order comes from the delay slot. */
+ * shape FaceTarget builds and updateRotation takes. */
+/* MATCHING: num is written before den; the scheduler puts each den store first */
 void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
     GsCOORD2PARAM *src;
 
@@ -914,8 +877,8 @@ void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
 
 /* Keeps `model`, a TmdModel, as the node's model, puts its TMD object in
  * GsDOBJ2.tmd, and has GsLinkObject4 link object 0 of the TMD to the node's
- * GsDOBJ2 (which starts at `attribute`).
- * MATCHING: the call re-reads self->model instead of using `model`. */
+ * GsDOBJ2 (which starts at `attribute`). */
+/* MATCHING: the call re-reads self->model instead of using `model` */
 void SceneNode__LinkModel(SceneNode *self, void *model) {
     self->model = model;
     self->tmd = (s32)((TmdModel *)model)->object;
@@ -940,13 +903,8 @@ extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
  * workm.t, as its own coord.t plus every ancestor's coord.t (translation
  * only). `target` less that position is rotated into the node's frame by
  * composeAndApplyRotation, and the ray runs from there RAYCAST_PROBE_LENGTH
- * along -y, then, on a miss, along +y.
- *
- * MATCHING, each measured (the report has the alternatives):
- *  - coord.t is copied as one LongVec3 assignment, not three;
- *  - the parent ternary is written twice per axis and reached by field;
- *  - the hit branch is written once per probe, inside the model test;
- *  - `node->workm.t != NULL` tests the array's address, as retail does. */
+ * along -y, then, on a miss, along +y. */
+/* MATCHING: one coord.t copy, the ternary twice per axis, one hit branch per probe, the workm.t test */
 s32 SceneNode__RaycastVertical(SceneNode *self, s32 *offset, s32 *target) {
     long *worldPos;
     SVECTOR origin;
@@ -1109,8 +1067,8 @@ s32 CalcBoxOutcode(TmdBox *box, TmdVec3 *point) {
 
 /* Replaces the `width` bits at bit `shift` of *word with `value` and returns
  * the field's old contents. The attribute setters of SceneNode, Sprite and
- * BoxFill wrap it.
- * MATCHING: the mask is built by a loop, not as (1 << width) - 1. */
+ * BoxFill wrap it. */
+/* MATCHING: the mask is built by a loop, not as (1 << width) - 1 */
 u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value) {
     u32 mask;
     s32 i;
@@ -1132,8 +1090,8 @@ u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value) {
 extern SVECTOR *ApplyMatrixSV(MATRIX *m, SVECTOR *v0, SVECTOR *v1);
 
 /* dst[i] = m * src[i] over `count` TmdVec3s, through ApplyMatrixSV (which
- * reads and writes an SVECTOR's first three). dst == src works in place.
- * MATCHING: each element is copied through an all-s16 struct (lwl/lwr, swl/swr). */
+ * reads and writes an SVECTOR's first three). dst == src works in place. */
+/* MATCHING: each element is copied whole through an all-s16 struct local */
 void ApplyMatrixToSVArray(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m) {
     TmdVec3 *end;
 
@@ -1149,8 +1107,8 @@ void ApplyMatrixToSVArray(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m) {
 }
 
 /* dst[i] = m * src[i] over `count` LongVec3s, through ApplyMatrixLV.
- * dst == src works in place.
- * MATCHING: the dead six-argument call sizes retail's outgoing-argument area. */
+ * dst == src works in place. */
+/* MATCHING: the dead six-argument call sizes the frame's outgoing-argument area */
 void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m) {
     LongVec3 *end;
 
@@ -1167,8 +1125,8 @@ void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m) {
     }
 }
 
-/* 1 when each component of `b` is within `range` of `a`'s, else 0.
- * MATCHING: the pointer bumps sit in the for's increment clause. */
+/* 1 when each component of `b` is within `range` of `a`'s, else 0. */
+/* MATCHING: the pointer bumps sit in the for's increment clause */
 s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b) {
     s32 i;
 

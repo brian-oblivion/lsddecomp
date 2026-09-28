@@ -483,3 +483,14 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * frame. Full derivation in docs/match-reports/ApplyMatrixToLVArray.md;
  * this is also why that call goes through an unprototyped function type. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments' process text here,
+verbatim; the source keeps a one-line `MATCHING:` note or the API doc.
+
+From `src/graphics/scene_node.c`:
+
+```c
+ * MATCHING: the dead six-argument call sizes retail's outgoing-argument area. */
+```

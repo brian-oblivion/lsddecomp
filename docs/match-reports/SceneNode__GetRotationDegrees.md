@@ -360,3 +360,14 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * (the compiler sinks the constant store into the delay slot itself).
  * See docs/match-reports/SceneNode__GetRotationDegrees.md. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments' process text here,
+verbatim; the source keeps a one-line `MATCHING:` note or the API doc.
+
+From `src/graphics/scene_node.c`:
+
+```c
+ * MATCHING: num is written before den; retail's den-first order comes from the delay slot. */
+```

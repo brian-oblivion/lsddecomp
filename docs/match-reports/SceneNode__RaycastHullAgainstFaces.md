@@ -606,3 +606,21 @@ corner strides 4 -> `HULL_FACE_CORNERS` (tmd_model.h). The redundant
  * equal constant-1 loads (savings 2) and hoists the 1 into $s1; Part 1 walks
  * `p`, `v` and `hi` as pointers. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments' process text here,
+verbatim; the source keeps a one-line `MATCHING:` note or the API doc.
+
+From `src/graphics/scene_node.c`:
+
+```c
+ * MATCHING: `hit` is only ever 0, but retail still tests it; the gate is
+ * two arms that each set the bit; the centre loop walks pointers. */
+```
+
+From `src/graphics/scene_node.c`:
+
+```c
+    u8 pad[24]; /* MATCHING: never read; retail's frame has 24 bytes here */
+```

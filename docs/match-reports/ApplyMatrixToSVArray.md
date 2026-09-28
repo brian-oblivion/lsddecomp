@@ -305,3 +305,14 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * are three s16 components, not the "32-bit value + trailing s16" the
  * former local `Rec6_d294` typedef guessed. Byte-identical either way. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments' process text here,
+verbatim; the source keeps a one-line `MATCHING:` note or the API doc.
+
+From `src/graphics/scene_node.c`:
+
+```c
+ * MATCHING: each element is copied through an all-s16 struct (lwl/lwr, swl/swr). */
+```

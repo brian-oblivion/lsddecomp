@@ -1017,3 +1017,21 @@ the same `slti 0x4001`). `* 8` -> `* HULL_BOX_CORNERS`. The slot it calls at
 ```
 
 (The first block sat between DispatchLinkCommand and this function.)
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments' process text here,
+verbatim; the source keeps a one-line `MATCHING:` note or the API doc.
+
+From `src/graphics/scene_node.c`:
+
+```c
+    MATRIX unused; /* MATCHING: never read; retail's frame has these 32 bytes */
+    { /* MATCHING: the cached pointer orders the two loads as retail does */
+```
+
+From `include/scene_node.h`:
+
+```c
+    /* +0x0A0 */ void (*tryAttachNearby)(Self *self); /* SceneNode__TryAttachNearby; its 2nd parameter arrives as the caller's untouched $a1 */ \
+```

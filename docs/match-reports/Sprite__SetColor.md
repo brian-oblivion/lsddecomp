@@ -30,3 +30,32 @@ A leaf that loads three signed bytes into three registers with `lb` and only the
 ## Track 4 (2026-09-25, round 82, alpha)
 
 Renamed from `func_8004229C`: +0x0B8 is Sprite's first own slot (the SceneNode table ends at +0x0B4), named `setColor` for this occupant, which writes GsSPRITE r,g,b. gTextRowMethods overrides it with TextRow__SetColor; StyleEffect__SpawnSprites passes it its colour triples. `Rgb_322b4` became `ColorRgb` (same all-s8 3-byte struct; the lever above still holds). And the class is unified as `Sprite` in `include/sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments' process text here,
+verbatim; the source keeps a one-line `MATCHING:` note or the API doc.
+
+From `include/draw_system.h`:
+
+```c
+/* An r, g, b colour as the game's objects keep and pass it: a sprite's,
+ * a box's, the background's, the ambient and flat lights', a viewport's
+ * clear and far colours. Three bytes, not Sony's four-byte CVECTOR.
+ * MATCHING: byte members give it size 3 and alignment 1, so a whole-struct
+ * copy, which is how its users copy it, is three lb then three sb. */
+typedef struct ColorRgb {
+    u8 r, g, b;
+} ColorRgb;
+```
+
+From `include/sprite.h`:
+
+```c
+/* libgs GsSPRITE, 0x24 bytes, field for field, with r,g,b as one ColorRgb.
+ * Kept local rather than Sony's GsSPRITE: Sprite__SetColor copies the colour
+ * as one ColorRgb (the whole-struct copy is what matches), and
+ * GetSetBitField takes `attribute` as a u32 *, where Sony's is unsigned long;
+ * Sony's type would cost a cast at each of those four sites to save the two
+ * in Viewport__DrawNode. */
+```

@@ -1,28 +1,16 @@
 /*
- * The sprite classes, and three small classes beside them.
- *
- * Sprites (include/sprite.h and its subclasses' headers): Sprite (class id
- * 0x44) is a SceneNode that draws an embedded GsSPRITE; ScreenSprite
- * (0x144) places it in screen space with a position and a pivot anchor;
- * CharSprite (0x1144) is one character of an 8x8 font, its texture cell
- * picked by a character code. Here are their allocators, ctors (each chains
- * to its parent's, installs its table, then calls reset), and the methods
- * each adds or overrides: texture binding (Sprite__Reset, InitGsSprite),
- * rotation, the display and semitransparency attribute bits, colour, screen
- * position and pivot, and the cell. GetCellRect is the free helper that turns
- * a character code into its cell in the font texture. TextRow and
- * VariantSprite are Sprite subclasses too, with their methods elsewhere.
- *
- * RequestedFile (include/requested_file.h, 0xB03): a FileResource that asks
- * the active data-source driver for one named file at construction and
- * records when it has arrived.
- *
- * FrameClock (include/frame_clock.h, 0x5): a BasicClass ticked once per
- * DrawSystem frame that counts frames and tells its parents whether it is
- * running, paused or stopped.
- *
- * LightRig (include/light_rig.h, 0x14): a SceneNode that owns three flat
- * lights and the ambient colour. StageMap inherits its getLight unchanged.
+ * The sprite classes, and three small classes beside them, each documented
+ * in its own header:
+ *  - Sprite (include/sprite.h), ScreenSprite (include/screen_sprite.h) and
+ *    CharSprite (include/char_sprite.h): allocators, ctors (each chains to
+ *    its parent's, installs its table, then calls reset) and the methods
+ *    each adds or overrides, with GetCellRect, the font-cell helper.
+ *    TextRow and VariantSprite derive from them, with methods elsewhere.
+ *  - RequestedFile (include/requested_file.h): one named file requested
+ *    from the active data-source driver.
+ *  - FrameClock (include/frame_clock.h): the per-frame clock.
+ *  - LightRig (include/light_rig.h): three flat lights and the ambient
+ *    colour.
  */
 #include "common.h"
 #include <libgte.h>
@@ -273,12 +261,13 @@ s32 Sprite__SetSemiTransRate(Sprite *self, s32 rate) {
     return GetSetBitField(&self->sprite.attribute, SPRITE_ATTR_RATE_SHIFT, 2, rate);
 }
 
-/* gTextRowMethods and gCharSpriteMethods slot +0x098 (update): empty override. */
+/* Slot +0x098 (update) of every sprite class's table but VariantSprite's: empty override. */
 void Sprite__Update(Sprite *self, void *sender, s32 event) {}
 
 /* Slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gVariantSpriteMethods (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
 void Sprite__SetColor(Sprite *self, ColorRgb *rgb) {
+    /* MATCHING: ColorRgb is three u8s, so this whole-struct copy moves exactly three bytes */
     self->sprite.rgb = *rgb;
 }
 

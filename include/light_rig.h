@@ -3,14 +3,16 @@
 
 #include "scene_node.h"
 
-/*
- * LightRig -- a scene node that owns the flat lights and the ambient colour
- * (class id 0x14, method table gLightRigMethods): SceneNode's subclass.
- * Methods in src/graphics/sprite.c. The name is for what the class's own methods
- * do, and the evidence is this:
+/**
+ * @file light_rig.h
+ * @brief LightRig, the scene node that owns the three flat lights and the
+ *        ambient colour.
+ *
+ * The name is for what the class's own methods do, and the evidence is this:
  *  - The ctor makes three FlatLightObj children (New_FlatLightObj(0), (1),
- *    (2): one Psy-Q flat light each, set through GsSetFlatLight; src/
- *    flat_light_obj.c), keeps them in `lights` and adds each as a child.
+ *    (2): one Psy-Q flat light each, set through GsSetFlatLight;
+ *    include/flat_light_obj.h), keeps them in `lights` and adds each as a
+ *    child.
  *  - Finalize fetches the same three through getLight (+0x0B8) and releases
  *    each before SceneNode's finalize.
  *  - setAmbientColor (+0x0BC) stores an r,g,b in `ambient` and hands it,
@@ -22,36 +24,25 @@
  *
  * Who holds one: IntermediateBase__Init makes one with New_LightRig() when
  * its init args bring none (IntermediateBase's +0x014) and, in mode 0, adds
- * its FrameClock object (+0x010) to it as a child. One class derives from
- * it: StageMap (gStageMapMethods, 0x114, the grid manager), whose ctor and
- * finalize chain to this class's first and whose table inherits getLight
- * unchanged; it expands these macros (include/stage_map.h).
- *
- * The ctor chains to SceneNode's (GetSceneNodeMethods()->ctor), so the id
- * tree (0x4 -> 0x14) is the ctor chain. The ctor returns nothing, but the
- * slot keeps SceneNode's `void *` ctor type: no caller of this class's ctor
- * reads $v0 (New_LightRig returns the allocation, StageMap__StageMap
- * discards it), so the two spellings compile alike.
- *
- * The object is 0x54 bytes (New_LightRig): `lights` at +0x044 and `ambient`
- * at +0x050, then one byte of word padding. StageMap names nothing of its
- * own in +0x044..+0x054 (its first own field, `origin`, is at +0x054).
+ * its FrameClock object (+0x010) to it as a child.
  */
 
 typedef struct LightRig LightRig;
 typedef struct LightRigMethods LightRigMethods;
 
-/* SceneNode's slots, then this class's own. `tools/classtable.py
- * gLightRigMethods --vs gSceneNodeMethods` lists the overrides of the
- * inherited ones (LightRig__LightRig, __Finalize, __Reset,
- * __DispatchLinkCommand). */
+/**
+ * SceneNode's slots, then LightRig's own, for LightRigMethods and StageMap's
+ * table to expand first. gLightRigMethods overrides the ctor, finalize,
+ * reset and dispatchLinkCommand with the LightRig__ methods below.
+ */
 /* clang-format off */
 #define LIGHTRIG_SLOTS(Self, CtorParams)                                                           \
     SCENENODE_SLOTS(Self, CtorParams);                                                            \
-    /* +0x0B8 */ BasicClass *(*getLight)(Self *self, s32 index); /* LightRig__GetLight: lights[index]; StageMap inherits it */ \
-    /* +0x0BC */ void (*setAmbientColor)(Self *self, ColorRgb *rgb, s32 swap) /* LightRig__SetAmbientColor; swap: the old colour comes back in *rgb */
+    /* +0x0B8 */ BasicClass *(*getLight)(Self *self, s32 index); /* LightRig__GetLight; StageMap inherits it */ \
+    /* +0x0BC */ void (*setAmbientColor)(Self *self, ColorRgb *rgb, s32 swap) /* LightRig__SetAmbientColor */
 /* clang-format on */
 
+/** SceneNode's fields, then LightRig's own, for StageMap to expand first. */
 /* clang-format off */
 #define LIGHTRIG_FIELDS(Methods)                                                                   \
     SCENENODE_FIELDS(Methods);                                                                    \
@@ -59,25 +50,91 @@ typedef struct LightRigMethods LightRigMethods;
     /* +0x050 */ ColorRgb ambient    /* setAmbientColor; GsSetAmbient gets each << 4. The object is 0x54 bytes (New_LightRig) */
 /* clang-format on */
 
+/** LightRig's method table: LIGHTRIG_SLOTS with its ctor parameters. */
 struct LightRigMethods {
     LIGHTRIG_SLOTS(LightRig, (LightRig * self));
 };
 
+/**
+ * LightRig: a SceneNode owning three flat lights and the ambient colour.
+ * Class id 0x14, table gLightRigMethods, parent SceneNode, whose ctor it
+ * chains to first; methods in src/graphics/sprite.c. One class derives from
+ * it: StageMap (0x114, the grid manager, include/stage_map.h), whose ctor
+ * and finalize chain to this class's and whose table inherits getLight
+ * unchanged. The object is 0x54 bytes (New_LightRig): `lights` at +0x044,
+ * `ambient` at +0x050, then one byte of word padding; StageMap's first own
+ * field is at +0x054.
+ *
+ * The ctor returns nothing, but the slot keeps SceneNode's `void *` ctor
+ * type; no caller of this class's ctor reads a result (New_LightRig returns
+ * the allocation, StageMap__StageMap discards it).
+ */
 struct LightRig {
     LIGHTRIG_FIELDS(LightRigMethods);
 };
 
+/** LightRig's method table (class id 0x14). */
 extern LightRigMethods gLightRigMethods;
-extern LightRigMethods *GetLightRigMethods(void); /* returns &gLightRigMethods */
 
-/* The occupants of gLightRigMethods this class owns, in slot order. The
- * inherited ones are SceneNode's and BasicClass's (their headers). */
+/**
+ * @brief The LightRig method table.
+ * @return &gLightRigMethods.
+ */
+extern LightRigMethods *GetLightRigMethods(void);
+
+/**
+ * @brief Allocates a LightRig and runs its ctor through the table.
+ * @return The new rig with its three lights, or NULL when the allocation
+ *         fails.
+ */
 LightRig *New_LightRig(void);
+
+/**
+ * @brief Constructor (slot +0x008): SceneNode's ctor, installs
+ *        gLightRigMethods, makes the three flat lights (New_FlatLightObj(0..2))
+ *        and adds each as a child, then calls reset.
+ * @param self The rig.
+ */
 void LightRig__LightRig(LightRig *self);
+
+/**
+ * @brief Finalizer (slot +0x00C): releases the three lights (fetched through
+ *        getLight), then SceneNode's finalize.
+ * @param self The rig.
+ */
 void LightRig__Finalize(LightRig *self);
+
+/**
+ * @brief Reset (slot +0x040): clears coord2->flg so libgs recomputes the
+ *        coordinate; the transform is left as it is.
+ * @param self The rig.
+ */
 void LightRig__Reset(LightRig *self);
+
+/**
+ * @brief dispatchLinkCommand (slot +0x09C): empty, so a rig takes no part in
+ *        the link test.
+ * @param self The rig.
+ * @param sender The SceneNode that sent the event.
+ * @param event The event.
+ */
 void LightRig__DispatchLinkCommand(LightRig *self, void *sender, s32 event);
+
+/**
+ * @brief getLight (slot +0x0B8): one of the three flat lights.
+ * @param self The rig.
+ * @param index 0..2; not checked.
+ * @return lights[index], a FlatLightObj.
+ */
 BasicClass *LightRig__GetLight(LightRig *self, s32 index);
+
+/**
+ * @brief setAmbientColor (slot +0x0BC): sets the ambient colour and hands it
+ *        to GsSetAmbient, each channel << 4 (0..255 to 0..4080 of ONE).
+ * @param self The rig.
+ * @param rgb The new colour; with `swap`, receives the old one.
+ * @param swap Non-zero to return the old colour in *rgb.
+ */
 void LightRig__SetAmbientColor(LightRig *self, ColorRgb *rgb, s32 swap);
 
 #endif
