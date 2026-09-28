@@ -1241,7 +1241,7 @@ void ApplyStyleDecorationIfSet(void) {
  *    built from one parameter block, gStyleSpawnOffsetX..gStyleSpawnColors,
  *    that StyleFillEffectKindN and SetupStyleSpawnParamsRandom/B fill in; each
  *    tick updates them with the target position;
- *  - two positional sound cues (gStyleCueSlots, in gStyleCueSlotPool): a
+ *  - two positional sound cues (gStyleCueSlots, in sStyleCueSlotPool): a
  *    free slot claims the next record of the stage's cue list that lies
  *    within its cue's distance of the target and starts the record's
  *    SoundCueSet callback (sStyleCueCallbacks, next section); a claimed
@@ -1948,7 +1948,7 @@ extern void StyleUpdateDecorSet(void);
 extern void StyleScrollVramStrips(void);
 extern s32 gStyleTickCount;
 extern s32 sStyleCueRecordIndex;
-extern StyleCueSlot gStyleCueSlotPool[];
+extern StyleCueSlot sStyleCueSlotPool[];
 extern StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *target, void *unused);
 extern s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused);
 
@@ -1983,7 +1983,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
             i++;
             i--;
         } else {
-            gStyleCueSlots[i] = TryStartStyleCue(&gStyleCueSlotPool[i], &lastCue, target, unused);
+            gStyleCueSlots[i] = TryStartStyleCue(&sStyleCueSlotPool[i], &lastCue, target, unused);
         }
     }
     return lastCue;
