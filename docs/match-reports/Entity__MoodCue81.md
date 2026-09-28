@@ -353,7 +353,7 @@ into `src/Entity_e.c` in place of the current `INCLUDE_ASM`):
 
 ```c
 #if 0
-extern u8 SCALE_EIGHT_SEVENTHS[];
+extern u8 sScaleEightSevenths[];
 
 void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
@@ -382,7 +382,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
-            this->methods->slot48(this, 0, SCALE_EIGHT_SEVENTHS);
+            this->methods->slot48(this, 0, sScaleEightSevenths);
             mod = -0x176;
             if (this->methods->slot144(this, this->unk94) < 0x200) {
                 this->methods->slot160(this);
@@ -649,7 +649,7 @@ current `INCLUDE_ASM`):
 
 ```c
 #if 0
-extern u8 SCALE_EIGHT_SEVENTHS[];
+extern u8 sScaleEightSevenths[];
 
 void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
@@ -677,7 +677,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
-            this->methods->slot48(this, 0, SCALE_EIGHT_SEVENTHS);
+            this->methods->slot48(this, 0, sScaleEightSevenths);
             mod = -0x176;
             if (this->methods->slot144(this, this->unk94) < 0x200) {
                 this->methods->slot160(this);
@@ -791,7 +791,7 @@ the report's original best-reached body above, which closed neither):
 
 ```c
 #if 0
-extern u8 SCALE_EIGHT_SEVENTHS[];
+extern u8 sScaleEightSevenths[];
 
 void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
     s32 mod;
@@ -819,7 +819,7 @@ void Entity__MoodCue81(Entity *this, EntityMoodHandlerArg *out) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         mood = this->unk44;
         if (mood == 1) {
-            this->methods->slot48(this, 0, SCALE_EIGHT_SEVENTHS);
+            this->methods->slot48(this, 0, sScaleEightSevenths);
             mod = -0x176;
             if (this->methods->slot144(this, this->unk94) < 0x200) {
                 this->methods->slot160(this);

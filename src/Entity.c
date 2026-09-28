@@ -2171,7 +2171,7 @@ void Entity__MoodCue81(Entity *this, SoundCueSet *out) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         state = this->state;
         if (state == 1) {
-            this->methods->updateScale(this, 0, SCALE_EIGHT_SEVENTHS);
+            this->methods->updateScale(this, 0, sScaleEightSevenths);
             dz = -374;
             if (this->methods->distanceToPeer(this, this->peer) < 512) {
                 this->methods->deactivate(this);
