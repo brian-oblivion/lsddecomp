@@ -1,6 +1,6 @@
 /*
- * BMemPMgr -- the game's pool allocator and the first half of BasicClass,
- * two things that share this file:
+ * BMemPMgr -- the game's pool allocator and BasicClass's methods, two
+ * things that share this file:
  *
  *  - The BMemPMgr pool allocator, the game's general-purpose allocator.
  *    BMemPMgrInit mallocs one area, a BMemPMgr header followed by the pool's
@@ -32,6 +32,7 @@ extern BMemPMgr *sDefaultBMemPMgr;
  * malloc-failure message. */
 extern char sBMemPMgrInitFailFmt[];
 
+/* MATCHING: bmem_pmgr.h declares this without a prototype, so main() can pass its dead second argument. */
 void *BMemPMgrInit(s32 poolSize) {
     BMemPMgr *pool;
 
@@ -315,8 +316,7 @@ void BasicClass__RemoveAllChildren(BasicClass *self) {
     BasicClass **childPtr;
     BasicClassListNode *cursor;
 
-    /* MATCHING: the named childPtr and the if/do-while with comma tests keep
-     * &child in one saved register and the loop body first. */
+    /* MATCHING: the named childPtr and the comma-tested if/do-while keep the loop's register and order. */
     childPtr = &child;
     cursor = self->children;
     if (GetNextBasicClass(childPtr, &cursor), child != NULL) {

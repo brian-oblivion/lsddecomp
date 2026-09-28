@@ -161,3 +161,10 @@ each until exhausted.
 
 The named `childPtr` and the `if`/`do`-`while` with comma tests (levers 1 and 2
 above) carry one `/* MATCHING: */` line in the source.
+
+## History (moved from src/app/bmem_pmgr.c, track 12)
+
+The `MATCHING:` note in the source was two lines; it is now one, and the
+full text is kept here:
+
+> MATCHING: the named childPtr and the if/do-while with comma tests keep &child in one saved register and the loop body first.

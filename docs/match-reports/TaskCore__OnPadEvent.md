@@ -159,3 +159,14 @@ The cases now read `PAD_EVENT_PRESSED + PAD_BUTTON_*` (include/pad.h):
 0x17 Rdown (cross) -> onPadCancel, 0x19 Rright (circle) -> onPadConfirm.
 The gate is `inputMode != TASKCORE_INPUT_NONE`. Case order is unchanged
 (the residue above) and carries a MATCHING line. Byte-identical.
+
+## History (moved from include/task_core.h, track 12)
+
+The comment over TASKCORE_SLOTS' +0x074..+0x084 read:
+
+> +0x074..+0x084: onPadEvent's cases. Called with self alone: $a1 still
+> holds the sender at that call, but no occupant in any of the four tables
+> reads it, and StreamTask's overrides up-call with self only.
+
+The header keeps the API half ("called with self alone: no occupant in any
+TaskCore table reads the sender").

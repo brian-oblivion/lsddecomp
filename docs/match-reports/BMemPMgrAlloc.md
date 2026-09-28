@@ -782,3 +782,15 @@ list (SetupBMemPMgrFreeList, BMemPMgrFree, the split remainder) and cleared
 when BMemPMgrAlloc takes one; `BMEM_PREV_FREE` 0x80000000 is set on the block
 above a freed one and on the sentinel, cleared on the block above an allocated
 one, and tested by BMemPMgrFree before it reads the lower neighbour's footer.
+
+## History (moved from include/bmem_pmgr.h, track 12)
+
+The header's declaration read:
+
+> `extern void *BMemPMgrAlloc(s32 size); /* arity-ok: the body reads $a1 as the fallback pool (BMemPMgrAlloc.md) */`
+
+with the block above it: "bmem_pmgr.c defines both K&R with a second
+parameter, a fallback pool read only while sDefaultBMemPMgr is unset, that
+no caller passes, so it must not see these one-argument prototypes.
+BMemPMgrFree always returns NULL." The register detail is this report's
+(above); the header keeps the arity-ok marker without it.

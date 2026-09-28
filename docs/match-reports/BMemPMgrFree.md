@@ -419,3 +419,11 @@ list (SetupBMemPMgrFreeList, BMemPMgrFree, the split remainder) and cleared
 when BMemPMgrAlloc takes one; `BMEM_PREV_FREE` 0x80000000 is set on the block
 above a freed one and on the sentinel, cleared on the block above an allocated
 one, and tested by BMemPMgrFree before it reads the lower neighbour's footer.
+
+## History (moved from include/bmem_pmgr.h, track 12)
+
+The header's declaration read:
+
+> `extern void *BMemPMgrFree(void *ptr); /* arity-ok: same as BMemPMgrAlloc (BMemPMgrFree.md) */`
+
+See BMemPMgrAlloc.md's section of the same name for the shared comment.

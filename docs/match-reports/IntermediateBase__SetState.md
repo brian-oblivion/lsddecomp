@@ -496,3 +496,10 @@ comment it replaced, verbatim:
  * it carried after the methods load was retired in round 89: removing it
  * left the object byte-identical. */
 ```
+
+## History (moved from src/app/task.c, track 12)
+
+The `MATCHING:` note in the source was two lines; it is now one, and the
+full text is kept here:
+
+> MATCHING: the two state hooks are ONE call through a slot picked per arm; two direct calls give self a sixth reference and swap $s0/$s1.

@@ -282,7 +282,7 @@ s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
     return self->result;
 }
 
-/* Hangs the slot widgets and the BgLayer under the light rig (unk14), sets the
+/* Hangs the slot widgets and the BgLayer under the light rig, sets the
  * fade-in colour, clears the default movie frame (no sub handle) and then the
  * screen to baseColor, and configures and opens the viewport's OT.
  * initArgs->drawSystem and the viewport are `BasicClass *` fields, cast to
@@ -332,7 +332,7 @@ void TaskCore__OnDeinit(TaskCore *self) {
 
 /* Section 1. TaskCore's own methods from +0x058 to +0x0C0: the pad
  * dispatch and its five button handlers, the state machine (update and
- * setState), the frame bound, the sound call, the view callback and the
+ * setState), the frame bound, the sound call, the exit callback and the
  * fade-in/fade-out pair. Each is the default for its slot in
  * gTaskCoreMethods, which StreamTask, TitleMenu and GraphRoom inherit or
  * override; include/task_core.h's banner describes the class and its states.
@@ -579,8 +579,8 @@ void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable) {
 }
 
 /* baseColor is where the fade-in starts; clearColor is what onDeinit clears the
- * screen to (TaskCore__Reset's defaults: black, black, 128 grey).
- * MATCHING: whole-ColorRgb copies are three lb then three sb; per-byte copies load with lbu. */
+ * screen to (TaskCore__Reset's defaults: black, black, 128 grey). */
+/* MATCHING: whole-ColorRgb copies; per-byte copies load each byte unsigned. */
 void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *clear, u8 *color96) {
     *(ColorRgb *)self->baseColor = *(ColorRgb *)base;
     *(ColorRgb *)self->clearColor = *(ColorRgb *)clear;
@@ -634,26 +634,9 @@ epilogue:
 }
 
 /*
- * Section 2. TaskCore's menu methods, gTaskCoreMethods +0x0C4 to +0x11C
- * (the class is include/task_core.h): the fade-out tick, the sub handle, and
- * a two-level picker over the menu description in `target`, a
- * TaskCoreTarget.
- *
- * The first level is the slots. setTarget makes one TextRow per
- * target->names entry (slotElements); findNextFreeSlot/findPrevFreeSlot step,
- * wrapping, to the next slot whose hiddenSlots entry is NULL; and
- * setActiveSlot moves the highlight from unselectedColor to selectedColor.
- * A slot whose target->slotLists entry is non-NULL also has a list of items,
- * a TaskCoreItemList: createSlotElements makes its rows (itemLists,
- * itemCounts) and starts its cursor (itemCursors) at savedCursor.
- *
- * The second level scrolls that list. beginElementScroll (inputMode
- * CHOOSING_SLOT to SCROLLING) shows every row with listView's frame behind
- * them and the cursor's row in cursorColor; advanceSlotCursor/
- * retreatSlotCursor move the cursor, wrapping, through setSlotCursor;
- * commitElementScroll keeps the cursor in savedCursor and leaves only its
- * row shown, cancelElementScroll goes back to savedCursor. The list is laid
- * out so that the cursor's row sits at TaskCoreItemList::pos.
+ * Section 2. TaskCore's menu methods, gTaskCoreMethods +0x0C4 to +0x11C: the
+ * fade-out tick, the sub handle, and the two-level picker over the menu
+ * description in `target` (include/task_core.h, TaskCore's "picker").
  */
 
 /* New_BoxFill's size and colour for listView: (320, 240), (32, 32, 64). */
@@ -677,8 +660,8 @@ struct TaskCoreItemList {
     ColorRgb cursorColor; /* +0x008 the colour of the item under the cursor while scrolling */
     u8 pad00B[5];
     /* +0x010 where the cursor's row is drawn; the list starts savedCursor rows
-     * above. MATCHING: a struct, so the copy is lw/lw, sw/sw, then a reload of
-     * .y (CommitElementScroll); two s32 fields compile differently. */
+     * above. */
+    /* MATCHING: a struct, so CommitElementScroll copies it whole and reloads .y; two s32 fields do not. */
     ScreenSpritePos pos;
     char **itemNames; /* +0x018 NULL-terminated; one New_TextRow per name */
 };
@@ -1280,8 +1263,7 @@ void IntermediateBase__IncrementFrameCounter(IntermediateBase *self) {
     self->frameCounter++;
 }
 
-/* MATCHING: the two state hooks are ONE call through a slot picked per arm;
- * two direct calls give self a sixth reference and swap $s0/$s1. */
+/* MATCHING: the two state hooks are ONE call through a slot picked per arm; two calls change registers. */
 void IntermediateBase__SetState(IntermediateBase *self, s32 state) {
     IntermediateBaseMethods *methods;
     void (*fn)(IntermediateBase *);
@@ -1390,30 +1372,10 @@ void Viewport__RemoveAllChildren(Viewport *self) {
 
 /*
  * Section 4. Viewport's methods from onNotify (+0x038) to the end of
- * gViewportMethods (include/viewport.h, whose banner says what the class
- * is); the ctor, finalize and the child overrides are in section 3,
- * drawNode in viewport_draw.c. In table order:
- *  - onNotify and its two per-sender handlers: a FrameClock event runs
- *    update, the DrawSystem's VSync event runs flip;
- *  - initDefaults and the field setters (screen size, OT length, packet
- *    count and size, which only take before initOt, projection, light
- *    mode, clear and far colours, fog near); four slots hold empty bodies;
- *  - attachViewChild/detachViewChild and the setters of the GsRVIEW2 that
- *    GsSetRefView2 takes (viewpoint, reference point, twist);
- *  - initOt/deinitOt: one allocation holding both halves of the
- *    double-buffered GsOT, each a header, its tags and its packet area;
- *  - update, per frame: projection, near clip, light mode and fog, the
- *    reference view, then this half's packet area and cleared OT, and the
- *    scene drawn into it;
- *  - flip: takes the buffer index from the DrawSystem, swaps, sorts the
- *    clear into the OT and draws it;
- *  - setFadeBox/getFadeBox and two flag setters.
- * Then the table getter, GetRootNode (update's helper) and Sony's
- * GsSetProjection.
- *
- * refView is viewport.h's ViewportRefView, GsRVIEW2's layout with vp and vr
- * as vectors (its comment says why), hence the (GsRVIEW2 *) cast at
- * GsSetRefView2.
+ * gViewportMethods, in table order (include/viewport.h documents the class);
+ * the ctor, finalize and the child overrides are in section 3, drawNode in
+ * viewport_draw.c. Then the table getter, GetRootNode (update's helper) and
+ * Sony's GsSetProjection.
  */
 
 /* Forwards to the base onNotify, then dispatches on the sender's class-id
@@ -1435,8 +1397,7 @@ void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
 extern s32 sDefaultViewportWidth;
 extern s32 sDefaultViewportHeight;
 extern ColorRgb sDefaultViewportColor;
-/* MATCHING: a second name for the same symbol, so cc1 cannot share one
- * address computation between the two copies; retail loads it twice. */
+/* MATCHING: a second name for the same symbol, so its address is computed twice. */
 extern ColorRgb sDefaultViewportColorAlias __asm__("sDefaultViewportColor");
 
 /* InitDefaults' values. The OT has 1 << VIEWPORT_DEFAULT_OT_LENGTH (8192)
@@ -1582,8 +1543,7 @@ void Viewport__NoOpSlot88(void) {}
 void Viewport__InitOt(Viewport *self) {
     s32 size;
     s32 buf;
-    /* MATCHING: written inline, the constant reassociates out of the sum and
-     * the final addu/addiu pair swaps. */
+    /* MATCHING: written inline, the constant reassociates out of the sum. */
     s32 hdrSize = sizeof(GsOT);
 
     if (self->otReady != 0) {

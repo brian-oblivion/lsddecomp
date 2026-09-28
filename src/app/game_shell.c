@@ -1,30 +1,13 @@
 /*
- * game_shell.c -- two classes, in ROM order: GameApplication,
- * the game's Application, and FileResource, the base of everything loaded
- * from a file, with the active-data-source layer and the data directory.
- *
- * GameApplication (include/game_application.h, which documents the class):
- * its allocator and ctor, the RNG seed and initSystems overrides, then the
- * hooks Application__RunMainLoop calls, each with the helpers it uses:
- *  - ShowIntroLogos: ETC\ASMKLOGO.TIM, the ETC\ASMK.STR movie, ETC\OSDLOGO.TIM
- *    (ShowImage for each image);
- *  - PlayOpeningMovie: one of the opening movies, at random;
- *  - RunTitleMenu: the day's GraphRoom (and PlaySpecialDayMovies when it
- *    scored), then the TitleMenu, and GraphRoom again whenever the menu's
- *    GRAPH is chosen (RunTask runs each);
- *  - RunDayTask: one day (a DayTask), then the cinematic DreamSys holds
- *    (PlayCinematic); nonzero once a year has gone by;
- *  - PlayEndingMovie: ETC\ENDING.STR.
- * Every hook but RunDayTask first calls SetActiveDataSourceDriverMode(0, 0,
- * 0). Every task is handed the Application's `aux` as its
- * IntermediateBaseInitArgs, runs to its end inside init, and is released. A
- * movie is a StreamTask given the path and movie id game_files.c's getters
- * return, the id turned into a frame count by GetMovieFrameCount; an image is
- * a TaskCore showing the TIM. Every movie but the intro's is gated by
- * config->playStreams. GetGameApplicationMethods, the table's getter, ends
- * the class.
- *
- * FileResource (include/file_resource.h): see the section banner below.
+ * game_shell.c -- two classes, in address order, and the layer on top of the
+ * second:
+ *  - GameApplication (include/game_application.h, which documents the class
+ *    and the order its hooks run in): its allocator and ctor, the RNG seed
+ *    and initSystems overrides, then each hook Application__RunMainLoop
+ *    calls, with the helpers it uses, and the table getter;
+ *  - FileResource (include/file_resource.h), the base of everything loaded
+ *    from a file, then the active-data-source layer and the data directory
+ *    (include/data_source.h).
  */
 #include "common.h"
 #include <libgte.h>
@@ -64,8 +47,7 @@ typedef IntermediateBase *(*NewTaskFn)(struct DreamSys *dreamSys);
 s32 GameApplication__RunTask(NewTaskFn newTask, struct DreamSys *dreamSys,
                              IntermediateBaseInitArgs *initArgs);
 
-/* MATCHING: the NULL path falls off the end; any explicit return there costs
- * an instruction (BMemPMgrAlloc's NULL is already in $v0). */
+/* MATCHING: the NULL path falls off the end; an explicit return there costs an instruction. */
 GameApplication *New_GameApplication(GameApplicationConfig *config) {
     GameApplication *self = BMemPMgrAlloc(sizeof(GameApplication));
 
@@ -80,8 +62,7 @@ GameApplication *New_GameApplication(GameApplicationConfig *config) {
  * ETC\DREAME5.TMD, config->dreamSysConfigOption handed to it, then the RNG seeded through
  * +0x040 (GameApplication__SeedRandom). */
 void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *config) {
-    /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
-     * frame by 8. */
+    /* MATCHING: mode is never set, but a bare ResourceSource shrinks the frame by 8. */
     ResourceRequest req;
 
     GetApplicationMethods()->ctor((Application *)self, config->dataSource);
@@ -129,7 +110,7 @@ void GameApplication__ShowIntroLogos(GameApplication *self) {
     }
 }
 
-/* Shows the TIM at `path` in a TaskCore (frame bound 0); its view callback,
+/* Shows the TIM at `path` in a TaskCore (frame bound 0); its exit callback,
  * run as the image ends, registers the game's files. */
 void GameApplication__ShowImage(GameApplication *self, const char *path) {
     TaskCore *task = New_TaskCore(0, 0, 0);
@@ -142,7 +123,7 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
     task->methods->release(task);
 }
 
-/* ShowImage's view callback: registers sRecordTable's files with the CD
+/* ShowImage's exit callback: registers sRecordTable's files with the CD
  * driver. */
 s32 GameApplication__RegisterFilesCallback(void) {
     return RegisterRecordTableFiles(0);
@@ -337,30 +318,10 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
 }
 
 /*
- * FileResource's own methods, the active-data-source dispatch
- * layer on top of them, and the data directory that CD paths are built in.
- *
- * FileResource (include/file_resource.h) is the base of every class the
- * game loads from a file: a BasicClass subclass owning one file buffer
- * (FileResource__LoadFile reads a whole named file into it, FreeBuffer
- * releases it) and declaring the file-I/O interface that the CD driver
- * (gCdDriverMethods, include/cd_driver.h) and the null driver
- * (gNullDriverMethods, include/null_driver.h) implement.
- *
- * sActiveDataSource selects one of those two drivers. SetActiveDataSource
- * installs one and copies its interface slots into FileResource's table and
- * into every client table. The Lock/Unlock, IsBusy/Idle, Get.../Set...
- * functions after it forward to the CD driver when it is active, and
- * otherwise do nothing, return a fixed value or call the null driver.
- * RegisterFileTableEntries appends CdFileEntry records to the CD driver's
- * file table and resolves them.
- *
- * SetDataDirectory/GetDataDirectory hold the directory that BuildCdFilePath
- * and CdStream__Open put between the root `\` and a file name. It is "" until
- * GameApplication's ctor installs "CDI\". BuildFileName joins an optional
- * directory, a name and an extension. ResourceRequest__Set fills the
- * {buffer, name, mode} descriptor the resource classes' ctors take. strcat,
- * which BuildFileName calls, is Sony's libc2 object, linked after this file.
+ * FileResource's own methods (include/file_resource.h), then the
+ * active-data-source layer on top of them and the data directory CD paths
+ * are built in (include/data_source.h). strcat, which BuildFileName calls,
+ * is Sony's libc2 object, linked after this file.
  */
 
 /* sActiveDataSource's two observed values are the header words of the two
