@@ -112,10 +112,10 @@ s32 GetBMemPMgrBusy(void) {
  * the object's flags word, which SetupPrimCode ORs into the GPU command
  * byte's shade-texture bit 0x1 (Psy-Q's SetShadeTex); it keeps its address
  * name because it is bss past the image end, where rename.py cannot reach
- * (the proposed name is in SetupPrimCode.md). D_80090C18 is the default ndiv
+ * (the proposed name is in SetupPrimCode.md). sSortNdiv is the default ndiv
  * from bits 9-11. */
 extern s32 sSortLightOff;              /* GsLOFF */
-extern s32 D_80090C18;              /* GsDIV1..5: subdivision level */
+extern s32 sSortNdiv;              /* GsDIV1..5: subdivision level */
 extern s32 sSortUseGlobalLightMode; /* GsLLMOD */
 extern s32 sSortLightMode;          /* GsFOG | GsMATE */
 
@@ -314,7 +314,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 
     /* MATCHING: four struct reads of attribute, hoisted by the scheduler
      * above the global stores; unk8 is stored after them as a field. */
-    D_80090C18 = (obj->attribute >> 9) & 0x7;
+    sSortNdiv = (obj->attribute >> 9) & 0x7;
     sSortLightOff = (obj->attribute >> 6) & 0x1;
     sSortUseGlobalLightMode = (obj->attribute >> 5) & 0x1;
     sSortLightMode = (obj->attribute >> 3) & 0x3;
@@ -1231,7 +1231,7 @@ void FlagLargePolyForDivide(void *ctxIn, s32 count) {
 extern s32 sDivClipWidth;
 extern s32 sDivClipHeight;
 
-/* SetNdivOverride's: when set, sNdivOverride replaces D_80090C18. */
+/* SetNdivOverride's: when set, sNdivOverride replaces sSortNdiv. */
 extern s32 sNdivOverrideSet;
 extern s32 sNdivOverride;
 
@@ -1252,7 +1252,7 @@ void FillDivPolygonHeader(void *divpIn, PolyDrawCtx *ctx, CVECTOR *rgbc, s32 tex
     if (sNdivOverrideSet) {
         ndiv = sNdivOverride;
     } else {
-        ndiv = D_80090C18;
+        ndiv = sSortNdiv;
     }
     pih = sDivClipWidth;
     piv = sDivClipHeight;
