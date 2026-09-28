@@ -32,7 +32,7 @@ extern u8 D_8006D61D;
 extern s32 D_8006D6C0[]; /* 0/1 flag table, selector 0..0x1B, same index family as D_8006D620 */
 extern s32 D_8006D7C0[]; /* 0/1 flag table, selector 0..0x1B */
 
-extern s32 D_8006D60C; /* last status byte (resp[0]) */
+extern s32 CD_status; /* last status byte (resp[0]) */
 extern s32 CD_debug;
 extern char *D_8006D620[];
 
@@ -99,21 +99,21 @@ s32 getintr(void) {
     *D_8006D8C8 = 7;
 
     if (cause != 3 || D_8006D7C0[D_8006D61D] != 0) {
-        if (!(D_8006D60C & 0x10) && (resp[0] & 0x10)) {
+        if (!(CD_status & 0x10) && (resp[0] & 0x10)) {
             D_8006D614++;
         }
         /* The volatile read keeps resp[0] a QImode value, so its
          * zero-extension survives as retail's `andi v0,v0,0xff`; flags is
          * then CSE'd from the value just stored.  resp[1] is a plain read. */
-        D_8006D60C = *(volatile u8 *)&resp[0];
+        CD_status = *(volatile u8 *)&resp[0];
         D_8006D610 = resp[1];
-        flags = D_8006D60C & 0x1D;
+        flags = CD_status & 0x1D;
     }
 
     if (cause == 5) {
         puts(D_800109B0);
         if (CD_debug > 0) {
-            printf(D_800109BC, D_8006D620[D_8006D61D], D_8006D60C, D_8006D610);
+            printf(D_800109BC, D_8006D620[D_8006D61D], CD_status, D_8006D610);
         }
     }
 
@@ -489,7 +489,7 @@ extern s32 D_8006D8A4;
 extern s32 CD_cbsync;
 extern s32 CD_cbready;
 extern s32 CD_cbread;
-extern s32 D_8006D60C;
+extern s32 CD_status;
 extern s32 D_8006D610;
 extern s32 D_8006D614;
 extern u8 D_8006D618;
@@ -586,7 +586,7 @@ void CD_shell(void) {
         saved = CD_cbsync;
         CD_cbsync = 0;
 
-        while (D_8006D60C & 0x10) {
+        while (CD_status & 0x10) {
             if ((u8)counter == 0) {
                 puts(D_80010A40);
             }
@@ -659,7 +659,7 @@ void CD_initintr(void) {
     CD_cbready = 0;
     CD_cbsync = 0;
     D_8006D610 = 0;
-    D_8006D60C = 0;
+    CD_status = 0;
     p = D_8006D8DC;
     for (i = 9; i != -1; i--) {
         *p = 0;
@@ -689,7 +689,7 @@ s32 CD_init(void) {
     CD_cbready = 0;
     CD_cbsync = 0;
     D_8006D610 = 0;
-    D_8006D60C = 0;
+    CD_status = 0;
     p = &D_8006D8DC;
     for (i = 9; i != -1; i--) {
         *p = 0;
@@ -718,7 +718,7 @@ s32 CD_init(void) {
     *D_8006D8D0 = 0x1325;
 
     counter = 0;
-    if (D_8006D60C & 0x10) {
+    if (CD_status & 0x10) {
         CD_cw(1, 0, 0, 0);
     }
 
@@ -726,7 +726,7 @@ s32 CD_init(void) {
         saved = CD_cbsync;
         CD_cbsync = 0;
 
-        while (D_8006D60C & 0x10) {
+        while (CD_status & 0x10) {
             if ((u8)counter == 0) {
                 puts(D_80010A40);
             }
@@ -791,7 +791,7 @@ s32 cd_read_retry(void) {
                     saved = CD_cbsync;
                     CD_cbsync = 0;
 
-                    while (D_8006D60C & 0x10) {
+                    while (CD_status & 0x10) {
                         if ((u8)counter == 0) {
                             puts(D_80010A40);
                         }
@@ -910,7 +910,7 @@ join:
     D_8006D8FC = CD_cbsync;
     D_8006D900 = CD_cbready;
 
-    if (D_8006D60C & 0xE0) {
+    if (CD_status & 0xE0) {
         CD_cw(9, 0, 0, 0);
     }
     CD_sync(0, 0);

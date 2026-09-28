@@ -3158,3 +3158,4 @@ CD_cbsync = 0x8006D5FC;
 CD_cbready = 0x8006D600;
 CD_cbread = 0x8006D604;
 CD_debug = 0x8006D608;
+CD_status = 0x8006D60C;

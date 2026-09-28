@@ -10,7 +10,7 @@ Configures the link driver's mode word (`D_8006D8F0`) from `(arg2 & 0x30)`,
 stages the three call arguments and the current `CD_cbsync`/`CD_cbready`
 callback pointers into the driver's staging globals, resets the retry
 counter (`D_8006D8DC = 8`), optionally kicks `CD_cw(9, 0, 0, 0)` if
-`D_8006D60C & 0xE0`, then calls `CD_sync(0, 0)` and
+`CD_status & 0xE0`, then calls `CD_sync(0, 0)` and
 `cd_read_retry()`, reducing the latter's result to a `0`/`-1` status.
 
 ## The C
@@ -65,7 +65,7 @@ join:
     D_8006D8FC = CD_cbsync;
     D_8006D900 = CD_cbready;
 
-    if (D_8006D60C & 0xE0) {
+    if (CD_status & 0xE0) {
         CD_cw(9, 0, 0, 0);
     }
     CD_sync(0, 0);

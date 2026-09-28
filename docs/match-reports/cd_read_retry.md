@@ -78,7 +78,7 @@ s32 cd_read_retry(void)
                     saved = CD_cbsync;
                     CD_cbsync = 0;
 
-                    while (D_8006D60C & 0x10) {
+                    while (CD_status & 0x10) {
                         if ((u8)counter == 0) {
                             puts(D_80010A40);
                         }
@@ -382,7 +382,7 @@ s32 cd_read_retry(void)
                     saved = CD_cbsync;
                     CD_cbsync = 0;
 
-                    while (D_8006D60C & 0x10) {
+                    while (CD_status & 0x10) {
                         if ((u8)counter == 0) {
                             puts(D_80010A40);
                         }
@@ -812,7 +812,7 @@ s32 cd_read_retry(void)
                     saved = CD_cbsync;
                     CD_cbsync = 0;
 
-                    while (D_8006D60C & 0x10) {
+                    while (CD_status & 0x10) {
                         if ((u8)counter == 0) {
                             puts(D_80010A40);
                         }
@@ -1153,7 +1153,7 @@ s32 cd_read_retry(void)
                     saved = CD_cbsync;
                     CD_cbsync = 0;
 
-                    while (D_8006D60C & 0x10) {
+                    while (CD_status & 0x10) {
                         if ((u8)counter == 0) {
                             puts(D_80010A40);
                         }
