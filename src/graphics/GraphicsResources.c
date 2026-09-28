@@ -1389,7 +1389,7 @@ s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 keepAct
             self->keepActive = keepActive;
             self->loops = loops;
             ds = GetDrawSystem();
-            ds->methods->clearImage(ds, gMovieClearColor, &self->frame);
+            ds->methods->clearImage(ds, sMovieClearColor, &self->frame);
             return 0;
         }
         return 1;

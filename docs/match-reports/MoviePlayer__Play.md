@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Start a movie: only when no movie is active (sActiveMoviePlayer NULL). Calls MoviePlayer__RequestStart(self) first when +0x68 is set, keeps arg2 at +0x5C and opens `name` on the stream object at +0x60 (its +0x044, with 100). On success it becomes the active movie (sActiveMoviePlayer = self), clears +0x40/+0x3C/+0x48/+0x44, sets +0x4C, keeps arg3/arg4 at +0x54/+0x58 and calls DrawSystem +0x078 with (&gMovieClearColor, &self->rect at +0x20); returns 0. Returns 1 when the open fails, 0 when a movie is already active.
+Start a movie: only when no movie is active (sActiveMoviePlayer NULL). Calls MoviePlayer__RequestStart(self) first when +0x68 is set, keeps arg2 at +0x5C and opens `name` on the stream object at +0x60 (its +0x044, with 100). On success it becomes the active movie (sActiveMoviePlayer = self), clears +0x40/+0x3C/+0x48/+0x44, sets +0x4C, keeps arg3/arg4 at +0x54/+0x58 and calls DrawSystem +0x078 with (&sMovieClearColor, &self->rect at +0x20); returns 0. Returns 1 when the open fails, 0 when a movie is already active.
 
 Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x040.
 
@@ -25,7 +25,7 @@ top of / earlier in `src/graphics/GraphicsResources.c`.
  * (sActiveMoviePlayer): optionally MoviePlayer__RequestStart first (+0x68), keep `arg2` at
  * +0x5C, open `name` on the stream object at +0x60 (its +0x044, 100); 1 when
  * that fails. Otherwise become the active movie, reset the state words, keep
- * `arg3`/`arg4` at +0x54/+0x58 and register gMovieClearColor with the frame
+ * `arg3`/`arg4` at +0x54/+0x58 and register sMovieClearColor with the frame
  * rectangle (+0x20) through DrawSystem +0x078. 0. */
 typedef struct StreamMethods457C0 {
     /* +0x000 */ u8 pad0[0x44];
@@ -64,7 +64,7 @@ typedef struct DrawSys457C0 {
 } DrawSys457C0;
 
 extern DataSrc33808 *sActiveMoviePlayer;
-extern s32 gMovieClearColor;
+extern s32 sMovieClearColor;
 extern void *GetDrawSystem(void);
 void MoviePlayer__RequestStart();
 
@@ -86,7 +86,7 @@ s32 MoviePlayer__Play(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) 
             self->unk54 = arg3;
             self->unk58 = arg4;
             ds = GetDrawSystem();
-            ds->methods->slot78(ds, &gMovieClearColor, self->rect);
+            ds->methods->slot78(ds, &sMovieClearColor, self->rect);
             return 0;
         }
         return 1;
@@ -105,7 +105,7 @@ Ninth build. Every shape with the failing open as an early `if (open(...) != 0) 
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The `DrawSys457C0` view is gone; the call goes through `include/DrawSystem.h`. DrawSystem +0x078 is `clearImage(self, u8 *color, DrawRect *rect)` (occupant DrawSystem__ClearImage), so this call clears the frame rectangle at +0x20 with `gMovieFrameRect` as the COLOR (a zero word: black), not "registers gMovieFrameRect with the rectangle". The source now reads `ds->methods->clearImage(ds, (u8 *)&gMovieFrameRect, (DrawRect *)self->rect)`; pointer casts only, byte-identical. Proposed (not done, not this class): rename `gMovieFrameRect` -> `gMovieClearColor`.
+The `DrawSys457C0` view is gone; the call goes through `include/DrawSystem.h`. DrawSystem +0x078 is `clearImage(self, u8 *color, DrawRect *rect)` (occupant DrawSystem__ClearImage), so this call clears the frame rectangle at +0x20 with `gMovieFrameRect` as the COLOR (a zero word: black), not "registers gMovieFrameRect with the rectangle". The source now reads `ds->methods->clearImage(ds, (u8 *)&gMovieFrameRect, (DrawRect *)self->rect)`; pointer casts only, byte-identical. Proposed (not done, not this class): rename `gMovieFrameRect` -> `sMovieClearColor`.
 
 ## Track 4 (2026-09-26, round 87)
 
@@ -113,7 +113,7 @@ The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Strea
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; Obj457C0 is gone. `rect` -> `frame` (a DrawRect, so the clearImage call needs no cast); `unk5C` -> `frameCount` (startRead's frameCount in Advance), `unk58` -> `loops`, `unk68` -> `autoPlay`, `unk3C`/`unk40`/`unk44`/`unk48`/`unk4C` -> `frameIndex`/`haveFrame`/`finished`/`streamEnded`/`frameDone`, `unk54` kept. `gMovieFrameRect` was renamed `gMovieClearColor` (rename.py) and typed `u8[4]`, so the color argument needs no cast either. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; Obj457C0 is gone. `rect` -> `frame` (a DrawRect, so the clearImage call needs no cast); `unk5C` -> `frameCount` (startRead's frameCount in Advance), `unk58` -> `loops`, `unk68` -> `autoPlay`, `unk3C`/`unk40`/`unk44`/`unk48`/`unk4C` -> `frameIndex`/`haveFrame`/`finished`/`streamEnded`/`frameDone`, `unk54` kept. `gMovieFrameRect` was renamed `sMovieClearColor` (rename.py) and typed `u8[4]`, so the color argument needs no cast either. Byte-identical; `typeviews.py --warnings` 0 new.
 
 ## Round 93 polish (charlie, track 7)
 
