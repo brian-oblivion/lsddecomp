@@ -27,13 +27,13 @@
  *
  * The menu. The six entries are TaskCore's slots, `activeSlot` their index:
  *  - 0 START is the target's confirm slot (unkC): TaskCore ends the menu with
- *    refreshViewValue, which this class extends to store SHAKE's setting
- *    (slotCounts[5]) through DreamSys's getSetScreenShake.
+ *    exit, which this class extends to store SHAKE's setting
+ *    (itemCursors[5]) through DreamSys's getSetScreenShake.
  *  - 1 FLASHBACK: result 0 and a flashback session opened; 4 GRAPH: result 2.
- *    Both then end the menu through refreshViewValue.
+ *    Both then end the menu through exit.
  *  - 2 SAVE runs saveToCard, 3 LOAD loadFromCard.
  *  - 5 SHAKE is the one entry with an item list (the target's unk24[5]).
- *  - FLASHBACK starts locked (registrationSlots[1] = 1); refreshMenu clears
+ *  - FLASHBACK starts locked (hiddenSlots[1] = 1); refreshMenu clears
  *    the lock through UpdateFlashbackLock when the save block allows it.
  * setState(5), the menu becoming active, runs refreshMenu: the save title's
  * text reloaded, FLASHBACK's lock recomputed, the widgets re-attached and
@@ -84,8 +84,8 @@ struct TitleMenuMethods {
                                                                      occupant reads self alone */
     /* +0x128 */ void (*beginCardAccess)(TitleMenu *self); /* TitleMenu__BeginCardAccess; saveToCard/loadFromCard call it first */
     /* +0x12C */ void (*endCardAccess)(TitleMenu *self); /* TitleMenu__EndCardAccess; onCardEvent's 0x16/0x17 */
-    /* +0x130 */ void (*saveToCard)(TitleMenu *self); /* TitleMenu__SaveToCard; tick's activeSlot 2, SAVE */
-    /* +0x134 */ void (*loadFromCard)(TitleMenu *self); /* TitleMenu__LoadFromCard; tick's activeSlot 3, LOAD */
+    /* +0x130 */ void (*saveToCard)(TitleMenu *self); /* TitleMenu__SaveToCard; confirmSlot's activeSlot 2, SAVE */
+    /* +0x134 */ void (*loadFromCard)(TitleMenu *self); /* TitleMenu__LoadFromCard; confirmSlot's activeSlot 3, LOAD */
     /* +0x138 */ void (*onCardEvent)(TitleMenu *self, BasicClass *sender,
                                      s32 event); /* TitleMenu__OnCardEvent; onNotify's class-0xB case */
 };
@@ -120,7 +120,7 @@ typedef struct {
     FullWidthChar chars[6];
 } FullWidthChars6;
 
-/* TitleMenu::activeSlot and the index into slotCounts: the six entries,
+/* TitleMenu::activeSlot and the index into itemCursors: the six entries,
  * in the order of the target's `names` (see the banner). */
 enum TitleMenuEntry {
     TITLEMENU_START = 0,

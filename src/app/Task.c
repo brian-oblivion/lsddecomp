@@ -122,7 +122,7 @@ void StreamTask__SetState(StreamTask *self, s32 state) {
             }
             break;
         case STREAMTASK_STATE_SKIPPED:
-            self->methods->refreshViewValue(self);
+            self->methods->exit(self);
             break;
     }
 }
@@ -242,14 +242,14 @@ void TaskCore__Reset(TaskCore *self) {
     methods->setFrameBound(self, -1);
     methods->setColors(self, sTaskCoreDefaultColors[0], sTaskCoreDefaultColors[1],
                        sTaskCoreDefaultColors[2]);
-    methods->setFadeCallbackEnabled(self, 1);
+    methods->setFadeInCallbackEnabled(self, 1);
     methods->setFadeOutCallbackEnabled(self, 1);
     self->fadeRate = 9;
     self->otLength = 3;
     self->unk2C = 300;
     self->packetSize = 64;
-    self->viewCallback = NULL;
-    self->viewCallbackCtx = NULL;
+    self->exitCallback = NULL;
+    self->exitCallbackCtx = NULL;
     self->unk34 = 1;
     self->inputMode = TASKCORE_INPUT_NONE;
 }
@@ -318,7 +318,7 @@ void TaskCore__OnDeinit(TaskCore *self) {
  * Input: while inputMode is not NONE, onPadEvent maps a press to a handler;
  * each handler plays the button tone (or moves a cursor) and reports what
  * happened as a state, which setState passes to the parents and then folds
- * back into ACTIVE. Fades: tickColorFade adds frameCounter * fadeRate to
+ * back into ACTIVE. Fades: tickFadeIn adds frameCounter * fadeRate to
  * baseColor and pushes the result to every slot widget and the BgLayer,
  * until it passes TASKCORE_FADE_FULL.
  */
@@ -368,7 +368,7 @@ void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event) {
             methods->setState(self, TASKCORE_STATE_FADE_IN);
             break;
         case TASKCORE_STATE_FADE_IN:
-            methods->tickFadeCallback(self);
+            methods->tickFadeInCallback(self);
             break;
         case TASKCORE_STATE_FADE_OUT:
             methods->tickFadeOutCallback(self);
@@ -393,7 +393,7 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
             break;
         case TASKCORE_STATE_TIMED_OUT:
             self->result = 1;
-            methods->refreshViewValue(self);
+            methods->exit(self);
             break;
         case TASKCORE_STATE_FADE_IN:
         case TASKCORE_STATE_FADE_OUT:
@@ -414,7 +414,7 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
             self->frameCounter = 0;
             switch (state) {
                 case TASKCORE_STATE_SLOT_CONFIRMED:
-                    methods->tick(self);
+                    methods->confirmSlot(self);
                     break;
                 case TASKCORE_STATE_ITEM_CONFIRMED:
                     methods->commitElementScroll(self);
@@ -511,20 +511,20 @@ void TaskCore__ConfirmSlot(TaskCore *self) {
     if (target->unk24[slot] != NULL) {
         self->methods->beginElementScroll(self);
     } else if (slot == target->exitSlot) {
-        self->methods->refreshViewValue(self);
+        self->methods->exit(self);
     }
 }
 
 void TaskCore__Exit(TaskCore *self) {
-    if (self->viewCallback != NULL) {
-        self->viewCallback(self->viewCallbackCtx);
+    if (self->exitCallback != NULL) {
+        self->exitCallback(self->exitCallbackCtx);
     }
     self->methods->setState(self, TASKCORE_STATE_FADE_OUT);
 }
 
 void TaskCore__SetExitCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx) {
-    self->viewCallback = callback;
-    self->viewCallbackCtx = ctx;
+    self->exitCallback = callback;
+    self->exitCallbackCtx = ctx;
 }
 
 void TaskCore__SetFadeInCallbackEnabled(TaskCore *self, s32 enable) {
@@ -536,7 +536,7 @@ void TaskCore__SetFadeInCallbackEnabled(TaskCore *self, s32 enable) {
             self->fadeInCallback = NULL;
             break;
         case 1:
-            self->fadeInCallback = methods->tickColorFade;
+            self->fadeInCallback = methods->tickFadeIn;
             break;
     }
 }
@@ -550,7 +550,7 @@ void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable) {
             self->fadeOutCallback = NULL;
             break;
         case 1:
-            self->fadeOutCallback = methods->tickFadeColor;
+            self->fadeOutCallback = methods->tickFadeOut;
             break;
     }
 }
@@ -618,11 +618,11 @@ epilogue:
  *
  * The first level is the slots. setTarget makes one TextRow per
  * target->names entry (slotElements); findNextFreeSlot/findPrevFreeSlot step,
- * wrapping, to the next slot whose registrationSlots entry is NULL; and
+ * wrapping, to the next slot whose hiddenSlots entry is NULL; and
  * setActiveSlot moves the highlight from unselectedColor to selectedColor.
  * A slot whose target->unk24 entry is non-NULL also has a list of items,
  * described by a SlotEntry: createSlotElements makes its rows (itemLists,
- * itemCounts) and starts its cursor (slotCounts) at savedCursor.
+ * itemCounts) and starts its cursor (itemCursors) at savedCursor.
  *
  * The second level scrolls that list. beginElementScroll (inputMode
  * CHOOSING_SLOT to SCROLLING) shows every row with listView's frame behind
@@ -723,7 +723,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *target) {
     widget = BMemPMgrAlloc(size);
     self->slotElements = (BasicClass **)widget;
     self->itemCounts = BMemPMgrAlloc(size);
-    self->slotCounts = BMemPMgrAlloc(size);
+    self->itemCursors = BMemPMgrAlloc(size);
     self->itemLists = BMemPMgrAlloc(size);
     self->slotCount = count;
 
@@ -782,7 +782,7 @@ void TaskCore__ReleaseTarget(TaskCore *self) {
         i++;
     }
     BMemPMgrFree(self->itemLists);
-    BMemPMgrFree(self->slotCounts);
+    BMemPMgrFree(self->itemCursors);
     BMemPMgrFree(self->itemCounts);
     BMemPMgrFree(self->slotElements);
 }
@@ -796,9 +796,9 @@ void TaskCore__UpdateSlotElements(TaskCore *self, void *parent) {
         return;
     }
     widget = (TextRow **)self->slotElements;
-    position = (SlotPos *)self->target->externalRecords;
+    position = (SlotPos *)self->target->slotPositions;
     for (i = 0; i < self->slotCount; i++, widget++, position++) {
-        if (self->target->registrationSlots[i] == NULL) {
+        if (self->target->hiddenSlots[i] == NULL) {
             TextRow *row = *widget;
 
             row->methods->attachToParent(row, parent, (LongVec3 *)position);
@@ -855,7 +855,7 @@ void TaskCore__FindNextFreeSlot(TaskCore *self) {
         if (i == self->activeSlot) {
             break;
         }
-        if (self->target->registrationSlots[i++] != NULL) {
+        if (self->target->hiddenSlots[i++] != NULL) {
             continue;
         }
         i--;
@@ -879,7 +879,7 @@ void TaskCore__FindPrevFreeSlot(TaskCore *self) {
         if (i == self->activeSlot) {
             break;
         }
-        if (self->target->registrationSlots[i--] != NULL) {
+        if (self->target->hiddenSlots[i--] != NULL) {
             continue;
         }
         i++;
@@ -928,7 +928,7 @@ void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *texture) {
     }
     item = BMemPMgrAlloc(count * sizeof(TextRow *));
     self->itemLists[slot] = (void *)item;
-    self->slotCounts[slot] = ((SrcDesc *)desc)->savedCursor;
+    self->itemCursors[slot] = ((SrcDesc *)desc)->savedCursor;
     self->itemCounts[slot] = count;
 
     names = ((SrcDesc *)desc)->itemNames;
@@ -1020,7 +1020,7 @@ void TaskCore__BeginElementScroll(TaskCore *self) {
     }
     slot = self->activeSlot;
     self->methods->refreshSlotView(self, self->unk14, 1);
-    item = ((TextRow **)self->itemLists[slot])[self->slotCounts[slot]];
+    item = ((TextRow **)self->itemLists[slot])[self->itemCursors[slot]];
     cursorColor = &((SlotEntry *)self->target->unk24[slot])->cursorColor;
     item->methods->setColor(item, cursorColor);
     self->inputMode = TASKCORE_INPUT_SCROLLING;
@@ -1039,7 +1039,7 @@ void TaskCore__CommitElementScroll(TaskCore *self) {
         return;
     }
     slot = self->activeSlot;
-    cursor = self->slotCounts[slot];
+    cursor = self->itemCursors[slot];
     pos = ((SlotEntry *)self->target->unk24[slot])->pos;
     pos.y -= cursor * SLOT_LIST_ROW_PITCH;
 
@@ -1079,13 +1079,13 @@ void TaskCore__CancelElementScroll(TaskCore *self) {
         return;
     }
     slot = self->activeSlot;
-    cursor = self->slotCounts[slot];
+    cursor = self->itemCursors[slot];
     self->methods->refreshSlotView(self, self->unk14, 0);
     items = (TextRow **)self->itemLists[slot];
     prevItem = items[cursor];
     prevItem->methods->setColor(prevItem, (SpriteRgb *)self->target->unselectedColor);
     saved = ((SlotEntry *)self->target->unk24[slot])->savedCursor;
-    self->slotCounts[slot] = saved;
+    self->itemCursors[slot] = saved;
     savedItem = items[saved];
     savedItem->methods->setDisplay(savedItem, 1);
     self->inputMode = TASKCORE_INPUT_CHOOSING_SLOT;
@@ -1094,7 +1094,7 @@ void TaskCore__CancelElementScroll(TaskCore *self) {
 
 void TaskCore__AdvanceSlotCursor(TaskCore *self) {
     s32 slot = self->activeSlot;
-    s32 cursor = self->slotCounts[slot];
+    s32 cursor = self->itemCursors[slot];
 
     cursor++;
     if (cursor >= self->itemCounts[slot]) {
@@ -1105,7 +1105,7 @@ void TaskCore__AdvanceSlotCursor(TaskCore *self) {
 
 void TaskCore__RetreatSlotCursor(TaskCore *self) {
     s32 slot = self->activeSlot;
-    s32 cursor = self->slotCounts[slot];
+    s32 cursor = self->itemCursors[slot];
 
     cursor--;
     if (cursor < 0) {
@@ -1123,14 +1123,14 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
     SpriteRgb *cursorColor;
 
     slot = self->activeSlot;
-    prev = self->slotCounts[slot];
+    prev = self->itemCursors[slot];
     items = (TextRow **)self->itemLists[slot];
     prevItem = items[prev];
     nextItem = items[cursor];
     prevItem->methods->setColor(prevItem, (SpriteRgb *)self->target->unselectedColor);
     cursorColor = &((SlotEntry *)self->target->unk24[slot])->cursorColor;
     nextItem->methods->setColor(nextItem, cursorColor);
-    self->slotCounts[slot] = cursor;
+    self->itemCursors[slot] = cursor;
     if (withSound != NULL) {
         self->methods->playSound(self, TASKCORE_TONE_CURSOR);
     }
@@ -1158,7 +1158,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
  */
 
 s32 TaskCore__GetActiveItemCursor(TaskCore *self) {
-    return self->slotCounts[self->activeSlot];
+    return self->itemCursors[self->activeSlot];
 }
 
 TaskCoreMethods *GetTaskCoreMethods(void) {

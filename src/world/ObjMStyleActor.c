@@ -3425,7 +3425,7 @@ void GraphRoom__Update(GraphRoom *self, BasicClass *sender, s32 event) {
 void GraphRoom__OnPadConfirm(GraphRoom *self) {
     if (self->scored == 0) {
         self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
-        self->methods->refreshViewValue(self);
+        self->methods->exit(self);
     }
 }
 

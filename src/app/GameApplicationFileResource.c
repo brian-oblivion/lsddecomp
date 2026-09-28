@@ -152,7 +152,7 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
     TaskCore *task = New_TaskCore(0, 0, 0);
 
     /* The callback takes no ctx and returns a value nobody reads. */
-    task->methods->setCallback(task, (void (*)(void *))GameApplication__RegisterFilesCallback, self);
+    task->methods->setExitCallback(task, (void (*)(void *))GameApplication__RegisterFilesCallback, self);
     task->methods->setFrameBound(task, 0);
     task->methods->setSubHandle(task, path, 0);
     task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, 0);

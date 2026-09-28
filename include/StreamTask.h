@@ -43,7 +43,7 @@
  *                         not fadingOut is setState(7).
  *   +0x060 setState       StreamTask__SetState: TaskCore's; 5 clears
  *                         fadingOut, 7 sets it, 8 aborts the player unless
- *                         abortBeforeFade, 0x12 refreshViewValue.
+ *                         abortBeforeFade, 0x12 exit.
  *   +0x06C setFrameBound  StreamTask__SetFrameBound: bound * 15 (TaskCore's
  *                         is * 20), negative kept.
  *   +0x078 onPadConfirm   StreamTask__OnPadConfirm: TaskCore's; with
@@ -51,7 +51,7 @@
  *   +0x080 onPadPrev      StreamTask__OnPadPrev: TaskCore's only.
  *   +0x084 onPadNext      StreamTask__OnPadNext: TaskCore's only.
  *   +0x088, +0x08C        StreamTask__NoOpSlot88/8C (NULL in TaskCore).
- *   +0x094 refreshViewValue StreamTask__Exit: abortBeforeFade,
+ *   +0x094 exit StreamTask__Exit: abortBeforeFade,
  *                         the player's Abort now; else setState(7) and the
  *                         abort at state 8.
  * The overrides of +0x04C/+0x080/+0x084 (and TaskCore's) take self alone;
@@ -75,7 +75,7 @@ typedef struct StreamTaskMethods StreamTaskMethods;
 
 /* StreamTask's own state, past TaskCore's (enum TaskCoreState): onPadConfirm
  * sets it when skipOnConfirm is on, and setState answers it with
- * refreshViewValue, which aborts the player at once or fades out first. */
+ * exit, which aborts the player at once or fades out first. */
 enum StreamTaskState { STREAMTASK_STATE_SKIPPED = 18 };
 
 /* `result` after a confirm press skipped the stream (TaskCore's timeout
@@ -120,7 +120,7 @@ struct StreamTask {
     /* +0x0C8 */ s32 loopCount; /* setLoopCount; reset -1; Play's fourth argument, the player's `loops` (MoviePlayer__Advance) */
     /* +0x0CC */ s32 skipOnConfirm; /* setSkipOnConfirm; reset 1; OnPadConfirm: nonzero ends the task with result 2 */
     /* +0x0D0 */ s32 unkD0; /* setUnkD0; reset 0; no method of this class reads it */
-    /* +0x0D4 */ s32 abortBeforeFade; /* setAbortBeforeFade; reset 1; RefreshViewValue aborts at once, else SetState(8) after the fade */
+    /* +0x0D4 */ s32 abortBeforeFade; /* setAbortBeforeFade; reset 1; Exit aborts at once, else SetState(8) after the fade */
     /* +0x0D8 */ s32 fadingOut; /* SetState: 5 clears, 7 sets; Update skips its setState(7) when set */
 };
 

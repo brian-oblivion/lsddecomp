@@ -184,7 +184,7 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSy
         locked = (save->amountFlashbacksAvailable == 0);
     }
     /* A NULL entry is one the cursor can stop on. */
-    target->registrationSlots[TITLEMENU_FLASHBACK] = (void *)locked;
+    target->hiddenSlots[TITLEMENU_FLASHBACK] = (void *)locked;
 }
 
 /* src/ui/ScreenWidgets.c: `value` as `width` full-width decimal digits into dst,
@@ -210,8 +210,8 @@ void StampSaveTitleDay(s32 day) {
  *
  * TitleMenu is the TaskCore menu between days: START, FLASHBACK, SAVE, LOAD,
  * GRAPH and SHAKE over ETC\TITLE.TIM. In ROM order here: finalize, onNotify,
- * reset, onDeinit, setState and tick (which acts on the chosen entry),
- * refreshViewValue (stores SHAKE's setting), the four overrides that manage
+ * reset, onDeinit, setState and confirmSlot (which acts on the chosen entry),
+ * exit (stores SHAKE's setting), the four overrides that manage
  * the save-title TextRow in place of TaskCore's slot widgets, refreshMenu,
  * and the memory-card methods that drive `saveCtrl`, a TaskObjF, for SAVE
  * and LOAD. The header's banner describes the class.
@@ -275,12 +275,12 @@ void TitleMenu__SetState(TitleMenu *self, s32 state) {
 void TitleMenu__ConfirmSlot(TitleMenu *self) {
     void (*fn)(TitleMenu *);
 
-    GetTaskCoreMethods()->tick((TaskCore *)self);
+    GetTaskCoreMethods()->confirmSlot((TaskCore *)self);
     switch (self->activeSlot) {
         case TITLEMENU_FLASHBACK:
             self->result = 0;
             self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 1);
-            fn = self->methods->refreshViewValue;
+            fn = self->methods->exit;
             break;
         case TITLEMENU_SAVE:
             fn = self->methods->saveToCard;
@@ -290,7 +290,7 @@ void TitleMenu__ConfirmSlot(TitleMenu *self) {
             break;
         case TITLEMENU_GRAPH:
             self->result = TITLEMENU_RESULT_GRAPH;
-            fn = self->methods->refreshViewValue;
+            fn = self->methods->exit;
             break;
         default:
             return;
@@ -301,8 +301,8 @@ void TitleMenu__ConfirmSlot(TitleMenu *self) {
 void TitleMenu__Exit(TitleMenu *self) {
     s32 shake;
 
-    GetTaskCoreMethods()->refreshViewValue((TaskCore *)self);
-    shake = self->slotCounts[TITLEMENU_SHAKE];
+    GetTaskCoreMethods()->exit((TaskCore *)self);
+    shake = self->itemCursors[TITLEMENU_SHAKE];
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
 }
 
@@ -450,7 +450,7 @@ void TitleMenu__EndCardAccess(TitleMenu *self) {
 void TitleMenu__SaveToCard(TitleMenu *self) {
     s32 shake;
 
-    shake = self->slotCounts[TITLEMENU_SHAKE];
+    shake = self->itemCursors[TITLEMENU_SHAKE];
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
     self->methods->beginCardAccess(self);
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
