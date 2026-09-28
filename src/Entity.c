@@ -1,9 +1,16 @@
-/* Entity: the class's construction and per-tick logic (include/Entity.h).
- * Entity_b holds its last three slots and the table getter, and Entity_b to
- * Entity_g the MoodCue handlers.
+/* Entity -- the class whole (include/Entity.h): its methods, its table
+ * getter Get_vtable_Entity, and the MoodCue handlers of its mood rows.
+ *
+ * What decided its edges (python3 tools/tuboundary.py): DreamAux.c before it
+ * and TodActor.c after it are other subjects, and both edges are "start
+ * edge possible"; they stay. Inside, the file is seven old carve slices,
+ * Entity and Entity_b to Entity_g, and every one of the six edges between
+ * them is "start edge possible, soft-unlikely" on single-user data (each
+ * quoting 0x80089eb0) and falls inside the one class, so all seven were
+ * merged. No forced boundary lies in the file.
  *
  * An Entity is a TodActor driven by one row of gEntityMoodTable, chosen by
- * New_Entity's moodIndex. This file holds:
+ * New_Entity's moodIndex. The first section holds:
  *  - construction and teardown: New_Entity, Entity__Entity, Entity__Reset
  *    (fog for unlockKind 1 to 9, tick callback B, start inactive),
  *    Entity__Finalize, and Entity__GetOrCreateFadeBox, the screen fade some
@@ -389,10 +396,7 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
     return this->active;
 }
 
-/* ---- merged from Entity_b ---- */
-
-/* Entity_b: the last of Entity's own methods, and fifteen of its MoodCue
- * handlers (include/Entity.h).
+/* ---- Entity's last methods; MoodCue handlers, rows 0 to 17 -------------
  *
  * The methods. Entity__Update runs the table's last three slots every tick:
  * Entity__UpdateTargetProximity (+0x178) latches targetReached through
@@ -418,7 +422,7 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
  * The literals are left unnamed where they are one handler's tuning: tick
  * counts, distances in world units, TOD frame numbers, VAB program numbers,
  * and the `state` values other than 0 and ENTITY_STATE_DONE, which are each
- * handler's own phases (same convention as Entity_c to Entity_g).
+ * handler's own phases (the convention of every handler section below).
  */
 
 s32 Entity__UpdateTargetProximity(Entity *this) {
@@ -790,28 +794,19 @@ void Entity__MoodCue17(Entity *this) {
     this->methods->updateScale(this, 1, SCALE_HALF);
 }
 
-/* ---- merged from Entity_c ---- */
-
-/* Third slice of the Entity block -- 20 functions, 0x4F754..0x5077C. The
- * remainder is `Entity_d` and is still a monolithic asm segment.
- *
- * The whole 97-function remainder this came out of has zero `jlabel`s and
- * zero `jr $t2`, so no slice of it needs a rodata slot attached and none of
- * it is a BIOS trampoline. Entity/Entity's `include/Entity.h` is already
- * heavily typed and these functions are the same class family -- extend that
- * header rather than starting a new one.
+/* ---- MoodCue handlers, rows 19 to 38 and 119 ---------------------------
  *
  * All 20 functions are `gEntityMoodHandlerTable` mood-dispatch callbacks,
  * `Entity__MoodCueNN` where NN is the table row (`asm/data/79528.data.s`,
- * stride 0x10) -- same family and naming convention as Entity/_d/_e/_g.
- * Row order does not track code address, so this unit's rows (19-27, 29-38,
+ * stride 0x10), as in every handler section.
+ * Row order does not track code address, so this section's rows (19-27, 29-38,
  * plus 119) are not contiguous with each other or with source order;
  * `Entity__MoodCue119` sits far from its neighbours by address alone,
  * confirmed against the table rather than assumed from proximity.
  * `Entity__MoodCue30` additionally occupies row 122 with the same handler
  * and different data words -- one function shared by two distinct mood-row
  * configurations, named for its lower row (same precedent as
- * `Entity__MoodCue81`, Entity_e).
+ * `Entity__MoodCue81`, below).
  *
  * Fields and slots are the unified Entity's (include/Entity.h): the
  * inherited ones carry TodActor's, Actor's and SceneNode's names (`state`,
@@ -821,7 +816,7 @@ void Entity__MoodCue17(Entity *this) {
  * The literals are left unnamed where they are one handler's tuning: tick
  * counts, distances in world units, TOD frame numbers, VAB program numbers,
  * and the `state` values other than 0 and ENTITY_STATE_DONE, which are each
- * handler's own phases (same convention as Entity_d/Entity_e).
+ * handler's own phases.
  */
 
 void Entity__MoodCue19(Entity *this, SoundCueSet *out) {
@@ -1142,10 +1137,9 @@ void Entity__MoodCue38(Entity *this, SoundCueSet *out) {
     }
 }
 
-/* ---- merged from Entity_d ---- */
-
-/* Entity_d: nineteen of Entity's MoodCue handlers and the helper two of
- * them share.
+/* ---- MoodCue handlers, rows 39 to 58 and 115 ---------------------------
+ *
+ * Nineteen of Entity's MoodCue handlers and the helper two of them share.
  *
  * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
  * NN (include/Entity.h): rows 39 to 52, 55 to 58 and 115. An Entity whose
@@ -1702,9 +1696,9 @@ tail:
     }
 }
 
-/* ---- merged from Entity_e ---- */
-
-/* Entity_e: twenty of Entity's MoodCue handlers.
+/* ---- MoodCue handlers, rows 59 to 81 ------------------------------------
+ *
+ * Twenty of Entity's MoodCue handlers.
  *
  * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
  * NN (include/Entity.h): rows 59, 61, 62, 64 to 71 and 73 to 81, and
@@ -1717,7 +1711,7 @@ tail:
  * entity (or the player, its `peer`) on moodTimer, the ticks since
  * startSoundCue, on the cue set's own `tick`, or on todFrame, the frame of
  * its TOD animation, and sends the dream an EntityEffect through
- * notifyParents. Entity__MoodCue108 (Entity_g) runs Entity__MoodCue71 and
+ * notifyParents. Entity__MoodCue108 (below) runs Entity__MoodCue71 and
  * then sets its scale to SCALE_SIX.
  *
  * The literals are left unnamed where they are one handler's tuning: tick
@@ -2215,10 +2209,9 @@ void Entity__MoodCue81(Entity *this, SoundCueSet *out) {
     }
 }
 
-/* ---- merged from Entity_f ---- */
-
-/* Entity_f: fifteen of Entity's MoodCue handlers and the two tone setters
- * they share.
+/* ---- MoodCue handlers, rows 82 to 96 ------------------------------------
+ *
+ * Fifteen of Entity's MoodCue handlers and the two tone setters they share.
  *
  * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
  * NN (include/Entity.h): rows 82 to 96, and Entity__MoodCue93 is row 107's
@@ -2586,10 +2579,10 @@ void Entity__MoodCue96(Entity *this, SoundCueSet *out) {
     }
 }
 
-/* ---- merged from Entity_g ---- */
-
-/* Entity_g: nineteen of Entity's MoodCue handlers and a per-tick helper
- * one of them shares with Entity.
+/* ---- MoodCue handlers, rows 98 to 129 -----------------------------------
+ *
+ * Nineteen of Entity's MoodCue handlers and a per-tick helper one of them
+ * shares with a handler above.
  *
  * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
  * NN (include/Entity.h): rows 98, 102 to 106, 108 to 111, 113, 114, 117,
@@ -2605,8 +2598,8 @@ void Entity__MoodCue96(Entity *this, SoundCueSet *out) {
  *
  * Entity__StepYawInWindowsThenDeactivate is not a row: it is a shared
  * per-tick helper called directly by two different row handlers,
- * Entity__MoodCue111 (this unit, twice) and Entity__MoodCue40 (Entity.c,
- * its only caller from outside this unit).
+ * Entity__MoodCue111 (this section, twice) and Entity__MoodCue40 (rows 39
+ * to 58, its only caller outside this section).
  *
  * The literals are left unnamed where they are one handler's tuning: tick
  * counts, distances in world units, TOD frame numbers, VAB program
