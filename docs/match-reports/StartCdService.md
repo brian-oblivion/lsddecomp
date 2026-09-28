@@ -22,7 +22,7 @@ void StartCdService(void)
         gCdCallbackInstalled = 1;
     }
 
-    gCdQueueEnabled = 1;
+    sCdQueueEnabled = 1;
     UnlockCd();
 }
 ```
@@ -31,7 +31,7 @@ void StartCdService(void)
 
 Set the `sCdLock` latch, then a one-shot guard on `gCdCallbackInstalled`: if it's
 still 0, optionally register `ServiceCdDriver` as a `VSyncCallback` (guarded
-by `gCdUseVSyncCallback`) and set the guard to 1. Either way, set `gCdQueueEnabled = 1`
+by `gCdUseVSyncCallback`) and set the guard to 1. Either way, set `sCdQueueEnabled = 1`
 and clear the latch. All three loads/stores collapse to constant `1`s in
 the disassembly (every `sw` in this function stores a literal `ori
 $v0,$zero,0x1` value, never a loaded one) — reading the raw instruction

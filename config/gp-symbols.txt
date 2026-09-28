@@ -73,7 +73,6 @@ gCdFileVersionSuffix
 gCdIdle
 gCdInitDone
 gCdOperation
-gCdQueueEnabled
 gCdReadBuffer
 gCdReadSectorCount
 gCdRequestQueue
@@ -189,6 +188,7 @@ sCardFilePrefix
 sCardPathPrefix
 sCdDriveInited
 sCdLock
+sCdQueueEnabled
 sDayDigits
 sDivClipHeight
 sDivClipWidth

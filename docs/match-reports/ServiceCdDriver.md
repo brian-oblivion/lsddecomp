@@ -22,7 +22,7 @@ extern s32 gCdUseVSyncCallback;
 extern s32 gCdTickStep;
 extern void TickCdStateMachine(void); /* code_179d8_r: state-machine step 1 */
 extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
-extern s32 gCdQueueEnabled;
+extern s32 sCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
 /* The class's method table down to +0x068 (see GetCdDriverMethods's
@@ -58,7 +58,7 @@ s32 ServiceCdDriver(void)
         TickCdLoadFileStateMachine();
     }
 
-    if (gCdQueueEnabled != 0) {
+    if (sCdQueueEnabled != 0) {
         ((Methods6D4E8_80EC *)GetCdDriverMethods())->runRequestQueue();
     }
 
@@ -95,7 +95,7 @@ sibling `code_179d8_r` unit — declared extern here per the
 per-call-site-typed convention `code_179d8_h.c` already established for
 cross-unit libcd calls, now confirmed to apply to cross-unit game-code calls
 too), an optional virtual dispatch through `gCdDriverMethods`'s own table slot
-+0x68 (guarded by `gCdQueueEnabled`), and finally an optional
++0x68 (guarded by `sCdQueueEnabled`), and finally an optional
 self-re-registration as a `VSyncCallback` (its own address, cast — the
 callback type is `void (*)(void)` and this function is typed `s32 (void)`
 for its early-return-0 paths, so the cast is required and harmless: nothing
@@ -120,7 +120,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | was | now | tier |
 | --- | --- | --- |
 | `func_800280EC` | `ServiceCdDriver` | A |
-| `D_8008A890` | `gCdQueueEnabled` | A |
+| `D_8008A890` | `sCdQueueEnabled` | A |
 
 **Evidence.** This is the driver's tick, and it is installed as one: both
 `StartCdService` and this function itself pass its address to
@@ -133,7 +133,7 @@ request queue through the class's own `+0x068` slot; re-arm itself. "Service"
 is the one word that covers a tick that both advances a state machine and
 drains a queue.
 
-**`gCdQueueEnabled`.** Its only reader is the guard on the `+0x068` dispatch
+**`sCdQueueEnabled`.** Its only reader is the guard on the `+0x068` dispatch
 here, and `tools/classtable.py` resolves that slot to `CdDriver__RunRequestQueue`
 (code_179d8_s), which walks `gCdRequestQueue`, dispatches each request and frees
 it with `FreeCdRequestNode`. So the flag gates queue processing specifically --

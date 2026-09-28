@@ -255,7 +255,7 @@ void UnlockCd(void) {
 extern s32 GetBMemPMgrBusy(void);             /* TmdRenderer */
 extern void TickCdStateMachine(void);         /* code_179d8_r: state-machine step 1 */
 extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
-extern s32 gCdQueueEnabled;
+extern s32 sCdQueueEnabled;
 
 s32 ServiceCdDriver(void) {
     if (sCdLock != 0) {
@@ -276,7 +276,7 @@ s32 ServiceCdDriver(void) {
         TickCdLoadFileStateMachine();
     }
 
-    if (gCdQueueEnabled != 0) {
+    if (sCdQueueEnabled != 0) {
         GetCdDriverMethods()->runRequestQueue();
     }
 
@@ -299,12 +299,12 @@ void StartCdService(void) {
         gCdCallbackInstalled = 1;
     }
 
-    gCdQueueEnabled = 1;
+    sCdQueueEnabled = 1;
     UnlockCd();
 }
 
 extern s32 gCdCallbackInstalled;
-extern s32 gCdQueueEnabled;
+extern s32 sCdQueueEnabled;
 
 void StopCdServiceIfIdle(void) {
     LockCd();
@@ -314,17 +314,17 @@ void StopCdServiceIfIdle(void) {
             VSyncCallback(0);
         }
         gCdCallbackInstalled = 0;
-        gCdQueueEnabled = 0;
+        sCdQueueEnabled = 0;
     }
 
     UnlockCd();
 }
 
-extern s32 gCdQueueEnabled;
+extern s32 sCdQueueEnabled;
 
 void DisableCdQueue(void) {
     LockCd();
-    gCdQueueEnabled = 0;
+    sCdQueueEnabled = 0;
     UnlockCd();
 }
 
