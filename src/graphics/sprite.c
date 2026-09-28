@@ -261,7 +261,7 @@ s32 Sprite__SetSemiTransRate(Sprite *self, s32 rate) {
     return GetSetBitField(&self->sprite.attribute, SPRITE_ATTR_RATE_SHIFT, 2, rate);
 }
 
-/* gTextRowMethods and gCharSpriteMethods slot +0x098 (update): empty override. */
+/* Slot +0x098 (update) of every sprite class's table but VariantSprite's: empty override. */
 void Sprite__Update(Sprite *self, void *sender, s32 event) {}
 
 /* Slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gVariantSpriteMethods (the
