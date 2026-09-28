@@ -7,17 +7,17 @@
 ## What this function does
 
 A plain `$gp`-relative getter, no arguments. Reads the scalar `s32` global
-`gFileTableCount` and returns it -- the getter half of the setter/getter pair
+`sFileTableCount` and returns it -- the getter half of the setter/getter pair
 completed by `SetFileTableCount` immediately before it in ROM order.
 
 ## The C
 
 ```c
-extern s32 gFileTableCount;
+extern s32 sFileTableCount;
 
 s32 GetFileTableCount(void)
 {
-    return gFileTableCount;
+    return sFileTableCount;
 }
 ```
 
@@ -34,7 +34,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80027FF0` | `GetFileTableCount` | A |
 
-**Evidence.** Returns `gFileTableCount` (see `SetFileTableCount.md`). Its one
+**Evidence.** Returns `sFileTableCount` (see `SetFileTableCount.md`). Its one
 caller, `GameApplicationFileResource.c`'s `RegisterFileTableEntries`, uses the value as the index of the
 first free slot before extending the table -- consistent with a count, not a
 capacity. Tier A by the pure-leaf rule.

@@ -624,11 +624,11 @@ void SetFileTable(CdFileEntry *table) {
 }
 
 void SetFileTableCount(s32 count) {
-    gFileTableCount = count;
+    sFileTableCount = count;
 }
 
 s32 GetFileTableCount(void) {
-    return gFileTableCount;
+    return sFileTableCount;
 }
 
 s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
@@ -872,7 +872,7 @@ void *FindCdFileEntry(char *name) {
         }
         i++;
         cur++;
-    } while (i < gFileTableCount);
+    } while (i < sFileTableCount);
     return NULL;
 }
 
@@ -884,7 +884,7 @@ s32 FindCdFileIndex(char *name) {
     LockCd();
     while (strstr(cur->name, name) == NULL) {
         i++;
-        if (i >= gFileTableCount) {
+        if (i >= sFileTableCount) {
             return -1;
         }
         cur++;

@@ -46,7 +46,7 @@ struct CdFileInfo {
  * `name` is passed by its own address (offset 0) to BuildCdFilePath, which
  * builds the full path from it; `pos` and `size` are then filled in from a
  * CdSearchFile lookup on that path, so an entry is a name resolved once and
- * reused as a seek target. sFileTable and gFileTableCount (this unit's
+ * reused as a seek target. sFileTable and sFileTableCount (this unit's
  * SetFileTable / SetFileTableCount) are the array's base and length --
  * FindCdFileIndex (CdDriver) walks the identical 0x1C stride over
  * sFileTable doing strstr() against `name`, confirming the layout

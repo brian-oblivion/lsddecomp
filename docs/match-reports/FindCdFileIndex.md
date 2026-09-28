@@ -6,7 +6,7 @@
 
 ## What it does
 
-Sibling of `FindCdFileEntry` over the same `sFileTable`/`gFileTableCount` record
+Sibling of `FindCdFileEntry` over the same `sFileTable`/`sFileTableCount` record
 table, but returns the matching record's **index** (`s32`) instead of a
 pointer, and `-1` if none match. Here the loop counter only increments on
 the not-found path (a plain instruction, not a branch-delay-slot trick),
@@ -23,7 +23,7 @@ s32 FindCdFileIndex(char *arg0)
     LockCd();
     while (strstr(cur, arg0) == NULL) {
         i++;
-        if (i >= gFileTableCount) {
+        if (i >= sFileTableCount) {
             return -1;
         }
         cur += 0x1C;

@@ -7,7 +7,7 @@
 ## What it does
 
 Linear scan over a flat table of 0x1C-byte string records based at
-`sFileTable`, `gFileTableCount` entries long. Returns a pointer to the first
+`sFileTable`, `sFileTableCount` entries long. Returns a pointer to the first
 record for which `strstr(record, needle) != NULL`, or `NULL` if none
 match. Brackets the whole scan with the unit's lock/unlock pair, but
 **only calls the unlock on the found path** -- the not-found path returns
@@ -30,7 +30,7 @@ void *FindCdFileEntry(char *arg0)
         }
         i++;
         cur += 0x1C;
-    } while (i < gFileTableCount);
+    } while (i < sFileTableCount);
     return NULL;
 }
 ```
@@ -42,7 +42,7 @@ GCC 2.6.3 -O2 does not hoist a test ahead of a `do-while` body.
 
 ### Proposed learning
 
-`sFileTable` (base pointer) / `gFileTableCount` (count) is a flat array of
+`sFileTable` (base pointer) / `sFileTableCount` (count) is a flat array of
 fixed-size string records; treat `sFileTable` as `char *` and step by
 `+= 0x1C` rather than declaring an array-of-struct type, since the
 per-record byte layout past the leading string is otherwise unknown to
@@ -50,7 +50,7 @@ this unit.
 
 ## Naming
 
-**Tier A.** Linear scan over the `sFileTable`/`gFileTableCount` record
+**Tier A.** Linear scan over the `sFileTable`/`sFileTableCount` record
 table, `strstr`-matching `name` against each 0x1C-byte record; returns the
 matching record pointer or `NULL`. Distinguished from `GetCdFileEntry`
 (direct index-to-pointer, no search) by the Find/Get convention. Caller
