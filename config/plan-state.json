@@ -1636,6 +1636,7 @@
       "checklist": {
         "comments": true,
         "docs-budget": true,
+        "globals": true,
         "nonmatching-clean": true,
         "style": true
       },
