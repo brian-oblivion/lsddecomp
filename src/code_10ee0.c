@@ -46,11 +46,11 @@ extern DrawSystem *gDrawSystem; /* sdata: the singleton GetDrawSystem returns */
 void ConvertRect(RECT *dst, DrawRect *src);
 
 DrawSystem *New_DrawSystem(void) {
-    DrawSystem *p = BMemPMgrAlloc(0x34);
+    DrawSystem *obj = BMemPMgrAlloc(0x34);
 
-    if (p != NULL) {
-        Get_vtable_DrawSystem()->ctor(p);
-        return p;
+    if (obj != NULL) {
+        Get_vtable_DrawSystem()->ctor(obj);
+        return obj;
     }
     return NULL;
 }
@@ -96,12 +96,12 @@ s32 DrawSystem__GetActiveBuffer(DrawSystem *self) {
     return GsGetActiveBuff();
 }
 
-void DrawSystem__LoadImage(DrawSystem *self, DrawRect *src, u32 *pixels) {
-    RECT rect;
+void DrawSystem__LoadImage(DrawSystem *self, DrawRect *rect, u32 *pixels) {
+    RECT gpuRect;
 
     if (self->running == 0 || self->syncMode != 0) {
-        ConvertRect(&rect, src);
-        LoadImage(&rect, pixels);
+        ConvertRect(&gpuRect, rect);
+        LoadImage(&gpuRect, pixels);
         if (self->syncMode != 0) {
             DrawSync(0);
         }
@@ -115,12 +115,12 @@ void ConvertRect(RECT *dst, DrawRect *src) {
     dst->h = src->h;
 }
 
-void DrawSystem__StoreImage(DrawSystem *self, u32 *pixels, DrawRect *src) {
-    RECT rect;
+void DrawSystem__StoreImage(DrawSystem *self, u32 *pixels, DrawRect *rect) {
+    RECT gpuRect;
 
     if (self->running == 0 || self->syncMode != 0) {
-        ConvertRect(&rect, src);
-        StoreImage(&rect, pixels);
+        ConvertRect(&gpuRect, rect);
+        StoreImage(&gpuRect, pixels);
         if (self->syncMode != 0) {
             DrawSync(0);
         }
@@ -131,11 +131,11 @@ s32 DrawSystem__NoOpSlot60(DrawSystem *self) {
     return 0;
 }
 
-void DrawSystem__MoveImage(DrawSystem *self, DrawRect *src, s16 x, s16 y) {
-    RECT rect;
+void DrawSystem__MoveImage(DrawSystem *self, DrawRect *rect, s16 x, s16 y) {
+    RECT gpuRect;
 
-    ConvertRect(&rect, src);
-    MoveImage(&rect, x, y);
+    ConvertRect(&gpuRect, rect);
+    MoveImage(&gpuRect, x, y);
 }
 
 void DrawSystem__RunLoop(DrawSystem *self) {
@@ -149,12 +149,12 @@ void DrawSystem__RunLoop(DrawSystem *self) {
 }
 
 void DrawSystem__CountFrames(DrawSystem *self) {
-    DrawSystem *obj = GetDrawSystem();
+    DrawSystem *drawSystem = GetDrawSystem();
 
-    obj->frameCount++;
-    if (obj->frameCount >= obj->vsyncCount && obj->countReached == 0) {
-        obj->countReached = 1;
-        obj->frameCount = 0;
+    drawSystem->frameCount++;
+    if (drawSystem->frameCount >= drawSystem->vsyncCount && drawSystem->countReached == 0) {
+        drawSystem->countReached = 1;
+        drawSystem->frameCount = 0;
     }
 }
 
@@ -168,16 +168,16 @@ s32 DrawSystem__GetVSyncCount(DrawSystem *self) {
     return self->vsyncCount;
 }
 
-void DrawSystem__ClearImage(DrawSystem *self, u8 *color, DrawRect *src) {
-    DrawRect dims;
-    RECT rect;
+void DrawSystem__ClearImage(DrawSystem *self, u8 *color, DrawRect *rect) {
+    DrawRect screen;
+    RECT gpuRect;
 
-    if (src == NULL) {
-        self->methods->getDims(self, &dims);
-        self->methods->clearImage(self, color, &dims);
+    if (rect == NULL) {
+        self->methods->getDims(self, &screen);
+        self->methods->clearImage(self, color, &screen);
     } else {
-        ConvertRect(&rect, src);
-        ClearImage(&rect, color[0], color[1], color[2]);
+        ConvertRect(&gpuRect, rect);
+        ClearImage(&gpuRect, color[0], color[1], color[2]);
     }
 }
 
