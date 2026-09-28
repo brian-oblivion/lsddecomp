@@ -2,6 +2,7 @@
 #define MODELDATA_H
 
 #include "FileResource.h"
+#include "TodSet.h"
 
 /*
  * ModelData -- a FileResource data source (class id 0x5F03, method table
@@ -52,15 +53,15 @@ typedef struct ModelDataMethods ModelDataMethods;
 #define MODELDATA_SLOTS(Self, CtorParams)                                                          \
     FILERESOURCE_SLOTS(Self, CtorParams);                                                            \
     /* +0x07C */ void (*releaseResources)(Self *self);          /* ModelData__ReleaseResources */  \
-    /* +0x080 */ u8 (*scanPackets)(Self *self, s32 arg1, s32 arg2); /* ModelData__ForwardScanPackets: todSet's +0x078 */ \
-    /* +0x084 */ void *(*decodePacketWord)(Self *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) /* ModelData__ForwardDecodePacketWord: todSet's +0x080 */
+    /* +0x080 */ u8 (*scanPackets)(Self *self, s32 out, s32 tmdId); /* ModelData__ForwardScanPackets: todSet's +0x078; out is a u8 *, tmdId a u32 * */ \
+    /* +0x084 */ void *(*decodePacketWord)(Self *self, s32 packet, s32 objId, s32 type, s32 flag, s32 len) /* ModelData__ForwardDecodePacketWord: todSet's +0x080; packet is a u32 *, the rest u8 * */
 /* clang-format on */
 
 /* clang-format off */
 #define MODELDATA_FIELDS(Methods)                                                                  \
     FILERESOURCE_FIELDS(Methods);                                                                    \
     /* +0x02C */ struct LinkResource *linkResource; /* New_LinkResource (include/LinkResource.h); released by ReleaseResources */ \
-    /* +0x030 */ FileResource *todSet;       /* New_TodSet (gTodSetMethods); +0x080/+0x084 forward to it */ \
+    /* +0x030 */ TodSet *todSet;       /* New_TodSet (gTodSetMethods); +0x080/+0x084 forward to it */ \
     /* +0x034 */ s32 ownsResources         /* the ctor's third argument: New_ModelData 1, TriggerWorld 0; BuildResources and ReleaseResources act only while it is set. The object is 0x38 bytes (New_ModelData): TriggerWorld's own fields start at +0x038 */
 /* clang-format on */
 
@@ -81,8 +82,8 @@ void ModelData__Finalize(ModelData *self);
 void ModelData__Load(ModelData *self);
 s32 ModelData__BuildResources(ModelData *self);
 void ModelData__ReleaseResources(ModelData *self);
-u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2);
-void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 arg1, s32 arg2, s32 arg3, s32 arg4,
-                                         s32 arg5);
+u8 ModelData__ForwardScanPackets(ModelData *self, s32 out, s32 tmdId);
+void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 packet, s32 objId, s32 type, s32 flag,
+                                         s32 len);
 
 #endif

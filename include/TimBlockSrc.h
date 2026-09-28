@@ -85,7 +85,7 @@ struct TimBlockSrc {
 extern TimBlockSrcMethods gTimBlockSrcMethods;
 extern TimBlockSrcMethods *GetTimBlockSrcMethods(void);
 
-void *New_TimBlockSrc(s32 arg0);
+void *New_TimBlockSrc(s32 name); /* name: the path, a char * the ctor opens; its one caller casts it to s32 */
 void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name);
 void TimBlockSrc__Finalize(TimBlockSrc *self);
 void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self);

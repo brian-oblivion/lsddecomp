@@ -898,7 +898,7 @@ s32 ModelData__BuildResources(ModelData *self) {
         self->linkResource = New_LinkResource(&req.src);
         if (self->linkResource != NULL) {
             req.src.buffer = ((ModelDataHeader *)self->buffer)->tods;
-            self->todSet = (FileResource *)New_TodSet(&req.src);
+            self->todSet = New_TodSet(&req.src);
             if (self->todSet != NULL) {
                 return 0;
             }
@@ -931,9 +931,8 @@ u8 ModelData__ForwardScanPackets(ModelData *self, s32 out, s32 tmdId) {
 /* decodePacketWord (+0x084): the TodSet's. */
 void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 packet, s32 objId, s32 type, s32 flag,
                                          s32 len) {
-    return ((TodSet *)self->todSet)
-        ->methods->decodePacketWord((TodSet *)self->todSet, (u32 *)packet, (u8 *)objId, (u8 *)type,
-                                    (u8 *)flag, (u8 *)len);
+    return self->todSet->methods->decodePacketWord(self->todSet, (u32 *)packet, (u8 *)objId,
+                                                   (u8 *)type, (u8 *)flag, (u8 *)len);
 }
 
 ModelDataMethods *GetModelDataMethods(void) {
