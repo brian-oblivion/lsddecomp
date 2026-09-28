@@ -100,7 +100,7 @@ every stage's mood table for a value equal to `*mood` and return the owning
 chunk — and the one call site outside this unit, `src/DreamSys.c:2003`
 inside `GenerateInitialSpawn` (`stage = GetStageChunkFromMood(&chunk,
 mood);`), passes a `MoodGraphPoint *mood` and uses the returned stage to
-index `sStageTimeLimits`/`STAGE_SPAWNPOINTS` and the returned `chunk` to
+index `sStageTimeLimits`/`sStageSpawnPoints` and the returned `chunk` to
 match a spawn point's own chunk, agreeing with "find the (stage, chunk) a
 mood value belongs to". Confirmed, not renamed. (`include/DreamSys.h:43`'s
 comment attributing `StageChunk`/`GetMoodFromStageChunk` usage to

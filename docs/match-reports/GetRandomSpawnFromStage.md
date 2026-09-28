@@ -102,7 +102,7 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 stg, s32 unused)
 	}
 
 	index = rand() % LEN_STAGE_SPAWNPOINTS[stage];
-	entry = &STAGE_SPAWNPOINTS[stage][index];
+	entry = &sStageSpawnPoints[stage][index];
 	*(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
 	target->position = sSpawnPosAdjust[entry->adjustment];
 	(*gpDinamicLinkPenalty)++;

@@ -840,7 +840,7 @@ extern s16 sStageTimeLimits[];
 
 extern struct RelativePos sSpawnPosAdjust[];
 
-extern StageSpawn *STAGE_SPAWNPOINTS[];
+extern StageSpawn *sStageSpawnPoints[];
 /* Retyped u8 (round 2026-09-08, GenerateInitialSpawn): retail reads it with
    `lbu`, and the surrounding loop guard (`count != 0` implying `count > 0`,
    a single `beqz`) only holds if it can't be negative -- a signed `s8` here
