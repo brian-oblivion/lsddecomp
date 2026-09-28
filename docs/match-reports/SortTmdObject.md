@@ -2111,3 +2111,18 @@ explanation of the four attribute reads, the do/while(0) loop-depth note,
 the binary-search switch layout and the "submit wrappers declared void"
 history (round 50) are all in the sections above; the source keeps one
 MATCHING line for each.
+
+## History (source comments moved in track 12, round 106)
+
+From the ADD_CLUT_ROWS macro's comment in src/graphics/tmd_renderer.c:
+
+> MATCHING: the do/while(0) gives back the loop depth SortTmdObject's goto
+> loops drop; without it local-alloc swaps $v0/$v1 at all six sites.
+
+From SortTmdObject's function comment in src/graphics/tmd_renderer.c:
+
+> MATCHING: retail keeps both pointers and addresses fields from each. The
+> loops are gotos because a do/while strength-reduces `elem` into a third
+> pointer (+28 words), `ctx` is assigned after the early return for
+> retail's a3 -> a1 -> s2 copy, and the RGB stores take `&POLY->r0` because
+> the addiu that forms it is retail's.

@@ -522,3 +522,9 @@ right numbers off the call sites for the wrong reason, corrected round 51;
 `ctx` was named round 77. From the old .c comment: the 0x20 frame is
 unused, and retail's `addiu $sp,$sp,-0x20` sits in the loop-skip branch's
 delay slot because nothing else before the branch is movable (round 75).
+
+## History (source comments moved in track 12, round 106)
+
+From FlagLargePolyForDivide's comment in src/graphics/tmd_renderer.c:
+the loop stopping one vertex short, so the last vertex never enters the
+box, was noted as "retail's behaviour" (the game's own quirk, kept).

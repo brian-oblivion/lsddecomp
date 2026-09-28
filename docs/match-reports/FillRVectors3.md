@@ -204,3 +204,11 @@ function keeps one `MATCHING:` line saying so. `PolyVtx`, `PolyXY8` and
 `CLAUDE.md` HARD RULE 6 cites this function as "`func_8001A3EC` (now
 `CopyPolyVtx3`)"; rename.py does not rewrite rule docs, so that reference is
 proposed to the head.
+
+## History (source comments moved in track 12, round 106)
+
+From FillRVectors3's comment in src/graphics/tmd_renderer.c:
+
+> MATCHING: whole-struct assignments. SVECTOR and DVECTOR have only short
+> members, so their alignment is 2 and GCC copies them with lwl/lwr,
+> swl/swr, as retail does.

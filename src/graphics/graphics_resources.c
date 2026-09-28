@@ -1,40 +1,20 @@
 /*
- * graphics_resources.c -- the FileResource data sources that turn loaded files
- * into graphics objects, the tile-map background layer, and the FMV player.
- *
- * FileResource subclasses, each reached through one of
- * gFileResourceMethods's table getters: an allocator (New_<Class>), a ctor
- * that adopts a buffer or requests a file, finalize, and the class's own
- * load steps.
- *  - TimBlockSrc reads a file of TIM blocks one CD read at a time (a 36-byte
- *    header of block offsets and sizes, then each block into a new
- *    TimArraySrc) and fades up to four 256-colour CLUT rows at VRAM y 480
- *    toward a colour (FadeClutRow).
- *  - TimArraySrc builds one TimImage per image of its buffer and uploads
- *    them.
- *  - LinkResource builds one TmdModel per object of a TMD, NULL-ended.
- *  - Tod walks one TOD animation's packets: ScanTodPackets lists a frame's
- *    object-create packets and finds the object a TMD id belongs to.
- *    TodSet is a Tod over a counted array of Tods.
- *  - ModelData builds a LinkResource and a TodSet from one buffer;
- *    TriggerWorld, its subclass, a counted array of ModelData.
- *  - TileMap and TileAtlas are built rather than loaded: a GsMAP over a
- *    20 x 15 grid of 16 x 16 cells, and the 300 GsCELLs it indexes.
- * Two more classes:
- *  - BgLayer, a SceneNode wrapping one GsBG over a TileMap's GsMAP; its
- *    rotation and scale follow SceneNode's ratio tables.
- *  - MoviePlayer, CD-streamed and MDEC-decoded FMV (CdStream frames,
- *    DecDCTvlc, then DecDCTin/DecDCTout in 16-pixel strips uploaded as they
- *    finish), one movie at a time (sActiveMoviePlayer).
- * The ctors take include/file_resource.h's ResourceSource; the build steps
- * that make them fill one as a ResourceRequest's `src`. The unit's own
- * types: UnprototypedCtorTable, the view the allocators call a ctor slot
- * through when they test its result; TimBlockHeader (and its byte copy,
- * TimBlockHeaderBytes), ModelDataHeader and SubBlockTable, the layouts of
- * TimBlockSrc's, ModelData's and TodSet's / TriggerWorld's buffers.
- *
- * The file holds more than one subject (BgLayer and MoviePlayer are not
- * FileResources); where the original files inside it began is not known.
+ * graphics_resources.c -- the FileResource data sources that turn loaded or
+ * built buffers into graphics objects, the tile-map background layer, and
+ * the FMV player. Each class's header documents it:
+ *  - TimBlockSrc (tim_block_src.h), TimArraySrc (tim_array_src.h): TIM
+ *    blocks read one CD read at a time into TimImages, and the CLUT fades;
+ *  - LinkResource (link_resource.h): a TMD file's TmdModels;
+ *  - Tod (tod.h), TodSet (tod_set.h): TOD animations and their packets;
+ *  - ModelData (model_data.h), TriggerWorld (trigger_world.h): a model
+ *    file's TMD and TODs, and a counted set of model files;
+ *  - TileMap (tile_map.h), TileAtlas (tile_atlas.h): the GsMAP and GsCELLs
+ *    of the 20 x 15 background grid, built rather than loaded;
+ *  - BgLayer (bg_layer.h): a SceneNode drawing one GsBG over a TileMap;
+ *  - MoviePlayer (movie_player.h): CD-streamed, MDEC-decoded FMV.
+ * Each FileResource class has an allocator (New_<Class>), a ctor that adopts
+ * a buffer or requests a file (a ResourceSource, include/file_resource.h),
+ * a finalizer, and its own load steps.
  */
 #include "common.h"
 #include <libgte.h>
@@ -304,12 +284,12 @@ void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, ColorRgb *color) {
 }
 
 /* fadeEntry (+0x080): set ramp `index`'s colour and rebuild it. */
-void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, ColorRgb *src) {
+void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, ColorRgb *color) {
     TimBlockSrcEntry *e;
 
     LockActiveDataSource();
     e = &self->entries[index];
-    e->color = *src;
+    e->color = *color;
     FadeClutRow(e, index);
     UnlockActiveDataSource();
 }
@@ -318,7 +298,7 @@ void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, ColorRgb *src) {
  * write mask - 1 rows below it, row i + 1 blending every non-zero colour
  * (i + 1) / mask of the way toward the ramp's colour (15-bit colours,
  * worked in 8 bits and 20.12 fixed point; the semi-transparency bit kept). */
-void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
+void FadeClutRow(TimBlockSrcEntry *entry, s32 index) {
     RECT dst;
     RECT src;
     u16 out[CLUT_COLORS];
@@ -348,12 +328,12 @@ void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
     dst.x = 0;
     dst.y = 0;
     dst.w = CLUT_COLORS;
-    r = e->color.r;
-    g = e->color.g;
-    b = e->color.b;
-    shift = FIX12_SHIFT - e->shift;
-    e->clutH = e->mask;
-    for (i = 0; i < e->mask - 1; i++) {
+    r = entry->color.r;
+    g = entry->color.g;
+    b = entry->color.b;
+    shift = FIX12_SHIFT - entry->shift;
+    entry->clutH = entry->mask;
+    for (i = 0; i < entry->mask - 1; i++) {
         f = (i + 1) << shift;
         rr = r * f;
         gg = g * f;

@@ -1,69 +1,109 @@
+/**
+ * @file flat_light_obj.h
+ * @brief FlatLightObj, one libgs flat light (GsF_LIGHT) as a BasicClass
+ *        object, and its method table.
+ */
 #ifndef FLAT_LIGHT_OBJ_H
 #define FLAT_LIGHT_OBJ_H
 
 #include "basic_class.h"
 #include "draw_system.h"
 
-/*
- * FlatLightObj -- one Psy-Q flat light, class id 0x6, method table
- * gFlatLightObjMethods, a direct BasicClass subclass (`tools/classtable.py
- * gFlatLightObjMethods --vs gBasicClassMethods`: overrides the ctor, adds three
- * slots). No class derives from it. Methods in src/graphics/flat_light_obj.c, which holds
- * the whole class: allocator, ctor, the three own slots and the getter.
- *
- * "FlatLight" is Sony's own name (LIBGS.H's GsF_LIGHT and GsSetFlatLight),
- * not a guess: the object keeps a light id at +0x00C and a GsF_LIGHT at
- * +0x010, and setColor/setDirection update the GsF_LIGHT and hand it by
- * address to GsSetFlatLight(lightId, &light). FlatLightParams is GsF_LIGHT's
- * layout (`int vx,vy,vz; unsigned char r,g,b;`, same offsets) with r,g,b
- * grouped as a ColorRgb (include/draw_system.h), which setColor's whole-struct
- * copy needs;
- * src/graphics/flat_light_obj.c takes GsSetFlatLight from <libgs.h> and casts to GsF_LIGHT *.
- *
- * Who holds one: LightRig__LightRig (src/graphics/sprite.c, include/light_rig.h)
- * makes three with New_FlatLightObj(0), (1), (2), keeps them in
- * LightRig::lights and adds each as a child; LightRig__Finalize releases
- * them. The one caller of setColor (+0x044) and setDirection (+0x048) is
- * StageMap__SetChildParams (src/world/dream_day.c), through LightRig's
- * getLight, with update = 1 and sources stepping 3 bytes (an r,g,b) and 6
- * bytes (an s16 vx,vy,vz) per light. That call site casts getLight's
- * BasicClass * to FlatLightObj * and its s32 sources to the slots' types.
- *
- * The object is 0x20 bytes (New_FlatLightObj's allocation).
- */
-
 typedef struct FlatLightObj FlatLightObj;
 typedef struct FlatLightObjMethods FlatLightObjMethods;
 
-/* == LIBGS.H GsF_LIGHT: the direction, then the colour. */
+/**
+ * @brief A flat light's direction and colour: <libgs.h>'s GsF_LIGHT, with
+ *        r, g, b grouped as one ColorRgb so setColor can copy them whole.
+ *
+ * The offsets are GsF_LIGHT's, so the methods pass it to GsSetFlatLight cast
+ * to GsF_LIGHT *.
+ */
 typedef struct {
-    /* +0x000 */ s32 vx, vy, vz;
-    /* +0x00C */ ColorRgb rgb;
+    /* +0x000 */ s32 vx, vy, vz; /**< the light's direction */
+    /* +0x00C */ ColorRgb rgb;   /**< the light's colour */
 } FlatLightParams;
 
+/**
+ * @brief FlatLightObj's method table, gFlatLightObjMethods: BasicClass's slots
+ *        with the ctor overridden, then three of its own.
+ */
 struct FlatLightObjMethods {
-    BASICCLASS_SLOTS(FlatLightObj, (FlatLightObj * self, s32 lightId)); /* ctor: FlatLightObj__FlatLightObj */
-    /* +0x040 */ void (*setLightId)(FlatLightObj *self, s32 lightId); /* FlatLightObj__SetLightId */
-    /* +0x044 */ void (*setColor)(FlatLightObj *self, s32 update,
-                                  ColorRgb *rgb); /* FlatLightObj__SetColor: copy *rgb if update, then GsSetFlatLight */
+    BASICCLASS_SLOTS(FlatLightObj, (FlatLightObj * self, s32 lightId)); /**< ctor: @see FlatLightObj__FlatLightObj */
+    /* +0x040 */ void (*setLightId)(FlatLightObj *self, s32 lightId); /**< @see FlatLightObj__SetLightId */
+    /* +0x044 */ void (*setColor)(FlatLightObj *self, s32 update, ColorRgb *rgb); /**< @see FlatLightObj__SetColor */
     /* +0x048 */ void (*setDirection)(FlatLightObj *self, s32 update,
-                                      s16 *dir); /* FlatLightObj__SetDirection: widen dir[0..2] if update, then GsSetFlatLight */
+                                      s16 *dir); /**< @see FlatLightObj__SetDirection */
 };
 
+/**
+ * @brief One of the game's three flat lights (class id 0x6): a light id and
+ *        the GsF_LIGHT it pushes to libgs on every change.
+ *
+ * Parent BasicClass; no class derives from it. Methods, the whole class, in
+ * src/graphics/flat_light_obj.c. The object is 0x20 bytes (New_FlatLightObj).
+ *
+ * LightRig__LightRig (src/graphics/sprite.c) makes three, with light ids 0, 1
+ * and 2, keeps them in LightRig::lights and adds each as a child;
+ * LightRig__Finalize releases them. Their one caller of setColor and
+ * setDirection is StageMap__SetChildParams (src/world/dream_day.c), through
+ * LightRig's getLight, with update = 1 and per-light sources of an r, g, b
+ * and an s16 vx, vy, vz.
+ */
 struct FlatLightObj {
     BASICCLASS_FIELDS(FlatLightObjMethods);
-    /* +0x00C */ s32 lightId;           /* the GsSetFlatLight id: 0, 1 or 2 from LightRig */
-    /* +0x010 */ FlatLightParams light; /* ends at +0x020, the object's size */
+    /* +0x00C */ s32 lightId;           /**< the GsSetFlatLight id: 0, 1 or 2 from LightRig */
+    /* +0x010 */ FlatLightParams light; /**< the light as last pushed; ends at +0x020, the object's size */
 };
 
+/** FlatLightObj's method table. */
 extern FlatLightObjMethods gFlatLightObjMethods;
-extern FlatLightObjMethods *GetFlatLightObjMethods(void); /* returns &gFlatLightObjMethods */
 
-/* The class's own methods, FlatLightObj, in ROM order. */
+/**
+ * @brief Returns FlatLightObj's method table.
+ * @return &gFlatLightObjMethods.
+ */
+extern FlatLightObjMethods *GetFlatLightObjMethods(void);
+
+/**
+ * @brief Allocates a FlatLightObj from the pool and constructs it.
+ * @param lightId The libgs flat light it drives (0, 1 or 2).
+ * @return The new light, or NULL when the pool is exhausted.
+ */
 FlatLightObj *New_FlatLightObj(s32 lightId);
+
+/**
+ * @brief Constructor (slot +0x008): BasicClass's, then setLightId.
+ * @param self    The object to construct.
+ * @param lightId The libgs flat light it drives.
+ */
 void FlatLightObj__FlatLightObj(FlatLightObj *self, s32 lightId);
+
+/**
+ * @brief Slot +0x040: sets the libgs flat light id the object drives.
+ * @param self    The light.
+ * @param lightId The new id; nothing is pushed until the next setColor or
+ *                setDirection.
+ */
 void FlatLightObj__SetLightId(FlatLightObj *self, s32 lightId);
+
+/**
+ * @brief Slot +0x044: optionally takes a new colour, then pushes the whole
+ *        light to libgs with GsSetFlatLight.
+ * @param self   The light.
+ * @param update Nonzero to copy `rgb` first; zero only pushes.
+ * @param rgb    The new colour.
+ */
 void FlatLightObj__SetColor(FlatLightObj *self, s32 update, ColorRgb *rgb);
+
+/**
+ * @brief Slot +0x048: optionally takes a new direction, then pushes the whole
+ *        light to libgs with GsSetFlatLight.
+ * @param self   The light.
+ * @param update Nonzero to widen dir[0..2] into vx, vy, vz first; zero only
+ *               pushes.
+ * @param dir    The new direction, three s16s.
+ */
 void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir);
 
 #endif

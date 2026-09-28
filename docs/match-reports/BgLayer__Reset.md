@@ -87,3 +87,9 @@ Later the same round (alpha, second class): TileMap unified too (`include/tile_m
 | `0x1000000`, `0x2000000` | `BG_ATTR_8BIT`, `BG_ATTR_15BIT` | B | GsBG attribute bits 24..25 are the colour mode in Sony's libgs (0 4-bit CLUT, 1 8-bit, 2 15-bit); mode 1, the one New_BgLayer's caller uses, is 15-bit over TileAtlas's GetTPage(2) pages, which agrees |
 | `320`, `240` | `BG_SCREEN_W`, `BG_SCREEN_H` | B | mode 1 sizes the layer to them; the display is 320 x 240 |
 | `0x1000` | `ONE` | A | unit scale in 20.12 |
+
+## History (source comments moved in track 12, round 106)
+
+From the BgLayer class banner in include/bg_layer.h: the GsBG colour
+r, g, b is one ColorRgb because retail copies it lb/lb/lb, sb/sb/sb here and
+in BgLayer__SetColor, a whole-struct copy (see that report).

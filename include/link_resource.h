@@ -1,44 +1,12 @@
+/**
+ * @file link_resource.h
+ * @brief LinkResource, the FileResource that turns one loaded TMD file into
+ *        an array of TmdModel objects, and its method table.
+ */
 #ifndef LINK_RESOURCE_H
 #define LINK_RESOURCE_H
 
 #include "file_resource.h"
-
-/*
- * LinkResource -- a FileResource data source (class id 0xD03, method table
- * gLinkResourceMethods) over one loaded TMD file: it builds one TmdModel
- * (include/tmd_model.h) per object of the TMD and hands them out by index.
- * Methods in src/graphics/graphics_resources.c; no subclasses.
- *
- * What its own methods do: map the file's TMD
- * (LinkResource__MapModel: GsMapModelingData(&file->flags)) and build and
- * return the TmdModel objects the callers LINK -- tod_actor.c's TOD
- * model-id packet passes getModel's result to SceneNode__LinkModel, and
- * dream_day.c links the TmdObject behind it with GsLinkObject4.
- *
- * Holders: ModelData's `linkResource` (ModelData__BuildResources, over the
- * TMD sub-block of a MOM file), PlacementGrid's `linkResource`
- * (StageMap__PopulateSlotCells, the element's models), DayTask's
- * `dreamerTmd` ("ETC\DREAMER.TMD") and DreamSys's ctor argument
- * (GameApplication__GameApplication, "ETC\DREAME5.TMD": DreamSys__DreamSys adds
- * getModel(0) as its child).
- *
- * Its parent ctor is the active driver's (GetActiveDataSourceMethods()->ctor,
- * chosen at run time; see include/model_data.h), so the fields below assume
- * FileResource's own 0x2C-byte layout. The object is 0x30 bytes
- * (New_LinkResource).
- *
- * Inherited slots keep FileResource's names and types; this table's occupants
- * differ from them in two places, and the callers cast:
- *   +0x008 ctor: LinkResource__LinkResource returns self, or NULL when the
- *          buffer it adopted fails to build (New_LinkResource tests it,
- *          through graphics_resources.c's unprototyped UnprototypedCtorTable view).
- *   +0x064 onRequestDone: LinkResource__BuildModels(self), s32: 1 when an
- *          allocation fails, else 0 after the active driver's onRequestDone.
- *   +0x078 processBuffer (NULL in FileResource): LinkResource__MapModel(self).
- *
- * The ctor's descriptor is ResourceSource (include/file_resource.h): a buffer
- * to adopt, else a file name to request.
- */
 
 struct TmdModel;
 struct TmdObject;
@@ -46,33 +14,123 @@ struct TmdObject;
 typedef struct LinkResource LinkResource;
 typedef struct LinkResourceMethods LinkResourceMethods;
 
+/**
+ * @brief LinkResource's method table, gLinkResourceMethods: FileResource's
+ *        slots, then three of its own.
+ *
+ * Inherited slots keep FileResource's names and types. Three occupants differ
+ * from them, and the callers cast: +0x008 ctor is LinkResource__LinkResource,
+ * which returns self or NULL; +0x064 onRequestDone is
+ * LinkResource__BuildModels, which returns s32 (LinkResourceBuildModelsFn);
+ * +0x078 processBuffer is LinkResource__MapModel (LinkResourceMapModelFn).
+ */
 struct LinkResourceMethods {
     FILERESOURCE_SLOTS(LinkResource, (LinkResource * self, ResourceSource *src));
-    /* +0x07C */ struct TmdObject *(*getTmdObject)(LinkResource *self, s32 index); /* LinkResource__GetTmdObject */
-    /* +0x080 */ struct TmdModel *(*getModel)(LinkResource *self, s32 index); /* LinkResource__GetModel */
-    /* +0x084 */ void (*slot84)(void); /* LinkResource__NoOp */
+    /* +0x07C */ struct TmdObject *(*getTmdObject)(LinkResource *self,
+                                                   s32 index); /**< @see LinkResource__GetTmdObject */
+    /* +0x080 */ struct TmdModel *(*getModel)(LinkResource *self, s32 index); /**< @see LinkResource__GetModel */
+    /* +0x084 */ void (*slot84)(void); /**< @see LinkResource__NoOp */
 };
 
+/**
+ * @brief A TMD model source (class id 0xD03): one loaded or adopted TMD file
+ *        and one TmdModel per object in it, handed out by index.
+ *
+ * Parent FileResource, through whichever data-source driver is active when it
+ * is built (its ctor chains to GetActiveDataSourceMethods()->ctor), so its
+ * fields follow FileResource's own 0x2C bytes. No subclasses. Methods in
+ * src/graphics/graphics_resources.c. The object is 0x30 bytes
+ * (New_LinkResource).
+ *
+ * Callers link the models it builds: tod_actor.c's TOD model-id packet passes
+ * getModel's result to SceneNode__LinkModel, and dream_day.c links the
+ * TmdObject behind one with GsLinkObject4. Holders: ModelData's
+ * `linkResource` (over the TMD in a MOM file), PlacementGrid's
+ * `linkResource`, DayTask's `dreamerTmd` ("ETC\DREAMER.TMD") and the
+ * DreamSys the GameApplication ctor builds over "ETC\DREAME5.TMD".
+ */
 struct LinkResource {
     FILERESOURCE_FIELDS(LinkResourceMethods);
-    /* +0x02C */ struct TmdModel **models; /* NULL-ended, one per TMD object (BuildModels); released and freed by Finalize */
+    /* +0x02C */ struct TmdModel **models; /**< NULL-ended, one per TMD object (BuildModels); released and freed by Finalize */
 };
 
-/* The occupants of +0x064 and +0x078 as the ctor and BuildModels call them
- * (no code: a function-pointer cast). */
+/** @brief LinkResource__BuildModels as the ctor calls it through the
+ *         void-typed onRequestDone slot. */
 typedef s32 (*LinkResourceBuildModelsFn)(LinkResource *self);
+
+/** @brief LinkResource__MapModel as BuildModels calls it through the
+ *         processBuffer slot. */
 typedef void (*LinkResourceMapModelFn)(LinkResource *self);
 
+/** LinkResource's method table. */
 extern LinkResourceMethods gLinkResourceMethods;
+
+/**
+ * @brief Returns LinkResource's method table.
+ * @return &gLinkResourceMethods.
+ */
 extern LinkResourceMethods *GetLinkResourceMethods(void);
 
+/**
+ * @brief Allocates a LinkResource from the pool and constructs it.
+ * @param src The descriptor: a TMD buffer to adopt, else a file name to
+ *            request.
+ * @return The new object, or NULL when the pool is exhausted or the models
+ *         of an adopted buffer cannot be built (the object is then freed).
+ */
 LinkResource *New_LinkResource(ResourceSource *src);
+
+/**
+ * @brief Constructor (slot +0x008): the active driver's, then either adopts
+ *        the descriptor's buffer and builds its models at once, or requests
+ *        the named file.
+ * @param self The object to construct.
+ * @param src  The descriptor, or NULL for neither.
+ * @return self, or NULL when building an adopted buffer's models fails.
+ */
 void *LinkResource__LinkResource(LinkResource *self, ResourceSource *src);
+
+/**
+ * @brief Finalizer (slot +0x00C): releases every model, frees the array, then
+ *        runs the active driver's finalizer.
+ * @param self The object being destroyed.
+ */
 void LinkResource__Finalize(LinkResource *self);
+
+/**
+ * @brief Slot +0x064 (onRequestDone): maps the TMD, then builds a NULL-ended
+ *        array of one TmdModel per TMD object and runs the driver's
+ *        onRequestDone.
+ * @param self The object, its buffer holding the TMD file.
+ * @return 0 on success; 1 when an allocation fails, everything built so far
+ *         released.
+ */
 s32 LinkResource__BuildModels(LinkResource *self);
+
+/**
+ * @brief Slot +0x078 (processBuffer): GsMapModelingData over the TMD in the
+ *        buffer, turning its offsets into addresses.
+ * @param self The object, its buffer holding the TMD file.
+ */
 void LinkResource__MapModel(LinkResource *self);
+
+/**
+ * @brief Slot +0x07C: one entry of the TMD's object table.
+ * @param self  The object.
+ * @param index The TMD object's index; not range-checked.
+ * @return The object table entry, inside the buffer.
+ */
 struct TmdObject *LinkResource__GetTmdObject(LinkResource *self, s32 index);
+
+/**
+ * @brief Slot +0x080: one of the built models.
+ * @param self  The object.
+ * @param index The model's index; not range-checked.
+ * @return The TmdModel built over TMD object `index`.
+ */
 struct TmdModel *LinkResource__GetModel(LinkResource *self, s32 index);
+
+/** @brief Slot +0x084: does nothing. */
 void LinkResource__NoOp(void);
 
 #endif

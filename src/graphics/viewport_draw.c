@@ -1,37 +1,9 @@
 /*
- * viewport_draw.c -- Viewport__DrawNode: draws one SceneNode into the Viewport's
- * current ordering table, after first drawing each of its SceneNode children
- * the same way.
- *
- * It is slot +0x0A0 (drawNode) of gViewportMethods, inherited unchanged by
- * gNodeGuardedViewportMethods (include/viewport.h). The node's class id
- * picks the draw path, and each path reads the node as the class it tests
- * for:
- *  - a BgLayer: its GsBG to GsSortBg, at the OT's last tag;
- *  - a BoxFill (FadeBox too): its GsBOXF placed from posX/posY, in percent
- *    of the half-screen while `relative` is set and in pixels otherwise, to
- *    GsSortBoxFill at the object's own pri;
- *  - a ScreenSprite (and its subclasses): its GsSPRITE placed from
- *    screenPos, percent of the half-screen from the centre, plus its pivot
- *    (mx, my), to GsSortSprite at tag 0;
- *  - any other Sprite: a world-space sprite. Its coord2's position goes
- *    through the local-screen matrix and a perspective divide by the
- *    Viewport's projH. It is dropped unless its depth is in 1..0xFFFF (the
- *    GTE's 16-bit screen z) and past nearZ, its x/y are clamped to
- *    SPRITE_POS_LIMIT, and its depth past nearZ over zDiv is its OT tag;
- *  - anything else: the node's own GsDOBJ2 (+0x010), under GsGetLws's light
- *    and local-screen matrices, to SortTmdObject (tmd_renderer.c), the
- *    game's replacement for GsSortObject4, when it has a TMD.
- * A GridCell whose GsDOFF bit is set is skipped, children and all.
- *
- * Before drawing, a node whose coord2 is dirty (flg == 0) rebuilds its
- * matrix from its GsCOORD2PARAM's rotate and scale and marks each child it
- * draws dirty in turn.
- *
- * The subclasses spell their GsBG/GsBOXF/GsSPRITE field by field, hence the
- * casts to Sony's types at the libgs calls.
- *
- * The rest of the Viewport class is in task.c.
+ * viewport_draw.c -- Viewport__DrawNode, the Viewport's drawNode slot
+ * (+0x0A0 of gViewportMethods, inherited by gNodeGuardedViewportMethods,
+ * include/viewport.h): it draws a SceneNode and its SceneNode children into
+ * the Viewport's current ordering table, picking a libgs sort call by the
+ * node's class. The rest of the Viewport class is in src/app/task.c.
  */
 #include "common.h"
 #include <libgte.h>
@@ -62,7 +34,23 @@
 
 /*
  * Draws `node` into self->ot[self->otIndex], after first drawing, in list
- * order, every child that is a SceneNode and whose parent is `node`.
+ * order, every child that is a SceneNode and whose parent is `node`. A
+ * GridCell whose GsDOFF bit is set is skipped, children and all. A node
+ * whose coord2 is dirty (flg == 0) first rebuilds its matrix from its
+ * GsCOORD2PARAM's rotate and scale, and marks each child it draws dirty.
+ * The node's class picks the path:
+ *  - BgLayer: its GsBG to GsSortBg, at the OT's last tag;
+ *  - BoxFill (FadeBox too): its GsBOXF at posX/posY, percent of the
+ *    half-screen while `relative` is set and pixels otherwise, to
+ *    GsSortBoxFill at its own pri;
+ *  - ScreenSprite: its GsSPRITE at screenPos, percent of the half-screen
+ *    from the centre, plus its pivot, to GsSortSprite at tag 0;
+ *  - any other Sprite, in world space: projected by the local-screen matrix
+ *    and the Viewport's projH; dropped unless its depth is 1..0xFFFF and
+ *    past nearZ, x/y clamped to SPRITE_POS_LIMIT, OT tag (depth - nearZ) /
+ *    zDiv;
+ *  - anything else: its GsDOBJ2 under GsGetLws's matrices to SortTmdObject,
+ *    when it has a TMD. Casts to Sony's types mark the libgs calls.
  */
 void Viewport__DrawNode(Viewport *self, SceneNode *node) {
     MATRIX lsBuf;
