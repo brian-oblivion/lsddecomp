@@ -9,7 +9,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-Returns the string `*GetSoundEffectDirRef()` (the "SND\\SE" pointer gSoundEffectDirPtr). Callers pass one ignored argument (DayTaskStageMap.c declares it `s32 GetSoundEffectDir(s32)`); the body never reads `a0`, so it is written `(void)` here.
+Returns the string `*GetSoundEffectDirRef()` (the "SND\\SE" pointer sSoundEffectDirPtr). Callers pass one ignored argument (DayTaskStageMap.c declares it `s32 GetSoundEffectDir(s32)`); the body never reads `a0`, so it is written `(void)` here.
 
 ## Source
 

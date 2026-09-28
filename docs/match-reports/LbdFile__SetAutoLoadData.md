@@ -32,7 +32,7 @@ extern s32 sForcedSoundBank;
 extern s32 sForcedStageBgm;
 extern u8 sSoundBankPaths[];
 extern u8 sRecordTable[];
-extern char *gSoundEffectDirPtr;  /* -> "SND\\SE" */
+extern char *sSoundEffectDirPtr;  /* -> "SND\\SE" */
 extern const char sAsmkMoviePath[];
 extern s16 sMovieFrameCounts[];
 

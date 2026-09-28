@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gSoundEffectDirPtr
 gSsTicksPerSecond
 gStartupBMemPMgr
 gStyleClearColor
@@ -205,6 +204,7 @@ sSaveTitleColorChannel
 sSaveTitleColorFrame
 sSaveTitleGlyphs
 sSaveTitleOffset
+sSoundEffectDirPtr
 sSpecialDayMood
 sStage5TriggerGridPos
 sStaircaseOffset0
