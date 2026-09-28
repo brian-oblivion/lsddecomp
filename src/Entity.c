@@ -2364,7 +2364,7 @@ void Entity__MoodCue85(Entity *this, SoundCueSet *out) {
                     this->fadeBox->methods->startFadeUp(this->fadeBox, (BasicClass *)this->ticker, 0, 0);
                 }
             }
-            ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 0, ROTATION_ZPLUS1);
+            ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 0, sRotationZPlus1);
         } else {
             SetCueTones18_3_3(out);
             ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, sRotationYawPlus180);
