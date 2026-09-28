@@ -703,7 +703,7 @@ extern void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world,
 
 /* Added to the viewport's projection distance; 0 in the image and never
  * written. */
-extern s32 gObjMProjectionBias;
+extern s32 sObjMProjectionBias;
 
 /* The StageMap's accepted tags (setAcceptedTags): the class ids of DreamSys
  * (0x1F34) and Entity (0x1F234), 0-terminated. */
@@ -720,7 +720,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
 
     drawSystem = (DrawSystem *)self->initArgs->drawSystem;
     width = drawSystem->methods->getDims(drawSystem, NULL)->w;
-    vp->methods->setProjection(vp, width / 2 * 5 / 3 + gObjMProjectionBias);
+    vp->methods->setProjection(vp, width / 2 * 5 / 3 + sObjMProjectionBias);
 
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &gObjMViewPoint,
                                  &gObjMViewRefPoint, 0);

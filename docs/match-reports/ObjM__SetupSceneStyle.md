@@ -24,7 +24,7 @@ struct UnkCObj_3bb8c_l {
 
 extern void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 extern void *GetStageGridDimensions(s32 index);
-extern s32 gObjMProjectionBias;
+extern s32 sObjMProjectionBias;
 extern s32 sObjMAcceptedClassIds;
 
 void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
@@ -38,7 +38,7 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
 
     obj = *(UnkCObj_3bb8c_l **)self->unkC;
     val = *obj->methods->slot7C(obj, 0);
-    unk18->methods->slot54(unk18, val / 2 * 5 / 3 + gObjMProjectionBias);
+    unk18->methods->slot54(unk18, val / 2 * 5 / 3 + sObjMProjectionBias);
 
     unk18->methods->slot70(unk18, self->unk3C, &gObjMViewPoint, &gObjMViewRefPoint, 0);
 
