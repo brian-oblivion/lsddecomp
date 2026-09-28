@@ -63,3 +63,13 @@ through `->methods->` from within this unit; what calls it, and what the
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `gDrawSystem` (rename.py). Byte-identical.
+
+## Track 7 (2026-09-28, round 101, alpha)
+
+Field `unkC` -> `countReached` (tier B, definition-only rename in
+`include/DrawSystem.h`; the compiler's error list named this function's two
+accesses and nothing else, and `tools/check-nonmatching.sh` found no
+NON_MATCHING accessor). Evidence: this body sets it to 1, and restarts
+`frameCount`, once `frameCount >= vsyncCount` while it is still 0. No C
+anywhere reads or clears it, so what the flag gates is not established; the
+name says only when it is raised.

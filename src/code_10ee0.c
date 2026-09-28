@@ -152,8 +152,8 @@ void DrawSystem__CountFrames(DrawSystem *self) {
     DrawSystem *obj = GetDrawSystem();
 
     obj->frameCount++;
-    if (obj->frameCount >= obj->vsyncCount && obj->unkC == 0) {
-        obj->unkC = 1;
+    if (obj->frameCount >= obj->vsyncCount && obj->countReached == 0) {
+        obj->countReached = 1;
         obj->frameCount = 0;
     }
 }
