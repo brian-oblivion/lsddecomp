@@ -132,3 +132,18 @@ list (SetupBMemPMgrFreeList, BMemPMgrFree, the split remainder) and cleared
 when BMemPMgrAlloc takes one; `BMEM_PREV_FREE` 0x80000000 is set on the block
 above a freed one and on the sentinel, cleared on the block above an allocated
 one, and tested by BMemPMgrFree before it reads the lower neighbour's footer.
+
+## History (moved from include/bmem_pmgr.h, track 12)
+
+The header's comment above the prototype read:
+
+> Makes the whole pool one free block. One argument: the body also reads a
+> fallback pool from $a1 while sDefaultBMemPMgr is unset, but BMemPMgrInit,
+> its only caller, never loads $a1, and a second parameter here would make
+> it load one.
+
+Measured at the track 12 pass (objdump of build/src/app/bmem_pmgr.c.o, which
+matches retail): the fallback is the function's only argument, `$a0`
+(`move a1,a0` after the `sDefaultBMemPMgr` test), not `$a1`. The comment
+described BMemPMgrAlloc/BMemPMgrFree's shape, which this function does not
+share; the C (`mgr = pool`) was right, and the header now says so.

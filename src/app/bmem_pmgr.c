@@ -1,6 +1,6 @@
 /*
- * BMemPMgr -- the game's pool allocator and the first half of BasicClass,
- * two things that share this file:
+ * BMemPMgr -- the game's pool allocator and BasicClass's methods, two
+ * things that share this file:
  *
  *  - The BMemPMgr pool allocator, the game's general-purpose allocator.
  *    BMemPMgrInit mallocs one area, a BMemPMgr header followed by the pool's
@@ -32,6 +32,7 @@ extern BMemPMgr *sDefaultBMemPMgr;
  * malloc-failure message. */
 extern char sBMemPMgrInitFailFmt[];
 
+/* MATCHING: bmem_pmgr.h declares this without a prototype, so main() can pass its dead second argument. */
 void *BMemPMgrInit(s32 poolSize) {
     BMemPMgr *pool;
 

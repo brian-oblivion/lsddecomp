@@ -178,3 +178,12 @@ The file's banner carried its edge evidence and the reason for its name:
 > because moving it is a split, which no tool does. Named for the
 > allocator: BasicClass.c would collide with the class's header,
 > include/BasicClass.h, and the rest of the class is in the other file.
+
+## History (moved from include/bmem_pmgr.h, track 12)
+
+The header's declaration carried the matching note on its own line:
+
+> `extern void *BMemPMgrInit(); /* MATCHING: unprototyped, main() passes a dead 2nd argument retail loads (arity-ok: main.md) */`
+
+It is now a doc block and a plain `arity-ok:` note (externcheck's marker),
+and the `MATCHING:` line sits above the definition in src/app/bmem_pmgr.c.
