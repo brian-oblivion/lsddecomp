@@ -33,3 +33,9 @@ void CdStream__OnStreamEnd(CdStreamObj *self) {
 Class unified as `CdStream` (include/cd_stream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
 
 Renamed from CdStreamObj__OnStreamEnd (tools/rename.py), the class rename only.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/cd/cd_stream.c`:
+
+The comment read "Tests onStreamEnd but calls onFrameReady, as retail does." The source keeps the first half; the header documents the quirk.

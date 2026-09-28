@@ -29,3 +29,16 @@ void CdStream__NoOpSlot7C(CdStreamObj *self) {
 Class unified as `CdStream` (include/cd_stream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
 
 Renamed from CdStreamObj__func_800478F8 (tools/rename.py): the empty occupant of slot +0x07C, named for its slot. The slot has callers: MoviePlayer__Rewind passes (MoviePlayer__RequestRestart, player) and MoviePlayer__Abort (0, 0), so the slot is typed `(self, fn, arg)` from their bytes while this body takes self only; with an empty body the slot's intent (a callback setter, by its arguments) is not evidenced here, so it is not named for it.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/cd_stream.h`:
+
+The slot comment in include/cd_stream.h read:
+
+>     /* +0x07C: the occupant, CdStream__NoOpSlot7C, is empty and takes self
+>      * only; the parameters are the callers'. MoviePlayer__Rewind passes
+>      * (MoviePlayer__RequestRestart, player) and MoviePlayer__Abort (0, 0), in
+>      * $a1/$a2, so a narrower slot would drop those argument loads. */
+
+The header now documents the slot with `@see CdStream__NoOpSlot7C` and names the callers; the reason for the three-parameter type is a `MATCHING:` line above the definition in src/cd/cd_stream.c.

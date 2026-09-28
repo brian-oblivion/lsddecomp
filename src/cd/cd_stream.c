@@ -285,7 +285,7 @@ void CdStream__ReleaseFrame(CdStream *self, u32 *base, u32 frame) {
     }
 }
 
-/* Tests onStreamEnd but calls onFrameReady, as retail does. */
+/* Tests onStreamEnd but calls onFrameReady. */
 void CdStream__OnStreamEnd(CdStream *self) {
     if (self->onStreamEnd != NULL) {
         self->onFrameReady(self->cbArg);
@@ -309,6 +309,7 @@ int CdStream__Sync(CdStream *self, int mode) {
     return CdSync(mode, self->cdResult);
 }
 
+/* MATCHING: cd_stream.h's slot keeps its callers' (self, fn, arg); a narrower slot drops their argument loads */
 void CdStream__NoOpSlot7C(CdStream *self) {}
 
 CdStreamMethods *GetCdStreamMethods(void) {

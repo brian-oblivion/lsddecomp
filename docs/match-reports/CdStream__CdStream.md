@@ -112,3 +112,37 @@ Constants (unit-local `#define`s, evidence on each definition):
 `_1X` 150 (the CD-ROM's sector rate at each speed), `CDSTREAM_FRAME_UNIT`
 2054 (kept named but unexplained: not the 2048-byte sector size). `state`
 is `enum CdStreamState` in include/cd_stream.h.
+
+## History (source comments moved in track 12, round 106)
+
+From `include/cd_stream.h`:
+
+The class banner in include/cd_stream.h read, before it became the header's Doxygen class documentation:
+
+> /*
+>  * CdStream -- one streamed CD file (an FMV's sectors) read through Sony's
+>  * libcd streaming library (StSetRing/StSetStream/StGetNext/StFreeRing), class
+>  * id 0x40, method table gCdStreamMethods, a direct BasicClass subclass.
+>  * Methods in src/cd/cd_stream.c. The one holder is MoviePlayer (gMoviePlayerMethods,
+>  * src/graphics/graphics_resources.c), whose ctor builds one with New_CdStream(cdSpeed, MOVIE_FPS, 0)
+>  * into its +0x060 and drives it through the slots below.
+>  *
+>  * One stream at a time. `sActiveCdStream` is the stream that owns the drive:
+>  * open sets it, close clears it, and seek/startRead/stop/restart/mute/demute
+>  * are no-ops for any other object. `state` runs 0 idle -> open ->
+>  * seek (1) -> startRead (2) -> stop (4) -> restart (back to 0 and re-seek);
+>  * close tears it down from any state.
+>  *
+>  * `cdSpeed` < 4 means double speed: the ctor then counts 300 sectors a second
+>  * (else 150) and startRead reads in mode 0x1C0 (CdlModeStream | CdlModeSpeed
+>  * | CdlModeRT; else 0x140). `bytesPerFrame` is (sectors a second / fps / 2
+>  * * 2) * 2054, and open divides the file size by it into `totalFrames`.
+>  *
+>  * The callback words (+0x048, +0x04C, +0x054) are cleared by the ctor and
+>  * written nowhere else: New_CdStream's one caller is MoviePlayer's ctor and
+>  * sActiveCdStream is read only in CdStream, so the object reaches no other
+>  * code, and MoviePlayer only calls slots. It hands its callback to slot
+>  * +0x07C instead, whose occupant is empty.
+>  *
+>  * NO FIELDS/SLOTS MACROS: no class lies below 0x40 (`typeviews.py --tree`).
+>  */
