@@ -1216,3 +1216,31 @@ carried, verbatim:
  * function in strict ROM-address order.
  */
 ```
+
+## History (moved from src/libsnd_vm_vol_ut_key_ut_keyv.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libsnd_vm_vol_ut_key_ut_keyv.c read:
+
+> NON_MATCHING: 315/324 words, 9 words short; raw word-match 10/324,
+> insertions 76 / deletions 76 (re-measured round 70, unchanged since
+> round 62). Residue: one GCC CSE decision on the
+> `_svm_tn[_svm_voice[i].unk14]` address plus two loop-invariant
+> hoists (docs/match-reports/SpuVmSetVol.md). Hand-derived.
+
+The declaration of the reentrancy lock at the top of the file carried:
+
+> Reentrancy lock, same identifier/type as the sibling reading in
+> Sony's `SsSeqCalledTbyT` (`libsnd/sscall`, linked since round 34; it was
+> libsnd_decre.c's matched func_80033738) -- "if already busy, return/skip;
+> set; ...; clear before returning" guarding a per-channel operation.
+
+The file's banner carried its edge evidence and the reason it is parked:
+
+> What decided its edges (python3 tools/tuboundary.py): the placed object
+> libsnd/vm_prog precedes it ("start edge possible") and the placed object
+> libsnd/ut_pb follows it ("start edge possible"), so there is nothing to
+> merge with. Inside, every edge is "boundary possible": the binary neither
+> proves nor forbids a file boundary. PARKED: the content says three files
+> (after SpuVmSetVol and after SsUtKeyOff, the 3.6 module edges), but that
+> split is a new carve, not a merge or rename, so the file keeps its carve
+> edges and is named for all three modules.

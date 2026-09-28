@@ -606,3 +606,13 @@ Signature is now Sony's `<libsnd.h>` prototype, all eight parameters
 `short`, returning `short` (was `s32` with `u16 p3, p4`); the body passes
 `(u16)p3, (u16)p4` to note2pitch2. Measured before and after: unchanged
 (248/253). ProgAtr/VagAtr substitution as in SsUtKeyOn.md.
+
+## History (moved from src/libsnd_vm_vol_ut_key_ut_keyv.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libsnd_vm_vol_ut_key_ut_keyv.c read:
+
+> NON_MATCHING: 248/253 words, 5 words short (re-measured round 70).
+> Residue: the busy-lock guard's branch polarity and a second guard
+> flip; the 5-word gap is not re-characterised since
+> `--nop-at-expansion` closed 11 of the old 16
+> (docs/match-reports/SsUtKeyOnV.md). Hand-derived.

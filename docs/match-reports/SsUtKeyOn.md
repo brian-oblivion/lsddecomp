@@ -1143,3 +1143,13 @@ The NON_MATCHING body now stores `_svm_voice[(u8) result].unkNN`; normalized dis
   `_svm_pg`/`_svm_tn`, pinned at those addresses. Every staged field's
   offset and width agrees with Sony's layout, and the vag == 0 (no tone) and
   vag == 0xFF (noise) tests read as Sony's field meanings. See SpuVmSetVol.md's Naming for the full evidence.
+
+## History (moved from src/libsnd_vm_vol_ut_key_ut_keyv.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libsnd_vm_vol_ut_key_ut_keyv.c read:
+
+> NON_MATCHING: 252/252 words, length exact; raw word-match 65/252,
+> insertions 11 / deletions 11 (re-measured round 70). Residue: the
+> busy-lock guard's branch polarity, with the rest not re-characterised
+> since `--nop-at-expansion` closed the old length gap
+> (docs/match-reports/SsUtKeyOn.md). Hand-derived.
