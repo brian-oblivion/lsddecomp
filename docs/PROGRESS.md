@@ -6,6 +6,74 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-28 — round 101: tracks 7 and 8 done, 75 units become 45 files, track 9 opens (premium head, plan revision 38)
+
+Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 19
+jobs, all Opus, none sent back. Gate 0 green.
+
+- **Track 7 done, thirteen units marked** (five samples each, Sony values
+  read from `<libcd.h>`/`<libgs.h>`, table words from `classtable.py`):
+  class_3bb8c_q, class_3bb8c_s, code_d294, code_179d8_r, code_3311c,
+  code_10ee0, class_16334, code_2a0e0, code_179d8_o, main, code_179d8_q,
+  code_2b78c, StageGrid. What landed:
+  - code_179d8_r takes `<libcd.h>`, and its two goto ladders are the
+    `switch`es GCC's decision tree came from (LEARNINGS 3b: case BODY
+    order sets a sparse switch node's branch encoding). code_3311c takes
+    `<libgs.h>`, code_2a0e0 `<libsnd.h>`: 4 to 2 files re-declare a Sony
+    name.
+  - code_179d8_q declared LockCd/UnlockCd after their first call: 13 cc1
+    warnings, gone (typeviews 59 to 44 over the round).
+  - StageGrid measured zero debt and still held 16 UPPER_SNAKE globals
+    (`STAGE_GRID_DIMENSIONS`, `STG00_CHUNK_MOODS`..): now `sName`. The
+    symbols file holds 132 such game globals and readability.py sees none
+    (for the operator).
+  - class_16334's table at 0xF64 is Pad's own rodata, not Psy-Q's (link
+    order); the yaml comment says so.
+- **Track 8 done, six jobs, eleven regions:** 48 units became 18 files
+  (src/ 75 to 45): GameApplicationFileResource (the getter follows its
+  class's methods in all 27 files that have one, so the 0x171E0 carve edge
+  was not a file edge), TimImage, FlatLightObj, SceneNode, DrawSystem, Pad,
+  WBgm, CdDriver (rodata joins four slices), Application, DayTaskStageMap,
+  TitleMenuTaskObjF, TextEntryItemList, ObjMStyleActor (ten slices), DreamAux,
+  Entity, TodActor. Parked: two carve edges content would move (b|c, j|k).
+- **Head edits at merge, zero bytes:**
+  - Two refused merges finished: the 0x1D7C `.rodata` line renamed so
+    unitfile.py could merge class_3bb8c_g; and code_179d8_o into CdDriver.c
+    by hand, because unitfile.py refuses any token rewrite whose NEW is
+    also an identifier (`CdDriver` is the type), done with its own
+    `rewrite_tokens` and `plan.ledger_rename`, byte-exact first build.
+  - The last merge's `replay.py` re-applied charlie's
+    `merge class_39e08 class_3bb8c` token rewrite to delta's
+    `#include "class_3bb8c.h"`, a header charlie had deliberately kept:
+    six lines restored by hand. A unit stem that is also a live header's
+    stem is a replay hazard (for the operator).
+  - Proposals applied: Sprite `accumulateScale`; `gStyleEffectViewport` as
+    `Viewport *`; the nine `ATTR_*_SHIFT` once (now SceneNode.h);
+    `CdLoc16` retired for Sony's `CdlLOC` (FileResource.h takes
+    `<libcd.h>`); `CD_TICK_NONE`; one `ApplicationLoopStatus`;
+    StageGrid.h's parameters and unit-static externs; yaml carve-history
+    lines; README's code map.
+- **Plan revision 38:** plan.py flushes a files batch before a region that
+  would take it past REGION_UNITS (a 1-unit region had been glued to a
+  22-unit one: round 100's "bundles independent regions" escalation, the
+  part of it that bit).
+- **Track 9 opens:** `style` (after one `make format` commit),
+  `nonmatching-clean` and `docs-budget` ticked as measured (LEARNINGS §4
+  distilled to the archive to make room for 3b's entry). Left: `layout`,
+  `readme`, `comments`.
+- **Measured** (`plan.py`, against round 100's entry): func_ 8 to 5, D_ 4
+  to 2, unk 128 to 120, magic 921 to 884, rawoff 64 to 58, m2c 8 to 6;
+  history 103 to 113 (the files banners' edge evidence and slice names).
+- **Deferred proposals** (in the reports): SceneNode's
+  updateRotation/updateScale slots and RatioToFixed12 as `Ratio16 *`;
+  StyleEffect__SpawnSprites' `scale` as `Ratio16 *`; re-home
+  class_3bb8c.h's sections into their class headers (the one placeholder
+  header left); `DATASOURCE_CD`/`_SPU` as shared names; FlatLightObj's
+  `setDirection` as `SVECTOR *`; `CdRequestNode::unk4`; the Find/Get
+  CdFileEntry return types.
+
+---
+
 ## 2026-09-27 — round 100: eleven units polished, five regions become six files, and the head finishes two parked edits (premium head)
 
 Premium head (Opus 5.5), cap 5, two waves with slots refilled as runners
