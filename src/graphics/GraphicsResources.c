@@ -61,9 +61,7 @@
 #include "MoviePlayer.h"
 #include "BMemPMgr.h"
 #include "GameApplicationFileResource.h"
-
-#define CD_SECTOR_SIZE 2048 /* a CD-ROM data sector: TimBlockSrc's first read */
-#define FIX12_SHIFT 12      /* ONE == 1 << FIX12_SHIFT: 20.12 fixed point */
+#include "CdDriver.h"
 
 /* The fade CLUTs: 256-colour rows from VRAM y 480. TimBlockSrc lays its
  * four ramps out there and TimArraySrc maps an image's CLUT row back to

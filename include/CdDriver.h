@@ -137,8 +137,7 @@ typedef struct CdRequestNode {
 /* A CD-ROM data sector's user data (2048 bytes; <libcd.h>'s CdlModeSize0/1
  * clear). CdRead counts sectors, so byte sizes and offsets are shifted by
  * CD_SECTOR_SHIFT (ReadCdFile, CdDriver__Seek), and GetCdFileSize reports a
- * file's size in whole sectors. CD_SECTOR_SIZE is spelled exactly as
- * GraphicsResources.c's own definition, so the two may meet. */
+ * file's size in whole sectors. */
 #define CD_SECTOR_SIZE 2048
 #define CD_SECTOR_SHIFT 11
 
