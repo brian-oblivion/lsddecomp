@@ -220,7 +220,7 @@ struct Viewport;
 
 struct LinkResource;
 
-/* DreamSys__DreamSys's `arg1` is a LinkResource (include/LinkResource.h;
+/* DreamSys__DreamSys's `modelSource` is a LinkResource (include/LinkResource.h;
    GameApplication__GameApplication passes New_LinkResource("ETC\DREAME5.TMD")): the
    ctor keeps it in modelSource and adds its getModel(0), a TmdModel, as a
    child. */
@@ -239,10 +239,10 @@ struct DreamSys {
     /* Set by DreamSys__SetSoundObj(self, value): a VabStreamObj, cast to
            one where it is called through (include/VabStreamObj.h). */
     s32 soundObj;
-    /* The camera: set by DreamSys__SetViewport (and the ctor's arg3); see
+    /* The camera: set by DreamSys__SetViewport (and the ctor's `viewport`); see
            `struct Viewport` above for the refView fields this class moves. */
     struct Viewport *viewport;
-    /* Set by the ctor to its `arg1`: the LinkResource its model 0 came
+    /* Set by the ctor to its `modelSource`: the LinkResource its model 0 came
        from. Not read elsewhere. */
     struct LinkResource *modelSource;
     /* The TimImage DayTask__DayTask hands over through
@@ -265,11 +265,11 @@ struct DreamSys {
     s32 unk78;
     /* Cleared by DreamSys__func_59590 (slot124); nothing else touches it. */
     s32 unk7C;
-    /* Set by DreamSys__SelectLookCallback(self, arg1): NULL when arg1==0, otherwise one of
-           three vtable-slot function pointers selected by arg1 (1/2/3). Called
+    /* Set by DreamSys__SelectLookCallback(self, mode): NULL when mode==0, otherwise one of
+           three vtable-slot function pointers selected by mode (1/2/3). Called
            with (self) by DreamSys__RunTickCallbacks, if non-NULL. */
     void (*lookCallback)(struct DreamSys *self);
-    /* Set unconditionally to arg1 by DreamSys__SelectLookCallback(self, arg1);
+    /* Set unconditionally to mode by DreamSys__SelectLookCallback(self, mode);
        no other observed use. */
     s32 lookCallbackMode;
     /* Index into the (sLookOffsetSteps, sLookOffsetLimits) delta/threshold table pair,
@@ -284,13 +284,13 @@ struct DreamSys {
     s32 lookYawCommand;
     /* Running delta accumulator paired with lookYawCommand; see DreamSys__StepLookYaw. */
     s32 lookYaw;
-    /* Set by DreamSys__SelectMoveCallback(self, arg1) as lookCallback is by
+    /* Set by DreamSys__SelectMoveCallback(self, mode) as lookCallback is by
        SelectLookCallback, from a different trio of vtable slots. Called with
        (self) by DreamSys__RunTickCallbacks, if non-NULL. */
     void (*moveCallback)(struct DreamSys *self);
-    /* "Mode" field read/written by DreamSys__SelectMoveCallback(self, arg1): when ==2 on
+    /* "Mode" field read/written by DreamSys__SelectMoveCallback(self, mode): when ==2 on
        entry, self->methods->stopDrift(self, 0) fires first; then it is set
-       unconditionally to arg1. */
+       unconditionally to mode. */
     s32 moveCallbackMode;
     /* (self->moveCommand ^ 1) < 1u, i.e. (moveCommand == 1), written by
        DreamSys__StepLookYaw; also toggled/incremented by DreamSys__FlipMoveCommand and forced
@@ -318,7 +318,7 @@ struct DreamSys {
     s32 moveCycleTick;
     /* Derived from `linkTarget->flags36` masked to 0x7F, or forced to
        0 (if >= 0x18) or 2 (if `state == 15` and this is still 0)
-       by DreamSys__NotifyLinkAttempt's `arg1 == -1` path. Also an index:
+       by DreamSys__NotifyLinkAttempt's `event == -1` path. Also an index:
        DreamSys__StartVoice does nothing when this is 0, else
        uses it to index sVoiceBySelect/sVoicePitchBySelect (see those externs), compares
        it against 0x16 (22) to decide whether to keep or discard
@@ -330,10 +330,10 @@ struct DreamSys {
        >= 0. */
     s32 voiceIndex;
     u8 padC0[4];
-    /* Set to 1 by DreamSys__SelectMoveCallback's arg1==2 case, alongside cueServiceActive and
+    /* Set to 1 by DreamSys__SelectMoveCallback's mode 2 case, alongside cueServiceActive and
        moveCallback. */
     s32 driftActive;
-    /* Set to 1 by DreamSys__SelectMoveCallback's arg1==2 case, alongside driftActive. */
+    /* Set to 1 by DreamSys__SelectMoveCallback's mode 2 case, alongside driftActive. */
     s32 cueServiceActive;
     /* The sound cue drifting runs: SelectMoveCallback mode 2 starts it with
      * soundCueCallback, TickDrift services it, ClearTickCallbacks flushes it. */
