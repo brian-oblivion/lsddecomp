@@ -153,7 +153,7 @@ Renamed `func_` -> `Obj86B60__SetTarget`. **Tier B**: Stores `a1` into `self->un
 ## Proposed field names
 
 Not renamed here -- both fields are CROSS-UNIT (read by `TaskCore__SetState`/
-`TaskCore__Tick` in `src/app/Task.c`, verified by attempting the rename and
+`TaskCore__ConfirmSlot` in `src/app/Task.c`, verified by attempting the rename and
 reading the compiler's own error list: both moved from "0 errors" to errors
 in `Task.c` specifically, none elsewhere). Proposing for the head to
 apply at merge (type scope: rename the definition, rebuild, fix exactly the
@@ -165,7 +165,7 @@ accessors the compiler lists, in both units):
 - `Unk4CObj::unk24` -> `slotEntries`, type `SlotEntry **` (tier B, retype +
   rename). Every dereference in `Task.c` (`TaskCore__CommitElementScroll`,
   `TaskCore__RefreshSlotView`, `TaskCore__CancelElementScroll`, `TaskCore__SetSlotCursor`)
-  already casts it to `SlotEntry *`/`(SlotEntry *)...` locally; `TaskCore__Tick`
+  already casts it to `SlotEntry *`/`(SlotEntry *)...` locally; `TaskCore__ConfirmSlot`
   (Task.c, not attempted) reads it as a generic word-pointer array and
   would need `(void **)self->unk4C->slotEntries` or an equivalent cast, a
   one-line fix at that one call site.
@@ -178,7 +178,7 @@ accessors the compiler lists, in both units):
   rename there is a pure rename, no cast needed.
 
 
-**Head disposition, round 78.** `unk4C` -> `target` APPLIED (type scope, 36 accessors across Task*). `Unk4CObj::unk10` -> `unselectedColor` APPLIED (5 accessors). `Unk4CObj::unk24` -> `slotEntries` + retype NOT applied: the retype needs a cast at `TaskCore__Tick`'s call site, which is a type change, left for track 4.
+**Head disposition, round 78.** `unk4C` -> `target` APPLIED (type scope, 36 accessors across Task*). `Unk4CObj::unk10` -> `unselectedColor` APPLIED (5 accessors). `Unk4CObj::unk24` -> `slotEntries` + retype NOT applied: the retype needs a cast at `TaskCore__ConfirmSlot`'s call site, which is a type change, left for track 4.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

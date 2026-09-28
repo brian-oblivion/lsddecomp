@@ -147,7 +147,7 @@ struct TaskCoreTarget {
     /* +0x084 */ void (*onPadNext)(Self *self);    /* TaskCore__OnPadNext: 0x13 */ \
     /* +0x088 */ void *slot88;                                   /* NULL; StreamTask__NoOpSlot88 */ \
     /* +0x08C */ void *slot8C;                                   /* NULL; StreamTask__NoOpSlot8C */ \
-    /* +0x090 */ void (*tick)(Self *self);                       /* TaskCore__Tick: setState(0xB) */ \
+    /* +0x090 */ void (*tick)(Self *self);                       /* TaskCore__ConfirmSlot: setState(0xB) */ \
     /* +0x094 */ void (*refreshViewValue)(Self *self);           /* TaskCore__RefreshViewValue */  \
     /* +0x098 */ void (*setCallback)(Self *self, void (*callback)(void *ctx), void *ctx); /* TaskCore__SetCallback */ \
     /* +0x09C */ void (*setFadeCallbackEnabled)(Self *self, s32 enable);    /* TaskCore__SetFadeCallbackEnabled */ \
@@ -252,7 +252,7 @@ void TaskCore__OnPadConfirm(TaskCore *self);
 void TaskCore__OnPadCancel(TaskCore *self);
 void TaskCore__OnPadPrev(TaskCore *self);
 void TaskCore__OnPadNext(TaskCore *self);
-void TaskCore__Tick(TaskCore *self);
+void TaskCore__ConfirmSlot(TaskCore *self);
 void TaskCore__RefreshViewValue(TaskCore *self);
 void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx);
 void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable);

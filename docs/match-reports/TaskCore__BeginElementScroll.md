@@ -67,7 +67,7 @@ None — matched on the first attempt. The `self->unk4C->unk24[idx] + 8`
 pointer arithmetic was cast to `u8 *` locally at the point of use rather
 than retyping the shared field `Unk4CObj::unk24` (still `void **`, used
 elsewhere in the sibling unit `Task.c`'s already-matched
-`TaskCore__Tick` as a pure null-check) — avoids a shared-header type change
+`TaskCore__ConfirmSlot` as a pure null-check) — avoids a shared-header type change
 for a computation this unit alone needs.
 
 ## Naming (round 78, naming runner echo)

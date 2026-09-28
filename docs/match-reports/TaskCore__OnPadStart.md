@@ -39,7 +39,7 @@ signature even where their own bodies also never read `a1`.
 ## Struct knowledge established
 
 - `Obj86B60::unk4C` (`Unk4CObj *`, +0x04C) -- gate-only use here; fully
-  dereferenced by `TaskCore__Tick` (see that report) and `TaskCore__SetState`
+  dereferenced by `TaskCore__ConfirmSlot` (see that report) and `TaskCore__SetState`
   (STALL, read off the disassembly only).
 - `Obj86B60Methods::slot70` (+0x070) -- IS `TaskCore__PlaySound`.
 

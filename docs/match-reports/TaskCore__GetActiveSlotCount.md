@@ -72,7 +72,7 @@ the getter itself is claimed.
 
 - `Obj86B60::unk58` -> `activeSlot` (tier B). The index into
   `unk4C->unk24[]`/`unk64[]`/`unk60[]`/`unk5C[]`, i.e. which ring-buffer
-  slot is currently selected -- established across `TaskCore__Tick`,
+  slot is currently selected -- established across `TaskCore__ConfirmSlot`,
   `TaskCore__FindNextFreeSlot`, `TaskCore__BroadcastToSlots`, `TaskCore__ReleaseSlotElements` (Task.c/_b.c) and
   this function. NOT renamed directly: heavily shared with `Task.c`
   and `Task.c` (the same class, split by address range). Head

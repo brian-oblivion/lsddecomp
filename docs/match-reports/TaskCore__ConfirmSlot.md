@@ -1,4 +1,6 @@
-# TaskCore__Tick — MATCH (30/30 words)
+# TaskCore__ConfirmSlot — MATCH (30/30 words)
+
+> Renamed from `TaskCore__Tick` on 2026-09-28 (tools/rename.py). Address 0x8003ca1c.
 
 > Renamed from `Obj86B60__Tick` on 2026-09-25 (tools/rename.py). Address 0x8003ca1c.
 
@@ -9,7 +11,7 @@
 ## What it does
 
 ```c
-void TaskCore__Tick(Obj86B60 *self)
+void TaskCore__ConfirmSlot(Obj86B60 *self)
 {
     Unk4CObj *target;
     s32 idx;

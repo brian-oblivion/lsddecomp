@@ -502,7 +502,7 @@ void TaskCore__OnPadNext(TaskCore *self) {
     handler(self);
 }
 
-void TaskCore__Tick(TaskCore *self) {
+void TaskCore__ConfirmSlot(TaskCore *self) {
     TaskCoreTarget *target;
     s32 slot;
 
