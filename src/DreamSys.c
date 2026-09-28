@@ -55,7 +55,7 @@
 
 /* With no look command pending, StepLookOffset springs the view height back
  * towards 0 by this much a tick (the size of one sLookOffsetSteps step), and
- * StepLookYaw turns back by this many degrees (one LOOK_YAW_STEPS step). */
+ * StepLookYaw turns back by this many degrees (one sLookYawSteps step). */
 #define LOOK_OFFSET_RETURN_STEP 600
 #define LOOK_YAW_RETURN_STEP 45
 
@@ -581,7 +581,7 @@ void DreamSys__StepLookYaw(DreamSys *this) {
     this->moveCommandLatch = (this->moveCommand == MOVE_COMMAND_FORWARD);
     idx = this->lookYawCommand;
     if (idx != 0) {
-        delta = LOOK_YAW_STEPS[idx];
+        delta = sLookYawSteps[idx];
         threshold = LOOK_YAW_LIMITS[idx];
         sum = delta + this->lookYaw;
         if ((sum >= 0) ? (sum < threshold) : ((~sum + 1) < threshold)) {

@@ -336,7 +336,7 @@ Re-derived the whole function fresh from
 `asm/nonmatchings/DreamSys/DreamSys__StepLookYaw.s` (not from the old report's
 `#if 0` snippet, per this round's instruction to re-measure and read the
 disassembly directly rather than trust a transcription). The shape is the
-sibling of `DreamSys__StepLookOffset`, one table pair over (`LOOK_YAW_STEPS`/`LOOK_YAW_LIMITS`,
+sibling of `DreamSys__StepLookOffset`, one table pair over (`sLookYawSteps`/`LOOK_YAW_LIMITS`,
 indexed by `unk_0x90`/`unk_0x94`), PLUS: an unconditional `unk_0xA8 =
 (unk_0xA0 == 1)` up front, a 16-bit "pending value" write through
 `TURN_ROTATION_YAW[0].value` before EACH vtable call, and an ALMOST-unconditional
@@ -406,7 +406,7 @@ above):**
   differently): made it WORSE and reintroduced drift starting at
   instruction 0 (the prologue's own `addiu sp` and frame layout changed),
   so the array element type staying `s32` (matching the existing
-  `LOOK_YAW_STEPS[3]`/`LOOK_YAW_LIMITS[3]` header declarations, themselves already
+  `sLookYawSteps[3]`/`LOOK_YAW_LIMITS[3]` header declarations, themselves already
   used successfully by the sibling function) is confirmed correct, and
   this axis is closed.
 
@@ -483,7 +483,7 @@ void DreamSys__StepLookYaw(DreamSys *this)
 	this->unk_0xA8 = inRange;
 	idx = this->unk_0x90;
 	if (idx != 0) {
-		delta = LOOK_YAW_STEPS[idx];
+		delta = sLookYawSteps[idx];
 		threshold = LOOK_YAW_LIMITS[idx];
 		sum = delta + this->unk_0x94;
 		inRange = (sum < 0) ? (-sum < threshold) : (sum < threshold);
@@ -505,7 +505,7 @@ void DreamSys__StepLookYaw(DreamSys *this)
 ```
 
 Vtable slot `0x148`. Same shape as `DreamSys__StepLookOffset`, one table pair over
-(`LOOK_YAW_STEPS`/`LOOK_YAW_LIMITS`, indexed by `unk_0x90`/`unk_0x94` instead of
+(`sLookYawSteps`/`LOOK_YAW_LIMITS`, indexed by `unk_0x90`/`unk_0x94` instead of
 `unk_0x88`/`unk_0x8C`), plus: computes `unk_0xA8 = (unk_0xA0 == 1)` up
 front unconditionally, and — instead of directly mutating a struct field
 through `unk_0x5C` — writes a 16-bit "pending value" into `TURN_ROTATION_YAW[0]`
@@ -518,9 +518,9 @@ separately this round, see `DreamSys__FlipMoveCommand.md`).
 
 ## Residue: identical to `DreamSys__StepLookOffset`'s residue 1
 
-`LOOK_YAW_STEPS[idx]` and `LOOK_YAW_LIMITS[idx]` hit the exact same missing-`addiu`
+`sLookYawSteps[idx]` and `LOOK_YAW_LIMITS[idx]` hit the exact same missing-`addiu`
 shape (confirmed word 14 of the diff: retail `687e2124` — `addiu $at,$at,
-%lo(LOOK_YAW_STEPS)` — is simply absent from my build's instruction stream,
+%lo(sLookYawSteps)` — is simply absent from my build's instruction stream,
 same signature as the other function). Did not re-run the isolated
 reproducers for this function specifically since the mechanism (verified
 against `maspsx`'s own source, not behavior) is per-instruction-pattern, not
@@ -613,7 +613,7 @@ Re-verified fresh (spliced the round-32 body back in): confirmed the exact
 inherited state, **76/77 words, 1 word SHORT**, same residue (opportunistic
 delay-slot placement of the `this` register setup across the three paths
 converging on the shared `call_tail: DreamSys__FlipMoveCommand(this);`) as rounds 32 and
-37. Checked the hoist-both precondition: retail's `LOOK_YAW_STEPS[idx]` and
+37. Checked the hoist-both precondition: retail's `sLookYawSteps[idx]` and
 `LOOK_YAW_LIMITS[idx]` loads (the OTHER part of this function, already matched)
 are the only adjacent-load pair in the function, and they are already
 correctly scheduled in the current body -- the residue that's actually open
