@@ -251,9 +251,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
             ctx->semiTrans = (*(u32 *)packet >> TMD_WORD_ABE_SHIFT) & 0x1;
             packetsLeft -= count;
 
-            /* MATCHING: cases in ascending type order; cc1 tests a sparse
-             * switch as a binary search and lays the bodies out in source
-             * order, which is retail's layout. */
+            /* MATCHING: cases stay in ascending type order (the bodies are laid out in source order). */
             switch (ctx->packetType) {
                 case TMD_TYPE(GPU_COM_F3, 0): {
                     u8 *elem;

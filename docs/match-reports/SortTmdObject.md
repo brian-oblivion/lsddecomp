@@ -2126,3 +2126,6 @@ From SortTmdObject's function comment in src/graphics/tmd_renderer.c:
 > pointer (+28 words), `ctx` is assigned after the early return for
 > retail's a3 -> a1 -> s2 copy, and the RGB stores take `&POLY->r0` because
 > the addiu that forms it is retail's.
+
+The switch's MATCHING note, shortened to one line by the head at merge (round 106); its full text was:
+"cases in ascending type order; cc1 tests a sparse switch as a binary search and lays the bodies out in source order, which is retail's layout."
