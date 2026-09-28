@@ -1244,3 +1244,18 @@ The file's banner carried its edge evidence and the reason it is parked:
 > (after SpuVmSetVol and after SsUtKeyOff, the 3.6 module edges), but that
 > split is a new carve, not a merge or rename, so the file keeps its carve
 > edges and is named for all three modules.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`:
+
+> From the file banner (shared by the five functions; its per-function list is
+> now each function's own comment): "Retail's build of them is on no SDK disc,
+> so they never placed as objects; progress.py counts these functions as
+> library by address, and they keep Sony's names and <libsnd.h>'s
+> prototypes." and "SpuVmSetVol, SsUtKeyOn and SsUtKeyOnV are carried as
+> INCLUDE_ASM with their best readable body under NON_MATCHING."
+>
+> The NON_MATCHING body's score comment: "NON_MATCHING: 315/324 words, 9 words
+> short. Residue: one GCC CSE decision on the `_svm_tn[_svm_voice[i].tone]`
+> address plus two loop-invariant hoists (docs/match-reports/SpuVmSetVol.md)."

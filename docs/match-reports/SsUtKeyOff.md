@@ -212,3 +212,11 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
   0x196/2). `volatile` on the pointee, as p.c spells it, is NOT
   byte-identical here: it moves the second store out of the `j` delay slot
   (measured), so this unit keeps it non-volatile with a MATCHING line.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`:
+
+> On the unit's plain declaration of _svm_sreg: "MATCHING: not volatile here;
+> volatile moves SsUtKeyOff's second store out of its branch delay slot." Now
+> one line.

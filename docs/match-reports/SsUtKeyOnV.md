@@ -616,3 +616,15 @@ The comment above this function's NON_MATCHING body in src/libsnd_vm_vol_ut_key_
 > flip; the 5-word gap is not re-characterised since
 > `--nop-at-expansion` closed 11 of the old 16
 > (docs/match-reports/SsUtKeyOnV.md). Hand-derived.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libsnd_vm_vol_ut_key_ut_keyv.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: 248/253 words, 5 words
+> short. Residue: the busy-lock guard's branch polarity and a second guard flip
+> (docs/match-reports/SsUtKeyOnV.md)."
+>
+> On the unit's volatile declaration of the tone byte (_svm_cur + 0x0C):
+> "MATCHING: volatile here; plain changes SsUtKeyOnV's NON_MATCHING body by a
+> word." Now one line, "preserved body".
