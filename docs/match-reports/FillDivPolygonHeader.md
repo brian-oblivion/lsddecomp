@@ -56,7 +56,7 @@ void FillDivPolygonHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 a
 }
 ```
 
-Populates a GPU primitive header at `arg0` (`sDivPolygon3`/`gDivPolygon4`
+Populates a GPU primitive header at `arg0` (`sDivPolygon3`/`sDivPolygon4`
 depending on caller): a selected OT/code word at +0x00, `sDivClipWidth` at
 +0x04, `sDivClipHeight` at +0x08, an unaligned `PolyUV4` at +0x10 copied from
 `*arg2`, and the plain word at `arg1 + 0x30` at +0x14. Only the two `u16`

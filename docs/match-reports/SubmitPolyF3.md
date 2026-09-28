@@ -1300,7 +1300,7 @@ own `extern void *SubmitPolyF3(void *prim, void *ctx);` view already used.
 
 The unit now includes `<libgte.h>` and `<libgpu.h>`, and every raw offset in
 the eight SubmitPoly* wrappers is a Sony field: `prim` is libgpu's
-`POLY_F3` (and siblings), the work buffers `sDivPolygon3`/`gDivPolygon4`
+`POLY_F3` (and siblings), the work buffers `sDivPolygon3`/`sDivPolygon4`
 (renamed from `gPolySubmitTableTri`/`gPolySubmitTableQuad`) are libgte's
 `DIVPOLYGON3`/`DIVPOLYGON4`, `ctx+0x88`/`+0x94` are `RVECTOR *[3]`/`[4]`
 pointing at those buffers' `r0..`, and `ctx+0xA4` is `SVECTOR *[4]`. The
