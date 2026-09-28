@@ -332,7 +332,7 @@ Data this function reads, renamed with tools/rename.py:
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | D_80087028 | sItemListPanelRect | A | the only reference is this New_ScreenSprite call's rect: SELECT.TIM's cell, SpriteRect {0, 0, 256, 160}; sibling of gTextEntryPanelRect |
-| D_8008AAF8 | sItemListPanelPos | A | the panel's attachToParent position (-100, -60), a ScreenSpritePos; sibling of gTextEntryPanelPos |
+| D_8008AAF8 | sItemListPanelPos | A | the panel's attachToParent position (-100, -60), a ScreenSpritePos; sibling of sTextEntryPanelPos |
 | D_8008AB14 | sStrSelect | A | the string "SELECT", the panel TIM's name; sibling of sStrComInput |
 | D_800116E4 | sItemListStrFontIcon | A | this unit's copy of "FONTICON" (TextEntryItemList's is sStrFontIcon, 0x8001161C) |
 | D_8008AB1C | sItemListCardPathPrefix | A | this unit's copy of "CARD\\" (TextEntryItemList's is sCardPathPrefix) |

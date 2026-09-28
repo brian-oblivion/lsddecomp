@@ -160,7 +160,7 @@ extern const char sCardPathPrefix[];       /* "CARD\\" */
 extern const char sTimExt[];               /* ".TIM" */
 extern SpriteRect gTextEntryPanelRect;     /* COMINPUT's cell: 224 x 120 from (0, 0) */
 extern SpriteRgb gTextEntryTextColor;      /* the text row's colour: (128, 128, 0) */
-extern ScreenSpritePos gTextEntryPanelPos; /* (-70, -60) */
+extern ScreenSpritePos sTextEntryPanelPos; /* (-70, -60) */
 extern ScreenSpritePos gTextEntryTextPos;  /* (-62, -15) */
 
 void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
@@ -185,7 +185,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
     self->panelSprite = New_ScreenSprite(panelTim, &gTextEntryPanelRect, 0);
     panelTim->methods->release(panelTim);
     self->panelSprite->methods->attachToParent(self->panelSprite, (SceneNode *)parent,
-                                               (LongVec3 *)&gTextEntryPanelPos);
+                                               (LongVec3 *)&sTextEntryPanelPos);
 
     fontTim = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
     ((TimImageUploadFn)fontTim->methods->processBuffer)(fontTim);
