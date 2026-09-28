@@ -37,16 +37,16 @@ discarded).
 ## `GetVariantSpriteMethods` and `gVariantSpriteMethods` are in UNCARVED ground
 
 `GetVariantSpriteMethods` is a plain no-argument getter (`return &gVariantSpriteMethods;`),
-confirmed by reading its body directly in `asm/class_3bb8c_q.s` -- the
+confirmed by reading its body directly in `asm/class_3bb8c_k.s` -- the
 still-monolithic segment immediately behind this unit
 (`class_3bb8c_k.c`'s own file banner already names it as this unit's
-successor, `class_3bb8c_q`). `gVariantSpriteMethods` is a 49-slot table
+successor, `class_3bb8c_k`). `gVariantSpriteMethods` is a 49-slot table
 (`tools/classtable.py` header `0x1F44`) whose `+0x008` slot resolves to
 THIS unit's own `VariantSprite__VariantSprite` (still queued at the time this was
 written; see its own report). Only the ctor slot is typed here
 (`D800879C4Methods`, local to this file) -- the rest of that class is out
 of this unit's scope (uncarved, belongs to whoever carves
-`class_3bb8c_q`).
+`class_3bb8c_k`).
 
 ## Shape note: `return obj;` INSIDE the `if`, not after it
 
@@ -78,7 +78,7 @@ check, construct, return -- mechanics ARE the purpose. `D800879C4` names
 the class this allocates (its own ctor's table, `gVariantSpriteMethods`, with the
 underscore dropped per this project's `D800878D4Methods`-style convention
 for an as-yet-unnamed class, since the class itself lives in uncarved
-ground `class_3bb8c_q.s` this runner cannot rename).
+ground `class_3bb8c_k.s` this runner cannot rename).
 
 ## Verify
 
@@ -163,5 +163,5 @@ The function comment, verbatim:
 
 ```c
 /* VariantSprite (include/VariantSprite.h, track 4, round 87): its allocator and
- * ctor. The other methods are in class_3bb8c_q.c and class_3bb8c_t.c. */
+ * ctor. The other methods are in class_3bb8c_k.c and class_3bb8c_t.c. */
 ```

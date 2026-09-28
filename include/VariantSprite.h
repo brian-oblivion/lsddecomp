@@ -13,7 +13,7 @@
  * Viewport__DrawNode projects it from its coordinate like any Sprite, not
  * the screen-space path ScreenSprite takes. Method table
  * gVariantSpriteMethods, getter GetVariantSpriteMethods. Methods in
- * src/class_3bb8c_k.c (New_, ctor), src/class_3bb8c_q.c (SetVariantClut,
+ * src/class_3bb8c_k.c (New_, ctor), src/class_3bb8c_k.c (SetVariantClut,
  * UpdateScale) and src/class_3bb8c_t.c (Update, the three no-ops, the
  * getter). No class derives from it.
  *

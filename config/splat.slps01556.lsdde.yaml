@@ -1736,7 +1736,6 @@ segments:
       # are frameless leaves (zero `addiu $sp, $sp, -N`), which is why the
       # prologue census reads 0 rather than 1.  Owns no jump table, so no
       # rodata attach.  Same multi-class caveat as _o/_p above.
-      - [0x485BC, c, class_3bb8c_q]
       # class_3bb8c_t: functions 96..112 of that remainder, 0x48738..0x48F74
       # (17 functions).  Carved MID-round 17 to re-staff a runner whose own
       # unit was exhausted.  Census 2026-09-04, three-grep screen per

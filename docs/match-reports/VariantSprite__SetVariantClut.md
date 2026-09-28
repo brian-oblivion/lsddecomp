@@ -6,7 +6,7 @@
 
 > Renamed from `func_80057DBC` on 2026-09-25 (tools/rename.py). Address 0x80057dbc.
 
-Round 47 (runner charlie). Unit: `src/class_3bb8c_q.c`, a BRAND NEW carve
+Round 47 (runner charlie). Unit: `src/class_3bb8c_k.c`, a BRAND NEW carve
 (this unit did not exist before round 47). Class: table `gVariantSpriteMethods` (49
 slots, resolved with `tools/classtable.py 0x800879C4`) -- this is slot40,
 the function tail-called by this class's own ctor `VariantSprite__VariantSprite` (see
@@ -142,7 +142,7 @@ The same tool run rewrote `Class879C4` tokens inside this report's older
 history prose (the known renametype behaviour pending an operator
 decision); those lines were left as the tool wrote them.
 
-History moved here from `src/class_3bb8c_q.c`'s banner: the unit is ROM
+History moved here from `src/class_3bb8c_k.c`'s banner: the unit is ROM
 0x485BC..0x48738, and its two functions were named in round 79 (tiers
 above). `variant` (+0x0A0) keeps its name: it is written here and read by
 nothing, which the header now says.
@@ -152,7 +152,7 @@ nothing, which the header now says.
 - `VariantSprite__UpdateScale`'s `s16 *ratios` -> `Ratio16 *ratios`
   (SceneNode.h's num/den pair, the type `Sprite__UpdateRotation` already
   takes): the body reads `ratios[0]/[1]` and `[2]/[3]` as two such pairs.
-  A body edit in `src/class_3bb8c_q.c`, so it is track 7's, not this
+  A body edit in `src/class_3bb8c_k.c`, so it is track 7's, not this
   pass's.
 
 ## Track 7 (2026-09-28, round 101, echo)
@@ -161,7 +161,7 @@ nothing, which the header now says.
 
 | name | tier | evidence |
 | --- | --- | --- |
-| `VARIANT_CLUT_STRIDE` (the literal `2` in `variant * 2`), unit-local in src/class_3bb8c_q.c | A | asm/data/76DC8.data.s holds one interleaved `{x, y}` table, `{0x3D0, 0x1FF}, {0x3E0, 0x1FF}`, which splat split into the 2-byte `gVariantSpriteClutX` and 6-byte `gVariantSpriteClutY`; both lookups step over one whole entry, 2 s16s, per variant ("The rodata shape" above). |
+| `VARIANT_CLUT_STRIDE` (the literal `2` in `variant * 2`), unit-local in src/class_3bb8c_k.c | A | asm/data/76DC8.data.s holds one interleaved `{x, y}` table, `{0x3D0, 0x1FF}, {0x3E0, 0x1FF}`, which splat split into the 2-byte `gVariantSpriteClutX` and 6-byte `gVariantSpriteClutY`; both lookups step over one whole entry, 2 s16s, per variant ("The rodata shape" above). |
 
 The locals and parameter names here were already roles (`self`, `variant`).
 

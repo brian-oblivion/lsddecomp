@@ -3,7 +3,7 @@
  *
  * - VariantSprite (include/VariantSprite.h): four empty methods and the
  *   table getter. Its ctor is in class_3bb8c_k, two more methods in
- *   class_3bb8c_q.
+ *   class_3bb8c_k.
  * - GraphRoom (include/GraphRoom.h, whose banner has the slots and fields),
  *   a TaskCore subclass, whole: allocator, ctor, every override, ScoreDayLog
  *   and the getter.
