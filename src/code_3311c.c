@@ -1,26 +1,21 @@
 /*
- * code_3311c -- GAME code carved from psyq_3311c on 2026-09-25 (FINISHING-PLAN
- * revision 18). 0x3311C..0x3328C (vram 0x8004291C..0x80042A8C). It was counted
- * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
- * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). What it holds: the whole of class
- * gFlatLightObjMethods -- allocator, ctor, its three own vtable slots
- * (+0x40/+0x44/+0x48), and the table getter.
+ * FlatLightObj: one Psy-Q flat light as a BasicClass object. This file holds
+ * the whole class: the allocator New_FlatLightObj, the constructor, its three
+ * own slots (setLightId, setColor, setDirection) and the table getter. The
+ * object and its method table are declared in include/FlatLightObj.h.
  *
- * All six functions matched and named in round 81 (alpha).
+ * setColor and setDirection update the object's copy of the light, then hand
+ * all of it to Sony's GsSetFlatLight under the object's light id, so a light
+ * is pushed to libgs on every change. The copy is a FlatLightParams, Sony's
+ * GsF_LIGHT layout with r,g,b grouped as one struct, hence the casts at the
+ * two calls. LightRig (src/Sprite.c) creates the three the game uses, light
+ * ids 0, 1 and 2.
  */
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
 #include "FlatLightObj.h"
-
-/*
- * The class is declared in include/FlatLightObj.h (track 4, round 87): the
- * object, its table and the evidence for the name live there. The unit's
- * only outside caller of New_FlatLightObj is LightRig__LightRig
- * (src/Sprite.c, include/LightRig.h), with light ids 0, 1, 2.
- */
 
 extern void *BMemPMgrAlloc(s32 size);
 
@@ -47,6 +42,7 @@ void FlatLightObj__SetLightId(FlatLightObj *self, s32 lightId) {
 
 void FlatLightObj__SetColor(FlatLightObj *self, s32 update, FlatLightColor *rgb) {
     if (update) {
+        /* MATCHING: a whole-struct copy; three per-byte stores compile 3 words longer */
         self->light.rgb = *rgb;
     }
     GsSetFlatLight(self->lightId, (GsF_LIGHT *)&self->light);
