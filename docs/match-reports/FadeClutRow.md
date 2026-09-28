@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Fade one 256-colour CLUT row toward the entry's colour. StoreImage reads the row (x 0, y (index << gTimBlockClutShift) + 0x1E0, 256 x 1) into a local buffer; then for each of mask - 1 steps, with f = (step + 1) << (12 - shift), every non-zero 15-bit colour is blended channel by channel ((c * (0x1000 - f) + colour * f) >> 15 on the <<3-scaled 5-bit channels, keeping the STP bit) into a second buffer, which LoadImage uploads to the next row down (dst.y = src.y + step + src.h), DrawSync between. Also copies the entry's mask to its +0x0A.
+Fade one 256-colour CLUT row toward the entry's colour. StoreImage reads the row (x 0, y (index << sTimBlockClutShift) + 0x1E0, 256 x 1) into a local buffer; then for each of mask - 1 steps, with f = (step + 1) << (12 - shift), every non-zero 15-bit colour is blended channel by channel ((c * (0x1000 - f) + colour * f) >> 15 on the <<3-scaled 5-bit channels, keeping the STP bit) into a second buffer, which LoadImage uploads to the next row down (dst.y = src.y + step + src.h), DrawSync between. Also copies the entry's mask to its +0x0A.
 
 Table slot (`tools/classtable.py`): not in any method table (called by TimBlockSrc__FadeEntry, gTimBlockSrcMethods +0x080).
 
@@ -60,7 +60,7 @@ void FadeClutRow(Ent6F0B8 *e, s32 index) {
     src.x = 0;
     src.w = 0x100;
     src.h = 1;
-    src.y = (index << gTimBlockClutShift) + 0x1E0;
+    src.y = (index << sTimBlockClutShift) + 0x1E0;
     StoreImage(&src, (u32 *)in);
     DrawSync(0);
     dst.h = 1;

@@ -147,9 +147,9 @@ typedef struct TimBlockHeader {
     /* +0x14 */ u32 sizes[4];
 } TimBlockHeader;
 
-extern s16 gTimBlockClutShift;
+extern s16 sTimBlockClutShift;
 
-/* ctor (+0x008): lay out the four fade ramps (2^gTimBlockClutShift rows
+/* ctor (+0x008): lay out the four fade ramps (2^sTimBlockClutShift rows
  * each, one after another from CLUT_FADE_Y), then open `name` and read its
  * first sector, whose header TIMBLOCK_LOAD_HEADER takes. */
 void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
@@ -168,8 +168,8 @@ void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
     self->sector = NULL;
     self->sectorSize = 0;
     addr = 0;
-    mask = 1 << gTimBlockClutShift;
-    shift = gTimBlockClutShift;
+    mask = 1 << sTimBlockClutShift;
+    shift = sTimBlockClutShift;
     for (i = 0; i < ARRAY_COUNT(self->entries); i++) {
         e = &self->entries[i];
         e->shift = shift;
@@ -342,7 +342,7 @@ void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
     src.x = 0;
     src.w = CLUT_COLORS;
     src.h = 1;
-    src.y = (index << gTimBlockClutShift) + CLUT_FADE_Y;
+    src.y = (index << sTimBlockClutShift) + CLUT_FADE_Y;
     StoreImage(&src, (u32 *)in);
     DrawSync(0);
     dst.h = 1;
