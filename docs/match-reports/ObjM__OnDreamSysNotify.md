@@ -4,7 +4,7 @@
 
 > Renamed from `func_80053984` on 2026-09-24 (tools/rename.py). Address 0x80053984.
 
-Unit `src/ObjMStyleActor.c`. Round 26, runner delta.
+Unit `src/world/ObjMStyleActor.c`. Round 26, runner delta.
 
 ## What it is
 

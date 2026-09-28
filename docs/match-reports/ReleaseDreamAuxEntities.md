@@ -107,7 +107,7 @@ this unit's own queue).
 gDreamAuxSlots2 (0x80088D2C) is gDreamAuxSlots one word in, so the word each
 element's first field reads is the slot's `entity`, the Entity
 SetDreamAuxWorld made; slot +0x004 is `release`. Its only caller is
-ObjM__TeardownStyle (onDeinit, src/ObjMStyleActor.c), mirroring ObjM's scene
+ObjM__TeardownStyle (onDeinit, src/world/ObjMStyleActor.c), mirroring ObjM's scene
 setup calling SetDreamAuxWorld. The body reads it as `(Entity *)slot->model`
 with a comment. `done` -> `i`; the split `i = 0; slot = ...;` keeps a
 one-line MATCHING comment (the derivation is above). Byte-identical.

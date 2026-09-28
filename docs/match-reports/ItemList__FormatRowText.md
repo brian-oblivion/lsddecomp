@@ -118,7 +118,7 @@ Round 75 (bravo, track 3). `func_8005292C` -> `ItemList__FormatRowText`, **tier 
 
 Not a table slot (non-virtual helper). Copies item (top + row)'s text, starting `column` characters in, into `dest`, truncated to 26 characters, pads to 26 with spaces, NUL-terminates, returns dest. Callers: CreateRows, RefreshRows. The matched body types `column` as `char *` and `texts` as `s32 *` (their sum is the source pointer); retyping them the natural way is left alone because it touches a matched body.
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
 
 ## Track 4 (2026-09-26, round 89)
 

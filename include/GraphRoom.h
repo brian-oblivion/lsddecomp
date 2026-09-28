@@ -7,7 +7,7 @@
  * GraphRoom -- class id 0x2F130, method table gGraphRoomMethods, a TaskCore
  * subclass (`tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`:
  * nine overrides and one slot of its own). No class derives from it.
- * src/ObjMStyleActor.c holds the whole class: allocator, ctor, every
+ * src/world/ObjMStyleActor.c holds the whole class: allocator, ctor, every
  * override, ScoreDayLog, and the getter.
  *
  * The name is round 75's reading, kept: reset loads "ETC\HGRAPH.TIM" as the

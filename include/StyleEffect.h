@@ -5,7 +5,7 @@
 #include "VariantSprite.h"
 
 /*
- * StyleEffect -- an Actor the style layer (src/ObjMStyleActor.c) places at an
+ * StyleEffect -- an Actor the style layer (src/world/ObjMStyleActor.c) places at an
  * offset from the target position and keeps there: every frame it moves to
  * pos + offset, plus however far the viewport's viewpoint has risen or
  * fallen since it was built. Its `kind` picks what it carries (enum
@@ -108,7 +108,7 @@ typedef void (*StyleEffectUpdateFn)(StyleEffect *self, LongVec3 *pos);
 extern StyleEffectMethods gStyleEffectMethods;
 extern StyleEffectMethods *GetStyleEffectMethods(void); /* ObjMStyleActor.c; returns &gStyleEffectMethods */
 
-/* The class's own methods, in address order (src/ObjMStyleActor.c).
+/* The class's own methods, in address order (src/world/ObjMStyleActor.c).
  * Four are declared WITHOUT a prototype on purpose: each is one-parameter,
  * but a caller in ObjMStyleActor.c passes a dead second argument that is
  * byte-load-bearing (the `arity-ok` notes there and in the reports). */

@@ -29,7 +29,7 @@ void TmdModel__SetFirstPrimClut(Outer_fa50 *self, s16 *xy) {
 
 `TmdModel__SetFirstPrimClut` -- KEPT (not renamed this round). Tier C: mechanics known
 (`t->unk6 = xy[0]/16; t->unk6 = ... + xy[1]*64;`, a double store overwriting
-the field), but its only caller is `src/ObjMStyleActor.c`, a live types-runner
+the field), but its only caller is `src/world/ObjMStyleActor.c`, a live types-runner
 unit this round; the class owning the `Outer_fa50`/`Inner_fa50`/`Target_fa50`
 chain is itself unconfirmed (see `TmdModel__AddFirstPrimClut.md`, its sibling).
 

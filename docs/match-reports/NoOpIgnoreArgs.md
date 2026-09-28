@@ -20,7 +20,7 @@ void NoOpIgnoreArgs(void) {
 
 Whole body is the trivial `jr $ra; nop` epilogue with nothing in between --
 splat emits this shape itself for any zero-instruction function. Called from
-`src/ObjMStyleActor.c`'s `StyleEffect__UpdateByKind` as the `self->unk54 == 2` handler,
+`src/world/ObjMStyleActor.c`'s `StyleEffect__UpdateByKind` as the `self->unk54 == 2` handler,
 alongside two real handlers for `case 0` and `case 3` -- i.e. retail's own
 source really does dispatch to an empty function for this state, this is not
 a decompilation artifact.

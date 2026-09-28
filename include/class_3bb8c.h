@@ -239,7 +239,7 @@ typedef struct StyleConfig {
 extern s32 GetStageMapChunkRecord(s32 index, s32 sub);
 extern void GetStageMapChunkRecordXY(s32 index, s32 x, s32 y);
 
-/* ObjM__TeardownStyle's helpers (src/world/DreamAux.c, src/ObjMStyleActor.c). */
+/* ObjM__TeardownStyle's helpers (src/world/DreamAux.c, src/world/ObjMStyleActor.c). */
 extern void ReleaseDreamAuxEntities(void);
 extern void StyleTeardown(void);
 

@@ -7,7 +7,7 @@
  * ItemList -- a list of strings the player picks one from (class id 0x20,
  * method table gItemListMethods): BasicClass's direct subclass, no class
  * below it. Methods in src/TextEntryItemList.c (New_ItemList .. DetachTarget)
- * and src/ObjMStyleActor.c (SetState .. GetItemListMethods).
+ * and src/world/ObjMStyleActor.c (SetState .. GetItemListMethods).
  *
  * The name is for what its own methods do:
  *  - the ctor copies a NULL-terminated list of item strings into buffers of

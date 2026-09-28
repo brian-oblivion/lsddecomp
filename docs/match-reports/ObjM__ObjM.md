@@ -22,7 +22,7 @@ as a post-construct hook.
 ## Struct/type notes
 
 Added a unit-LOCAL pair of types, `Class87034Methods_3bb8c_k` /
-`Obj87034_3bb8c_k`, in `src/ObjMStyleActor.c` itself (not in the shared
+`Obj87034_3bb8c_k`, in `src/world/ObjMStyleActor.c` itself (not in the shared
 `include/class_3bb8c.h`) -- deliberately, per this round's header-contention
 rule. `ObjMStyleActor` (echo, live in the same round) already has its OWN
 independent view of the SAME table (`Obj87034Methods_3bb8c_l` in the shared

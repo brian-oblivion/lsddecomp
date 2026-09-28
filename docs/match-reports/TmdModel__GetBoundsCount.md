@@ -24,7 +24,7 @@ s32 TmdModel__GetBoundsCount(void *self) {
 
 `TmdModel__GetBoundsCount` -- KEPT (not renamed this round). Tier C: mechanics fully
 known (returns `gTmdModelBoundsCount`, ignoring its argument), but renaming
-would touch `src/ObjMStyleActor.c`, a live types-runner unit this round
+would touch `src/world/ObjMStyleActor.c`, a live types-runner unit this round
 (FINISHING-PLAN track 4); `tools/rename.py` rewrites every caller
 tree-wide, so this rename is deferred to avoid the collision.
 

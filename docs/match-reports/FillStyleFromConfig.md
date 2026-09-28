@@ -64,7 +64,7 @@ other functions in this unit; this function writes a colour-table pointer to
 +0x018 and a plain sign-extended byte to +0x014. Same offsets, incompatible
 types — so `$a0` is a different struct.
 
-`struct StyleM` therefore lives in `src/ObjMStyleActor.c`, not in
+`struct StyleM` therefore lives in `src/world/ObjMStyleActor.c`, not in
 `include/class_3bb8c.h` (eleven units). Nothing in the shared header changed.
 
 ### Proposed learning

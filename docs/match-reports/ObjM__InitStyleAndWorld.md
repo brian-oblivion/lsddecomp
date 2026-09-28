@@ -2,7 +2,7 @@
 
 > Renamed from `func_80052F10` on 2026-09-24 (tools/rename.py). Address 0x80052f10.
 
-Unit `src/ObjMStyleActor.c`. Round 26, runner delta.
+Unit `src/world/ObjMStyleActor.c`. Round 26, runner delta.
 
 ## What it is
 

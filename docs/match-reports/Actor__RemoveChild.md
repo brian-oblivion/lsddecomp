@@ -61,7 +61,7 @@ occupant.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__UnlinkCompanion`. Override of +0x014 (removeChild), named for its slot: clears `grid`/`ticker` by the same class-id tests, then chains SceneNode's removeChild. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__UnlinkCompanion`. Override of +0x014 (removeChild), named for its slot: clears `grid`/`ticker` by the same class-id tests, then chains SceneNode's removeChild. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 99, alpha)
 

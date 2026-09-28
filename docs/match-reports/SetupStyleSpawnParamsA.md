@@ -23,7 +23,7 @@ fix was declaring a global as a SCALAR instead of an INCOMPLETE ARRAY.**
 ### The revisit measurement, taken before changing anything
 
 Spliced the inherited body in verbatim (it was preserved in
-`src/ObjMStyleActor.c` in `#if 0`, and in this report as a ```c fence rather
+`src/world/ObjMStyleActor.c` in `#if 0`, and in this report as a ```c fence rather
 than `#if 0` -- the brief's note was correct; the fence is now gone because
 the function matches).
 
@@ -320,7 +320,7 @@ an unrelated modulo test. MATCHED, 110/110, ins 0/del 0.
 
 Parameters: `(LongVec3 *pos, s32 offsetY)` -- the type StyleFillEffectKind0's shared function pointer calls both setups with (round 93; `void *` before). `pos` is unused; `offsetY == 0` picks one of `gStyleSpawnYChoices`.
 
-### Comments moved here from src/ObjMStyleActor.c
+### Comments moved here from src/world/ObjMStyleActor.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

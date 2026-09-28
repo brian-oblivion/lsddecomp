@@ -13,7 +13,7 @@
  * Viewport__DrawNode projects it from its coordinate like any Sprite, not
  * the screen-space path ScreenSprite takes. Method table
  * gVariantSpriteMethods, getter GetVariantSpriteMethods. Methods in
- * src/ObjMStyleActor.c, New_VariantSprite through the getter. No class
+ * src/world/ObjMStyleActor.c, New_VariantSprite through the getter. No class
  * derives from it.
  *
  * Who makes it: only StyleEffect (include/StyleEffect.h), five per instance of

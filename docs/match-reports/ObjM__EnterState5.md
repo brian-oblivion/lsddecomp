@@ -2,7 +2,7 @@
 
 > Renamed from `func_80053BE8` on 2026-09-24 (tools/rename.py). Address 0x80053be8.
 
-Unit: `src/ObjMStyleActor.c`. Runner: echo, round 16.
+Unit: `src/world/ObjMStyleActor.c`. Runner: echo, round 16.
 
 43/43 words, byte-exact. `./build-and-verify.sh` green (whole-image SHA1 verified).
 

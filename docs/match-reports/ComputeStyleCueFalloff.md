@@ -119,7 +119,7 @@ Locals `kind` became `tick`. Zero bytes.
   edge of the range (SoundCueSet.h: attenuation 10 leaves only `vol % 10`).
   Zero bytes (a local's name is not in the object).
 
-Two comments in `src/ObjMStyleActor.c` lost their history (it is in the
+Two comments in `src/world/ObjMStyleActor.c` lost their history (it is in the
 Derivation above) and now read as documentation. What they said, verbatim:
 
 ```c

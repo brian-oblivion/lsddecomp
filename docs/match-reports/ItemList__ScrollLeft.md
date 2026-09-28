@@ -53,4 +53,4 @@ Round 75 (bravo, track 3). `func_80052498` -> `ItemList__ScrollLeft`, **tier A**
 
 Slot +0x080 (`tools/classtable.py gItemListMethods`). Decrements `column` if it stays >= 0, then refreshRows. Dispatched by HandleInputCode on code 4.
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).

@@ -8,7 +8,7 @@ Unit `ObjMStyleActor`. **5/5 words, byte-exact.** First build after reopening.
 
 Carved round 17, filed as `gp_rel` blocked. Round 42 resolved `gp_rel` via
 `--gp-symbols`; round 44's head reopened this unit's stub as `REOPENED --
-ASSIGNABLE` (see the file banner in `src/ObjMStyleActor.c`). Never attempted
+ASSIGNABLE` (see the file banner in `src/world/ObjMStyleActor.c`). Never attempted
 until now.
 
 ## Derivation

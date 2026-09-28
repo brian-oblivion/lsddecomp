@@ -153,7 +153,7 @@ on init's return through DayTask; 2 and 3 are DayTask's own codes.
 Proposed, not applied (accessors outside this job's units):
 - slot +0x074 `slot74` -> `togglePause`: NULL here, its one occupant is
   ObjM__TogglePause and its one caller ObjM__DispatchPadEvent's 0x21 case
-  (`src/ObjMStyleActor.c`).
+  (`src/world/ObjMStyleActor.c`).
 - field +0x034 `sound` `BasicClass *` -> `struct VabStreamObj *`, with the
   ctor's and New_TimedTask's `sound` parameter: every object that reaches it
   is a New_VabStreamObj, and four units cast it back. Needs ObjM.h's ctor

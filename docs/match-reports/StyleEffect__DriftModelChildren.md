@@ -37,7 +37,7 @@ address is a temporary of the comparison and the allocation comes out as
 retail's. Round 44's alias lever was right about the copy and wrong about
 where it came from.
 
-The matched body is the plain C in `src/ObjMStyleActor.c` (the round-44 body
+The matched body is the plain C in `src/world/ObjMStyleActor.c` (the round-44 body
 below is kept as history).
 
 ### Proposed learning
@@ -142,7 +142,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self)
 #endif
 ```
 
-Declarations this needs (already committed in `src/ObjMStyleActor.c`, kept
+Declarations this needs (already committed in `src/world/ObjMStyleActor.c`, kept
 regardless of this function's match state):
 
 ```c
@@ -208,7 +208,7 @@ before the next was tried:
 None of these four changed the function's WORD COUNT — length has been exact
 (121/121 emitted) since lever 1; only word-content differed from there on.
 
-## Struct findings (kept in `src/ObjMStyleActor.c` independent of this stall)
+## Struct findings (kept in `src/world/ObjMStyleActor.c` independent of this stall)
 
 - **`LinkNodeMethods` needed a NEW slot, `slotBC` at +0x0BC**, distinct from
   the already-established `slotB8` at +0x0B8 (round 26 finding, unchanged).

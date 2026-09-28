@@ -80,7 +80,7 @@ Locals `kind` became `tick`. Zero bytes.
 
 ## Track 7 (2026-09-27, round 96, charlie)
 
-The unit banner of `src/ObjMStyleActor.c` was rewritten to say what the file
+The unit banner of `src/world/ObjMStyleActor.c` was rewritten to say what the file
 holds (and now names IsStyleVariantEven). The old one, verbatim:
 
 ```c

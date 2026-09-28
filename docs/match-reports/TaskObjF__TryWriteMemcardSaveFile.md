@@ -289,7 +289,7 @@ typedef struct McSaveHeader {
 `IconPaletteHalf` deliberately has no `s32` member (alignment 2) so a
 whole-struct copy compiles to the unaligned `lwl`/`lwr` + `swl`/`swr`
 idiom already documented for `Descriptor10`
-(`include/class_3bb8c.h`) and `Block24` (`src/ObjMStyleActor.c`).
+(`include/class_3bb8c.h`) and `Block24` (`src/world/ObjMStyleActor.c`).
 `IconFrame` is a plain byte array (alignment 1) so a whole-struct
 copy compiles to the RUNTIME-alignment-checked dual-path copy retail
 actually shows for the three 0x80-byte spans -- confirmed against
@@ -593,7 +593,7 @@ typedef struct IconPaletteHalf {
 /* One 16x16 4bpp icon animation frame -- a raw, opaque 0x80-byte span
  * (alignment 1, a plain byte array), so a whole-struct copy compiles to
  * the RUNTIME-alignment-checked lw/sw-vs-lwl/lwr dual path retail shows
- * for these three chunks (the same idiom src/ObjMStyleActor.c's Block24
+ * for these three chunks (the same idiom src/world/ObjMStyleActor.c's Block24
  * documents: "a byte array... compiles the copy as a generic
  * runtime-alignment-checked memcpy loop instead"). Three of these are
  * copied in sequence. */

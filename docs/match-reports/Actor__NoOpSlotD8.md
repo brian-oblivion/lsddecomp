@@ -2,7 +2,7 @@
 
 > Renamed from `DreamSys__NoOpSlotD8` on 2026-09-25 (tools/rename.py). Address 0x80057610.
 
-Unit: `src/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0D8`
+Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0D8`
 (resolved via `tools/classtable.py gDreamSysMethods`, which lists this
 exact function -- `0x80057610` -- as the default table's `+0x0D8` value).
 No match report existed before this round: this is a splat-matched,
@@ -28,7 +28,7 @@ this project's established "per-call-site signature" precedent, see
 **`Actor__NoOpSlotD8` -- tier A.** A pure no-op leaf: mechanics ARE
 the purpose (nothing happens). Named after the established project
 convention for exactly this shape -- compare `TextRow__NoOpSlotD0`
-(`src/ScreenWidgets.c`) and `NoOpIgnoreArgs` (`src/ObjMStyleActor.c`), both
+(`src/ScreenWidgets.c`) and `NoOpIgnoreArgs` (`src/world/ObjMStyleActor.c`), both
 `Class__NoOpSlotOFFSET`/`NoOpXxx` for an empty vtable-slot implementation
 of otherwise-unknown purpose. `Actor__NoOpSlotE8` (this unit, below)
 is the sibling case: a DIFFERENT slot with the SAME shape.
@@ -42,4 +42,4 @@ tools/funcdiff.py Actor__NoOpSlotD8   # 2/2
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__NoOpSlotD8`. Occupant of +0x0D8 in gActorMethods, empty; the prefix follows the table it sits in. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__NoOpSlotD8`. Occupant of +0x0D8 in gActorMethods, empty; the prefix follows the table it sits in. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

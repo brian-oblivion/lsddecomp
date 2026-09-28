@@ -4,7 +4,7 @@
 
 > Renamed from `func_800580E0` on 2026-09-24 (tools/rename.py). Address 0x800580e0.
 
-Unit: `src/ObjMStyleActor.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x05C`
+Unit: `src/world/ObjMStyleActor.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x05C`
 (resolved via `tools/classtable.py gGraphRoomMethods`).
 
 ## Signature

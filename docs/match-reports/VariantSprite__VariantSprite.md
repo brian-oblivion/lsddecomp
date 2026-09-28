@@ -6,7 +6,7 @@
 
 > Renamed from `func_80057D10` on 2026-09-19 (tools/rename.py). Address 0x80057d10.
 
-Unit: `src/ObjMStyleActor.c`. Class: `gVariantSpriteMethods` (49 slots, uncarved --
+Unit: `src/world/ObjMStyleActor.c`. Class: `gVariantSpriteMethods` (49 slots, uncarved --
 `asm/ObjMStyleActor.s`) -- THIS is its own ctor, resolved via
 `tools/classtable.py gVariantSpriteMethods` at `+0x008`, and the callee of this
 unit's own `New_VariantSprite` (`GetVariantSpriteMethods()->ctor(...)`, see its

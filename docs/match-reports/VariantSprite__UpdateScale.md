@@ -6,7 +6,7 @@
 
 > Renamed from `func_80057DF4` on 2026-09-25 (tools/rename.py). Address 0x80057df4.
 
-Round 47 (runner charlie). Unit: `src/ObjMStyleActor.c`, a BRAND NEW carve
+Round 47 (runner charlie). Unit: `src/world/ObjMStyleActor.c`, a BRAND NEW carve
 (this unit did not exist before round 47). Class: table `gVariantSpriteMethods` (49
 slots, resolved with `tools/classtable.py 0x800879C4`) -- this is slot48,
 immediately after `VariantSprite__SetVariantClut` (slot40, same unit, see its own
@@ -201,7 +201,7 @@ the source keeps one `MATCHING:` line on `xScale`.
   `accumScaleX/Y` by the ratios instead of writing `sprite.scalex/scaley`.
   No writer of a non-zero value found. Not applied: `Sprite__Reset` is
   outside this job. The rename touches `self->unk58` in src/graphics/Sprite.c and
-  src/ObjMStyleActor.c, plus the comments on the two fields after it and
+  src/world/ObjMStyleActor.c, plus the comments on the two fields after it and
   VariantSprite.h's banner line that names it.
 
 Applied by the round 101 head at merge: `unk58` is `accumulateScale` (tier B), in `SPRITE_FIELDS`, `Sprite__Reset` and this method; zero bytes.

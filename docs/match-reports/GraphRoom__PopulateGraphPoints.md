@@ -39,7 +39,7 @@ several places:
 ```c
 /* +0x0E0, called by this unit's own GraphRoom__PopulateGraphPoints as (self, arg1) -- the
  * FIRST thing that function does, before touching anything else. */
-/* (added to D_8006E730Methods, see include comment in src/ObjMStyleActor.c) */
+/* (added to D_8006E730Methods, see include comment in src/world/ObjMStyleActor.c) */
 
 /* +0x0C4, called by this unit's own GraphRoom__PopulateGraphPoints as (self, arg1, &point,
  * 0), where `point` is a 2-word {x, y}-shaped local. */

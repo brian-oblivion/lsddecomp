@@ -84,7 +84,7 @@ Round 75 (bravo, track 3). `func_8005278C` -> `ItemList__ReleaseRows`, **tier A*
 
 Slot +0x090 (`tools/classtable.py gItemListMethods`), called by ItemList__ReleaseResources. Releases each of the min(itemCount, 4) row objects and clears its `rows[]` entry.
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
 
 ## Round 99 (delta, track 7)
 

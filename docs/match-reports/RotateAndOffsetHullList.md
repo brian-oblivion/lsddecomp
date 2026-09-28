@@ -74,7 +74,7 @@ Several sibling counted loops whose counter and strength-reduced pointer come ou
 
 `RotateAndOffsetHullList` -- KEPT (not renamed this round). Tier C: mechanics fully
 known (rotates a counted list of box-corner sets a quarter turn and offsets
-one face), but its only caller is `src/ObjMStyleActor.c`, a live types-runner
+one face), but its only caller is `src/world/ObjMStyleActor.c`, a live types-runner
 unit this round; renaming would rewrite that unit's extern declaration and
 call site out from under it.
 

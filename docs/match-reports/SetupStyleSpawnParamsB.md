@@ -227,7 +227,7 @@ MATCHED, 87/87, ins 0/del 0.
 
 Parameters `(LongVec3 *pos, s32 offsetY)`, both unused (see SetupStyleSpawnParamsA); local `dayMod3`.
 
-### Comments moved here from src/ObjMStyleActor.c
+### Comments moved here from src/world/ObjMStyleActor.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

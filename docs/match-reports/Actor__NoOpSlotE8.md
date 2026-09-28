@@ -2,7 +2,7 @@
 
 > Renamed from `DreamSys__NoOpSlotE8` on 2026-09-25 (tools/rename.py). Address 0x80057c74.
 
-Unit: `src/ObjMStyleActor.c`. Class: `DreamSys` family. No match report
+Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys` family. No match report
 existed before this round (same situation as `Actor__NoOpSlotD8`,
 this unit): a splat-matched, length-exact two-word leaf (`jr $ra; nop`),
 never a `STALL`, just never documented.
@@ -61,4 +61,4 @@ tools/funcdiff.py Actor__NoOpSlotE8   # 2/2
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__NoOpSlotE8`. Occupant of +0x0E8, empty; Actor__NotifyMove calls it on an Actor linkTarget, DreamSys overrides it (DreamSys__NoOpSlotE8Default). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__NoOpSlotE8`. Occupant of +0x0E8, empty; Actor__NotifyMove calls it on an Actor linkTarget, DreamSys overrides it (DreamSys__NoOpSlotE8Default). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

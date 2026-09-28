@@ -7,7 +7,7 @@
  * ObjM -- class id 0x2F230, method table gObjMMethods: TimedTask's second
  * subclass (its ctor calls TimedTask__TimedTask first; the first is
  * DayTask). No class derives from it. Methods, in ROM order:
- * src/ObjMStyleActor.c, New_ObjM through GetObjMMethods. The object is
+ * src/world/ObjMStyleActor.c, New_ObjM through GetObjMMethods. The object is
  * 0x88 bytes (New_ObjM); its own fields run from TimedTask's 0x38.
  *
  * Built by DayTask__StartObjM (src/world/DayTaskStageMap.c): New_ObjM(DayTask's
