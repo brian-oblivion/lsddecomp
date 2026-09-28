@@ -34,7 +34,7 @@
 #include "game_application.h"
 #include "dream_sys.h"
 #include "link_resource.h"
-#include "TaskCore.h"
+#include "task_core.h"
 #include "stream_task.h"
 #include "graph_room.h"
 #include "TitleMenu.h"

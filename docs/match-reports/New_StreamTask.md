@@ -66,7 +66,7 @@ by `gStreamTaskMethods`'s own ctor-slot dispatch (`classtable.py`) and by
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-StreamTaskObj's table now expands TASKCORE_SLOTS (include/TaskCore.h, round 84): the ctor call is `ctor` and its fifth argument is cast to the ctor's `StreamTaskInitData *`. Byte-identical.
+StreamTaskObj's table now expands TASKCORE_SLOTS (include/task_core.h, round 84): the ctor call is `ctor` and its fifth argument is cast to the ctor's `StreamTaskInitData *`. Byte-identical.
 
 ## Track 4 (2026-09-26, round 87)
 

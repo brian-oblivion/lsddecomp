@@ -3,7 +3,7 @@
  * order:
  *  - StreamTask (include/stream_task.h), whole: it plays one movie stream
  *    through a MoviePlayer inside TaskCore's fade and state machine;
- *  - TaskCore (include/TaskCore.h), the base of the game's menu and screen
+ *  - TaskCore (include/task_core.h), the base of the game's menu and screen
  *    tasks: allocator, ctor, finalize, resetCounters, init and the
  *    onInit/onDeinit hooks, which build and tear down the TileAtlas ->
  *    TileMap -> BgLayer chain, clear the screen and configure the viewport;
@@ -335,7 +335,7 @@ void TaskCore__OnDeinit(TaskCore *self) {
  * setState), the frame bound, the sound call, the view callback and the
  * fade-in/fade-out pair. Each is the default for its slot in
  * gTaskCoreMethods, which StreamTask, TitleMenu and GraphRoom inherit or
- * override; include/TaskCore.h's banner describes the class and its states.
+ * override; include/task_core.h's banner describes the class and its states.
  * Section 2 follows with the slot and item-list methods.
  *
  * Input: while inputMode is not NONE, onPadEvent maps a press to a handler;
@@ -635,7 +635,7 @@ epilogue:
 
 /*
  * Section 2. TaskCore's menu methods, gTaskCoreMethods +0x0C4 to +0x11C
- * (the class is include/TaskCore.h): the fade-out tick, the sub handle, and
+ * (the class is include/task_core.h): the fade-out tick, the sub handle, and
  * a two-level picker over the menu description in `target`, a
  * TaskCoreTarget.
  *

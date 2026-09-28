@@ -52,7 +52,7 @@ left `Class__func_xxxxx`.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-StreamTaskObj now expands TASKCORE_SLOTS (include/TaskCore.h, round 84): its `slot60` call is `setState`. Byte-identical.
+StreamTaskObj now expands TASKCORE_SLOTS (include/task_core.h, round 84): its `slot60` call is `setState`. Byte-identical.
 
 ## Track 4 (2026-09-26, round 87)
 

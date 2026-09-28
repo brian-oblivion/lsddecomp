@@ -1,5 +1,5 @@
-#ifndef TASKCORE_H
-#define TASKCORE_H
+#ifndef TASK_CORE_H
+#define TASK_CORE_H
 
 #include "intermediate_base.h"
 

@@ -59,8 +59,8 @@ and message code have no independent evidence of game meaning. Tier C.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__func_8003C858 (tools/rename.py). Occupant of +0x078 (`onPadConfirm`, onPadEvent's 0x19 case). Named from what it reaches: setState(0xB) runs tick (inputMode 1: begin scrolling or finish on the target's unkC slot) and setState(0xF) commitElementScroll (inputMode 2). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__func_8003C858 (tools/rename.py). Occupant of +0x078 (`onPadConfirm`, onPadEvent's 0x19 case). Named from what it reaches: setState(0xB) runs tick (inputMode 1: begin scrolling or finish on the target's unkC slot) and setState(0xF) commitElementScroll (inputMode 2). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 98, alpha)
 
-`reason` -> `state`; `0x10`/`0xF`/`0xB`/`1` -> TASKCORE_TONE_BUTTON, TASKCORE_STATE_ITEM_CONFIRMED, TASKCORE_STATE_SLOT_CONFIRMED, TASKCORE_INPUT_CHOOSING_SLOT (include/TaskCore.h). Byte-identical.
+`reason` -> `state`; `0x10`/`0xF`/`0xB`/`1` -> TASKCORE_TONE_BUTTON, TASKCORE_STATE_ITEM_CONFIRMED, TASKCORE_STATE_SLOT_CONFIRMED, TASKCORE_INPUT_CHOOSING_SLOT (include/task_core.h). Byte-identical.

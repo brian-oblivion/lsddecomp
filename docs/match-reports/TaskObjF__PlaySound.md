@@ -65,7 +65,7 @@ means here, so kept at tier B rather than A.
 
 ## Track 4 (2026-09-26, round 89)
 
-Renamed from `TaskObjF__SetChildFlag8`. The field it calls (+0x06C, was `childC`) is set only by TaskObjF__Init's 7th argument, and Init's one caller, TitleMenu__BeginCardAccess, passes `self->sound` (TaskCore's VabStreamObj, include/TaskCore.h). +0x080 of that table is `playTone(index, vol, endVol)` (include/VabStreamObj.h), called here with (index, 0x7F, 0x7F): the same shape and the same rename as `TimedTask__PlaySound` (round 84). Callers: TaskObjF__AdvanceState (index 0 and 0x10), TaskObjF__AbortFromState (0x10), through slot +0x08C.
+Renamed from `TaskObjF__SetChildFlag8`. The field it calls (+0x06C, was `childC`) is set only by TaskObjF__Init's 7th argument, and Init's one caller, TitleMenu__BeginCardAccess, passes `self->sound` (TaskCore's VabStreamObj, include/task_core.h). +0x080 of that table is `playTone(index, vol, endVol)` (include/VabStreamObj.h), called here with (index, 0x7F, 0x7F): the same shape and the same rename as `TimedTask__PlaySound` (round 84). Callers: TaskObjF__AdvanceState (index 0 and 0x10), TaskObjF__AbortFromState (0x10), through slot +0x08C.
 
 ## Track 7 (2026-09-27, round 95)
 

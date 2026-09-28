@@ -96,7 +96,7 @@ since `unk2C`'s meaning is not established and 10 is the slot's `bound`.
 
 ## Proposed field names
 
-TaskCore's (include/TaskCore.h, accessed by task.c/TaskViewport*.c):
+TaskCore's (include/task_core.h, accessed by task.c/TaskViewport*.c):
 `unk34` -> `clearOnDeinit` (TaskCore__OnDeinit clears the display with
 `unk93` only when it is nonzero; this Reset sets 0 and TitleMenu's own
 onDeinit clears both buffers instead). `unk2C` stays: it is the viewport's
@@ -104,4 +104,4 @@ onDeinit clears both buffers instead). `unk2C` stays: it is the viewport's
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-TaskCore fields renamed (include/TaskCore.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.
+TaskCore fields renamed (include/task_core.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.

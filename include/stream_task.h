@@ -1,7 +1,7 @@
 #ifndef STREAM_TASK_H
 #define STREAM_TASK_H
 
-#include "TaskCore.h"
+#include "task_core.h"
 #include "draw_system.h"
 
 /*
@@ -55,7 +55,7 @@
  *                         the player's Abort now; else setState(7) and the
  *                         abort at state 8.
  * The overrides of +0x04C/+0x080/+0x084 (and TaskCore's) take self alone;
- * the up-call to onInit casts the slot, as TaskCore.h's banner says.
+ * the up-call to onInit casts the slot, as task_core.h's banner says.
  *
  * +0x044: StreamTask__Init takes (self, args, streamName, streamGroup,
  * autoPlay) where IntermediateBase's init takes (self, args, mode) and

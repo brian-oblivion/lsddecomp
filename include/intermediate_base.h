@@ -35,7 +35,7 @@ typedef struct IntermediateBaseMethods IntermediateBaseMethods;
 typedef struct IntermediateBaseInitArgs IntermediateBaseInitArgs;
 
 /* The two states IntermediateBase__SetState acts on itself; a subclass's
- * own states sit above them (TaskCore.h's enum TaskCoreState). */
+ * own states sit above them (task_core.h's enum TaskCoreState). */
 enum IntermediateBaseState {
     INTERMEDIATEBASE_STATE_START = 2, /* init's (mode 0); onStart starts the DrawSystem */
     INTERMEDIATEBASE_STATE_STOP = 3   /* onStop stops the DrawSystem */

@@ -61,7 +61,7 @@ already used elsewhere for a field of unconfirmed game meaning
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-StreamTaskObj now expands TASKCORE_FIELDS/TASKCORE_SLOTS (include/TaskCore.h, round 84): the field this sets is TaskCore's +0x040 `frameBound`, and this function is StreamTaskObj's override of TaskCore's +0x06C setFrameBound (x15 where TaskCore__SetFrameBound multiplies by 20). Byte-identical.
+StreamTaskObj now expands TASKCORE_FIELDS/TASKCORE_SLOTS (include/task_core.h, round 84): the field this sets is TaskCore's +0x040 `frameBound`, and this function is StreamTaskObj's override of TaskCore's +0x06C setFrameBound (x15 where TaskCore__SetFrameBound multiplies by 20). Byte-identical.
 
 ## Track 4 (2026-09-26, round 87)
 

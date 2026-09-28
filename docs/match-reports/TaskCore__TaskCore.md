@@ -146,7 +146,7 @@ overwrites it). `Class__Class` convention, same precedent as
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from TaskCoreObj__TaskCoreObj (tools/rename.py). Occupant of +0x008 (`ctor`). Calls IntermediateBase's ctor first, and each subclass ctor (StreamTaskObj, TitleMenu, GraphRoomObj) calls this one first. Parameters named from the body: `target` goes to setTarget (+0x0D8), `soundBankPath` (both subclass ctors pass "ETC\ETCSE") to New_VabStreamObj, whose result, or the caller's `sound`, is +0x048. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from TaskCoreObj__TaskCoreObj (tools/rename.py). Occupant of +0x008 (`ctor`). Calls IntermediateBase's ctor first, and each subclass ctor (StreamTaskObj, TitleMenu, GraphRoomObj) calls this one first. Parameters named from the body: `target` goes to setTarget (+0x0D8), `soundBankPath` (both subclass ctors pass "ETC\ETCSE") to New_VabStreamObj, whose result, or the caller's `sound`, is +0x048. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 

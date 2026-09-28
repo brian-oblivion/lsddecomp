@@ -109,7 +109,7 @@ dtor at the same slot. Same `Class__Destroy` convention as
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from TaskCoreObj__Destroy (tools/rename.py). Occupant of +0x00C (`finalize`), named for the slot: releases bgLayer, tileMap, tileAtlas, `sound` when the ctor made it and `subHandle` when owned, runs releaseTarget, then IntermediateBase's finalize. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from TaskCoreObj__Destroy (tools/rename.py). Occupant of +0x00C (`finalize`), named for the slot: releases bgLayer, tileMap, tileAtlas, `sound` when the ctor made it and `subHandle` when owned, runs releaseTarget, then IntermediateBase's finalize. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, alpha)
 

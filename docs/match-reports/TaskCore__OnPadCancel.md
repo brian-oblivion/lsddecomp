@@ -38,8 +38,8 @@ independent purpose evidence. Tier C.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__func_8003C8D0 (tools/rename.py). Occupant of +0x07C (`onPadCancel`, 0x17): setState(0x11), which runs cancelElementScroll, when not in inputMode 1. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__func_8003C8D0 (tools/rename.py). Occupant of +0x07C (`onPadCancel`, 0x17): setState(0x11), which runs cancelElementScroll, when not in inputMode 1. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 98, alpha)
 
-`0x10`/`0x11`/`1` -> TASKCORE_TONE_BUTTON, TASKCORE_STATE_SCROLL_CANCELLED, TASKCORE_INPUT_CHOOSING_SLOT (include/TaskCore.h). Byte-identical.
+`0x10`/`0x11`/`1` -> TASKCORE_TONE_BUTTON, TASKCORE_STATE_SCROLL_CANCELLED, TASKCORE_INPUT_CHOOSING_SLOT (include/task_core.h). Byte-identical.

@@ -69,4 +69,4 @@ form is the project's existing one for a constant-return empty slot
 overrides of the other tables (`CdStream__NoOpSlot60`). The section above
 saying the placeholder was kept predates this rename. The slot keeps the
 name `slot60`, the house form for an empty slot (`dream_sys.h`,
-`file_resource.h`, `TaskCore.h`). Nothing in C calls it.
+`file_resource.h`, `task_core.h`). Nothing in C calls it.

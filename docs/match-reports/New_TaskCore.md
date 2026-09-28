@@ -67,4 +67,4 @@ table (per this unit's header comment).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from New_TaskCoreObj (tools/rename.py). The allocator (0xA4 bytes), now `New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound)`, the ctor's own arguments. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from New_TaskCoreObj (tools/rename.py). The allocator (0xA4 bytes), now `New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound)`, the ctor's own arguments. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

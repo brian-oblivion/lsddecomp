@@ -126,7 +126,7 @@ switch and the slot's universal, unoverridden occupancy), so tier A.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__OnTag2Notify (tools/rename.py). Occupant of +0x058 (`onPadEvent`: IntermediateBase__OnNotify's case for a Pad sender), named for the slot. Its cases call +0x074..+0x084 with self alone (byte-identical to passing the sender, which stays in $a1). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__OnTag2Notify (tools/rename.py). Occupant of +0x058 (`onPadEvent`: IntermediateBase__OnNotify's case for a Pad sender), named for the slot. Its cases call +0x074..+0x084 with self alone (byte-identical to passing the sender, which stays in $a1). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Unit history, moved from code_2cc8c.c's banner (round 98, alpha, track 7)
 

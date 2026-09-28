@@ -72,7 +72,7 @@ convention; this IS `GraphRoomObj`'s own vtable slot +0x008
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__GraphRoomObj` -> `GraphRoom__GraphRoom`
 
@@ -80,7 +80,7 @@ The class is unified in `include/graph_room.h` (class id 0x2F130, table `gGraphR
 
 ## Track 7 (2026-09-27, round 97, delta)
 
-- **Naming: `D_8001176C` -> `sGraphSoundBankPath`** (tier A): the rodata string `"ETC\ETCSE"`, passed as TaskCore's ctor's `soundBankPath` (include/TaskCore.h). This ctor is its only user; `s` for data only this unit reads, like `sTitleTimPath`. TitleMenu's ctor passes its own copy of the same string (`sTitleMenuSoundBankPath`, class_3bb8c.h).
+- **Naming: `D_8001176C` -> `sGraphSoundBankPath`** (tier A): the rodata string `"ETC\ETCSE"`, passed as TaskCore's ctor's `soundBankPath` (include/task_core.h). This ctor is its only user; `s` for data only this unit reads, like `sTitleTimPath`. TitleMenu's ctor passes its own copy of the same string (`sTitleMenuSoundBankPath`, class_3bb8c.h).
 - The pointer zeros (TaskCore ctor's `target` and `sound`, `setTarget`'s target) are written `NULL`. Zero bytes changed.
 
 ## History (moved from include/GraphRoom.h, round 102)

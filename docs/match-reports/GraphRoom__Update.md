@@ -57,7 +57,7 @@ body alone).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
@@ -69,4 +69,4 @@ The class is unified in `include/graph_room.h` (class id 0x2F130, table `gGraphR
 
 ## Track 7 (2026-09-27, round 97, delta)
 
-Unchanged. `inputMode == 1` stays a literal: an enum for TaskCore's inputMode (0 none, 1 choosing a slot, 2 scrolling its items) belongs in include/TaskCore.h, whose other includers would change, so it is proposed to the head.
+Unchanged. `inputMode == 1` stays a literal: an enum for TaskCore's inputMode (0 none, 1 choosing a slot, 2 scrolling its items) belongs in include/task_core.h, whose other includers would change, so it is proposed to the head.

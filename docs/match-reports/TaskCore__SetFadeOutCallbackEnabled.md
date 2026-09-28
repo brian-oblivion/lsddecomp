@@ -53,7 +53,7 @@ reusing "Fade" on a guess.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__func_8003CB30 (tools/rename.py). Occupant of +0x0A0 (`setFadeOutCallbackEnabled`). Named on the cross-unit evidence the round-78 naming pass lacked: the function it installs at +0x08C (now `fadeOutCallback`), +0x0C4's TaskCore__TickFadeOut, computes 0x80 - frameCounter * fadeRate, the mirror of the fade-in callback's base + frameCounter * fadeRate. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__func_8003CB30 (tools/rename.py). Occupant of +0x0A0 (`setFadeOutCallbackEnabled`). Named on the cross-unit evidence the round-78 naming pass lacked: the function it installs at +0x08C (now `fadeOutCallback`), +0x0C4's TaskCore__TickFadeOut, computes 0x80 - frameCounter * fadeRate, the mirror of the fade-in callback's base + frameCounter * fadeRate. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 98, alpha)
 

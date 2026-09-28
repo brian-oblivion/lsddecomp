@@ -56,7 +56,7 @@ the other side), so left `Class__func_xxxxx`.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). StreamTaskObj now expands TASKCORE_FIELDS: +0x038 is `result`.
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). StreamTaskObj now expands TASKCORE_FIELDS: +0x038 is `result`.
 
 ## Track 4 (2026-09-26, round 87)
 

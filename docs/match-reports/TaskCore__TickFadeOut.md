@@ -86,7 +86,7 @@ Renamed `func_` -> `Obj86B60__TickFadeColor`. **Tier B**: Computes a decreasing 
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__TickFadeColor (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__TickFadeColor (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
@@ -94,7 +94,7 @@ bgLayer is a `BgLayer *` (include/bg_layer.h): the `Unk78Obj` view is gone and +
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
-`0x80 - frameCounter * fadeRate` and `(u8)c >= 0x81` are now `TASKCORE_FADE_FULL - ...` and `(u8)level > TASKCORE_FADE_FULL` (TaskCore.h, alpha's constant: 128, the colour that draws a texture at its own brightness). `>= 129` and `> 128` compile to the same sltiu, byte-exact. c -> level, buf -> color.
+`0x80 - frameCounter * fadeRate` and `(u8)c >= 0x81` are now `TASKCORE_FADE_FULL - ...` and `(u8)level > TASKCORE_FADE_FULL` (task_core.h, alpha's constant: 128, the colour that draws a texture at its own brightness). `>= 129` and `> 128` compile to the same sltiu, byte-exact. c -> level, buf -> color.
 
 ## Track 10 (2026-09-28, round 104, echo)
 

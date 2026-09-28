@@ -151,7 +151,7 @@ shared by this unit's other four StreamTask launchers.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-The task these functions build with New_TaskCore is a plain TaskCore (include/TaskCore.h, track 4 round 84); game_application.h's LoaderTask view is gone and the calls use TaskCore's slot names (setCallback, setFrameBound, setSubHandle, init, release). The old `start` slot at +0x004 is BasicClass's release, and StreamTask's own +0x004 is typed `void *(*release)` too: with one void and one value-returning, StartCinematicStream's two branches stopped cross-jumping into one call (+6 instructions). Byte-identical.
+The task these functions build with New_TaskCore is a plain TaskCore (include/task_core.h, track 4 round 84); game_application.h's LoaderTask view is gone and the calls use TaskCore's slot names (setCallback, setFrameBound, setSubHandle, init, release). The old `start` slot at +0x004 is BasicClass's release, and StreamTask's own +0x004 is typed `void *(*release)` too: with one void and one value-returning, StartCinematicStream's two branches stopped cross-jumping into one call (+6 instructions). Byte-identical.
 
 ## Track 7 polish (round 100, echo)
 

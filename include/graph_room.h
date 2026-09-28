@@ -1,7 +1,7 @@
 #ifndef GRAPH_ROOM_H
 #define GRAPH_ROOM_H
 
-#include "TaskCore.h"
+#include "task_core.h"
 
 /*
  * GraphRoom -- class id 0x2F130, method table gGraphRoomMethods, a TaskCore

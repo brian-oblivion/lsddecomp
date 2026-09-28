@@ -87,14 +87,14 @@ Renamed `func_` -> `Obj86B60__ReleaseTarget`. **Tier B**: The exact teardown cou
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__ReleaseTarget (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__ReleaseTarget (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88)
 
 TimImage is unified (`include/tim_image.h`) and `include/task.h`'s
 `Unk74Obj`/`Unk74ObjMethods` view of it is deleted, together with that
 header's local `extern` of New_TimImage. The handle is cast to
-`TimImage *` (TaskCore.h still types the field `BasicClass *`); its slots are
+`TimImage *` (task_core.h still types the field `BasicClass *`); its slots are
 TimImage's: +0x004 `release`, +0x05C `freeBuffer` (was `slot5C`), and
 +0x078, FileResource's `void *slot78` whose occupant is TimImage__Upload,
 called through `TimImageUploadFn`. `path` is cast to `char *` for

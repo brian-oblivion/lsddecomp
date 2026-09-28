@@ -91,7 +91,7 @@ supported yet.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). This function occupies +0x044 with five parameters where TASKCORE_SLOTS (IntermediateBase) types the slot init(args, mode): a contradiction left for StreamTaskObj's own job.
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). This function occupies +0x044 with five parameters where TASKCORE_SLOTS (IntermediateBase) types the slot init(args, mode): a contradiction left for StreamTaskObj's own job.
 
 ## Track 4 (2026-09-26, round 87)
 

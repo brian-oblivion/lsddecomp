@@ -1055,7 +1055,7 @@
         "gTaskCoreMethods": {
           "class": "TaskCore",
           "date": "2026-09-25",
-          "header": "include/TaskCore.h"
+          "header": "include/task_core.h"
         },
         "gTaskObjFMethods": {
           "class": "TaskObjF",
