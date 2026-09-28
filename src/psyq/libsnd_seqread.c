@@ -456,7 +456,7 @@ void ContResetAll(s16 a0, s16 a1) {
 
 /* The mark callbacks SsSetMarkCallback installs, one per (access number,
  * sequence number); ContNrpn1 calls the entry with (access, seq, data). */
-extern SsMarkCallbackProc D_80090368[][16];
+extern SsMarkCallbackProc _ss_MarkCallback[][16];
 
 /* CC98 (NRPN LSB). While a loop start set by ContNrpn2's kind 0x14 still
  * waits for its count (unk27 == 1, unk10 == 0), the value becomes the loop
@@ -482,7 +482,7 @@ void ContNrpn1(s16 a0, s16 a1, u8 a2) {
         s16 ch = a0;
         s16 sl = a1;
 
-        fn = D_80090368[ch][sl];
+        fn = _ss_MarkCallback[ch][sl];
         if (fn != NULL) {
             fn(ch, sl, a2);
         }

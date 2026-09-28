@@ -4,7 +4,7 @@
 
 ## Round 94 (runner echo, track 6): Sony types
 
-`Fn80090368` is gone: `D_80090368` is Sony's mark-callback table, and its element type is Sony's `SsMarkCallbackProc` (`void (*)(short, short, short)`, `include/psyq/libsnd.h`). Retail calls the entry with THREE arguments, `(ch, sl, data)`: `$a1` holds the sign-extended slot at the `jalr`. The old two-argument local type dropped `sl`. That is the "slot index used exactly once" residue described below, so the preserved body's call is now `fn(ch, sl, a2 & 0xFF)`.
+`Fn80090368` is gone: `_ss_MarkCallback` is Sony's mark-callback table, and its element type is Sony's `SsMarkCallbackProc` (`void (*)(short, short, short)`, `include/psyq/libsnd.h`). Retail calls the entry with THREE arguments, `(ch, sl, data)`: `$a1` holds the sign-extended slot at the `jalr`. The old two-argument local type dropped `sl`. That is the "slot index used exactly once" residue described below, so the preserved body's call is now `fn(ch, sl, a2 & 0xFF)`.
 
 **That closed it.** With the three-argument call, the round-27 body is 77/77
 and the whole image is byte-exact. A structured rewrite of the same body is
@@ -124,7 +124,7 @@ for a small closed set of event kinds) to decide which byte field to
 stamp with `a2`, and then -- **unconditionally of which path was taken** --
 checks whether `rec->unk16 == 0x28` (freshly re-read from memory) and, if
 so, looks up a function pointer in a per-(channel,slot) dispatch table
-(`D_80090368`, 0x40-byte-stride rows of 16 pointers) and calls it with
+(`_ss_MarkCallback`, 0x40-byte-stride rows of 16 pointers) and calls it with
 `(channel, a2 & 0xFF)`. It finishes by caching
 `ReadDeltaValue(channel, slot)` into `rec->unk88`, the same tail every
 sibling function in this file has.
@@ -155,7 +155,7 @@ check:
     {
         s16 ch = a0;
         s16 sl = a1;
-        fn = D_80090368[ch][sl];
+        fn = _ss_MarkCallback[ch][sl];
         if (fn != NULL) {
             fn(ch, a2 & 0xFF);
         }
@@ -231,7 +231,7 @@ modeling each predecessor as an independently-gated call site.
                                                            independent diffs)
 ```
 
-Retail computes the slot (`a1`/`sl`) index into `D_80090368[ch][sl]` in TWO
+Retail computes the slot (`a1`/`sl`) index into `_ss_MarkCallback[ch][sl]` in TWO
 steps: sign-extend into a real register (`sra a1,v0,0x10`), then separately
 multiply by 4 (`sll v0,a1,0x2`). This project's compiler, given the same
 source shape, FUSES those two steps into one `sll`+`sra`-by-14 pair (the
@@ -250,7 +250,7 @@ peephole and retail's apparently does not.
   `a0`/`a1` directly -- no change).
 - Declaring `sl` as `s32` instead of `s16` (regressed to 47/77 -- extra
   divergences appeared in the row-pointer computation too).
-- `Fn80090368 *row = D_80090368[a0]; fn = row[a1];` splitting row-then-column
+- `Fn80090368 *row = _ss_MarkCallback[a0]; fn = row[a1];` splitting row-then-column
   into two statements (regressed to 51/77).
 - Reordering the `sl`/`ch` local declarations (inert).
 - Passing `ch` vs `a0` directly as the call's first argument (inert).
@@ -271,7 +271,7 @@ on any one function of the one-word-short cluster against the other three.
 Before doing that cross-check, closed out this report's own flagged
 "untested axis": a bare `__asm__("")` scheduling barrier placed between
 `sl`'s definition and its use (`s16 sl = a1; __asm__(""); fn =
-D_80090368[ch][sl];`). **Inert -- byte-for-byte identical output, 54/77
+_ss_MarkCallback[ch][sl];`). **Inert -- byte-for-byte identical output, 54/77
 unchanged.** The barrier blocks cross-block code motion (as documented
 elsewhere in this project), but the fused shift here happens entirely
 WITHIN one basic block during instruction selection for the index

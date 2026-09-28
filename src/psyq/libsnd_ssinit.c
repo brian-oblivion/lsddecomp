@@ -15,7 +15,7 @@
  *
  * Data: _snd_openflag and _snd_ev_flag are pinned by name in
  * config/psyq-objects.ld. D_8006DC5C/D_8006DC6C are read only by _SsInit,
- * a Sony function, so they keep their placeholder names. D_80090368 is
+ * a Sony function, so they keep their placeholder names. _ss_MarkCallback is
  * libsnd's mark-callback table (SsMarkCallbackProc [32][16], <libsnd.h>'s
  * type), which SsSetMarkCallback fills and ContNrpn1 calls through.
  *
@@ -43,7 +43,7 @@ extern s32 _snd_ev_flag;
 /* The mark callbacks SsSetMarkCallback installs, one per (access number,
  * sequence number); _SsInit clears them all.  Same table ContNrpn1
  * (libsnd_seqread) calls through. */
-extern SsMarkCallbackProc D_80090368[0x20][16];
+extern SsMarkCallbackProc _ss_MarkCallback[0x20][16];
 
 /*
  * Sound-system init.  Reached only through SsInit (arg0 = 0) and
@@ -101,7 +101,7 @@ void _SsInit(s32 arg0) {
 
     for (j = 0; j < 0x20; j++) {
         for (i = 15; i >= 0; i--) {
-            D_80090368[j][i] = NULL;
+            _ss_MarkCallback[j][i] = NULL;
         }
     }
 

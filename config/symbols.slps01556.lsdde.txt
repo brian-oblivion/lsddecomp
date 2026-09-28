@@ -3166,3 +3166,4 @@ CD_mode = 0x8006D61C;
 CD_com = 0x8006D61D;
 CD_comstr = 0x8006D620;
 CD_intstr = 0x8006D6A0;
+_ss_MarkCallback = 0x80090368;
