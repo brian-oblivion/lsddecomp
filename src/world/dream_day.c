@@ -40,7 +40,7 @@
 #include "StageMap.h"
 #include "wbgm.h"
 #include "tim_image.h"
-#include "FrameClock.h"
+#include "frame_clock.h"
 #include "dream_sys.h"
 #include "LinkResource.h"
 #include "ObjM.h"

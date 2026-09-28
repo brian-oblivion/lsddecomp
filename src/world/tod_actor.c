@@ -27,7 +27,7 @@
 #include "Tod.h"
 #include "LinkResource.h"
 #include "VabStreamObj.h"
-#include "FrameClock.h"
+#include "frame_clock.h"
 #include "bmem_pmgr.h"
 
 /*

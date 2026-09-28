@@ -42,5 +42,5 @@ are Pad and FrameClock (`typeviews.py --tree`), and ItemList and TaskObjF
 already call the same pair `inputSource`/`tickSource`. The kind test reads
 `((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK` (main's define in include/basic_class.h, added verbatim) and compares with
 `PAD_CLASS_ID`/`FRAMECLOCK_CLASS_ID` (new in include/pad.h and
-include/FrameClock.h, TASKOBJF_CLASS_ID's form) instead of
+include/frame_clock.h, TASKOBJF_CLASS_ID's form) instead of
 `**(s32 **)child`. Zero bytes changed.

@@ -30,7 +30,7 @@
 #include "tim_image.h"
 #include "VabStreamObj.h"
 #include "pad.h"
-#include "FrameClock.h"
+#include "frame_clock.h"
 #include "ItemList.h"
 #include "ScreenSprite.h"
 #include "bmem_pmgr.h"

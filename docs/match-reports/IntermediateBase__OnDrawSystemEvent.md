@@ -91,7 +91,7 @@ The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/c
 
 ## Track 4 (2026-09-26, round 88, delta: FrameClock)
 
-The `self->unk10` call is FrameClock's +0x044 `tick` (include/FrameClock.h): the call now casts to `FrameClock *` and names the slot, instead of the `IntermediateBaseLinked` view's `slot44` (that view still covers initArgs->unk4). Byte-identical.
+The `self->unk10` call is FrameClock's +0x044 `tick` (include/frame_clock.h): the call now casts to `FrameClock *` and names the slot, instead of the `IntermediateBaseLinked` view's `slot44` (that view still covers initArgs->unk4). Byte-identical.
 
 ## Track 7 (round 98, echo)
 

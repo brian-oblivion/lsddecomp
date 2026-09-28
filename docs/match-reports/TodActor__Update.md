@@ -84,4 +84,4 @@ Renamed from `TodActor__OnClass6EF50Notify`. Override of +0x098, SceneNode's `up
 
 ## Track 7 (round 99, bravo)
 
-`sender`, `event`; events 2 and 4 are `FRAMECLOCK_EVENT_RUNNING` and `FRAMECLOCK_EVENT_FLAG14` (include/FrameClock.h, whose banner names this release on event 4): the ticker is the FrameClock this object keeps as Actor.ticker. Byte-identical.
+`sender`, `event`; events 2 and 4 are `FRAMECLOCK_EVENT_RUNNING` and `FRAMECLOCK_EVENT_FLAG14` (include/frame_clock.h, whose banner names this release on event 4): the ticker is the FrameClock this object keeps as Actor.ticker. Byte-identical.

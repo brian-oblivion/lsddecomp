@@ -160,4 +160,4 @@ Class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; its NUL
 
 ## Track 4 (2026-09-26, round 88, delta: FrameClock)
 
-`New_D8006EF50` is now `New_FrameClock` (include/FrameClock.h), returning `FrameClock *`; the store into `unk10` (`BasicClass *`, field unchanged) upcasts it. Byte-identical.
+`New_D8006EF50` is now `New_FrameClock` (include/frame_clock.h), returning `FrameClock *`; the store into `unk10` (`BasicClass *`, field unchanged) upcasts it. Byte-identical.

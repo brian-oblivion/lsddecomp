@@ -940,7 +940,7 @@
         "gFrameClockMethods": {
           "class": "FrameClock",
           "date": "2026-09-26",
-          "header": "include/FrameClock.h"
+          "header": "include/frame_clock.h"
         },
         "gGameApplicationMethods": {
           "class": "GameApplication",

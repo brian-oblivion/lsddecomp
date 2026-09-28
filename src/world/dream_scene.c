@@ -44,7 +44,7 @@
 #include "wbgm.h"
 #include "LbdFile.h"
 #include "box_fill.h"
-#include "FrameClock.h"
+#include "frame_clock.h"
 #include "actor.h"
 #include "StyleEffect.h"
 #include "Viewport.h"

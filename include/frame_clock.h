@@ -1,5 +1,5 @@
-#ifndef FRAMECLOCK_H
-#define FRAMECLOCK_H
+#ifndef FRAME_CLOCK_H
+#define FRAME_CLOCK_H
 
 #include "basic_class.h"
 

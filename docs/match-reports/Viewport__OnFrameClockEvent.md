@@ -57,7 +57,7 @@ Renamed from `Unk18Obj__OnNotifyTag5`. Slot +0x094 `onNotifyTag5`, onNotify's cl
 
 ## Track 7 (round 95, alpha, polish pass)
 
-Events 2 and 3 are `FRAMECLOCK_EVENT_RUNNING` and `FRAMECLOCK_EVENT_PAUSED`, a new `enum FrameClockEvent` in include/FrameClock.h (values from FrameClock__Tick, the clock's own banner). Byte-identical.
+Events 2 and 3 are `FRAMECLOCK_EVENT_RUNNING` and `FRAMECLOCK_EVENT_PAUSED`, a new `enum FrameClockEvent` in include/frame_clock.h (values from FrameClock__Tick, the clock's own banner). Byte-identical.
 
 ## Proposed field names (round 95, alpha)
 

@@ -50,7 +50,7 @@
 #include <sys/file.h>
 #include "basic_class.h"
 #include "pad.h"
-#include "FrameClock.h"
+#include "frame_clock.h"
 #include "ScreenSprite.h"
 #include "TextEntry.h"
 #include "ItemList.h"

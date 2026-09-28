@@ -17,7 +17,7 @@
  * the active data-source driver for one named file at construction and
  * records when it has arrived.
  *
- * FrameClock (include/FrameClock.h, 0x5): a BasicClass ticked once per
+ * FrameClock (include/frame_clock.h, 0x5): a BasicClass ticked once per
  * DrawSystem frame that counts frames and tells its parents whether it is
  * running, paused or stopped.
  *
@@ -33,7 +33,7 @@
 #include "flat_light_obj.h"
 #include "RequestedFile.h"
 #include "tim_image.h"
-#include "FrameClock.h"
+#include "frame_clock.h"
 #include "bmem_pmgr.h"
 #include <strings.h>
 #include "data_source.h"

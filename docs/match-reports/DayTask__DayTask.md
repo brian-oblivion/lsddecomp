@@ -269,7 +269,7 @@ occupant TimImage__Upload) through `TimImageUploadFn`, +0x05C is
 
 ## Track 4 (2026-09-26, round 88, delta: FrameClock)
 
-`New_D8006EF50` is now `New_FrameClock` (include/FrameClock.h), returning `FrameClock *`; the store into `Obj0C::unk8` (`SubObjG *`, field unchanged) upcasts it, and dream_day.h's own `SubObjG *` extern of it is gone. Byte-identical.
+`New_D8006EF50` is now `New_FrameClock` (include/frame_clock.h), returning `FrameClock *`; the store into `Obj0C::unk8` (`SubObjG *`, field unchanged) upcasts it, and dream_day.h's own `SubObjG *` extern of it is gone. Byte-identical.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 

@@ -53,7 +53,7 @@
 #include <libgs.h>
 #include "scene_node.h"
 #include "pad.h"
-#include "FrameClock.h"
+#include "frame_clock.h"
 #include "tmd_model.h"
 #include "actor.h"
 #include "bmem_pmgr.h"

@@ -26,7 +26,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "FrameClock.h"
+#include "frame_clock.h"
 #include "task.h"
 #include "TextRow.h"
 #include "bmem_pmgr.h"

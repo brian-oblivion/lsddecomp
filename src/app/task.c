@@ -31,7 +31,7 @@
 #include "tim_image.h"
 #include "Viewport.h"
 #include "LightRig.h"
-#include "FrameClock.h"
+#include "frame_clock.h"
 #include <strings.h>
 
 /* {x 640, y 0, w 320, h 240}: the default movie frame. TaskCore__OnInit clears

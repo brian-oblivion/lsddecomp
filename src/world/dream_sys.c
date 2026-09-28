@@ -38,7 +38,7 @@
 #include "dream_sys.h"
 #include "entity.h"
 #include "pad.h"
-#include "FrameClock.h"
+#include "frame_clock.h"
 #include "LinkResource.h"
 #include "StageMap.h"
 #include "LbdFile.h"
