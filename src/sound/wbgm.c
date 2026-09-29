@@ -6,7 +6,7 @@
  * loaded) after update; then the table getter; IsWBgmActive, which
  * VabStreamObj__Finalize checks before it shuts libsnd down; and
  * GetSsSizeTableBuf, the buffer vab_sound.c passes to
- * SsSetTableSize.
+ * SsSetTableSize. The method table ends the file.
  */
 #include "common.h"
 #include <libsnd.h>
@@ -199,3 +199,34 @@ s32 IsWBgmActive(void) {
 void *GetSsSizeTableBuf(void) {
     return &sSsSizeTableBuf;
 }
+
+/* WBgm's method table (include/wbgm.h): BasicClass's slots with the ctor,
+ * finalize and onNotify, then the player's slots. A (void *) entry is a
+ * method declared on BasicClass *. */
+WBgmMethods gWBgmMethods = {
+    WBGM_CLASS_ID,
+    (void *)BasicClass__Release,
+    WBgm__WBgm,
+    WBgm__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    WBgm__OnNotify,
+    NULL,
+    WBgm__Update,
+    WBgm__Play,
+    WBgm__Stop,
+    WBgm__Pause,
+    WBgm__Resume,
+    WBgm__SetVol,
+    WBgm__Crescendo,
+    WBgm__SetSeq,
+    WBgm__SetVab,
+};

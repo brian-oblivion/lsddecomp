@@ -10,8 +10,8 @@
  *   save block, and StampSaveTitleDay, which writes the day into the save
  *   title ("LSD   Day001");
  * - TaskObjF (include/task_objf.h), the memory-card controller TitleMenu's
- *   SAVE and LOAD drive, then StampSaveTitleFileLetter.
- *
+ *   SAVE and LOAD drive, then StampSaveTitleFileLetter;
+ * - the four method tables, the menu's layout and the card's messages.
  * Each class runs from its New_ (allocate, then the ctor through the
  * class's table) to its table getter; a ctor chains to its parent's, then
  * installs its own table. The first two belong with dream_day.c's code:
@@ -48,9 +48,8 @@
 #include <convert.h>
 
 /* Per TaskObjF::events slot: the event spec TaskObjF__OpenEvents passes to
- * OpenEvent, and the value WaitForReadyEvent returns for that slot.
- * Unsized: only the four slots are read. */
-extern s32 sCardEventSpecs[];
+ * OpenEvent, and the value WaitForReadyEvent returns for that slot. */
+extern s32 sCardEventSpecs[4];
 
 extern McDevicePath sMcDevicePath1; /* "bu10:" */
 extern McDevicePath sMcDevicePath0; /* "bu00:" */
@@ -60,7 +59,9 @@ extern McDevicePath sMcDevicePath0; /* "bu00:" */
 extern s32 sTaskObjFCount;
 
 /* TitleMenu's menu description, a TaskCoreTarget: TitleMenu__TitleMenu
- * passes &sTitleMenuTarget as TaskCore's ctor's `target` and again to setTarget. */
+ * passes &sTitleMenuTarget as TaskCore's ctor's `target` and again to
+ * setTarget. Its six slots, START to SHAKE: */
+#define TITLE_MENU_SLOT_COUNT (TITLEMENU_SHAKE + 1)
 extern TaskCoreTarget sTitleMenuTarget;
 
 /* "ETC\ETCSE", TitleMenu__TitleMenu's soundBankPath for TaskCore's ctor
@@ -1359,10 +1360,10 @@ void TaskObjF__SetState(TaskObjF *self, s32 state) {
     }
 }
 
-/* The message icon's name per state, CARD\<name>.TIM ("NOCONECT" ..
- * "LOADERR" for states 2..16). Entries 0 and 1 are not names; no setState
- * call passes 0 or 1. */
-extern char *sCardIconNames[TASKOBJF_STATE_EDIT_TITLE];
+/* The message icon's name per state from NO_CARD, CARD\<name>.TIM
+ * ("NOCONECT" .. "LOADERR" for states 2..16). */
+#define CARD_ICON_COUNT (TASKOBJF_STATE_EDIT_TITLE - TASKOBJF_STATE_NO_CARD)
+extern char *sCardIconNames[CARD_ICON_COUNT];
 extern char sTitleCardPathPrefix[]; /* "CARD\\" */
 extern char sCardPathSuffix[];      /* ".TIM" */
 /* {0, 0, 160, 120} */
@@ -1378,7 +1379,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
     ScreenSprite *icon;
 
     /* MATCHING: `path` and `icon` hold the buffer and the sprite across the calls. */
-    if (index >= ARRAY_COUNT(sCardIconNames)) {
+    if (index >= TASKOBJF_STATE_EDIT_TITLE) {
         return;
     }
     if (self->spriteParent == 0) {
@@ -1389,7 +1390,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
     }
 
     path = pathBuf;
-    name = sCardIconNames[index];
+    name = sCardIconNames[index - TASKOBJF_STATE_NO_CARD];
     path[0] = '\0';
     strcat(path, sTitleCardPathPrefix);
     strcat(path, name);
@@ -1638,3 +1639,401 @@ s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
         return (s32)glyphs;
     }
 }
+
+/* The file's method tables and the title menu's and the memory card's data,
+ * in the order the image keeps them. A (void *) entry is a function whose
+ * declared type differs from its slot's: a method inherited from a parent
+ * class and declared on the parent's type, or an empty method declared
+ * (void). */
+
+/* NodeGuardedViewport (include/node_guarded_viewport.h): Viewport's table
+ * with its own initDefaults and update, then four empty slots. */
+NodeGuardedViewportMethods gNodeGuardedViewportMethods = {
+    NODEGUARDEDVIEWPORT_CLASS_ID,
+    (void *)BasicClass__Release,
+    NodeGuardedViewport__NodeGuardedViewport,
+    (void *)Viewport__Finalize,
+    (void *)Viewport__AddChild,
+    (void *)Viewport__RemoveChild,
+    (void *)Viewport__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)Viewport__OnNotify,
+    NULL,
+    (void *)NodeGuardedViewport__InitDefaults,
+    (void *)Viewport__SetScreenSize,
+    (void *)Viewport__SetOtLength,
+    (void *)Viewport__SetMaxPackets,
+    (void *)Viewport__SetPacketSize,
+    (void *)Viewport__SetProjection,
+    Viewport__NoOpSlot58,
+    Viewport__NoOpSlot5C,
+    (void *)Viewport__SetLightMode,
+    (void *)Viewport__SetClearColor,
+    (void *)Viewport__SetFarColor,
+    (void *)Viewport__SetFogNear,
+    (void *)Viewport__AttachViewChild,
+    (void *)Viewport__DetachViewChild,
+    (void *)Viewport__SetViewPoint,
+    (void *)Viewport__SetViewRef,
+    (void *)Viewport__SetTwist,
+    Viewport__NoOpSlot84,
+    Viewport__NoOpSlot88,
+    (void *)Viewport__InitOt,
+    (void *)Viewport__DeinitOt,
+    (void *)Viewport__OnFrameClockEvent,
+    (void *)Viewport__OnDrawSystemEvent,
+    NodeGuardedViewport__Update,
+    (void *)Viewport__DrawNode,
+    (void *)Viewport__Flip,
+    (void *)Viewport__SetFadeBox,
+    (void *)Viewport__GetFadeBox,
+    (void *)Viewport__SetExtraSwap,
+    (void *)Viewport__SetDrawEnabled,
+    NodeGuardedViewport__NoOpSlotB8,
+    NodeGuardedViewport__NoOpSlotBC,
+    NodeGuardedViewport__NoOpSlotC0,
+    NodeGuardedViewport__NoOpSlotC4,
+};
+
+/* GridCell (include/grid_cell.h): SceneNode's table with reset and
+ * dispatchLinkCommand, then onActorLinkCommand and returnSelf. */
+GridCellMethods gGridCellMethods = {
+    GRIDCELL_CLASS_ID,
+    (void *)BasicClass__Release,
+    (void *)GridCell__GridCell,
+    (void *)SceneNode__Finalize,
+    (void *)SceneNode__AddChild,
+    (void *)SceneNode__RemoveChild,
+    (void *)SceneNode__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)SceneNode__OnNotify,
+    NULL,
+    (void *)GridCell__Reset,
+    (void *)SceneNode__UpdateRotation,
+    (void *)SceneNode__UpdateScale,
+    (void *)SceneNode__AttachToParent,
+    (void *)SceneNode__DetachFromParent,
+    (void *)SceneNode__DetachAttachedChildren,
+    (void *)SceneNode__GetNextAttachedChild,
+    (void *)SceneNode__NoOpFinalizeHook,
+    (void *)SceneNode__SetDisplay,
+    (void *)SceneNode__SetSemiTrans,
+    (void *)SceneNode__SetSemiTransRate,
+    (void *)SceneNode__SetLighting,
+    (void *)SceneNode__SetLightMode,
+    (void *)SceneNode__SetLightDim,
+    (void *)SceneNode__SetUseZ,
+    (void *)SceneNode__SetSubdivision,
+    (void *)SceneNode__SetBackClip,
+    (void *)SceneNode__GetRotMatrix,
+    (void *)SceneNode__NotifyWithHull,
+    (void *)SceneNode__GetModelHull,
+    (void *)SceneNode__TransformAndNotifyParents,
+    (void *)SceneNode__OnPadEvent,
+    (void *)SceneNode__Update,
+    (void *)GridCell__DispatchLinkCommand,
+    (void *)SceneNode__TryAttachNearby,
+    (void *)SceneNode__ComposeAndApplyRotation,
+    (void *)SceneNode__CheckBoundsOverlap,
+    (void *)SceneNode__RaycastHullAgainstFaces,
+    SceneNode__NoOpSlotB0,
+    (void *)SceneNode__AddToActorParents,
+    GridCell__OnActorLinkCommand,
+    GridCell__ReturnSelf,
+};
+
+/* TitleMenu (include/title_menu.h): TaskCore's table with the title menu's
+ * reset, state, confirm, exit and save-title overrides, then its menu and
+ * memory-card slots. */
+TitleMenuMethods gTitleMenuMethods = {
+    TITLEMENU_CLASS_ID,
+    (void *)BasicClass__Release,
+    TitleMenu__TitleMenu,
+    TitleMenu__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)TitleMenu__OnNotify,
+    NULL,
+    TitleMenu__Reset,
+    (void *)TaskCore__Init,
+    (void *)IntermediateBase__Deinit,
+    (void *)TaskCore__OnInit,
+    TitleMenu__OnDeinit,
+    (void *)IntermediateBase__OnDrawSystemEvent,
+    (void *)TaskCore__OnPadEvent,
+    (void *)TaskCore__Update,
+    TitleMenu__SetState,
+    (void *)IntermediateBase__OnStart,
+    (void *)IntermediateBase__OnStop,
+    (void *)TaskCore__SetFrameBound,
+    (void *)TaskCore__PlaySound,
+    (void *)TaskCore__OnPadStart,
+    (void *)TaskCore__OnPadConfirm,
+    (void *)TaskCore__OnPadCancel,
+    (void *)TaskCore__OnPadPrev,
+    (void *)TaskCore__OnPadNext,
+    NULL,
+    NULL,
+    TitleMenu__ConfirmSlot,
+    TitleMenu__Exit,
+    (void *)TaskCore__SetExitCallback,
+    (void *)TaskCore__SetFadeInCallbackEnabled,
+    (void *)TaskCore__SetFadeOutCallbackEnabled,
+    (void *)TaskCore__SetColors,
+    (void *)TaskCore__SetFadeRate,
+    (void *)TaskCore__TickFadeInCallback,
+    (void *)TaskCore__TickFadeIn,
+    NULL,
+    NULL,
+    NULL,
+    (void *)TaskCore__TickFadeOutCallback,
+    (void *)TaskCore__TickFadeOut,
+    NULL,
+    NULL,
+    NULL,
+    (void *)TaskCore__SetSubHandle,
+    TitleMenu__CreateSaveTitle,
+    TitleMenu__DestroySaveTitle,
+    TitleMenu__AttachSaveTitle,
+    (void *)TitleMenu__CycleSaveTitleColor,
+    (void *)TaskCore__FindNextFreeSlot,
+    (void *)TaskCore__FindPrevFreeSlot,
+    (void *)TaskCore__SetActiveSlot,
+    (void *)TaskCore__GetActiveSlot,
+    (void *)TaskCore__CreateSlotElements,
+    (void *)TaskCore__ReleaseSlotElements,
+    (void *)TaskCore__RefreshSlotView,
+    (void *)TaskCore__BroadcastToSlotElements,
+    (void *)TaskCore__BeginElementScroll,
+    (void *)TaskCore__CommitElementScroll,
+    (void *)TaskCore__CancelElementScroll,
+    (void *)TaskCore__AdvanceSlotCursor,
+    (void *)TaskCore__RetreatSlotCursor,
+    (void *)TaskCore__SetSlotCursor,
+    (void *)TaskCore__GetActiveItemCursor,
+    (void *)TitleMenu__RefreshMenu,
+    TitleMenu__BeginCardAccess,
+    TitleMenu__EndCardAccess,
+    TitleMenu__SaveToCard,
+    TitleMenu__LoadFromCard,
+    TitleMenu__OnCardEvent,
+};
+
+/* The title menu's strings. They are the image's read-only data and small
+ * data, declared plain char because the tables' fields are char *. */
+extern char sTitleMenuStartName[];      /* "START" */
+extern char sTitleMenuFlashbackName[];  /* "FLASHBACK" */
+extern char sTitleMenuSaveName[];       /* "SAVE" */
+extern char sTitleMenuLoadName[];       /* "LOAD" */
+extern char sTitleMenuGraphName[];      /* "GRAPH" */
+extern char sTitleMenuShakeName[];      /* "SHAKE" */
+extern char sShakeOffName[];            /* "Off" */
+extern char sShakeOnName[];             /* "On" */
+extern const char sTitleMenuFontPath[]; /* "ETC\FONTICON.TIM" */
+
+/* SHAKE's two settings, the item list its slot opens. */
+char *sShakeItemNames[] = {sShakeOffName, sShakeOnName, NULL};
+
+/* SHAKE's item list: the cursor starts on Off, drawn in yellow, at (53, 57). */
+TaskCoreItemList sShakeItemList = {{0}, 0, {128, 128, 0}, {0}, {53, 57}, sShakeItemNames};
+
+/* The slots' tables, per slot START, FLASHBACK, SAVE, LOAD, GRAPH, SHAKE. */
+/* clang-format off */
+
+/* The item list each slot opens: only SHAKE has one. */
+TaskCoreItemList *sTitleMenuSlotLists[TITLE_MENU_SLOT_COUNT] = {
+    NULL, NULL, NULL, NULL, NULL, &sShakeItemList,
+};
+
+/* Non-NULL for the slots the cursor skips: FLASHBACK, locked until
+ * UpdateFlashbackLock unlocks it from the save. One entry more than there
+ * are slots. */
+void *sTitleMenuHiddenSlots[TITLE_MENU_SLOT_COUNT + 1] = {
+    NULL, (void *)1, NULL, NULL, NULL, NULL, NULL,
+};
+
+/* The menu, top to bottom, NULL-terminated. */
+char *sTitleMenuSlotNames[TITLE_MENU_SLOT_COUNT + 1] = {
+    sTitleMenuStartName,
+    sTitleMenuFlashbackName,
+    sTitleMenuSaveName,
+    sTitleMenuLoadName,
+    sTitleMenuGraphName,
+    sTitleMenuShakeName,
+    NULL,
+};
+
+/* Each slot's position, percent of half the screen from the centre: one
+ * column, 12 apart. */
+ScreenSpritePos sTitleMenuSlotPositions[TITLE_MENU_SLOT_COUNT] = {
+    {8, -3}, {8, 9}, {8, 21}, {8, 33}, {8, 45}, {8, 57},
+};
+/* clang-format on */
+
+/* The title menu: ETC\FONTICON.TIM's font, START selected first, grey
+ * slots with the selected one yellow. */
+TaskCoreTarget sTitleMenuTarget = {
+    sTitleMenuFontPath,
+    NULL,
+    0,
+    0,
+    {80, 80, 80},
+    {128, 128, 0},
+    {0},
+    sTitleMenuHiddenSlots,
+    sTitleMenuSlotNames,
+    sTitleMenuSlotPositions,
+    sTitleMenuSlotLists,
+};
+
+/* The save files' suffixes, "-01" to "-15". */
+extern char sSaveFileSuffix01[]; /* "-01" */
+extern char sSaveFileSuffix02[]; /* "-02" */
+extern char sSaveFileSuffix03[]; /* "-03" */
+extern char sSaveFileSuffix04[]; /* "-04" */
+extern char sSaveFileSuffix05[]; /* "-05" */
+extern char sSaveFileSuffix06[]; /* "-06" */
+extern char sSaveFileSuffix07[]; /* "-07" */
+extern char sSaveFileSuffix08[]; /* "-08" */
+extern char sSaveFileSuffix09[]; /* "-09" */
+extern char sSaveFileSuffix10[]; /* "-10" */
+extern char sSaveFileSuffix11[]; /* "-11" */
+extern char sSaveFileSuffix12[]; /* "-12" */
+extern char sSaveFileSuffix13[]; /* "-13" */
+extern char sSaveFileSuffix14[]; /* "-14" */
+extern char sSaveFileSuffix15[]; /* "-15" */
+
+/* clang-format off */
+char *sSaveFileSuffixes[] = {
+    sSaveFileSuffix01,
+    sSaveFileSuffix02,
+    sSaveFileSuffix03,
+    sSaveFileSuffix04,
+    sSaveFileSuffix05,
+    sSaveFileSuffix06,
+    sSaveFileSuffix07,
+    sSaveFileSuffix08,
+    sSaveFileSuffix09,
+    sSaveFileSuffix10,
+    sSaveFileSuffix11,
+    sSaveFileSuffix12,
+    sSaveFileSuffix13,
+    sSaveFileSuffix14,
+    sSaveFileSuffix15,
+    NULL,
+};
+/* clang-format on */
+
+DrawRect sDisplayBufferRects[2] = {{0, 0, 320, 240}, {0, 240, 320, 240}};
+
+/* TaskObjF (include/task_objf.h): BasicClass's slots with the memory-card
+ * controller's card, file, state, icon, input and dialog slots. */
+TaskObjFMethods gTaskObjFMethods = {
+    TASKOBJF_CLASS_ID,
+    (void *)BasicClass__Release,
+    TaskObjF__TaskObjF,
+    TaskObjF__Finalize,
+    TaskObjF__AddChild,
+    TaskObjF__RemoveChild,
+    TaskObjF__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    TaskObjF__OnNotify,
+    NULL,
+    TaskObjF__SetCardSlot,
+    TaskObjF__OpenEvents,
+    TaskObjF__CloseEvents,
+    TaskObjF__CheckCardStatus,
+    TaskObjF__FormatCard,
+    TaskObjF__ProbeMemcardFile,
+    TaskObjF__FindUnusedMemcardName,
+    TaskObjF__CollectExistingMemcardFiles,
+    TaskObjF__CheckCardSpace,
+    TaskObjF__ReadMemcardFile,
+    TaskObjF__WriteMemcardSaveFile,
+    TaskObjF__Init,
+    TaskObjF__Deinit,
+    TaskObjF__BeginLoad,
+    TaskObjF__BeginSave,
+    TaskObjF__SetState,
+    TaskObjF__LoadCardIcon,
+    TaskObjF__ReleaseCardIcon,
+    TaskObjF__OnInputEvent,
+    TaskObjF__PlaySound,
+    TaskObjF__AdvanceState,
+    TaskObjF__AbortFromState,
+    (void *)TaskObjF__TickStateDelay,
+    TaskObjF__AttachTextEntry,
+    TaskObjF__DetachTextEntry,
+    TaskObjF__OnTextEntryResult,
+    TaskObjF__AttachItemList,
+    TaskObjF__DetachItemList,
+    TaskObjF__OnItemListResult,
+};
+
+s32 sCardEventSpecs[4] = {EvSpIOE, EvSpERROR, EvSpTIMOUT, EvSpNEW};
+
+/* The message icons' names, CARD\<name>.TIM, for states NO_CARD to
+ * LOAD_ERROR. */
+extern char sNoCardIconName[];          /* "NOCONECT" */
+extern char sCardErrorIconName[];       /* "ERROR" */
+extern char sCardChangedIconName[];     /* "CHANGE" */
+extern char sUnformattedLoadIconName[]; /* "UNFORM1" */
+extern char sUnformattedSaveIconName[]; /* "UNFORM2" */
+extern char sFormattingIconName[];      /* "FORMING" */
+extern char sFormatErrorIconName[];     /* "FORMERR" */
+extern char sSaveNoSpaceIconName[];     /* "SAVEEMPT" */
+extern char sSaveOverwriteIconName[];   /* "SAVEWAR" */
+extern char sSavingIconName[];          /* "SAVING" */
+extern char sSaveErrorIconName[];       /* "SAVEERR" */
+extern char sLoadNotFoundIconName[];    /* "NOTFOUND" */
+extern char sLoadWarningIconName[];     /* "LOADWAR" */
+extern char sLoadingIconName[];         /* "LOADING" */
+extern char sLoadErrorIconName[];       /* "LOADERR" */
+
+/* clang-format off */
+char *sCardIconNames[CARD_ICON_COUNT] = {
+    sNoCardIconName,           /* TASKOBJF_STATE_NO_CARD */
+    sCardErrorIconName,        /* TASKOBJF_STATE_CARD_ERROR */
+    sCardChangedIconName,      /* TASKOBJF_STATE_CARD_CHANGED */
+    sUnformattedLoadIconName,  /* TASKOBJF_STATE_UNFORMATTED_LOAD */
+    sUnformattedSaveIconName,  /* TASKOBJF_STATE_UNFORMATTED_SAVE */
+    sFormattingIconName,       /* TASKOBJF_STATE_FORMATTING */
+    sFormatErrorIconName,      /* TASKOBJF_STATE_FORMAT_ERROR */
+    sSaveNoSpaceIconName,      /* TASKOBJF_STATE_SAVE_NO_SPACE */
+    sSaveOverwriteIconName,    /* TASKOBJF_STATE_SAVE_OVERWRITE_WARNING */
+    sSavingIconName,           /* TASKOBJF_STATE_SAVING */
+    sSaveErrorIconName,        /* TASKOBJF_STATE_SAVE_ERROR */
+    sLoadNotFoundIconName,     /* TASKOBJF_STATE_LOAD_NOT_FOUND */
+    sLoadWarningIconName,      /* TASKOBJF_STATE_LOAD_WARNING */
+    sLoadingIconName,          /* TASKOBJF_STATE_LOADING */
+    sLoadErrorIconName,        /* TASKOBJF_STATE_LOAD_ERROR */
+};
+/* clang-format on */
+
+SpriteRect sCardIconRect = {0, 0, 160, 120};

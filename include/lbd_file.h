@@ -12,6 +12,9 @@
 typedef struct LbdFile LbdFile;
 typedef struct LbdFileMethods LbdFileMethods;
 
+/** LbdFile's class id (gLbdFileMethods word +0x000). */
+#define LBDFILE_CLASS_ID 0x903
+
 /** `headerReady` once StageMap__OnDrawSystemEvent has linked the header's
  * placements into the slot's cells (1 is "read, not yet consumed"). */
 #define LBDFILE_HEADER_CONSUMED 2

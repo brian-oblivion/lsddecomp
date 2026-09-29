@@ -8,6 +8,8 @@
  *  - FileResource (include/file_resource.h), the base of everything loaded
  *    from a file, then the active-data-source layer and the data directory
  *    (include/data_source.h).
+ * The two method tables and the data-source clients' getter list end the
+ * file.
  */
 #include "common.h"
 #include <libgte.h>
@@ -30,10 +32,26 @@
 #include <strings.h>
 #include <stdio.h>
 #include "dream_day.h"
+#include "placement_grid.h"
+#include "tim_image.h"
+#include "tile_atlas.h"
+#include "tile_map.h"
+#include "tim_array_src.h"
+#include "tim_block_src.h"
+#include "vab_stream_obj.h"
+#include "requested_file.h"
+#include "lbd_file.h"
+#include "tod.h"
+#include "tod_set.h"
+#include "model_data.h"
+#include "trigger_world.h"
 
 /* The table getters of every class SetActiveDataSource rebinds, NULL-
- * terminated; it sits right after gFileResourceMethods's last slot. */
-extern void *(*sDataSourceClientGetters[])(void);
+ * terminated; defined at the end, right after gFileResourceMethods. */
+/* A class's table getter, as sDataSourceClientGetters lists them. */
+typedef void *(*MethodsGetterFn)(void);
+
+extern MethodsGetterFn sDataSourceClientGetters[];
 
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
 
@@ -429,8 +447,8 @@ ResourceRequest *ResourceRequest__Set(ResourceRequest *self, void *buffer, char 
 void SetActiveDataSource(s32 source) {
     FileResourceMethods *src;
     FileResourceMethods *methods;
-    void *(*getMethods)(void);
-    void *(**entry)(void);
+    MethodsGetterFn getMethods;
+    MethodsGetterFn *entry;
 
     entry = sDataSourceClientGetters;
     sActiveDataSource = source;
@@ -580,3 +598,99 @@ char *BuildFileName(char *dest, char *name, char *dir, char *ext) {
     strcat(dest, ext);
     return dest;
 }
+
+/* The two classes' method tables, then the getters of every class
+ * SetActiveDataSource rebinds. A (void *) entry is a function whose declared
+ * type differs from its slot's: a method inherited from a parent class and
+ * declared on the parent's type, or a table getter returning its own class's
+ * table type. */
+
+/* GameApplication (include/game_application.h): Application's table with
+ * the ctor, the RNG seed and initSystems, then the hooks
+ * Application__RunMainLoop calls, in the order it calls them. */
+GameApplicationMethods gGameApplicationMethods = {
+    GAMEAPPLICATION_CLASS_ID,
+    (void *)BasicClass__Release,
+    GameApplication__GameApplication,
+    (void *)Application__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    (void *)GameApplication__SeedRandom,
+    (void *)GameApplication__InitSystems,
+    (void *)Application__NoOpSlot48,
+    (void *)Application__RunMainLoop,
+    GameApplication__ShowIntroLogos,
+    GameApplication__PlayOpeningMovie,
+    GameApplication__RunTitleMenu,
+    (void *)GameApplication__OnRepeatMenu,
+    GameApplication__RunDayTask,
+    GameApplication__PlayEndingMovie,
+};
+
+/* FileResource (include/file_resource.h): BasicClass's slots, loadFile,
+ * freeBuffer and onRequestDone. The data-source slots are NULL until
+ * SetActiveDataSource binds the active driver's, and processBuffer is each
+ * subclass's. */
+FileResourceMethods gFileResourceMethods = {
+    FILERESOURCE_CLASS_ID,
+    FileResource__Release,
+    FileResource__FileResource,
+    FileResource__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    FileResource__LoadFile,
+    FileResource__FreeBuffer,
+    NoOp,
+    FileResource__OnRequestDone,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+};
+
+/* The table getter of every data-source client, NULL-terminated.
+ * SetActiveDataSource rebinds each table's file-I/O slots. */
+MethodsGetterFn sDataSourceClientGetters[] = {
+    (void *)GetPlacementGridMethods,
+    (void *)GetTimImageMethods,
+    (void *)GetTileAtlasMethods,
+    (void *)GetTileMapMethods,
+    (void *)GetTimArraySrcMethods,
+    (void *)GetTimBlockSrcMethods,
+    (void *)GetLinkResourceMethods,
+    (void *)GetVabStreamObjMethods,
+    (void *)GetRequestedFileMethods,
+    (void *)GetLbdFileMethods,
+    (void *)GetTodMethods,
+    (void *)GetTodSetMethods,
+    (void *)GetModelDataMethods,
+    (void *)GetTriggerWorldMethods,
+    NULL,
+};

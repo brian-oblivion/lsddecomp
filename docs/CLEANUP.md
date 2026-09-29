@@ -47,8 +47,10 @@ file, and a runner can't follow a procedure that doesn't exist yet.
 > and docs/CLEANUP.md (your track's section). Your item: `<id>`: `<done-when
 > from plan.py>`. Stay inside your area's files and the headers of the
 > classes they define. After every change, `./build-and-verify.sh` must end
-> `OK: build matches retail`. Make one commit per coherent change, with a
-> message that says what changed in game terms. Before you finish,
+> `OK: build matches retail`. Write build logs inside your worktree (e.g.
+> `build/b.log`), never in a shared temp directory. Make one commit per
+> coherent change, with a message that says what changed in game terms.
+> Never touch `config/plan-state.json`. Before you finish,
 > `tools/lint.sh` and `doxygen Doxyfile` must be clean and `git status
 > --porcelain` must be empty. Report what you changed, what you left and why,
 > and anything that needs a decision.
@@ -124,6 +126,20 @@ was the linkStage column, read as a flat array); they are one symbol now.
   inherited base method on `BasicClass *`, an empty method declared
   `(void)`) is written `(void *)Fn`, with one comment above the run of
   tables saying so; matching entries stay bare so they're still checked.
+- **House style: one slot per line, each commented with its offset and
+  field name** (`/* +0x008 */ Foo__Foo, /* ctor */`), as `item_list.c`
+  and the world tables are. A reader looks a slot up by offset; a bare list
+  makes them count. (The graphics and rest tables went in bare, and are a
+  follow-up.)
+- **Unlabelled strings a table points at:** `tools/rename.py` refuses a
+  name nothing references yet, so write the C with the `D_` name, let the
+  link fail once, then rename. A label that sits at the wrong address (a
+  column or index-offset alias, like `sCardIconNames` inside
+  `sCardEventSpecs`) is moved in the symbols file by hand; its reader
+  indexes the true array with `[i - k]`, which compiles the same.
+- A function reached only through a table may have no prototype yet: when
+  the build says "undeclared", add it to its header. GCC 2.6.3 prints that
+  without an `error:` prefix, so grep `^src/.*:[0-9]*: [^w]` too.
 
 **Limits.** A unit's `.data` is one run, so a table that can't move yet
 blocks every table after it in the same unit. `.sdata` variables can't

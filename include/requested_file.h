@@ -27,13 +27,19 @@
 typedef struct RequestedFile RequestedFile;
 typedef struct RequestedFileMethods RequestedFileMethods;
 
+/** RequestedFile's class id (gRequestedFileMethods word +0x000): 0xB under
+ * FileResource's 0x3. */
+#define REQUESTEDFILE_CLASS_ID 0xB03
+
 /** The ctor's stack copy of the name it hands requestLoadFile: 32 bytes,
  * NUL included (strcpy, unchecked). */
 #define REQUESTEDFILE_NAME_SIZE 32
 
-/** RequestedFile's method table: FileResource's slots with its ctor parameters. */
+/** RequestedFile's method table: FileResource's slots up to +0x074
+ * (FILERESOURCE_BASE_SLOTS; there is no processBuffer) with its ctor
+ * parameters. */
 struct RequestedFileMethods {
-    FILERESOURCE_SLOTS(RequestedFile, (RequestedFile * self, char *name));
+    FILERESOURCE_BASE_SLOTS(RequestedFile, (RequestedFile * self, char *name));
 };
 
 /**

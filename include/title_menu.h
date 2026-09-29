@@ -16,6 +16,9 @@
 typedef struct TitleMenu TitleMenu;
 typedef struct TitleMenuMethods TitleMenuMethods;
 
+/** TitleMenu's class id (gTitleMenuMethods word +0x000). */
+#define TITLEMENU_CLASS_ID 0x1F130
+
 struct DreamSys;
 struct TimImage;
 struct TextRow;

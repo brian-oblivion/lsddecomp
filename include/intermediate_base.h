@@ -16,6 +16,10 @@
 
 typedef struct IntermediateBase IntermediateBase;
 typedef struct IntermediateBaseMethods IntermediateBaseMethods;
+
+/** IntermediateBase's class id (gIntermediateBaseMethods word +0x000). */
+#define INTERMEDIATEBASE_CLASS_ID 0x30
+
 typedef struct IntermediateBaseInitArgs IntermediateBaseInitArgs;
 
 /** The two states IntermediateBase__SetState acts on itself; a subclass's

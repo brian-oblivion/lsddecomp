@@ -14,6 +14,9 @@
 typedef struct NodeGuardedViewport NodeGuardedViewport;
 typedef struct NodeGuardedViewportMethods NodeGuardedViewportMethods;
 
+/** NodeGuardedViewport's class id (gNodeGuardedViewportMethods word +0x000). */
+#define NODEGUARDEDVIEWPORT_CLASS_ID 0x17
+
 /** Viewport's slots, then NodeGuardedViewport's own. It overrides the
  * inherited ctor, initDefaults (+0x040) and update (+0x09C). */
 /* clang-format off */

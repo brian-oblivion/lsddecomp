@@ -1,7 +1,7 @@
 /*
  * cd_driver.c -- the CD-ROM data-source driver, CdDriver (include/cd_driver.h,
  * whose file documentation describes the driver mode, the service tick, the
- * state machines and the blocking calls). Five parts, in address order:
+ * state machines and the blocking calls). Six parts, in address order:
  *   1. the lifecycle: the allocator, the constructor, the finalizer and the
  *      empty slot +0x040;
  *   2. the request methods open, close, seek, read and loadFile (slots
@@ -11,7 +11,8 @@
  *      the queue's front end, the driver mode, the file table, the lock and
  *      the service tick;
  *   4. the read state machines, the queue's nodes, the file-table lookups;
- *   5. the blocking file calls.
+ *   5. the blocking file calls;
+ *   6. the method table and the pretend file entry a seek aims at.
  *
  * `self` in a method is never a CdDriver of its own but whichever
  * FileResource client called its own slot, so every field used is
@@ -147,7 +148,8 @@ void CdDriver__Close(CdDriver *self) {
     UnlockCd();
 }
 
-extern CdlLOC sCdSeekLoc;
+/* The pretend file entry a state-machine seek aims at; defined at the end. */
+extern CdFileEntry sCdSeekEntry;
 
 s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
     s32 status;
@@ -164,16 +166,15 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
             if ((offset & (CD_SECTOR_SIZE - 1)) != 0) {
                 sectors = sectors + 1;
             }
-            CdIntToPos(CdPosToInt(&self->pos) + sectors, &sCdSeekLoc);
+            CdIntToPos(CdPosToInt(&self->pos) + sectors, &sCdSeekEntry.pos);
             if (mode == SEEK_SET) {
                 if (sCdAsyncEnabled != 0) {
-                    /* the state machine seeks to &sCdSeekParam->pos: aim it
-                     * at a pretend entry whose pos is sCdSeekLoc */
-                    sCdSeekParam = (CdFileEntry *)((u8 *)&sCdSeekLoc - offsetof(CdFileEntry, pos));
+                    /* the state machine seeks to &sCdSeekParam->pos */
+                    sCdSeekParam = &sCdSeekEntry;
                     sCdTickStep = CD_TICK_STATE_MACHINE;
                 } else {
                     do {
-                        CdControl(CdlSetloc, (u_char *)&sCdSeekLoc, 0);
+                        CdControl(CdlSetloc, (u_char *)&sCdSeekEntry.pos, 0);
                         do {
                             status = CdSync(0, 0);
                         } while (status == CdlNoIntr);
@@ -1044,3 +1045,43 @@ void NoOp4(void) {}
 s32 GetCdUseVSyncCallback(void) {
     return sCdUseVSyncCallback;
 }
+
+/* CdDriver's method table (include/cd_driver.h): FileResource's slots up to
+ * +0x074, the eleven data-source slots filled with the driver's own methods.
+ * A (void *) entry is a method declared on another class's type. */
+CdDriverMethods gCdDriverMethods = {
+    CDDRIVER_CLASS_ID,
+    (void *)FileResource__Release,
+    CdDriver__CdDriver,
+    CdDriver__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    CdDriver__NoOpSlot40,
+    CdDriver__Open,
+    CdDriver__Close,
+    CdDriver__Seek,
+    CdDriver__NoOpSlot50,
+    CdDriver__Read,
+    CdDriver__LoadFile,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    (void *)FileResource__OnRequestDone,
+    CdDriver__RunRequestQueue,
+    CdDriver__RequestLoadFile,
+    (void *)CdDriver__StopService,
+    CdDriver__CancelRequests,
+};
+
+/* The pretend file entry CdDriver__Seek aims the state machine at
+ * (sCdSeekParam): only its pos is used, the sector a seek moves to. */
+CdFileEntry sCdSeekEntry = {{0}};

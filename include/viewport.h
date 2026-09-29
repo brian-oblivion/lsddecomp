@@ -20,6 +20,10 @@
 
 typedef struct Viewport Viewport;
 typedef struct ViewportMethods ViewportMethods;
+
+/** Viewport's class id (gViewportMethods word +0x000). */
+#define VIEWPORT_CLASS_ID 0x7
+
 typedef struct ViewportRefView ViewportRefView;
 
 /** libgs GsRVIEW2, 0x20 bytes, field for field: the argument GsSetRefView2
@@ -329,6 +333,13 @@ void Viewport__OnDrawSystemEvent(Viewport *self, BasicClass *sender, s32 event);
  * sceneRoot and the view node's root into it.
  * @param self the viewport */
 void Viewport__Update(Viewport *self);
+
+/** @brief Draws a SceneNode and its SceneNode children into this half's OT,
+ * each by its kind (BgLayer, GridCell, BoxFill, ScreenSprite, a world-space
+ * Sprite, or a TMD object); defined in src/graphics/viewport_draw.c.
+ * @param self the viewport
+ * @param node the node to draw */
+void Viewport__DrawNode(Viewport *self, SceneNode *node);
 
 /** @brief Takes the buffer index from the DrawSystem; when drawing is
  * enabled, resets the GPU, swaps, sorts the clear into this half's OT and
