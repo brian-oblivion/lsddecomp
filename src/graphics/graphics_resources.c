@@ -8,11 +8,10 @@
  *  - Tod (tod.h): a TOD animation and its packets;
  *  - ModelData (model_data.h), TriggerWorld (trigger_world.h): a model
  *    file's TMD and TODs, and a counted set of model files;
- *  - TileMap (tile_map.h): the GsMAP of the 20 x 15 background grid, built
- *    rather than loaded;
  *  - BgLayer (bg_layer.h): a SceneNode drawing one GsBG over a TileMap.
- * TileAtlas, the map's cells, TodSet, a set of Tods, and MoviePlayer, the
- * FMV player, follow in tile_atlas.c, tod_set.c and movie_player.c.
+ * TileMap and TileAtlas, the background grid's GsMAP and GsCELLs, TodSet,
+ * a set of Tods, and MoviePlayer, the FMV player, follow in tile_map.c,
+ * tile_atlas.c, tod_set.c and movie_player.c.
  * Each FileResource class has an allocator (New_<Class>), a ctor that adopts
  * a buffer or requests a file (a ResourceSource, include/file_resource.h),
  * a finalizer, and its own load steps. The method tables close the file.
@@ -24,7 +23,6 @@
 #include "tim_array_src.h"
 #include "bg_layer.h"
 #include "tile_map.h"
-#include "tile_atlas.h"
 #include "link_resource.h"
 #include "bmem_pmgr.h"
 #include "data_source.h"
@@ -930,78 +928,6 @@ TriggerWorldMethods *GetTriggerWorldMethods(void) {
     return &gTriggerWorldMethods;
 }
 
-/* Allocate and construct a TileMap over `atlas`. */
-TileMap *New_TileMap(s32 source, TileAtlas *atlas) {
-    TileMap *obj = BMemPMgrAlloc(sizeof(TileMap));
-
-    if (obj != NULL) {
-        GetTileMapMethods()->ctor(obj, source, atlas);
-        return obj;
-    }
-    return NULL;
-}
-
-/* ctor (+0x008): with no `source` (the one caller's), build the default
- * grid at once. What a nonzero `source` would be, no caller shows. */
-void TileMap__TileMap(TileMap *self, s32 source, TileAtlas *atlas) {
-    s32 unused[8]; /* MATCHING: never used; it gives retail's 0x40-byte stack */
-
-    GetActiveDataSourceMethods()->ctor((FileResource *)self);
-    self->methods = GetTileMapMethods();
-    self->atlas = atlas;
-    self->loaded = 0;
-    if (source == 0) {
-        self->defaultGrid = 1;
-        self->loadState = 0;
-        self->methods->onRequestDone(self);
-    }
-}
-
-/* finalize (+0x00C): free the map's index table. */
-void TileMap__Finalize(TileMap *self) {
-    BMemPMgrFree(self->map.index);
-    GetActiveDataSourceMethods()->finalize((FileResource *)self);
-}
-
-/* onRequestDone (+0x064): when idle, BuildMap. */
-void TileMap__Load(TileMap *self) {
-    if (self->loadState == 0) {
-        ((TileMapBuildMapFn)self->methods->processBuffer)(self);
-        self->loaded = 1;
-    }
-}
-
-/* +0x078: map the atlas's cells, the default grid indexing them in order;
- * without the default grid, or when the index table cannot be had, free
- * the buffer instead. */
-void TileMap__BuildMap(TileMap *self) {
-    s32 n;
-    s32 i;
-    u16 *p;
-
-    self->map.base = self->atlas->cells;
-    if (self->defaultGrid != 0) {
-        self->map.ncellw = TILEMAP_COLS;
-        self->map.cellw = TILE_SIZE;
-        self->map.cellh = TILE_SIZE;
-        self->map.ncellh = TILEMAP_ROWS;
-        n = self->map.ncellw * self->map.ncellh;
-        self->map.index = BMemPMgrAlloc(n * sizeof(*self->map.index));
-        if (self->map.index != NULL) {
-            p = self->map.index;
-            for (i = 0; i < n; i++) {
-                *p++ = i;
-            }
-            return;
-        }
-    }
-    self->methods->freeBuffer(self);
-}
-
-TileMapMethods *GetTileMapMethods(void) {
-    return &gTileMapMethods;
-}
-
 /* The classes' method tables, in the order the image keeps them. Each
  * fills its class's header's slots with the class's own method or the
  * parent's. A (void *) entry is a method whose declared parameters differ
@@ -1285,39 +1211,4 @@ TriggerWorldMethods gTriggerWorldMethods = {
     /* +0x080 scanPackets */ (void *)ModelData__ForwardScanPackets,
     /* +0x084 decodePacketWord */ (void *)ModelData__ForwardDecodePacketWord,
     /* +0x088 getModelData */ TriggerWorld__GetModelData,
-};
-
-/* TileMap: load, then build the GsMAP. */
-TileMapMethods gTileMapMethods = {
-    /* +0x000 header */ TILEMAP_CLASS_ID,
-    /* +0x004 release */ (void *)FileResource__Release,
-    /* +0x008 ctor */ TileMap__TileMap,
-    /* +0x00C finalize */ TileMap__Finalize,
-    /* +0x010 addChild */ (void *)BasicClass__AddChild,
-    /* +0x014 removeChild */ (void *)BasicClass__RemoveChild,
-    /* +0x018 removeAllChildren */ (void *)BasicClass__RemoveAllChildren,
-    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
-    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
-    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
-    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
-    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
-    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
-    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
-    /* +0x038 onNotify */ (void *)BasicClass__OnNotify,
-    /* +0x03C slot3C */ NULL,
-    /* +0x040 slot40 */ NULL,
-    /* +0x044 open */ NULL,
-    /* +0x048 close */ NULL,
-    /* +0x04C seek */ NULL,
-    /* +0x050 slot50 */ NULL,
-    /* +0x054 read */ NULL,
-    /* +0x058 loadFile */ NULL,
-    /* +0x05C freeBuffer */ (void *)FileResource__FreeBuffer,
-    /* +0x060 slot60 */ NoOp,
-    /* +0x064 onRequestDone */ TileMap__Load,
-    /* +0x068 runRequestQueue */ NULL,
-    /* +0x06C requestLoadFile */ NULL,
-    /* +0x070 stopService */ NULL,
-    /* +0x074 cancelRequests */ NULL,
-    /* +0x078 processBuffer */ TileMap__BuildMap,
 };

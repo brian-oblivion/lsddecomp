@@ -52,7 +52,7 @@ struct TileMapMethods {
  *
  * BgLayer__Reset points a GsBG's map at `map` and sizes the layer from it.
  * Parent FileResource, through the active data-source driver; no subclasses.
- * Methods in src/graphics/graphics_resources.c. The object is 0x44 bytes
+ * Methods in src/graphics/tile_map.c. The object is 0x44 bytes
  * (New_TileMap).
  *
  * Its one builder is TaskCore__TaskCore (src/app/task.c): New_TileAtlas(0),
