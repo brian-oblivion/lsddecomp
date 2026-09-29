@@ -9,7 +9,7 @@
  *        the memory card's load-file picker.
  *
  * Methods in src/ui/input_dialogs.c (New_ItemList .. ItemList__DetachTarget)
- * and src/world/dream_scene.c (ItemList__SetState .. GetItemListMethods).
+ * and src/ui/item_list.c (ItemList__SetState .. GetItemListMethods).
  */
 
 /* The objects it holds, by tag (`target` is TaskObjF's `sound`, a

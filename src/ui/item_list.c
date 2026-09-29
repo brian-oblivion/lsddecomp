@@ -19,6 +19,9 @@
 #include "bmem_pmgr.h"
 #include <strings.h>
 
+/* The y step from one row to the next (createRows). */
+#define ITEMLIST_ROW_SPACING 10
+
 /* The row colours, two 3-byte RGBs in sdata, 4 bytes apart; only their
  * addresses are taken (setColor). */
 extern struct ColorRgb sItemListRowColor;
@@ -180,9 +183,6 @@ void ItemList__CursorDown(ItemList *self, s32 unused1, s32 unused2, s32 forwarde
  * lower. */
 extern s32 sItemListRowOriginX;
 extern s32 sItemListRowOriginY;
-
-/* The y step from one row to the next (createRows). */
-#define ITEMLIST_ROW_SPACING 10
 
 void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32 top, s32 column,
                           s32 cursor) {
