@@ -527,6 +527,7 @@
     },
     "17": {
       "checklist": {
+        "shape-graphics": true,
         "ub-calls": true
       },
       "reason": "",
