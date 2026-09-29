@@ -499,7 +499,7 @@ s32 Entity__UpdateActivationState(Entity *self) {
                 }
             }
         }
-        goto merge; /* MATCHING: randCheck placed after this block, reached by goto */
+        goto merge; /* MATCHING: gotos to one shared random roll; a roll in each arm compiles two */
 
     randCheck:
         if ((rand() & 0x7F) == 0) {
