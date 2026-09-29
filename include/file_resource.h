@@ -21,6 +21,9 @@
 typedef struct FileResource FileResource;
 typedef struct FileResourceMethods FileResourceMethods;
 
+/** FileResource's class id (gFileResourceMethods word +0x000). */
+#define FILERESOURCE_CLASS_ID 0x3
+
 /** FileResource's slots up to +0x074, BasicClass's first: the whole table
  * of a class that has no processBuffer step (RequestedFile and the two
  * drivers, CdDriver and NullDriver), whose table ends there.

@@ -17,6 +17,10 @@
 
 typedef struct BasicClass BasicClass;
 typedef struct BasicClassMethods BasicClassMethods;
+
+/** BasicClass's class id (gBasicClassMethods word +0x000). */
+#define BASICCLASS_CLASS_ID 0x0
+
 typedef struct BasicClassListNode BasicClassListNode;
 
 /** The one notifyParents event the base class defines: finalize sends it, and

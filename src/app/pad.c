@@ -8,7 +8,8 @@
  * dispatchEvents sends at most one event per button to the pad's parents.
  * loadButtonTable copies sDefaultButtonMasks, a fixed table of libetc's
  * mask values, into sButtonMasks, whose order is enum PadButton. The two
- * remaining slots are empty and never called.
+ * remaining slots are empty and never called. The method table ends the
+ * file.
  */
 #include "common.h"
 #include <libetc.h>
@@ -147,3 +148,31 @@ void Pad__NoOpSlot54(void) {}
 PadMethods *GetPadMethods(void) {
     return &gPadMethods;
 }
+
+/* Pad's method table (include/pad.h): BasicClass's slots with the ctor and
+ * finalize, then init, updateMasks, dispatchEvents, loadButtonTable and the
+ * two empty slots. */
+PadMethods gPadMethods = {
+    PAD_CLASS_ID,
+    (void *)BasicClass__Release,
+    Pad__Pad,
+    Pad__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    Pad__Init,
+    Pad__UpdateMasks,
+    Pad__DispatchEvents,
+    Pad__NoOpSlot4C,
+    Pad__LoadButtonTable,
+    Pad__NoOpSlot54,
+};

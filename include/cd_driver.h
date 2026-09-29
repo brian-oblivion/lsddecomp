@@ -65,6 +65,9 @@
 typedef struct CdDriver CdDriver;
 typedef struct CdDriverMethods CdDriverMethods;
 
+/** CdDriver's class id (gCdDriverMethods word +0x000). */
+#define CDDRIVER_CLASS_ID 0x13
+
 /**
  * @brief CdDriver's method table: FileResource's slots up to +0x074
  * (FILERESOURCE_BASE_SLOTS), eleven of them
