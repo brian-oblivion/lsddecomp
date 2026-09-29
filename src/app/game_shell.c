@@ -62,7 +62,8 @@ GameApplication *New_GameApplication(GameApplicationConfig *config) {
  * ETC\DREAME5.TMD, config->dreamSysConfigOption handed to it, then the RNG seeded through
  * +0x040 (GameApplication__SeedRandom). */
 void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *config) {
-    /* MATCHING: mode is never set, but a bare ResourceSource shrinks the frame by 8. */
+    /* MATCHING: a whole ResourceRequest though mode is never set; a bare
+     * ResourceSource makes the stack frame smaller than retail's. */
     ResourceRequest req;
 
     GetApplicationMethods()->ctor((Application *)self, config->dataSource);
@@ -155,7 +156,7 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
  * APPLICATION_LOOP_OPENING. */
 s32 GameApplication__RunTitleMenu(GameApplication *self) {
     s32 status;
-    s32 graphResult; /* MATCHING: set after the GraphRoom check, it holds its 2 in a saved register */
+    s32 graphResult; /* MATCHING: GRAPH, set after the GraphRoom check, not the constant */
 
     if (self->config->pollGraphRoom != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
@@ -182,7 +183,9 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
         }
 
         self->skipGraphRoomPoll = 0;
-        return ((u32)status < 1) << 1; /* MATCHING: status == 0 ? LOOP_DAY : LOOP_OPENING */
+        /* MATCHING: status == 0 ? APPLICATION_LOOP_DAY : APPLICATION_LOOP_OPENING,
+         * spelled as retail computes it; the ternary compiles differently. */
+        return ((u32)status < 1) << 1;
     }
     return APPLICATION_LOOP_DAY;
 }
@@ -204,7 +207,8 @@ s32 GameApplication__RunTask(NewTaskFn newTask, struct DreamSys *dreamSys,
 void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
     StreamTask *task;
 
-    /* MATCHING: the frame keeps 12 bytes here, frameTotal in the last 4. */
+    /* MATCHING: frameTotal is the last word of a 12-byte local, where retail's
+     * stack frame keeps it; a lone s32 sits elsewhere. */
     struct {
         u8 pad00[8];
         s32 frameTotal;
@@ -440,7 +444,8 @@ void SetActiveDataSource(s32 source) {
         src = (FileResourceMethods *)GetNullDriverMethods();
     }
     methods = GetFileResourceMethods();
-    /* MATCHING: a while/for loop compiles top-tested; retail jumps into a bottom test. */
+    /* MATCHING: gotos, because retail's loop is entered at its bottom test;
+     * a while or for loop tests at the top. */
     goto copy;
 next:
     entry++;

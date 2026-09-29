@@ -47,8 +47,6 @@ extern CdStream *sActiveCdStream; /* the stream that owns the drive, or NULL */
 extern s32 sCdStreamAudioMixSet;
 extern char sCdStreamVersionSuffix[]; /* ";1" */
 
-/* MATCHING: the ctor call and return sit inside `if (obj != NULL)`; an early
- * `return NULL` adds a jump. */
 CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved) {
     CdStream *obj = BMemPMgrAlloc(sizeof(CdStream));
 
@@ -59,8 +57,8 @@ CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved) {
     return NULL;
 }
 
-/* MATCHING: the sectors-a-second choice stays an inline conditional; a local
- * lets cc1 hoist its load and reorder the stores. */
+/* MATCHING: the sectors-a-second choice stays an inline conditional; in a
+ * local it is computed earlier and the stores come out in another order. */
 void CdStream__CdStream(CdStream *self, u32 cdSpeed, s32 fps, s32 reserved) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetCdStreamMethods();
@@ -308,7 +306,9 @@ int CdStream__Sync(CdStream *self, int mode) {
     return CdSync(mode, self->cdResult);
 }
 
-/* MATCHING: cd_stream.h's slot keeps its callers' (self, fn, arg); a narrower slot drops their argument loads */
+/* The slot's type in cd_stream.h keeps its callers' (self, fn, arg), though
+ * the body is empty and reads none of them. */
+/* MATCHING: a narrower slot type would change the callers' argument set-up. */
 void CdStream__SetEndCallback(CdStream *self) {}
 
 CdStreamMethods *GetCdStreamMethods(void) {
