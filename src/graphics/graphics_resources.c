@@ -125,7 +125,8 @@ typedef struct TimBlockHeader {
 
 /** @brief The same header as AdvanceLoadState copies it out of the sector
  * buffer. */
-/* MATCHING: bytes, so the copy is a byte-aligned block move. */
+/* MATCHING: bytes, so the copy is a byte-aligned block move; copying the
+ * TimBlockHeader itself loses retail's test of the pointers' alignment. */
 typedef struct TimBlockHeaderBytes {
     u8 bytes[sizeof(TimBlockHeader)]; /**< a TimBlockHeader's bytes */
 } TimBlockHeaderBytes;
@@ -200,7 +201,6 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
     switch (self->loadState) {
         case TIMBLOCK_LOAD_HEADER:
             if (self->flags & CD_FLAG_READ_DONE) {
-                /* MATCHING: a byte-aligned struct copy; a word-aligned one loses retail's runtime alignment test */
                 *(TimBlockHeaderBytes *)self->buffer = *(TimBlockHeaderBytes *)self->sector;
                 BMemPMgrFree(self->sector);
                 max = FindMaxTimBlockSize((FileResource *)self);
@@ -247,6 +247,8 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
             break;
     }
     goto out;
+/* MATCHING: both failures jump to one tail after the switch; setting failed
+ * and breaking where each is found lays those stores out inside the case. */
 fail:
     self->failed = 1;
 out:
@@ -389,7 +391,7 @@ void *LinkResource__LinkResource(LinkResource *self, ResourceSource *src) {
             self->buffer = src->buffer;
             self->bufferSize = 0;
             if (((LinkResourceBuildModelsFn)self->methods->onRequestDone)(self)) {
-                goto fail;
+                goto fail; /* MATCHING: a return NULL here lays the failure out before the success return */
             }
         } else {
             self->methods->requestLoadFile(self, src->name);
@@ -815,7 +817,7 @@ void *ModelData__ModelData(ModelData *self, ResourceSource *src, s32 owns) {
         self->buffer = src->buffer;
         self->bufferSize = 0;
         if (((s32 (*)())self->methods->onRequestDone)(self)) {
-            goto fail;
+            goto fail; /* MATCHING: a return NULL here lays the failure out before the success return */
         }
     } else {
         self->methods->requestLoadFile(self, src->name);
@@ -954,7 +956,7 @@ s32 TriggerWorld__BuildResources(TriggerWorld *self) {
         req.src.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
         *p = (s32)New_ModelData(&req.src);
         if (*p == 0) {
-            goto fail;
+            goto fail; /* MATCHING: releasing and returning here lays the cleanup out inside the loop */
         }
         self->modelDataCount++;
         p++;
@@ -1308,6 +1310,8 @@ s32 MoviePlayer__InitFrame(MoviePlayer *self, DrawRect *frame, s32 external) {
     self->stripRect.w = MOVIE_STRIP_W;
     self->stripSize = (self->stripRect.h * MOVIE_STRIP_W) >> 1; /* 16-bit pixels, in words */
     return 0;
+/* MATCHING: every failed allocation jumps here; one || chain with the
+ * cleanup in its body lays the cleanup out before the frame setup. */
 fail:
     MoviePlayer__FreeFrameBuffers(self);
     return 1;

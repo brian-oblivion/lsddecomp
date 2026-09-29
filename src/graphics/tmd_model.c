@@ -80,6 +80,8 @@ void TmdModel__TmdModel(TmdModel *self, TmdObject *object) {
     TmdModel__InitBoundsCount(self);
 }
 
+/* MATCHING: one whole-struct copy; as four word assignments each word is
+ * loaded and stored in turn, not all four loaded first. */
 void TmdModel__SetQuad(TmdModel *self, TmdModelQuad *src) {
     self->quad = *src;
 }
@@ -546,8 +548,8 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
             idx[1] = PRIM(TMD_P_TNG3)->v1;
             idx[2] = PRIM(TMD_P_TNG3)->v2;
             size = sizeof(TMD_P_TNG3);
-        /* MATCHING: every triangle case jumps to this one tail; a copy per
-         * case compiles differently. */
+        /* MATCHING: every triangle case jumps to this one tail; with a copy
+         * per case the count pointer and the vertex array trade places. */
         tri:
             *n = 3;
             break;

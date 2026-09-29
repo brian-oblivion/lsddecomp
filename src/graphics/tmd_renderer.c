@@ -176,7 +176,7 @@ void FlagLargePolyForDivide(void *ctx, s32 count);
  * `packet` is the current TMD packet and `elem` walks beside it, parked on
  * one member; PKT names the packet as seen from `elem`, POLY the primitive.
  */
-/* MATCHING: retail's shape needs the two packet cursors, a goto loop per case,
+/* MATCHING: two packet cursors, a goto loop per case (a do/while grows the frame),
  * ctx set only after the GsDOFF test, and the colour stores through &POLY->r0 */
 void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     PolyDrawCtx *ctx;
@@ -697,21 +697,16 @@ s32 ProjectTriFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, v
 
     gte_ldv3(vtx[0], vtx[1], vtx[2]);
 
-    if (TransformAndCullPoly(prim, ctx) != 0) {
-        goto fail;
-    }
-
-    {
+    if (TransformAndCullPoly(prim, ctx) == 0) {
         u_long *sz0 = &ctx->divVtx3[0]->sz;
         u_long *sz1 = &ctx->divVtx3[1]->sz;
         u_long *sz2 = &ctx->divVtx3[2]->sz;
 
         gte_stsz3(sz0, sz1, sz2);
+        storeSxy(prim);
+        FlagLargePolyForDivide(ctx, 3);
+        return 0;
     }
-    storeSxy(prim);
-    FlagLargePolyForDivide(ctx, 3);
-    return 0;
-fail:
     return 1;
 }
 
@@ -736,31 +731,28 @@ s32 ProjectQuadFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, 
 
     gte_ldv3(vtx[0], vtx[1], vtx[2]);
 
-    if (TransformAndCullPoly(prim, ctx) != 0) {
-        goto fail;
+    if (TransformAndCullPoly(prim, ctx) == 0) {
+        storeSxy(prim, 1);
+
+        gte_ldv0(vtx[3]);
+        gte_rtps();
+
+        {
+            u_long *sz0 = &ctx->divVtx4[0]->sz;
+            u_long *sz1 = &ctx->divVtx4[1]->sz;
+            u_long *sz2 = &ctx->divVtx4[2]->sz;
+            u_long *sz3 = &ctx->divVtx4[3]->sz;
+
+            gte_stsz4(sz0, sz1, sz2, sz3);
+        }
+
+        storeSxy(prim, 0);
+
+        gte_stsxy2(&ctx->sxy[3]);
+
+        FlagLargePolyForDivide(ctx, 4);
+        return 0;
     }
-
-    storeSxy(prim, 1);
-
-    gte_ldv0(vtx[3]);
-    gte_rtps();
-
-    {
-        u_long *sz0 = &ctx->divVtx4[0]->sz;
-        u_long *sz1 = &ctx->divVtx4[1]->sz;
-        u_long *sz2 = &ctx->divVtx4[2]->sz;
-        u_long *sz3 = &ctx->divVtx4[3]->sz;
-
-        gte_stsz4(sz0, sz1, sz2, sz3);
-    }
-
-    storeSxy(prim, 0);
-
-    gte_stsxy2(&ctx->sxy[3]);
-
-    FlagLargePolyForDivide(ctx, 4);
-    return 0;
-fail:
     return 1;
 }
 

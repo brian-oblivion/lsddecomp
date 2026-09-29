@@ -429,7 +429,8 @@ void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
     offset.y = offset.y - selfPos->y;
     offset.z = offset.z - selfPos->z;
 
-    /* MATCHING: each axis as gotos, and -x as ~x + 1; if/else is longer. */
+    /* MATCHING: each axis as gotos, and -x as ~x + 1; as if/else the sign's two range
+     * tests share one compare, and a ternary into mag keeps fewer values around. */
     if (offset.x < 0) {
         goto x_neg;
     }
@@ -683,29 +684,21 @@ s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2) {
     code2 = CalcBoxOutcode(box, p2);
 
     if (code1 == 0) {
-        if (code2 != 0) {
-            goto shared_test;
+        if (code2 == 0) {
+            return CLIP_INSIDE;
         }
-        return CLIP_INSIDE;
+    } else if (code2 == 0) {
+        if (out != NULL) {
+            BisectSegmentToBox(out, box, p2, p1);
+        }
+        return CLIP_P2_INSIDE;
     }
-    if (code2 != 0) {
-        goto shared_test;
+    if (code1 == 0) {
+        if (out != NULL) {
+            BisectSegmentToBox(out, box, p1, p2);
+        }
+        return CLIP_P1_INSIDE;
     }
-    if (out != NULL) {
-        BisectSegmentToBox(out, box, p2, p1);
-    }
-    return CLIP_P2_INSIDE;
-
-shared_test:
-    if (code1 != 0) {
-        goto combined;
-    }
-    if (out != NULL) {
-        BisectSegmentToBox(out, box, p1, p2);
-    }
-    return CLIP_P1_INSIDE;
-
-combined:
     if ((code1 & code2) != 0) {
         return CLIP_MISS;
     }
@@ -796,22 +789,22 @@ void SceneNode__NoOpSlotB0(void) {}
 
 /* Adds this node as a child (addChild) to every parent of `node` that is
  * an Actor. */
-/* MATCHING: two nested do/while loops, not a goto loop, so SCENENODE_CLASS_ID is set up once,
- * before both */
 void SceneNode__AddToActorParents(SceneNode *self, void *node) {
     SceneNode *parent;
     void *cursor;
 
     parent = NULL;
     do {
-        do {
+        for (;;) {
             BasicClass__GetNextParentRef(node, (BasicClass **)&parent, (BasicClassListNode **)&cursor);
             if (parent != NULL && (parent->methods->header & CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID) {
-                goto found;
+                break;
             }
-        } while (cursor != NULL);
-        parent = NULL;
-    found:
+            if (cursor == NULL) {
+                parent = NULL;
+                break;
+            }
+        }
         if (parent != NULL && (u8)parent->methods->header == ACTOR_CLASS_ID) {
             parent->methods->addChild(parent, (BasicClass *)self);
         }
