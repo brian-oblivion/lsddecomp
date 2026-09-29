@@ -325,3 +325,46 @@ s32 ItemList__GetCursorIndex(ItemList *self) {
 ItemListMethods *GetItemListMethods(void) {
     return &gItemListMethods;
 }
+
+/* ItemList's method table, class id 0x20: BasicClass's slots, six of them
+ * overridden, then ItemList's own from +0x040. A slot whose function is
+ * declared for another class's `self` takes a `void *` cast. */
+/* clang-format off */
+ItemListMethods gItemListMethods = {
+    /* +0x000 header */ 0x20,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ ItemList__ItemList,
+    /* +0x00C finalize */ ItemList__Finalize,
+    /* +0x010 addChild */ (void *)ItemList__AddChild,
+    /* +0x014 removeChild */ (void *)ItemList__RemoveChild,
+    /* +0x018 removeAllChildren */ ItemList__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ ItemList__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 resetView */ ItemList__ResetView,
+    /* +0x044 loadResources */ ItemList__LoadResources,
+    /* +0x048 releaseResources */ ItemList__ReleaseResources,
+    /* +0x04C attachTarget */ ItemList__AttachTarget,
+    /* +0x050 detachTarget */ ItemList__DetachTarget,
+    /* +0x054 setState */ ItemList__SetState,
+    /* +0x058 tickClosing */ (void *)ItemList__TickClosing,
+    /* +0x05C handleInputCode */ ItemList__HandleInputCode,
+    /* +0x060 playSound */ ItemList__PlaySound,
+    /* +0x064 pad64 */ {NULL, NULL, NULL, NULL, NULL, NULL},
+    /* +0x07C scrollRight */ ItemList__ScrollRight,
+    /* +0x080 scrollLeft */ ItemList__ScrollLeft,
+    /* +0x084 cursorUp */ (void *)ItemList__CursorUp,
+    /* +0x088 cursorDown */ (void *)ItemList__CursorDown,
+    /* +0x08C createRows */ ItemList__CreateRows,
+    /* +0x090 releaseRows */ ItemList__ReleaseRows,
+    /* +0x094 refreshRows */ ItemList__RefreshRows,
+    /* +0x098 stepCursorInView */ (void *)ItemList__StepCursorInView,
+    /* +0x09C getCursorIndex */ ItemList__GetCursorIndex,
+};
+/* clang-format on */

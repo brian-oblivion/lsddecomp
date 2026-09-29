@@ -1887,6 +1887,8 @@ segments:
       - [0x769D4, .data, world/stage_grid]  # the stage grids and their chunk moods
       - [0x76DC8, .data, world/dream_day]  # DayTask, TimedTask, StageMap: method tables and chunk tables
       - [0x771D8, data]              # class_39e08
+      - [0x77788, .data, ui/item_list]  # gItemListMethods
+      - [0x77828, data]
       - [0x782AC, .data, world/graph_room]  # gGraphRoomMethods, sGraphScoreMoods
       - [0x783DC, .data, world/dream_sys]  # DreamSys's method table, its movement tables, the stage spawn and link tables
       - [0x79520, .data, world/dream_aux]  # the resident entity, the placements and each stage's chunk triggers
