@@ -155,6 +155,12 @@ def game_bodies(live, info):
         if info and (name not in info or progress.is_library(info[name][0])):
             continue
         end = ms[k + 1].start() if k + 1 < len(ms) else len(live)
+        # A body ends at its closing brace in column 0: what follows before
+        # the next definition is file-level (a data table's initializer is
+        # data, not literals a reader has to decode).
+        close = live.find("\n}", m.start(), end)
+        if close >= 0:
+            end = close + 2
         out.append((name, live[m.start():end]))
     return out
 
