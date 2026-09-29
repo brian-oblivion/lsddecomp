@@ -118,7 +118,8 @@ check "format (clang-format --dry-run over make format's files, no tabs)" lint_f
 # apidoc and declcheck preprocess the source, so they need Sony's headers
 # (include/psyq/, generated from the SDK disc and never committed)
 if [ -f include/psyq/libgte.h ]; then
-    check "apidoc (python3 tools/apidoc.py -v)" "$PY" tools/apidoc.py -v
+    # apidoc imports declcheck, which needs pycparser from the venv
+    check "apidoc (.venv/bin/python3 tools/apidoc.py -v)" "$VENV_PY" tools/apidoc.py -v
 else
     echo "skip  apidoc (no include/psyq/: run tools/psyq_sdk.py install)"
 fi
