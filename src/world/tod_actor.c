@@ -449,7 +449,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                                                       &head.type, &head.flag, &head.length);
     partIndex = TodActor__FindPartIndex(self, head.objectId);
     if (partIndex < 0) {
-        goto end;
+        return (u32 *)packet + head.length;
     }
     part = self->parts[partIndex];
     coord = part->coord2;
@@ -483,7 +483,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     data += 2; /* three s16 scales, padded to two words */
                 }
                 if (!(head.flag & TOD_COORD_TRANSLATE)) {
-                    goto end;
+                    break;
                 }
                 {
                     long *trans = &param->trans.vx;
@@ -510,7 +510,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     data += 2;
                 }
                 if (!(head.flag & TOD_COORD_TRANSLATE)) {
-                    goto end;
+                    break;
                 }
                 {
                     long *trans = &param->trans.vx;
@@ -564,8 +564,6 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
             break;
         }
     }
-
-end:
     return (u32 *)packet + head.length;
 }
 
