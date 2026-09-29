@@ -94,9 +94,7 @@ void LbdFile__AdvanceLoadState(LbdFile *self) {
             self->loadState = LBDFILE_LOAD_IDLE;
             self->headerReady = 1;
             if (self->autoLoadData != 0) {
-                /* MATCHING: called with no argument, as retail does; the slot still
-                 * receives this loader, the caller's own `self`. */
-                ((LbdFileLoadDataBlockNoArgFn)self->methods->loadDataBlock)();
+                self->methods->loadDataBlock(self);
             }
         }
     } else if (self->loadState == LBDFILE_LOAD_DATA) {

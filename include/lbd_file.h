@@ -104,13 +104,6 @@ struct LbdFile {
 typedef void (*LbdFileLoadHeaderFn)(LbdFile *self, char *name);
 
 /**
- * @brief A no-argument view of loadDataBlock (+0x080), the type
- * LbdFile__AdvanceLoadState calls it through; the occupant still receives
- * the caller's `self`.
- */
-typedef s32 (*LbdFileLoadDataBlockNoArgFn)(void);
-
-/**
  * @brief A no-argument view of releaseDataBlock (+0x084), the type
  * LbdFile__LoadDataBlock calls it through; the occupant still receives the
  * caller's `self`.
