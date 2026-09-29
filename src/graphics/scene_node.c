@@ -196,7 +196,7 @@ SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *parent, LongVec
 
     if (self->parent == NULL) {
         self->parent = parent;
-        /* MATCHING: coord2 through a local, reloaded after addChild */
+        /* MATCHING: coord2 through a local, read again after addChild */
         coord2 = self->coord2;
         coord2->super = parent->coord2;
         parent->methods->addChild(parent, (BasicClass *)self);
@@ -673,7 +673,7 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *
  * BisectSegmentToBox writes the crossing to `out` when it is non-NULL. With
  * both ends outside and not on the same side of any face, the segment is
  * halved and each half tried in turn, until it can no longer be halved. */
-/* MATCHING: the final if (mid.y) with two identical arms; a plain return adds a register move */
+/* MATCHING: the final if (mid.y) with two identical arms; a plain return is longer */
 s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2) {
     u8 code1;
     u8 code2;
@@ -796,7 +796,8 @@ void SceneNode__NoOpSlotB0(void) {}
 
 /* Adds this node as a child (addChild) to every parent of `node` that is
  * an Actor. */
-/* MATCHING: two nested do/while loops, not gotos, so SCENENODE_CLASS_ID is hoisted out of them */
+/* MATCHING: two nested do/while loops, not a goto loop, so SCENENODE_CLASS_ID is set up once,
+ * before both */
 void SceneNode__AddToActorParents(SceneNode *self, void *node) {
     SceneNode *parent;
     void *cursor;
@@ -842,7 +843,7 @@ void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src) {
 /* dst = `src` rotated by the node's rotation (as RotateLocalVector) plus the
  * node's world position, coord2->workm.t. A node with no parent reads the
  * position through NULL. */
-/* MATCHING: the parent test is repeated per axis; hoisting it changes the code */
+/* MATCHING: the parent test is repeated per axis; testing it once changes the code */
 void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 unused) {
     MATRIX rot;
     long *worldPos;
@@ -863,7 +864,6 @@ void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 u
 /* out[i] = GsCOORD2PARAM.rotate's angle i (ONE to the turn) in degrees, over
  * 1: `* 45 >> 9` is `* 360 / ONE` reduced by 8, rounding down. The Ratio16[3]
  * shape FaceTarget builds and updateRotation takes. */
-/* MATCHING: num is written before den; the scheduler puts each den store first */
 void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
     GsCOORD2PARAM *src;
 
@@ -1030,7 +1030,7 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 zeroPitch, s3
 }
 
 /* `pair` (a Ratio16) as 20.12 fixed point, from the quotient and the
- * remainder so that num * ONE cannot overflow; the / and % share one div. */
+ * remainder so that num * ONE cannot overflow; the / and % share one division. */
 s32 RatioToFixed12(void *pair) {
     Ratio16 *p;
     s32 whole, rem, frac;
@@ -1109,7 +1109,8 @@ void ApplyMatrixToSVArray(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m) {
 
 /* dst[i] = m * src[i] over `count` LongVec3s, through ApplyMatrixLV.
  * dst == src works in place. */
-/* MATCHING: the dead six-argument call sizes the frame's outgoing-argument area */
+/* MATCHING: the dead six-argument call gives the function retail's stack room for
+ * six outgoing arguments */
 void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m) {
     LongVec3 *end;
 
