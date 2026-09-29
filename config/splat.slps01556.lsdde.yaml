@@ -1475,7 +1475,7 @@ segments:
       # never through the caller's frame.
       # Clear of both remainder hazards (zero `jlabel`, zero `jr $t2`), so
       # no rodata slot to attach and no hasm/.word disposition here either.
-      - [0x3DA54, c, ui/node_guarded_viewport]
+      - [0x3DA54, c, world/node_guarded_viewport]
       # class_3bb8c_d / _e / _f: front of the 305-function class_3bb8c
       # remainder, split into three ~20-function C units in round 14. The
       # tail (#59 onward, 0x403E4) deliberately STAYS asm as class_3bb8c_g
@@ -1986,7 +1986,7 @@ segments:
       - [0x76DC8, .data, world/day_task]  # gDayTaskMethods, DayTask's view points
       - [0x76E68, .data, world/timed_task]  # gTimedTaskMethods
       - [0x76EE8, .data, world/stage_map]  # gStageMapMethods, the chunk and footprint tables
-      - [0x771D8, .data, ui/node_guarded_viewport]  # gNodeGuardedViewportMethods
+      - [0x771D8, .data, world/node_guarded_viewport]  # gNodeGuardedViewportMethods
       - [0x772A0, .data, world/grid_cell]  # gGridCellMethods
       - [0x77360, .data, ui/title_menu]  # gTitleMenuMethods .. sDisplayBufferRects: the title menu
       - [0x775C4, .data, ui/task_objf]  # gTaskObjFMethods .. sCardIconRect: the memory card's messages
