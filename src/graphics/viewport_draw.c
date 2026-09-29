@@ -67,7 +67,8 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
     u32 classId;
 
     dirty = 0;
-    /* MATCHING: explicit pointers; retail keeps both addresses in s-registers */
+    /* MATCHING: both matrices through pointer locals, set once here; retail keeps
+     * the two addresses for the whole function rather than recomputing them */
     ls = &lsBuf;
     lw = &lwBuf;
     if ((u8)node->methods->header == GRIDCELL_CLASS_ID && (s32)node->attribute < 0) { /* GsDOFF, bit 31 */
@@ -77,7 +78,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
     coord2 = node->coord2;
     if (coord2->flg == 0) {
         elem = &coord2->coord.m[0][0];
-        scale = (u32 *)&coord2->param->scale; /* MATCHING: read unsigned (srl) */
+        scale = (u32 *)&coord2->param->scale; /* MATCHING: unsigned, so products shift unsigned */
         dirty = 1;
         end = &coord2->coord.m[3][0];
         RotMatrix(&coord2->param->rotate, &coord2->coord);
@@ -153,8 +154,9 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
         gsSprite->y += gsSprite->my;
         GsSortSprite(gsSprite, self->ot[self->otIndex], 0);
     } else {
-        /* MATCHING: declared here, not at the top, for the frame layout; scr is
-         * never used and reserves 8 frame bytes retail leaves untouched */
+        /* MATCHING: declared here, not at the top, so they sit where retail keeps
+         * them on the stack; scr is never used and holds 8 bytes retail leaves
+         * untouched */
         VECTOR pos;
         SVECTOR scr;
         Sprite *worldSprite;
@@ -178,7 +180,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             pos.vy = (pos.vy * self->projH) / pos.vz;
             pos.vz = (pos.vz - self->nearZ) / self->zDiv;
             worldSprite = (Sprite *)node;
-            /* MATCHING: ~v + 1, not -v (nor/addiu, not negu) */
+            /* MATCHING: ~v + 1, not -v: retail negates by complementing and adding one */
             if ((pos.vx < 0 ? ~pos.vx + 1 : pos.vx) <= SPRITE_POS_LIMIT) {
                 worldSprite->sprite.x = pos.vx;
             } else {
