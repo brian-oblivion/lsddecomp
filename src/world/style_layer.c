@@ -372,7 +372,7 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
     s32 i;
 
     if (sStyleGrid == 0) {
-        i = ARRAY_COUNT(sStyleCueSlots) - 1;
+        i = ARRAY_COUNT(sStyleCueSlots) - 1; /* MATCHING: set here; set in the for header it differs */
         slot = &sStyleCueSlots[ARRAY_COUNT(sStyleCueSlots) - 1];
         sStyleGrid = grid;
         sStyleStage = stage;
@@ -381,11 +381,10 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
         sStyleDay = day;
         sStyleUnreadArg = unreadArg;
         sStyleTickCount = 0;
-        do {
+        for (; i >= 0; i--) {
             *slot = 0;
-            i--;
             slot--;
-        } while (i >= 0);
+        }
         return (s32)ApplyStyleConfig();
     }
     return 0;
@@ -594,24 +593,23 @@ void StyleUpdateDecorSet(void) {
         return;
     }
     pos = *(BoxFillPos *)&sStyleDecorPosX;
-    i = 0;
+    i = 0; /* MATCHING: set here; set in the for header the code differs */
     if (sStyleDecorVariant == STYLE_DECOR_LOWERED) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
     slot = sStyleDecorSlots;
     colorOfs = 0;
     pos.y += fade * 3;
-    do {
+    for (; i < STYLE_DECOR_BANDS; i++) {
         AdjustRgbByDelta(rgb, (u8 *)(colorOfs + sStyleDecorColors), fade);
         band = *slot;
         band->methods->setColor(band, 1, rgb);
         band = *slot;
-        i++;
         colorOfs += 3;
         band->methods->setPosition(band, &pos);
         pos.y += 3;
         slot++;
-    } while (i < STYLE_DECOR_BANDS);
+    }
     AdjustRgbByDelta(rgb, (u8 *)sStyleClearColor, fade);
     viewport->methods->setClearColor(viewport, (ColorRgb *)rgb);
 }
