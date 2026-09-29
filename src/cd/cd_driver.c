@@ -84,7 +84,7 @@ void CdDriver__Open(CdDriver *self, char *name, s32 param0, s32 param1) {
     char path[CD_PATH_SIZE];
     CdlFILE statBuf;
     CdFileEntry *entry;
-    s32 size; /* MATCHING: not shared with status: one local adds a move in the CdSync loop */
+    s32 size; /* MATCHING: not shared with status; one local for both is longer */
     s32 status;
 
     if (sCdAsyncEnabled == 0 && sCdSyncQueueMode == 0) {
@@ -214,7 +214,7 @@ s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
                 sCdReadBuffer = buf;
                 sCdTickStep = CD_TICK_STATE_MACHINE;
             } else {
-            /* MATCHING: a goto, not do-while: a do-while hoists the -1 into a saved register */
+            /* MATCHING: a goto, not do-while: a do-while sets up the -1 once, ahead of the loop */
             retry:
                 CdRead(size >> CD_SECTOR_SHIFT, buf, CdlModeSpeed);
                 do {
@@ -261,7 +261,7 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
             if (entry == NULL) {
                 return;
             }
-            /* MATCHING: entry->size spelled at both uses; one local merges the two loads */
+            /* MATCHING: entry->size spelled at both uses; one local reads it once, retail twice */
             sectorCount = entry->size >> CD_SECTOR_SHIFT;
             sCdReadSectorCount = sectorCount;
             if ((entry->size & (CD_SECTOR_SIZE - 1)) != 0) {
@@ -402,7 +402,8 @@ void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
 
     if (name != NULL) {
         if (sCdAsyncEnabled != 0) {
-            /* MATCHING: retail's bug, a store through the caller's $s2 */
+            /* MATCHING: retail's bug: a store through a pointer never set, so to
+             * whatever address the caller left behind */
             unassigned[1] = 1;
             fileIndex = FindCdFileIndex(name);
             EnqueueCdRequest(self, fileIndex, CD_OP_LOAD_FILE, 0, 0);
@@ -655,7 +656,7 @@ void DisableCdQueue(void) {
 void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1) {
     CdRequestNode *node = AllocCdRequestNode();
 
-    /* MATCHING: retail's store order; cc1 keeps statement order here */
+    /* MATCHING: retail's store order, not field order; statement order sets it here */
     node->op = op;
     node->param0 = param0;
     node->owner = owner;
@@ -953,7 +954,8 @@ void FileResource__DestroyCdReadDriver(FileResource *self) {
 
 void NoOp2(void) {}
 
-/* MATCHING: the retry is a label and goto; a while or for loop hoists &path out of it */
+/* MATCHING: the retry is a label and goto; a while or for loop computes &path once,
+ * outside it */
 void OpenCdFile(CdDriver *self, char *name) {
     s32 retries;
     CdlFILE file;
@@ -1006,11 +1008,12 @@ s32 GetCdFileSize(CdDriver *self) {
 
 void NoOp3(void) {}
 
-/* MATCHING: the seek retry and the CdSync wait are gotos, only the CdReadSync wait a do-while */
+/* MATCHING: the seek retry and the CdSync wait are gotos, only the CdReadSync wait a
+ * do-while */
 s32 ReadCdFile(CdDriver *self, void *buf, s32 size) {
     s32 sectors;
     s32 status;
-    char scratch[2048]; /* MATCHING: never used; it sizes the frame so syncResult sits where retail's does */
+    char scratch[2048];    /* MATCHING: never used; it puts syncResult where retail keeps it */
     u_char syncResult[16]; /* MATCHING: CdSync writes 8 bytes; 16 keeps the frame layout */
 
     if (self->isOpen != 0) {
