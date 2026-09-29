@@ -503,7 +503,7 @@ s32 Entity__UpdateSoundCueStop(Entity *self);
 /**
  * @brief Row 51's handler, run by row 113's too (Entity__CueWalkWithTurnsMaybeGiantRow113): at
  *        moodTimer 0 in state 0, one time in five, scales to sScaleSix,
- *        moves 800 in local y and enters state 11; plays program 8 every
+ *        moves 800 in local y and leaves state 0, so only once; plays program 8 every
  *        fifth tick; turns by -90, +90 and (at random) 180 degrees at
  *        moodTimer 90, 160 and 220; moves -80 a tick in local z.
  * @param self The entity.
