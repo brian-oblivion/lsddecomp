@@ -1341,6 +1341,8 @@ segments:
       # (carve history; merged into ScreenWidgets above, round 100)
       # code_2cc8c_f: #30..#59, 0x30E64..0x3197C (psyq_memset follows, so no
       # data tail). Zero blocked functions.
+      # BoxFill, New_BoxFill (0x800404D0) to GetBoxFillMethods.
+      - [0x30CD0, c, ui/box_fill]
       # TextRow, New_TextRow (0x800408CC) to GetTextRowMethods.
       - [0x310CC, c, ui/text_row]
       # The full-width Shift-JIS helpers, DecodeFullWidthSjis (0x80040FC0) to FormatFullWidthNumber.
@@ -1934,7 +1936,8 @@ segments:
       - [0x5EF30, .data, app/task_core]  # gTaskCoreMethods and its three constants
       - [0x5F078, .data, app/intermediate_base]  # gIntermediateBaseMethods
       - [0x5F0E4, .data, app/viewport]  # gViewportMethods
-      - [0x5F19C, .data, ui/screen_widgets]  # gFadeBoxMethods .. gBoxFillMethods
+      - [0x5F19C, .data, ui/screen_widgets]  # gFadeBoxMethods, its colour tables
+      - [0x5F2C0, .data, ui/box_fill]  # gBoxFillMethods
       - [0x5F390, .data, ui/text_row]  # gTextRowMethods
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)
       - [0x5F474, .data, graphics/char_sprite]  # gCharSpriteMethods, sCharSpriteCellRect

@@ -5,7 +5,7 @@
  * Declares the BoxFill class (object, method table, and the slot and field
  * macros its subclass expands), the size and position pairs its methods
  * take, and its attribute-bit and class-id constants. Methods are defined
- * in src/ui/screen_widgets.c.
+ * in src/ui/box_fill.c.
  */
 #ifndef BOX_FILL_H
 #define BOX_FILL_H
@@ -118,7 +118,7 @@ struct BoxFillMethods {
  *
  * Class id 0x64 (BOXFILL_CLASS_ID), method table gBoxFillMethods, parent
  * SceneNode: BoxFill__BoxFill runs SceneNode's ctor first. Methods in
- * src/ui/screen_widgets.c. One class derives from it, FadeBox (0x164,
+ * src/ui/box_fill.c. One class derives from it, FadeBox (0x164,
  * include/fade_box.h), whose ctor runs this one's first.
  *
  * Drawing: Viewport__DrawNode takes its own path for a node whose class-id
@@ -171,7 +171,7 @@ typedef void (*BoxFillResetFn)(BoxFill *self, BoxFillSize *size, void *color, s3
  * caller passing a BoxFillPos casts it. */
 typedef void (*BoxFillAttachToParentFn)(BoxFill *self, SceneNode *parent, BoxFillPos *pos);
 
-/* The class's own methods, in ROM order (screen_widgets.c). A subclass
+/* The class's own methods, in ROM order (box_fill.c). A subclass
  * reaches the base ones through GetBoxFillMethods() and upcasts. */
 
 /**
