@@ -10,9 +10,8 @@
  * its model, and the table getter. ReturnZero follows; nothing calls it or
  * points at it.
  *
- * The prototypes for FileResource's active-driver getter and the pool
- * allocator, and the cast for LinkResource's getModel, are this file's
- * reading of its callees and stay in it.
+ * The type LinkResource's getModel is called through,
+ * PlacementGridGetModelFn, is this file's own.
  */
 #include "common.h"
 #include <libgte.h>
@@ -41,7 +40,7 @@ typedef struct PlacementGridBuffer {
 
 /* LinkResource__GetModel as PlacementGrid__ResolveEntry calls it through
  * `linkResource`'s getModel (+0x080). The occupant reads only (self, index). */
-/* MATCHING: the four arguments keep `placement` in $a3 across the call */
+/* MATCHING: all four arguments, as retail passes them, though the occupant reads two */
 typedef s32 (*PlacementGridGetModelFn)(LinkResource *self, s32 model, s32 cell, CellPlacement *placement);
 
 PlacementGrid *New_PlacementGrid(char *name) {
@@ -396,7 +395,8 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 vol, s32 endVol) {
 
     if (index >= 0) {
         program = index >> VAB_TONE_BITS;
-        /* MATCHING: row is loaded before tone, or tone folds to index & 0xF. */
+        /* MATCHING: row is read before tone is worked out; the other way round,
+         * tone simplifies to index & 0xF, which retail does not do. */
         row = self->progVagTable[program];
         tone = index - program * VAB_TONES_PER_PROG;
         entry = &row[tone];
@@ -440,8 +440,8 @@ s32 VabStreamObj__Unmute(VabStreamObj *self) {
 
     result = self->muted;
     if (result != 0) {
-        /* MATCHING: retail returns what SsSetMute leaves in $v0 (SpuSetMute's
-         * result); <libsnd.h> declares it void, so the call is cast. */
+        /* MATCHING: retail returns what SsSetMute returns (SpuSetMute's result),
+         * though <libsnd.h> declares it void, so the call is cast. */
         result = ((s32 (*)(char))SsSetMute)(0);
         self->muted = 0;
     }

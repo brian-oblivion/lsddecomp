@@ -56,11 +56,11 @@ extern u8 sMovieClearColor[4];          /* a zero word: play's clearImage color,
 #define CLUT_STP 0x8000 /* a 15-bit colour's semi-transparency bit */
 
 /* GsBG attribute bits 24..25, the colour mode (LIBGS: 0 4-bit CLUT, 1 8-bit
- * CLUT, 2 15-bit direct). BgLayer's mode 1 is the one New_BgLayer's caller
+ * CLUT, 2 15-bit direct). BGLAYER_MODE_SCREEN is the one New_BgLayer's caller
  * uses, over TileAtlas's 15-bit texture pages. */
 #define BG_ATTR_8BIT (1 << 24)
 #define BG_ATTR_15BIT (2 << 24)
-#define BG_SCREEN_W 320 /* mode 1's layer size */
+#define BG_SCREEN_W 320 /* BGLAYER_MODE_SCREEN's layer size */
 #define BG_SCREEN_H 240
 #define BG_SCALE_MAX 30000 /* BgLayer__UpdateScale's clamp, in 20.12 */
 
@@ -599,7 +599,7 @@ u8 ScanTodPackets(Tod *self, u8 *out, u32 *tmdId, u32 *data) {
     s32 index;
 
     packetCount = ((TodFrame *)data)->packetCount;
-    data += 2;
+    data = ((TodFrame *)data)->packets;
     i = 0;
     created = 0;
     index = 0;
@@ -666,17 +666,17 @@ void BgLayer__BgLayer(BgLayer *self, TileMap *src, s32 mode) {
     ((BgLayerResetFn)self->methods->reset)(self, src, mode);
 }
 
-/* reset (+0x040): lay the GsBG over `src`'s map, sized to the map (mode 0,
- * 8-bit CLUT) or to the screen (mode 1, 15-bit), at the origin, unscaled,
- * unrotated, pivoting on its centre. */
+/* reset (+0x040): lay the GsBG over `src`'s map, sized to the map
+ * (BGLAYER_MODE_MAP, 8-bit CLUT) or to the screen (BGLAYER_MODE_SCREEN,
+ * 15-bit), at the origin, unscaled, unrotated, pivoting on its centre. */
 extern ColorRgb sBgLayerDefaultColor;
 
 void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
-    if (mode == 0) {
+    if (mode == BGLAYER_MODE_MAP) {
         self->bgAttribute = BG_ATTR_8BIT;
         self->w = src->map.cellw * src->map.ncellw;
         self->h = src->map.cellh * src->map.ncellh;
-    } else if (mode == 1) {
+    } else if (mode == BGLAYER_MODE_SCREEN) {
         self->bgAttribute = BG_ATTR_15BIT;
         self->w = BG_SCREEN_W;
         self->h = BG_SCREEN_H;
@@ -998,7 +998,7 @@ TileMap *New_TileMap(s32 source, TileAtlas *atlas) {
 /* ctor (+0x008): with no `source` (the one caller's), build the default
  * grid at once. What a nonzero `source` would be, no caller shows. */
 void TileMap__TileMap(TileMap *self, s32 source, TileAtlas *atlas) {
-    s32 unused[8]; /* MATCHING: retail's 0x40-byte frame */
+    s32 unused[8]; /* MATCHING: never used; it gives retail's 0x40-byte stack */
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileMapMethods();
@@ -1020,7 +1020,9 @@ void TileMap__Finalize(TileMap *self) {
 /* onRequestDone (+0x064): when idle, BuildMap. */
 void TileMap__Load(TileMap *self) {
     if (self->loadState == 0) {
-        ((TileMapBuildMapFn)self->methods->processBuffer)(); /* MATCHING: retail passes no argument */
+        /* MATCHING: called with no argument, as retail does; the slot still
+         * receives this map, the caller's own `self`. */
+        ((TileMapBuildMapFn)self->methods->processBuffer)();
         self->loaded = 1;
     }
 }
@@ -1070,7 +1072,7 @@ TileAtlas *New_TileAtlas(s32 source) {
 /* ctor (+0x008): with no `source` (the one caller's), build the default
  * cells at once. */
 void TileAtlas__TileAtlas(TileAtlas *self, s32 source) {
-    s32 unused[8]; /* MATCHING: retail's 0x40-byte frame */
+    s32 unused[8]; /* MATCHING: never used; it gives retail's 0x40-byte stack */
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileAtlasMethods();
@@ -1093,10 +1095,12 @@ void TileAtlas__Finalize(TileAtlas *self) {
 
 /* onRequestDone (+0x064): when idle, BuildCells. */
 void TileAtlas__Load(TileAtlas *self) {
-    s32 unused[8]; /* MATCHING: retail's 0x38-byte frame */
+    s32 unused[8]; /* MATCHING: never used; it gives retail's 0x38-byte stack */
 
     if (self->loadState == 0) {
-        ((TileAtlasBuildCellsFn)self->methods->processBuffer)(); /* MATCHING: retail passes no argument */
+        /* MATCHING: called with no argument, as retail does; the slot still
+         * receives this atlas, the caller's own `self`. */
+        ((TileAtlasBuildCellsFn)self->methods->processBuffer)();
         self->loaded = 1;
     }
 }
@@ -1280,7 +1284,7 @@ void MoviePlayer__Finalize(MoviePlayer *self) {
  * cannot be. Then take `frame`, and the first strip at its left edge. */
 s32 MoviePlayer__InitFrame(MoviePlayer *self, DrawRect *frame, s32 external) {
     s32 size;
-    s32 unused[2]; /* MATCHING: retail's 0x28-byte frame */
+    s32 unused[2]; /* MATCHING: never used; it gives retail's 0x28-byte stack */
 
     self->external = external;
     if (external == 0) {
@@ -1298,14 +1302,14 @@ s32 MoviePlayer__InitFrame(MoviePlayer *self, DrawRect *frame, s32 external) {
         if ((self->ring = BMemPMgrAlloc(MOVIE_RING_SIZE)) == NULL) {
             goto fail;
         }
-        if ((self->strip = BMemPMgrAlloc(frame->h << 5)) == NULL) {
+        if ((self->strip = BMemPMgrAlloc(frame->h * MOVIE_STRIP_W * sizeof(u16))) == NULL) {
             goto fail;
         }
     }
     self->stripRect = *frame;
     self->frame = self->stripRect;
     self->stripRect.w = MOVIE_STRIP_W;
-    self->stripSize = (self->stripRect.h << 4) >> 1;
+    self->stripSize = (self->stripRect.h * MOVIE_STRIP_W) >> 1; /* 16-bit pixels, in words */
     return 0;
 fail:
     MoviePlayer__FreeFrameBuffers(self);

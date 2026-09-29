@@ -462,17 +462,24 @@
       "status": "auto"
     },
     "14": {
-      "checklist": {},
+      "checklist": {
+        "data-setup": true
+      },
       "reason": "",
       "status": "auto"
     },
     "15": {
-      "checklist": {},
+      "checklist": {
+        "literals-graphics": true
+      },
       "reason": "",
       "status": "auto"
     },
     "16": {
-      "checklist": {},
+      "checklist": {
+        "comments-graphics": true,
+        "comments-rest": true
+      },
       "reason": "",
       "status": "auto"
     },
@@ -483,6 +490,7 @@
     },
     "18": {
       "checklist": {
+        "mood-cues": true,
         "noop-slots": true
       },
       "reason": "",

@@ -54,7 +54,7 @@ enum MovieId {
  * last. What the frames are for is not established. */
 #define MOVIE_SPAN_GAP_FRAMES 10
 
-/* allocator: new LbdFile object */
+/* allocator: a new map-chunk loader from the pool */
 LbdFile *New_LbdFile(void) {
     LbdFile *obj = BMemPMgrAlloc(sizeof(LbdFile));
     if (obj != NULL) {
@@ -93,7 +93,8 @@ void LbdFile__AdvanceLoadState(LbdFile *self) {
             self->loadState = LBDFILE_LOAD_IDLE;
             self->headerReady = 1;
             if (self->autoLoadData != 0) {
-                /* MATCHING: called with no argument; retail leaves $a0 unset */
+                /* MATCHING: called with no argument, as retail does; the slot still
+                 * receives this loader, the caller's own `self`. */
                 ((LbdFileLoadDataBlockNoArgFn)self->methods->loadDataBlock)();
             }
         }
@@ -114,7 +115,8 @@ void LbdFile__CancelRequests(LbdFile *self) {
     self->loadState = LBDFILE_LOAD_IDLE;
 }
 
-/* slot +0x078 of gLbdFileMethods: start streaming a file into the buffer */
+/* slot +0x078 of gLbdFileMethods (processBuffer): read the chunk file's header
+ * block into the fixed buffer, cancelling any load in progress */
 void LbdFile__LoadHeader(LbdFile *self, char *name) {
     if (self->buffer != NULL && name != NULL) {
         if (self->loadState == LBDFILE_LOAD_IDLE) {
@@ -144,7 +146,8 @@ s32 LbdFile__LoadDataBlock(LbdFile *self) {
     if (self->loadState != LBDFILE_LOAD_IDLE) {
         return 0;
     }
-    /* MATCHING: called with no argument; retail leaves $a0 unset */
+    /* MATCHING: called with no argument, as retail does; the slot still
+     * receives this loader, the caller's own `self`. */
     ((LbdFileReleaseDataBlockNoArgFn)self->methods->releaseDataBlock)();
     size = ((LbdFileHeader *)self->buffer)->dataSize;
     self->dataBuffer = BMemPMgrAlloc(size);
@@ -237,7 +240,8 @@ char **GetSoundEffectDirRef(void) {
     return &sSoundEffectDirPtr;
 }
 
-/* MATCHING: game_files.h declares it unprototyped: DayTask's ctor passes a dead argument, which a prototype would drop */
+/* MATCHING: game_files.h declares it unprototyped: DayTask's ctor passes a dead
+ * argument, which a prototype would drop. */
 char *GetSoundEffectDir(void) {
     return *GetSoundEffectDirRef();
 }
@@ -323,7 +327,8 @@ CdFileEntry *GetEndingMovieRecord(s32 *movieIdOut) {
     return &GetRecordTable(NULL)[RECORD_ENDING_MOVIE];
 }
 
-/* MATCHING: game_files.h declares it unprototyped: PlayEndingMovie passes a dead second argument, which a prototype would drop */
+/* MATCHING: game_files.h declares it unprototyped: PlayEndingMovie passes a
+ * dead second argument, which a prototype would drop. */
 CdFileEntry *GetEndingMovie(s32 *movieIdOut) {
     s32 movieId;
     CdFileEntry *rec = GetEndingMovieRecord(&movieId);
@@ -384,7 +389,8 @@ CdFileEntry *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount) {
     s32 movieId;
     s32 start;
     CdFileEntry *rec = GetSpecialDayRecords(&firstMovieId, day);
-    dayCount *= SPECIAL_DAY_MOVIE_COUNT; /* MATCHING: one variable; becomes the end movie id */
+    /* MATCHING: dayCount becomes the end movie id; a separate local differs. */
+    dayCount *= SPECIAL_DAY_MOVIE_COUNT;
     *frameTotal = 0;
     start = firstMovieId;
     dayCount += start;

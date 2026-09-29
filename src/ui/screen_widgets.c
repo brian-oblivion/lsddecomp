@@ -99,7 +99,8 @@ void FadeBox__SetStep(FadeBox *self, s32 step) {
     self->step = step;
 }
 
-/* MATCHING: both StartFade functions pass their arguments on to configure; a (self) call reorders them. */
+/* MATCHING: both StartFade functions pass all their arguments on to configure;
+ * passing only self compiles differently. */
 void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32 mode) {
     s32 storedChannels;
 
@@ -143,7 +144,8 @@ s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 mode
         rate = BOXFILL_SEMITRANS_RATE(GsATWO);
         self->channels = FADEBOX_CHANNELS_ALL;
     }
-    /* MATCHING: retail stores `channels` twice; one store drops four instructions. */
+    /* MATCHING: retail stores `channels` twice, above and here; one store is
+     * four instructions shorter. */
     self->channels = channels;
     if (channels == 0) {
         self->channels = FADEBOX_CHANNELS_ALL;
@@ -201,7 +203,8 @@ void *FadeBox__GetColor(FadeBox *self) {
     return &sFadeBoxMaskColors[self->channels * 3];
 }
 
-/* MATCHING: the position pairs are copied as whole structs; field copies allocate differently. */
+/* MATCHING: the position pairs are copied as whole structs; field copies compile
+ * differently. */
 void FadeBox__PushPosition(FadeBox *self, BoxFillSize *size, BoxFillPos *pos) {
     if (self->parent != 0) {
         self->savedW = self->boxW;
@@ -220,7 +223,8 @@ void FadeBox__PopPosition(FadeBox *self) {
     y = self->savedPosY;
     self->posX = x;
     self->posY = y;
-    /* MATCHING: without it the savedW/savedH loads move above the posX/posY stores. */
+    /* MATCHING: an ordering barrier; without it the savedW/savedH reads move above
+     * the posX/posY writes. */
     __asm__("");
     self->boxW = self->savedW;
     self->boxH = self->savedH;
@@ -323,7 +327,7 @@ void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, 
     void (*fn)();
 
     fn = (void (*)())self->methods->attachToParent;
-    /* MATCHING: without the do/while(0) the prologue's two register saves swap. */
+    /* MATCHING: without the do/while(0) the entry code comes out in another order. */
     do {
         fn(self, parent, pos, attachArg);
         self->relative = 0;
@@ -535,7 +539,7 @@ TextRowMethods *GetTextRowMethods(void) {
 
 /* `d` and `dst` are two cursors over one buffer; `special` holds
  * SJIS_TRAIL_SPACE. */
-/* MATCHING: `special` gets the constant loaded before `d` is copied from `dst`. */
+/* MATCHING: `special` is set before `d` is copied from `dst`, retail's order. */
 u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 special;
@@ -565,7 +569,8 @@ u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     return dst;
 }
 
-/* MATCHING: the `d = dst; dst++;` cursor pairs and the `trail` copy of `c` set the register choice. */
+/* MATCHING: the `d = dst; dst++;` cursor pairs and the `trail` copy of `c` give
+ * retail's code; `*dst++` and `c` alone compile differently. */
 u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 c;
@@ -604,7 +609,8 @@ u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
 /* Sony's itoa (libc2): the decimal digits of `n`, in the library's own buffer. */
 extern char *itoa(int n);
 
-/* MATCHING: the declaration order text/fill/padded and `fill` in two statements set the register choice. */
+/* MATCHING: the declaration order text/fill/padded and `fill` set in two
+ * statements give retail's code. */
 void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded) {
     char text[width + 1];
     s32 fill;

@@ -55,26 +55,65 @@ file, and a runner can't follow a procedure that doesn't exist yet.
 
 ## Track 14: data in C
 
-The game's tables live in the disassembly, and the C only sees
-`extern EntityMoodRow sEntityMoodTable[];`. A reader never sees which entity
-links to which stage or which script it runs. Defined in C, a table reads
-like this (row 0, from the retail bytes):
+The game's tables lived in the disassembly, and the C only saw an
+`extern`. A reader never saw which entity links to which stage or which
+script it runs. Defined in C, a table reads like this:
 
 ```c
-EntityMoodRow sEntityMoodTable[] = {
-    [0] = { {0, 2}, 20, ENTITY_ACTIVATE_AT_ATTACH, 0, 0, 2, -13, 4, 1, 10, 0, Entity__MoodCue00 },
+EntityMoodRow sEntityMoodTable[ENTITY_MOOD_ROW_COUNT] = {
+    /*            unread   unlk  act  dea   aR   pR   lnk  vid  tol  thr  cue  handler */
+    /*   0 */ {{  0,   2},   20,   0,   0,   0,   2,  -13,   4,   1,  10,   0, Entity__CuePaceOrLiftOffOnPink},
     ...
 ```
 
-**Why it needs a setup item.** splat cut many tables into several labels,
-wherever code reads a column on its own (`sEntityLinkStageTable` is
-`sEntityMoodTable`'s linkStage column, read as a flat array). The labels
-have to merge back into one symbol, the data has to move from the `.data`
-segment into the unit's own section without moving a byte, and every column
-reader has to become a field access or keep its view through a documented
-alias. `data-setup` works that out on `sEntityMoodTable`, proves it
-byte-identical, and writes the steps here. Then each area moves the data it
-owns. An `extern` stays only for data another file defines.
+That table is done (the end of `src/world/entity.c`). splat had cut it into
+six labels, wherever code read a column on its own (`sEntityLinkStageTable`
+was the linkStage column, read as a flat array); they are one symbol now.
+
+**Procedure** (proven on `sEntityMoodTable`):
+
+1. **Find the table's extent.** Its start is its symbol; its end is the next
+   label that is *not* one of its columns (`grep -n dlabel asm/data/*.s`
+   around it, and the struct's size times the row count must land on it
+   exactly). Only a table whose bytes all belong to one `.c` can move: the
+   bytes before and after stay asm, and a run of data that several files
+   own splits into one `.data` line per owner.
+2. **Dump it:** `python3 tools/datatable.py <symbol> --rows N --layout
+   "<the struct's fields>"`. It prints the rows with pointers as symbol
+   names, and first lists every label the symbols file places inside the
+   range. Those are the column cuts.
+3. **Remove the column labels** from `config/symbols.slps01556.lsdde.txt`
+   (not the table's own symbol), and turn each reader into a row-field
+   access: `sEntityLinkStageTable[i * 16]` became
+   `sEntityMoodTable[i].linkStage`, which compiles the same. If a reader
+   doesn't match that way, keep the view as a documented macro over the
+   table, never as a second symbol.
+4. **Write the initializer** in the owning `.c`. If its rows name functions
+   of the same file, put it at the end, after them, with an `extern`
+   declaration at the top (sized with a `#define` in the header) so earlier
+   code can use it. Give pointer fields a type the entries have, so the
+   table needs no casts (the mood table's `handler` became
+   `EntityMoodCueFn`, and 17 handlers declared with fewer parameters gained
+   the unused one: that compiles the same). A wide table goes between
+   `/* clang-format off */` and `/* clang-format on */`, one row per line,
+   columns aligned under a comment header; the column meanings stay in the
+   struct's field docs.
+5. **Re-cut splat.** In `config/splat.slps01556.lsdde.yaml`'s data list,
+   split the `data` line that holds the table: `[<start>, .data,
+   <dir>/<unit>]` at the table's file offset (`vram - 0x80010000 + 0x800`),
+   then a new `[<end>, data]` for the bytes after it. The dot form says the
+   bytes come from the unit's own `.data` section. The linker packs input
+   sections at 2 bytes (`SUBALIGN`), so the object's own 16-byte alignment
+   doesn't move anything.
+6. `make extract`, `./build-and-verify.sh`. Confirm the bytes come from C:
+   `objdump -h build/src/<dir>/<unit>.c.o` shows a `.data` of the table's
+   size, and `build/lsdde.map` puts the symbol at its old address.
+7. A unit's second table in the same `.data` run needs no new yaml line if
+   nothing lies between: its `.data` holds both, in definition order. A gap
+   owned by another file splits the run.
+
+Then each area moves the data it owns. An `extern` stays only for data
+another file defines.
 
 ## Track 15: named literals, a pass
 
@@ -83,13 +122,13 @@ screen coordinate reads fine as a number. Name a literal when the name says
 more than the value:
 
 - **Per-script states.** `Entity::state` isn't one enum. Each
-  `Entity__MoodCueNN` handler runs its own small script, and values from 11
+  mood-row handler (`Entity__Cue*`) runs its own small script, and values from 11
   up are that script's private steps (1 is the shared `ENTITY_STATE_DONE`).
   Name them locally:
 
   ```c
-  void Entity__MoodCue30(Entity *self) {
-      enum { CUE30_APPROACH = 11, CUE30_GROW = 12, CUE30_FOLLOW = 13 };
+  void Entity__CueHoverOverDreamerOnBlueElseRise(Entity *self) {
+      enum { HOVER_APPROACH = 11, HOVER_GROW = 12, HOVER_FOLLOW = 13 };
   ```
 
 - **Enums that already exist.** `entity.c:988` compares `getDreamColor()`
@@ -129,8 +168,8 @@ Some constructs exist only because they reproduce retail's bytes:
 
 ## Track 18: behaviour names
 
-Names that are table positions: 107 `Entity__MoodCueNN` handlers and 56
-`*__NoOpSlotNN` occupants. A handler's body says what the entity does
+Names that were table positions: 107 `Entity__MoodCueNN` handlers (now
+`Entity__Cue<Behaviour>`) and 56 `*__NoOpSlotNN` occupants. A handler's body says what the entity does
 ("rises, then faces the dreamer"), so it can be named for that now. What the
 entity *is* (which character, which stage) needs track 14's table, which says
 which stage row NN links to and which video it ends in. Rename them first by

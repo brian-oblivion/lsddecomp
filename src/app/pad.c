@@ -23,7 +23,7 @@ extern u32 sButtonMasks[PAD_BUTTON_COUNT]; /* runtime copy of the button-mask ta
 
 /** @brief A 0x40-byte block: Pad__LoadButtonTable copies the default table
  * as one. */
-/* MATCHING: a struct assignment, not a word-indexed copy loop, gives the inlined block move. */
+/* MATCHING: copied as one struct assignment, not a word-by-word loop, as retail copies it. */
 typedef struct {
     u32 w[16]; /**< the 16 button masks */
 } Block64;
@@ -93,7 +93,7 @@ void Pad__DispatchEvents(Pad *self) {
     s32 code;
     s32 i;
 
-    /* MATCHING: without this barrier the prologue saves s0 before ra, s2, s1. */
+    /* MATCHING: an ordering barrier; without it the entry code comes out in another order. */
     __asm__("");
     held = self->heldMask;
     released = self->releasedMask;

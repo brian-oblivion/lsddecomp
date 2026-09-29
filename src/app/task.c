@@ -226,7 +226,7 @@ void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankP
     TaskCoreMethods *methods;
 
     GetIntermediateBaseMethods()->ctor((IntermediateBase *)self);
-    /* MATCHING: one GetTaskCoreMethods() call; a second one for setTarget adds a jal. */
+    /* MATCHING: one GetTaskCoreMethods() call, kept for setTarget; retail calls it once. */
     methods = GetTaskCoreMethods();
     self->methods = methods;
     methods->setTarget(self, target);
@@ -260,7 +260,7 @@ void TaskCore__Finalize(TaskCore *self) {
 }
 
 void TaskCore__Reset(TaskCore *self) {
-    /* MATCHING: self->methods reloaded after each call is a word longer. */
+    /* MATCHING: the table read once; reading self->methods at each call is a word longer. */
     TaskCoreMethods *methods = self->methods;
     methods->setFrameBound(self, -1);
     methods->setColors(self, sTaskCoreDefaultColors[0], sTaskCoreDefaultColors[1],
@@ -319,7 +319,7 @@ void TaskCore__OnInit(TaskCore *self) {
 /* Closes the viewport's OT, detaches the view and the BgLayer, and clears the
  * screen to clearColor while clearOnDeinit is set. */
 void TaskCore__OnDeinit(TaskCore *self) {
-    /* MATCHING: without the local, self->viewport is reloaded and the frame shrinks. */
+    /* MATCHING: a local; reading self->viewport at each call compiles differently. */
     Viewport *viewport = (Viewport *)self->viewport;
     viewport->methods->deinitOt(viewport);
     viewport->methods->detachViewChild(viewport);
@@ -580,7 +580,7 @@ void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable) {
 
 /* baseColor is where the fade-in starts; clearColor is what onDeinit clears the
  * screen to (TaskCore__Reset's defaults: black, black, 128 grey). */
-/* MATCHING: whole-ColorRgb copies; per-byte copies load each byte unsigned. */
+/* MATCHING: each colour copied as one ColorRgb; byte-by-byte copies compile differently. */
 void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *clear, u8 *color96) {
     *(ColorRgb *)self->baseColor = *(ColorRgb *)base;
     *(ColorRgb *)self->clearColor = *(ColorRgb *)clear;
@@ -609,7 +609,7 @@ s32 TaskCore__TickFadeIn(TaskCore *self) {
     u8 color[3];
 
     level = self->frameCounter * self->fadeRate;
-    /* MATCHING: level first; base + level swaps the addu operands. */
+    /* MATCHING: level first; base + level puts each add's operands the other way round. */
     color[0] = level + self->baseColor[0];
     color[1] = level + self->baseColor[1];
     color[2] = level + self->baseColor[2];
@@ -659,7 +659,7 @@ struct TaskCoreItemList {
     s32 savedCursor; /**< +0x004 the committed item cursor: the list opens at it, commit stores it, cancel returns to it */
     ColorRgb cursorColor; /**< +0x008 the colour of the item under the cursor while scrolling */
     u8 pad00B[5];
-    /* MATCHING: a struct, so CommitElementScroll copies it whole and reloads .y; two s32 fields do not. */
+    /* MATCHING: a struct, not two s32 fields, so CommitElementScroll copies it whole. */
     /** +0x010 where the cursor's row is drawn; the list starts savedCursor
      * rows above. */
     ScreenSpritePos pos;
@@ -826,7 +826,7 @@ void TaskCore__BroadcastToSlots(TaskCore *self, void *color) {
             self->methods->broadcastToSlotElements(self, color);
         }
         i++;
-        /* MATCHING: without it GCC moves i++ into the slotCount load's delay slot. */
+        /* MATCHING: an ordering barrier; without it i++ is scheduled beside the slotCount read. */
         __asm__("");
     }
     self->activeSlot = savedSlot;
@@ -1263,7 +1263,8 @@ void IntermediateBase__IncrementFrameCounter(IntermediateBase *self) {
     self->frameCounter++;
 }
 
-/* MATCHING: the two state hooks are ONE call through a slot picked per arm; two calls change registers. */
+/* MATCHING: the two state hooks are one call through a slot picked per arm; a call in each arm
+ * compiles differently. */
 void IntermediateBase__SetState(IntermediateBase *self, s32 state) {
     IntermediateBaseMethods *methods;
     void (*fn)(IntermediateBase *);
@@ -1415,11 +1416,11 @@ extern ColorRgb sDefaultViewportColorAlias __asm__("sDefaultViewportColor");
 void Viewport__InitDefaults(Viewport *self) {
     self->clockEventCount = 0;
     self->otReady = 0;
-    /* MATCHING: without it both loads hoist above the two zero stores. */
+    /* MATCHING: an ordering barrier; without it the two size reads move above the zero stores. */
     __asm__("");
     self->screenSize.width = sDefaultViewportWidth;
     self->screenSize.height = sDefaultViewportHeight;
-    /* MATCHING: without it both stores sink below the constant stores. */
+    /* MATCHING: the same; without it the size stores move below the constant stores. */
     __asm__("");
     self->otLength = VIEWPORT_DEFAULT_OT_LENGTH;
     self->maxPackets = VIEWPORT_DEFAULT_MAX_PACKETS;
@@ -1737,7 +1738,7 @@ SceneNode *GetRootNode(SceneNode *node) {
 }
 
 /* Sony's libgs GsSetProjection (gs_106). No SDK object places it, so it is
- * carried as C; progress.py counts it as library. */
+ * carried as C; it is Sony's code, not the game's. */
 void GsSetProjection(long h) {
     SetGeomScreen(h);
 }

@@ -84,7 +84,7 @@ struct SpriteGs {
 };
 
 /* Bit positions in SpriteGs.attribute, as libgs.h documents GsSPRITE's. */
-#define SPRITE_ATTR_MODE_SHIFT 24 /**< colour mode, 2 bits: the TIM's pmode & 0x3 */
+#define SPRITE_ATTR_MODE_SHIFT 24 /**< colour mode, 2 bits: TIM_PMODE_DEPTH_MASK */
 #define SPRITE_ATTR_RATE_SHIFT 28 /**< semitransparency rate, 2 bits (GsAZERO..GsATHREE) */
 #define SPRITE_ATTR_ALON_SHIFT 30 /**< GsALON: semitransparency on */
 #define SPRITE_ATTR_DOFF_SHIFT 31 /**< GsDOFF: display off */

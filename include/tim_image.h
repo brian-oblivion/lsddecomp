@@ -66,6 +66,10 @@ typedef void (*TimImageUploadFn)(TimImage *self);
  * uploads too. */
 #define TIM_PMODE_CLUT_BIT 3
 
+/** The pixel mode's low two bits, the colour depth as GetTPage's `tp` takes
+ * it (0 4-bit CLUT, 1 8-bit CLUT, 2 15-bit direct); InitGsSprite reads it. */
+#define TIM_PMODE_DEPTH_MASK 0x3
+
 /** TimImage's method table. */
 extern TimImageMethods gTimImageMethods;
 
