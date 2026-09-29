@@ -30,60 +30,174 @@ extern s32 sEntityFadeBoxDefaultOffset[2];
 /* Defined at the end of this file, after the handlers it lists. */
 extern EntityMoodRow sEntityMoodTable[ENTITY_MOOD_ROW_COUNT];
 
-/* The motion templates (.data, in address order):
- * the constant triples the MoodCue handlers in src/world/entity.c pass to
- * updateRotation (+0x044) and updateScale (+0x048) -- three Ratio16s
- * (include/scene_node.h), degrees or scale factors, {x, y, z} -- and to
- * addTranslation (+0x0BC), three s32 deltas. Named by value. The slots take
- * the table untyped, so the element type is the reader's (SceneNode__Update-
- * Rotation/UpdateScale), not the callers'. sTranslateYMinus64's data also
- * holds a second triple, (0, -0x20, 0); sScaleX3's z den is
- * sScaleTemplateZDenom (below). */
-extern Ratio16 sRotationXPlusEighth[];
-extern Ratio16 sRotationYawPlus9[];
-extern Ratio16 sRotationYawMinus9[];
-extern Ratio16 sRotationYawPlus180[];
-extern Ratio16 sRotationYawPlus90[];
-extern Ratio16 sRotationYawMinus90[];
-extern Ratio16 sRotationYawPlus2[];
-extern Ratio16 sRotationYawMinusThird[];
-extern Ratio16 sRotationYawMinusHalf[];
-extern Ratio16 sRotationZPlus9[];
-extern Ratio16 sRotationZPlus1[];
-extern Ratio16 sRotationZMinus9[];
-extern Ratio16 sRotationYawMinus120[];
-extern Ratio16 sRotationX50YMinus120Z30[];
-extern Ratio16 sRotationYawPlus4[];
-extern Ratio16 sRotationXPlus90[];
-extern Ratio16 sRotationYawPlus1[];
-extern Ratio16 sRotationZMinus90[];
-extern LongVec3 sTranslateYPlus256[];
-extern LongVec3 sTranslateYMinus4096[];
-extern LongVec3 sTranslateYMinus512[];
-extern LongVec3 sTranslateYPlus64[];
-extern LongVec3 sTranslateYPlus8[];
-extern LongVec3 sTranslateYMinus64[];
-extern LongVec3 sTranslateYMinus256[];
-extern LongVec3 sTranslateXMinus64[];
-extern LongVec3 sTranslateYPlus64ZMinus64[];
-extern LongVec3 sTranslateYMinus1500ZPlus1024[];
-extern LongVec3 sTranslateZMinus256[];
-extern Ratio16 sScaleQuarter[];
-extern Ratio16 sScaleHalf[];
-extern Ratio16 sScaleXFourFifthsYSixFifths[]; /* {4/5, 6/5, 5/5} */
-extern Ratio16 sScaleDouble[];
-extern Ratio16 sScaleMinusSixtyFourth[];
-extern Ratio16 sScaleEightSevenths[];
-extern Ratio16 sScaleUnit[]; /* {1/1, 1/1, 1/1}, a .data copy of scene_node.h's sSceneNodeScaleOne */
-extern Ratio16 sScaleEighth[];
-extern Ratio16 sScaleXEighthY2ZEighth[];
-extern Ratio16 sScaleSix[];
-extern Ratio16 sScaleTwoFifths[];
-extern Ratio16 sScaleY2[];
-extern Ratio16 sScaleY4[];
-extern Ratio16 sScaleTriple[];
-extern Ratio16 sScaleThirtySecond[];
-extern Ratio16 sScaleX3[];
+/* Entity's method table, class id 0x1F234: TodActor's slots, with Entity's
+ * overrides, then Entity's own from +0x144. A slot whose function is declared
+ * for another class's `self` (a parent's method, or an override that keeps
+ * the parent's parameter types) takes a `void *` cast. */
+/* clang-format off */
+EntityMethods gEntityMethods = {
+    /* +0x000 header */ 0x1F234,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ (void *)Entity__Entity,
+    /* +0x00C finalize */ Entity__Finalize,
+    /* +0x010 addChild */ (void *)Actor__AddChild,
+    /* +0x014 removeChild */ (void *)Actor__RemoveChild,
+    /* +0x018 removeAllChildren */ (void *)Actor__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)TodActor__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 reset */ Entity__Reset,
+    /* +0x044 updateRotation */ (void *)SceneNode__UpdateRotation,
+    /* +0x048 updateScale */ (void *)SceneNode__UpdateScale,
+    /* +0x04C attachToParent */ (void *)Entity__AttachToParent,
+    /* +0x050 detachFromParent */ (void *)Entity__DetachFromParent,
+    /* +0x054 detachAttachedChildren */ (void *)SceneNode__DetachAttachedChildren,
+    /* +0x058 getNextAttachedChild */ (void *)SceneNode__GetNextAttachedChild,
+    /* +0x05C finalizeHook */ (void *)SceneNode__NoOpFinalizeHook,
+    /* +0x060 setDisplay */ (void *)TodActor__SetDisplay,
+    /* +0x064 setSemiTransOn */ (void *)SceneNode__SetSemiTrans,
+    /* +0x068 setSemiTransRate */ (void *)SceneNode__SetSemiTransRate,
+    /* +0x06C setLighting */ (void *)SceneNode__SetLighting,
+    /* +0x070 setLightMode */ (void *)TodActor__SetLightMode,
+    /* +0x074 setLightDim */ (void *)SceneNode__SetLightDim,
+    /* +0x078 setUseZ */ (void *)SceneNode__SetUseZ,
+    /* +0x07C setSubdivision */ (void *)SceneNode__SetSubdivision,
+    /* +0x080 setBackClip */ (void *)SceneNode__SetBackClip,
+    /* +0x084 getRotMatrix */ (void *)SceneNode__GetRotMatrix,
+    /* +0x088 notifyWithHull */ (void *)Actor__NotifyMove,
+    /* +0x08C getModelHull */ (void *)SceneNode__GetModelHull,
+    /* +0x090 transformAndNotifyParents */ (void *)SceneNode__TransformAndNotifyParents,
+    /* +0x094 onPadEvent */ (void *)SceneNode__OnPadEvent,
+    /* +0x098 update */ Entity__Update,
+    /* +0x09C dispatchLinkCommand */ (void *)Actor__DispatchLinkCommand,
+    /* +0x0A0 tryAttachNearby */ (void *)SceneNode__TryAttachNearby,
+    /* +0x0A4 composeAndApplyRotation */ (void *)SceneNode__ComposeAndApplyRotation,
+    /* +0x0A8 checkBoundsOverlap */ (void *)SceneNode__CheckBoundsOverlap,
+    /* +0x0AC raycastHullAgainstFaces */ (void *)SceneNode__RaycastHullAgainstFaces,
+    /* +0x0B0 slotB0 */ NULL,
+    /* +0x0B4 addToActorParents */ (void *)SceneNode__AddToActorParents,
+    /* +0x0B8 setTranslation */ (void *)Actor__SetTranslation,
+    /* +0x0BC addTranslation */ (void *)Actor__AddTranslation,
+    /* +0x0C0 addLocalTranslation */ (void *)Actor__AddLocalTranslation,
+    /* +0x0C4 moveLocalZ */ (void *)Actor__MoveLocalZ,
+    /* +0x0C8 moveLocalX */ (void *)Actor__MoveLocalX,
+    /* +0x0CC moveLocalY */ (void *)Actor__MoveLocalY,
+    /* +0x0D0 moveLocalZOrFindLink */ (void *)Actor__MoveLocalZOrFindLink,
+    /* +0x0D4 moveLocalXOrFindLink */ (void *)Actor__MoveLocalXOrFindLink,
+    /* +0x0D8 slotD8 */ Actor__NoOpSlotD8,
+    /* +0x0DC onActorLinkCommand */ Entity__NotifyLinkStage,
+    /* +0x0E0 onGridCellLinkCommand */ Entity__OnGridCellLinkCommand,
+    /* +0x0E4 setLastOffsetValue */ (void *)Actor__SetLastOffsetValue,
+    /* +0x0E8 onLinkUpdate */ (void *)Actor__OnLinkUpdate,
+    /* +0x0EC setPendingExtra */ (void *)Actor__SetPendingExtra,
+    /* +0x0F0 setMainPartNotifies */ (void *)TodActor__SetMainPartNotifies,
+    /* +0x0F4 setupModelData */ (void *)TodActor__SetupModelData,
+    /* +0x0F8 teardownModelData */ (void *)TodActor__TeardownModelData,
+    /* +0x0FC findPartIndex */ (void *)TodActor__FindPartIndex,
+    /* +0x100 setupParts */ (void *)TodActor__SetupParts,
+    /* +0x104 teardownParts */ (void *)TodActor__TeardownParts,
+    /* +0x108 tick */ (void *)TodActor__Tick,
+    /* +0x10C selectTickCallback */ (void *)TodActor__SelectTickCallback,
+    /* +0x110 enableTickCallback */ (void *)TodActor__EnableTickCallback,
+    /* +0x114 disableTickCallback */ (void *)TodActor__DisableTickCallback,
+    /* +0x118 tickMoveZ */ TodActor__TickMoveZ,
+    /* +0x11C tickCallbackB */ Entity__TickSoundCue,
+    /* +0x120 tickCallbackC */ TodActor__TickCallbackC,
+    /* +0x124 playTone */ (void *)TodActor__PlayTone,
+    /* +0x128 setTod */ (void *)TodActor__SetTod,
+    /* +0x12C playTod */ (void *)TodActor__PlayTod,
+    /* +0x130 stopTod */ (void *)TodActor__StopTod,
+    /* +0x134 applyTodFrame */ (void *)TodActor__ApplyTodFrame,
+    /* +0x138 applyTodPacket */ (void *)TodActor__ApplyTodPacket,
+    /* +0x13C linkPeer */ (void *)TodActor__LinkPeer,
+    /* +0x140 unlinkPeer */ (void *)TodActor__UnlinkPeer,
+    /* +0x144 distanceToPeer */ Entity__DistanceToPeer,
+    /* +0x148 getProximityRatio */ Entity__GetProximityRatio,
+    /* +0x14C getMoodEffect */ Entity__GetMoodEffect,
+    /* +0x150 getUnlockEffect */ Entity__GetUnlockEffect,
+    /* +0x154 getLinkStage */ Entity__GetLinkStage,
+    /* +0x158 getEventVideo */ Entity__GetEventVideo,
+    /* +0x15C activate */ Entity__Activate,
+    /* +0x160 deactivate */ Entity__Deactivate,
+    /* +0x164 setTargetReached */ Entity__SetTargetReached,
+    /* +0x168 startSoundCue */ Entity__StartSoundCue,
+    /* +0x16C stopSoundCue */ Entity__StopSoundCue,
+    /* +0x170 updateActivationState */ Entity__UpdateActivationState,
+    /* +0x174 updateDeactivationState */ Entity__UpdateDeactivationState,
+    /* +0x178 updateTargetProximity */ Entity__UpdateTargetProximity,
+    /* +0x17C updateSoundCueStart */ Entity__UpdateSoundCueStart,
+    /* +0x180 updateSoundCueStop */ (void *)Entity__UpdateSoundCueStop,
+};
+/* clang-format on */
+
+/* The motion templates, in address order: the constant triples the MoodCue
+ * handlers pass to updateRotation (+0x044) and updateScale (+0x048) -- three
+ * Ratio16s (include/scene_node.h), degrees or scale factors, {x, y, z} -- and
+ * the deltas they pass to addTranslation (+0x0BC). Named by value. The
+ * slots take the table untyped, so the element type is the reader's
+ * (SceneNode__UpdateRotation/UpdateScale), not the callers'. Three of them
+ * (sRotationYawPlus270, sTranslateYMinus32, sScaleXQuarterZHalf) no code
+ * reads. */
+/* clang-format off */
+Ratio16 sRotationXPlusEighth[3]      = {{  1, 8}, {   0, 1}, {  0, 1}};
+Ratio16 sRotationYawPlus9[3]         = {{  0, 1}, {   9, 1}, {  0, 1}};
+Ratio16 sRotationYawMinus9[3]        = {{  0, 1}, {  -9, 1}, {  0, 1}};
+Ratio16 sRotationYawPlus180[3]       = {{  0, 1}, { 180, 1}, {  0, 1}};
+Ratio16 sRotationYawPlus90[3]        = {{  0, 1}, {  90, 1}, {  0, 1}};
+Ratio16 sRotationYawMinus90[3]       = {{  0, 1}, { -90, 1}, {  0, 1}};
+Ratio16 sRotationYawPlus2[3]         = {{  0, 1}, {   2, 1}, {  0, 1}};
+Ratio16 sRotationYawMinusThird[3]    = {{  0, 1}, {  -1, 3}, {  0, 1}};
+Ratio16 sRotationYawMinusHalf[3]     = {{  0, 1}, {  -1, 2}, {  0, 1}};
+Ratio16 sRotationZPlus9[3]           = {{  0, 1}, {   0, 1}, {  9, 1}};
+Ratio16 sRotationZPlus1[3]           = {{  0, 1}, {   0, 1}, {  1, 1}};
+Ratio16 sRotationZMinus9[3]          = {{  0, 1}, {   0, 1}, { -9, 1}};
+Ratio16 sRotationYawMinus120[3]      = {{  0, 1}, {-120, 1}, {  0, 1}};
+Ratio16 sRotationX50YMinus120Z30[3]  = {{ 50, 1}, {-120, 1}, { 30, 1}};
+Ratio16 sRotationYawPlus4[3]         = {{  0, 1}, {   4, 1}, {  0, 1}};
+Ratio16 sRotationXPlus90[3]          = {{ 90, 1}, {   0, 1}, {  0, 1}};
+Ratio16 sRotationYawPlus1[3]         = {{  0, 1}, {   1, 1}, {  0, 1}};
+Ratio16 sRotationZMinus90[3]         = {{  0, 1}, {   0, 1}, {-90, 1}};
+Ratio16 sRotationYawPlus270[3]       = {{  0, 1}, { 270, 1}, {  0, 1}};
+
+LongVec3 sTranslateYPlus256            = {  0,   256,    0};
+LongVec3 sTranslateYMinus4096          = {  0, -4096,    0};
+LongVec3 sTranslateYMinus512           = {  0,  -512,    0};
+LongVec3 sTranslateYPlus64             = {  0,    64,    0};
+LongVec3 sTranslateYPlus8              = {  0,     8,    0};
+LongVec3 sTranslateYMinus64            = {  0,   -64,    0};
+LongVec3 sTranslateYMinus32            = {  0,   -32,    0};
+LongVec3 sTranslateYMinus256           = {  0,  -256,    0};
+LongVec3 sTranslateXMinus64            = {-64,     0,    0};
+LongVec3 sTranslateYPlus64ZMinus64     = {  0,    64,  -64};
+LongVec3 sTranslateYMinus1500ZPlus1024 = {  0, -1500, 1024};
+LongVec3 sTranslateZMinus256           = {  0,     0, -256};
+
+Ratio16 sScaleQuarter[3]               = {{ 1,  4}, {1,  4}, {1,  4}};
+Ratio16 sScaleHalf[3]                  = {{ 1,  2}, {1,  2}, {1,  2}};
+Ratio16 sScaleXFourFifthsYSixFifths[3] = {{ 4,  5}, {6,  5}, {5,  5}};
+Ratio16 sScaleDouble[3]                = {{ 2,  1}, {2,  1}, {2,  1}};
+Ratio16 sScaleMinusSixtyFourth[3]      = {{-1, 64}, {-1, 64}, {-1, 64}};
+Ratio16 sScaleEightSevenths[3]         = {{ 8,  7}, {8,  7}, {8,  7}};
+Ratio16 sScaleUnit[3]                  = {{ 1,  1}, {1,  1}, {1,  1}}; /* a .data copy of scene_node.h's sSceneNodeScaleOne */
+Ratio16 sScaleEighth[3]                = {{ 1,  8}, {1,  8}, {1,  8}};
+Ratio16 sScaleXEighthY2ZEighth[3]      = {{ 1,  8}, {2,  1}, {1,  8}};
+Ratio16 sScaleSix[3]                   = {{ 6,  1}, {6,  1}, {6,  1}};
+Ratio16 sScaleTwoFifths[3]             = {{ 2,  5}, {2,  5}, {2,  5}};
+Ratio16 sScaleY2[3]                    = {{ 1,  1}, {2,  1}, {1,  1}};
+Ratio16 sScaleY4[3]                    = {{ 1,  1}, {4,  1}, {1,  1}};
+Ratio16 sScaleXQuarterZHalf[3]         = {{ 1,  4}, {1,  1}, {1,  2}};
+Ratio16 sScaleTriple[3]                = {{ 3,  1}, {3,  1}, {3,  1}};
+Ratio16 sScaleThirtySecond[3]          = {{ 1, 32}, {1, 32}, {1, 32}};
+Ratio16 sScaleX3[3]                    = {{ 3,  1}, {1,  1}, {1,  1}};
+/* Entity__CueRunOffOrStopAndJitterDepth writes z's den before each use. */
+Ratio16 sScaleDepthJitter[3]           = {{ 1,  1}, {1,  1}, {1,  1}};
+/* clang-format on */
 
 Entity *New_Entity(s32 moodIndex, void *desc, void *sound) {
     Entity *obj;
@@ -583,7 +697,7 @@ void Entity__CuePaceOrLiftOffOnPink(Entity *self, SoundCueSet *out) {
         if (self->moodTimer < 100) {
             self->methods->moveLocalZ(self, 50, 0);
         } else if (self->moodTimer < 250) {
-            self->methods->addTranslation(self, sTranslateYPlus64ZMinus64);
+            self->methods->addTranslation(self, &sTranslateYPlus64ZMinus64);
         }
     } else if (self->moodTimer == 250) {
         self->methods->stopTod(self);
@@ -640,7 +754,7 @@ void Entity__CueApproachRiseThenSpiralAway(Entity *self, SoundCueSet *out) {
         self->methods->updateRotation(self, 0, sRotationYawPlus2);
         self->methods->moveLocalZ(self, -320, 0);
     } else if (self->moodTimer >= 56 || Entity__IsNearTarget(self, self->coord2->coord.t, 1, 1) != 0) {
-        self->methods->addTranslation(self, sTranslateYMinus64);
+        self->methods->addTranslation(self, &sTranslateYMinus64);
     } else if (self->moodTimer >= 10) {
         SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
         self->methods->moveLocalZ(self, -256, 0);
@@ -652,7 +766,7 @@ void Entity__CueApproachRiseThenSpiralAway(Entity *self, SoundCueSet *out) {
 /* Row 8: holds double size and rises 64 a tick. */
 void Entity__CueDoubleSizeAndRise(Entity *self, SoundCueSet *out) {
     self->methods->updateScale(self, 1, sScaleDouble);
-    self->methods->addTranslation(self, sTranslateYMinus64);
+    self->methods->addTranslation(self, &sTranslateYMinus64);
 }
 
 /* Row 9: sounds program 10 every half animation cycle and walks forward 30 a tick. */
@@ -832,7 +946,7 @@ void Entity__CueWalkAndTurnOrSpinFlickering(Entity *self, SoundCueSet *out) {
                 turn = sRotationYawPlus90;
             }
             self->methods->updateRotation(self, 0, turn);
-            self->methods->addTranslation(self, sTranslateYPlus256);
+            self->methods->addTranslation(self, &sTranslateYPlus256);
         } else {
             self->methods->moveLocalZOrFindLink(self, -374, (void *)(rand() % 2));
         }
@@ -913,17 +1027,17 @@ void Entity__CueDropInRushDreamerThenDriftUp(Entity *self, SoundCueSet *out) {
             self->moodTimer = 0;
         }
         if (self->moodTimer >= 7) {
-            self->methods->addTranslation(self, sTranslateYMinus64);
+            self->methods->addTranslation(self, &sTranslateYMinus64);
             self->methods->moveLocalZ(self, 10, 0);
         } else {
-            self->methods->addTranslation(self, sTranslateXMinus64);
+            self->methods->addTranslation(self, &sTranslateXMinus64);
         }
     } else if (self->moodTimer == 0) {
-        self->methods->addTranslation(self, sTranslateYMinus4096);
+        self->methods->addTranslation(self, &sTranslateYMinus4096);
     } else if (self->moodTimer < 65) {
-        self->methods->addTranslation(self, sTranslateYPlus64);
+        self->methods->addTranslation(self, &sTranslateYPlus64);
     } else if (self->moodTimer < 71) {
-        self->methods->addTranslation(self, sTranslateYMinus64);
+        self->methods->addTranslation(self, &sTranslateYMinus64);
         self->methods->moveLocalZ(self, -30, 0);
     } else {
         EntityMethods *methods = self->methods;
@@ -1066,7 +1180,7 @@ void Entity__CueHoverOverDreamerOnBlueElseRise(Entity *self, SoundCueSet *out) {
             }
         } else if (self->state == HOVER_FOLLOW) {
             self->methods->setTranslation(self, (LongVec3 *)((DreamSys *)self->peer)->coord2->coord.t);
-            self->methods->addTranslation(self, sTranslateYMinus1500ZPlus1024);
+            self->methods->addTranslation(self, &sTranslateYMinus1500ZPlus1024);
         }
     }
 }
@@ -1168,9 +1282,9 @@ void Entity__CueWobble(Entity *self, SoundCueSet *out) {
     (*moveZ)(self, arg1c, 0);
 
     if (rem500 < 32) {
-        self->methods->addTranslation(self, sTranslateYMinus64);
+        self->methods->addTranslation(self, &sTranslateYMinus64);
     } else if (rem500 < 64) {
-        self->methods->addTranslation(self, sTranslateYPlus64);
+        self->methods->addTranslation(self, &sTranslateYPlus64);
     }
 }
 
@@ -1216,11 +1330,6 @@ void Entity__CueTone1Slow(Entity *self, SoundCueSet *out) {
  * no per-tick effect. Entity__RollScaleOrDelayedDrift is not a row:
  * Entity__CueShuffleSideways and Entity__CueStepTurnThenShuffle call it first thing every tick.
  */
-
-/* The z den of a scale template, three Ratio16s {1/1, 1/1, 1/zDenom} that
- * end here (sScaleX3's data runs on into the template's first ten bytes).
- * Entity__CueRunOffOrStopAndJitterDepth writes the den and passes the template. */
-extern s16 sScaleTemplateZDenom;
 
 /* Defined after Entity__CueShuffleSideways, which calls it. */
 void Entity__RollScaleOrDelayedDrift(Entity *self);
@@ -1304,10 +1413,10 @@ void Entity__CueRunOffOrStopAndJitterDepth(Entity *self, SoundCueSet *out) {
     if (self->state == JITTER_DEPTH) {
         if ((self->moodTimer & 3) == 0) {
             roll = rand();
-            zDenom = &sScaleTemplateZDenom;
+            zDenom = &sScaleDepthJitter[2].den;
             *zDenom = roll % 32 + 1;
             /* Back from the den to the start of its template. */
-            /* MATCHING: the address is formed from sScaleTemplateZDenom, not sScaleX3 */
+            /* MATCHING: the address is formed from the den, not the template */
             self->methods->updateScale(self, 1, (Ratio16 *)(zDenom + 1) - 3);
         }
     }
@@ -1411,7 +1520,7 @@ void Entity__RollScaleOrDelayedDrift(Entity *self) {
         }
     }
     if (self->state == DRIFT_ARMED && self->moodTimer >= 201) {
-        self->methods->addTranslation(self, sTranslateZMinus256);
+        self->methods->addTranslation(self, &sTranslateZMinus256);
     }
 }
 
@@ -2000,7 +2109,7 @@ void Entity__CueChaseDreamerTumbleIfLinkPressed(Entity *self, SoundCueSet *out) 
     } else if (self->state == TUMBLING) {
         if (self->moodTimer < 8) {
             self->methods->updateRotation(self, 0, sRotationZPlus9);
-            self->methods->addTranslation(self, sTranslateYPlus8);
+            self->methods->addTranslation(self, &sTranslateYPlus8);
         } else {
             u32 coin;
 
@@ -2301,7 +2410,7 @@ void Entity__CueAnimateThenShootUp(Entity *self, SoundCueSet *out) {
         }
     } else {
         self->methods->stopTod(self);
-        self->methods->addTranslation(self, sTranslateYMinus512);
+        self->methods->addTranslation(self, &sTranslateYMinus512);
     }
     SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
 }
@@ -2646,7 +2755,7 @@ void Entity__CueFadeSkipTodThenLink(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         if (Entity__GetOrCreateFadeBox(self, NULL, NULL, (void *)5, 0) != NULL) {
             if (rand() & 1) {
-                self->methods->addTranslation(self, sTranslateYMinus256);
+                self->methods->addTranslation(self, &sTranslateYMinus256);
             }
             self->fadeBox->methods->startFadeDown(self->fadeBox, (BasicClass *)self->ticker, 0, 0);
         }

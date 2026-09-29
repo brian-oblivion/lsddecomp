@@ -43,7 +43,7 @@ typedef struct StyleConfig {
     s32 lightColors;  /**< +0x004: setChildParams `colors` (SetupSceneStyle). */
     s32 ambientColor; /**< +0x008: setAmbientColor's rgb, a pointer (SetupSceneStyle). */
     void *clearColor; /**< +0x00C: the viewport's clear colour (EnterStyleSession); a sStylePalette entry. */
-    u8 pad10[0x014 - 0x010];
+    void *grey;    /**< +0x010: a grey, 0x808080 (sStyleGrey10); nothing reads it. */
     s32 colorMode; /**< +0x014: 1 makes the far colour clearColor; 2 fades the TIM block to clearColor, else farColor. */
     void *farColor; /**< +0x018: the viewport's far colour unless colorMode is 1; a sStylePalette entry. */
     s32 fogNear; /**< +0x01C: the viewport's setFogNear; a sStyleFogNears value. */

@@ -34,49 +34,278 @@
 #include "data_source.h"
 #include "dream_aux.h"
 
-/* The rectangle StageMap__InitFootprintRect copies into rects[index] before
- * setting its slotIndex: no slot (-1), the whole 20 x 20 cells from (0, 0). */
-extern CellRect sFullSlotRect;
-
-/* The spec table SetTargetAndLoadChunks passes to loadChunksAround: seven
- * entries, every `load` nonzero, so every slot is (re)loaded. */
-extern ChunkSlotSpec sDefaultTargetSpecs[7];
-
-/* Indexed by neighbour key (ChunkSlotSpec::neighbour) in
- * StageMap__LoadChunksAround: the world offset of that neighbour's
- * cellParent from the centre position. Unsized: the key is the caller's
- * byte. */
-extern LongVec3 sNeighbourOffsets[];
-
-/* CHUNK_NEIGHBOUR_BIT(key) for each neighbour key: what
- * StageMap__ComputeChunkLoadEntry tests against ComputeNeighbourMask's
- * result. */
-extern const s32 sNeighbourBits[7];
-
-/* The chunk-index steps to the seven chunks around a centre chunk, by
- * neighbour key (ChunkNeighbourDelta, include/stage_map.h). */
-extern const ChunkNeighbourDelta sChunkNeighbourDeltas[7];
-
-/* Indexed by the neighbour key (LbdFile::elemKey) of the slot holding the
- * target, read signed by StageMap__UpdateFootprintTracking (01 02 03 00 04
- * 05 06 00). The byte (0..6) is UpdateFootprintTracking's return value and
- * the index into sFootprintResultPtrTable. */
-extern const s8 sFootprintResultRemap[8];
-
-/* 7 pointers, the first NULL, the rest to 4-word tables of ChunkSlotSpecs
- * (seven 2-byte entries, padded): UpdateFootprintTracking passes the
- * selected one to loadChunksAround as its spec table, as
- * SetTargetAndLoadChunks passes sDefaultTargetSpecs. */
-extern ChunkSlotSpec *sFootprintResultPtrTable[7];
-
 /* "ETC\\ETC.TIM" and "ETC\\DREAMER.TMD", the files DayTask's ctor loads. */
 extern const char sEtcTimPath[];
 extern const char sDreamerTmdPath[];
 
+/* The data of the three classes, in address order: DayTask's, TimedTask's
+ * and StageMap's. A method-table slot whose function is declared for
+ * another class's `self` (a parent's method, or an override that keeps the
+ * parent's parameter types) takes a `void *` cast. */
+
+/* DayTask's method table, class id 0x1F230. */
+/* clang-format off */
+DayTaskMethods gDayTaskMethods = {
+    /* +0x000 header */ 0x1F230,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ DayTask__DayTask,
+    /* +0x00C finalize */ DayTask__Finalize,
+    /* +0x010 addChild */ (void *)BasicClass__AddChild,
+    /* +0x014 removeChild */ (void *)BasicClass__RemoveChild,
+    /* +0x018 removeAllChildren */ (void *)BasicClass__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)DayTask__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 resetCounters */ DayTask__ResetPhase,
+    /* +0x044 init */ (void *)DayTask__Init,
+    /* +0x048 deinit */ DayTask__Deinit,
+    /* +0x04C onInit */ (void *)DayTask__OnInit,
+    /* +0x050 onDeinit */ DayTask__OnDeinit,
+    /* +0x054 onDrawSystemEvent */ DayTask__AdvancePhase,
+    /* +0x058 onPadEvent */ (void *)TimedTask__NoOpOnPadEvent,
+    /* +0x05C update */ (void *)TimedTask__CheckTimeout,
+    /* +0x060 setState */ (void *)TimedTask__SetState,
+    /* +0x064 onStart */ (void *)IntermediateBase__OnStart,
+    /* +0x068 onStop */ (void *)IntermediateBase__OnStop,
+    /* +0x06C setTimeout */ (void *)TimedTask__SetTimeout,
+    /* +0x070 playSound */ (void *)TimedTask__PlaySound,
+    /* +0x074 togglePause */ NULL,
+    /* +0x078 slot78 */ NULL,
+    /* +0x07C onTimedOut */ (void *)DayTask__OnTimedOut,
+    /* +0x080 onDreamSysNotify */ (void *)DayTask__OnDreamSysNotify,
+    /* +0x084 onObjMNotify */ DayTask__OnObjMNotify,
+};
+/* clang-format on */
+
 /* The viewpoint and view-reference points DayTask__OnInit hands the
- * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000). */
-extern LongVec3 sDayViewPoint;
-extern LongVec3 sDayViewRef;
+ * viewport's attachViewChild. */
+LongVec3 sDayViewPoint = {0, -1200, 0};
+LongVec3 sDayViewRef = {0, -1200, 10000};
+
+/* TimedTask's method table, class id 0x230: +0x074..+0x07C are NULL here
+ * and filled by its subclasses. */
+/* clang-format off */
+TimedTaskMethods gTimedTaskMethods = {
+    /* +0x000 header */ 0x230,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ TimedTask__TimedTask,
+    /* +0x00C finalize */ TimedTask__Finalize,
+    /* +0x010 addChild */ (void *)BasicClass__AddChild,
+    /* +0x014 removeChild */ (void *)BasicClass__RemoveChild,
+    /* +0x018 removeAllChildren */ (void *)BasicClass__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)IntermediateBase__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 resetCounters */ TimedTask__CancelTimeout,
+    /* +0x044 init */ TimedTask__Init,
+    /* +0x048 deinit */ TimedTask__Deinit,
+    /* +0x04C onInit */ NULL,
+    /* +0x050 onDeinit */ NULL,
+    /* +0x054 onDrawSystemEvent */ (void *)IntermediateBase__OnDrawSystemEvent,
+    /* +0x058 onPadEvent */ (void *)TimedTask__NoOpOnPadEvent,
+    /* +0x05C update */ TimedTask__CheckTimeout,
+    /* +0x060 setState */ TimedTask__SetState,
+    /* +0x064 onStart */ (void *)IntermediateBase__OnStart,
+    /* +0x068 onStop */ (void *)IntermediateBase__OnStop,
+    /* +0x06C setTimeout */ TimedTask__SetTimeout,
+    /* +0x070 playSound */ TimedTask__PlaySound,
+    /* +0x074 togglePause */ NULL,
+    /* +0x078 slot78 */ NULL,
+    /* +0x07C onTimedOut */ NULL,
+};
+/* clang-format on */
+
+/* StageMap's method table, class id 0x114. */
+/* clang-format off */
+StageMapMethods gStageMapMethods = {
+    /* +0x000 header */ 0x114,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ (void *)StageMap__StageMap,
+    /* +0x00C finalize */ StageMap__Finalize,
+    /* +0x010 addChild */ (void *)SceneNode__AddChild,
+    /* +0x014 removeChild */ (void *)SceneNode__RemoveChild,
+    /* +0x018 removeAllChildren */ (void *)SceneNode__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)StageMap__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 reset */ StageMap__Reset,
+    /* +0x044 updateRotation */ (void *)SceneNode__UpdateRotation,
+    /* +0x048 updateScale */ (void *)SceneNode__UpdateScale,
+    /* +0x04C attachToParent */ (void *)SceneNode__AttachToParent,
+    /* +0x050 detachFromParent */ (void *)SceneNode__DetachFromParent,
+    /* +0x054 detachAttachedChildren */ (void *)SceneNode__DetachAttachedChildren,
+    /* +0x058 getNextAttachedChild */ (void *)SceneNode__GetNextAttachedChild,
+    /* +0x05C finalizeHook */ (void *)SceneNode__NoOpFinalizeHook,
+    /* +0x060 setDisplay */ (void *)SceneNode__SetDisplay,
+    /* +0x064 setSemiTransOn */ (void *)SceneNode__SetSemiTrans,
+    /* +0x068 setSemiTransRate */ (void *)SceneNode__SetSemiTransRate,
+    /* +0x06C setLighting */ (void *)SceneNode__SetLighting,
+    /* +0x070 setLightMode */ (void *)SceneNode__SetLightMode,
+    /* +0x074 setLightDim */ (void *)SceneNode__SetLightDim,
+    /* +0x078 setUseZ */ (void *)SceneNode__SetUseZ,
+    /* +0x07C setSubdivision */ (void *)SceneNode__SetSubdivision,
+    /* +0x080 setBackClip */ (void *)SceneNode__SetBackClip,
+    /* +0x084 getRotMatrix */ (void *)SceneNode__GetRotMatrix,
+    /* +0x088 notifyWithHull */ (void *)StageMap__OnSlotEvent,
+    /* +0x08C getModelHull */ (void *)SceneNode__GetModelHull,
+    /* +0x090 transformAndNotifyParents */ (void *)SceneNode__TransformAndNotifyParents,
+    /* +0x094 onPadEvent */ (void *)SceneNode__OnPadEvent,
+    /* +0x098 update */ (void *)StageMap__UpdateIfEnabled,
+    /* +0x09C dispatchLinkCommand */ (void *)StageMap__DispatchLinkCommand,
+    /* +0x0A0 tryAttachNearby */ (void *)SceneNode__TryAttachNearby,
+    /* +0x0A4 composeAndApplyRotation */ (void *)SceneNode__ComposeAndApplyRotation,
+    /* +0x0A8 checkBoundsOverlap */ (void *)SceneNode__CheckBoundsOverlap,
+    /* +0x0AC raycastHullAgainstFaces */ (void *)SceneNode__RaycastHullAgainstFaces,
+    /* +0x0B0 slotB0 */ SceneNode__NoOpSlotB0,
+    /* +0x0B4 addToActorParents */ (void *)SceneNode__AddToActorParents,
+    /* +0x0B8 getLight */ (void *)LightRig__GetLight,
+    /* +0x0BC setAmbientColor */ (void *)LightRig__SetAmbientColor,
+    /* +0x0C0 unloadAllSlots */ StageMap__UnloadAllSlots,
+    /* +0x0C4 setChildParams */ StageMap__SetChildParams,
+    /* +0x0C8 setCallback */ StageMap__SetCallback,
+    /* +0x0CC setAcceptedTags */ StageMap__SetAcceptedTags,
+    /* +0x0D0 forwardAcceptedCommand */ StageMap__ForwardAcceptedCommand,
+    /* +0x0D4 getCurrentCellKey */ (void *)StageMap__GetCurrentCellKey,
+    /* +0x0D8 slotD8 */ StageMap__NoOpSlotD8,
+    /* +0x0DC setGridSpan */ StageMap__SetGridSpan,
+    /* +0x0E0 setConfig */ StageMap__SetConfig,
+    /* +0x0E4 setTargetAndLoadChunks */ StageMap__SetTargetAndLoadChunks,
+    /* +0x0E8 computeCellOffsets */ StageMap__ComputeCellOffsets,
+    /* +0x0EC enable */ StageMap__Enable,
+    /* +0x0F0 disable */ StageMap__Disable,
+    /* +0x0F4 updateFootprintTracking */ StageMap__UpdateFootprintTracking,
+    /* +0x0F8 loadChunksAround */ (void *)StageMap__LoadChunksAround,
+    /* +0x0FC applyChunkLoads */ StageMap__ApplyChunkLoads,
+    /* +0x100 onDrawSystemEvent */ StageMap__OnDrawSystemEvent,
+    /* +0x104 populateSlotCells */ StageMap__PopulateSlotCells,
+    /* +0x108 clearSlotCells */ StageMap__ClearSlotCells,
+    /* +0x10C getTargetDescriptor */ StageMap__GetTargetDescriptor,
+    /* +0x110 computeFootprintDescriptor */ StageMap__ComputeFootprintDescriptor,
+    /* +0x114 getLastEventSlotChunk */ StageMap__GetLastEventSlotChunk,
+    /* +0x118 findSlotByNeighbour */ StageMap__FindSlotByNeighbour,
+    /* +0x11C findSlotForPosition */ StageMap__FindSlotForPosition,
+    /* +0x120 findSlotIndexByNeighbour */ StageMap__FindSlotIndexByNeighbour,
+    /* +0x124 findSlotIndexByChunk */ StageMap__FindSlotIndexByChunk,
+    /* +0x128 refreshFootprint */ StageMap__RefreshFootprint,
+    /* +0x12C applyToSenderFootprint */ StageMap__ApplyToSenderFootprint,
+    /* +0x130 getUnk1CC */ StageMap__GetUnk1CC,
+    /* +0x134 setBounds */ StageMap__SetBounds,
+    /* +0x138 startScaleRamp */ StageMap__StartScaleRamp,
+    /* +0x13C stepScaleRamp */ StageMap__StepScaleRamp,
+    /* +0x140 endScaleRamp */ StageMap__EndScaleRamp,
+};
+/* clang-format on */
+
+/* The origin StageMap's ctor takes when it is given none. */
+LongVec3 sDefaultOrigin = {0, 0, 0};
+
+/* clang-format off */
+/* Indexed by neighbour key (ChunkSlotSpec::neighbour, enum ChunkNeighbour)
+ * in StageMap__LoadChunksAround: the world offset of that neighbour's
+ * cellParent from the centre position. */
+LongVec3 sNeighbourOffsets[CHUNK_NEIGHBOUR_COUNT] = {
+    /* PREV_ROW_LO */ {-40960, 0, -61440},
+    /* PREV_ROW_HI */ {     0, 0, -61440},
+    /* PREV_COL    */ {-61440, 0, -20480},
+    /* CENTRE      */ {-20480, 0, -20480},
+    /* NEXT_COL    */ { 20480, 0, -20480},
+    /* NEXT_ROW_LO */ {-40960, 0,  20480},
+    /* NEXT_ROW_HI */ {     0, 0,  20480},
+};
+
+/* CHUNK_NEIGHBOUR_BIT(key) for each neighbour key: what
+ * StageMap__ComputeChunkLoadEntry tests against ComputeNeighbourMask's
+ * result. */
+s32 sNeighbourBits[CHUNK_NEIGHBOUR_COUNT] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40};
+
+/* The chunk-index steps to the seven chunks around a centre chunk, by
+ * neighbour key (ChunkNeighbourDelta, include/stage_map.h). */
+ChunkNeighbourDelta sChunkNeighbourDeltas[CHUNK_NEIGHBOUR_COUNT] = {
+    /*               rows  odd  even */
+    /* PREV_ROW_LO */ {-1,  -1,  0},
+    /* PREV_ROW_HI */ {-1,   0,  1},
+    /* PREV_COL    */ { 0,  -1, -1},
+    /* CENTRE      */ { 0,   0,  0},
+    /* NEXT_COL    */ { 0,   1,  1},
+    /* NEXT_ROW_LO */ { 1,  -1,  0},
+    /* NEXT_ROW_HI */ { 1,   0,  1},
+};
+
+/* Indexed by the neighbour key (LbdFile::elemKey) of the slot holding the
+ * target, read signed by StageMap__UpdateFootprintTracking: 0 for the centre
+ * (no reload), else which of sFootprintResultPtrTable's spec tables to
+ * load. The byte is also UpdateFootprintTracking's return value. */
+s8 sFootprintResultRemap[8] = {1, 2, 3, 0, 4, 5, 6, 0};
+
+/* The spec table SetTargetAndLoadChunks passes to loadChunksAround, one
+ * {neighbour, load} per slot: every slot (re)loaded. */
+ChunkSlotSpec sDefaultTargetSpecs[CHUNK_NEIGHBOUR_COUNT] = {
+    {0, 1}, {1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}, {6, 1},
+};
+
+/* The spec tables UpdateFootprintTracking passes when the target has moved
+ * into the named neighbour: each slot's new neighbour key, and whether it
+ * (re)loads; three slots load in each, the four whose chunk is still in
+ * reach do not. */
+ChunkSlotSpec sFootprintSpecsPrevRowLo[CHUNK_NEIGHBOUR_COUNT] = {
+    {3, 0}, {4, 0}, {5, 0}, {6, 0}, {0, 1}, {1, 1}, {2, 1},
+};
+ChunkSlotSpec sFootprintSpecsPrevRowHi[CHUNK_NEIGHBOUR_COUNT] = {
+    {2, 0}, {3, 0}, {0, 1}, {5, 0}, {6, 0}, {1, 1}, {4, 1},
+};
+ChunkSlotSpec sFootprintSpecsPrevCol[CHUNK_NEIGHBOUR_COUNT] = {
+    {1, 0}, {0, 1}, {3, 0}, {4, 0}, {2, 1}, {6, 0}, {5, 1},
+};
+ChunkSlotSpec sFootprintSpecsNextCol[CHUNK_NEIGHBOUR_COUNT] = {
+    {1, 1}, {0, 0}, {4, 1}, {2, 0}, {3, 0}, {6, 1}, {5, 0},
+};
+ChunkSlotSpec sFootprintSpecsNextRowLo[CHUNK_NEIGHBOUR_COUNT] = {
+    {2, 1}, {5, 1}, {0, 0}, {1, 0}, {6, 1}, {3, 0}, {4, 0},
+};
+ChunkSlotSpec sFootprintSpecsNextRowHi[CHUNK_NEIGHBOUR_COUNT] = {
+    {4, 1}, {5, 1}, {6, 1}, {0, 0}, {1, 0}, {2, 0}, {3, 0},
+};
+
+/* By UpdateFootprintTracking's result (sFootprintResultRemap). */
+ChunkSlotSpec *sFootprintResultPtrTable[7] = {
+    NULL,
+    sFootprintSpecsPrevRowLo, sFootprintSpecsPrevRowHi, sFootprintSpecsPrevCol,
+    sFootprintSpecsNextCol, sFootprintSpecsNextRowLo, sFootprintSpecsNextRowHi,
+};
+
+/* The rectangle StageMap__InitFootprintRect copies into rects[index] before
+ * setting its slotIndex: no slot (-1), the whole 20 x 20 cells from (0, 0). */
+CellRect sFullSlotRect = {-1, 0, 0, 20, 20};
+
+/* The four scale steps (x/y/z) StartScaleRamp picks for `scaleStep`: y
+ * +1/64 and +1/4 for a positive rate (fast 0, nonzero), -1/64 and -1/4
+ * otherwise; x and z 0/1. */
+Ratio16 sScaleStepUpSlow[3]   = {{0, 1}, { 1, 64}, {0, 1}};
+Ratio16 sScaleStepUpFast[3]   = {{0, 1}, { 1,  4}, {0, 1}};
+Ratio16 sScaleStepDownSlow[3] = {{0, 1}, {-1, 64}, {0, 1}};
+Ratio16 sScaleStepDownFast[3] = {{0, 1}, {-1,  4}, {0, 1}};
+
+/* The scale ResetCellScale sets on every cell. */
+Ratio16 sScaleOne[3] = {{1, 1}, {1, 1}, {1, 1}};
+/* clang-format on */
 
 DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 syncDriver) {
     DayTask *self;
@@ -410,8 +639,6 @@ StageMap *New_StageMap(LongVec3 *origin, s32 autoLoad) {
     }
     return NULL;
 }
-
-extern LongVec3 sDefaultOrigin;
 
 void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
     s32 i;
@@ -1381,17 +1608,6 @@ ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos) {
  * ramp (StartScaleRamp, StepScaleRamp, EndScaleRamp) walks every cell with
  * ForEachSlot and ForEachSlotCell.
  */
-
-/* The four scale steps (Ratio16[3], x/y/z) StartScaleRamp picks for
- * `scaleStep`: y +1/64 and +1/4 for a positive rate (fast 0, nonzero),
- * -1/64 and -1/4 otherwise; x and z 0/1. */
-extern Ratio16 sScaleStepUpSlow[3];
-extern Ratio16 sScaleStepUpFast[3];
-extern Ratio16 sScaleStepDownSlow[3];
-extern Ratio16 sScaleStepDownFast[3];
-
-/* 1/1, 1/1, 1/1: the scale ResetCellScale sets on every cell. */
-extern Ratio16 sScaleOne[3];
 
 s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key) {
     s32 index;

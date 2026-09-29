@@ -18,9 +18,79 @@
 #include "variant_sprite.h"
 #include "bmem_pmgr.h"
 
-/* One {x, y} entry of sVariantSpriteClutX/Y's table, in s16s: the stride
- * both lookups index by. */
-#define VARIANT_CLUT_STRIDE 2
+/** @brief A CLUT's position in VRAM. */
+typedef struct {
+    s16 x; /**< the column */
+    s16 y; /**< the row */
+} VariantClutPos;
+
+/* VariantSprite's data, in address order. */
+
+/* VariantSprite's method table, class id 0x1F44: Sprite's slots, with
+ * VariantSprite's overrides. A slot whose function is declared for another
+ * class's `self` takes a `void *` cast. */
+/* clang-format off */
+VariantSpriteMethods gVariantSpriteMethods = {
+    /* +0x000 header */ 0x1F44,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ (void *)VariantSprite__VariantSprite,
+    /* +0x00C finalize */ (void *)SceneNode__Finalize,
+    /* +0x010 addChild */ (void *)SceneNode__AddChild,
+    /* +0x014 removeChild */ (void *)SceneNode__RemoveChild,
+    /* +0x018 removeAllChildren */ (void *)SceneNode__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)SceneNode__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 reset */ (void *)VariantSprite__SetVariantClut,
+    /* +0x044 updateRotation */ (void *)Sprite__UpdateRotation,
+    /* +0x048 updateScale */ (void *)VariantSprite__UpdateScale,
+    /* +0x04C attachToParent */ (void *)SceneNode__AttachToParent,
+    /* +0x050 detachFromParent */ (void *)SceneNode__DetachFromParent,
+    /* +0x054 detachAttachedChildren */ (void *)SceneNode__DetachAttachedChildren,
+    /* +0x058 getNextAttachedChild */ (void *)SceneNode__GetNextAttachedChild,
+    /* +0x05C finalizeHook */ (void *)SceneNode__NoOpFinalizeHook,
+    /* +0x060 setDisplay */ (void *)Sprite__SetDisplay,
+    /* +0x064 setSemiTransOn */ (void *)Sprite__SetSemiTrans,
+    /* +0x068 setSemiTransRate */ (void *)Sprite__SetSemiTransRate,
+    /* +0x06C setLighting */ (void *)SceneNode__SetLighting,
+    /* +0x070 setLightMode */ (void *)SceneNode__SetLightMode,
+    /* +0x074 setLightDim */ (void *)SceneNode__SetLightDim,
+    /* +0x078 setUseZ */ (void *)SceneNode__SetUseZ,
+    /* +0x07C setSubdivision */ (void *)SceneNode__SetSubdivision,
+    /* +0x080 setBackClip */ (void *)SceneNode__SetBackClip,
+    /* +0x084 getRotMatrix */ (void *)SceneNode__GetRotMatrix,
+    /* +0x088 notifyWithHull */ (void *)SceneNode__NotifyWithHull,
+    /* +0x08C getModelHull */ (void *)SceneNode__GetModelHull,
+    /* +0x090 transformAndNotifyParents */ (void *)SceneNode__TransformAndNotifyParents,
+    /* +0x094 onPadEvent */ (void *)SceneNode__OnPadEvent,
+    /* +0x098 update */ VariantSprite__Update,
+    /* +0x09C dispatchLinkCommand */ (void *)SceneNode__DispatchLinkCommand,
+    /* +0x0A0 tryAttachNearby */ (void *)SceneNode__TryAttachNearby,
+    /* +0x0A4 composeAndApplyRotation */ (void *)SceneNode__ComposeAndApplyRotation,
+    /* +0x0A8 checkBoundsOverlap */ (void *)SceneNode__CheckBoundsOverlap,
+    /* +0x0AC raycastHullAgainstFaces */ (void *)SceneNode__RaycastHullAgainstFaces,
+    /* +0x0B0 slotB0 */ SceneNode__NoOpSlotB0,
+    /* +0x0B4 addToActorParents */ (void *)SceneNode__AddToActorParents,
+    /* +0x0B8 setColor */ (void *)Sprite__SetColor,
+    /* +0x0BC slotBC */ VariantSprite__NoOpSlotBC,
+    /* +0x0C0 slotC0 */ VariantSprite__NoOpSlotC0,
+    /* +0x0C4 slotC4 */ VariantSprite__NoOpSlotC4,
+};
+/* clang-format on */
+
+/* VariantSprite's two texture cells, forwarded as the Sprite ctor's `rect`
+ * (Sprite__Reset copies it into Sprite.rect): 16x16 at u 0x00 and 0x10,
+ * v 0x120. */
+SpriteRect sVariantSpriteCells[2] = {{0x00, 0x120, 16, 16}, {0x10, 0x120, 16, 16}};
+
+/* The two variants' CLUTs: adjacent 16-colour rows on VRAM's bottom line. */
+VariantClutPos sVariantSpriteClut[2] = {{976, 511}, {992, 511}};
 
 VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture) {
     void *obj = BMemPMgrAlloc(sizeof(VariantSprite));
@@ -30,11 +100,6 @@ VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture) {
     }
     return NULL;
 }
-
-/* VariantSprite's two texture cells, forwarded as the Sprite ctor's `rect`
- * (Sprite__Reset copies it into Sprite.rect): u,v = (0x00,0x20) and
- * (0x10,0x20), 16x16. */
-extern SpriteRect sVariantSpriteCells[2];
 
 /* Sprite's ctor with the variant's cell, then this class's table, and the
  * reset slot (VariantSprite__SetVariantClut) with the variant, through
@@ -46,16 +111,10 @@ void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetA
     ((VariantSpriteResetFn)self->methods->reset)(self, variant);
 }
 
-/* The two variants' CLUT positions, one {x, y} table in VRAM:
- * {976, 511} and {992, 511}, adjacent 16-colour rows on the bottom line. */
-/* MATCHING: two externs, one address base for x and one for y. */
-extern const s16 sVariantSpriteClutX[];
-extern const s16 sVariantSpriteClutY[];
-
 void VariantSprite__SetVariantClut(VariantSprite *self, s32 variant) {
     self->variant = variant;
-    self->sprite.cx = sVariantSpriteClutX[variant * VARIANT_CLUT_STRIDE];
-    self->sprite.cy = sVariantSpriteClutY[variant * VARIANT_CLUT_STRIDE];
+    self->sprite.cx = sVariantSpriteClut[variant].x;
+    self->sprite.cy = sVariantSpriteClut[variant].y;
 }
 
 /*

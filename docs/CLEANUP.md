@@ -134,6 +134,36 @@ initialized data, so there's nothing to write. `make extract` leaves stale
 `asm/data/*.s` files behind; grep for a moved table's `dlabel` still hits
 them, but they aren't linked.
 
+What else bites, from the `world` tables:
+
+- **A unit has one `.data` section,** so its C data must be one unbroken
+  run, defined in the file in address order. When the order in memory is
+  not the order the code wants, define the whole run in one block after the
+  includes and drop the scattered `extern`s (`dream_sys.c`, `dream_day.c`).
+  A function a table names needs a prototype before the table: its header's,
+  or one in the `.c` for a function only the table names.
+- **GCC word-aligns every array, struct and union** it emits, so the zero
+  bytes between two odd-sized arrays come for free: size each array to its
+  real length, never with a pad element. A run that ends off a word does
+  not: the next unit's `.data` would land 2 bytes early (SUBALIGN), and a
+  2-byte `[<end>, data]` line comes out empty. Give it a `[<end>, pad]` line.
+- **`const` moves data to `.rodata`.** An `extern const` over `.data` bytes
+  loses the `const` when the table is defined.
+- **A method table** is a `<Class>Methods` initializer, one slot per line
+  (`tools/classtable.py <table>` lists them, and the size is the gap to the
+  next label, so trailing NULL slots count). Comment each slot with its
+  offset and field name. A slot whose function is declared for another
+  class's `self` draws "initialization from incompatible pointer type": cast
+  exactly those to `(void *)`.
+- **A union initializes through its first member.** `MoodGraphPoint` lists
+  its `axis` struct first so a point reads `{{dynamic, upper}}`; `-Wall`
+  wants both brace pairs.
+- **A column label** (splat's `sTurnRotationYaw` at `&sTurnRotations[0][1]`)
+  goes from the symbols file, and the reader writes the row field; the
+  address comes out the same.
+- **Warnings only show on a recompile.** After the edit that should silence
+  them, `touch` the `.c` before reading the log again.
+
 Then each area moves the data it owns. An `extern` stays only for data
 another file defines.
 

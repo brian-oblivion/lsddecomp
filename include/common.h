@@ -36,13 +36,14 @@
  * up. Access the axes separately, or copy both as one halfword.
  */
 typedef union MoodGraphPoint {
-    s16 value; /**< Both axes packed together, for whole-point copies. */
-
-    /** @brief The two axes, a signed byte each. */
+    /** @brief The two axes, a signed byte each. First, so that an
+     * initializer reads `{dynamic, upper}`. */
     struct axis {
         s8 dynamic; /**< The static-to-dynamic axis. */
         s8 upper;   /**< The downer-to-upper axis. */
     } axis;         /**< The point as separate axes. */
+
+    s16 value; /**< Both axes packed together, for whole-point copies. */
 } MoodGraphPoint;
 
 #endif
