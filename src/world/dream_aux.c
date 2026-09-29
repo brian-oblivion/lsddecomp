@@ -681,7 +681,7 @@ bool ProcessDreamAuxTriggerRecord(s32 day, DreamAuxTriggerEntry *trigger, Trigge
     s32 desc[4]; /* New_Entity's descriptor: word +0x00C the ModelData */
 
     if (!CheckDreamAuxTriggerCondition(day, record)) {
-        goto fail;
+        return false;
     }
 
     EnableTeleportsForKind(record->moodIndex);
@@ -691,27 +691,22 @@ bool ProcessDreamAuxTriggerRecord(s32 day, DreamAuxTriggerEntry *trigger, Trigge
     model = world->methods->getModelData(world, record->modelIndex);
     desc[3] = (s32)model;
 
-    if (model == NULL) {
-        goto skip;
-    }
-
-    while (spawn < end) {
-        if (*spawn == -1) {
-            break;
+    if (model != NULL) {
+        while (spawn < end) {
+            if (*spawn == -1) {
+                break;
+            }
+            if (SpawnDreamAuxTriggerEntity(record->moodIndex, desc, trigger, (u8)*spawn)) {
+                return true;
+            }
+            spawn++;
         }
-        if (SpawnDreamAuxTriggerEntity(record->moodIndex, desc, trigger, (u8)*spawn)) {
-            return true;
-        }
-        spawn++;
     }
 
-skip:
-    if (record->moodIndex == TRIGGER_CHAIN_MOOD_ROW) {
-        return ProcessDreamAuxTriggerRecord(day, trigger, record + TRIGGER_CHAIN_STRIDE, world);
+    if (record->moodIndex != TRIGGER_CHAIN_MOOD_ROW) {
+        return false;
     }
-
-fail:
-    return false;
+    return ProcessDreamAuxTriggerRecord(day, trigger, record + TRIGGER_CHAIN_STRIDE, world);
 }
 
 /* Tests `record`'s condition against `day` (enum TriggerCondition) and
