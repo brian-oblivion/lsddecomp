@@ -56,8 +56,8 @@ struct TileAtlas {
 };
 
 /** @brief TileAtlas__BuildCells as TileAtlas__Load calls it through the
- *         processBuffer slot: with no argument. */
-typedef void (*TileAtlasBuildCellsFn)();
+ *         untyped processBuffer slot. */
+typedef void (*TileAtlasBuildCellsFn)(TileAtlas *self);
 
 /** TileAtlas's method table. */
 extern TileAtlasMethods gTileAtlasMethods;

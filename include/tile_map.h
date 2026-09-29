@@ -58,8 +58,8 @@ struct TileMap {
 };
 
 /** @brief TileMap__BuildMap as TileMap__Load calls it through the
- *         processBuffer slot: with no argument. */
-typedef void (*TileMapBuildMapFn)();
+ *         untyped processBuffer slot. */
+typedef void (*TileMapBuildMapFn)(TileMap *self);
 
 /** TileMap's method table. */
 extern TileMapMethods gTileMapMethods;

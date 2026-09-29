@@ -1021,9 +1021,7 @@ void TileMap__Finalize(TileMap *self) {
 /* onRequestDone (+0x064): when idle, BuildMap. */
 void TileMap__Load(TileMap *self) {
     if (self->loadState == 0) {
-        /* MATCHING: called with no argument, as retail does; the slot still
-         * receives this map, the caller's own `self`. */
-        ((TileMapBuildMapFn)self->methods->processBuffer)();
+        ((TileMapBuildMapFn)self->methods->processBuffer)(self);
         self->loaded = 1;
     }
 }
@@ -1099,9 +1097,7 @@ void TileAtlas__Load(TileAtlas *self) {
     s32 unused[8]; /* MATCHING: never used; it gives retail's 0x38-byte stack */
 
     if (self->loadState == 0) {
-        /* MATCHING: called with no argument, as retail does; the slot still
-         * receives this atlas, the caller's own `self`. */
-        ((TileAtlasBuildCellsFn)self->methods->processBuffer)();
+        ((TileAtlasBuildCellsFn)self->methods->processBuffer)(self);
         self->loaded = 1;
     }
 }
