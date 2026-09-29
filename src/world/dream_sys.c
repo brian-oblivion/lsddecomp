@@ -1892,19 +1892,17 @@ bool DreamSys__LoadNextFlashback(DreamSys *self, bool quiet) {
     FlashbackEntry *entry;
 
     idx = self->currentFlashbackIndex;
-    if (idx >= self->amountFlashbacksAvailable) {
-        goto fail;
+    if (idx < self->amountFlashbacksAvailable) {
+        self->state = DREAMSYS_LINK_FLASHBACK;
+        entry = &self->storedFlashbacks[idx];
+        if (!quiet) {
+            self->methods->notifyParents(self, DREAMSYS_LINK_FLASHBACK);
+        }
+        self->currentDay = entry->day;
+        self->currentStage = entry->stageID;
+        self->linkCoordinates = entry->position;
+        return true;
     }
-    self->state = DREAMSYS_LINK_FLASHBACK;
-    entry = &self->storedFlashbacks[idx];
-    if (!quiet) {
-        self->methods->notifyParents(self, DREAMSYS_LINK_FLASHBACK);
-    }
-    self->currentDay = entry->day;
-    self->currentStage = entry->stageID;
-    self->linkCoordinates = entry->position;
-    return true;
-fail:
     return false;
 }
 
