@@ -9,8 +9,7 @@
  *        the hull sweep it reports after a move, and the link search that
  *        lets it stand on the grid.
  *
- * Methods in src/world/dream_scene.c, SetStyleEffectSources through
- * GetActorMethods.
+ * Methods in src/world/actor.c, New_Actor through GetActorMethods.
  */
 
 typedef struct Actor Actor;

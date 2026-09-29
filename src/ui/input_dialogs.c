@@ -3,7 +3,7 @@
  * in ROM order: TextEntry whole (include/text_entry.h), the editor for the
  * save title, then the first half of ItemList (include/item_list.h), the
  * list the player picks a save file from. ItemList's list methods and its
- * getter follow in dream_scene.c.
+ * getter follow in item_list.c.
  *
  * Both keep a Pad and a FrameClock child by class, draw through a
  * ScreenSprite panel and TextRows built from CARD\ TIMs, and do nothing
@@ -468,7 +468,7 @@ TextEntryMethods *GetTextEntryMethods(void) {
  * from: its allocator and ctor, BasicClass's overrides (finalize, child
  * bookkeeping, onNotify), and the view and resource methods resetView,
  * loadResources, releaseResources, attachTarget and detachTarget. Its list
- * methods and GetItemListMethods are in dream_scene.c.
+ * methods and GetItemListMethods are in item_list.c.
  *
  * Like TextEntry it keeps its input and tick children by kind (Pad,
  * FrameClock) and draws through a ScreenSprite panel and TextRows built from
