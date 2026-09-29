@@ -5,6 +5,8 @@
 #   ./tools/setup.sh              # run every step that is not already done
 #   ./tools/setup.sh --force      # redo every step from scratch
 #   ./tools/setup.sh --no-verify  # skip the final build (faster; not advised)
+#   ./tools/setup.sh --lint-only  # no disc or SDK: the venv and GCC 2.6.3's cpp,
+#                                 # all tools/lint.sh needs (CI's lint job)
 #
 # This is the ONLY setup path. Matching rounds run in worktrees that symlink an
 # already-built toolchain, so this script is the only thing that re-runs often
@@ -19,10 +21,12 @@ ROOT=$(pwd)
 
 FORCE=0
 VERIFY=1
+LINT=0
 for arg in "$@"; do
     case "$arg" in
         --force)     FORCE=1 ;;
         --no-verify) VERIFY=0 ;;
+        --lint-only) LINT=1 ;;
         -h|--help)   sed -n '2,12p' "$0"; exit 0 ;;
         *)           echo "unknown option: $arg" >&2; exit 2 ;;
     esac
@@ -48,6 +52,9 @@ ok "python3, git, curl, make, sha1sum, cc"
 
 # ---------------------------------------------------------------------------
 step "Locating the game executable"
+if [ "$LINT" = 1 ]; then
+    skip "--lint-only: no disc needed"
+else
 if [ ! -f disk/SLPS_015.56 ]; then
     # A disc image in the tree is the common case for a first run, so extract
     # from it rather than making the user find the incantation. Only when
@@ -73,6 +80,7 @@ sha1sum -c check.sha1 >/dev/null 2>&1 || die "disk/SLPS_015.56 is not the
       expected: $(cut -d' ' -f1 check.sha1)
       actual:   $(sha1sum disk/SLPS_015.56 | cut -d' ' -f1)"
 ok "disk/SLPS_015.56 verified"
+fi
 
 # ---------------------------------------------------------------------------
 step "Python venv (splat, m2c and asm-differ dependencies)"
@@ -94,6 +102,7 @@ fi
 
 # ---------------------------------------------------------------------------
 step "Cloning asm-differ, m2c, maspsx and decomp-permuter"
+if [ "$LINT" = 1 ]; then skip "--lint-only: the lint uses none of them"; fi
 clone() {
     local dir=$1 url=$2 probe=$3
     if [ "$FORCE" = 1 ]; then rm -rf "$dir"; fi
@@ -107,10 +116,10 @@ clone() {
 }
 # All four are load-bearing. maspsx is IN THE BUILD PIPELINE -- without it the
 # executable does not assemble, let alone match.
-clone tools/maspsx          https://github.com/mkst/maspsx.git                maspsx.py
-clone tools/asm-differ      https://github.com/simonlindholm/asm-differ.git   diff.py
-clone tools/m2c             https://github.com/matt-kempster/m2c.git          m2c.py
-clone tools/decomp-permuter https://github.com/simonlindholm/decomp-permuter.git permuter.py
+[ "$LINT" = 1 ] || clone tools/maspsx          https://github.com/mkst/maspsx.git                maspsx.py
+[ "$LINT" = 1 ] || clone tools/asm-differ      https://github.com/simonlindholm/asm-differ.git   diff.py
+[ "$LINT" = 1 ] || clone tools/m2c             https://github.com/matt-kempster/m2c.git          m2c.py
+[ "$LINT" = 1 ] || clone tools/decomp-permuter https://github.com/simonlindholm/decomp-permuter.git permuter.py
 
 # maspsx does not expose addiu_at independently of --aspsx-version: it is only
 # switched on below 2.30, where it drags three nop-insertion rules with it
@@ -192,6 +201,11 @@ else
     tools/gcc263/gcc --version 2>/dev/null | grep -q '^2\.6\.3' \
         || die "tools/gcc263/gcc is not GCC 2.6.3"
     ok "tools/gcc263 (cc1, cpp, gcc)"
+fi
+
+if [ "$LINT" = 1 ]; then
+    printf '\n\033[32mLint setup complete.\033[0m Run tools/lint.sh.\n'
+    exit 0
 fi
 
 # -- binutils ---------------------------------------------------------------

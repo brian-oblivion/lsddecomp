@@ -6,6 +6,37 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-29 — premium session: plan revision 46 (the port leaves, CI and decomp.dev arrive)
+
+- **Phase 4 moved to `lsd-port`.** The operator made a repository for the
+  Linux port and wants this project marked finished sooner. Track 14 and its
+  plan text are gone from here, and the port's plan (the design questions,
+  the platform-layer tracks, playable-on-Linux) is that repository's
+  `docs/PLAN.md`. The project ends at track 13, whose two open items are the
+  operator's decisions (licence, process docs).
+- **CI, `.github/workflows/`.** `lint` needs no disc: `./tools/setup.sh
+  --lint-only` (new: the venv and GCC 2.6.3's cpp, no disc, no clones, no
+  binutils), `tools/lint.sh`, and a Doxygen build that fails on any warning.
+  The Doxygen step is unverified locally, since doxygen is not installed on
+  the operator's machine; its first run is the measurement. A fresh
+  disc-free clone passed `--lint-only` and all five lint checks. `build` runs
+  the full setup and `./build-and-verify.sh` against `check.sha1`, then the
+  decomp.dev report, reading the disc and SDK from a private repository
+  (`LSD_DEPS_REPO` variable, `LSD_DEPS_TOKEN` secret), as sotn-decomp's CI
+  does. It skips without the secret.
+- **decomp.dev (`tools/objdiff_report.py`).** Target objects come from a
+  second splat split with `make_full_disasm_for_code`, from a temporary
+  config beside the real one so the split's tree-side writes
+  (include/include_asm.h) come out identical. It is assembled with the
+  Makefile's own `as` flags, `nonmatching` lines stripped. Base objects are
+  the matching build's. There are 237 units: 30 game, 207 sdk (the `o`
+  objects, psyq_ asm, src/psyq/). All 45 `c` units have target and base
+  `.text` of identical size, and the matching build is byte-identical after
+  it. objdiff-cli itself runs only in CI. After the first report on `main`,
+  the repository admin adds the project at decomp.dev/manage/new.
+
+---
+
 ## 2026-09-28 — round 106: tracks 12 and 13's code items done (premium head, plan revision 45)
 
 The premium head did track 12's setup item `apidoc-setup` itself, revised

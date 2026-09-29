@@ -1,0 +1,50 @@
+# Disc-free checks: formatting, documentation, readability counters,
+# declarations and file names (tools/lint.sh), plus a Doxygen build. Needs
+# nothing but the repository, so it runs on every push and pull request,
+# forks included.
+name: lint
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # .clang-format is written for clang-format 22; tools/lint.sh refuses any
+      # other major, because another major formats differently.
+      - name: clang-format 22 and Doxygen
+        run: |
+          pip install "clang-format==22.*"
+          sudo apt-get update -qq && sudo apt-get install -y -qq doxygen
+
+      - name: Toolchain for the lint (venv, GCC 2.6.3's cpp)
+        run: ./tools/setup.sh --lint-only
+
+      - name: tools/lint.sh
+        run: tools/lint.sh
+
+      # Doxyfile warns on undocumented members and parameters; any warning fails.
+      - name: Doxygen
+        run: |
+          mkdir -p build/doxygen
+          doxygen Doxyfile >/dev/null
+          if [ -s build/doxygen/warnings.log ]; then
+            cat build/doxygen/warnings.log
+            echo "::error::Doxygen reported $(wc -l < build/doxygen/warnings.log) warning(s)"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: doxygen-html
+          path: build/doxygen/html
+          if-no-files-found: ignore

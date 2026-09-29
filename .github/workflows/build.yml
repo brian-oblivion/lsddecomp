@@ -1,0 +1,86 @@
+# The byte-exact build: rebuild SLPS_015.56 and check it against check.sha1,
+# then publish the objdiff progress report decomp.dev reads
+# (decomp.wiki/tools/decomp-dev: an artifact named <VERSION>_report).
+#
+# The build needs the retail executable and the Psy-Q SDK discs, which are
+# never in this repository. They come from a PRIVATE repository you own,
+# holding
+#     disk/SLPS_015.56
+#     sdk/<the SDK disc zips config/psyq-objects.txt names>
+# read with a fine-grained token (contents: read-only on that repo alone),
+# stored as the secret LSD_DEPS_TOKEN, and the repository named in the
+# variable LSD_DEPS_REPO (owner/name). Without the secret (forks, pull
+# requests from forks) the job says so and skips; the lint workflow still runs.
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HAVE_DEPS: ${{ secrets.LSD_DEPS_TOKEN != '' }}
+    steps:
+      - name: Dependencies available?
+        if: env.HAVE_DEPS != 'true'
+        run: echo "::notice::LSD_DEPS_TOKEN is not set here; the byte-exact build is skipped."
+
+      - uses: actions/checkout@v4
+        if: env.HAVE_DEPS == 'true'
+
+      - name: Fetch the disc and SDK (private)
+        if: env.HAVE_DEPS == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.LSD_DEPS_REPO }}
+          token: ${{ secrets.LSD_DEPS_TOKEN }}
+          path: .deps
+
+      - name: Place them
+        if: env.HAVE_DEPS == 'true'
+        run: |
+          cp .deps/disk/SLPS_015.56 disk/
+          cp .deps/sdk/* sdk/
+          rm -rf .deps
+
+      - uses: actions/setup-python@v5
+        if: env.HAVE_DEPS == 'true'
+        with:
+          python-version: "3.12"
+
+      # binutils is built from source by setup.sh and takes minutes; GCC and
+      # the converted SDK objects are cheap to keep too. Keyed on the script.
+      - uses: actions/cache@v4
+        if: env.HAVE_DEPS == 'true'
+        with:
+          path: |
+            tools/binutils
+            tools/gcc263
+          key: toolchain-${{ hashFiles('tools/setup.sh') }}
+
+      # setup.sh ends with ./build-and-verify.sh and fails unless the image
+      # matches check.sha1. That is the SHA check.
+      - name: Setup, build and verify against check.sha1
+        if: env.HAVE_DEPS == 'true'
+        run: ./tools/setup.sh
+
+      - name: Verify again (the oracle, on its own)
+        if: env.HAVE_DEPS == 'true'
+        run: ./build-and-verify.sh
+
+      - name: objdiff progress report
+        if: env.HAVE_DEPS == 'true'
+        run: |
+          curl -sfL -o tools/objdiff-cli \
+            https://github.com/encounter/objdiff/releases/latest/download/objdiff-cli-linux-x86_64
+          chmod +x tools/objdiff-cli
+          python3 tools/objdiff_report.py --report
+
+      - uses: actions/upload-artifact@v4
+        if: env.HAVE_DEPS == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          name: SLPS_015.56_report
+          path: build/report.json
