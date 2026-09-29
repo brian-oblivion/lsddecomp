@@ -319,7 +319,8 @@ Two GitHub Actions workflows live in `.github/workflows/`:
   publishes the objdiff progress report that [decomp.dev](https://decomp.dev)
   reads (`tools/objdiff_report.py`, artifact `SLPS_015.56_report`). The disc
   and the SDK never enter this repository, so the job reads them from a
-  private repository the owner keeps (`disk/SLPS_015.56`, `sdk/*.zip`). It
+  private repository the owner keeps (`disk/SLPS_015.56` and a copy of
+  `lib/`, the converted SDK objects). It
   is named in the `LSD_DEPS_REPO` variable and read with the
   `LSD_DEPS_TOKEN` secret. Without the secret the job skips.
 

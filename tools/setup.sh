@@ -266,9 +266,16 @@ fi
 # Idempotent: re-extracts nothing that is already under sdk/work/, and dies
 # with the exact archive.org file name if a disc the manifest needs is absent.
 # The build cannot link without lib/, so this is not optional.
+# A lib/ brought in whole (CI's private dependencies repository: the SDK zips
+# are 66-373 MB each, over GitHub's 100 MB file limit, and lib/ is under 1 MB)
+# needs no sdk/: `check` proves it complete and in step with the manifest.
+if ! ls sdk/*.zip >/dev/null 2>&1 && .venv/bin/python3 tools/psyq_sdk.py check >/dev/null 2>&1; then
+    skip "lib/ complete per the manifest, and no SDK disc in sdk/"
+else
 .venv/bin/python3 tools/psyq_sdk.py install \
     || die "could not produce lib/ from sdk/. See sdk/README.md."
 ok "lib/ ($(find lib -name '*.o' | wc -l) objects, verified against retail)"
+fi
 
 # ---------------------------------------------------------------------------
 step "Extracting asm/ and verifying the build"
