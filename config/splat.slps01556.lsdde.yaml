@@ -1891,6 +1891,7 @@ segments:
       - [0x77828, data]
       - [0x77834, .data, world/objm]  # gObjMMethods, the view points, the per-stage pending extras
       - [0x77974, data]
+      - [0x77EFC, .data, world/style_effect]  # gStyleEffectMethods, the model-child and sprite tables
       - [0x780D4, .data, world/actor]  # gActorMethods
       - [0x781C4, .data, world/variant_sprite]  # gVariantSpriteMethods, its cells and CLUTs
       - [0x782AC, .data, world/graph_room]  # gGraphRoomMethods, sGraphScoreMoods
