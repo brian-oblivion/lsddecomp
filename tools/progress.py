@@ -11,8 +11,9 @@ them (docs/PARALLEL-RUNS.md, Gate 1):
             "defined in C" == "matched" for as long as build-and-verify.sh is
             green -- which is the only reason this can be counted statically.
   queued    INCLUDE_ASM entries: carved into a C unit, awaiting decompilation.
-  stalled   queued AND has a docs/match-reports/ file, i.e. someone already
-            attempted it and wrote down why it did not go. NOT fresh ground.
+  stalled   queued AND has a docs/match-reports/ file (archive/process),
+            or keeps its readable body under `#ifdef NON_MATCHING`: someone
+            already attempted it and it did not go. NOT fresh ground.
   banked    queued, unattempted, in a unit whose header says DELIBERATELY
             UNWORKED -- carved to fix a boundary or bank the ground, but
             classified as senior work rather than cold-runner work.
@@ -72,6 +73,7 @@ NM = ROOT / "tools/binutils/bin/mipsel-linux-gnu-nm"
 ELF = ROOT / "build/lsdde.elf"
 YAML = ROOT / "config/splat.slps01556.lsdde.yaml"
 REPORTS = ROOT / "docs/match-reports"
+NM_BLOCK_RE = re.compile(r"^#ifdef NON_MATCHING\b(.*?)^#else\b", re.M | re.S)
 REOPENED_RE = re.compile(
     r"^[\s>*_#-]*(?:REOPENED|DERIVATION ONLY) -- ASSIGNABLE\b", re.M)
 
@@ -382,7 +384,11 @@ def main():
         if info:
             defs = [d for d in defs if d in info]
 
-        stall = [f for f in inc if f in reports]
+        # A readable body kept under `#ifdef NON_MATCHING` is an attempt on
+        # record: the function was written as correct C and did not match
+        # (track 17's stalls), so it is not fresh ground either.
+        kept = set(DEF_RE.findall("\n".join(NM_BLOCK_RE.findall(text))))
+        stall = [f for f in inc if f in reports or f in kept]
         is_banked = "DELIBERATELY UNWORKED" in text
         unattempted = len(inc) - len(stall)
 
@@ -413,7 +419,7 @@ def main():
             a = info.get(f, (None, 0))[0]
             if a is not None and is_library(a):
                 lib_queued.append((f, sizes.get(f, 0)))
-                if f in reports:
+                if f in stall:
                     lib_stalled += 1
 
     library_matched, library_matched_b = len(lib_matched), sum(s for _, s in lib_matched)

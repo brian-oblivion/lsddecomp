@@ -700,6 +700,8 @@ def collect(st):
     fresh_funcs, stall_rows, promotable = [], [], []
     for words, unit, func, title in rows:
         state, has_body = report_state(func)
+        if state == "fresh" and func in nm_defined(unit):
+            state = "stalled"   # correct C kept under NON_MATCHING: attempted (progress.py)
         if state == "fresh":
             fresh_funcs.append((words, unit, func, title))
         else:
