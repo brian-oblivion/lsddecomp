@@ -1077,7 +1077,6 @@ PlaceDreamAuxEntityByPlayer = 0x8005CF34; // type:func
 sMomPathSymSpy = 0x8001186C; // type:func
 sMomPathSymDog = 0x8001187C; // type:func
 sDreamAuxSlots = 0x80088D28;
-sDreamAuxSlots2 = 0x80088D2C;
 sDreamAuxStage = 0x8008ABF8;
 sDreamAuxWorld = 0x8008AC00;
 sDreamAuxGroupCounts = 0x80089A7C;

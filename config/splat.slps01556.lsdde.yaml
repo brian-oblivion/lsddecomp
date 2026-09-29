@@ -1889,8 +1889,8 @@ segments:
       - [0x771D8, data]              # class_39e08
       - [0x782AC, .data, world/graph_room]  # gGraphRoomMethods, sGraphScoreMoods
       - [0x783DC, .data, world/dream_sys]  # DreamSys's method table, its movement tables, the stage spawn and link tables
-      - [0x79520, data]
-      - [0x79528, data]
+      - [0x79520, .data, world/dream_aux]  # the resident entity, the placements and each stage's chunk triggers
+      - [0x7A2D2, pad]               # 2 bytes: dream_aux.c's .data ends 2 short of a word (SUBALIGN(2))
       - [0x7A2D4, .data, world/entity]    # gEntityMethods, the motion templates, sEntityMoodTable
       - [0x7AEC4, .data, world/tod_actor]  # gTodActorMethods
       - [0x7B008, sdata]
