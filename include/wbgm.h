@@ -15,6 +15,9 @@
 typedef struct WBgm WBgm;
 typedef struct WBgmMethods WBgmMethods;
 
+/** WBgm's class id (gWBgmMethods word +0x000). */
+#define WBGM_CLASS_ID 0x50
+
 /**
  * @brief WBgm's method table (24 slots): BasicClass's fifteen, with the ctor,
  * finalize and onNotify overridden, then nine of its own.

@@ -4,7 +4,7 @@
  * finalize, the screen size setter, initSystems (display, sound and 3D
  * bring-up, and the shared task argument block), a no-op slot, the
  * never-returning main loop that drives the subclass's hooks by
- * runTitleMenu's ApplicationLoopStatus, and the table getter.
+ * runTitleMenu's ApplicationLoopStatus, the table getter and the table.
  */
 #include "common.h"
 #include <libgte.h>
@@ -85,3 +85,36 @@ void Application__RunMainLoop(Application *self) {
 ApplicationMethods *GetApplicationMethods(void) {
     return &gApplicationMethods;
 }
+
+/* Application's method table (include/application.h): BasicClass's slots
+ * with the ctor and finalize, setScreenDims, initSystems and the main loop;
+ * the six sequence hooks are NULL here, each GameApplication's. A (void *)
+ * entry is a method declared on another class's type. */
+ApplicationMethods gApplicationMethods = {
+    APPLICATION_CLASS_ID,
+    (void *)BasicClass__Release,
+    Application__Application,
+    Application__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    Application__SetScreenDims,
+    (void *)Application__InitSystems,
+    Application__NoOpSlot48,
+    Application__RunMainLoop,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+};

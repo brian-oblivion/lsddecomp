@@ -30,6 +30,10 @@
 typedef struct LightRig LightRig;
 typedef struct LightRigMethods LightRigMethods;
 
+/** LightRig's class id (gLightRigMethods word +0x000): 0x1 under SceneNode's
+ * 0x4. */
+#define LIGHTRIG_CLASS_ID 0x14
+
 /**
  * SceneNode's slots, then LightRig's own, for LightRigMethods and StageMap's
  * table to expand first. gLightRigMethods overrides the ctor, finalize,

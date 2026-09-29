@@ -14,7 +14,8 @@
  *    PushBasicClassListNode/RemoveBasicClassListNode, the pool-backed list
  *    primitives its `children` and `parentRefs` lists share, and the list
  *    helpers, table getter and notification pair that close the file, with
- *    the pool's busy-flag accessors.
+ *    the pool's busy-flag accessors. BasicClass's method table ends the
+ *    file.
  */
 
 #include "common.h"
@@ -463,3 +464,26 @@ void SetBMemPMgrBusy(s32 busy) {
 s32 GetBMemPMgrBusy(void) {
     return sBMemPMgrBusy;
 }
+
+/* BasicClass's own method table (include/basic_class.h): the root's fifteen
+ * slots, which every class's table starts with. */
+/* clang-format off */
+BasicClassMethods gBasicClassMethods = {
+    BASICCLASS_CLASS_ID,
+    BasicClass__Release,
+    BasicClass__BasicClass,
+    BasicClass__Finalize,
+    BasicClass__AddChild,
+    BasicClass__RemoveChild,
+    BasicClass__RemoveAllChildren,
+    BasicClass__GetNextChild,
+    BasicClass__AddParentRef,
+    BasicClass__RemoveParentRef,
+    BasicClass__ClearParentRefs,
+    BasicClass__GetNextParentRef,
+    BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    BasicClass__OnNotify,
+    NULL,
+};
+/* clang-format on */

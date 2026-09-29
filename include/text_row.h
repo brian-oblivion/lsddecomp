@@ -14,6 +14,9 @@
 typedef struct TextRow TextRow;
 typedef struct TextRowMethods TextRowMethods;
 
+/** TextRow's class id (gTextRowMethods word +0x000). */
+#define TEXTROW_CLASS_ID 0x11144
+
 #define TEXTROW_DEFAULT_PITCH 7 /**< reset's cellPitch: pixels from one cell's x to the next */
 #define TEXTROW_GAP_WIDTH 16    /**< the extra x attachToParent adds before cell `gapIndex` */
 

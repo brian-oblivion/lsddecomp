@@ -15,6 +15,9 @@
 typedef struct GameApplication GameApplication;
 typedef struct GameApplicationMethods GameApplicationMethods;
 
+/** GameApplication's class id (gGameApplicationMethods word +0x000). */
+#define GAMEAPPLICATION_CLASS_ID 0x1F60
+
 /** The ctor's argument: which parts of the sequence run. One instance,
  * sGameApplicationConfig = {DATASOURCE_CD, 0, 1, 1, 1, 1}, kept at self->config; each
  * gate below is read `!= 0` by the methods it names. */

@@ -1852,6 +1852,7 @@ segments:
       - [0x5BBE2, pad]                        # 2 bytes; 0x802 is not 2-aligned
       - [0x5BBE4, o, libgte/msc02, .data]     # 0x1A0
       - [0x5BD84, data]
+      - [0x5BD8C, .data, app/bmem_pmgr]  # gBasicClassMethods
       - [0x5BDCC, .data, graphics/scene_node]  # gSceneNodeMethods, sRotationZero, sSceneNodeScaleOne
       - [0x5BE9C, o, libgte/ratan, .data]    # 0x802, the arctan table -> 0x5C69E
       - [0x5C69E, pad]                       # 2 bytes; 0x802 is not 2-aligned
@@ -1865,30 +1866,38 @@ segments:
       - [0x5DB10, o, libetc/intr_dma, .data]
       - [0x5DB38, o, libetc/intr_vb, .data]
       - [0x5DB60, o, libetc/vsync, .data]
-      - [0x5DB70, data]
+      - [0x5DB70, .data, app/pad]  # gPadMethods
+      - [0x5DBC8, .data, app/game_shell]  # gGameApplicationMethods .. sDataSourceClientGetters
+      - [0x5DCE8, .data, cd/cd_driver]  # gCdDriverMethods, sCdSeekEntry
       - [0x5DD7C, o, libcd/sys, .data]       # 0x80 -> 0x5DDFC; D_8006D5FC (game data) follows exactly
       - [0x5DDFC, data]
       - [0x5E138, o, libcd/iso9660, .data]   # 8 bytes (two 0x1F8010xx DMA register addresses) -> 0x5E140
-      - [0x5E140, data]
+      - [0x5E140, .data, sound/vab_sound]  # gPlacementGridMethods, gNullDriverMethods, gVabStreamObjMethods
+      - [0x5E2D4, data]
+      - [0x5EC8C, .data, sound/wbgm]  # gWBgmMethods
+      - [0x5ECF0, .data, app/application]  # gApplicationMethods
       - [0x5ED58, .data, graphics/tim_image]  # gTimImageMethods
-      - [0x5EDF8, data]
+      - [0x5EDF8, .data, app/task]  # gStreamTaskMethods .. gViewportMethods
+      - [0x5F19C, .data, ui/screen_widgets]  # gFadeBoxMethods .. gTextRowMethods
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)
-      - [0x5F474, .data, graphics/sprite]  # gCharSpriteMethods .. gSpriteMethods
-      - [0x5F6D8, data]
+      - [0x5F474, .data, graphics/sprite]  # gCharSpriteMethods .. gLightRigMethods
       - [0x5F86C, .data, graphics/flat_light_obj]  # gFlatLightObjMethods
       - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods .. gMoviePlayerMethods
       - [0x5FE84, data]
       - [0x5FFC8, o, libpress/vlc, .data]     # 0x18 -> 0x5FFE0 (dlabel D_8006F7E0)
       - [0x5FFE0, data]
+      - [0x71FE0, .data, cd/cd_stream]  # gCdStreamMethods
+      - [0x72060, data]                 # four CD-ROM register addresses, 0x1F801800..03
       - [0x72070, o, libcd/c_003, .data]      # 0x10 -> 0x72080 (dlabel D_80081870)
       - [0x72080, data]
       - [0x720A0, o, libcd/c_011, .data]      # 0x50 -> 0x720F0 (dlabel D_800818A0)
       - [0x720F0, data]
+      - [0x72140, .data, cd/game_files]  # gLbdFileMethods .. sMovieFrameCounts: the file table
       - [0x769D4, .data, world/stage_grid]  # the stage grids and their chunk moods
       - [0x76DC8, .data, world/dream_day]  # DayTask, TimedTask, StageMap: method tables and chunk tables
-      - [0x771D8, data]              # class_39e08
-      - [0x77788, .data, ui/item_list]  # gItemListMethods
-      - [0x77828, data]
+      - [0x771D8, .data, ui/title_menu]  # gNodeGuardedViewportMethods .. sCardIconRect: the title menu, the card messages
+      - [0x776D0, .data, ui/input_dialogs]  # gTextEntryMethods, sTextEntryPanelRect
+      - [0x77788, .data, ui/item_list]  # gItemListMethods, sItemListPanelRect
       - [0x77834, .data, world/objm]  # gObjMMethods, the view points, the per-stage pending extras
       - [0x77974, .data, world/style_layer]  # spawn tables, colours, configs, cue records
       - [0x77EFA, pad]               # 2 bytes: style_layer.c's .data ends 2 short of a word

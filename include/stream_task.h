@@ -16,6 +16,9 @@
 typedef struct StreamTask StreamTask;
 typedef struct StreamTaskMethods StreamTaskMethods;
 
+/** StreamTask's class id (gStreamTaskMethods word +0x000). */
+#define STREAMTASK_CLASS_ID 0x1130
+
 /** StreamTask's own state, past TaskCore's (enum TaskCoreState): onPadConfirm
  * sets it when skipOnConfirm is on, and setState answers it with exit, which
  * aborts the player at once or fades out first. */

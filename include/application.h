@@ -18,6 +18,10 @@
 
 typedef struct Application Application;
 typedef struct ApplicationMethods ApplicationMethods;
+
+/** Application's class id (gApplicationMethods word +0x000). */
+#define APPLICATION_CLASS_ID 0x60
+
 struct Pad; /* pad.h: initSystems's pad, main()'s New_Pad(0, 0) */
 
 /** Application's slots, BasicClass's first. +0x050..+0x064 are NULL in

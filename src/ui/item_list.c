@@ -5,7 +5,8 @@
  * closing and reporting (SetState, TickClosing), the Pad events
  * (HandleInputCode, PlaySound), the cursor and scroll methods, the four
  * visible rows (create, release, refresh, format), the view and cursor
- * helpers, and the table getter GetItemListMethods.
+ * helpers, the table getter GetItemListMethods, then the table and the
+ * panel's cell.
  */
 #include "common.h"
 #include <libgte.h>
@@ -333,7 +334,7 @@ ItemListMethods *GetItemListMethods(void) {
  * declared for another class's `self` takes a `void *` cast. */
 /* clang-format off */
 ItemListMethods gItemListMethods = {
-    /* +0x000 header */ 0x20,
+    /* +0x000 header */ ITEMLIST_CLASS_ID,
     /* +0x004 release */ (void *)BasicClass__Release,
     /* +0x008 ctor */ ItemList__ItemList,
     /* +0x00C finalize */ ItemList__Finalize,
@@ -370,3 +371,7 @@ ItemListMethods gItemListMethods = {
     /* +0x09C getCursorIndex */ ItemList__GetCursorIndex,
 };
 /* clang-format on */
+
+/* SELECT's cell, the item-list panel ItemList__LoadResources
+ * (input_dialogs.c) shows: 256 x 160 from (0, 0). */
+SpriteRect sItemListPanelRect = {0, 0, 256, 160};

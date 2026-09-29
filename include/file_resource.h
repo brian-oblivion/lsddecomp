@@ -10,7 +10,8 @@
  * @brief FileResource, the base of every class loaded from a file and of the
  * data-source drivers, and the descriptors the file-backed ctors take.
  *
- * Declares the class (FILERESOURCE_SLOTS, FILERESOURCE_FIELDS for its
+ * Declares the class (FILERESOURCE_SLOTS and the shorter
+ * FILERESOURCE_BASE_SLOTS, FILERESOURCE_FIELDS for its
  * subclasses), the ResourceSource and ResourceRequest descriptors, the flag
  * bits the CD driver reports request completion with, and FileResource's own
  * methods, defined in src/app/game_shell.c. The functions that bind the
@@ -20,12 +21,18 @@
 typedef struct FileResource FileResource;
 typedef struct FileResourceMethods FileResourceMethods;
 
-/** FileResource's slots, BasicClass's first. +0x040..+0x058 and
- * +0x068..+0x074 are the data-source interface: NULL or placeholders in the
- * static tables, filled at run time from the active driver's table
- * (SetActiveDataSource), and named for the CD driver's occupants. */
+/** FileResource's class id (gFileResourceMethods word +0x000). */
+#define FILERESOURCE_CLASS_ID 0x3
+
+/** FileResource's slots up to +0x074, BasicClass's first: the whole table
+ * of a class that has no processBuffer step (RequestedFile and the two
+ * drivers, CdDriver and NullDriver), whose table ends there.
+ * +0x040..+0x058 and +0x068..+0x074 are the data-source interface: NULL or
+ * placeholders in the static tables, filled at run time from the active
+ * driver's table (SetActiveDataSource), and named for the CD driver's
+ * occupants. */
 /* clang-format off */
-#define FILERESOURCE_SLOTS(Self, CtorParams)                                                         \
+#define FILERESOURCE_BASE_SLOTS(Self, CtorParams)                                                    \
     BASICCLASS_SLOTS(Self, CtorParams);                                                            \
     /* +0x040 */ void (*slot40)(void);                          /**< CD: CdDriver__NoOpSlot40 */   \
     /* +0x044 */ void (*open)(Self *self, char *name, s32 arg2, s32 arg3); /**< CD: CdDriver__Open */ \
@@ -40,7 +47,13 @@ typedef struct FileResourceMethods FileResourceMethods;
     /* +0x068 */ void (*runRequestQueue)(void);                 /**< CD: CdDriver__RunRequestQueue */ \
     /* +0x06C */ void (*requestLoadFile)(Self *self, char *name); /**< CD: CdDriver__RequestLoadFile */ \
     /* +0x070 */ void (*stopService)(Self *self);               /**< CD: CdDriver__StopService; neither occupant reads self, but CdDriver__RunRequestQueue passes it */ \
-    /* +0x074 */ void (*cancelRequests)(Self *self);            /**< CD: CdDriver__CancelRequests */ \
+    /* +0x074 */ void (*cancelRequests)(Self *self)             /**< CD: CdDriver__CancelRequests */
+/* clang-format on */
+
+/** FileResource's slots: FILERESOURCE_BASE_SLOTS, then processBuffer. */
+/* clang-format off */
+#define FILERESOURCE_SLOTS(Self, CtorParams)                                                         \
+    FILERESOURCE_BASE_SLOTS(Self, CtorParams);                                                     \
     /* +0x078 */ void *processBuffer                            /**< NULL here; each subclass's step that consumes the loaded buffer (TimImage__Upload, ModelData__BuildResources, ...), signature per class */
 /* clang-format on */
 

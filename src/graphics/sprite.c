@@ -11,8 +11,7 @@
  *  - FrameClock (include/frame_clock.h): the per-frame clock.
  *  - LightRig (include/light_rig.h): three flat lights and the ambient
  *    colour.
- * The three sprite classes' method tables close the file; RequestedFile's,
- * FrameClock's and LightRig's are still in the data disassembly.
+ * The six classes' method tables close the file.
  */
 #include "common.h"
 #include <libgte.h>
@@ -495,8 +494,8 @@ LightRigMethods *GetLightRigMethods(void) {
     return &gLightRigMethods;
 }
 
-/* The sprite classes' method tables and the two constants between them, in
- * the order the image keeps them. Each table fills its class's header's slots
+/* The six classes' method tables and the two constants between the sprite
+ * classes' tables, in the order the image keeps them. Each table fills its class's header's slots
  * with the class's own method or the parent's. A (void *) entry is a
  * method whose declared parameters differ from the slot's, usually one
  * inherited from a parent class and declared on the parent's type. */
@@ -665,4 +664,121 @@ SpriteMethods gSpriteMethods = {
     SceneNode__NoOpSlotB0,
     (void *)SceneNode__AddToActorParents,
     Sprite__SetColor,
+};
+
+/* RequestedFile (include/requested_file.h): FileResource's slots up to
+ * +0x074 with its ctor, finalize and onRequestDone; the file-I/O slots are
+ * NULL until SetActiveDataSource binds the active driver's. */
+RequestedFileMethods gRequestedFileMethods = {
+    REQUESTEDFILE_CLASS_ID,
+    (void *)FileResource__Release,
+    RequestedFile__RequestedFile,
+    RequestedFile__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    RequestedFile__MarkLoaded,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+};
+
+/* FrameClock (include/frame_clock.h): BasicClass's slots with its ctor,
+ * finalize, removeParentRef and notifyParents, then its seven clock slots. */
+FrameClockMethods gFrameClockMethods = {
+    FRAMECLOCK_CLASS_ID,
+    (void *)BasicClass__Release,
+    FrameClock__FrameClock,
+    FrameClock__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    FrameClock__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    FrameClock__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    FrameClock__Reset,
+    FrameClock__Tick,
+    FrameClock__GetFrameCount,
+    FrameClock__Pause,
+    FrameClock__Resume,
+    FrameClock__IsPaused,
+    FrameClock__Stop,
+};
+
+/* LightRig (include/light_rig.h): SceneNode's table with its ctor, finalize,
+ * reset and dispatchLinkCommand, then getLight and setAmbientColor. */
+LightRigMethods gLightRigMethods = {
+    LIGHTRIG_CLASS_ID,
+    (void *)BasicClass__Release,
+    (void *)LightRig__LightRig,
+    LightRig__Finalize,
+    (void *)SceneNode__AddChild,
+    (void *)SceneNode__RemoveChild,
+    (void *)SceneNode__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)SceneNode__OnNotify,
+    NULL,
+    LightRig__Reset,
+    (void *)SceneNode__UpdateRotation,
+    (void *)SceneNode__UpdateScale,
+    (void *)SceneNode__AttachToParent,
+    (void *)SceneNode__DetachFromParent,
+    (void *)SceneNode__DetachAttachedChildren,
+    (void *)SceneNode__GetNextAttachedChild,
+    (void *)SceneNode__NoOpFinalizeHook,
+    (void *)SceneNode__SetDisplay,
+    (void *)SceneNode__SetSemiTrans,
+    (void *)SceneNode__SetSemiTransRate,
+    (void *)SceneNode__SetLighting,
+    (void *)SceneNode__SetLightMode,
+    (void *)SceneNode__SetLightDim,
+    (void *)SceneNode__SetUseZ,
+    (void *)SceneNode__SetSubdivision,
+    (void *)SceneNode__SetBackClip,
+    (void *)SceneNode__GetRotMatrix,
+    (void *)SceneNode__NotifyWithHull,
+    (void *)SceneNode__GetModelHull,
+    (void *)SceneNode__TransformAndNotifyParents,
+    (void *)SceneNode__OnPadEvent,
+    (void *)SceneNode__Update,
+    LightRig__DispatchLinkCommand,
+    (void *)SceneNode__TryAttachNearby,
+    (void *)SceneNode__ComposeAndApplyRotation,
+    (void *)SceneNode__CheckBoundsOverlap,
+    (void *)SceneNode__RaycastHullAgainstFaces,
+    SceneNode__NoOpSlotB0,
+    (void *)SceneNode__AddToActorParents,
+    LightRig__GetLight,
+    LightRig__SetAmbientColor,
 };
