@@ -329,11 +329,6 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
  * is Sony's libc2 object, linked after this file.
  */
 
-/* sActiveDataSource's two observed values are the header words of the two
- * sibling classes it selects between: gCdDriverMethods (the CD-ROM read driver,
- * cd_driver.c) and gNullDriverMethods (NullDriver, the null driver, include/null_driver.h). */
-#define DATASOURCE_CD 0x13
-#define DATASOURCE_NULL 0x23
 
 void *FileResource__Release(FileResource *self) {
     self->freeGuard = 0;
