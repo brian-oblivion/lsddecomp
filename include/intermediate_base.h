@@ -11,7 +11,7 @@
  *
  * Declares the class (INTERMEDIATEBASE_SLOTS, INTERMEDIATEBASE_FIELDS for its
  * subclasses), its two built-in states, the IntermediateBaseInitArgs block,
- * and its methods, defined in src/app/task.c.
+ * and its methods, defined in src/app/intermediate_base.c.
  */
 
 typedef struct IntermediateBase IntermediateBase;
@@ -96,8 +96,8 @@ struct IntermediateBaseMethods {
 /**
  * IntermediateBase -- the base of the game's tasks: class id 0x30, method
  * table gIntermediateBaseMethods, a BasicClass subclass that runs one
- * attached job to a result. Methods in src/app/task.c. Two classes derive
- * from it: TaskCore (0x130, task_core.h: StreamTask, TitleMenu and GraphRoom
+ * attached job to a result. Methods in src/app/intermediate_base.c. Two
+ * classes derive from it: TaskCore (0x130, task_core.h: StreamTask, TitleMenu and GraphRoom
  * below it) and TimedTask (0x230: DayTask and ObjM below it). It is
  * abstract: +0x04C, +0x050 and +0x058 are NULL in its own table, and
  * init/deinit call the first two. It has no allocator; the object is 0x28
