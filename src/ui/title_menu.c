@@ -713,9 +713,7 @@ s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 
     return result;
 }
 
-/* Returns the last call's result, CardInfoStatus's 0 or CardLoadStatus's
- * status, with no return statement. */
-/* MATCHING: no return statement; an explicit return adds two words. */
+/* CardInfoStatus's 0 when no card answered, else CardLoadStatus's status. */
 s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 *formatted) {
     s32 status;
 
