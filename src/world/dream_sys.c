@@ -38,52 +38,943 @@ extern s32 sLinkTriggerIndex;
 extern s32 sLinkDstStage;
 extern s32 sLinkSpawnIndex;
 
-/* sProjectOffsetZ is the LAST word of a 3-word (LongVec3-shaped) scratch
-   vector whose first two words have no symbol of their own: they are the 8
-   zero bytes after sVoicePitchBySelect's 24, which voiceSelect (bounded to
-   [0, 0x18) by DreamSys__NotifyLinkAttempt) never reaches.
-   DreamSys__ProjectPointAtDistance writes `dist` into this word and passes
-   `&sProjectOffsetZ - 2` to SceneNode__LocalOffsetToWorldPos as its 3-word
-   `src` vector: the local offset (0, 0, dist). */
-extern s32 sProjectOffsetZ;
+/* The number of stages: every per-stage table below has one entry each. */
+#define STAGE_COUNT 14
 
-/* Delta/threshold table pairs consumed by DreamSys__StepLookOffset (sLookOffsetSteps /
-   sLookOffsetLimits, indexed by DreamSys::lookOffsetCommand) and DreamSys__StepLookYaw (sLookYawSteps /
-   sLookYawLimits, indexed by DreamSys::lookYawCommand). Index 0 is unused/zero in both
-   pairs; indices 1 and 2 are the negative/positive delta and its matching
-   threshold. */
-extern s32 sLookOffsetSteps[3];
-extern s32 sLookOffsetLimits[3];
-extern s32 sLookYawSteps[3];
-extern s32 sLookYawLimits[3];
+/* A trigger tile whose value is negative: any tile of the chunk triggers. */
+#define ANY_TILE {{255, 255}}
 
-/* Consumed by DreamSys__ApplyMoveCommand, both indexed by that
-   function's own `arg1` (a mood/day-type selector, range implied by the
-   table sizes below): `sMoveCommandSigns[arg1] * sMoveModeSpeeds[self->moveMode]` forms
-   a signed delta, then `sMoveCommandDispatch[arg1]` is called with it. Index 0 is
-   unused/null in sMoveCommandDispatch (arg1 == 0 returns before reaching any of
-   these, per that function's own guard) -- consistent with sMoveCommandSigns[0]
-   being 0 too. sMoveModeSpeeds is indexed separately by DreamSys::moveMode (its
-   own "Current" value, see that field), not by arg1. */
-extern s32 sMoveModeSpeeds[5];
-extern s8 sMoveCommandSigns[8];
+/* Defined below and named only by the tables: five of DreamSys's slots and
+ * the staircase walks sStaircaseTickFns lists. */
+void DreamSys__SetSoundObj(DreamSys *self, VabStreamObj *value);
+void DreamSys__SetEtcTim(DreamSys *self, struct TimImage *value);
+void DreamSys__SelectLookCallback(DreamSys *self, s32 mode);
+void DreamSys__SelectMoveCallback(DreamSys *self, s32 mode);
+void DreamSys__ProcessChunkChange(DreamSys *self, void *entity, s32 effect);
+s32 DreamSys__TickStaircaseYawPlus90(DreamSys *self);
+s32 DreamSys__TickStaircaseYawMinus135(DreamSys *self);
+s32 DreamSys__TickStaircaseYawPlus45(DreamSys *self);
+s32 DreamSys__TickStaircaseYawMinus90(DreamSys *self);
 
-/* One table of Ratio16[3] entries under two labels:
-   DreamSys__StepLookYaw references its SECOND word (entry 0's yaw
-   numerator, which it overwrites with its own per-tick delta) while
-   DreamSys__ApplyPendingTurn address-takes whole entries. Entry 0 is
-   (0 deg, 45 deg, 0 deg), the 45 being the +-0x2D DreamSys__StepLookYaw
-   writes; entries 1, (0, -6, 0), and 2, (0, +6, 0), are
-   DreamSys::turnCommand's values 1 and 2. */
-extern Ratio16 sTurnRotationYaw[]; /* == &sTurnRotations[0][1] */
-extern Ratio16 sTurnRotations[][3];
+/* DreamSys's data, in address order. A method-table slot whose function is
+ * declared for another class's `self` takes a `void *` cast. */
 
-/* (0 deg, 180 deg, 0 deg). Address-of only, forwarded as SceneNode__UpdateRotation's
-   arg2 with flag 1 (absolute) by DreamSys__ResetSessionState. */
-extern Ratio16 sRotationYaw180[3];
+/* DreamSys's method table, class id 0x1F34: Actor's slots, with DreamSys's
+ * overrides, then its own from +0x0F0. */
+/* clang-format off */
+DreamSysMethods gDreamSysMethods = {
+    /* +0x000 header */ 0x1F34,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ (void *)DreamSys__DreamSys,
+    /* +0x00C finalize */ (void *)SceneNode__Finalize,
+    /* +0x010 addChild */ (void *)Actor__AddChild,
+    /* +0x014 removeChild */ (void *)Actor__RemoveChild,
+    /* +0x018 removeAllChildren */ (void *)Actor__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)SceneNode__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 reset */ DreamSys__ResetSessionState,
+    /* +0x044 updateRotation */ (void *)SceneNode__UpdateRotation,
+    /* +0x048 updateScale */ (void *)SceneNode__UpdateScale,
+    /* +0x04C attachToParent */ (void *)DreamSys__SpawnAtLink,
+    /* +0x050 detachFromParent */ (void *)DreamSys__DetachFromParent,
+    /* +0x054 detachAttachedChildren */ (void *)SceneNode__DetachAttachedChildren,
+    /* +0x058 getNextAttachedChild */ (void *)SceneNode__GetNextAttachedChild,
+    /* +0x05C finalizeHook */ (void *)SceneNode__NoOpFinalizeHook,
+    /* +0x060 setDisplay */ (void *)SceneNode__SetDisplay,
+    /* +0x064 setSemiTransOn */ (void *)SceneNode__SetSemiTrans,
+    /* +0x068 setSemiTransRate */ (void *)SceneNode__SetSemiTransRate,
+    /* +0x06C setLighting */ (void *)SceneNode__SetLighting,
+    /* +0x070 setLightMode */ (void *)SceneNode__SetLightMode,
+    /* +0x074 setLightDim */ (void *)SceneNode__SetLightDim,
+    /* +0x078 setUseZ */ (void *)SceneNode__SetUseZ,
+    /* +0x07C setSubdivision */ (void *)SceneNode__SetSubdivision,
+    /* +0x080 setBackClip */ (void *)SceneNode__SetBackClip,
+    /* +0x084 getRotMatrix */ (void *)SceneNode__GetRotMatrix,
+    /* +0x088 notifyWithHull */ DreamSys__NotifyLinkAttempt,
+    /* +0x08C getModelHull */ (void *)SceneNode__GetModelHull,
+    /* +0x090 transformAndNotifyParents */ (void *)SceneNode__TransformAndNotifyParents,
+    /* +0x094 onPadEvent */ (void *)DreamSys__OnPadEvent,
+    /* +0x098 update */ (void *)DreamSys__TimerTick,
+    /* +0x09C dispatchLinkCommand */ DreamSys__DispatchChunkChange,
+    /* +0x0A0 tryAttachNearby */ (void *)SceneNode__TryAttachNearby,
+    /* +0x0A4 composeAndApplyRotation */ (void *)SceneNode__ComposeAndApplyRotation,
+    /* +0x0A8 checkBoundsOverlap */ (void *)SceneNode__CheckBoundsOverlap,
+    /* +0x0AC raycastHullAgainstFaces */ (void *)SceneNode__RaycastHullAgainstFaces,
+    /* +0x0B0 slotB0 */ NULL,
+    /* +0x0B4 addToActorParents */ (void *)SceneNode__AddToActorParents,
+    /* +0x0B8 setTranslation */ (void *)Actor__SetTranslation,
+    /* +0x0BC addTranslation */ (void *)Actor__AddTranslation,
+    /* +0x0C0 addLocalTranslation */ (void *)Actor__AddLocalTranslation,
+    /* +0x0C4 moveLocalZ */ (void *)Actor__MoveLocalZ,
+    /* +0x0C8 moveLocalX */ (void *)Actor__MoveLocalX,
+    /* +0x0CC moveLocalY */ (void *)Actor__MoveLocalY,
+    /* +0x0D0 moveLocalZOrFindLink */ (void *)Actor__MoveLocalZOrFindLink,
+    /* +0x0D4 moveLocalXOrFindLink */ (void *)Actor__MoveLocalXOrFindLink,
+    /* +0x0D8 slotD8 */ Actor__NoOpSlotD8,
+    /* +0x0DC onActorLinkCommand */ DreamSys__DispatchInstanceEffect,
+    /* +0x0E0 onGridCellLinkCommand */ DreamSys__WallLink,
+    /* +0x0E4 setLastOffsetValue */ (void *)Actor__SetLastOffsetValue,
+    /* +0x0E8 onLinkUpdate */ (void *)DreamSys__OnLinkUpdate,
+    /* +0x0EC setPendingExtra */ (void *)Actor__SetPendingExtra,
+    /* +0x0F0 getSetFlashbackSession */ DreamSys__GetSetFlashbackSession,
+    /* +0x0F4 setMoveOverride */ DreamSys__SetMoveOverride,
+    /* +0x0F8 resetLinkState */ DreamSys__ResetLinkState,
+    /* +0x0FC blockMovement */ DreamSys__BlockMovement,
+    /* +0x100 getLinkCommandFlag */ DreamSys__GetLinkCommandFlag,
+    /* +0x104 getSetDreamTimeLimit */ DreamSys__GetSetDreamTimeLimit,
+    /* +0x108 getDreamTimerScaled */ DreamSys__GetDreamTimerScaled,
+    /* +0x10C setSoundObj */ DreamSys__SetSoundObj,
+    /* +0x110 setViewport */ DreamSys__SetViewport,
+    /* +0x114 setEtcTim */ DreamSys__SetEtcTim,
+    /* +0x118 updateTickState */ DreamSys__UpdateTickState,
+    /* +0x11C runTickCallbacks */ DreamSys__RunTickCallbacks,
+    /* +0x120 projectPointAtDistance */ DreamSys__ProjectPointAtDistance,
+    /* +0x124 clearUnusedFlag7C */ DreamSys__ClearUnusedFlag7C,
+    /* +0x128 clearUnusedFlag78 */ DreamSys__ClearUnusedFlag78,
+    /* +0x12C beforeMoveCommand */ DreamSys__BeforeMoveCommand,
+    /* +0x130 clearTickCallbacks */ DreamSys__ClearTickCallbacks,
+    /* +0x134 setTickCallbacks */ DreamSys__SetTickCallbacks,
+    /* +0x138 selectLookCallback */ DreamSys__SelectLookCallback,
+    /* +0x13C selectMoveCallback */ DreamSys__SelectMoveCallback,
+    /* +0x140 stepLook */ DreamSys__StepLook,
+    /* +0x144 stepLookOffset */ DreamSys__StepLookOffset,
+    /* +0x148 stepLookYaw */ DreamSys__StepLookYaw,
+    /* +0x14C noOpLook2 */ (void *)DreamSys__NoOpLook2,
+    /* +0x150 noOpLook3 */ (void *)DreamSys__NoOpLook3,
+    /* +0x154 tickMove */ DreamSys__TickMove,
+    /* +0x158 tickMoveFree */ DreamSys__TickMoveFree,
+    /* +0x15C tickMoveForced */ DreamSys__TickMoveForced,
+    /* +0x160 tickMoveHeld */ DreamSys__TickMoveHeld,
+    /* +0x164 advanceMoveCycle */ DreamSys__AdvanceMoveCycle,
+    /* +0x168 startVoice */ DreamSys__StartVoice,
+    /* +0x16C stopVoice */ DreamSys__StopVoice,
+    /* +0x170 applyMoveCommand */ DreamSys__ApplyMoveCommand,
+    /* +0x174 applyPendingTurn */ DreamSys__ApplyPendingTurn,
+    /* +0x178 tickDrift */ DreamSys__TickDrift,
+    /* +0x17C stopDrift */ DreamSys__StopDrift,
+    /* +0x180 getSetMoveMode */ DreamSys__GetSetMoveMode,
+    /* +0x184 changeMoveMode */ DreamSys__ChangeMoveMode,
+    /* +0x188 restorePreviousMoveMode */ DreamSys__RestorePreviousMoveMode,
+    /* +0x18C setGateFlags */ DreamSys__SetGateFlags,
+    /* +0x190 setTickPeriod */ DreamSys__SetTickPeriod,
+    /* +0x194 soundCueCallback */ DreamSys__SoundCueCallback,
+    /* +0x198 initNewGame */ DreamSys__InitNewGame,
+    /* +0x19C getSetScreenShake */ DreamSys__GetSetScreenShake,
+    /* +0x1A0 getCurrentDayAndYear */ DreamSys__GetCurrentDayAndYear,
+    /* +0x1A4 advanceDay */ DreamSys__AdvanceDay,
+    /* +0x1A8 clearNewGameFlag */ DreamSys__ClearNewGameFlag,
+    /* +0x1AC getNewGameFlag */ DreamSys__GetNewGameFlag,
+    /* +0x1B0 getSaveBlock */ DreamSys__GetSaveBlock,
+    /* +0x1B4 startDay */ DreamSys__StartDay,
+    /* +0x1B8 endDay */ DreamSys__EndDay,
+    /* +0x1BC getCinematic */ DreamSys__GetCinematic,
+    /* +0x1C0 initSpawnLoc */ DreamSys__InitSpawnLoc,
+    /* +0x1C4 dynamicLink */ DreamSys__DynamicLink,
+    /* +0x1C8 staticWallLink */ DreamSys__StaticWallLink,
+    /* +0x1CC loadNextFlashback */ DreamSys__LoadNextFlashback,
+    /* +0x1D0 tryTunnelLink */ DreamSys__TryTunnelLink,
+    /* +0x1D4 tryStageTimerLink */ DreamSys__TryStageTimerLink,
+    /* +0x1D8 tryInstantTeleportLink */ DreamSys__TryInstantTeleportLink,
+    /* +0x1DC tryStaircaseLink */ DreamSys__TryStaircaseLink,
+    /* +0x1E0 getCurrentStage */ DreamSys__GetCurrentStage,
+    /* +0x1E4 processChunkChange */ DreamSys__ProcessChunkChange,
+    /* +0x1E8 instanceEffectsOnJournal */ DreamSys__InstanceEffectsOnJournal,
+    /* +0x1EC getPreviousDayMood */ DreamSys__GetPreviousDayMood,
+    /* +0x1F0 initMoodContributors */ DreamSys__InitMoodContributors,
+    /* +0x1F4 logChunkMood */ DreamSys__LogChunkMood,
+    /* +0x1F8 logInstanceMood */ DreamSys__LogInstanceMood,
+    /* +0x1FC updateDreamChart */ DreamSys__UpdateDreamChart,
+    /* +0x200 getDreamColor */ DreamSys__GetDreamColor,
+    /* +0x204 clearMoodGraph */ DreamSys__ClearMoodGraph,
+    /* +0x208 logMood */ DreamSys__LogMood,
+    /* +0x20C getMoodAverage */ DreamSys__GetMoodAverage,
+    /* +0x210 calcUnlockScore */ DreamSys__CalcUnlockScore,
+    /* +0x214 addFlashback */ DreamSys__AddFlashback,
+    /* +0x218 flashbackSaving */ DreamSys__FlashbackSaving,
+    /* +0x21C resetFlashbackList */ DreamSys__ResetFlashbackList,
+    /* +0x220 saveLinkSnapshot */ DreamSys__SaveLinkSnapshot,
+    /* +0x224 restoreLinkSnapshot */ DreamSys__RestoreLinkSnapshot,
+    /* +0x228 getSetConfigOption */ DreamSys__GetSetConfigOption,
+};
+/* clang-format on */
+
+/* clang-format off */
+/* (0, 180, 0) degrees: DreamSys__ResetSessionState's absolute
+ * updateRotation. */
+Ratio16 sRotationYaw180[3] = {{0, 1}, {180, 1}, {0, 1}};
+
+/* CalcDreamColor's 3 x 3 table, [dynamicClass][upperClass], each axis
+ * classed 0..2 first. */
+s8 sDreamColorTable[9] = {6, 7, 2, 4, 7, 1, 3, 0, 5};
+
+/* DreamSys__ApplyMoveCommand's tables: sMoveCommandSigns[command] times
+ * sMoveModeSpeeds[moveMode] is the signed step, and
+ * sMoveCommandDispatch[command] (Actor +0x0D0/+0x0D4) takes it. Command 0
+ * returns before reaching them. */
+s32 sMoveModeSpeeds[5] = {0, 24, 64, 128, 384};
+s8 sMoveCommandSigns[8] = {0, 1, -1, -1, 1, 0, 0, 0};
+void (*sMoveCommandDispatch[5])(DreamSys *self, s32 val, void *extra) = {
+    NULL, (void *)Actor__MoveLocalZOrFindLink, (void *)Actor__MoveLocalZOrFindLink,
+    (void *)Actor__MoveLocalXOrFindLink, (void *)Actor__MoveLocalXOrFindLink,
+};
+
+/* The look steps and their limits: DreamSys__StepLookOffset's, indexed by
+ * lookOffsetCommand, and DreamSys__StepLookYaw's, by lookYawCommand. Index 0
+ * is unused; 1 and 2 are the negative and positive step. */
+s32 sLookOffsetSteps[3] = {0, -600, 600};
+s32 sLookOffsetLimits[3] = {0, 9000, 9000};
+s32 sLookYawSteps[3] = {0, -45, 45};
+s32 sLookYawLimits[3] = {0, 181, 181};
+
+/* The relative turns: row 0 is StepLookYaw's, whose yaw numerator it
+ * overwrites with its step before each use; rows 1 and 2, (0, -6, 0) and
+ * (0, 6, 0), are DreamSys__ApplyPendingTurn's for turnCommand 1 and 2. */
+Ratio16 sTurnRotations[3][3] = {
+    {{0, 1}, {45, 1}, {0, 1}},
+    {{0, 1}, {-6, 1}, {0, 1}},
+    {{0, 1}, {6, 1}, {0, 1}},
+};
 
 /* DreamSys__TickDrift's per-tick addTranslation (+0x0BC) step. */
-extern LongVec3 sDriftStep;
+LongVec3 sDriftStep = {0, 512, 0};
+
+/* Indexed by voiceSelect (0..0x17, DreamSys__NotifyLinkAttempt bounds
+ * it): DreamSys__StartVoice plays program sVoiceBySelect[voiceSelect] at
+ * octave offset sVoicePitchBySelect[voiceSelect]. */
+s8 sVoiceBySelect[0x18] = {0, 3, 29, 18, 25, 18, 28, 29, 3, 30, 30, 3, 3, 21, 16, 16, 10, 28, 18, 6, 13, 19, 12, 30};
+s8 sVoicePitchBySelect[0x18] = {0, 0, -1, -2, 2, -1, 0, 0, -1, 0, 0, -1, 1, 0, 2, -2, 2, 2, -1, 1, 2, 2, 1, -2};
+
+/* DreamSys__ProjectPointAtDistance's local offset (0, 0, dist): it writes
+ * z and hands the vector to SceneNode__LocalOffsetToWorldPos. */
+LongVec3 sProjectOffset = {0, 0, 0};
+
+/* The staircase walks, indexed by GetLastSpawnExtra() and stored in
+ * staircaseTickFn by DreamSys__TryStaircaseLink. */
+s32 (*sStaircaseTickFns[4])(DreamSys *self) = {
+    DreamSys__TickStaircaseYawPlus90, DreamSys__TickStaircaseYawMinus135,
+    DreamSys__TickStaircaseYawPlus45, DreamSys__TickStaircaseYawMinus90,
+};
+
+/* (0, +45, 0) and (0, -45, 0) degrees: the staircase walks' relative
+ * updateRotation. */
+Ratio16 sRotationYawPlus45[3] = {{0, 1}, {45, 1}, {0, 1}};
+Ratio16 sRotationYawMinus45[3] = {{0, 1}, {-45, 1}, {0, 1}};
+
+/* Each stage's time limit, TryStageTimerLink's. */
+s16 sStageTimeLimits[STAGE_COUNT] = {240, 180, 480, 420, 120, 600, 60, 300, 240, 300, 240, 180, 120, 480};
+
+/* The positions relative to a tile a spawn lands at, by
+ * StageSpawn::adjustment. */
+struct RelativePos sSpawnPosAdjust[37] = {
+    /*  0 */ {0, 0, 0},
+    /*  1 */ {0, -2048, 0},
+    /*  2 */ {0, -4096, 0},
+    /*  3 */ {0, -6144, 0},
+    /*  4 */ {0, -8192, 0},
+    /*  5 */ {0, -512, 0},
+    /*  6 */ {0, -1024, 0},
+    /*  7 */ {0, -1536, 0},
+    /*  8 */ {0, -3072, 0},
+    /*  9 */ {0, -10240, 0},
+    /* 10 */ {0, -2048, 0},
+    /* 11 */ {-1024, 512, 0},
+    /* 12 */ {1024, 0, 0},
+    /* 13 */ {1024, 0, 1024},
+    /* 14 */ {-1024, 0, 1024},
+    /* 15 */ {-256, 0, 0},
+    /* 16 */ {0, -380, 0},
+    /* 17 */ {0, -700, 0},
+    /* 18 */ {-256, 0, 1024},
+    /* 19 */ {-256, 0, 128},
+    /* 20 */ {0, 0, -1024},
+    /* 21 */ {0, -768, 0},
+    /* 22 */ {-896, -7311, -393},
+    /* 23 */ {0, 0, 256},
+    /* 24 */ {512, 0, 160},
+    /* 25 */ {0, -2048, 1280},
+    /* 26 */ {0, -4096, 1280},
+    /* 27 */ {0, -6144, 1280},
+    /* 28 */ {0, -8192, 1024},
+    /* 29 */ {0, -256, 0},
+    /* 30 */ {0, -2489, 0},
+    /* 31 */ {0, 3728, 0},
+    /* 32 */ {0, 512, 0},
+    /* 33 */ {0, -4800, 0},
+    /* 34 */ {0, 1024, 0},
+    /* 35 */ {0, 2048, 0},
+    /* 36 */ {0, -14336, 0},
+};
+
+/* Each stage's spawn points, GenerateInitialSpawn's and
+ * GetRandomSpawnFromStage's: a chunk, a tile in it, an sSpawnPosAdjust
+ * index and the extra byte. */
+StageSpawn sStg00SpawnPoints[8] = {
+    /* chunk      tile     adj extra */
+    {{ 0,  0}, { 6,  3},  0,  0},
+    {{ 0,  0}, { 1,  8},  0,  0},
+    {{ 0,  0}, { 6,  8},  0,  0},
+    {{ 0,  1}, { 7,  9},  1,  0},
+    {{ 0,  2}, { 5,  8},  2,  0},
+    {{ 0,  3}, { 7,  9},  3,  0},
+    {{ 0,  3}, { 4,  8},  3,  0},
+    {{ 0,  4}, { 4,  8},  4,  0},
+};
+StageSpawn sStg01SpawnPoints[3] = {
+    /* chunk      tile     adj extra */
+    {{ 2,  1}, {12,  9},  0,  0},
+    {{ 1,  0}, {12, 14},  0,  0},
+    {{ 1,  1}, {18, 15},  0,  0},
+};
+StageSpawn sStg02SpawnPoints[30] = {
+    /* chunk      tile     adj extra */
+    {{ 0,  1}, {19,  0},  0,  0},
+    {{ 1,  0}, {18,  4},  0,  0},
+    {{ 2,  0}, {11, 16},  0,  0},
+    {{ 4,  0}, { 4,  8},  0,  0},
+    {{ 1,  1}, {11, 14},  0,  0},
+    {{ 2,  1}, {11, 19},  0,  0},
+    {{ 2,  1}, { 4, 14},  0,  0},
+    {{ 3,  1}, {18,  9},  0,  0},
+    {{ 4,  1}, {18, 19},  0,  0},
+    {{ 0,  2}, {15,  6},  0,  0},
+    {{ 1,  2}, {15, 12},  0,  0},
+    {{ 2,  2}, {11, 19},  0,  0},
+    {{ 2,  2}, {16, 11},  0,  0},
+    {{ 3,  2}, {14,  6},  0,  0},
+    {{ 5,  2}, { 2,  7},  0,  0},
+    {{ 0,  3}, {13, 19},  0,  0},
+    {{ 1,  3}, {19,  1}, 29,  0},
+    {{ 2,  3}, { 2, 19}, 29,  0},
+    {{ 3,  3}, {13,  3},  0,  0},
+    {{ 3,  3}, { 7,  8},  0,  0},
+    {{ 0,  4}, {10, 13}, 29,  0},
+    {{ 2,  4}, {11,  6},  0,  0},
+    {{ 3,  4}, {14,  8},  0,  0},
+    {{ 4,  4}, {14,  8},  0,  0},
+    {{ 4,  4}, {13,  0},  0,  0},
+    {{ 2,  5}, {16, 13},  0,  0},
+    {{ 3,  5}, { 1, 16},  0,  0},
+    {{ 4,  5}, { 6,  0},  6,  0},
+    {{ 1,  2}, {12, 19}, 29,  0},
+    {{ 4,  0}, { 2, 19},  0,  0},
+};
+StageSpawn sStg03SpawnPoints[123] = {
+    /* chunk      tile     adj extra */
+    {{ 2,  0}, { 9,  9},  0,  0},
+    {{ 3,  0}, { 6, 10},  0,  0},
+    {{ 6,  0}, {13, 13},  1,  0},
+    {{13,  0}, { 3, 16},  5,  0},
+    {{ 4,  1}, { 9,  1},  0,  0},
+    {{ 5,  1}, {10,  9},  1,  0},
+    {{ 6,  1}, {16, 19},  0,  0},
+    {{ 7,  1}, { 6, 15},  0,  0},
+    {{10,  1}, { 7, 18},  6,  0},
+    {{11,  1}, { 7,  0},  0,  0},
+    {{ 5,  2}, { 8, 18},  0,  0},
+    {{ 6,  2}, { 9, 12},  0,  0},
+    {{ 7,  2}, { 0, 19},  0,  0},
+    {{ 8,  2}, {15, 13},  0,  0},
+    {{12,  2}, { 7,  5},  0,  0},
+    {{14,  2}, { 5, 10}, 30,  0},
+    {{ 3,  3}, {19, 10},  0,  0},
+    {{ 4,  3}, {12, 10},  0,  0},
+    {{ 5,  3}, {19, 19},  0,  0},
+    {{ 7,  3}, { 4, 12}, 30,  0},
+    {{ 8,  3}, { 5,  5},  0,  0},
+    {{ 9,  3}, {15,  6},  0,  0},
+    {{10,  3}, { 9, 19},  0,  0},
+    {{11,  3}, { 9, 16},  0,  0},
+    {{12,  3}, {15, 12},  1,  0},
+    {{13,  3}, { 0, 10},  6,  0},
+    {{15,  3}, { 6, 16},  0,  0},
+    {{ 4,  4}, { 7,  4},  0,  0},
+    {{ 5,  4}, { 2,  0},  0,  0},
+    {{ 6,  4}, { 8,  0},  0,  0},
+    {{ 7,  4}, {14,  6},  0,  0},
+    {{ 8,  4}, {17, 17},  0,  0},
+    {{ 9,  4}, { 0,  5},  0,  0},
+    {{10,  4}, { 9, 13},  0,  0},
+    {{11,  4}, {19, 19},  0,  0},
+    {{12,  4}, { 4,  0},  0,  0},
+    {{13,  4}, {15, 14},  7,  0},
+    {{ 1,  5}, {16, 15},  0,  0},
+    {{ 2,  5}, {13, 16},  6,  0},
+    {{ 3,  5}, { 8, 15},  6,  0},
+    {{ 4,  5}, { 3, 18},  0,  0},
+    {{ 5,  5}, { 8, 12},  5,  0},
+    {{ 7,  5}, {15,  8},  0,  0},
+    {{ 8,  5}, {13, 10},  1,  0},
+    {{ 9,  5}, {14, 19},  0,  0},
+    {{11,  5}, {19, 18},  2,  0},
+    {{12,  5}, { 4, 14},  2,  0},
+    {{14,  5}, { 8,  6},  0,  0},
+    {{ 2,  6}, {10,  8},  0,  0},
+    {{ 3,  6}, {13, 13},  0,  0},
+    {{ 4,  6}, {16,  4},  0,  0},
+    {{ 6,  6}, { 9, 10},  6,  0},
+    {{ 8,  6}, {13, 14},  0,  0},
+    {{ 9,  6}, { 7,  4}, 31,  0},
+    {{10,  6}, { 1,  5},  0,  0},
+    {{11,  6}, {18, 12},  2,  0},
+    {{12,  6}, { 2,  7},  2,  0},
+    {{14,  6}, {10, 11},  0,  0},
+    {{ 2,  7}, {11,  8},  0,  0},
+    {{ 3,  7}, {10,  0},  0,  0},
+    {{ 4,  7}, {12, 16},  0,  0},
+    {{ 5,  7}, { 3,  9},  0,  0},
+    {{ 6,  7}, {19,  1},  0,  0},
+    {{ 7,  7}, { 6, 15},  0,  0},
+    {{ 8,  7}, {16,  2},  0,  0},
+    {{ 9,  7}, { 9, 15},  5,  0},
+    {{10,  7}, {13,  4},  0,  0},
+    {{11,  7}, {11, 15},  0,  0},
+    {{12,  7}, { 6,  9},  0,  0},
+    {{13,  7}, {11, 12},  0,  0},
+    {{14,  7}, { 6, 19},  0,  0},
+    {{ 2,  8}, { 1,  7},  0,  0},
+    {{ 3,  8}, { 2,  1},  0,  0},
+    {{ 4,  8}, {13, 12},  0,  0},
+    {{ 6,  8}, { 3,  5},  0,  0},
+    {{ 9,  8}, { 1, 11},  0,  0},
+    {{10,  8}, {18, 14},  0,  0},
+    {{ 2,  9}, {13,  7},  0,  0},
+    {{ 4,  9}, {11, 13},  0,  0},
+    {{ 5,  9}, { 1,  3},  0,  0},
+    {{ 6,  9}, {12,  3},  0,  0},
+    {{ 7,  9}, {17, 19},  0,  0},
+    {{10,  9}, {18, 12},  0,  0},
+    {{ 1, 10}, {19, 19},  0,  0},
+    {{ 3, 10}, {19, 13},  0,  0},
+    {{ 4, 10}, { 5, 15},  0,  0},
+    {{ 5, 10}, {10, 13},  0,  0},
+    {{ 9, 10}, { 4, 12},  0,  0},
+    {{10, 10}, { 9,  5},  0,  0},
+    {{11, 10}, { 7, 17},  0,  0},
+    {{ 1, 11}, {13, 10}, 32,  0},
+    {{ 2, 11}, {16,  3},  0,  0},
+    {{ 4, 11}, { 8, 11},  7,  0},
+    {{ 5, 11}, { 5, 12},  0,  0},
+    {{ 7, 11}, { 2, 19},  0,  0},
+    {{11, 11}, { 7, 11},  0,  0},
+    {{ 1, 12}, {19, 11},  0,  0},
+    {{ 2, 12}, {19, 19},  0,  0},
+    {{ 3, 12}, { 1, 19},  0,  0},
+    {{ 4, 12}, { 9, 18},  0,  0},
+    {{ 5, 12}, { 8, 18},  0,  0},
+    {{ 6, 12}, {13, 11},  3,  0},
+    {{ 6, 12}, { 5,  7},  0,  0},
+    {{ 9, 12}, {11, 17},  0,  0},
+    {{10, 12}, { 8,  6},  0,  0},
+    {{ 2, 13}, { 9, 12},  0,  0},
+    {{ 3, 13}, {15, 14},  0,  0},
+    {{ 4, 13}, { 9,  1},  0,  0},
+    {{ 5, 13}, {12, 11},  2,  0},
+    {{ 6, 13}, {10, 10},  1,  0},
+    {{ 7, 13}, {15,  1},  8,  0},
+    {{ 8, 13}, { 9,  9},  1,  0},
+    {{ 9, 13}, {16, 17},  0,  0},
+    {{10, 13}, { 1,  0},  0,  0},
+    {{11, 13}, {17,  7},  0,  0},
+    {{13, 13}, {15, 18},  0,  0},
+    {{14, 13}, { 9,  6},  0,  0},
+    {{ 4, 14}, {12,  5},  1,  0},
+    {{ 6, 14}, { 4, 13},  0,  0},
+    {{ 9, 14}, {14,  8},  0,  0},
+    {{13, 14}, {15, 12},  0,  0},
+    {{14, 15}, { 5,  6},  0,  0},
+    {{ 9,  4}, { 8, 11}, 21,  0},
+};
+StageSpawn sStg04SpawnPoints[20] = {
+    /* chunk      tile     adj extra */
+    {{ 0,  0}, { 2,  3},  0,  0},
+    {{ 1,  0}, {10, 19},  0,  0},
+    {{ 2,  0}, { 3, 15},  0,  0},
+    {{ 4,  0}, {15, 19},  0,  0},
+    {{ 1,  1}, {10, 16},  6,  0},
+    {{ 3,  1}, { 0,  3},  0,  0},
+    {{ 4,  1}, {12, 14},  0,  0},
+    {{ 1,  2}, { 4,  9},  0,  0},
+    {{ 2,  2}, {10,  8}, 34,  0},
+    {{ 3,  2}, { 9,  2},  0,  0},
+    {{ 4,  2}, { 9,  8},  0,  0},
+    {{ 0,  3}, {14,  8},  0,  0},
+    {{ 1,  3}, {10, 11},  0,  0},
+    {{ 2,  3}, { 5, 11},  0,  0},
+    {{ 5,  3}, { 5,  9}, 16,  0},
+    {{ 0,  4}, { 2,  8},  0,  0},
+    {{ 1,  4}, {16, 16},  0,  0},
+    {{ 2,  4}, {13,  1},  0,  0},
+    {{ 3,  4}, { 0, 11},  0,  0},
+    {{ 4,  4}, { 4,  5},  0,  0},
+};
+StageSpawn sStg05SpawnPoints[21] = {
+    /* chunk      tile     adj extra */
+    {{ 0,  0}, {18, 10},  1,  0},
+    {{ 1,  0}, {16, 12},  0,  0},
+    {{ 2,  0}, { 9, 16},  0,  0},
+    {{ 3,  0}, {19, 19},  0,  0},
+    {{ 1,  1}, {16, 18},  0,  0},
+    {{ 2,  1}, { 2, 19},  0,  0},
+    {{ 4,  1}, { 0, 14},  5,  0},
+    {{ 0,  2}, {19, 19},  1,  0},
+    {{ 1,  2}, {14, 10},  5,  0},
+    {{ 3,  2}, { 9,  2},  0,  0},
+    {{ 1,  3}, {10, 12}, 32,  0},
+    {{ 3,  3}, { 3, 14},  0,  0},
+    {{ 4,  3}, { 5, 18},  0,  0},
+    {{ 1,  4}, {10, 19},  0,  0},
+    {{ 2,  4}, { 9,  5},  0,  0},
+    {{ 3,  4}, {11, 17},  0,  0},
+    {{ 4,  4}, { 4,  9},  0,  0},
+    {{ 2,  5}, { 2,  4},  0,  0},
+    {{ 3,  5}, { 9,  2},  6,  0},
+    {{ 4,  1}, { 0, 14}, 32,  0},
+    {{ 3,  1}, {18, 16}, 36,  0},
+};
+StageSpawn sStg06SpawnPoints[2] = {
+    {{ 0,  0}, { 8,  7},  0,  0},
+    {{ 0,  5}, { 9,  6},  9,  0},
+};
+StageSpawn sStg07SpawnPoints[5] = {
+    /* chunk      tile     adj extra */
+    {{ 0,  0}, { 6, 13},  0,  0},
+    {{ 1,  0}, {10,  8},  0,  0},
+    {{ 2,  0}, {18, 12},  0,  0},
+    {{ 3,  0}, {12, 13}, 32,  0},
+    {{ 4,  0}, { 5, 10},  0,  0},
+};
+StageSpawn sStg08SpawnPoints[3] = {
+    /* chunk      tile     adj extra */
+    {{ 0,  0}, { 9,  2},  0,  0},
+    {{ 0,  1}, {18, 12},  0,  0},
+    {{ 0,  2}, {10,  5},  0,  0},
+};
+StageSpawn sStg09SpawnPoints[4] = {
+    /* chunk      tile     adj extra */
+    {{ 0,  0}, { 3, 17},  0,  0},
+    {{ 0,  1}, {13,  2},  0,  0},
+    {{ 0,  1}, {13,  8}, 34,  0},
+    {{ 0,  0}, { 4, 12}, 35,  0},
+};
+StageSpawn sStg10SpawnPoints[5] = {
+    /* chunk      tile     adj extra */
+    {{ 0,  0}, { 1,  9},  0,  0},
+    {{ 1,  0}, { 6,  9},  0,  0},
+    {{ 2,  0}, {10,  9},  0,  0},
+    {{ 2,  0}, {14, 10}, 34,  0},
+    {{ 1,  0}, { 6,  9},  5,  0},
+};
+StageSpawn sStg11SpawnPoints[4] = {
+    /* chunk      tile     adj extra */
+    {{ 2,  1}, { 8,  9},  0,  0},
+    {{ 1,  1}, { 9,  8},  0,  0},
+    {{ 2,  1}, { 8,  9}, 34,  0},
+    {{ 3,  1}, { 1,  8},  6,  0},
+};
+StageSpawn sStg12SpawnPoints[8] = {
+    /* chunk      tile     adj extra */
+    {{ 1,  1}, { 9,  5},  0,  0},
+    {{ 2,  1}, { 4, 10},  6,  0},
+    {{ 0,  2}, {16,  6},  6,  0},
+    {{ 1,  2}, { 9,  8},  6,  0},
+    {{ 2,  2}, { 6,  9},  0,  0},
+    {{ 1,  3}, { 4, 10},  6,  0},
+    {{ 2,  3}, { 8, 17},  0,  0},
+    {{ 1,  2}, { 9,  8}, 10,  0},
+};
+StageSpawn sStg13SpawnPoints[3] = {
+    /* chunk      tile     adj extra */
+    {{ 0,  0}, { 9,  7},  0,  0},
+    {{ 0,  1}, {14, 16},  0,  0},
+    {{ 1,  1}, { 0,  1},  0,  0},
+};
+StageSpawn *sStageSpawnPoints[STAGE_COUNT] = {
+    sStg00SpawnPoints, sStg01SpawnPoints, sStg02SpawnPoints, sStg03SpawnPoints,
+    sStg04SpawnPoints, sStg05SpawnPoints, sStg06SpawnPoints, sStg07SpawnPoints,
+    sStg08SpawnPoints, sStg09SpawnPoints, sStg10SpawnPoints, sStg11SpawnPoints,
+    sStg12SpawnPoints, sStg13SpawnPoints,
+};
+
+/* MATCHING: u8; as s8, GenerateInitialSpawn's loop guard gains a `blez` retail does not have. */
+u8 sStageSpawnPointsCount[STAGE_COUNT] = {8, 3, 30, 123, 20, 21, 2, 5, 3, 4, 5, 4, 8, 3};
+
+/* The fixed links, TestForStaticLink's GetStaticSpawn tables: per stage,
+ * the spawns, then the triggers (a chunk, a tile or ANY_TILE, and the
+ * destination stage and spawn), then their counts. The same shape serves
+ * the tunnels, teleporters and staircases below. */
+StageSpawn sStg00PermalinkSpawns[3] = {
+    /* chunk      tile     adj extra */
+    {{ 0,  2}, { 4,  9},  2,  0},
+    {{ 0,  2}, { 7,  9},  2,  1},
+    {{ 0,  2}, { 6,  9},  2,  2},
+};
+StageSpawn sStg02PermalinkSpawns[2] = {
+    {{ 4,  3}, { 8, 14},  0,  3},
+    {{ 3,  1}, { 2, 19},  0,  4},
+};
+StageSpawn sStg03PermalinkSpawns[2] = {
+    {{ 6,  4}, { 2,  3},  0,  5},
+    {{ 7, 13}, {10,  9}, 22,  6},
+};
+StageSpawn sStg04PermalinkSpawns[1] = {
+    {{ 5,  3}, {11,  9}, 16,  7},
+};
+StageSpawn sStg05PermalinkSpawns[1] = {
+    {{ 1,  3}, {17, 10},  0,  8},
+};
+StageSpawn sStg06PermalinkSpawns[1] = {
+    {{ 0,  0}, { 8,  7},  0,  9},
+};
+StageSpawn sStg09PermalinkSpawns[1] = {
+    {{ 0,  0}, { 3, 17},  0, 10},
+};
+StageSpawn sStg10PermalinkSpawns[1] = {
+    {{ 0,  0}, {11,  9},  0, 11},
+};
+StageSpawn sStg11PermalinkSpawns[1] = {
+    {{ 1,  1}, { 9,  9},  0, 12},
+};
+StageSpawn sStg12PermalinkSpawns[1] = {
+    {{ 1,  2}, {10, 12},  0, 13},
+};
+StageSpawn *sStagePermalinkSpawns[STAGE_COUNT] = {
+    sStg00PermalinkSpawns, NULL, sStg02PermalinkSpawns, sStg03PermalinkSpawns,
+    sStg04PermalinkSpawns, sStg05PermalinkSpawns, sStg06PermalinkSpawns, NULL,
+    NULL, sStg09PermalinkSpawns, sStg10PermalinkSpawns, sStg11PermalinkSpawns,
+    sStg12PermalinkSpawns, NULL,
+};
+StaticLinkTrigger sStg00PermalinkTriggers[3] = {
+    /* chunk      tile      stage spawn */
+    {{ 0,  2}, {{  4,   9}}, 10,  0},
+    {{ 0,  2}, {{  7,   8}},  2,  0},
+    {{ 0,  2}, {{  6,   8}},  3,  0},
+};
+StaticLinkTrigger sStg02PermalinkTriggers[2] = {
+    {{ 2,  1}, ANY_TILE,  6,  0},
+    {{ 5,  3}, {{  2,   8}},  0,  1},
+};
+StaticLinkTrigger sStg03PermalinkTriggers[1] = {
+    {{ 6,  4}, {{  1,   2}},  0,  2},
+};
+StaticLinkTrigger sStg04PermalinkTriggers[4] = {
+    /* chunk      tile      stage spawn */
+    {{ 2,  1}, ANY_TILE, 11,  0},
+    {{ 3,  1}, ANY_TILE, 11,  0},
+    {{ 4,  1}, ANY_TILE, 11,  0},
+    {{ 4,  2}, ANY_TILE, 11,  0},
+};
+StaticLinkTrigger sStg05PermalinkTriggers[2] = {
+    {{ 1,  3}, ANY_TILE,  9,  0},
+    {{ 2,  3}, ANY_TILE,  9,  0},
+};
+StaticLinkTrigger sStg06PermalinkTriggers[1] = {
+    {{ 0,  5}, {{  5,   5}},  2,  1},
+};
+StaticLinkTrigger sStg09PermalinkTriggers[1] = {
+    {{ 0,  1}, {{ 13,  14}},  5,  0},
+};
+StaticLinkTrigger sStg10PermalinkTriggers[1] = {
+    {{ 0,  0}, {{  0,  10}},  0,  0},
+};
+StaticLinkTrigger sStg11PermalinkTriggers[1] = {
+    {{ 1,  1}, {{  9,   9}},  4,  0},
+};
+StaticLinkTrigger sStg12PermalinkTriggers[1] = {
+    {{ 1,  2}, {{ 10,  14}},  3,  1},
+};
+StaticLinkTrigger *sStagePermalinkTriggers[STAGE_COUNT] = {
+    sStg00PermalinkTriggers, NULL, sStg02PermalinkTriggers, sStg03PermalinkTriggers,
+    sStg04PermalinkTriggers, sStg05PermalinkTriggers, sStg06PermalinkTriggers, NULL,
+    NULL, sStg09PermalinkTriggers, sStg10PermalinkTriggers, sStg11PermalinkTriggers,
+    sStg12PermalinkTriggers, NULL,
+};
+s8 sStagePermalinkTriggersCount[STAGE_COUNT] = {3, 0, 2, 1, 4, 2, 1, 0, 0, 1, 1, 1, 1, 0};
+
+/* The four cardinal rotations, yaw 0, 90, 180 and 270 degrees.
+ * CheckTunnelHeading and CheckStaircaseHeading store an entry's address in
+ * enterRotation / exitRotation, which SetMoveOverride, SpawnAtLink and
+ * TryStaircaseLink apply. */
+Ratio16 sCardinalRotations[4][3] = {
+    {{0, 1}, {0, 1}, {0, 1}},
+    {{0, 1}, {90, 1}, {0, 1}},
+    {{0, 1}, {180, 1}, {0, 1}},
+    {{0, 1}, {270, 1}, {0, 1}},
+};
+
+/* The tunnels, TestForTunnelLinks' tables, with a heading per spawn and per
+ * trigger (an sCardinalRotations index): the player must face the
+ * trigger's to take the tunnel (DreamSys__CheckTunnelHeading) and leaves
+ * facing the spawn's. */
+StageSpawn sStg00TunnelSpawns[1] = {
+    {{ 0,  0}, { 8,  0}, 15, 14},
+};
+u8 sStg00TunnelExitHeadings[1] = {0};
+StageSpawn sStg01TunnelSpawns[2] = {
+    {{ 1,  0}, { 8,  0}, 18, 15},
+    {{ 1,  1}, {18, 19}, 20, 16},
+};
+u8 sStg01TunnelExitHeadings[2] = {0, 2};
+StageSpawn sStg02TunnelSpawns[3] = {
+    /* chunk      tile     adj extra */
+    {{ 2,  0}, {10,  0}, 19, 17},
+    {{ 3,  5}, {18, 17},  0, 18},
+    {{ 4,  2}, { 8,  6}, 12, 19},
+};
+u8 sStg02TunnelExitHeadings[3] = {0, 3, 2};
+StageSpawn sStg03TunnelSpawns[5] = {
+    /* chunk      tile     adj extra */
+    {{ 7,  8}, { 8,  6}, 12, 20},
+    {{ 3,  9}, { 8,  6}, 12, 21},
+    {{13,  6}, { 9,  6}, 12, 22},
+    {{11, 12}, { 8,  6}, 12, 23},
+    {{ 3,  4}, { 7,  6}, 12, 24},
+};
+u8 sStg03TunnelExitHeadings[5] = {2, 2, 2, 2, 2};
+StageSpawn sStg04TunnelSpawns[1] = {
+    {{ 2,  0}, { 9,  0}, 23, 25},
+};
+u8 sStg04TunnelExitHeadings[1] = {0};
+StageSpawn sStg05TunnelSpawns[1] = {
+    {{ 2,  0}, { 8,  0}, 24, 26},
+};
+u8 sStg05TunnelExitHeadings[1] = {0};
+StageSpawn sStg07TunnelSpawns[1] = {
+    {{ 0,  0}, { 9,  0}, 23, 27},
+};
+u8 sStg07TunnelExitHeadings[1] = {0};
+StageSpawn sStg08TunnelSpawns[1] = {
+    {{ 0,  0}, { 9,  0}, 23, 28},
+};
+u8 sStg08TunnelExitHeadings[1] = {0};
+StageSpawn sStg13TunnelSpawns[1] = {
+    {{ 0,  0}, { 8,  0}, 18, 29},
+};
+u8 sStg13TunnelExitHeadings[1] = {0};
+StageSpawn *sTunnelSpawns[STAGE_COUNT] = {
+    sStg00TunnelSpawns, sStg01TunnelSpawns, sStg02TunnelSpawns, sStg03TunnelSpawns,
+    sStg04TunnelSpawns, sStg05TunnelSpawns, NULL, sStg07TunnelSpawns,
+    sStg08TunnelSpawns, NULL, NULL, NULL,
+    NULL, sStg13TunnelSpawns,
+};
+u8 *sTunnelExitHeadings[STAGE_COUNT] = {
+    sStg00TunnelExitHeadings, sStg01TunnelExitHeadings, sStg02TunnelExitHeadings, sStg03TunnelExitHeadings,
+    sStg04TunnelExitHeadings, sStg05TunnelExitHeadings, NULL, sStg07TunnelExitHeadings,
+    sStg08TunnelExitHeadings, NULL, NULL, NULL,
+    NULL, sStg13TunnelExitHeadings,
+};
+StaticLinkTrigger sStg00TunnelTriggers[2] = {
+    {{ 0,  0}, {{  8,   1}},  3,  0},
+    {{ 0,  0}, {{  9,   1}},  3,  0},
+};
+u8 sStg00TunnelEnterHeadings[2] = {2, 2};
+StaticLinkTrigger sStg01TunnelTriggers[4] = {
+    /* chunk      tile      stage spawn */
+    {{ 1,  0}, {{  8,   1}},  3,  1},
+    {{ 1,  0}, {{  9,   1}},  3,  1},
+    {{ 1,  1}, {{ 18,  17}},  8,  0},
+    {{ 1,  1}, {{ 19,  17}},  8,  0},
+};
+u8 sStg01TunnelEnterHeadings[4] = {2, 2, 0, 0};
+StaticLinkTrigger sStg02TunnelTriggers[6] = {
+    /* chunk      tile      stage spawn */
+    {{ 2,  0}, {{ 10,   1}},  3,  2},
+    {{ 2,  0}, {{ 11,   1}},  3,  2},
+    {{ 3,  5}, {{ 14,  16}},  7,  0},
+    {{ 3,  5}, {{ 14,  17}},  7,  0},
+    {{ 4,  2}, {{  8,   8}}, 13,  0},
+    {{ 4,  2}, {{  9,   8}}, 13,  0},
+};
+u8 sStg02TunnelEnterHeadings[6] = {2, 2, 1, 1, 0, 0};
+StaticLinkTrigger sStg03TunnelTriggers[10] = {
+    /* chunk      tile      stage spawn */
+    {{ 7,  8}, {{  8,   9}},  0,  0},
+    {{ 7,  8}, {{  9,   9}},  0,  0},
+    {{ 3,  9}, {{  8,   8}},  1,  0},
+    {{ 3,  9}, {{  9,   8}},  1,  0},
+    {{13,  6}, {{  9,   8}},  2,  0},
+    {{13,  6}, {{ 10,   8}},  2,  0},
+    {{11, 12}, {{  8,   8}},  4,  0},
+    {{11, 12}, {{  9,   8}},  4,  0},
+    {{ 3,  4}, {{  7,   8}},  5,  0},
+    {{ 3,  4}, {{  8,   8}},  5,  0},
+};
+u8 sStg03TunnelEnterHeadings[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+StaticLinkTrigger sStg04TunnelTriggers[2] = {
+    {{ 2,  0}, {{  8,   1}},  3,  3},
+    {{ 2,  0}, {{  9,   1}},  3,  3},
+};
+u8 sStg04TunnelEnterHeadings[2] = {2, 2};
+StaticLinkTrigger sStg05TunnelTriggers[2] = {
+    {{ 2,  0}, {{  8,   1}},  3,  4},
+    {{ 2,  0}, {{  9,   1}},  3,  4},
+};
+u8 sStg05TunnelEnterHeadings[2] = {2, 2};
+StaticLinkTrigger sStg07TunnelTriggers[2] = {
+    {{ 0,  0}, {{  8,   3}},  2,  1},
+    {{ 0,  0}, {{  9,   3}},  2,  1},
+};
+u8 sStg07TunnelEnterHeadings[2] = {2, 2};
+StaticLinkTrigger sStg08TunnelTriggers[2] = {
+    {{ 0,  0}, {{  8,   1}},  1,  1},
+    {{ 0,  0}, {{  9,   1}},  1,  1},
+};
+u8 sStg08TunnelEnterHeadings[2] = {2, 2};
+StaticLinkTrigger sStg13TunnelTriggers[2] = {
+    {{ 0,  0}, {{  8,   1}},  2,  2},
+    {{ 0,  0}, {{  9,   1}},  2,  2},
+};
+u8 sStg13TunnelEnterHeadings[2] = {2, 2};
+StaticLinkTrigger *sTunnelTriggers[STAGE_COUNT] = {
+    sStg00TunnelTriggers, sStg01TunnelTriggers, sStg02TunnelTriggers, sStg03TunnelTriggers,
+    sStg04TunnelTriggers, sStg05TunnelTriggers, NULL, sStg07TunnelTriggers,
+    sStg08TunnelTriggers, NULL, NULL, NULL,
+    NULL, sStg13TunnelTriggers,
+};
+u8 *sTunnelEnterHeadings[STAGE_COUNT] = {
+    sStg00TunnelEnterHeadings, sStg01TunnelEnterHeadings, sStg02TunnelEnterHeadings, sStg03TunnelEnterHeadings,
+    sStg04TunnelEnterHeadings, sStg05TunnelEnterHeadings, NULL, sStg07TunnelEnterHeadings,
+    sStg08TunnelEnterHeadings, NULL, NULL, NULL,
+    NULL, sStg13TunnelEnterHeadings,
+};
+s8 sTunnelTriggersCount[STAGE_COUNT] = {2, 4, 6, 10, 2, 2, 0, 2, 2, 0, 0, 0, 0, 2};
+
+/* The instant teleporters, TestForInstantTeleporters' tables. */
+StageSpawn sStg02TeleportSpawns[9] = {
+    /* chunk      tile     adj extra */
+    {{ 1,  1}, { 4,  8},  0,  0},
+    {{ 1,  0}, { 7, 14},  0,  0},
+    {{ 4,  1}, { 1,  3},  0,  0},
+    {{ 4,  3}, { 3, 10}, 10,  0},
+    {{ 3,  4}, {16,  3}, 11,  0},
+    {{ 2,  3}, { 2, 16},  0,  0},
+    {{ 4,  4}, { 0, 18},  0,  0},
+    {{ 2,  1}, { 4, 14},  0,  0},
+    {{ 5,  1}, { 1, 14},  0,  0},
+};
+StageSpawn sStg03TeleportSpawns[3] = {
+    /* chunk      tile     adj extra */
+    {{ 9,  4}, { 9, 18}, 21,  0},
+    {{ 9,  4}, { 9,  3}, 21,  0},
+    {{ 7,  4}, { 7,  0},  0,  0},
+};
+StageSpawn sStg05TeleportSpawns[5] = {
+    /* chunk      tile     adj extra */
+    {{ 4,  1}, { 0, 14},  5,  0},
+    {{ 3,  3}, { 8, 10},  0,  0},
+    {{ 1,  2}, {13, 14},  0,  0},
+    {{ 2,  2}, { 9, 19},  0,  0},
+    {{ 1,  2}, {13,  5},  0,  0},
+};
+StageSpawn sStg08TeleportSpawns[3] = {
+    /* chunk      tile     adj extra */
+    {{ 0,  0}, { 9,  5}, 17,  0},
+    {{ 0,  1}, {11, 12},  0,  0},
+    {{ 0,  1}, {17,  3},  0,  0},
+};
+StageSpawn *sTeleportSpawns[STAGE_COUNT] = {
+    NULL, NULL, sStg02TeleportSpawns, sStg03TeleportSpawns,
+    NULL, sStg05TeleportSpawns, NULL, NULL,
+    sStg08TeleportSpawns, NULL, NULL, NULL,
+    NULL, NULL,
+};
+StaticLinkTrigger sStg02TeleportTriggers[8] = {
+    /* chunk      tile      stage spawn */
+    {{ 1,  1}, {{  4,  10}},  2,  0},
+    {{ 0,  0}, {{  7,  17}},  2,  1},
+    {{ 4,  1}, {{  7,   0}},  2,  2},
+    {{ 4,  3}, {{  4,  18}},  2,  3},
+    {{ 1,  2}, {{  1,  14}},  2,  5},
+    {{ 2,  1}, {{ 13,  14}},  2,  7},
+    {{ 4,  4}, {{ 13,   3}},  2,  6},
+    {{ 4,  1}, {{ 11,   0}},  2,  8},
+};
+StaticLinkTrigger sStg03TeleportTriggers[1] = {
+    {{ 7,  4}, {{  0,   5}},  3,  2},
+};
+StaticLinkTrigger sStg05TeleportTriggers[5] = {
+    /* chunk      tile      stage spawn */
+    {{ 3,  1}, {{ 18,  16}},  5,  0},
+    {{ 2,  3}, {{ 11,  11}},  5,  1},
+    {{ 0,  2}, {{ 18,  10}},  5,  2},
+    {{ 2,  2}, {{  9,  16}},  5,  3},
+    {{ 1,  2}, {{ 13,  16}},  5,  4},
+};
+StaticLinkTrigger sStg08TeleportTriggers[3] = {
+    /* chunk      tile      stage spawn */
+    {{ 0,  0}, {{  8,  11}},  8,  0},
+    {{ 0,  0}, {{  9,   4}},  8,  1},
+    {{ 0,  1}, {{ 17,   8}},  8,  2},
+};
+StaticLinkTrigger *sTeleportTriggers[STAGE_COUNT] = {
+    NULL, NULL, sStg02TeleportTriggers, sStg03TeleportTriggers,
+    NULL, sStg05TeleportTriggers, NULL, NULL,
+    sStg08TeleportTriggers, NULL, NULL, NULL,
+    NULL, NULL,
+};
+s8 sTeleportTriggersCount[STAGE_COUNT] = {0, 0, 8, 1, 0, 5, 0, 0, 3, 0, 0, 0, 0, 0};
+
+/* The staircases, TestForStaircaseNodes' tables (stage 0 only), with
+ * headings as for the tunnels (DreamSys__CheckStaircaseHeading). */
+StageSpawn sStg00StaircaseSpawns[8] = {
+    /* chunk      tile     adj extra */
+    {{ 0,  1}, { 8,  7}, 25,  0},
+    {{ 0,  2}, { 8,  7}, 26,  0},
+    {{ 0,  3}, { 8,  7}, 27,  0},
+    {{ 0,  4}, { 9,  7}, 28,  2},
+    {{ 0,  0}, { 9,  9},  0,  1},
+    {{ 0,  1}, { 9,  9},  1,  1},
+    {{ 0,  2}, { 9,  9},  2,  1},
+    {{ 0,  3}, { 9,  9},  3,  3},
+};
+u8 sStg00StaircaseExitHeadings[8] = {0, 0, 0, 3, 3, 3, 3, 3};
+StageSpawn *sStaircaseSpawns[STAGE_COUNT] = {
+    sStg00StaircaseSpawns, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL,
+};
+u8 *sStaircaseExitHeadings[STAGE_COUNT] = {
+    sStg00StaircaseExitHeadings, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL,
+};
+StaticLinkTrigger sStg00StaircaseTriggers[8] = {
+    /* chunk      tile      stage spawn */
+    {{ 0,  0}, {{  9,   9}},  0,  0},
+    {{ 0,  1}, {{  9,   9}},  0,  1},
+    {{ 0,  2}, {{  9,   9}},  0,  2},
+    {{ 0,  3}, {{  9,   9}},  0,  3},
+    {{ 0,  1}, {{  8,   8}},  0,  4},
+    {{ 0,  2}, {{  8,   8}},  0,  5},
+    {{ 0,  3}, {{  8,   8}},  0,  6},
+    {{ 0,  4}, {{  8,   7}},  0,  7},
+};
+u8 sStg00StaircaseEnterHeadings[8] = {2, 2, 2, 2, 2, 2, 2, 1};
+StaticLinkTrigger *sStaircaseTriggers[STAGE_COUNT] = {
+    sStg00StaircaseTriggers, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL,
+};
+u8 *sStaircaseEnterHeadings[STAGE_COUNT] = {
+    sStg00StaircaseEnterHeadings, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL,
+};
+s8 sStaircaseTriggersCount[STAGE_COUNT] = {8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+/* IsDaySpecial's table of special days. */
+s16 sSpecialDays[42] = {2, 15, 43, 81, 120, 126, 202, 259, 267, 284, 308, 328, 358, 7, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91, 98, 105, 112, 119, 126, 134, 141, 148, 155, 162, 169, 176, 183, 190, 197, 204};
+/* clang-format on */
 
 /* A `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a` argument
    by DreamSys__TickStaircaseYawPlus45. */
@@ -98,73 +989,9 @@ extern struct RelativePos sStaircaseOffset1;
 /* The same, for DreamSys__TickStaircaseYawMinus90. */
 extern struct RelativePos sStaircaseOffset3;
 
-/* (0 deg, +45 deg, 0 deg), forwarded as vtable slot +0x044's (SceneNode__UpdateRotation)
-   arg2 with flag 0 (relative) by DreamSys__TickStaircaseYawPlus90 and
-   DreamSys__TickStaircaseYawPlus45. Its three {num, den} Ratio16s
-   are {0,1} {0x2D,1} {0,1}, the same form as sRotationYaw180 and every
-   sCardinalRotations entry. */
-extern Ratio16 sRotationYawPlus45[3];
-
-/* (0 deg, -45 deg, 0 deg) -- the mirror of sRotationYawPlus45 above
-   ({0,1} {0xFFD3,1} {0,1}), used the same way by
-   DreamSys__TickStaircaseYawMinus135 and DreamSys__TickStaircaseYawMinus90. */
-extern Ratio16 sRotationYawMinus45[3];
-
-/* 3x3 lookup table indexed by [dynamicClass][upperClass], each axis
-   classified into {0,1,2} by CalcDreamColor first. */
-extern s8 sDreamColorTable[9];
-
-/* Byte tables indexed by DreamSys::voiceSelect (bounded to [0,0x18) at
-   the write site -- see that field's own comment). DreamSys__StartVoice
-   reads both: sVoiceBySelect[voiceSelect] (values 0..0x1E) feeds
-   VabStreamObj playTone's `index` argument (program << 4, tone 0);
-   sVoicePitchBySelect[voiceSelect] (values include -2..2, hence `s8` not `u8`) feeds
-   setPitchOffset's `octave` argument directly. sVoicePitchBySelect is these
-   24 bytes; the zero bytes after it are the sProjectOffsetZ vector above. */
-extern const s8 sVoiceBySelect[0x18];
-extern const s8 sVoicePitchBySelect[0x18];
-
-/* Dispatch table indexed by DreamSys__ApplyMoveCommand's `arg1`; see that table's own
-   comment near sMoveModeSpeeds/sMoveCommandSigns above. Same element signature as
-   Actor__MoveLocalZOrFindLink/Actor__MoveLocalXOrFindLink (Actor +0x0D0/+0x0D4). */
-extern void (*sMoveCommandDispatch[5])(DreamSys *self, s32 val, void *extra);
-
-/* 4-entry table of `s32 (DreamSys *self)` functions (DreamSys__TickStaircaseYawPlus90,
-   DreamSys__TickStaircaseYawMinus135, DreamSys__TickStaircaseYawPlus45, DreamSys__TickStaircaseYawMinus90),
-   indexed by GetLastSpawnExtra()'s return value and
-   stashed into DreamSys::staircaseTickFn by DreamSys__TryStaircaseLink. */
-extern s32 (*sStaircaseTickFns[4])(DreamSys *self);
-
-extern s16 sStageTimeLimits[];
-
-extern struct RelativePos sSpawnPosAdjust[];
-
-extern StageSpawn *sStageSpawnPoints[];
-
-/* MATCHING: u8; as s8, GenerateInitialSpawn's loop guard gains a `blez` retail does not have. */
-extern u8 sStageSpawnPointsCount[];
-
-extern StageSpawn *sStagePermalinkSpawns[];
-extern StaticLinkTrigger *sStagePermalinkTriggers[];
-extern s8 sStagePermalinkTriggersCount[];
-
-/* The special days, IsDaySpecial's table. */
-extern s16 sSpecialDays[42];
-
 /* The fixed "special day" mood, returned by IsDaySpecial on a match;
    only its address is used. */
 extern MoodGraphPoint sSpecialDayMood;
-
-/* Table triple for TestForTunnelLinks, same roles as the
-   STAGE_PERMALINK_* triple above but for tunnel links specifically. */
-extern s8 sTunnelTriggersCount[];
-extern StaticLinkTrigger *sTunnelTriggers[];
-extern StageSpawn *sTunnelSpawns[];
-
-/* Table triple for TestForStaircaseNodes. */
-extern s8 sStaircaseTriggersCount[];
-extern StaticLinkTrigger *sStaircaseTriggers[];
-extern StageSpawn *sStaircaseSpawns[];
 
 /* With no look command pending, StepLookOffset springs the view height back
  * towards 0 by this much a tick (the size of one sLookOffsetSteps step), and
@@ -541,8 +1368,9 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *self, s32 *out, s32 dist, s32 *re
     long *worldTrans;
     s32 *offsetZ;
 
-    offsetZ = &sProjectOffsetZ;
+    offsetZ = &sProjectOffset.z;
     *offsetZ = dist;
+    /* MATCHING: the vector's address is formed back from z */
     SceneNode__LocalOffsetToWorldPos((SceneNode *)self, worldPos, offsetZ - 2, 0);
 
     height = InterpolateYAtZ(&self->viewport->refView.vp, &self->viewport->refView.vr, dist);
@@ -695,8 +1523,8 @@ void DreamSys__StepLookYaw(DreamSys *self) {
         threshold = sLookYawLimits[idx];
         sum = delta + self->lookYaw;
         if ((sum >= 0) ? (sum < threshold) : ((~sum + 1) < threshold)) {
-            sTurnRotationYaw[0].num = delta;
-            self->methods->updateRotation(self, 0, &sTurnRotationYaw[-1]);
+            sTurnRotations[0][1].num = delta;
+            self->methods->updateRotation(self, 0, sTurnRotations[0]);
             self->lookYaw = sum;
         }
         self->lookYawCommand = 0;
@@ -705,8 +1533,8 @@ void DreamSys__StepLookYaw(DreamSys *self) {
         delta = -LOOK_YAW_RETURN_STEP;
         if (self->lookYaw < 0)
             delta = LOOK_YAW_RETURN_STEP;
-        sTurnRotationYaw[0].num = delta;
-        self->methods->updateRotation(self, 0, &sTurnRotationYaw[-1]);
+        sTurnRotations[0][1].num = delta;
+        self->methods->updateRotation(self, 0, sTurnRotations[0]);
         self->lookYaw += delta;
         flipTarget = self;
     } else {
@@ -1677,20 +2505,6 @@ s32 TestForTunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s
 /* Defined below, in ROM order. */
 extern s32 IsHeadingAligned(Ratio16 *rotation, u8 heading);
 
-/* Cardinal-direction indices, per stage: the player must face
-   sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex] to take the
-   tunnel GetStaticSpawn matched, and leaves facing
-   sTunnelExitHeadings[sLinkDstStage][sLinkSpawnIndex]. */
-extern u8 *sTunnelEnterHeadings[];
-extern u8 *sTunnelExitHeadings[];
-
-/* The four cardinal rotations, yaw 0, 90, 180 and 270 degrees, in
-   SceneNode__UpdateRotation's form. CheckTunnelHeading and
-   CheckStaircaseHeading store an entry's address in enterRotation /
-   exitRotation, which SetMoveOverride, SpawnAtLink and TryStaircaseLink
-   apply. */
-extern Ratio16 sCardinalRotations[][3];
-
 s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     u8 heading;
     s32 idx;
@@ -1776,12 +2590,6 @@ void SetInstantTeleportersEnabled(bool value) {
     sInstantTeleportersEnabled = value;
 }
 
-/* TestForInstantTeleporters' GetStaticSpawn tables: trigger counts,
-   triggers and spawns per stage, as for tunnels and staircases. */
-extern s8 sTeleportTriggersCount[];
-extern StaticLinkTrigger *sTeleportTriggers[];
-extern StageSpawn *sTeleportSpawns[];
-
 s32 TestForInstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
     s32 result;
 
@@ -1804,11 +2612,6 @@ s32 TestForStaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos
                               sStaircaseSpawns, 0);
     return -1;
 }
-
-/* CheckStaircaseHeading's pair of heading tables, indexed as
-   sTunnelEnterHeadings / sTunnelExitHeadings are. */
-extern u8 *sStaircaseEnterHeadings[];
-extern u8 *sStaircaseExitHeadings[];
 
 s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     u8 heading;
