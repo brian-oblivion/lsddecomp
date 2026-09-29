@@ -1341,6 +1341,8 @@ segments:
       # (carve history; merged into ScreenWidgets above, round 100)
       # code_2cc8c_f: #30..#59, 0x30E64..0x3197C (psyq_memset follows, so no
       # data tail). Zero blocked functions.
+      # The full-width Shift-JIS helpers, DecodeFullWidthSjis (0x80040FC0) to FormatFullWidthNumber.
+      - [0x317C0, c, ui/full_width_sjis]
       # psyq_memset chunk A: libc2 memory / formatted-output helpers.
       - [0x3197C, o, libc2/memset]     # memset
       - [0x319A8, o, libc2/itoa]       # itoa

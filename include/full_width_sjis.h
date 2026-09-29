@@ -5,7 +5,7 @@
  * Full-width Shift-JIS takes two bytes a character. The save title, the
  * text entry buffer and the item list's names are stored full-width and
  * edited or drawn one byte a character, so these convert between the two.
- * Defined in src/ui/screen_widgets.c.
+ * Defined in src/ui/full_width_sjis.c.
  */
 #ifndef FULL_WIDTH_SJIS_H
 #define FULL_WIDTH_SJIS_H
