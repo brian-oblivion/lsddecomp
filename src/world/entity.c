@@ -1158,7 +1158,7 @@ void Entity__CueHoverOverDreamerOnBlueElseRise(Entity *self, SoundCueSet *out) {
         SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
         if (self->state == HOVER_APPROACH) {
             self->methods->moveLocalZ(self, -100, 0);
-            if ((u32)(self->moodTimer - 85) < 30) {
+            if (self->moodTimer >= 85 && self->moodTimer < 115) {
                 self->methods->moveLocalY(self, 80, 0);
             } else if (self->moodTimer == 120) {
                 self->state = HOVER_FOLLOW;
@@ -1213,11 +1213,11 @@ void Entity__CueWalkZigzagThenDashAway(Entity *self, SoundCueSet *out) {
     EntityMethods *methods;
     s32 zDelta;
 
-    if ((u32)(self->moodTimer - 400) < 10) {
+    if (self->moodTimer >= 400 && self->moodTimer < 410) {
         self->methods->updateRotation(self, 0, sRotationYawPlus9);
-    } else if ((u32)(self->moodTimer - 700) < 10) {
+    } else if (self->moodTimer >= 700 && self->moodTimer < 710) {
         self->methods->updateRotation(self, 0, sRotationYawMinus9);
-    } else if ((u32)(self->moodTimer - 830) < 4) {
+    } else if (self->moodTimer >= 830 && self->moodTimer < 834) {
         self->methods->updateRotation(self, 0, sRotationYawMinus9);
     } else if (self->moodTimer >= 851) {
         self->methods->deactivate(self);
