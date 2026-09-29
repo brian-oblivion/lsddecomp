@@ -40,10 +40,6 @@
  * part's coordinate parameters are Sony's GsCOORD2PARAM.
  */
 
-/* Header word of gModelDataMethods, the class New_ModelData allocates and
- * TodActor.modelData points at. */
-#define MODEL_DATA_CLASS_HEADER 0x5F03
-
 /* A TOD rotation is in 1/4096 degree; divided by 360 it is a GTE angle
  * (ONE to the turn), which ApplyTodPacket then wraps with % ONE. */
 #define TOD_ROTATE_PER_ANGLE 360
@@ -127,7 +123,7 @@ void TodActor__OnNotify(TodActor *self, BasicClass *sender, s32 event) {
 
     base = GetActorMethods();
     base->onNotify((Actor *)self, sender, event);
-    if ((u16)sender->methods->header == MODEL_DATA_CLASS_HEADER &&
+    if ((sender->methods->header & CLASS_ID_LEVEL4_MASK) == MODELDATA_CLASS_ID &&
         event == BASICCLASS_EVENT_FINALIZED && self->ownsModelData == 0) {
         self->methods->release(self);
     }
@@ -255,13 +251,13 @@ s32 TodActor__FindPartIndex(TodActor *self, s32 id) {
     s32 count;
     s32 i;
     u8 wanted;
-    u8 unused[8]; /* MATCHING: retail's 8-byte frame; without it the frame is empty */
+    u8 unused[8]; /* MATCHING: never used; it gives retail's 8-byte stack, which is otherwise empty */
 
     if (self->partIds == NULL) {
         return -1;
     }
     ids = self->partIds;
-    __asm__(""); /* MATCHING: keeps the copy of ids above the partCount load, not in blez's delay slot */
+    __asm__(""); /* MATCHING: an ordering barrier; without it ids is copied after the partCount test */
     count = self->partCount;
     if (count <= 0) {
         return -1;
@@ -296,7 +292,7 @@ void TodActor__TeardownParts(TodActor *self) {
  * second fills partIds and turns tmdId[0] into the index of the object drawn
  * with that TMD id, which becomes mainPart. 0, or 1 with the parts released. */
 s32 TodActor__CreateParts(TodActor *self) {
-    u32 tmdId[4]; /* MATCHING: [1] changes the frame; only [0] is used */
+    u32 tmdId[4]; /* MATCHING: four words for retail's stack; only [0] is used */
     s32 count;
     s32 i;
     Actor **p;
@@ -537,7 +533,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                 partCoord->coord.t[0] = x;
                 partCoord->coord.t[1] = y;
                 partCoord->coord.t[2] = z;
-                __asm__(""); /* MATCHING: keeps the t[2] store ahead of break's jump, whose delay slot stays a nop */
+                __asm__(""); /* MATCHING: an ordering barrier; it keeps the t[2] store ahead of the break */
             }
             break;
         }
@@ -597,3 +593,93 @@ void TodActor__UnlinkPeer(TodActor *self) {
 TodActorMethods *GetTodActorMethods(void) {
     return &gTodActorMethods;
 }
+
+/* TodActor's method table, class id 0x234: Actor's slots, nine of them
+ * overridden, then TodActor's own from +0x0F0. A slot whose function is
+ * declared for another class's `self` (a parent's method, or an override
+ * that keeps the parent's parameter types) takes a `void *` cast. */
+/* clang-format off */
+TodActorMethods gTodActorMethods = {
+    /* +0x000 header */ 0x234,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ (void *)TodActor__TodActor,
+    /* +0x00C finalize */ TodActor__Finalize,
+    /* +0x010 addChild */ (void *)Actor__AddChild,
+    /* +0x014 removeChild */ (void *)Actor__RemoveChild,
+    /* +0x018 removeAllChildren */ (void *)Actor__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)TodActor__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 reset */ TodActor__Reset,
+    /* +0x044 updateRotation */ (void *)SceneNode__UpdateRotation,
+    /* +0x048 updateScale */ (void *)SceneNode__UpdateScale,
+    /* +0x04C attachToParent */ (void *)TodActor__AttachToParent,
+    /* +0x050 detachFromParent */ (void *)TodActor__DetachFromParent,
+    /* +0x054 detachAttachedChildren */ (void *)SceneNode__DetachAttachedChildren,
+    /* +0x058 getNextAttachedChild */ (void *)SceneNode__GetNextAttachedChild,
+    /* +0x05C finalizeHook */ (void *)SceneNode__NoOpFinalizeHook,
+    /* +0x060 setDisplay */ (void *)TodActor__SetDisplay,
+    /* +0x064 setSemiTransOn */ (void *)SceneNode__SetSemiTrans,
+    /* +0x068 setSemiTransRate */ (void *)SceneNode__SetSemiTransRate,
+    /* +0x06C setLighting */ (void *)SceneNode__SetLighting,
+    /* +0x070 setLightMode */ (void *)TodActor__SetLightMode,
+    /* +0x074 setLightDim */ (void *)SceneNode__SetLightDim,
+    /* +0x078 setUseZ */ (void *)SceneNode__SetUseZ,
+    /* +0x07C setSubdivision */ (void *)SceneNode__SetSubdivision,
+    /* +0x080 setBackClip */ (void *)SceneNode__SetBackClip,
+    /* +0x084 getRotMatrix */ (void *)SceneNode__GetRotMatrix,
+    /* +0x088 notifyWithHull */ (void *)Actor__NotifyMove,
+    /* +0x08C getModelHull */ (void *)SceneNode__GetModelHull,
+    /* +0x090 transformAndNotifyParents */ (void *)SceneNode__TransformAndNotifyParents,
+    /* +0x094 onPadEvent */ (void *)SceneNode__OnPadEvent,
+    /* +0x098 update */ TodActor__Update,
+    /* +0x09C dispatchLinkCommand */ (void *)Actor__DispatchLinkCommand,
+    /* +0x0A0 tryAttachNearby */ (void *)SceneNode__TryAttachNearby,
+    /* +0x0A4 composeAndApplyRotation */ (void *)SceneNode__ComposeAndApplyRotation,
+    /* +0x0A8 checkBoundsOverlap */ (void *)SceneNode__CheckBoundsOverlap,
+    /* +0x0AC raycastHullAgainstFaces */ (void *)SceneNode__RaycastHullAgainstFaces,
+    /* +0x0B0 slotB0 */ NULL,
+    /* +0x0B4 addToActorParents */ (void *)SceneNode__AddToActorParents,
+    /* +0x0B8 setTranslation */ (void *)Actor__SetTranslation,
+    /* +0x0BC addTranslation */ (void *)Actor__AddTranslation,
+    /* +0x0C0 addLocalTranslation */ (void *)Actor__AddLocalTranslation,
+    /* +0x0C4 moveLocalZ */ (void *)Actor__MoveLocalZ,
+    /* +0x0C8 moveLocalX */ (void *)Actor__MoveLocalX,
+    /* +0x0CC moveLocalY */ (void *)Actor__MoveLocalY,
+    /* +0x0D0 moveLocalZOrFindLink */ (void *)Actor__MoveLocalZOrFindLink,
+    /* +0x0D4 moveLocalXOrFindLink */ (void *)Actor__MoveLocalXOrFindLink,
+    /* +0x0D8 slotD8 */ Actor__NoOpSlotD8,
+    /* +0x0DC onActorLinkCommand */ (void *)Actor__OnActorLinkCommand,
+    /* +0x0E0 onGridCellLinkCommand */ (void *)Actor__OnGridCellLinkCommand,
+    /* +0x0E4 setLastOffsetValue */ (void *)Actor__SetLastOffsetValue,
+    /* +0x0E8 onLinkUpdate */ (void *)Actor__OnLinkUpdate,
+    /* +0x0EC setPendingExtra */ (void *)Actor__SetPendingExtra,
+    /* +0x0F0 setMainPartNotifies */ TodActor__SetMainPartNotifies,
+    /* +0x0F4 setupModelData */ TodActor__SetupModelData,
+    /* +0x0F8 teardownModelData */ TodActor__TeardownModelData,
+    /* +0x0FC findPartIndex */ TodActor__FindPartIndex,
+    /* +0x100 setupParts */ TodActor__SetupParts,
+    /* +0x104 teardownParts */ TodActor__TeardownParts,
+    /* +0x108 tick */ TodActor__Tick,
+    /* +0x10C selectTickCallback */ TodActor__SelectTickCallback,
+    /* +0x110 enableTickCallback */ TodActor__EnableTickCallback,
+    /* +0x114 disableTickCallback */ TodActor__DisableTickCallback,
+    /* +0x118 tickMoveZ */ TodActor__TickMoveZ,
+    /* +0x11C tickCallbackB */ TodActor__TickCallbackB,
+    /* +0x120 tickCallbackC */ TodActor__TickCallbackC,
+    /* +0x124 playTone */ TodActor__PlayTone,
+    /* +0x128 setTod */ TodActor__SetTod,
+    /* +0x12C playTod */ TodActor__PlayTod,
+    /* +0x130 stopTod */ TodActor__StopTod,
+    /* +0x134 applyTodFrame */ (void *)TodActor__ApplyTodFrame,
+    /* +0x138 applyTodPacket */ TodActor__ApplyTodPacket,
+    /* +0x13C linkPeer */ TodActor__LinkPeer,
+    /* +0x140 unlinkPeer */ TodActor__UnlinkPeer,
+};
+/* clang-format on */

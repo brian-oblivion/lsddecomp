@@ -463,14 +463,17 @@
     },
     "14": {
       "checklist": {
-        "data-setup": true
+        "data-setup": true,
+        "data-world": true
       },
       "reason": "",
       "status": "auto"
     },
     "15": {
       "checklist": {
-        "literals-graphics": true
+        "literals-graphics": true,
+        "literals-rest": true,
+        "literals-world": true
       },
       "reason": "",
       "status": "auto"
@@ -478,7 +481,8 @@
     "16": {
       "checklist": {
         "comments-graphics": true,
-        "comments-rest": true
+        "comments-rest": true,
+        "comments-world": true
       },
       "reason": "",
       "status": "auto"

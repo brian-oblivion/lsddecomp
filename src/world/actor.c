@@ -61,7 +61,7 @@ void Actor__AddChild(Actor *self, BasicClass *child) {
 
     GetSceneNodeMethods()->addChild((SceneNode *)self, child);
     classId = child->methods->header;
-    if ((classId & 0xFFF) == STAGEMAP_CLASS_ID) {
+    if ((classId & CLASS_ID_LEVEL3_MASK) == STAGEMAP_CLASS_ID) {
         self->grid = (struct StageMap *)child;
     } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->ticker = child;
@@ -71,7 +71,7 @@ void Actor__AddChild(Actor *self, BasicClass *child) {
 void Actor__RemoveChild(Actor *self, BasicClass *child) {
     s32 classId = child->methods->header;
 
-    if ((classId & 0xFFF) == STAGEMAP_CLASS_ID) {
+    if ((classId & CLASS_ID_LEVEL3_MASK) == STAGEMAP_CLASS_ID) {
         self->grid = NULL;
     } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->ticker = NULL;
@@ -115,7 +115,7 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                     s32 forward = (offset >= 0);
                     s32 delta;
 
-                    /* MATCHING: goto, not if/else, for retail's branch order */
+                    /* MATCHING: goto, not if/else, which lays the two faces out the other way */
                     if (offset < 0) {
                         goto backward;
                     }
@@ -128,7 +128,7 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                 }
                 self->methods->transformAndNotifyParents(self, &hull, event);
                 if (self->linkTarget != NULL) {
-                    if ((u8)self->linkTarget->methods->header == ACTOR_CLASS_ID) {
+                    if ((self->linkTarget->methods->header & CLASS_ID_LEVEL2_MASK) == ACTOR_CLASS_ID) {
                         ((Actor *)self->linkTarget)->methods->onLinkUpdate((Actor *)self->linkTarget);
                     }
                 }
@@ -141,9 +141,9 @@ void Actor__NotifyMove(Actor *self, s32 event) {
  * any class below it) to onActorLinkCommand, from a GridCell to
  * onGridCellLinkCommand, from anything else nowhere. */
 void Actor__DispatchLinkCommand(Actor *self, BasicClass *sender, s32 event) {
-    if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
+    if ((sender->methods->header & CLASS_ID_LEVEL2_MASK) == ACTOR_CLASS_ID) {
         self->methods->onActorLinkCommand(self, sender, event);
-    } else if ((u8)sender->methods->header == GRIDCELL_CLASS_ID) {
+    } else if ((sender->methods->header & CLASS_ID_LEVEL2_MASK) == GRIDCELL_CLASS_ID) {
         self->methods->onGridCellLinkCommand(self, sender, event);
     }
 }
@@ -159,7 +159,7 @@ void Actor__AddTranslation(Actor *self, LongVec3 *delta) {
 /* Sets (set != 0) or adds to the offset from the parent, coord2->coord.t,
  * then clears coord2->flg so libgs recomputes the matrix. */
 void Actor__UpdateTranslation(Actor *self, s32 set, LongVec3 *v) {
-    Actor *actor = self; /* MATCHING: a second name for self; without it $a0 is used, not $t0 */
+    Actor *actor = self; /* MATCHING: a second name for self; without it the code differs */
     GsCOORDINATE2 *coord = actor->coord2;
 
     if (set) {
@@ -256,7 +256,8 @@ void *Actor__ScanLinkCandidates(Actor *self, void *offset, void *pos, s32 count,
  * vertical grid, the same cell in the slots above and below
  * (BuildLinkQueries with span 1). On a hit the cell becomes linkTarget, the
  * actor moves by the ray's offset (addTranslation) and notifyWithHull gets
- * -1; with no hit, linkTarget is NULL and it gets -2. Returns whether it
+ * ACTOR_EVENT_FLOOR_FOUND; with no hit, linkTarget is NULL and it gets
+ * ACTOR_EVENT_NO_FLOOR. Returns whether it
  * linked; 0 as well when the actor has no grid or no slot holds its
  * position. */
 s32 Actor__FindNearbyLink(Actor *self) {
@@ -276,10 +277,10 @@ s32 Actor__FindNearbyLink(Actor *self) {
             self->linkTarget = result;
             if (result != NULL) {
                 self->methods->addTranslation(self, &offset);
-                self->methods->notifyWithHull(self, -1);
+                self->methods->notifyWithHull(self, ACTOR_EVENT_FLOOR_FOUND);
                 return 1;
             }
-            self->methods->notifyWithHull(self, -2);
+            self->methods->notifyWithHull(self, ACTOR_EVENT_NO_FLOOR);
             return 0;
         }
     }
@@ -330,7 +331,7 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *queries, ChunkSlot **slots,
         key = slotKey + 1;
         if (key < dims->rows) {
             slots[1] = map->methods->findSlotByNeighbour(map, key);
-            count = 2; /* MATCHING: after the call, for the delay-slot fill */
+            count = 2; /* MATCHING: after the call, not before it */
             queries[1] = queries[0];
         }
         key = slotKey - 1;
@@ -402,7 +403,7 @@ void *Actor__ScanGridWindow(Actor *self, void *offset, void *pos, GridQuery *que
         for (col = 0; col < query->numCols; col++) {
             GridCell *node;
 
-            /* MATCHING: *bucket re-read at each use; a local costs a register */
+            /* MATCHING: *bucket re-read at each use; a local compiles differently */
             if (AcceptGridElem(*bucket, offset, pos) != NULL) {
                 return *bucket;
             }
@@ -459,3 +460,71 @@ void Actor__SetPendingExtra(Actor *self, s32 extra) {
 ActorMethods *GetActorMethods(void) {
     return &gActorMethods;
 }
+
+/* Actor's method table, class id 0x34: SceneNode's slots, with Actor's
+ * overrides, then its own from +0x0B8. A slot whose function is declared
+ * for another class's `self` takes a `void *` cast. */
+/* clang-format off */
+ActorMethods gActorMethods = {
+    /* +0x000 header */ 0x34,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ (void *)Actor__Actor,
+    /* +0x00C finalize */ (void *)SceneNode__Finalize,
+    /* +0x010 addChild */ Actor__AddChild,
+    /* +0x014 removeChild */ Actor__RemoveChild,
+    /* +0x018 removeAllChildren */ Actor__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)SceneNode__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 reset */ Actor__Reset,
+    /* +0x044 updateRotation */ (void *)SceneNode__UpdateRotation,
+    /* +0x048 updateScale */ (void *)SceneNode__UpdateScale,
+    /* +0x04C attachToParent */ (void *)SceneNode__AttachToParent,
+    /* +0x050 detachFromParent */ (void *)SceneNode__DetachFromParent,
+    /* +0x054 detachAttachedChildren */ (void *)SceneNode__DetachAttachedChildren,
+    /* +0x058 getNextAttachedChild */ (void *)SceneNode__GetNextAttachedChild,
+    /* +0x05C finalizeHook */ (void *)SceneNode__NoOpFinalizeHook,
+    /* +0x060 setDisplay */ (void *)SceneNode__SetDisplay,
+    /* +0x064 setSemiTransOn */ (void *)SceneNode__SetSemiTrans,
+    /* +0x068 setSemiTransRate */ (void *)SceneNode__SetSemiTransRate,
+    /* +0x06C setLighting */ (void *)SceneNode__SetLighting,
+    /* +0x070 setLightMode */ (void *)SceneNode__SetLightMode,
+    /* +0x074 setLightDim */ (void *)SceneNode__SetLightDim,
+    /* +0x078 setUseZ */ (void *)SceneNode__SetUseZ,
+    /* +0x07C setSubdivision */ (void *)SceneNode__SetSubdivision,
+    /* +0x080 setBackClip */ (void *)SceneNode__SetBackClip,
+    /* +0x084 getRotMatrix */ (void *)SceneNode__GetRotMatrix,
+    /* +0x088 notifyWithHull */ Actor__NotifyMove,
+    /* +0x08C getModelHull */ (void *)SceneNode__GetModelHull,
+    /* +0x090 transformAndNotifyParents */ (void *)SceneNode__TransformAndNotifyParents,
+    /* +0x094 onPadEvent */ (void *)SceneNode__OnPadEvent,
+    /* +0x098 update */ (void *)SceneNode__Update,
+    /* +0x09C dispatchLinkCommand */ (void *)Actor__DispatchLinkCommand,
+    /* +0x0A0 tryAttachNearby */ (void *)SceneNode__TryAttachNearby,
+    /* +0x0A4 composeAndApplyRotation */ (void *)SceneNode__ComposeAndApplyRotation,
+    /* +0x0A8 checkBoundsOverlap */ (void *)SceneNode__CheckBoundsOverlap,
+    /* +0x0AC raycastHullAgainstFaces */ (void *)SceneNode__RaycastHullAgainstFaces,
+    /* +0x0B0 slotB0 */ NULL,
+    /* +0x0B4 addToActorParents */ (void *)SceneNode__AddToActorParents,
+    /* +0x0B8 setTranslation */ Actor__SetTranslation,
+    /* +0x0BC addTranslation */ Actor__AddTranslation,
+    /* +0x0C0 addLocalTranslation */ Actor__AddLocalTranslation,
+    /* +0x0C4 moveLocalZ */ Actor__MoveLocalZ,
+    /* +0x0C8 moveLocalX */ Actor__MoveLocalX,
+    /* +0x0CC moveLocalY */ Actor__MoveLocalY,
+    /* +0x0D0 moveLocalZOrFindLink */ Actor__MoveLocalZOrFindLink,
+    /* +0x0D4 moveLocalXOrFindLink */ Actor__MoveLocalXOrFindLink,
+    /* +0x0D8 slotD8 */ Actor__NoOpSlotD8,
+    /* +0x0DC onActorLinkCommand */ Actor__OnActorLinkCommand,
+    /* +0x0E0 onGridCellLinkCommand */ Actor__OnGridCellLinkCommand,
+    /* +0x0E4 setLastOffsetValue */ Actor__SetLastOffsetValue,
+    /* +0x0E8 onLinkUpdate */ (void *)Actor__OnLinkUpdate,
+    /* +0x0EC setPendingExtra */ Actor__SetPendingExtra,
+};
+/* clang-format on */

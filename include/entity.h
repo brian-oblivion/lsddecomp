@@ -15,7 +15,7 @@
 #include "sound_cue_set.h"
 
 /** gEntityMethods' class id (TodActor's 0xF234 with a 1 above it):
- * `(header & 0xFFFFF) == ENTITY_CLASS_ID` is its is-kind-of test. */
+ * `(header & CLASS_ID_LEVEL5_MASK) == ENTITY_CLASS_ID` is its is-kind-of test. */
 #define ENTITY_CLASS_ID 0x1F234
 
 typedef struct Entity Entity;
@@ -206,14 +206,17 @@ enum EntityActivateKind {
 /** deactivateKind: when Entity__UpdateDeactivationState deactivates an active
  * Entity. 0 and 3 make no test; 1 and 2 test as activateKind does; from
  * ENTITY_DEACTIVATE_TIMED up, it deactivates on the tick that equals
- * deactivateKind * 15. */
+ * deactivateKind * ENTITY_DEACTIVATE_TICK_UNIT. */
 enum EntityDeactivateKind {
     ENTITY_DEACTIVATE_NONE = 0, /**< never */
     ENTITY_DEACTIVATE_NEAR = 1, /**< while near */
     ENTITY_DEACTIVATE_FAR = 2,  /**< while not near */
     ENTITY_DEACTIVATE_NONE_ALT = 3, /**< never either: what sets it apart from 0 is not in Entity code */
-    ENTITY_DEACTIVATE_TIMED = 10 /**< and above: on tick deactivateKind * 15 */
+    ENTITY_DEACTIVATE_TIMED = 10 /**< and above: on tick deactivateKind * ENTITY_DEACTIVATE_TICK_UNIT */
 };
+
+/** A timed deactivateKind counts in steps of this many ticks. */
+#define ENTITY_DEACTIVATE_TICK_UNIT 15
 
 /** A linkStage of 127 ends the dream instead of linking: Entity__NotifyLinkStage
  * sends ENTITY_EFFECT_EVENT_VIDEO when the row has an eventVideo, else
@@ -503,7 +506,7 @@ s32 Entity__UpdateSoundCueStop(Entity *self);
 /**
  * @brief Row 51's handler, run by row 113's too (Entity__CueWalkWithTurnsMaybeGiantRow113): at
  *        moodTimer 0 in state 0, one time in five, scales to sScaleSix,
- *        moves 800 in local y and enters state 11; plays program 8 every
+ *        moves 800 in local y and leaves state 0, so only once; plays program 8 every
  *        fifth tick; turns by -90, +90 and (at random) 180 degrees at
  *        moodTimer 90, 160 and 220; moves -80 a tick in local z.
  * @param self The entity.

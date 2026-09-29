@@ -25,7 +25,7 @@ typedef struct StageMapMethods StageMapMethods;
 typedef struct ChunkSlot ChunkSlot;
 
 /** StageMap's class id (gStageMapMethods word +0x000). Three nibbles, so
- * `(header & 0xFFF) == STAGEMAP_CLASS_ID` tests for it or a class below it
+ * `(header & CLASS_ID_LEVEL3_MASK) == STAGEMAP_CLASS_ID` tests for it or a class below it
  * (ObjM__OnNotify). */
 #define STAGEMAP_CLASS_ID 0x114
 

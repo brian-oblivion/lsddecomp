@@ -44,7 +44,13 @@
  * GsSortBoxFill unmasked. */
 #define STYLE_DECOR_PRI 0x1FFF
 
-/* How far down (pixels) decor variant 2 draws the set. */
+/* sStyleDecorVariant: whether there is a decoration set, and where it sits.
+ * PickStyleFallbackConfig picks it for variant 0's records 0..5. */
+#define STYLE_DECOR_NONE 0    /* no bands */
+#define STYLE_DECOR_UPPER 1   /* records 0..3: the set at sStyleDecorPosX/Y */
+#define STYLE_DECOR_LOWERED 2 /* records 4..5: STYLE_DECOR_VARIANT2_DROP lower */
+
+/* How far down (pixels) STYLE_DECOR_LOWERED draws the set. */
 #define STYLE_DECOR_VARIANT2_DROP 30
 
 /* StyleUpdateDecorSet's fade step: the viewport's view-point y less its
@@ -71,6 +77,296 @@ extern StyleCueSlot *sStyleCueSlots[2];
 
 extern void *ApplyStyleConfig(void);
 
+/** @brief A stage's style config: four signed bytes, from
+ * sStyleStageConfigs (NULL for a stage without a fixed one) or
+ * PickStyleFallbackConfig (below), which FillStyleFromConfig turns
+ * into sStyleConfig's last four words. */
+typedef struct StyleStageConfig {
+    s8 colorMode; /**< StyleConfig::colorMode */
+    s8 fogLevel; /**< sStyleFogNears index; STYLE_DECOR_FOG_LEVEL and up also build the decoration box */
+    s8 farColorIndex; /**< sStylePalette index: StyleConfig::farColor, and the decoration box's colour */
+    s8 clearColorIndex; /**< sStylePalette index: StyleConfig::clearColor */
+} StyleStageConfig;
+
+/** @brief One 8-byte record of a stage's cue list (sStyleCueRecordLists):
+ * the cell it sits in, its in-cell offset (a sStyleCueOffsets index) and
+ * `cue`, its cue index (the sStyleCueCallbacks and sStyleCueDistanceTable
+ * row, InitSoundCueSet's tag), negated while a slot holds the record. */
+typedef struct StyleCueRecord {
+    CellKey key;    /**< +0x0 the cell the cue sits in */
+    u8 offsetIndex; /**< +0x4 its offset in the cell, a sStyleCueOffsets index */
+    u8 pad5;        /* +0x5 */
+    s8 cue;         /**< +0x6 the cue index; negated while a slot holds the record */
+    u8 pad7;        /* +0x7 */
+} StyleCueRecord;
+
+/* The fixed configs of the stages whose config is in .sdata, and the two
+ * greys sStyleConfig points at (+0x008 ambientColor and +0x010). */
+extern s32 sStyleAmbientGrey;
+extern s32 sStyleGrey10;
+extern StyleStageConfig sStyleStage06Configs[];
+extern StyleStageConfig sStyleStage08Configs[];
+extern StyleStageConfig sStyleStage10Configs[];
+extern StyleStageConfig sStyleStage11Configs[];
+
+/* Defined below: the cue callbacks sStyleCueCallbacks lists. */
+void StyleCue00(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue01(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue02(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue03(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue04(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue05(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue06(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue07(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue08(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue09(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue10(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue11(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue12(StyleCueSlot *ctx, SoundCueSet *set);
+void StyleCue13(StyleCueSlot *ctx, SoundCueSet *set);
+
+/* The style layer's data, in address order. */
+/* clang-format off */
+/* The effects' spawn rotations (x, y, z degrees) and scales. */
+Ratio16 sStyleSpawnRotations[7][3] = {
+    {{0, 1}, {0, 1}, {0, 1}},
+    {{0, 1}, {60, 1}, {0, 1}},
+    {{0, 1}, {120, 1}, {0, 1}},
+    {{0, 1}, {180, 1}, {0, 1}},
+    {{0, 1}, {230, 1}, {0, 1}},
+    {{-5, 1}, {0, 1}, {0, 1}},
+    {{-3, 1}, {180, 1}, {0, 1}},
+};
+Ratio16 sStyleSpawnScales[5][3] = {
+    {{7, 1}, {1, 1}, {7, 1}},
+    {{6, 1}, {1, 1}, {7, 1}},
+    {{7, 1}, {1, 1}, {6, 1}},
+    {{7, 1}, {1, 1}, {2, 1}},
+    {{2, 1}, {1, 1}, {7, 1}},
+};
+Ratio16 sStyleKind1Scale[2][3] = {
+    {{1, 1}, {1, 1}, {1, 1}},
+    {{2, 1}, {1, 1}, {2, 1}},
+};
+
+/* The kind-3 and kind-2 effects' colours. */
+u8 sStyleKind3Colors[4][3] = {
+    {255, 230, 180}, {255, 180, 180}, {255, 0, 0}, {0, 0, 0},
+};
+u8 sStyleKind2Colors[4][3] = {
+    {255, 128, 0}, {200, 200, 255}, {128, 128, 255}, {0, 0, 0},
+};
+
+/* The decoration's band colours, one RGB triple per band: A, or B for a
+ * variant-0 config whose decor colour is STYLE_DECOR_B_PALETTE_INDEX. */
+u8 sStyleDecorColorsA[18 * 3] = {
+     55, 119, 148,   60, 121, 151,   65, 123, 154,   70, 125, 157,   75, 127, 160,   80, 129, 163,
+     85, 131, 166,   90, 133, 169,   95, 135, 172,  100, 137, 175,  105, 139, 178,  110, 141, 181,
+    115, 143, 184,  120, 150, 187,  123, 152, 190,  126, 153, 192,  128, 154, 193,  130, 155, 194,
+};
+u8 sStyleDecorColorsB[18 * 3] = {
+     55, 119, 148,   60, 121, 151,   65, 123, 154,   70, 125, 157,   75, 127, 160,   80, 129, 163,
+     90, 131, 166,  110, 133, 169,  130, 135, 172,  150, 137, 175,  170, 139, 178,  190, 141, 181,
+    210, 143, 184,  230, 150, 187,  235, 152, 190,  240, 153, 192,  245, 154, 193,  250, 155, 194,
+};
+
+/* The StageMap's light directions and colours (sStyleConfig's first two
+ * words, setChildParams). */
+s16 sStyleLightDirs[10] = {50, 300, 60, 0, 500, -60, -300, 20, 20, 0};
+u8 sStyleLightColors[3][3] = {
+    {200, 200, 200}, {200, 240, 240}, {255, 230, 230},
+};
+
+/* 24 RGB triples (a greyscale ramp first: 0, 64, 128, 255) the configs'
+ * colour indices pick, and six fogNear distances, 26624 down to 2048. */
+/* MATCHING: sStylePalette is indexed as u8[][3], for the stride-3 address arithmetic. */
+u8 sStylePalette[24][3] = {
+    {0, 0, 0}, {64, 64, 64}, {128, 128, 128}, {255, 255, 255}, {64, 0, 0}, {8, 32, 8},
+    {32, 32, 8}, {24, 8, 8}, {24, 24, 8}, {24, 24, 128}, {8, 8, 24}, {255, 0, 0},
+    {100, 140, 180}, {50, 119, 145}, {130, 155, 194}, {0, 100, 190}, {0, 50, 30}, {70, 50, 0},
+    {250, 155, 194}, {0, 255, 0}, {120, 140, 180}, {120, 0, 180}, {180, 0, 120}, {0, 0, 0},
+};
+s32 sStyleFogNears[6] = {26624, 20480, 14336, 8192, 4096, 2048};
+
+/* Kind 0's effect counts, and the spawn heights the kinds pick from. */
+s8 sStyleKind0Counts[4] = {0, 3, 8, 16};
+s32 sStyleSpawnYChoices[4] = {-6144, -10240, -14336, -20480};
+
+/* The fixed configs, {colorMode, fogLevel, farColorIndex, clearColorIndex}:
+ * stage 5's (the others' are .sdata, declared above), then the four
+ * fallback variants PickStyleFallbackConfig picks from, by day and stage. */
+StyleStageConfig sStyleStage05Configs[2] = {{0, 2, 10, 10}, {0, 1, 14, 13}};
+s8 sStyleVariant0Configs[7][4] = {
+    {0, 1, 14, 13},
+    {0, 2, 14, 13},
+    {0, 1, 18, 13},
+    {0, 2, 18, 13},
+    {0, 1, 14, 13},
+    {0, 2, 14, 13},
+    {0, 2, 20, 12},
+};
+s8 sStyleVariant1Configs[10][4] = {
+    {0, 3,  3,  3},
+    {0, 2,  3,  3},
+    {0, 1,  3,  3},
+    {0, 0, 21, 21},
+    {0, 1, 19, 19},
+    {0, 2,  2,  2},
+    {0, 3,  2,  2},
+    {0, 4,  2,  2},
+    {0, 3, 21, 22},
+    {0, 4,  1,  1},
+};
+s8 sStyleVariant2Configs[12][4] = {
+    {0, 2,  3,  0},
+    {1, 2,  3,  0},
+    {2, 2,  3,  0},
+    {0, 2,  7, 10},
+    {1, 2,  7, 10},
+    {2, 2,  7, 10},
+    {0, 2,  8, 10},
+    {1, 2,  8, 10},
+    {2, 2,  8, 10},
+    {0, 2,  6,  6},
+    {0, 2,  5,  5},
+    {0, 1,  4,  4},
+};
+s8 sStyleVariant3Configs[5][4] = {
+    {0, 3,  0,  0},
+    {0, 3,  9,  9},
+    {0, 3, 22, 17},
+    {0, 3, 16, 16},
+    {0, 3, 17, 17},
+};
+s8 *sStyleVariantConfigs[4] = {sStyleVariant0Configs[0], sStyleVariant1Configs[0], sStyleVariant2Configs[0], sStyleVariant3Configs[0]};
+s8 sStyleVariantConfigCounts[4] = {7, 10, 12, 5};
+s8 sStyleVariantPicks[16] = {0, 1, 2, 3, 1, 2, 3, 0, 0, 0, 2, 2, 1, 3, 1, 0};
+
+/* Each stage's fixed configs, or NULL for the fallback. */
+StyleStageConfig *sStyleStageConfigs[14] = {
+    NULL, NULL, NULL, NULL,
+    NULL, sStyleStage05Configs, sStyleStage06Configs, sStyleStage06Configs,
+    sStyleStage08Configs, sStyleStage06Configs, sStyleStage10Configs, sStyleStage11Configs,
+    sStyleStage11Configs, NULL,
+};
+
+/* The one StyleConfig the layer fills (FillStyleFromConfig writes the last
+ * four words; clearColor is also the kind-2 effects' alternate colour). */
+StyleConfig sStyleConfig = {
+    (s32)sStyleLightDirs, (s32)sStyleLightColors, (s32)&sStyleAmbientGrey, NULL,
+    &sStyleGrey10, -1, NULL, 0,
+};
+
+/* StyleScrollVramStrips' two VRAM strips and their one-column scratch
+ * rects (RotateVramRectRight reads only a scratch rect's corner). */
+DrawRect sStyleStripRectA = {0x0, 0x1F0, 248, 8};
+DrawRect sStyleStripScratchA = {0x100, 0x1F0, 1, 8};
+DrawRect sStyleStripRectB = {0x0, 0x1F8, 248, 8};
+DrawRect sStyleStripScratchB = {0x100, 0x1F8, 1, 8};
+
+/* Per cue index, the distance within which it starts, and its callback. */
+s32 sStyleCueDistanceTable[15] = {0, 81920, 40960, 16384, 40960, 61440, 81920, 81920, 40960, 40960, 20480, 40960, 61440, 40960, 4096};
+SoundCueCallbackFn sStyleCueCallbacks[15] = {
+    NULL,
+    (SoundCueCallbackFn)StyleCue00, (SoundCueCallbackFn)StyleCue01, (SoundCueCallbackFn)StyleCue02,
+    (SoundCueCallbackFn)StyleCue03, (SoundCueCallbackFn)StyleCue04, (SoundCueCallbackFn)StyleCue05,
+    (SoundCueCallbackFn)StyleCue06, (SoundCueCallbackFn)StyleCue07, (SoundCueCallbackFn)StyleCue08,
+    (SoundCueCallbackFn)StyleCue09, (SoundCueCallbackFn)StyleCue10, (SoundCueCallbackFn)StyleCue11,
+    (SoundCueCallbackFn)StyleCue12, (SoundCueCallbackFn)StyleCue13,
+};
+
+/* The in-cell offsets a record's offsetIndex picks. */
+CellOffset sStyleCueOffsets[1] = {{{0, 0}, 0}};
+
+/* Each stage's positional cues: the chunk and cell (column in the low
+ * byte, row in the high), the offset index and the cue index. */
+StyleCueRecord sStyleStage00Cues[1] = {
+    {{0x0200, 0x0806}, 0, 0, 14, 0},
+};
+StyleCueRecord sStyleStage02Cues[9] = {
+    /* chunk   cell   off  cue */
+    {{0x0304, 0x040B}, 0, 0,  9, 0},
+    {{0x0003, 0x0910}, 0, 0,  4, 0},
+    {{0x0104, 0x0206}, 0, 0,  4, 0},
+    {{0x0104, 0x0E05}, 0, 0,  4, 0},
+    {{0x0203, 0x050F}, 0, 0,  4, 0},
+    {{0x0203, 0x110F}, 0, 0,  4, 0},
+    {{0x0304, 0x0905}, 0, 0,  4, 0},
+    {{0x0403, 0x0110}, 0, 0,  4, 0},
+    {{0x0403, 0x0D10}, 0, 0,  4, 0},
+};
+StyleCueRecord sStyleStage03Cues[29] = {
+    /* chunk   cell   off  cue */
+    {{0x0407, 0x0607}, 0, 0,  1, 0},
+    {{0x040A, 0x0B0E}, 0, 0,  1, 0},
+    {{0x0105, 0x0A03}, 0, 0,  2, 0},
+    {{0x0309, 0x0600}, 0, 0,  5, 0},
+    {{0x000A, 0x0A09}, 0, 0,  5, 0},
+    {{0x000A, 0x0A09}, 0, 0,  5, 0},
+    {{0x000A, 0x0A09}, 0, 0,  5, 0},
+    {{0x0002, 0x0909}, 0, 0, 12, 0},
+    {{0x000A, 0x0A09}, 0, 0, 12, 0},
+    {{0x000A, 0x0A09}, 0, 0, 12, 0},
+    {{0x0104, 0x0009}, 0, 0,  1, 0},
+    {{0x0104, 0x1308}, 0, 0,  1, 0},
+    {{0x0208, 0x0C0A}, 0, 0,  1, 0},
+    {{0x0407, 0x0507}, 0, 0,  1, 0},
+    {{0x040A, 0x0C0E}, 0, 0,  1, 0},
+    {{0x0502, 0x0B02}, 0, 0,  1, 0},
+    {{0x0705, 0x0713}, 0, 0,  1, 0},
+    {{0x0003, 0x0A03}, 0, 0, 12, 0},
+    {{0x000A, 0x1301}, 0, 0, 12, 0},
+    {{0x0105, 0x0713}, 0, 0, 12, 0},
+    {{0x010C, 0x0C00}, 0, 0, 12, 0},
+    {{0x0207, 0x0304}, 0, 0, 12, 0},
+    {{0x0209, 0x0011}, 0, 0, 12, 0},
+    {{0x0507, 0x080F}, 0, 0, 12, 0},
+    {{0x0706, 0x0805}, 0, 0, 12, 0},
+    {{0x0805, 0x0B07}, 0, 0, 12, 0},
+    {{0x0D0D, 0x0F0F}, 0, 0, 12, 0},
+    {{0x0E01, 0x0F01}, 0, 0, 12, 0},
+    {{0x0E0D, 0x0909}, 0, 0, 12, 0},
+};
+StyleCueRecord sStyleStage04Cues[5] = {
+    /* chunk   cell   off  cue */
+    {{0x0305, 0x0902}, 0, 0,  3, 0},
+    {{0x0200, 0x1110}, 0, 0,  8, 0},
+    {{0x0401, 0x0D10}, 0, 0,  6, 0},
+    {{0x0401, 0x0011}, 0, 0,  6, 0},
+    {{0x0402, 0x020E}, 0, 0,  6, 0},
+};
+StyleCueRecord sStyleStage05Cues[9] = {
+    /* chunk   cell   off  cue */
+    {{0x0504, 0x0600}, 0, 0, 11, 0},
+    {{0x0504, 0x0600}, 0, 0,  7, 0},
+    {{0x0502, 0x0202}, 0, 0,  7, 0},
+    {{0x0400, 0x0F12}, 0, 0,  7, 0},
+    {{0x0301, 0x0D08}, 0, 0,  7, 0},
+    {{0x0200, 0x1112}, 0, 0,  7, 0},
+    {{0x0101, 0x1307}, 0, 0,  7, 0},
+    {{0x0000, 0x1212}, 0, 0,  7, 0},
+    {{0x0000, 0x0512}, 0, 0,  7, 0},
+};
+StyleCueRecord sStyleStage10Cues[1] = {
+    {{0x0002, 0x0A08}, 0, 0, 10, 0},
+};
+StyleCueRecord sStyleStage11Cues[1] = {
+    {{0x0101, 0x080C}, 0, 0, 10, 0},
+};
+StyleCueRecord sStyleStage13Cues[1] = {
+    {{0x0000, 0x0903}, 0, 0, 13, 0},
+};
+
+/* The per-stage cue lists and their lengths. */
+u8 *sStyleCueRecordLists[14] = {
+    (u8 *)sStyleStage00Cues, NULL, (u8 *)sStyleStage02Cues, (u8 *)sStyleStage03Cues,
+    (u8 *)sStyleStage04Cues, (u8 *)sStyleStage05Cues, NULL, NULL,
+    NULL, NULL, (u8 *)sStyleStage10Cues, (u8 *)sStyleStage11Cues,
+    NULL, (u8 *)sStyleStage13Cues,
+};
+u8 sStyleCueRecordCounts[14] = {1, 0, 9, 29, 5, 9, 0, 0, 0, 0, 1, 1, 0, 1};
+/* clang-format on */
+
 s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadArg) {
     StyleCueSlot **slot;
     s32 i;
@@ -95,22 +391,8 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
     return 0;
 }
 
-/** @brief A stage's style config: four signed bytes, from
- * sStyleStageConfigs (NULL for a stage without a fixed one) or
- * PickStyleFallbackConfig (below), which FillStyleFromConfig turns
- * into sStyleConfig's last four words. */
-typedef struct StyleStageConfig {
-    s8 colorMode; /**< StyleConfig::colorMode */
-    s8 fogLevel; /**< sStyleFogNears index; STYLE_DECOR_FOG_LEVEL and up also build the decoration box */
-    s8 farColorIndex; /**< sStylePalette index: StyleConfig::farColor, and the decoration box's colour */
-    s8 clearColorIndex; /**< sStylePalette index: StyleConfig::clearColor */
-} StyleStageConfig;
-
-extern StyleConfig sStyleConfig;
-extern StyleStageConfig *sStyleStageConfigs[];
 extern void *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg);
-extern u8 sStylePalette[][3];
 extern const u8 *sStyleDecorColor;
 
 /* The stage's fixed config, or with none PickStyleFallbackConfig's, into
@@ -128,11 +410,6 @@ void *ApplyStyleConfig(void) {
     }
     return &sStyleConfig;
 }
-
-/* sStylePalette is 24 RGB triples (a greyscale ramp first: 0, 64, 128, 255).
- * sStyleFogNears is six fogNear distances, 26624 down to 2048. */
-/* MATCHING: sStylePalette is indexed as u8[][3], for the stride-3 address arithmetic. */
-extern s32 sStyleFogNears[];
 
 void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg) {
     style->clearColor = sStylePalette[cfg->clearColorIndex];
@@ -200,20 +477,16 @@ void StyleFlushDecoration(void) {
     }
 }
 
-extern s8 sStyleVariantPicks[];
-extern s8 sStyleVariantConfigCounts[];
 extern s32 sStyleConfigIndex;
-extern s8 *sStyleVariantConfigs[];
 extern const u8 *sStyleClearColor;
-extern u8 sStyleDecorColorsB[];
 extern const u8 *sStyleDecorColors;
-extern u8 sStyleDecorColorsA[];
 extern s32 sStyleDecorVariant;
 
 /* The config for a stage without a fixed one: the variant from
  * sStyleVariantPicks[(day + stage) & 0xF], then record (day + stage) % count
  * of that variant's table. For variant 0 it also sets the clear colour, the
- * band colours and, for records 0..5, the decor variant (1, or 2 for 4..5). */
+ * band colours and, for records 0..5, the decor variant (STYLE_DECOR_UPPER,
+ * or STYLE_DECOR_LOWERED for 4..5). */
 void *PickStyleFallbackConfig(void) {
     s32 seed;
     s32 variant;
@@ -241,9 +514,9 @@ void *PickStyleFallbackConfig(void) {
         }
         sStyleDecorColors = decorColors;
         if (index < 4) {
-            sStyleDecorVariant = 1;
+            sStyleDecorVariant = STYLE_DECOR_UPPER;
         } else if (index < 6) {
-            sStyleDecorVariant = 2;
+            sStyleDecorVariant = STYLE_DECOR_LOWERED;
         }
     }
     return config;
@@ -270,11 +543,11 @@ void StyleBuildDecorSet(void) {
     Viewport *viewport;
     SceneNode *parent;
 
-    if (sStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == STYLE_DECOR_NONE) {
         return;
     }
     pos = *(BoxFillPos *)&sStyleDecorPosX;
-    if (sStyleDecorVariant == 2) {
+    if (sStyleDecorVariant == STYLE_DECOR_LOWERED) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
     size = *(BoxFillSize *)&sStyleDecorSizeW;
@@ -304,14 +577,14 @@ void StyleUpdateDecorSet(void) {
     Viewport *viewport;
     s32 height;
     s32 fade;
-    u8 rgb[8]; /* MATCHING: 8, not 3 (the frame keeps pos at sp+0x18) */
+    u8 rgb[8]; /* MATCHING: 8 bytes, not the 3 it uses, to place pos where retail's stack has it */
     BoxFillPos pos;
     s32 colorOfs;
     s32 i;
     BoxFill **slot;
     BoxFill *band;
 
-    if (sStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == STYLE_DECOR_NONE) {
         return;
     }
     viewport = ((StyleSceneRefs *)sStyleSceneRefs)->viewport;
@@ -322,7 +595,7 @@ void StyleUpdateDecorSet(void) {
     }
     pos = *(BoxFillPos *)&sStyleDecorPosX;
     i = 0;
-    if (sStyleDecorVariant == 2) {
+    if (sStyleDecorVariant == STYLE_DECOR_LOWERED) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
     slot = sStyleDecorSlots;
@@ -352,13 +625,12 @@ void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
 
 /* Releases the bands, if StyleBuildDecorSet made them. */
 void StyleReleaseDecorSet(void) {
-    if (sStyleDecorVariant != 0) {
+    if (sStyleDecorVariant != STYLE_DECOR_NONE) {
         ReleaseBasicClassArray((BasicClass **)sStyleDecorSlots, ARRAY_COUNT(sStyleDecorSlots));
-        sStyleDecorVariant = 0;
+        sStyleDecorVariant = STYLE_DECOR_NONE;
     }
 }
 
-extern s8 sStyleKind0Counts[];
 extern s32 sStyleEffectSlotCount;
 extern StyleEffect *sStyleEffectSlots[];
 extern StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos);
@@ -419,18 +691,6 @@ void StyleReleaseEffectSlots(void) {
     }
 }
 
-/** @brief One 8-byte record of a stage's cue list (sStyleCueRecordLists):
- * the cell it sits in, its in-cell offset (a sStyleCueOffsets index) and
- * `cue`, its cue index (the sStyleCueCallbacks and sStyleCueDistanceTable
- * row, InitSoundCueSet's tag), negated while a slot holds the record. */
-typedef struct StyleCueRecord {
-    CellKey key;    /**< +0x0 the cell the cue sits in */
-    u8 offsetIndex; /**< +0x4 its offset in the cell, a sStyleCueOffsets index */
-    u8 pad5;        /* +0x5 */
-    s8 cue;         /**< +0x6 the cue index; negated while a slot holds the record */
-    u8 pad7;        /* +0x7 */
-} StyleCueRecord;
-
 /** @brief One of the two positional cues: the record it holds, the
  * record's world position, the last distance to the target, and its sound
  * cue. */
@@ -458,8 +718,6 @@ void StyleTeardown(void) {
     }
 }
 
-extern Ratio16 sStyleSpawnScales[][3];
-extern s32 sStyleSpawnYChoices[];
 extern Ratio16 *sStyleSpawnScale;
 extern s32 sStyleSpawnTableIndex;
 /* The first word of the StyleEffectParams block every effect is built from
@@ -489,28 +747,25 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
     }
     for (i = 0; i < count; i++) {
         setup(pos, offsetY);
-        *slots =
-            New_StyleEffect(0, (StyleEffectParams *)&sStyleSpawnOffsetX, (SceneNode *)sStyleGrid, pos);
+        *slots = New_StyleEffect(STYLE_EFFECT_MODEL_ROW, (StyleEffectParams *)&sStyleSpawnOffsetX,
+                                 (SceneNode *)sStyleGrid, pos);
         slots++;
     }
     return slots;
 }
 
-extern s32 sStyleSpawnYChoice2;
-extern Ratio16 sStyleKind1Scale[];
-
 /* Fills `count` slots with kind-1 effects: sStyleKind1Scale, offset y
- * sStyleSpawnYChoice2. */
+ * sStyleSpawnYChoices[2]. */
 StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
 
-    offsetY = sStyleSpawnYChoice2;
-    sStyleSpawnScale = sStyleKind1Scale;
+    offsetY = sStyleSpawnYChoices[2];
+    sStyleSpawnScale = sStyleKind1Scale[0];
     for (i = 0; i < count; i++) {
         SetupStyleSpawnParamsRandom(pos, offsetY);
-        *slots =
-            New_StyleEffect(1, (StyleEffectParams *)&sStyleSpawnOffsetX, (SceneNode *)sStyleGrid, pos);
+        *slots = New_StyleEffect(STYLE_EFFECT_MODEL, (StyleEffectParams *)&sStyleSpawnOffsetX,
+                                 (SceneNode *)sStyleGrid, pos);
         slots++;
     }
     return slots;
@@ -518,15 +773,13 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
 
 extern s32 sStyleSpawnColors[];
 extern Ratio16 *sStyleSpawnRotation;
-extern Ratio16 sStyleSpawnRotations[][3];
 extern s32 sStyleSpawnOffsetY;
 extern s32 sStyleSpawnOffsetZ;
-extern u8 sStyleKind3Colors[][3];
 
 /** @brief sStyleSpawnRotation seen as a one-field struct, through which
  * StyleFillEffectKind3 stores the effect's rotation. */
 /* MATCHING: the rotation store goes through a one-field struct, so the
- * sStyleGrid load may schedule above it (a plain pointer store blocks it). */
+ * sStyleGrid read can come before it; a plain pointer store keeps it after. */
 typedef struct PtrBoxK3 {
     Ratio16 *p; /**< +0x000 the spawn rotation */
 } PtrBoxK3;
@@ -538,8 +791,8 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     s32 *offsetZ;
     PtrBoxK3 *rotation;
 
-    SetupStyleSpawnParamsRandom(pos, sStyleSpawnYChoice2);
-    if (sStyleDecorVariant != 0 && sStyleDecorColors == sStyleDecorColorsB) {
+    SetupStyleSpawnParamsRandom(pos, sStyleSpawnYChoices[2]);
+    if (sStyleDecorVariant != STYLE_DECOR_NONE && sStyleDecorColors == sStyleDecorColorsB) {
         sStyleSpawnOffsetX = -45056;
         sStyleSpawnOffsetY = -8192;
         sStyleSpawnOffsetZ = 0;
@@ -557,51 +810,53 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     rotation = (PtrBoxK3 *)&sStyleSpawnRotation;
     rotation->p = sStyleSpawnRotations[0];
     /* MATCHING: the block's address is taken back from its rotation member */
-    *slots = New_StyleEffect(
-        3, (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
-        (SceneNode *)sStyleGrid, pos);
+    *slots =
+        New_StyleEffect(STYLE_EFFECT_JITTER_SPRITES,
+                        (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
+                        (SceneNode *)sStyleGrid, pos);
     slots++;
     return slots;
 }
 
-extern s32 sStyleKind2AltColor;
-extern u8 sStyleKind2Colors[][3];
-
 /** @brief One word of sStyleSpawnColors seen as a one-field struct, through
  * which StyleFillEffectKind2 stores the effect's two colours. */
 /* MATCHING: the first colour store goes through a one-field struct, as
- * PtrBoxK3's does, so the sStyleDay load may schedule above it. */
+ * PtrBoxK3's does, so the sStyleDay read can come before it. */
 typedef struct S32BoxK2 {
-    s32 v; /**< +0x000 a colour: first an RGB triple's address, then sStyleKind2AltColor or 0 */
+    s32 v; /**< +0x000 a colour: first an RGB triple's address, then sStyleConfig.clearColor or 0 */
 } S32BoxK2;
 
 /* Appends one kind-2 effect with a random colour and, except on every
- * twentieth day, sStyleKind2AltColor as its alternate colour. */
+ * twentieth day, sStyleConfig.clearColor as its alternate colour. */
 StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     s32 r;
     s32 altColor;
     S32BoxK2 *color;
     Ratio16 **rotation;
+    s32 offsetY;
 
     r = rand();
     color = (S32BoxK2 *)sStyleSpawnColors;
     color->v = (s32)sStyleKind2Colors[(u32)r % 3];
     color++;
-    altColor = (sStyleDay / 20) * 20; /* MATCHING: not `% 20`, which jump.c folds */
+    altColor = (sStyleDay / 20) * 20; /* MATCHING: not `sStyleDay % 20`, which compiles differently */
     if (sStyleDay != altColor) {
-        altColor = sStyleKind2AltColor;
+        altColor = (s32)sStyleConfig.clearColor;
     } else {
         altColor = 0;
     }
+    /* MATCHING: the height is read before the colour is stored */
+    offsetY = sStyleSpawnYChoices[2];
     color->v = altColor;
-    SetupStyleSpawnParamsRandom(pos, sStyleSpawnYChoice2);
+    SetupStyleSpawnParamsRandom(pos, offsetY);
     rotation = &sStyleSpawnRotation;
     *rotation = sStyleSpawnRotations[0];
     sStyleSpawnTableIndex = rand() % 6;
     /* MATCHING: the block's address is taken back from its rotation member */
-    *slots = New_StyleEffect(
-        2, (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
-        (SceneNode *)sStyleGrid, pos);
+    *slots =
+        New_StyleEffect(STYLE_EFFECT_SPRITES,
+                        (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
+                        (SceneNode *)sStyleGrid, pos);
     slots++;
     return slots;
 }
@@ -629,19 +884,17 @@ void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
     sStyleSpawnModelLayout = rand() % 5;
 }
 
-extern s32 sStyleSpawnYChoice1;
-
 /* The every-seventh-day setup: fixed offset y, x of 0..19 steps of 2048, z
  * by day % 3 (40960, -40960, 2048), then the same rotation and layout
  * picks as SetupStyleSpawnParamsRandom. Both parameters are unused; it has
  * that function's signature because StyleFillEffectKind0 calls either
  * through one pointer. */
-/* MATCHING: each rand() is used inline; one local for all three adds a move after every call. */
+/* MATCHING: each rand() is used inline; one local for all three is a word longer per call. */
 void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     s32 dayMod3;
 
     rand();
-    sStyleSpawnOffsetY = sStyleSpawnYChoice1;
+    sStyleSpawnOffsetY = sStyleSpawnYChoices[1];
     sStyleSpawnOffsetX = (rand() % 20) << 11;
     dayMod3 = sStyleDay % 3;
     sStyleSpawnOffsetZ = 40960;
@@ -655,7 +908,6 @@ void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
 }
 
 extern StyleCueRecord *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target);
-extern SoundCueCallbackFn sStyleCueCallbacks[];
 
 /* Claims the next record in range for `slot` and starts its cue. A started
  * cue equal to *lastCue is reported back negated. Returns the slot, or NULL. */
@@ -677,12 +929,6 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
 }
 
 extern s32 sStyleCueRecordIndex;
-extern u8 *sStyleCueRecordLists[];
-extern u8 sStyleCueRecordCounts[];
-extern s32 sStyleCueDistanceTable[];
-
-/* sStyleCueOffsets: the in-cell offsets a record's offsetIndex picks. */
-extern CellOffset sStyleCueOffsets[];
 
 /* From sStyleCueRecordIndex on, the first free record of the stage's list
  * whose X+Z distance from the target is under its cue's distance; each
@@ -712,7 +958,7 @@ StyleCueRecord *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *t
             grid->methods->computeCellOffsets(grid, pos, &buf);
             dx = pos->x - target->x;
             if (dx < 0) {
-                dx = ~dx + 1; /* MATCHING: not -dx (the nor fills the delay slot) */
+                dx = ~dx + 1; /* MATCHING: not -dx; retail complements and adds one */
             }
             dz = pos->z - target->z;
             if (dz >= 0) {
@@ -758,7 +1004,7 @@ s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
     }
     dx = slot->pos.x - target->x;
     if (dx < 0) {
-        dx = ~dx + 1; /* MATCHING: not -dx (the nor fills the delay slot) */
+        dx = ~dx + 1; /* MATCHING: not -dx; retail complements and adds one */
     }
     dz = slot->pos.z - target->z;
     if (dz >= 0) {
@@ -769,7 +1015,7 @@ s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
     slot->lastDist = dist;
     cue = slot->entry->cue;
     if (dist < sStyleCueDistanceTable[-cue]) {
-        dist = 1; /* MATCHING: not `return 1` (jump.c folds that to slt) */
+        dist = 1; /* MATCHING: not `return 1`, which folds into the compare's result */
         return dist;
     }
     return 0;
@@ -810,7 +1056,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
             if (ServiceStyleCueIfNear(sStyleCueSlots[i], target, unused) == 0) {
                 sStyleCueSlots[i] = FlushStyleCue(sStyleCueSlots[i]);
             }
-            /* MATCHING: a no-op pair that gives target/i retail's registers */
+            /* MATCHING: a no-op pair; without it target and i are kept differently */
             i++;
             i--;
         } else {
@@ -819,11 +1065,6 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     }
     return lastCue;
 }
-
-extern DrawRect sStyleStripRectA;
-extern DrawPoint sStyleStripScratchA;
-extern DrawRect sStyleStripRectB;
-extern DrawPoint sStyleStripScratchB;
 
 /* One step of RotateVramRectRight's one-column VRAM rotation: stage 2 on the
  * strip at y 496, stages 3..5 on the one at y 504. */
@@ -834,12 +1075,12 @@ void StyleScrollVramStrips(void) {
 
     if (sStyleStage == 2) {
         rect = &sStyleStripRectA;
-        scratch = &sStyleStripScratchA;
+        scratch = (DrawPoint *)&sStyleStripScratchA;
         count = 1; /* MATCHING: a local set in each branch, not a literal argument */
     } else if ((u32)(sStyleStage - 3) < 3) {
         count = 1;
         rect = &sStyleStripRectB;
-        scratch = &sStyleStripScratchB;
+        scratch = (DrawPoint *)&sStyleStripScratchB;
     } else {
         return;
     }

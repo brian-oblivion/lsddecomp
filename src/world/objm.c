@@ -22,6 +22,7 @@
 #include "pad.h"
 #include "fade_box.h"
 #include "dream_sys.h"
+#include "entity.h"
 #include "stage_map.h"
 #include "node_guarded_viewport.h"
 #include "tim_block_src.h"
@@ -37,6 +38,89 @@
  * gridSpan >> 12). */
 #define DEFAULT_GRID_SPAN 40960
 
+/* ObjM's data, in address order. A method-table slot whose function is
+ * declared for another class's `self` takes a `void *` cast. */
+
+/* ObjM's method table, class id 0x2F230: TimedTask's slots, with ObjM's
+ * overrides, then its own. */
+/* clang-format off */
+ObjMMethods gObjMMethods = {
+    /* +0x000 header */ 0x2F230,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ ObjM__ObjM,
+    /* +0x00C finalize */ ObjM__Finalize,
+    /* +0x010 addChild */ (void *)BasicClass__AddChild,
+    /* +0x014 removeChild */ (void *)BasicClass__RemoveChild,
+    /* +0x018 removeAllChildren */ (void *)BasicClass__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)ObjM__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 resetCounters */ (void *)ObjM__NoOpResetCounters,
+    /* +0x044 init */ (void *)ObjM__AttachTarget,
+    /* +0x048 deinit */ ObjM__DetachTarget,
+    /* +0x04C onInit */ (void *)ObjM__InitStyleAndWorld,
+    /* +0x050 onDeinit */ ObjM__TeardownStyle,
+    /* +0x054 onDrawSystemEvent */ (void *)ObjM__OnDrawSystemEvent,
+    /* +0x058 onPadEvent */ (void *)ObjM__DispatchPadEvent,
+    /* +0x05C update */ (void *)ObjM__Update,
+    /* +0x060 setState */ (void *)TimedTask__SetState,
+    /* +0x064 onStart */ (void *)IntermediateBase__OnStart,
+    /* +0x068 onStop */ (void *)IntermediateBase__OnStop,
+    /* +0x06C setTimeout */ (void *)TimedTask__SetTimeout,
+    /* +0x070 playSound */ (void *)TimedTask__PlaySound,
+    /* +0x074 togglePause */ ObjM__TogglePause,
+    /* +0x078 slot78 */ NULL,
+    /* +0x07C onTimedOut */ (void *)ObjM__NoOpOnTimedOut,
+    /* +0x080 setupSceneStyle */ ObjM__SetupSceneStyle,
+    /* +0x084 exitSceneStyle */ ObjM__ExitSceneStyle,
+    /* +0x088 enterStyleSession */ ObjM__EnterStyleSession,
+    /* +0x08C tickStyle */ ObjM__TickStyle,
+    /* +0x090 onDreamSysNotify */ ObjM__OnDreamSysNotify,
+    /* +0x094 enterTimeUp */ ObjM__EnterTimeUp,
+    /* +0x098 enterLinkDynamic */ ObjM__EnterLinkDynamic,
+    /* +0x09C enterLinkWall */ ObjM__EnterLinkWall,
+    /* +0x0A0 enterLinkFlashback */ ObjM__EnterLinkFlashback,
+    /* +0x0A4 enterLinkTunnel */ ObjM__EnterLinkTunnel,
+    /* +0x0A8 enterLinkStageTimer */ ObjM__EnterLinkStageTimer,
+    /* +0x0AC notifyLinkTeleport */ ObjM__NotifyLinkTeleport,
+    /* +0x0B0 onFadeNotify */ ObjM__OnFadeNotify,
+    /* +0x0B4 onStageMapNotify */ ObjM__OnStageMapNotify,
+    /* +0x0B8 checkAuxTrigger */ ObjM__CheckAuxTrigger,
+    /* +0x0BC slotBC */ ObjM__NoOpSlotBC,
+    /* +0x0C0 updateCloseReadyFlag */ ObjM__UpdateCloseReadyFlag,
+    /* +0x0C4 clearCloseReadyFlag */ ObjM__ClearCloseReadyFlag,
+    /* +0x0C8 closeAndNotifyNewGame */ ObjM__CloseAndNotifyNewGame,
+    /* +0x0CC closeAndNotify */ ObjM__CloseAndNotify,
+    /* +0x0D0 advancePauseSetup */ ObjM__AdvancePauseSetup,
+    /* +0x0D4 teardownPauseOverlay */ ObjM__TeardownPauseOverlay,
+};
+/* clang-format on */
+
+/* The StageMap's accepted tags (setAcceptedTags), 0-terminated. */
+s32 sObjMAcceptedClassIds[3] = {DREAMSYS_CLASS_ID, ENTITY_CLASS_ID, 0};
+
+/* The value ObjM__InitStyleAndWorld hands DreamSys's setPendingExtra, per
+ * stage. */
+/* clang-format off */
+s32 sStagePendingExtras[14] = {
+    /* stages 0..6  */ 0x080, 0x400, 0x080, 0x100, 0x100, 0x100, 0x000,
+    /* stages 7..13 */ 0x100, 0x100, 0x080, 0x000, 0x000, 0x400, 0x400,
+};
+/* clang-format on */
+
+/* The StageMap's bounds on stage 0: columns 0..8, rows 0..9. */
+CellBounds sStage0Bounds = {0, 0, 8, 9};
+
+/* The viewport's view point and reference point (attachViewChild). */
+LongVec3 sObjMViewPoint = {0, -1200, 0};
+LongVec3 sObjMViewRefPoint = {0, -1200, 10000};
+
 ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, TimImage *etcTim,
                struct LinkResource *dreamerTmd, s32 stage) {
     ObjM *self;
@@ -46,7 +130,7 @@ ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, TimImage *etcTim,
     if (self != NULL) {
         methods = GetObjMMethods();
         methods->ctor(self, sound, bgm, etcTim, dreamerTmd, stage);
-        return self; /* MATCHING: two returns, not one */
+        return self;
     }
     return NULL;
 }
@@ -77,11 +161,11 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
 
     GetTimedTaskMethods()->onNotify((TimedTask *)self, sender, event);
     tag = sender->methods->header;
-    if ((tag & 0xFFF) == STAGEMAP_CLASS_ID) {
+    if ((tag & CLASS_ID_LEVEL3_MASK) == STAGEMAP_CLASS_ID) {
         self->methods->onStageMapNotify(self, sender, event);
-    } else if ((tag & 0xFFF) == FADEBOX_CLASS_ID) {
+    } else if ((tag & CLASS_ID_LEVEL3_MASK) == FADEBOX_CLASS_ID) {
         self->methods->onFadeNotify(self, (struct FadeBox *)sender, event);
-    } else if ((tag & 0xFFFF) == DREAMSYS_CLASS_ID) {
+    } else if ((tag & CLASS_ID_LEVEL4_MASK) == DREAMSYS_CLASS_ID) {
         self->methods->onDreamSysNotify(self, sender, event);
     }
 }
@@ -95,7 +179,7 @@ void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dr
     ((StageMap *)args->lightRig)
         ->methods->setCallback((StageMap *)args->lightRig, (ChunkFileFn)ObjM__GetGridRecord, self);
     self->dreamSys = dreamSys;
-    GetTimedTaskMethods()->init((TimedTask *)self, args, 1);
+    GetTimedTaskMethods()->init((TimedTask *)self, args, INTERMEDIATEBASE_INIT_ATTACH);
     self->methods->addChild(self, (BasicClass *)dreamSys);
 }
 
@@ -116,14 +200,6 @@ void ObjM__DetachTarget(ObjM *self) {
     self->methods->removeChild(self, (BasicClass *)self->dreamSys);
     GetTimedTaskMethods()->deinit((TimedTask *)self);
 }
-
-/* The viewport's view point and reference point (attachViewChild), the
- * StageMap's bounds on stage 0, and one DreamSys setPendingExtra value per
- * stage. */
-extern LongVec3 sObjMViewPoint;
-extern LongVec3 sObjMViewRefPoint;
-extern s32 sStagePendingExtras[];
-extern CellBounds sStage0Bounds;
 
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 initOption) {
@@ -161,7 +237,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 i
         stage = *(s32 volatile *)&self->stage;
         self->tickPeriod = 16;
         three = 3;
-        /* MATCHING: without the barrier `three`'s li moves past the store above. */
+        /* MATCHING: an ordering barrier; without it the 3 is set up ahead of the store above. */
         __asm__("");
         flag = (stage == 5);
         if (stage == 6) {
@@ -186,7 +262,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 i
     GetSetHitHeightGate(flag);
 
     self->dreamSys->methods->setPendingExtra(self->dreamSys, sStagePendingExtras[self->stage]);
-    self->state = 5;
+    self->state = OBJM_STATE_LINK_DYNAMIC;
 }
 
 /* onDeinit. */
@@ -317,10 +393,6 @@ void ObjM__NoOpOnTimedOut(void) {}
  * written. */
 extern s32 sObjMProjectionBias;
 
-/* The StageMap's accepted tags (setAcceptedTags): the class ids of DreamSys
- * (0x1F34) and Entity (0x1F234), 0-terminated. */
-extern s32 sObjMAcceptedClassIds[];
-
 void ObjM__SetupSceneStyle(ObjM *self) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
     StyleConfig *style = self->styleConfig;
@@ -408,11 +480,11 @@ void ObjM__TickStyle(ObjM *self) {
               0, 0);
 }
 
-/* While ObjM's state is 0 each DreamSys link code runs its enterState slot
+/* While ObjM is OBJM_STATE_IDLE each DreamSys link code runs its enterState slot
  * (DREAMSYS_LINK_DAY_START none); otherwise any code from 9 up clears the
  * DreamSys's own state. */
 void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code) {
-    if (self->state == 0) {
+    if (self->state == OBJM_STATE_IDLE) {
         switch (code) {
             case DREAMSYS_TIME_UP:
                 self->methods->enterTimeUp(self);
@@ -449,12 +521,12 @@ void ObjM__EnterTimeUp(ObjM *self) {
     s32 t;
     s32 step;
 
-    self->state = 4;
+    self->state = OBJM_STATE_TIME_UP;
     if (self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &color, -1) == 0) {
         phase = (self->frameCounter + self->stage) & 3;
-        t = phase; /* MATCHING: the copy keeps retail's extra move. */
+        t = phase; /* MATCHING: tested through a copy; testing phase compiles differently. */
         if (t == 0) {
-            self->methods->notifyParents(self, 4);
+            self->methods->notifyParents(self, OBJM_STATE_TIME_UP);
             return;
         }
         step = 10;
@@ -482,7 +554,7 @@ void ObjM__EnterLinkDynamic(ObjM *self) {
     if (self->dreamSys->currentStage < 0) {
         self->methods->enterLinkWall(self);
     } else {
-        self->state = 5;
+        self->state = OBJM_STATE_LINK_DYNAMIC;
         color = self->dreamSys->methods->getDreamColor(self->dreamSys);
         ObjM__StartFadeUp(self, color, 0, 10, 1);
         self->dreamSys->methods->blockMovement(self->dreamSys);
@@ -492,7 +564,7 @@ void ObjM__EnterLinkDynamic(ObjM *self) {
 void ObjM__EnterLinkWall(ObjM *self) {
     s32 color;
 
-    self->state = 6;
+    self->state = OBJM_STATE_LINK_WALL;
     color = self->dreamSys->methods->getDreamColor(self->dreamSys);
     ObjM__StartFadeUp(self, color, 0, 30, 1);
     self->dreamSys->methods->blockMovement(self->dreamSys);

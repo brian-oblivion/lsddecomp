@@ -33,6 +33,115 @@
  * this over the child's per-tick step, sModelChildDriftZ[tableIndex]. */
 #define MODEL_CHILD_DRIFT_RANGE 24500
 
+/* StyleEffect's data, in address order. */
+
+/* StyleEffect's method table, class id 0xEF34: Actor's slots, with
+ * StyleEffect's overrides and no slots of its own. A slot whose function is
+ * declared for another class's `self` takes a `void *` cast. */
+/* clang-format off */
+StyleEffectMethods gStyleEffectMethods = {
+    /* +0x000 header */ 0xEF34,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ (void *)StyleEffect__StyleEffect,
+    /* +0x00C finalize */ StyleEffect__Finalize,
+    /* +0x010 addChild */ (void *)Actor__AddChild,
+    /* +0x014 removeChild */ (void *)Actor__RemoveChild,
+    /* +0x018 removeAllChildren */ (void *)Actor__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)SceneNode__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 reset */ (void *)StyleEffect__SetParams,
+    /* +0x044 updateRotation */ (void *)SceneNode__UpdateRotation,
+    /* +0x048 updateScale */ (void *)SceneNode__UpdateScale,
+    /* +0x04C attachToParent */ (void *)SceneNode__AttachToParent,
+    /* +0x050 detachFromParent */ (void *)SceneNode__DetachFromParent,
+    /* +0x054 detachAttachedChildren */ (void *)SceneNode__DetachAttachedChildren,
+    /* +0x058 getNextAttachedChild */ (void *)SceneNode__GetNextAttachedChild,
+    /* +0x05C finalizeHook */ (void *)SceneNode__NoOpFinalizeHook,
+    /* +0x060 setDisplay */ (void *)SceneNode__SetDisplay,
+    /* +0x064 setSemiTransOn */ (void *)SceneNode__SetSemiTrans,
+    /* +0x068 setSemiTransRate */ (void *)SceneNode__SetSemiTransRate,
+    /* +0x06C setLighting */ (void *)SceneNode__SetLighting,
+    /* +0x070 setLightMode */ (void *)SceneNode__SetLightMode,
+    /* +0x074 setLightDim */ (void *)SceneNode__SetLightDim,
+    /* +0x078 setUseZ */ (void *)SceneNode__SetUseZ,
+    /* +0x07C setSubdivision */ (void *)SceneNode__SetSubdivision,
+    /* +0x080 setBackClip */ (void *)SceneNode__SetBackClip,
+    /* +0x084 getRotMatrix */ (void *)SceneNode__GetRotMatrix,
+    /* +0x088 notifyWithHull */ (void *)Actor__NotifyMove,
+    /* +0x08C getModelHull */ (void *)SceneNode__GetModelHull,
+    /* +0x090 transformAndNotifyParents */ (void *)SceneNode__TransformAndNotifyParents,
+    /* +0x094 onPadEvent */ (void *)SceneNode__OnPadEvent,
+    /* +0x098 update */ (void *)SceneNode__Update,
+    /* +0x09C dispatchLinkCommand */ (void *)Actor__DispatchLinkCommand,
+    /* +0x0A0 tryAttachNearby */ (void *)SceneNode__TryAttachNearby,
+    /* +0x0A4 composeAndApplyRotation */ (void *)SceneNode__ComposeAndApplyRotation,
+    /* +0x0A8 checkBoundsOverlap */ (void *)SceneNode__CheckBoundsOverlap,
+    /* +0x0AC raycastHullAgainstFaces */ (void *)SceneNode__RaycastHullAgainstFaces,
+    /* +0x0B0 slotB0 */ NULL,
+    /* +0x0B4 addToActorParents */ (void *)SceneNode__AddToActorParents,
+    /* +0x0B8 setTranslation */ (void *)Actor__SetTranslation,
+    /* +0x0BC addTranslation */ (void *)Actor__AddTranslation,
+    /* +0x0C0 addLocalTranslation */ (void *)Actor__AddLocalTranslation,
+    /* +0x0C4 moveLocalZ */ (void *)Actor__MoveLocalZ,
+    /* +0x0C8 moveLocalX */ (void *)Actor__MoveLocalX,
+    /* +0x0CC moveLocalY */ (void *)Actor__MoveLocalY,
+    /* +0x0D0 moveLocalZOrFindLink */ (void *)Actor__MoveLocalZOrFindLink,
+    /* +0x0D4 moveLocalXOrFindLink */ (void *)Actor__MoveLocalXOrFindLink,
+    /* +0x0D8 slotD8 */ Actor__NoOpSlotD8,
+    /* +0x0DC onActorLinkCommand */ (void *)Actor__OnActorLinkCommand,
+    /* +0x0E0 onGridCellLinkCommand */ (void *)Actor__OnGridCellLinkCommand,
+    /* +0x0E4 setLastOffsetValue */ (void *)Actor__SetLastOffsetValue,
+    /* +0x0E8 onLinkUpdate */ (void *)Actor__OnLinkUpdate,
+    /* +0x0EC setPendingExtra */ (void *)StyleEffect__Update,
+};
+/* clang-format on */
+
+/* The model children's row (StyleEffect__PlaceModelChildren): child i sits
+ * (i + 1) spacings from the start, by modelChildLayout. */
+LongVec3 sModelChildOffsetInit = {0, 0, 0};
+s32 sModelChildSpacing[5] = {0, -128, 128, -256, 64};
+
+/* Per-`tableIndex` z step for the model children (0 = no drift), also the
+ * divisor of MODEL_CHILD_DRIFT_RANGE for the reset period. Same index space
+ * as sSpriteShiftX. */
+s32 sModelChildDriftZ[8] = {0, 0, 0, -1, -2, -4, -16, -256};
+
+/* The start value of each child's per-frame z delta. */
+LongVec3 sModelChildDriftInit = {0, 0, 0};
+
+/* The per-frame rotation increment updateRotation(.., 0, ..) adds to self
+ * and to each model child: 1/10 degree of yaw. */
+Ratio16 sSpinRotStep[3] = {{0, 1}, {1, 10}, {0, 1}};
+
+/* The sprite kinds' x shift per `tableIndex`, their scales and the scratch
+ * vector the shift is built in. */
+s32 sSpriteShiftX[6] = {0, 0, -128, -256, -512, -768};
+Ratio16 sSpriteScaleLarge[3] = {{6, 5}, {6, 5}, {1, 1}};
+Ratio16 sSpriteScaleHalf[3] = {{3, 6}, {3, 6}, {1, 1}};
+Ratio16 sSpriteScaleSmall[3] = {{4, 6}, {4, 6}, {1, 1}};
+LongVec3 sSpriteShiftScratch = {0, 0, 0};
+
+/* Six scale tables, each three Ratio16s (x, y, z), for the jittering
+ * sprites: a thin streak along y or along x, {1/16, 7/1}, {7/1, 1/16}, then
+ * the same with 3 and 2; z is 1/1. VariantSprite__UpdateScale reads x and y. */
+/* clang-format off */
+Ratio16 sStyleEffectJitterScales[6][3] = {
+    {{1, 16}, {7,  1}, {1, 1}},
+    {{7,  1}, {1, 16}, {1, 1}},
+    {{1, 16}, {3,  1}, {1, 1}},
+    {{3,  1}, {1, 16}, {1, 1}},
+    {{1, 16}, {2,  1}, {1, 1}},
+    {{2,  1}, {1, 16}, {1, 1}},
+};
+/* clang-format on */
+
 StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *parent, LongVec3 *pos) {
     StyleEffect *self = BMemPMgrAlloc(sizeof(StyleEffect));
 
@@ -69,7 +178,7 @@ void StyleEffect__Finalize(StyleEffect *self) {
 }
 
 void StyleEffect__SetParams(StyleEffect *self, StyleEffectParams *params) {
-    self->params = *params; /* MATCHING: one struct copy: the 4-aligned block moves 4 words a loop */
+    self->params = *params;
     self->tick = 0;
 }
 
@@ -81,12 +190,6 @@ void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
 
 /* The class and its children: include/style_effect.h (the owner),
  * include/actor.h (modelChildren) and include/variant_sprite.h (sprites). */
-
-extern s32 sSpriteShiftX[];
-extern Ratio16 sSpriteScaleLarge[3];
-extern Ratio16 sSpriteScaleHalf[3];
-extern Ratio16 sSpriteScaleSmall[3];
-extern LongVec3 sSpriteShiftScratch;
 
 void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b);
 void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, void *scale);
@@ -191,7 +294,7 @@ void StyleEffect__ReleaseByKind(StyleEffect *self) {
     }
 }
 
-/* Plain Vec3 add: dst = a + b. Frameless -- no self/vtable involved. */
+/* Plain Vec3 add: dst = a + b. Not a method: no self. */
 void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b) {
     dst->x = a->x + b->x;
     dst->y = a->y + b->y;
@@ -211,8 +314,6 @@ void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, 
  * numerator) for layouts 1-2 and along y for 3-4. reuse = 0 creates them
  * (New_Actor, sharing the owner's model, attached to the owner);
  * reuse = 1 only resets their translation (setTranslation). */
-extern LongVec3 sModelChildOffsetInit;
-extern s32 sModelChildSpacing[];
 
 void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
     LongVec3 childPos;
@@ -243,16 +344,6 @@ void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
     }
 }
 
-/* Per-`tableIndex` z step for the model children (0 = no drift), also the
- * divisor of MODEL_CHILD_DRIFT_RANGE for the reset period below. Same index space as
- * sSpriteShiftX. */
-extern s32 sModelChildDriftZ[];
-/* All-zero LongVec3, the start value of each child's per-frame z delta. */
-extern LongVec3 sModelChildDriftInit;
-/* Ratio triple {0/1, 1/10, 0/1}: the per-frame rotation increment
- * updateRotation(.., 0, ..) adds to self and to each model child. */
-extern Ratio16 sSpinRotStep[3];
-
 /* Once tick passes MODEL_CHILD_DRIFT_DELAY, for a layout with model
  * children and a nonzero sModelChildDriftZ step: spin self and both
  * children, move child i along z by step + 3 * i, and every
@@ -275,7 +366,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
         slot = self->modelChildren;
         self->methods->updateRotation(self, 0, sSpinRotStep);
         i = 0;
-        /* MATCHING: the step's pointer is taken here, after the call; held earlier, two registers swap */
+        /* MATCHING: the step's pointer is taken after the call; taken earlier, the code differs */
         stepZ = &sModelChildDriftZ[tableIndex];
         extraZ = 0;
         for (; i < ARRAY_COUNT(self->modelChildren); i++) {
@@ -373,11 +464,6 @@ void NoOpIgnoreArgs(void) {}
 /* ------------------------------------------------------------------ *
  * StyleEffect's sprite kinds (STYLE_EFFECT_SPRITES, _JITTER_SPRITES).
  * ------------------------------------------------------------------ */
-
-/* Six scale tables, each three Ratio16s (x, y, z), for the jittering
- * sprites: a thin streak along y or along x, {1/16, 7/1}, {7/1, 1/16}, then
- * the same with 3 and 2; z is 1/1. VariantSprite__UpdateScale reads x and y. */
-extern Ratio16 sStyleEffectJitterScales[6][3];
 
 /* Kind 2's release; ReleaseJitterSprites, kind 3's, is the same body. */
 void StyleEffect__ReleaseSprites(StyleEffect *self) {

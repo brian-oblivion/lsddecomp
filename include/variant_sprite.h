@@ -58,7 +58,7 @@ struct VariantSpriteMethods {
  * variant is the whole of what it adds to Sprite: `variant` picks the
  * texture cell the Sprite ctor binds (sVariantSpriteCells, two adjacent
  * 16x16 cells) and the CLUT the reset slot then points the GsSPRITE at
- * (sVariantSpriteClutX/Y, two adjacent 16-colour rows at VRAM y 511). Its
+ * (sVariantSpriteClut, two adjacent 16-colour rows at VRAM y 511). Its
  * class id's low 12 bits are not 0x144, so Viewport__DrawNode projects it
  * from its coordinate like any Sprite, not by the screen-space path
  * ScreenSprite takes. No class derives from it.

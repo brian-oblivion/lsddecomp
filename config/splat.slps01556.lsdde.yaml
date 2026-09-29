@@ -1893,16 +1893,23 @@ segments:
       - [0x720A0, o, libcd/c_011, .data]      # 0x50 -> 0x720F0 (dlabel D_800818A0)
       - [0x720F0, data]
       - [0x72140, .data, cd/game_files]  # gLbdFileMethods .. sMovieFrameCounts: the file table
-      - [0x769D4, data]               # StageGrid's data slot
-      - [0x76DC8, data]              # class_39e08
+      - [0x769D4, .data, world/stage_grid]  # the stage grids and their chunk moods
+      - [0x76DC8, .data, world/dream_day]  # DayTask, TimedTask, StageMap: method tables and chunk tables
       - [0x771D8, .data, ui/title_menu]  # gNodeGuardedViewportMethods .. sCardIconRect: the title menu, the card messages
       - [0x776D0, .data, ui/input_dialogs]  # gTextEntryMethods, sTextEntryPanelRect
       - [0x77788, .data, ui/item_list]  # gItemListMethods, sItemListPanelRect
-      - [0x77834, data]
-      - [0x783dc, data]               # DreamSys's data slot
-      - [0x79528, data]
-      - [0x7A6A4, .data, world/entity]    # sEntityMoodTable, 130 rows of 16 bytes
-      - [0x7AEC4, data]
+      - [0x77834, .data, world/objm]  # gObjMMethods, the view points, the per-stage pending extras
+      - [0x77974, .data, world/style_layer]  # spawn tables, colours, configs, cue records
+      - [0x77EFA, pad]               # 2 bytes: style_layer.c's .data ends 2 short of a word
+      - [0x77EFC, .data, world/style_effect]  # gStyleEffectMethods, the model-child and sprite tables
+      - [0x780D4, .data, world/actor]  # gActorMethods
+      - [0x781C4, .data, world/variant_sprite]  # gVariantSpriteMethods, its cells and CLUTs
+      - [0x782AC, .data, world/graph_room]  # gGraphRoomMethods, sGraphScoreMoods
+      - [0x783DC, .data, world/dream_sys]  # DreamSys's method table, its movement tables, the stage spawn and link tables
+      - [0x79520, .data, world/dream_aux]  # the resident entity, the placements and each stage's chunk triggers
+      - [0x7A2D2, pad]               # 2 bytes: dream_aux.c's .data ends 2 short of a word (SUBALIGN(2))
+      - [0x7A2D4, .data, world/entity]    # gEntityMethods, the motion templates, sEntityMoodTable
+      - [0x7AEC4, .data, world/tod_actor]  # gTodActorMethods
       - [0x7B008, sdata]
       - [0x7B010, o, libc2/prnt, .sdata]      # "(null)", 7 bytes
       - [0x7B018, sdata]

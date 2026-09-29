@@ -5,12 +5,6 @@ D_8008A958
 D_8008A970
 D_8008AA1C
 D_8008AAE0
-D_8008AB78
-D_8008AB7C
-D_8008AB80
-D_8008AB84
-D_8008AB8C
-D_8008AB90
 D_8008AC68
 D_8008ACA0
 gpDinamicLinkPenalty
@@ -165,6 +159,7 @@ sStaircaseOffset2
 sStaircaseOffset3
 sStartupBMemPMgr
 sStrSelect
+sStyleAmbientGrey
 sStyleClearColor
 sStyleConfigIndex
 sStyleCueRecordIndex
@@ -187,9 +182,14 @@ sStyleEffectSlotCount
 sStyleEffectTim
 sStyleEffectTmd
 sStyleEffectViewport
+sStyleGrey10
 sStyleGrid
 sStyleSceneRefs
 sStyleStage
+sStyleStage06Configs
+sStyleStage08Configs
+sStyleStage10Configs
+sStyleStage11Configs
 sStyleTickCount
 sStyleUnreadArg
 sStyleVariant
