@@ -528,6 +528,7 @@
     "17": {
       "checklist": {
         "shape-graphics": true,
+        "shape-rest": true,
         "ub-calls": true
       },
       "reason": "",
