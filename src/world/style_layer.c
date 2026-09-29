@@ -372,7 +372,7 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
     s32 i;
 
     if (sStyleGrid == 0) {
-        i = ARRAY_COUNT(sStyleCueSlots) - 1;
+        i = ARRAY_COUNT(sStyleCueSlots) - 1; /* MATCHING: set here; set in the for header it differs */
         slot = &sStyleCueSlots[ARRAY_COUNT(sStyleCueSlots) - 1];
         sStyleGrid = grid;
         sStyleStage = stage;
@@ -381,11 +381,10 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
         sStyleDay = day;
         sStyleUnreadArg = unreadArg;
         sStyleTickCount = 0;
-        do {
+        for (; i >= 0; i--) {
             *slot = 0;
-            i--;
             slot--;
-        } while (i >= 0);
+        }
         return (s32)ApplyStyleConfig();
     }
     return 0;
@@ -594,24 +593,23 @@ void StyleUpdateDecorSet(void) {
         return;
     }
     pos = *(BoxFillPos *)&sStyleDecorPosX;
-    i = 0;
+    i = 0; /* MATCHING: set here; set in the for header the code differs */
     if (sStyleDecorVariant == STYLE_DECOR_LOWERED) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
     slot = sStyleDecorSlots;
     colorOfs = 0;
     pos.y += fade * 3;
-    do {
+    for (; i < STYLE_DECOR_BANDS; i++) {
         AdjustRgbByDelta(rgb, (u8 *)(colorOfs + sStyleDecorColors), fade);
         band = *slot;
         band->methods->setColor(band, 1, rgb);
         band = *slot;
-        i++;
         colorOfs += 3;
         band->methods->setPosition(band, &pos);
         pos.y += 3;
         slot++;
-    } while (i < STYLE_DECOR_BANDS);
+    }
     AdjustRgbByDelta(rgb, (u8 *)sStyleClearColor, fade);
     viewport->methods->setClearColor(viewport, (ColorRgb *)rgb);
 }
@@ -943,36 +941,34 @@ StyleCueRecord *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *t
     s32 dx, dz, dist;
     StageMap *grid;
 
-    if (target == 0) {
-        goto fail;
-    }
-    records = sStyleCueRecordLists[sStyleStage];
-    remaining = sStyleCueRecordCounts[sStyleStage] - sStyleCueRecordIndex;
-    entry = (StyleCueRecord *)(sStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
-    for (j = 0; j < remaining; j++, entry++) {
-        sStyleCueRecordIndex++;
-        if (entry->cue > 0) {
-            buf.key = entry->key;
-            buf.offset = sStyleCueOffsets[entry->offsetIndex];
-            grid = (StageMap *)sStyleGrid;
-            grid->methods->computeCellOffsets(grid, pos, &buf);
-            dx = pos->x - target->x;
-            if (dx < 0) {
-                dx = ~dx + 1; /* MATCHING: not -dx; retail complements and adds one */
-            }
-            dz = pos->z - target->z;
-            if (dz >= 0) {
-                dist = dx + dz;
-            } else {
-                dist = dx - dz;
-            }
-            *outDist = dist;
-            if (dist < sStyleCueDistanceTable[entry->cue]) {
-                return entry;
+    if (target != 0) {
+        records = sStyleCueRecordLists[sStyleStage];
+        remaining = sStyleCueRecordCounts[sStyleStage] - sStyleCueRecordIndex;
+        entry = (StyleCueRecord *)(sStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
+        for (j = 0; j < remaining; j++, entry++) {
+            sStyleCueRecordIndex++;
+            if (entry->cue > 0) {
+                buf.key = entry->key;
+                buf.offset = sStyleCueOffsets[entry->offsetIndex];
+                grid = (StageMap *)sStyleGrid;
+                grid->methods->computeCellOffsets(grid, pos, &buf);
+                dx = pos->x - target->x;
+                if (dx < 0) {
+                    dx = ~dx + 1; /* MATCHING: not -dx; retail complements and adds one */
+                }
+                dz = pos->z - target->z;
+                if (dz >= 0) {
+                    dist = dx + dz;
+                } else {
+                    dist = dx - dz;
+                }
+                *outDist = dist;
+                if (dist < sStyleCueDistanceTable[entry->cue]) {
+                    return entry;
+                }
             }
         }
     }
-fail:
     return 0;
 }
 
@@ -1077,7 +1073,7 @@ void StyleScrollVramStrips(void) {
         rect = &sStyleStripRectA;
         scratch = (DrawPoint *)&sStyleStripScratchA;
         count = 1; /* MATCHING: a local set in each branch, not a literal argument */
-    } else if ((u32)(sStyleStage - 3) < 3) {
+    } else if (sStyleStage >= 3 && sStyleStage < 6) {
         count = 1;
         rect = &sStyleStripRectB;
         scratch = (DrawPoint *)&sStyleStripScratchB;

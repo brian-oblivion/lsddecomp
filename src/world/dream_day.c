@@ -588,6 +588,7 @@ void TimedTask__NoOpOnPadEvent(void) {}
 
 void TimedTask__CheckTimeout(TimedTask *self, BasicClass *sender, s32 event) {
     GetIntermediateBaseMethods()->update((IntermediateBase *)self, sender, event);
+    /* MATCHING: compared unsigned, as retail does; the base class declares both s32 */
     if ((u32)self->frameCounter > (u32)self->timeoutFrames) {
         self->methods->setState(self, TIMEDTASK_STATE_TIMED_OUT);
     }
@@ -793,21 +794,17 @@ void StageMap__Reset(StageMap *self) {
 void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *slot) {
     GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, command);
 
-    /* MATCHING: two if+goto tests; an if/else-if chain inverts the branches */
-    if (command == STAGEMAP_EVENT_SLOT_RELEASE)
-        goto release;
-    if (command == STAGEMAP_EVENT_SLOT_DATA_READY)
-        goto record;
-    return;
-
-release:
-    if (slot->heldObj != NULL) {
-        slot->heldObj = slot->heldObj->methods->release(slot->heldObj);
+    switch (command) {
+        case STAGEMAP_EVENT_SLOT_RELEASE:
+            if (slot->heldObj != NULL) {
+                slot->heldObj = slot->heldObj->methods->release(slot->heldObj);
+            }
+            /* fall through */
+        case STAGEMAP_EVENT_SLOT_DATA_READY:
+            self->lastEventSlot = slot;
+            self->methods->notifyParents(self, command);
+            break;
     }
-
-record:
-    self->lastEventSlot = slot;
-    self->methods->notifyParents(self, command);
 }
 
 void StageMap__UpdateIfEnabled(StageMap *self) {
@@ -1245,42 +1242,36 @@ s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 col
     s32 bit = sNeighbourBits[neighbour];
     s32 result;
 
-    if ((onGridMask & bit) == 0) {
-        result = 0;
-        goto nullCase;
-    }
+    if ((onGridMask & bit) != 0) {
+        if (self->config->isVertical == 0) {
+            const ChunkNeighbourDelta *delta = &sChunkNeighbourDeltas[neighbour];
+            s32 chunk;
+            s32 step;
 
-    if (self->config->isVertical == 0) {
-        const ChunkNeighbourDelta *delta = &sChunkNeighbourDeltas[neighbour];
-        s32 chunk;
-        s32 step;
-
-        if (delta->rowDelta == 0) {
-            step = delta->colDeltaOddRow;
-        } else {
-            step = columns * delta->rowDelta;
-            if (oddRow != 0) {
-                step += delta->colDeltaOddRow;
+            if (delta->rowDelta == 0) {
+                step = delta->colDeltaOddRow;
             } else {
-                step += delta->colDeltaEvenRow;
+                step = columns * delta->rowDelta;
+                if (oddRow != 0) {
+                    step += delta->colDeltaOddRow;
+                } else {
+                    step += delta->colDeltaEvenRow;
+                }
             }
+            chunk = centreChunk + step;
+            out->chunkIndex.word = chunk;
+        } else {
+            out->chunkIndex.word = centreChunk + neighbour;
         }
-        chunk = centreChunk + step;
-        out->chunkIndex.word = chunk;
+
+        out->file = self->chunkFileFn(self->chunkFileCtx, out->chunkIndex.word, 0, 0);
+        do { /* MATCHING: an empty do/while (0); without it the code comes out differently */
+        } while (0);
+        result = 1;
     } else {
-        out->chunkIndex.word = centreChunk + neighbour;
+        out->file = NULL;
+        result = 0;
     }
-
-    out->file = self->chunkFileFn(self->chunkFileCtx, out->chunkIndex.word, 0, 0);
-    do { /* MATCHING: an empty do/while (0); without it the code comes out differently */
-    } while (0);
-    result = 1;
-    goto storeKey;
-
-nullCase:
-    out->file = NULL;
-
-storeKey:
     out->neighbour = neighbour;
     return result;
 }
@@ -1373,11 +1364,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     LinkResource *oldResource;
     GridCell **cell;
     u8 *cells;
-    GsCOORDINATE2 *coord;
     GsCOORD2PARAM *param;
-    s32 x;
-    s32 y;
-    s32 z;
     s32 rotY;
     s32 model;
     s32 hidden;
@@ -1429,15 +1416,8 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
             (*cell)->tmd = (s32)((TmdModel *)(*cell)->model)->object;
             GsLinkObject4((u_long)((TmdModel *)(*cell)->model)->object,
                           (GsDOBJ2 *)&(*cell)->attribute, 0);
-            coord = (*cell)->coord2;
-            /* MATCHING: an ordering barrier; it keeps the rec.x/.y/.z reads after coord2's */
-            __asm__("");
-            x = rec.x;
-            y = rec.y;
-            z = rec.z;
-            coord->coord.t[0] = x;
-            coord->coord.t[1] = y;
-            coord->coord.t[2] = z;
+            /* MATCHING: one struct copy, every load before every store */
+            *(LongVec3 *)(*cell)->coord2->coord.t = *(LongVec3 *)&rec.x;
             param = (*cell)->coord2->param;
             param->rotate.vx = 0;
             rotY = rec.rotY;
@@ -1578,7 +1558,7 @@ ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos) {
     SplitCoord2 *origin;
     s32 edge;
 
-    i = 0;
+    i = 0; /* MATCHING: the counter set first, apart from the for header, as retail orders it */
     span = STAGE_CHUNK_SIZE;
     layerTop = 0;
     for (; i < CHUNK_NEIGHBOUR_COUNT; i++, layerTop -= VERTICAL_LAYER_HEIGHT) {
@@ -1925,30 +1905,27 @@ void StageMap__SetBounds(StageMap *self, CellBounds *bounds) {
     self->bounds = bounds;
 }
 
-/* MATCHING: the goto ladder, `scale` read before the sign test, `val` in an if/else, `~rate + 1` */
+/* MATCHING: the up-slow table set ahead of the fast test (one store after both ifs compiles
+ * differently), `scale` read before the sign test, `val` in an if/else, `~rate + 1` */
 void StageMap__StartScaleRamp(StageMap *self, s32 rate, s32 fast) {
     Ratio16 *table;
     s32 val;
     s32 scale;
 
-    if (rate <= 0) {
-        goto rate_le;
+    if (rate > 0) {
+        table = sScaleStepUpSlow;
+        if (fast != 0) {
+            self->scaleStep = sScaleStepUpFast;
+        } else {
+            self->scaleStep = table;
+        }
+    } else {
+        table = sScaleStepDownSlow;
+        if (fast != 0) {
+            table = sScaleStepDownFast;
+        }
+        self->scaleStep = table;
     }
-    table = sScaleStepUpSlow;
-    if (fast == 0) {
-        goto store;
-    }
-    self->scaleStep = sScaleStepUpFast;
-    goto merge;
-rate_le:
-    table = sScaleStepDownSlow;
-    if (fast == 0) {
-        goto store;
-    }
-    table = sScaleStepDownFast;
-store:
-    self->scaleStep = table;
-merge:
     scale = self->scaleStep[1].den;
     if (rate >= 0) {
         val = scale * rate;
@@ -2001,8 +1978,7 @@ void StageMap__ForEachSlotCell(StageMap *self, StageMapCellFn cellFn, ChunkSlot 
     GridCell **end;
 
     end = slot->cells + STAGE_SLOT_CELLS;
-    cell = slot->cells;
-    for (; cell < end; cell++) {
+    for (cell = slot->cells; cell < end; cell++) {
         cellFn(self, *cell);
     }
 }

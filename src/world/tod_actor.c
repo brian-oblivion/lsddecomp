@@ -225,11 +225,9 @@ s32 TodActor__AcquireModelData(TodActor *self, TodActorDesc *desc) {
         self->modelData = New_ModelData(&desc->src);
         self->ownsModelData = 1;
     }
-    if (self->modelData == NULL) {
-        goto fail;
+    if (self->modelData != NULL) {
+        return self->methods->setupParts(self);
     }
-    return self->methods->setupParts(self);
-fail:
     TodActor__ReleaseModelData(self);
     return 1;
 }
@@ -257,12 +255,11 @@ s32 TodActor__FindPartIndex(TodActor *self, s32 id) {
         return -1;
     }
     ids = self->partIds;
-    __asm__(""); /* MATCHING: an ordering barrier; without it ids is copied after the partCount test */
     count = self->partCount;
+    i = 0;
     if (count <= 0) {
         return -1;
     }
-    i = 0;
     wanted = (u8)id;
     do {
         if (*ids == wanted) {
@@ -323,6 +320,7 @@ s32 TodActor__CreateParts(TodActor *self) {
     self->mainPart = self->parts[tmdId[0]];
     return 0;
 
+    /* MATCHING: gotos to one shared cleanup, as retail has it; cleaning up at each failure repeats it */
 alloc_fail:
     self->partIds = NULL;
 fail:
@@ -422,12 +420,11 @@ void TodActor__StopTod(TodActor *self) {
 
 void *TodActor__ApplyTodFrame(TodActor *self, void *frame, void *extra) {
     s32 count;
-    u32 i;
+    u32 i; /* MATCHING: unsigned; a signed counter compiles a signed loop test */
 
     count = ((TodFrame *)frame)->packetCount;
     frame = ((TodFrame *)frame)->packets;
-    for (i = 0; i < count;) {
-        i++;
+    for (i = 0; i < count; i++) {
         frame = self->methods->applyTodPacket(self, frame, extra);
     }
     return frame;
@@ -451,7 +448,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                                                       &head.type, &head.flag, &head.length);
     partIndex = TodActor__FindPartIndex(self, head.objectId);
     if (partIndex < 0) {
-        goto end;
+        return (u32 *)packet + head.length;
     }
     part = self->parts[partIndex];
     coord = part->coord2;
@@ -485,7 +482,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     data += 2; /* three s16 scales, padded to two words */
                 }
                 if (!(head.flag & TOD_COORD_TRANSLATE)) {
-                    goto end;
+                    break;
                 }
                 {
                     long *trans = &param->trans.vx;
@@ -512,7 +509,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     data += 2;
                 }
                 if (!(head.flag & TOD_COORD_TRANSLATE)) {
-                    goto end;
+                    break;
                 }
                 {
                     long *trans = &param->trans.vx;
@@ -522,19 +519,8 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     }
                 }
             }
-            {
-                GsCOORDINATE2 *partCoord;
-                s32 x, y, z;
-
-                partCoord = part->coord2;
-                x = param->trans.vx;
-                y = param->trans.vy;
-                z = param->trans.vz;
-                partCoord->coord.t[0] = x;
-                partCoord->coord.t[1] = y;
-                partCoord->coord.t[2] = z;
-                __asm__(""); /* MATCHING: an ordering barrier; it keeps the t[2] store ahead of the break */
-            }
+            /* MATCHING: one struct copy, every load before every store */
+            *(LongVec3 *)part->coord2->coord.t = *(LongVec3 *)&param->trans;
             break;
         }
         case TOD_PACKET_MODEL_ID: {
@@ -566,8 +552,6 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
             break;
         }
     }
-
-end:
     return (u32 *)packet + head.length;
 }
 

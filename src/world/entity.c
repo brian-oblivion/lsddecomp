@@ -499,7 +499,7 @@ s32 Entity__UpdateActivationState(Entity *self) {
                 }
             }
         }
-        goto merge; /* MATCHING: randCheck placed after this block, reached by goto */
+        goto merge; /* MATCHING: gotos to one shared random roll; a roll in each arm compiles two */
 
     randCheck:
         if ((rand() & 0x7F) == 0) {
@@ -628,17 +628,9 @@ s32 Entity__IsTargetInRange(Entity *self, s32 range) {
     other = self->peer;
     oy = other->coord2->coord.t[1];
     ty = self->coord2->coord.t[1];
-    /* MATCHING: two ifs and a goto; one || with plain returns compiles differently */
-    if (oy + 512 < ty) {
-        goto fail;
-    }
-    if (ty < oy - 512) {
-        goto fail;
-    }
-    if (self->methods->distanceToPeer(self, other) < range) {
+    if (oy + 512 >= ty && ty >= oy - 512 && self->methods->distanceToPeer(self, other) < range) {
         return 1;
     }
-fail:
     return 0;
 }
 
@@ -1092,24 +1084,17 @@ void Entity__CueRiseFasterThenPitchUp(Entity *self, SoundCueSet *out) {
 /* Row 26: runs forward 384 a tick, climbing what it meets, with one 11520 lunge at moodTimer 110;
  * sounds program 26 every animation cycle. */
 void Entity__CueRunAndLunge(Entity *self, SoundCueSet *out) {
-    s32 v1;
     s32 zDelta;
     void (**moveZOrFindLink)(Entity *self, s32 val, void *notify);
 
-    do { /* MATCHING: without the do/while (0) the code comes out differently */
-        if (out->tick % self->todFrameCount == 0) {
-            out->attenuation = self->methods->getProximityRatio(self);
-            out->slots[0].program = 26;
-            __asm__(""); /* MATCHING: an ordering barrier; v1 = 110 stays after the store */
-            v1 = 110;
-            goto compare;
-        }
-    } while (0);
-    v1 = 110;
-compare:
+    if (out->tick % self->todFrameCount == 0) {
+        out->attenuation = self->methods->getProximityRatio(self);
+        out->slots[0].program = 26;
+    }
+    /* MATCHING: the method slot is looked up before the lunge test; looked up at the call it differs */
     moveZOrFindLink = &self->methods->moveLocalZOrFindLink;
     zDelta = -384;
-    if (self->moodTimer == v1) {
+    if (self->moodTimer == 110) {
         zDelta = -11520;
     }
     (*moveZOrFindLink)(self, zDelta, 0);
@@ -1173,7 +1158,7 @@ void Entity__CueHoverOverDreamerOnBlueElseRise(Entity *self, SoundCueSet *out) {
         SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
         if (self->state == HOVER_APPROACH) {
             self->methods->moveLocalZ(self, -100, 0);
-            if ((u32)(self->moodTimer - 85) < 30) {
+            if (self->moodTimer >= 85 && self->moodTimer < 115) {
                 self->methods->moveLocalY(self, 80, 0);
             } else if (self->moodTimer == 120) {
                 self->state = HOVER_FOLLOW;
@@ -1228,11 +1213,11 @@ void Entity__CueWalkZigzagThenDashAway(Entity *self, SoundCueSet *out) {
     EntityMethods *methods;
     s32 zDelta;
 
-    if ((u32)(self->moodTimer - 400) < 10) {
+    if (self->moodTimer >= 400 && self->moodTimer < 410) {
         self->methods->updateRotation(self, 0, sRotationYawPlus9);
-    } else if ((u32)(self->moodTimer - 700) < 10) {
+    } else if (self->moodTimer >= 700 && self->moodTimer < 710) {
         self->methods->updateRotation(self, 0, sRotationYawMinus9);
-    } else if ((u32)(self->moodTimer - 830) < 4) {
+    } else if (self->moodTimer >= 830 && self->moodTimer < 834) {
         self->methods->updateRotation(self, 0, sRotationYawMinus9);
     } else if (self->moodTimer >= 851) {
         self->methods->deactivate(self);
@@ -1343,16 +1328,10 @@ void Entity__CueStutterTodMaybeTall(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         dayYearPhase =
             ((DreamSys *)self->peer)->methods->getCurrentDayAndYear((DreamSys *)self->peer, 0) % 3;
-        if (dayYearPhase == 0) {
-            if (rand() % 3 != 0) {
-                goto skipScaleBump;
-            }
-        } else if (dayYearPhase != 2) {
-            goto skipScaleBump;
+        if (dayYearPhase == 0 ? rand() % 3 == 0 : dayYearPhase == 2) {
+            self->methods->updateScale(self, 1, sScaleY4);
         }
-        self->methods->updateScale(self, 1, sScaleY4);
     }
-skipScaleBump:
     if (out->tick % 22 == 0) {
         out->attenuation = self->methods->getProximityRatio(self);
         out->slots[0].program = 2;
@@ -1535,16 +1514,10 @@ void Entity__CueWatchDreamerMaybeGiant(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         dayYearPhase =
             ((DreamSys *)self->peer)->methods->getCurrentDayAndYear((DreamSys *)self->peer, 0) % 3;
-        if (dayYearPhase == 0) {
-            if (rand() % 3 != 0) {
-                goto skipScaleBump;
-            }
-        } else if (dayYearPhase != 1) {
-            goto skipScaleBump;
+        if (dayYearPhase == 0 ? rand() % 3 == 0 : dayYearPhase == 1) {
+            self->methods->updateScale(self, 1, sScaleSix);
         }
-        self->methods->updateScale(self, 1, sScaleSix);
     }
-skipScaleBump:
     if (out->tick == 0) {
         out->attenuation = 0;
         out->slots[0].program = 18;
@@ -1884,40 +1857,39 @@ void Entity__CueConfrontDreamerThenLinkOnTouch(Entity *self, SoundCueSet *out) {
     if (self->state == 0) {
         self->methods->deactivate(self);
         self->methods->stopSoundCue(self);
-        goto tail;
-    }
-    if (out->tick % 100 == 0) {
-        out->attenuation = self->methods->getProximityRatio(self);
-        out->slots[0].program = 12;
-        out->slots[0].octave = -1;
-    }
-    if (self->moodTimer < 3) {
-        self->methods->moveLocalY(self, 150, 0);
-    } else if (self->moodTimer < 7) {
-        self->methods->moveLocalY(self, (self->moodTimer & 1) ? -50 : 50, 0);
-    } else if (self->moodTimer == 100) {
-        if (rand() & 1) {
-            self->state = CONFRONT_ADVANCE;
-            self->methods->stopTod(self);
+    } else {
+        if (out->tick % 100 == 0) {
+            out->attenuation = self->methods->getProximityRatio(self);
+            out->slots[0].program = 12;
+            out->slots[0].octave = -1;
         }
-    } else if (self->moodTimer == 240) {
-        ((DreamSys *)self->peer)
-            ->methods->setTickCallbacks((DreamSys *)self->peer, MOVE_CALLBACK_TICK_MOVE,
-                                        LOOK_CALLBACK_STEP_LOOK);
-    }
-    if (self->state == CONFRONT_ADVANCE) {
-        if (self->moodTimer < 130) {
-            self->methods->moveLocalY(self, 10, 0);
-        } else if (self->moodTimer < 160) {
-            self->methods->moveLocalZ(self, -30, 0);
-        } else if (self->moodTimer < 301) {
-            /* nothing */
-        } else {
-            SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
-            self->methods->moveLocalZ(self, -30, 0);
+        if (self->moodTimer < 3) {
+            self->methods->moveLocalY(self, 150, 0);
+        } else if (self->moodTimer < 7) {
+            self->methods->moveLocalY(self, (self->moodTimer & 1) ? -50 : 50, 0);
+        } else if (self->moodTimer == 100) {
+            if (rand() & 1) {
+                self->state = CONFRONT_ADVANCE;
+                self->methods->stopTod(self);
+            }
+        } else if (self->moodTimer == 240) {
+            ((DreamSys *)self->peer)
+                ->methods->setTickCallbacks((DreamSys *)self->peer, MOVE_CALLBACK_TICK_MOVE,
+                                            LOOK_CALLBACK_STEP_LOOK);
+        }
+        if (self->state == CONFRONT_ADVANCE) {
+            if (self->moodTimer < 130) {
+                self->methods->moveLocalY(self, 10, 0);
+            } else if (self->moodTimer < 160) {
+                self->methods->moveLocalZ(self, -30, 0);
+            } else if (self->moodTimer < 301) {
+                /* nothing */
+            } else {
+                SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
+                self->methods->moveLocalZ(self, -30, 0);
+            }
         }
     }
-tail:
     if (self->methods->distanceToPeer(self, self->peer) < 512) {
         self->methods->deactivate(self);
         self->methods->notifyParents(self, ENTITY_EFFECT_LINK_STAGE);

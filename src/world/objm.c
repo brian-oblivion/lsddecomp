@@ -231,20 +231,16 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 i
     self->initOption = initOption;
     if (self->stage != 0) {
         s32 stage;
-        s32 three;
 
         /* MATCHING: the volatile read keeps retail's second load of self->stage. */
         stage = *(s32 volatile *)&self->stage;
         self->tickPeriod = 16;
-        three = 3;
-        /* MATCHING: an ordering barrier; without it the 3 is set up ahead of the store above. */
-        __asm__("");
         flag = (stage == 5);
+        self->moveMode = 3;
         if (stage == 6) {
             flag = 1;
         }
-        self->moveMode = three;
-        if (stage == three) {
+        if (stage == 3) {
             flag = 1;
         }
         ((StageMap *)self->lightRig)->methods->setBounds((StageMap *)self->lightRig, 0);
@@ -321,7 +317,6 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
 /* onPadEvent, only in session: Start pressed toggles the pause, Select
  * held and released sets and clears the close-ready flag, triangle pressed
  * closes (closeAndNotifyNewGame). */
-/* MATCHING: the gotos keep retail's compare order; a switch sorts the cases. */
 void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code) {
     ObjMMethods *m = self->methods;
     void (*fn)(ObjM *);
@@ -329,34 +324,22 @@ void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code) {
     if (self->inSession == 0) {
         return;
     }
-    if (code == PAD_EVENT_PRESSED + PAD_BUTTON_RUP) {
-        goto closeAndNotify;
+    switch (code) { /* MATCHING: the cases stay in this order; retail lays their bodies out in it */
+        case PAD_EVENT_PRESSED + PAD_BUTTON_START:
+            fn = m->togglePause;
+            break;
+        case PAD_EVENT_HELD + PAD_BUTTON_SELECT:
+            fn = m->updateCloseReadyFlag;
+            break;
+        case PAD_EVENT_PRESSED + PAD_BUTTON_RUP:
+            fn = m->closeAndNotifyNewGame;
+            break;
+        case PAD_EVENT_RELEASED + PAD_BUTTON_SELECT:
+            fn = m->clearCloseReadyFlag;
+            break;
+        default:
+            return;
     }
-    if (code <= PAD_EVENT_PRESSED + PAD_BUTTON_RUP) {
-        if (code == PAD_EVENT_HELD + PAD_BUTTON_SELECT) {
-            goto updateCloseReady;
-        }
-        return;
-    }
-    if (code == PAD_EVENT_PRESSED + PAD_BUTTON_START) {
-        goto togglePause;
-    }
-    if (code == PAD_EVENT_RELEASED + PAD_BUTTON_SELECT) {
-        goto clearCloseReady;
-    }
-    return;
-togglePause:
-    fn = m->togglePause;
-    goto call;
-updateCloseReady:
-    fn = m->updateCloseReadyFlag;
-    goto call;
-closeAndNotify:
-    fn = m->closeAndNotifyNewGame;
-    goto call;
-clearCloseReady:
-    fn = m->clearCloseReadyFlag;
-call:
     fn(self);
 }
 

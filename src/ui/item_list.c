@@ -29,28 +29,18 @@ extern struct ColorRgb sItemListRowColor;
 extern struct ColorRgb sItemListCursorColor;
 
 void ItemList__SetState(ItemList *self, s32 state) {
-    /* MATCHING: gotos; an if/else chain tests the ranges and lays out the arms in
-     * another order. */
     self->closeTicks = 0;
-    if (state < ITEMLIST_RESULT_CHOSEN) {
-        goto end;
+    switch (state) {
+        case ITEMLIST_RESULT_CHOSEN:
+        case ITEMLIST_RESULT_CANCELLED:
+            self->methods->removeChild(self, self->inputSource);
+            self->methods->releaseResources(self);
+            self->result = state;
+            break;
+        case ITEMLIST_STATE_REPORT:
+            self->methods->notifyParents(self, self->result);
+            break;
     }
-    if (state < ITEMLIST_STATE_REPORT) {
-        goto case_lt4;
-    }
-    if (state == ITEMLIST_STATE_REPORT) {
-        goto case_eq4;
-    }
-    goto end;
-case_lt4:
-    self->methods->removeChild(self, self->inputSource);
-    self->methods->releaseResources(self);
-    self->result = state;
-    goto end;
-case_eq4:
-    self->methods->notifyParents(self, self->result);
-end:
-    return;
 }
 
 void ItemList__TickClosing(ItemList *self) {

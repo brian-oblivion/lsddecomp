@@ -158,16 +158,14 @@ StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *par
 /* `kind` goes into Actor's pendingExtra (+0x054): see include/style_effect.h. */
 StyleEffect *StyleEffect__StyleEffect(StyleEffect *self, s32 kind, StyleEffectParams *params,
                                       SceneNode *parent, LongVec3 *pos) {
-    if (GetActorMethods()->ctor((Actor *)self) == NULL) {
-        goto fail;
+    if (GetActorMethods()->ctor((Actor *)self) != NULL) {
+        self->methods = GetStyleEffectMethods();
+        self->state = 0;
+        self->pendingExtra = kind;
+        ((StyleEffectSetParamsFn)self->methods->reset)(self, params);
+        StyleEffect__InitByKind(self, parent, pos);
+        return self;
     }
-    self->methods = GetStyleEffectMethods();
-    self->state = 0;
-    self->pendingExtra = kind;
-    ((StyleEffectSetParamsFn)self->methods->reset)(self, params);
-    StyleEffect__InitByKind(self, parent, pos);
-    return self;
-fail:
     return NULL;
 }
 
@@ -355,17 +353,18 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
     s32 tableIndex;
     s32 extraZ;
     s32 period;
-    s32 tick;
+    u32 tick; /* MATCHING: unsigned; retail takes the period remainder of the tick unsigned */
     Actor **slot;
     s32 i;
     s32 *stepZ;
 
     tableIndex = self->params.tableIndex;
+    /* MATCHING: tick compared unsigned, as retail does; SceneNode declares it s32 */
     if (self->params.modelChildLayout != 0 && sModelChildDriftZ[tableIndex] != 0 &&
         (u32)self->tick > MODEL_CHILD_DRIFT_DELAY) {
         slot = self->modelChildren;
         self->methods->updateRotation(self, 0, sSpinRotStep);
-        i = 0;
+        i = 0; /* MATCHING: set here, before the call; set in the for header the code differs */
         /* MATCHING: the step's pointer is taken after the call; taken earlier, the code differs */
         stepZ = &sModelChildDriftZ[tableIndex];
         extraZ = 0;
@@ -381,12 +380,12 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
         period = MODEL_CHILD_DRIFT_RANGE / sModelChildDriftZ[tableIndex];
         tick = self->tick;
         if (period >= 0) {
-            if ((u32)tick % (u32)period == 0) {
+            if (tick % period == 0) {
                 StyleEffect__PlaceModelChildren(self, 1);
             }
         } else {
             u32 absPeriod = ~period + 1;
-            if ((u32)tick % absPeriod == 0) {
+            if (tick % absPeriod == 0) {
                 StyleEffect__PlaceModelChildren(self, 1);
             }
         }
@@ -515,10 +514,8 @@ void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
     sStyleEffectTmd = tmd;
     sStyleEffectTim = (void *)tim;
     sStyleEffectViewport = (Viewport *)viewport;
-    i = 0;
-    do {
+    for (i = 0; i < 2; i++) {
         model = (TmdModel *)tmd->methods->setBackClip(tmd, sStyleEffectModelIds[i]);
         TmdModel__SetFirstPrimClut(model, sStyleEffectClutPos);
-        i++;
-    } while (i < 2);
+    }
 }

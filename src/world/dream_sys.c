@@ -1097,35 +1097,34 @@ void DreamSys__NotifyLinkAttempt(DreamSys *self, s32 event) {
     s32 voice;
 
     GetActorMethods()->notifyWithHull((Actor *)self, event);
-    if (event == ACTOR_EVENT_NO_FLOOR)
-        goto no_floor;
-    if (event != ACTOR_EVENT_FLOOR_FOUND)
-        return;
+    switch (event) {
+        case ACTOR_EVENT_FLOOR_FOUND:
+            voice = self->linkTarget->flags36 & 0x7F;
+            self->voiceSelect = voice;
+            if (voice >= ARRAY_COUNT(sVoiceBySelect))
+                self->voiceSelect = 0;
 
-    voice = self->linkTarget->flags36 & 0x7F;
-    self->voiceSelect = voice;
-    if (voice >= ARRAY_COUNT(sVoiceBySelect))
-        self->voiceSelect = 0;
+            if (self->state == DREAMSYS_LINK_TUNNEL && self->voiceSelect == 0)
+                self->voiceSelect = 2;
 
-    if (self->state == DREAMSYS_LINK_TUNNEL && self->voiceSelect == 0)
-        self->voiceSelect = 2;
-
-    if (self->currentStage != 9)
-        return;
-    goto try_stage_timer_link;
-
-no_floor:
-    if (self->grid->methods->findSlotForPosition(self->grid, (LongVec3 *)self->coord2->coord.t)
-            ->loader->headerReady != LBDFILE_HEADER_CONSUMED)
-        goto undo_step;
-
-try_stage_timer_link:
-    self->methods->tryStageTimerLink(
-        self, (PlayerSpawnPoint *)self->grid->methods->getTargetDescriptor(self->grid, 0, 0));
-    return;
-
-undo_step:
-    self->methods->restoreLinkSnapshot(self);
+            if (self->currentStage == 9) {
+                self->methods->tryStageTimerLink(
+                    self,
+                    (PlayerSpawnPoint *)self->grid->methods->getTargetDescriptor(self->grid, 0, 0));
+            }
+            break;
+        case ACTOR_EVENT_NO_FLOOR:
+            if (self->grid->methods
+                    ->findSlotForPosition(self->grid, (LongVec3 *)self->coord2->coord.t)
+                    ->loader->headerReady == LBDFILE_HEADER_CONSUMED) {
+                self->methods->tryStageTimerLink(
+                    self,
+                    (PlayerSpawnPoint *)self->grid->methods->getTargetDescriptor(self->grid, 0, 0));
+            } else {
+                self->methods->restoreLinkSnapshot(self);
+            }
+            break;
+    }
 }
 
 void DreamSys__OnPadEvent(DreamSys *self, s32 sender, s32 event) {
@@ -1190,27 +1189,23 @@ void DreamSys__TimerTick(DreamSys *self, s32 sender, s32 event) {
 
     old = self->tick;
     self->tick = old + 1;
-    if ((u32)old < (u32)self->dreamTimeLimit)
-        goto tick_only;
-
-    if (self->isFlashbackSession) {
-        if (self->state != DREAMSYS_NO_LINK || self->methods->loadNextFlashback(self, 0)) {
-            /* MATCHING: keeps this branch's own copy of the identical
-               `tick = 0; return;` tail, rather than a jump to the one after notifyParents. */
-            __asm__("");
-            self->tick = 0;
-            return;
+    if ((u32)old >= (u32)self->dreamTimeLimit) { /* MATCHING: compared unsigned, as retail does */
+        if (self->isFlashbackSession) {
+            if (self->state != DREAMSYS_NO_LINK || self->methods->loadNextFlashback(self, 0)) {
+                /* MATCHING: a barrier; without it this `tick = 0` jumps to the copy after notifyParents */
+                __asm__("");
+                self->tick = 0;
+                return;
+            }
+        } else {
+            self->methods->flashbackSaving(self, 0, 16);
         }
+        self->methods->notifyParents(self, DREAMSYS_TIME_UP);
+        self->tick = 0;
     } else {
-        self->methods->flashbackSaving(self, 0, 16);
+        self->methods->updateTickState(self);
+        self->methods->runTickCallbacks(self);
     }
-    self->methods->notifyParents(self, DREAMSYS_TIME_UP);
-    self->tick = 0;
-    return;
-
-tick_only:
-    self->methods->updateTickState(self);
-    self->methods->runTickCallbacks(self);
 }
 
 void DreamSys__DispatchChunkChange(DreamSys *self, void *sender, s32 event) {
@@ -1317,12 +1312,12 @@ s32 DreamSys__GetSetDreamTimeLimit(DreamSys *self, s32 value) {
     result = self->dreamTimeLimit;
     self->dreamTimeLimit = value;
     if (result >= 0)
-        result = (u32)result / DREAM_TICKS_PER_SECOND;
+        result = (u32)result / DREAM_TICKS_PER_SECOND; /* MATCHING: an unsigned divide, as retail does */
     return result;
 }
 
 s32 DreamSys__GetDreamTimerScaled(DreamSys *self) {
-    return (u32)self->tick / DREAM_TICKS_PER_SECOND;
+    return (u32)self->tick / DREAM_TICKS_PER_SECOND; /* MATCHING: an unsigned divide, as retail does */
 }
 
 void DreamSys__SetSoundObj(DreamSys *self, VabStreamObj *value) {
@@ -1340,6 +1335,7 @@ void DreamSys__SetEtcTim(DreamSys *self, struct TimImage *value) {
 void DreamSys__UpdateTickState(DreamSys *self) {
     if (self->movementBlocked == 0) {
         self->linkCommandFlag = 0;
+        /* MATCHING: an unsigned remainder, as retail takes it; both fields are s32 */
         self->tickBoundary = ((u32)self->tick % (u32)self->tickPeriod) == 0;
     }
 }
@@ -1481,19 +1477,11 @@ void DreamSys__StepLookOffset(DreamSys *self) {
         delta = sLookOffsetSteps[idx];
         threshold = sLookOffsetLimits[idx];
         sum = delta + self->lookOffset;
-        if (sum >= 0) {
-            if (sum < threshold)
-                goto apply;
-            self->lookOffsetCommand = LOOK_OFFSET_COMMAND_NONE;
-            return;
+        /* MATCHING: `~sum + 1`, not -sum, which compiles differently */
+        if (sum >= 0 ? sum < threshold : (~sum + 1) < threshold) {
+            self->viewport->refView.vr.y += delta;
+            self->lookOffset = sum;
         }
-        if ((~sum + 1) >= threshold) {
-            self->lookOffsetCommand = LOOK_OFFSET_COMMAND_NONE;
-            return;
-        }
-    apply:
-        self->viewport->refView.vr.y += delta;
-        self->lookOffset = sum;
         self->lookOffsetCommand = LOOK_OFFSET_COMMAND_NONE;
         return;
     }
@@ -1905,19 +1893,17 @@ bool DreamSys__LoadNextFlashback(DreamSys *self, bool quiet) {
     FlashbackEntry *entry;
 
     idx = self->currentFlashbackIndex;
-    if (idx >= self->amountFlashbacksAvailable) {
-        goto fail;
+    if (idx < self->amountFlashbacksAvailable) {
+        self->state = DREAMSYS_LINK_FLASHBACK;
+        entry = &self->storedFlashbacks[idx];
+        if (!quiet) {
+            self->methods->notifyParents(self, DREAMSYS_LINK_FLASHBACK);
+        }
+        self->currentDay = entry->day;
+        self->currentStage = entry->stageID;
+        self->linkCoordinates = entry->position;
+        return true;
     }
-    self->state = DREAMSYS_LINK_FLASHBACK;
-    entry = &self->storedFlashbacks[idx];
-    if (!quiet) {
-        self->methods->notifyParents(self, DREAMSYS_LINK_FLASHBACK);
-    }
-    self->currentDay = entry->day;
-    self->currentStage = entry->stageID;
-    self->linkCoordinates = entry->position;
-    return true;
-fail:
     return false;
 }
 
@@ -2033,13 +2019,15 @@ s32 DreamSys__TickStaircaseYawPlus90(DreamSys *self) {
     if (self->moveMode != MOVE_MODE_RUN) {
         if (self->staircaseFrame >= 133)
             return 1;
-        if ((u32)(self->staircaseFrame - 43) < 15 || (u32)(self->staircaseFrame - 75) < 15) {
+        if ((self->staircaseFrame >= 43 && self->staircaseFrame < 58) ||
+            (self->staircaseFrame >= 75 && self->staircaseFrame < 90)) {
             self->turnCommand = TURN_COMMAND_RIGHT;
         }
     } else {
         if (self->staircaseFrame >= 19)
             return 1;
-        if ((u32)(self->staircaseFrame - 8) < 2 || (u32)(self->staircaseFrame - 13) < 2) {
+        if ((self->staircaseFrame >= 8 && self->staircaseFrame < 10) ||
+            (self->staircaseFrame >= 13 && self->staircaseFrame < 15)) {
             self->methods->updateRotation(self, 0, sRotationYawPlus45);
         }
     }
@@ -2057,19 +2045,21 @@ s32 DreamSys__TickStaircaseYawMinus135(DreamSys *self) {
     if (self->moveMode != MOVE_MODE_RUN) {
         if (self->staircaseFrame >= 149)
             return 1;
-        if ((u32)(self->staircaseFrame - 22) < 15 || (u32)(self->staircaseFrame - 57) < 16 ||
-            (u32)(self->staircaseFrame - 110) < 15) {
+        if ((self->staircaseFrame >= 22 && self->staircaseFrame < 37) ||
+            (self->staircaseFrame >= 57 && self->staircaseFrame < 73) ||
+            (self->staircaseFrame >= 110 && self->staircaseFrame < 125)) {
             self->turnCommand = TURN_COMMAND_LEFT;
         }
-        flag = (u32)(self->staircaseFrame - 57) < 53;
+        flag = (self->staircaseFrame >= 57 && self->staircaseFrame < 110);
     } else {
         if (self->staircaseFrame >= 25)
             return 1;
-        if ((u32)(self->staircaseFrame - 6) < 2 || (u32)(self->staircaseFrame - 11) < 2 ||
-            (u32)(self->staircaseFrame - 20) < 2) {
+        if ((self->staircaseFrame >= 6 && self->staircaseFrame < 8) ||
+            (self->staircaseFrame >= 11 && self->staircaseFrame < 13) ||
+            (self->staircaseFrame >= 20 && self->staircaseFrame < 22)) {
             self->methods->updateRotation(self, 0, sRotationYawMinus45);
         }
-        flag = (u32)(self->staircaseFrame - 3) < 14;
+        flag = (self->staircaseFrame >= 3 && self->staircaseFrame < 17);
     }
     if (flag) {
         self->lookOffsetCommand = LOOK_OFFSET_COMMAND_DOWN;
@@ -2085,7 +2075,7 @@ s32 DreamSys__TickStaircaseYawPlus45(DreamSys *self) {
     }
     if (self->moveMode != MOVE_MODE_RUN) {
         if (self->staircaseFrame < 101) {
-            if ((u32)(self->staircaseFrame - 43) < 15) {
+            if (self->staircaseFrame >= 43 && self->staircaseFrame < 58) {
                 self->turnCommand = TURN_COMMAND_RIGHT;
             }
         } else {
@@ -2093,7 +2083,7 @@ s32 DreamSys__TickStaircaseYawPlus45(DreamSys *self) {
         }
     } else {
         if (self->staircaseFrame < 15) {
-            if ((u32)(self->staircaseFrame - 8) < 2) {
+            if (self->staircaseFrame >= 8 && self->staircaseFrame < 10) {
                 self->methods->updateRotation(self, 0, sRotationYawPlus45);
             }
         } else {
@@ -2114,17 +2104,19 @@ s32 DreamSys__TickStaircaseYawMinus90(DreamSys *self) {
     if (self->moveMode != MOVE_MODE_RUN) {
         if (self->staircaseFrame >= 113)
             return 1;
-        if ((u32)(self->staircaseFrame - 30) < 15 || (u32)(self->staircaseFrame - 82) < 15) {
+        if ((self->staircaseFrame >= 30 && self->staircaseFrame < 45) ||
+            (self->staircaseFrame >= 82 && self->staircaseFrame < 97)) {
             self->turnCommand = TURN_COMMAND_LEFT;
         }
-        flag = (u32)(self->staircaseFrame - 30) < 52;
+        flag = (self->staircaseFrame >= 30 && self->staircaseFrame < 82);
     } else {
         if (self->staircaseFrame >= 19)
             return 1;
-        if ((u32)(self->staircaseFrame - 6) < 2 || (u32)(self->staircaseFrame - 15) < 2) {
+        if ((self->staircaseFrame >= 6 && self->staircaseFrame < 8) ||
+            (self->staircaseFrame >= 15 && self->staircaseFrame < 17)) {
             self->methods->updateRotation(self, 0, sRotationYawMinus45);
         }
-        flag = (u32)self->staircaseFrame < 9;
+        flag = (self->staircaseFrame >= 0 && self->staircaseFrame < 9);
     }
     if (flag) {
         self->lookOffsetCommand = LOOK_OFFSET_COMMAND_DOWN;
@@ -2373,7 +2365,7 @@ void DreamSys__AddFlashback(DreamSys *self, s32 stage, PlayerSpawnPoint *pos, s3
     if (self->amountFlashbacksAvailable < ARRAY_COUNT(self->storedFlashbacks)) {
         entry += self->amountFlashbacksAvailable++;
     } else {
-        entry += (u32)self->tick % 9;
+        entry += (u32)self->tick % 9; /* MATCHING: an unsigned remainder, as retail takes it */
     }
     entry->stageID = stage;
     entry->position = *pos;
@@ -2448,12 +2440,10 @@ s32 CalcNavigationScore(void) {
 
     sum = 0;
     p = *gpNavChallengesComplete;
-    i = 0;
-    do {
+    for (i = 0; i < NAV_CHALLENGE_COUNT; i++) {
         if (p[i] != 0)
             sum += NAV_CHALLENGE_SCORE;
-        i++;
-    } while (i < NAV_CHALLENGE_COUNT);
+    }
     if (sum >= NAV_CHALLENGE_COUNT * NAV_CHALLENGE_SCORE)
         sum = UNLOCK_SCORE_MAX;
     sum -= *gpDinamicLinkPenalty * DYNAMIC_LINK_PENALTY;
@@ -2689,7 +2679,7 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
         entry = sStageSpawnPoints[stage];
         for (i = 0; i < count; i++, entry++) {
             if (*(s16 *)&chunk == *(s16 *)&entry->chunk)
-                goto found;
+                goto found; /* MATCHING: a break and a test after the loop compiles an extra compare */
         }
         entry = &sStageSpawnPoints[stage][*(s16 *)&chunk % count];
 
@@ -2707,6 +2697,7 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
 MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day) {
     s32 i;
 
+    /* MATCHING: tested unsigned, as retail does; `i` stays signed, since a u32 changes the `% 12` */
     for (i = 0; (u32)i < ARRAY_COUNT(sSpecialDays); i++) {
         if (day == sSpecialDays[i]) {
             /* One of the special day's records, and one of twelve

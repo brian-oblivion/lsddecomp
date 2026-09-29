@@ -481,7 +481,7 @@ const char sMomPathSymDog[] = "ETC\\SYMDOG.MOM";
 
 void InitDreamAux(void) {
     ResourceRequest req;
-    u32 i;
+    u32 i; /* MATCHING: unsigned; a signed counter compiles a signed loop test */
     s32 record;
 
     for (i = 0; i < ARRAY_COUNT(sDreamAuxGroupRecords); i++) {
@@ -500,7 +500,7 @@ void InitDreamAux(void) {
 
 void ReleaseDreamAuxModels(void) {
     DreamAuxSlot *slot = sDreamAuxSlots;
-    u32 i;
+    u32 i; /* MATCHING: unsigned; a signed counter compiles a signed loop test */
 
     for (i = 0; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
         ModelData *model = slot->model;
@@ -527,7 +527,7 @@ void SetTeleportsEnabled(s32 stage);
 void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct VabStreamObj *sound,
                       struct FrameClock *frameClock) {
     DreamAuxSlot *slot = sDreamAuxSlots;
-    u32 i;
+    u32 i; /* MATCHING: unsigned; a signed counter compiles a signed loop test */
 
     sDreamAuxStage = stage;
     sDreamAuxStageMap = stageMap;
@@ -561,14 +561,11 @@ void EnableTeleportsForKind(s32 moodIndex) {
 }
 
 void ReleaseDreamAuxEntities(void) {
-    u32 i;
+    u32 i; /* MATCHING: unsigned; a signed counter compiles a signed loop test */
     DreamAuxSlot *slot;
 
-    /* MATCHING: assignments, not initializers, so i and slot are set up in retail's order */
-    i = 0;
     slot = sDreamAuxSlots;
-
-    for (; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
+    for (i = 0; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
         Entity *entity = slot->entity;
 
         if (entity != NULL) {
@@ -681,7 +678,7 @@ bool ProcessDreamAuxTriggerRecord(s32 day, DreamAuxTriggerEntry *trigger, Trigge
     s32 desc[4]; /* New_Entity's descriptor: word +0x00C the ModelData */
 
     if (!CheckDreamAuxTriggerCondition(day, record)) {
-        goto fail;
+        return false;
     }
 
     EnableTeleportsForKind(record->moodIndex);
@@ -691,27 +688,22 @@ bool ProcessDreamAuxTriggerRecord(s32 day, DreamAuxTriggerEntry *trigger, Trigge
     model = world->methods->getModelData(world, record->modelIndex);
     desc[3] = (s32)model;
 
-    if (model == NULL) {
-        goto skip;
-    }
-
-    while (spawn < end) {
-        if (*spawn == -1) {
-            break;
+    if (model != NULL) {
+        while (spawn < end) {
+            if (*spawn == -1) {
+                break;
+            }
+            if (SpawnDreamAuxTriggerEntity(record->moodIndex, desc, trigger, (u8)*spawn)) {
+                return true;
+            }
+            spawn++;
         }
-        if (SpawnDreamAuxTriggerEntity(record->moodIndex, desc, trigger, (u8)*spawn)) {
-            return true;
-        }
-        spawn++;
     }
 
-skip:
-    if (record->moodIndex == TRIGGER_CHAIN_MOOD_ROW) {
-        return ProcessDreamAuxTriggerRecord(day, trigger, record + TRIGGER_CHAIN_STRIDE, world);
+    if (record->moodIndex != TRIGGER_CHAIN_MOOD_ROW) {
+        return false;
     }
-
-fail:
-    return false;
+    return ProcessDreamAuxTriggerRecord(day, trigger, record + TRIGGER_CHAIN_STRIDE, world);
 }
 
 /* Tests `record`'s condition against `day` (enum TriggerCondition) and
@@ -721,16 +713,17 @@ bool CheckDreamAuxTriggerCondition(s32 day, TriggerRecord *record) {
     s32 id;
 
     if (condition == TRIGGER_COND_ALWAYS) {
-        goto success;
+        record->triggered = 1;
+        return true;
     }
 
+    /* MATCHING: gotos; retail lays the negating arm out after the plain one, which no if/else gives */
     if (condition < 0) {
         if (record->triggered == 0) {
             goto negate;
         }
         return false;
     }
-    /* MATCHING: this arm sits before `negate:` and jumps, as retail's does */
     id = condition;
     goto have_idx;
 
@@ -787,7 +780,6 @@ have_idx:
             break;
     }
 
-success:
     record->triggered = 1;
     return true;
 }
