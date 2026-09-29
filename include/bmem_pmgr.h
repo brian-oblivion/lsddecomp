@@ -93,7 +93,7 @@ struct BMemPMgr {
 /** @brief Creates the game's one pool: mallocs its header, poolSize bytes of
  * blocks (at least BMEMPMGR_MIN_POOL_SIZE) and the sentinel, and makes the
  * blocks one free block. Declared without a prototype: the definition takes
- * `s32 poolSize`, and main() passes a second argument the body never reads.
+ * `u32 poolSize`, and main() passes a second argument the body never reads.
  * @return the pool (a BMemPMgr), or NULL when malloc fails */
 extern void *BMemPMgrInit(); /* arity-ok: main() passes a dead second argument */
 
@@ -116,7 +116,7 @@ extern void FreeMem(void *ptr);
  * is split off as a new free block.
  * @param size bytes wanted; 0 allocates nothing
  * @return the payload, or NULL when no free block is large enough */
-extern void *BMemPMgrAlloc(s32 size); /* arity-ok: the definition takes a fallback pool no caller passes */
+extern void *BMemPMgrAlloc(u32 size); /* arity-ok: the definition takes a fallback pool no caller passes */
 
 /** @brief Returns a block to the default pool, merging it with free
  * neighbours below and above, and appends it to the free list's tail.
