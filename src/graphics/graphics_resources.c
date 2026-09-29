@@ -1298,14 +1298,14 @@ s32 MoviePlayer__InitFrame(MoviePlayer *self, DrawRect *frame, s32 external) {
         if ((self->ring = BMemPMgrAlloc(MOVIE_RING_SIZE)) == NULL) {
             goto fail;
         }
-        if ((self->strip = BMemPMgrAlloc(frame->h << 5)) == NULL) {
+        if ((self->strip = BMemPMgrAlloc(frame->h * MOVIE_STRIP_W * sizeof(u16))) == NULL) {
             goto fail;
         }
     }
     self->stripRect = *frame;
     self->frame = self->stripRect;
     self->stripRect.w = MOVIE_STRIP_W;
-    self->stripSize = (self->stripRect.h << 4) >> 1;
+    self->stripSize = (self->stripRect.h * MOVIE_STRIP_W) >> 1; /* 16-bit pixels, in words */
     return 0;
 fail:
     MoviePlayer__FreeFrameBuffers(self);
