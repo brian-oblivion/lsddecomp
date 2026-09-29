@@ -1364,11 +1364,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     LinkResource *oldResource;
     GridCell **cell;
     u8 *cells;
-    GsCOORDINATE2 *coord;
     GsCOORD2PARAM *param;
-    s32 x;
-    s32 y;
-    s32 z;
     s32 rotY;
     s32 model;
     s32 hidden;
@@ -1420,15 +1416,8 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
             (*cell)->tmd = (s32)((TmdModel *)(*cell)->model)->object;
             GsLinkObject4((u_long)((TmdModel *)(*cell)->model)->object,
                           (GsDOBJ2 *)&(*cell)->attribute, 0);
-            coord = (*cell)->coord2;
-            /* MATCHING: an ordering barrier; it keeps the rec.x/.y/.z reads after coord2's */
-            __asm__("");
-            x = rec.x;
-            y = rec.y;
-            z = rec.z;
-            coord->coord.t[0] = x;
-            coord->coord.t[1] = y;
-            coord->coord.t[2] = z;
+            /* MATCHING: one struct copy, every load before every store */
+            *(LongVec3 *)(*cell)->coord2->coord.t = *(LongVec3 *)&rec.x;
             param = (*cell)->coord2->param;
             param->rotate.vx = 0;
             rotY = rec.rotY;
