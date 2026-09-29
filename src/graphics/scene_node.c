@@ -429,7 +429,8 @@ void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
     offset.y = offset.y - selfPos->y;
     offset.z = offset.z - selfPos->z;
 
-    /* MATCHING: each axis as gotos, and -x as ~x + 1; if/else is longer. */
+    /* MATCHING: each axis as gotos, and -x as ~x + 1; as if/else the sign's two range
+     * tests share one compare, and a ternary into mag keeps fewer values around. */
     if (offset.x < 0) {
         goto x_neg;
     }
