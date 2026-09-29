@@ -363,7 +363,7 @@ CdFileEntry *GetSpecialDayRecords(s32 *movieIdOut, s32 day) {
     return &rec[day * SPECIAL_DAY_RECORD_COUNT];
 }
 
-/* A special day's record or an event movie; *movieIdOut is -1 for a
+/* A special day's record or an event movie; *movieIdOut is MOVIE_ID_NONE for a
  * special day's TIM images. */
 CdFileEntry *GetSpecialDayOrEventRecord(s32 *movieIdOut, CinematicCall pick) {
     s32 firstMovieId;
@@ -371,7 +371,8 @@ CdFileEntry *GetSpecialDayOrEventRecord(s32 *movieIdOut, CinematicCall pick) {
     if (pick.bank >= 0) {
         rec = GetSpecialDayRecords(&firstMovieId, pick.bank);
         if (movieIdOut != NULL) {
-            *movieIdOut = ((u16)pick.entry < SPECIAL_DAY_MOVIE_COUNT) ? pick.entry + firstMovieId : -1;
+            *movieIdOut = ((u16)pick.entry < SPECIAL_DAY_MOVIE_COUNT) ? pick.entry + firstMovieId
+                                                                      : MOVIE_ID_NONE;
         }
         return &rec[pick.entry];
     }

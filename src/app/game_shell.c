@@ -266,7 +266,7 @@ s32 GameApplication__RunDayTask(GameApplication *self) {
 
 /* The special day record or event movie DreamSys's getCinematic names: a
  * movie is streamed (gated by config->playStreams, no skip on confirm), a
- * TIM image (movie id -1) is shown for 10 seconds. */
+ * TIM image (MOVIE_ID_NONE) is shown for 10 seconds. */
 void GameApplication__PlayCinematic(GameApplication *self) {
     CinematicCall cc;
 
@@ -280,7 +280,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
     path = GetSpecialDayOrEventRecord(&movieId, cc)->name;
     SetActiveDataSourceDriverMode(0, 0, 0);
 
-    if (movieId != -1) {
+    if (movieId != MOVIE_ID_NONE) {
         if (self->config->playStreams != 0) {
             StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 

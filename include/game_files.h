@@ -36,8 +36,12 @@
  * Special day 0 is SPDAY01. @{ */
 #define SPECIAL_DAY_RECORD_COUNT 6 /**< records per special day */
 #define SPECIAL_DAY_MOVIE_COUNT 2  /**< of them, the leading .STR movies */
-
 /** @} */
+
+/** The movie id GetSpecialDayOrEventRecord hands back for a record that is
+ * not a movie: one of a special day's TIM images, which is shown instead of
+ * streamed (GameApplication__PlayCinematic). */
+#define MOVIE_ID_NONE (-1)
 
 /**
  * @brief The cinematic DreamSys's getCinematic names, and what
@@ -231,7 +235,7 @@ extern CdFileEntry *GetSpecialDayRecords(s32 *movieIdOut, s32 day);
 /**
  * @brief A special day's record or an event movie, for the pair DreamSys's
  * getCinematic returns.
- * @param movieIdOut Receives the movie id, or -1 for a special day's TIM
+ * @param movieIdOut Receives the movie id, or MOVIE_ID_NONE for a special day's TIM
  *                   images; may be NULL.
  * @param pick       The special day and record, or the event movie.
  * @return The record.
