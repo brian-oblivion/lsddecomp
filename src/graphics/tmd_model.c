@@ -80,6 +80,8 @@ void TmdModel__TmdModel(TmdModel *self, TmdObject *object) {
     TmdModel__InitBoundsCount(self);
 }
 
+/* MATCHING: one whole-struct copy; as four word assignments each word is
+ * loaded and stored in turn, not all four loaded first. */
 void TmdModel__SetQuad(TmdModel *self, TmdModelQuad *src) {
     self->quad = *src;
 }
