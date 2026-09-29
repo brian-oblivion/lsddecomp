@@ -232,7 +232,7 @@ segments:
       - [0x19B4, o, libc2/sprintf, .rdata]
       # jtbl_80011290 (5 words) is code_322b4's switch table, ATTACHED for its
       # `.L` labels; D_800112A4 onward is psyq_36654's (libpress) and stays plain.
-      - [0x1A90, .rodata, graphics/char_sprite]
+      - [0x1A90, .rodata, graphics/screen_sprite]
       - [0x1AA4, rodata]
       # 0x1B -> 0x1B6B; retail's next string is at 0x1B6C, which is exactly
       # where SUBALIGN(2) puts it, so no pad line is needed.
@@ -1335,6 +1335,8 @@ segments:
       - [0x319E8, o, libc2/sprintf]    # sprintf
       - [0x32248, o, libc2/memmove]    # memmove
       - [0x322b4, c, graphics/char_sprite]       # game code (revision 18; was psyq_322b4)
+      # ScreenSprite, New_ScreenSprite (0x80041C9C) to GetScreenSpriteMethods; owns jtbl_80011290.
+      - [0x3249C, c, graphics/screen_sprite]
       # Sprite, New_Sprite (0x80041EE8) to GetSpriteMethods.
       - [0x326E8, c, graphics/sprite]
       # RequestedFile, New_RequestedFile (0x800422CC) to GetRequestedFileMethods.
@@ -1893,7 +1895,8 @@ segments:
       - [0x5EDF8, .data, app/task]  # gStreamTaskMethods .. gViewportMethods
       - [0x5F19C, .data, ui/screen_widgets]  # gFadeBoxMethods .. gTextRowMethods
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)
-      - [0x5F474, .data, graphics/char_sprite]  # gCharSpriteMethods .. sVec3Zero
+      - [0x5F474, .data, graphics/char_sprite]  # gCharSpriteMethods, sCharSpriteCellRect
+      - [0x5F54C, .data, graphics/screen_sprite]  # gScreenSpriteMethods, sVec3Zero
       - [0x5F61C, .data, graphics/sprite]  # gSpriteMethods
       - [0x5F6D8, .data, graphics/requested_file]  # gRequestedFileMethods
       - [0x5F750, .data, graphics/frame_clock]  # gFrameClockMethods
