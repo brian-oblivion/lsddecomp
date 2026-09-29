@@ -206,7 +206,7 @@ void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
  * from the image, size and u,v from the cell, the pivot at its centre,
  * neutral colour, scale 1.0 and no rotation. `tim` is a TimImage's GsIMAGE. */
 void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, GsIMAGE *tim) {
-    s32 mode = tim->pmode & 0x3;
+    s32 mode = tim->pmode & TIM_PMODE_DEPTH_MASK;
     s32 grey = SPRITE_RGB_NEUTRAL;
 
     sprite->attribute = mode << SPRITE_ATTR_MODE_SHIFT;
