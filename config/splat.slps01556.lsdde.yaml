@@ -1335,6 +1335,8 @@ segments:
       - [0x319E8, o, libc2/sprintf]    # sprintf
       - [0x32248, o, libc2/memmove]    # memmove
       - [0x322b4, c, graphics/sprite]       # game code (revision 18; was psyq_322b4)
+      # LightRig, New_LightRig (0x80042694) to GetLightRigMethods.
+      - [0x32E94, c, graphics/light_rig]
       # psyq_memset chunk B: three short runs in the libgs/libcd remainder.
       - [0x330F4, o, libgs/gs_110]     # GsSetAmbient
       - [0x3311c, c, graphics/flat_light_obj]       # game code (revision 18; was psyq_3311c)
@@ -1885,7 +1887,8 @@ segments:
       - [0x5EDF8, .data, app/task]  # gStreamTaskMethods .. gViewportMethods
       - [0x5F19C, .data, ui/screen_widgets]  # gFadeBoxMethods .. gTextRowMethods
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)
-      - [0x5F474, .data, graphics/sprite]  # gCharSpriteMethods .. gLightRigMethods
+      - [0x5F474, .data, graphics/sprite]  # gCharSpriteMethods .. gFrameClockMethods
+      - [0x5F7AC, .data, graphics/light_rig]  # gLightRigMethods
       - [0x5F86C, .data, graphics/flat_light_obj]  # gFlatLightObjMethods
       - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods .. gMoviePlayerMethods
       - [0x5FE84, data]
