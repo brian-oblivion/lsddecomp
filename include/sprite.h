@@ -169,11 +169,8 @@ Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *resetArg, s32
  * @param rect The texture cell.
  * @param resetArg Handed on to reset.
  * @param resetWord Handed on to reset.
- * @return What reset returns; Sprite__Reset returns nothing, and no caller
- *         reads it.
  */
-void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *resetArg,
-                     s32 resetWord);
+void Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *resetArg, s32 resetWord);
 
 /**
  * @brief Reset (slot +0x040): binds the texture and cell and rebuilds the
