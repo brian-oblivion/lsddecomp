@@ -683,29 +683,21 @@ s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2) {
     code2 = CalcBoxOutcode(box, p2);
 
     if (code1 == 0) {
-        if (code2 != 0) {
-            goto shared_test;
+        if (code2 == 0) {
+            return CLIP_INSIDE;
         }
-        return CLIP_INSIDE;
+    } else if (code2 == 0) {
+        if (out != NULL) {
+            BisectSegmentToBox(out, box, p2, p1);
+        }
+        return CLIP_P2_INSIDE;
     }
-    if (code2 != 0) {
-        goto shared_test;
+    if (code1 == 0) {
+        if (out != NULL) {
+            BisectSegmentToBox(out, box, p1, p2);
+        }
+        return CLIP_P1_INSIDE;
     }
-    if (out != NULL) {
-        BisectSegmentToBox(out, box, p2, p1);
-    }
-    return CLIP_P2_INSIDE;
-
-shared_test:
-    if (code1 != 0) {
-        goto combined;
-    }
-    if (out != NULL) {
-        BisectSegmentToBox(out, box, p1, p2);
-    }
-    return CLIP_P1_INSIDE;
-
-combined:
     if ((code1 & code2) != 0) {
         return CLIP_MISS;
     }
