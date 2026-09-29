@@ -51,7 +51,7 @@ typedef void (*BgLayerResetFn)(BgLayer *self, struct TileMap *src, s32 mode);
  *        exactly libgs's GsBG, laid over a TileMap's GsMAP.
  *
  * Parent SceneNode (its ctor chains to SceneNode's first); no class derives
- * from it. Methods in src/graphics/graphics_resources.c. The object is 0x68
+ * from it. Methods in src/graphics/bg_layer.c. The object is 0x68
  * bytes (New_BgLayer).
  *
  * Viewport__DrawNode (src/graphics/viewport_draw.c) passes a BgLayer's GsBG,
