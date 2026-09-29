@@ -40,6 +40,88 @@
 
 /* DreamSaveBlock, the save block GraphRoom plots, is include/dream_sys.h's. */
 
+/* GraphRoom's method table, class id 0x2F130: TaskCore's slots, with
+ * GraphRoom's overrides, then its own tickHighlight at +0x124. A slot whose
+ * function is declared for another class's `self` takes a `void *` cast. */
+/* clang-format off */
+GraphRoomMethods gGraphRoomMethods = {
+    /* +0x000 header */ 0x2F130,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ GraphRoom__GraphRoom,
+    /* +0x00C finalize */ (void *)TaskCore__Finalize,
+    /* +0x010 addChild */ (void *)BasicClass__AddChild,
+    /* +0x014 removeChild */ (void *)BasicClass__RemoveChild,
+    /* +0x018 removeAllChildren */ (void *)BasicClass__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)IntermediateBase__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 resetCounters */ GraphRoom__Reset,
+    /* +0x044 init */ GraphRoom__Init,
+    /* +0x048 deinit */ (void *)IntermediateBase__Deinit,
+    /* +0x04C onInit */ (void *)TaskCore__OnInit,
+    /* +0x050 onDeinit */ (void *)TaskCore__OnDeinit,
+    /* +0x054 onDrawSystemEvent */ (void *)IntermediateBase__OnDrawSystemEvent,
+    /* +0x058 onPadEvent */ (void *)TaskCore__OnPadEvent,
+    /* +0x05C update */ GraphRoom__Update,
+    /* +0x060 setState */ (void *)TaskCore__SetState,
+    /* +0x064 onStart */ (void *)IntermediateBase__OnStart,
+    /* +0x068 onStop */ (void *)IntermediateBase__OnStop,
+    /* +0x06C setFrameBound */ (void *)TaskCore__SetFrameBound,
+    /* +0x070 playSound */ (void *)TaskCore__PlaySound,
+    /* +0x074 onPadStart */ (void *)TaskCore__OnPadStart,
+    /* +0x078 onPadConfirm */ GraphRoom__OnPadConfirm,
+    /* +0x07C onPadCancel */ (void *)TaskCore__OnPadCancel,
+    /* +0x080 onPadPrev */ (void *)TaskCore__OnPadPrev,
+    /* +0x084 onPadNext */ (void *)TaskCore__OnPadNext,
+    /* +0x088 slot88 */ NULL,
+    /* +0x08C slot8C */ NULL,
+    /* +0x090 confirmSlot */ (void *)TaskCore__ConfirmSlot,
+    /* +0x094 exit */ (void *)TaskCore__Exit,
+    /* +0x098 setExitCallback */ (void *)TaskCore__SetExitCallback,
+    /* +0x09C setFadeInCallbackEnabled */ (void *)TaskCore__SetFadeInCallbackEnabled,
+    /* +0x0A0 setFadeOutCallbackEnabled */ (void *)TaskCore__SetFadeOutCallbackEnabled,
+    /* +0x0A4 setColors */ (void *)TaskCore__SetColors,
+    /* +0x0A8 setFadeRate */ (void *)TaskCore__SetFadeRate,
+    /* +0x0AC tickFadeInCallback */ (void *)TaskCore__TickFadeInCallback,
+    /* +0x0B0 tickFadeIn */ (void *)TaskCore__TickFadeIn,
+    /* +0x0B4 slotB4 */ NULL,
+    /* +0x0B8 slotB8 */ NULL,
+    /* +0x0BC slotBC */ NULL,
+    /* +0x0C0 tickFadeOutCallback */ (void *)TaskCore__TickFadeOutCallback,
+    /* +0x0C4 tickFadeOut */ (void *)TaskCore__TickFadeOut,
+    /* +0x0C8 slotC8 */ NULL,
+    /* +0x0CC slotCC */ NULL,
+    /* +0x0D0 slotD0 */ NULL,
+    /* +0x0D4 setSubHandle */ (void *)TaskCore__SetSubHandle,
+    /* +0x0D8 setTarget */ (void *)GraphRoom__BuildGraphPoints,
+    /* +0x0DC releaseTarget */ GraphRoom__ReleaseGraphPoints,
+    /* +0x0E0 updateSlotElements */ GraphRoom__PopulateGraphPoints,
+    /* +0x0E4 broadcastToSlots */ (void *)TaskCore__BroadcastToSlots,
+    /* +0x0E8 findNextFreeSlot */ (void *)TaskCore__FindNextFreeSlot,
+    /* +0x0EC findPrevFreeSlot */ (void *)TaskCore__FindPrevFreeSlot,
+    /* +0x0F0 setActiveSlot */ (void *)TaskCore__SetActiveSlot,
+    /* +0x0F4 getActiveSlot */ (void *)TaskCore__GetActiveSlot,
+    /* +0x0F8 createSlotElements */ (void *)TaskCore__CreateSlotElements,
+    /* +0x0FC releaseSlotElements */ (void *)TaskCore__ReleaseSlotElements,
+    /* +0x100 refreshSlotView */ (void *)TaskCore__RefreshSlotView,
+    /* +0x104 broadcastToSlotElements */ (void *)TaskCore__BroadcastToSlotElements,
+    /* +0x108 beginElementScroll */ (void *)TaskCore__BeginElementScroll,
+    /* +0x10C commitElementScroll */ (void *)TaskCore__CommitElementScroll,
+    /* +0x110 cancelElementScroll */ (void *)TaskCore__CancelElementScroll,
+    /* +0x114 advanceSlotCursor */ (void *)TaskCore__AdvanceSlotCursor,
+    /* +0x118 retreatSlotCursor */ (void *)TaskCore__RetreatSlotCursor,
+    /* +0x11C setSlotCursor */ (void *)TaskCore__SetSlotCursor,
+    /* +0x120 getActiveItemCursor */ (void *)TaskCore__GetActiveItemCursor,
+    /* +0x124 tickHighlight */ GraphRoom__TickHighlight,
+};
+/* clang-format on */
+
 GraphRoom *New_GraphRoom(struct DreamSys *dreamSys) {
     GraphRoom *obj = BMemPMgrAlloc(sizeof(GraphRoom));
     if (obj != NULL) {
@@ -186,9 +268,8 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
     }
 }
 
-/* The four moods ScoreDayLog looks for, as (dynamic, upper): (-1, 1),
- * (1, 1), (0, 0), (0, -3). */
-extern MoodGraphPoint sGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT];
+/* The four moods ScoreDayLog looks for, {dynamic, upper}. */
+MoodGraphPoint sGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT] = {{{-1, 1}}, {{1, 1}}, {{0, 0}}, {{0, -3}}};
 
 /* Whether every sGraphScoreMoods entry appears among the plotted days (the
  * window PopulateGraphPoints walks, newest first), recording in

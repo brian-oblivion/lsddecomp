@@ -1867,6 +1867,7 @@ segments:
       - [0x720F0, data]
       - [0x769D4, .data, world/stage_grid]  # the stage grids and their chunk moods
       - [0x76DC8, data]              # class_39e08
+      - [0x782AC, .data, world/graph_room]  # gGraphRoomMethods, sGraphScoreMoods
       - [0x783dc, data]               # DreamSys's data slot
       - [0x79528, data]
       - [0x7A2D4, .data, world/entity]    # gEntityMethods, the motion templates, sEntityMoodTable
