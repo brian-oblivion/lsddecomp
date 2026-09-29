@@ -1,7 +1,9 @@
 # Disc-free checks: formatting, documentation, readability counters,
-# declarations and file names (tools/lint.sh), plus a Doxygen build. Needs
-# nothing but the repository, so it runs on every push and pull request,
-# forks included.
+# declarations and file names (tools/lint.sh), plus a Doxygen build. Runs on
+# every push and pull request, forks included. The two checks that preprocess
+# the source (apidoc, declcheck) need Sony's headers, which are never in this
+# repository: with the LSD_DEPS_TOKEN secret (build.yml) they come from the
+# private dependencies repository, and without it lint.sh skips those two.
 name: lint
 
 on:
@@ -16,8 +18,23 @@ concurrency:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    env:
+      HAVE_DEPS: ${{ secrets.LSD_DEPS_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Sony's headers (private, optional)
+        if: env.HAVE_DEPS == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.LSD_DEPS_REPO }}
+          token: ${{ secrets.LSD_DEPS_TOKEN }}
+          path: .deps
+          sparse-checkout: include/psyq
+
+      - name: Place them
+        if: env.HAVE_DEPS == 'true'
+        run: cp -r .deps/include/psyq include/ && rm -rf .deps
 
       - uses: actions/setup-python@v5
         with:

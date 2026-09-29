@@ -74,7 +74,7 @@ if [ ! -f disk/SLPS_015.56 ]; then
     fi
 fi
 [ -f disk/SLPS_015.56 ] || die "disk/SLPS_015.56 not found.
-      Bring your own copy of SLPS-01556 — see disk/README.md."
+      Bring your own copy of SLPS-01556 — see README.md, 'Building it'."
 sha1sum -c check.sha1 >/dev/null 2>&1 || die "disk/SLPS_015.56 is not the
       expected dump. Every address in config/ is wrong for another revision.
       expected: $(cut -d' ' -f1 check.sha1)
@@ -247,7 +247,7 @@ step "Psy-Q library objects (sdk/ -> lib/)"
 # binary is the one decompme/compilers publishes (also what lom-decomp uses).
 POP=tools/psyq-obj-parser/psyq-obj-parser
 POPURL='https://github.com/decompme/compilers/releases/download/compilers/psyq-obj-parser.tar.gz?2025-03-18'
-if [ "$FORCE" = 1 ]; then rm -rf tools/psyq-obj-parser lib; fi
+if [ "$FORCE" = 1 ]; then rm -rf tools/psyq-obj-parser lib include/psyq; fi
 if [ -x "$POP" ]; then
     skip "$POP"
 else
@@ -266,14 +266,14 @@ fi
 # Idempotent: re-extracts nothing that is already under sdk/work/, and dies
 # with the exact archive.org file name if a disc the manifest needs is absent.
 # The build cannot link without lib/, so this is not optional.
-# A lib/ brought in whole (CI's private dependencies repository: the SDK zips
+# A lib/ and include/psyq/ brought in whole (CI's private dependencies repository: the SDK zips
 # are 66-373 MB each, over GitHub's 100 MB file limit, and lib/ is under 1 MB)
 # needs no sdk/: `check` proves it complete and in step with the manifest.
 if ! ls sdk/*.zip >/dev/null 2>&1 && .venv/bin/python3 tools/psyq_sdk.py check >/dev/null 2>&1; then
-    skip "lib/ complete per the manifest, and no SDK disc in sdk/"
+    skip "lib/ and include/psyq/ complete per the manifest, and no SDK disc in sdk/"
 else
 .venv/bin/python3 tools/psyq_sdk.py install \
-    || die "could not produce lib/ from sdk/. See sdk/README.md."
+    || die "could not produce lib/ from sdk/. See README.md, 'Building it'."
 ok "lib/ ($(find lib -name '*.o' | wc -l) objects, verified against retail)"
 fi
 

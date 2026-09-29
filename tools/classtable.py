@@ -196,7 +196,7 @@ def main():
     args = ap.parse_args()
 
     if not RETAIL.exists():
-        sys.exit(f"{RETAIL} missing — see disk/README.md")
+        sys.exit(f"{RETAIL} missing — see README.md, "Building it"")
     data = RETAIL.read_bytes()
     syms = load_symbols()
 

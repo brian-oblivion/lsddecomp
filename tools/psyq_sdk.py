@@ -4,7 +4,7 @@
     python3 tools/psyq_sdk.py install     # sdk/*.zip -> lib/<lib>/<module>.o per the manifest
     python3 tools/psyq_sdk.py match       # locate EVERY converted object in retail (discovery)
     python3 tools/psyq_sdk.py coverage    # which SDK functions the matched objects own
-    python3 tools/psyq_sdk.py check       # manifest and splat yaml agree, lib/ is complete
+    python3 tools/psyq_sdk.py check       # manifest and splat yaml agree, lib/ and include/psyq/ complete
 
 WHY. The executable links Sony's Psy-Q libraries. Those libraries shipped as
 `.LIB` archives of `.OBJ` files on the SDK discs, with full symbol names, so
@@ -12,7 +12,9 @@ instead of re-deriving that code as C we link the objects themselves, exactly
 as the game did, through splat `o` segments. Bytes are Sony's, so nothing here
 is committed: `sdk/` holds the user's discs, `lib/` is generated from them,
 both are gitignored, and `config/psyq-objects.txt` is the committed manifest
-that says which object from which disc lands where.
+that says which object from which disc lands where. Sony's headers are the
+same: `install` writes include/psyq/ from a disc's PSX/INCLUDE/, as listed
+(with the sha1 of each generated file) in `config/psyq-headers.txt`.
 
 Pipeline, per disc, all under sdk/work/<version>/ and each step idempotent:
     track1.bin   the data track pulled out of the redump zip
@@ -22,7 +24,7 @@ Pipeline, per disc, all under sdk/work/<version>/ and each step idempotent:
     elf/<lib>/   ELF objects, via psyq-obj-parser (pcsx-redux; fetched by setup.sh)
     match.txt    every object placed in retail by tools/match_obj.py
 
-The approach follows parasite-eve-2-decomp (CC0) — see CREDITS.md.
+The approach follows parasite-eve-2-decomp (CC0) — see README.md, Credits.
 """
 import argparse
 import re
@@ -45,6 +47,8 @@ SDK_DIR = ROOT / "sdk"
 WORK = SDK_DIR / "work"
 LIB_DIR = ROOT / "lib"
 MANIFEST = ROOT / "config/psyq-objects.txt"
+HEADERS = ROOT / "config/psyq-headers.txt"
+HEADER_DIR = ROOT / "include/psyq"
 YAML = ROOT / "config/splat.slps01556.lsdde.yaml"
 EXE = ROOT / "disk/SLPS_015.56"
 OBJCOPY = ROOT / "tools/binutils/bin/mipsel-linux-gnu-objcopy"
@@ -324,10 +328,48 @@ def verify_at(obj: Path, exe: bytes, off: int):
 
 # --- commands ----------------------------------------------------------------
 
+def read_headers():
+    """[(version, relative path, sha1)] from config/psyq-headers.txt."""
+    rows = []
+    for line in HEADERS.read_text().splitlines():
+        if line.strip() and not line.startswith("#"):
+            ver, rel, sha = line.split()
+            rows.append((ver, rel, sha))
+    return rows
+
+
+def header_problems():
+    """What is missing or different under include/psyq/, one line each."""
+    import hashlib
+    bad = []
+    for _, rel, sha in read_headers():
+        dst = HEADER_DIR / rel
+        if not dst.exists():
+            bad.append(f"include/psyq/{rel} missing -- run `psyq_sdk.py install`")
+        elif hashlib.sha1(dst.read_bytes()).hexdigest() != sha:
+            bad.append(f"include/psyq/{rel} differs from {HEADERS.name}")
+    return bad
+
+
+def install_headers():
+    """Write include/psyq/ from each disc's PSX/INCLUDE/: lowercase names, LF."""
+    for ver, rel, _ in read_headers():
+        src = WORK / ver / "psx" / "INCLUDE" / rel.upper()
+        if not src.exists():
+            die(f"{src.relative_to(ROOT)} not found (Psy-Q {ver} disc not extracted?)")
+        dst = HEADER_DIR / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_bytes(src.read_bytes().replace(b"\r\n", b"\n"))
+    bad = header_problems()
+    if bad:
+        die("\n  ".join(["generated headers do not match the manifest:"] + bad))
+    print(f"include/psyq/: {len(read_headers())} Sony headers generated and verified")
+
+
 def cmd_install(_args):
     rows = read_manifest()
     have = discs()
-    need = sorted({v for v, _, _ in rows})
+    need = sorted({v for v, _, _ in rows} | {v for v, _, _ in read_headers()})
     missing = [v for v in need if v not in have]
     if missing:
         lines = [f"the manifest needs Psy-Q {', '.join(missing)} and sdk/ has "
@@ -335,11 +377,12 @@ def cmd_install(_args):
                  "Drop the redump zip(s) into sdk/ (do not unpack):"]
         for v in missing:
             lines.append(f"    {DISC_NAMES.get(v, 'Runtime Library Version ' + v)}")
-        lines.append(f"  from {ARCHIVE}  -- see sdk/README.md")
+        lines.append(f"  from {ARCHIVE}  -- see README.md, "Building it"")
         die("\n  ".join(lines))
     exe = EXE.read_bytes() if EXE.exists() else None
     for ver in need:
         prepare(ver, have[ver])
+    install_headers()
     from match_obj import masked_text
     spans = []
     for ver, name, off in rows:
@@ -992,10 +1035,13 @@ def cmd_check(_args):
         if not (LIB_DIR / f"{name}.o").exists():
             print(f"lib/{name}.o missing -- run `psyq_sdk.py install`")
             ok = False
+    for line in header_problems():
+        print(line)
+        ok = False
     if ok and any(WORK.glob("*/match.txt")):
         class A: check = True
         cmd_ldfrag(A())
-    print("OK: manifest, yaml and lib/ agree" if ok else "FAILED")
+    print("OK: manifest, yaml, lib/ and include/psyq/ agree" if ok else "FAILED")
     sys.exit(0 if ok else 1)
 
 

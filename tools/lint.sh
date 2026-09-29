@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Disc-free lint (FINISHING-PLAN track 13): the source checks CI can run with
 # the repo and the toolchain from tools/setup.sh, and nothing else. It needs no
-# disk/SLPS_015.56, sdk/, lib/, asm/ or build/. It never rewrites a file.
+# disk/SLPS_015.56, sdk/, lib/, asm/ or build/; apidoc and declcheck also want
+# Sony's headers (include/psyq/) and are skipped without them. It never
+# rewrites a file.
 #
 #   tools/lint.sh            run every check; exit 0 when all pass, 1 otherwise
 #
@@ -113,9 +115,19 @@ lint_snake() {
 }
 
 check "format (clang-format --dry-run over make format's files, no tabs)" lint_format
-check "apidoc (python3 tools/apidoc.py -v)" "$PY" tools/apidoc.py -v
+# apidoc and declcheck preprocess the source, so they need Sony's headers
+# (include/psyq/, generated from the SDK disc and never committed)
+if [ -f include/psyq/libgte.h ]; then
+    check "apidoc (python3 tools/apidoc.py -v)" "$PY" tools/apidoc.py -v
+else
+    echo "skip  apidoc (no include/psyq/: run tools/psyq_sdk.py install)"
+fi
 check "readability (python3 tools/readability.py --json, finished counters)" lint_readability
-check "declcheck (.venv/bin/python3 tools/declcheck.py --verbose)" lint_decl
+if [ -f include/psyq/libgte.h ]; then
+    check "declcheck (.venv/bin/python3 tools/declcheck.py --verbose)" lint_decl
+else
+    echo "skip  declcheck (no include/psyq/: run tools/psyq_sdk.py install)"
+fi
 check "snake_case (python3 tools/unitfile.py check)" lint_snake
 
 if [ ${#failed[@]} -eq 0 ]; then

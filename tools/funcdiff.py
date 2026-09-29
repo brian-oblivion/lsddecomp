@@ -206,7 +206,7 @@ def main():
     start, end = rng
 
     if not RETAIL.exists():
-        sys.exit(f"{RETAIL} missing — see disk/README.md")
+        sys.exit(f"{RETAIL} missing — see README.md, "Building it"")
     if not BUILT.exists():
         sys.exit(f"{BUILT} missing — run ./build-and-verify.sh")
 

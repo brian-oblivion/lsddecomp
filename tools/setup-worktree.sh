@@ -63,14 +63,15 @@ ln -s "$MAIN/.round" "$dest/.round"
 ln -s "$MAIN/disk/SLPS_015.56" "$dest/disk/SLPS_015.56"
 ln -s "$MAIN/.venv" "$dest/.venv"
 ln -s "$MAIN/lib" "$dest/lib"
-# The SDK discs and everything unpacked from them. sdk/README.md is tracked, so
+ln -s "$MAIN/include/psyq" "$dest/include/psyq"
+# The SDK discs and everything unpacked from them. sdk/.gitkeep is tracked, so
 # sdk/ itself is a real directory in the worktree; link its CONTENTS (the zips
 # and the work/ tree with match.txt and the ELF objects). An SDK-object
 # conversion runner needs these for `psyq_sdk.py install`, `place`, `runs`
 # and `symbols`; without them every one of those silently sees an empty
 # corpus (round 29's runner found this and linked them by hand).
 for f in "$MAIN"/sdk/*; do
-    case "$(basename "$f")" in README.md) continue;; esac
+    case "$(basename "$f")" in .gitkeep) continue;; esac
     ln -s "$f" "$dest/sdk/$(basename "$f")"
 done
 for t in $REQUIRED $OPTIONAL; do
