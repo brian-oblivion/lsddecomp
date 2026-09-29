@@ -75,7 +75,7 @@ struct ModelDataMethods {
  * @brief An actor's model and animation data (class id 0x5F03): one buffer
  *        split into a LinkResource over its TMD and a TodSet over its TODs.
  *
- * The buffer is a MOM file (ModelDataHeader, in graphics_resources.c): the
+ * The buffer is a MOM file (ModelDataHeader, in model_data.c): the
  * TMD at the offset in its third word, the TODs from +0x0C. TOD packet scans
  * are forwarded to the TodSet.
  *
@@ -84,7 +84,7 @@ struct ModelDataMethods {
  * GetActiveDataSourceMethods()->ctor, so it is TimBlockSrc's sibling and
  * carries none of its layout. One subclass, TriggerWorld, which builds its
  * ModelData part not owning its resources. Methods in
- * src/graphics/graphics_resources.c.
+ * src/graphics/model_data.c.
  *
  * Holders: TodActor (TodActor.modelData) and InitDreamAux's MOM files
  * (src/world/dream_aux.c).

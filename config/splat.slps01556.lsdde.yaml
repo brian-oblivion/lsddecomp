@@ -1350,6 +1350,8 @@ segments:
       - [0x3311c, c, graphics/flat_light_obj]       # game code (revision 18; was psyq_3311c)
       - [0x3328C, o, libgs/gs_107]     # GsSetFlatLight, gte_set_lc, gte_read_lc
       - [0x33808, c, graphics/graphics_resources] # game code (revision 18; was the head of psyq_33808)
+      # ModelData, New_ModelData (0x8004468C) to GetModelDataMethods.
+      - [0x34E8C, c, graphics/model_data]
       # TriggerWorld, New_TriggerWorld (0x80044A0C) to GetTriggerWorldMethods.
       - [0x3520C, c, graphics/trigger_world]
       # TileMap, New_TileMap (0x80044CD4) to GetTileMapMethods.
@@ -1912,7 +1914,8 @@ segments:
       - [0x5F750, .data, graphics/frame_clock]  # gFrameClockMethods
       - [0x5F7AC, .data, graphics/light_rig]  # gLightRigMethods
       - [0x5F86C, .data, graphics/flat_light_obj]  # gFlatLightObjMethods
-      - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods .. gModelDataMethods
+      - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods .. gBgLayerMethods
+      - [0x5FB84, .data, graphics/model_data]  # gModelDataMethods
       - [0x5FC0C, .data, graphics/trigger_world]  # gTriggerWorldMethods
       - [0x5FC98, .data, graphics/tile_map]  # gTileMapMethods
       - [0x5FD14, .data, graphics/tile_atlas]  # gTileAtlasMethods
