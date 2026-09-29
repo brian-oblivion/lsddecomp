@@ -71,7 +71,7 @@ struct CharSpriteMethods {
  * CharSprite: one character of an 8x8 font, a screen-space sprite whose
  * texture cell is picked by a one-byte character code. Class id 0x1144,
  * table gCharSpriteMethods, parent ScreenSprite, whose ctor it chains to
- * first; methods in src/graphics/sprite.c. One class derives from it:
+ * first; methods in src/graphics/char_sprite.c. One class derives from it:
  * TextRow (0x11144, include/text_row.h), which expands these macros. The
  * object is 0xAC bytes (New_CharSprite).
  */

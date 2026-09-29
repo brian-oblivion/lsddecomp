@@ -84,7 +84,7 @@ struct ScreenSpriteMethods {
 /**
  * ScreenSprite: a Sprite drawn at a screen position rather than projected.
  * Class id 0x144 (SCREENSPRITE_CLASS_ID), table gScreenSpriteMethods, parent
- * Sprite, whose ctor it chains to first; methods in src/graphics/sprite.c.
+ * Sprite, whose ctor it chains to first; methods in src/graphics/char_sprite.c.
  * Two classes derive from it: CharSprite (0x1144, one 8x8 font character,
  * include/char_sprite.h), which expands these macros, and TextRow (0x11144,
  * below CharSprite, include/text_row.h). The object is 0xA8 bytes
