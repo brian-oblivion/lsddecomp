@@ -14,6 +14,9 @@ struct TmdObject;
 typedef struct LinkResource LinkResource;
 typedef struct LinkResourceMethods LinkResourceMethods;
 
+/** LinkResource's class id (gLinkResourceMethods word +0x000). */
+#define LINKRESOURCE_CLASS_ID 0xD03
+
 /**
  * @brief LinkResource's method table, gLinkResourceMethods: FileResource's
  *        slots, then three of its own.

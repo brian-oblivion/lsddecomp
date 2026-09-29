@@ -1865,7 +1865,8 @@ segments:
       - [0x5F474, .data, graphics/sprite]  # gCharSpriteMethods .. gSpriteMethods
       - [0x5F6D8, data]
       - [0x5F86C, .data, graphics/flat_light_obj]  # gFlatLightObjMethods
-      - [0x5F8B8, data]
+      - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods .. gMoviePlayerMethods
+      - [0x5FE84, data]
       - [0x5FFC8, o, libpress/vlc, .data]     # 0x18 -> 0x5FFE0 (dlabel D_8006F7E0)
       - [0x5FFE0, data]
       - [0x72070, o, libcd/c_003, .data]      # 0x10 -> 0x72080 (dlabel D_80081870)

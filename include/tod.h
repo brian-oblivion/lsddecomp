@@ -80,6 +80,9 @@ typedef struct TodPacket {
 typedef struct Tod Tod;
 typedef struct TodMethods TodMethods;
 
+/** Tod's class id (gTodMethods word +0x000). */
+#define TOD_CLASS_ID 0x4F03
+
 /**
  * @brief Tod's slots, for its table and TodSet's: FileResource's, then two of
  *        its own, both filled by the same functions in either table.

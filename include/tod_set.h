@@ -13,6 +13,9 @@ struct ResourceSource;
 typedef struct TodSet TodSet;
 typedef struct TodSetMethods TodSetMethods;
 
+/** TodSet's class id (gTodSetMethods word +0x000). */
+#define TODSET_CLASS_ID 0x14F03
+
 /**
  * @brief TodSet's method table, gTodSetMethods: Tod's slots, with no new ones.
  *

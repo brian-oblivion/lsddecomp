@@ -19,6 +19,9 @@ struct TileAtlas;
 typedef struct TileMap TileMap;
 typedef struct TileMapMethods TileMapMethods;
 
+/** TileMap's class id (gTileMapMethods word +0x000). */
+#define TILEMAP_CLASS_ID 0x203
+
 /**
  * @brief TileMap's method table, gTileMapMethods: FileResource's slots, with
  *        no new ones.
