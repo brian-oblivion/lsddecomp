@@ -385,7 +385,7 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
 #define VAB_TONES_PER_PROG 16
 
 /* Key on the tone a packed index names, at vol, and ramp it to endVol.
- * Returns the voice, or -1. */
+ * Returns the voice, or VAB_NO_VOICE. */
 s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 vol, s32 endVol) {
     s32 program;
     s32 tone;
@@ -407,7 +407,7 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 vol, s32 endVol) {
             return result;
         }
     }
-    return -1;
+    return VAB_NO_VOICE;
 }
 
 /* The SPU's voice count: StopVoice keys off every voice for a voice number
@@ -420,7 +420,7 @@ s32 VabStreamObj__StopVoice(VabStreamObj *self, s32 voice) {
     } else {
         SsUtAllKeyOff(0);
     }
-    return -1;
+    return VAB_NO_VOICE;
 }
 
 s32 VabStreamObj__Mute(VabStreamObj *self) {
@@ -484,7 +484,7 @@ s32 InitSoundCueSet(VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
         return 0;
     }
     slot = set->slots;
-    sentinel = -1;
+    sentinel = VAB_NO_VOICE;
     count = ARRAY_COUNT(set->slots) - 1;
     set->tag = tag;
     set->owner = owner;
