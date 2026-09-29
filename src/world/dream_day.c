@@ -1918,30 +1918,27 @@ void StageMap__SetBounds(StageMap *self, CellBounds *bounds) {
     self->bounds = bounds;
 }
 
-/* MATCHING: the goto ladder, `scale` read before the sign test, `val` in an if/else, `~rate + 1` */
+/* MATCHING: the up-slow table set ahead of the fast test (one store after both ifs compiles
+ * differently), `scale` read before the sign test, `val` in an if/else, `~rate + 1` */
 void StageMap__StartScaleRamp(StageMap *self, s32 rate, s32 fast) {
     Ratio16 *table;
     s32 val;
     s32 scale;
 
-    if (rate <= 0) {
-        goto rate_le;
+    if (rate > 0) {
+        table = sScaleStepUpSlow;
+        if (fast != 0) {
+            self->scaleStep = sScaleStepUpFast;
+        } else {
+            self->scaleStep = table;
+        }
+    } else {
+        table = sScaleStepDownSlow;
+        if (fast != 0) {
+            table = sScaleStepDownFast;
+        }
+        self->scaleStep = table;
     }
-    table = sScaleStepUpSlow;
-    if (fast == 0) {
-        goto store;
-    }
-    self->scaleStep = sScaleStepUpFast;
-    goto merge;
-rate_le:
-    table = sScaleStepDownSlow;
-    if (fast == 0) {
-        goto store;
-    }
-    table = sScaleStepDownFast;
-store:
-    self->scaleStep = table;
-merge:
     scale = self->scaleStep[1].den;
     if (rate >= 0) {
         val = scale * rate;
