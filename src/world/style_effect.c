@@ -158,16 +158,14 @@ StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *par
 /* `kind` goes into Actor's pendingExtra (+0x054): see include/style_effect.h. */
 StyleEffect *StyleEffect__StyleEffect(StyleEffect *self, s32 kind, StyleEffectParams *params,
                                       SceneNode *parent, LongVec3 *pos) {
-    if (GetActorMethods()->ctor((Actor *)self) == NULL) {
-        goto fail;
+    if (GetActorMethods()->ctor((Actor *)self) != NULL) {
+        self->methods = GetStyleEffectMethods();
+        self->state = 0;
+        self->pendingExtra = kind;
+        ((StyleEffectSetParamsFn)self->methods->reset)(self, params);
+        StyleEffect__InitByKind(self, parent, pos);
+        return self;
     }
-    self->methods = GetStyleEffectMethods();
-    self->state = 0;
-    self->pendingExtra = kind;
-    ((StyleEffectSetParamsFn)self->methods->reset)(self, params);
-    StyleEffect__InitByKind(self, parent, pos);
-    return self;
-fail:
     return NULL;
 }
 
