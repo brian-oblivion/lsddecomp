@@ -58,6 +58,11 @@ typedef struct ModelDataMethods ModelDataMethods;
     /* +0x034 */ s32 ownsResources         /* the ctor's third argument: New_ModelData 1, TriggerWorld 0; BuildResources and ReleaseResources act only while it is set */
 /* clang-format on */
 
+/** ModelData's class id (gModelDataMethods word +0x000). Four nibbles, so
+ * `(header & CLASS_ID_LEVEL4_MASK) == MODELDATA_CLASS_ID` is its is-kind-of
+ * test (TodActor__OnNotify; TriggerWorld, 0x15F03, passes it). */
+#define MODELDATA_CLASS_ID 0x5F03
+
 /** @brief ModelData's method table, gModelDataMethods (see MODELDATA_SLOTS). */
 struct ModelDataMethods {
     MODELDATA_SLOTS(ModelData, (ModelData * self, struct ResourceSource *src, s32 owns));
