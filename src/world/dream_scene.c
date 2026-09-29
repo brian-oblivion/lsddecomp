@@ -1067,15 +1067,15 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
     return 0;
 }
 
-/* A stage's style config: four signed bytes, from sStyleStageConfigs (NULL
- * for a stage without a fixed one) or PickStyleFallbackConfig
- * (next section), which FillStyleFromConfig turns into sStyleConfig's last
- * four words. */
+/** @brief A stage's style config: four signed bytes, from
+ * sStyleStageConfigs (NULL for a stage without a fixed one) or
+ * PickStyleFallbackConfig (next section), which FillStyleFromConfig turns
+ * into sStyleConfig's last four words. */
 typedef struct StyleStageConfig {
-    s8 colorMode; /* StyleConfig::colorMode */
-    s8 fogLevel; /* sStyleFogNears index; STYLE_DECOR_FOG_LEVEL and up also build the decoration box */
-    s8 farColorIndex; /* sStylePalette index: StyleConfig::farColor, and the decoration box's colour */
-    s8 clearColorIndex; /* sStylePalette index: StyleConfig::clearColor */
+    s8 colorMode; /**< StyleConfig::colorMode */
+    s8 fogLevel; /**< sStyleFogNears index; STYLE_DECOR_FOG_LEVEL and up also build the decoration box */
+    s8 farColorIndex; /**< sStylePalette index: StyleConfig::farColor, and the decoration box's colour */
+    s8 clearColorIndex; /**< sStylePalette index: StyleConfig::clearColor */
 } StyleStageConfig;
 
 /* The fog levels whose config also gets a decoration box (ApplyStyleConfig):
@@ -1117,14 +1117,14 @@ void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg) {
     style->colorMode = cfg->colorMode;
 }
 
-/* What sStyleSceneRefs points at: ObjM's +0x06C..+0x07B block
+/** @brief What sStyleSceneRefs points at: ObjM's +0x06C..+0x07B block
  * (ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
  * keeps it; include/objm.h). */
 typedef struct StyleSceneRefs {
-    void *sound;        /* +0x000, ObjM::ctorSound: the sound object the cue functions take first */
-    void *dreamerTmd;   /* +0x004, ObjM::dreamerTmd */
-    void *etcTim;       /* +0x008, ObjM::etcTim */
-    Viewport *viewport; /* +0x00C, ObjM::cachedViewport */
+    void *sound;      /**< +0x000, ObjM::ctorSound: the sound object the cue functions take first */
+    void *dreamerTmd; /**< +0x004, ObjM::dreamerTmd */
+    void *etcTim;     /**< +0x008, ObjM::etcTim */
+    Viewport *viewport; /**< +0x00C, ObjM::cachedViewport */
 } StyleSceneRefs;
 
 extern s32 sStyleDecorObj;           /* a BoxFill * */
@@ -1416,25 +1416,26 @@ void StyleReleaseEffectSlots(void) {
     }
 }
 
-/* One 8-byte record of a stage's cue list (sStyleCueRecordLists): the cell
- * it sits in, its in-cell offset (a sStyleCueOffsets index) and `cue`, its
- * cue index (the sStyleCueCallbacks and sStyleCueDistanceTable row,
- * InitSoundCueSet's tag), negated while a slot holds the record. */
+/** @brief One 8-byte record of a stage's cue list (sStyleCueRecordLists):
+ * the cell it sits in, its in-cell offset (a sStyleCueOffsets index) and
+ * `cue`, its cue index (the sStyleCueCallbacks and sStyleCueDistanceTable
+ * row, InitSoundCueSet's tag), negated while a slot holds the record. */
 typedef struct StyleCueRecord {
-    CellKey key;    /* +0x0 */
-    u8 offsetIndex; /* +0x4 */
+    CellKey key;    /**< +0x0 the cell the cue sits in */
+    u8 offsetIndex; /**< +0x4 its offset in the cell, a sStyleCueOffsets index */
     u8 pad5;        /* +0x5 */
-    s8 cue;         /* +0x6 */
+    s8 cue;         /**< +0x6 the cue index; negated while a slot holds the record */
     u8 pad7;        /* +0x7 */
 } StyleCueRecord;
 
-/* One of the two positional cues: the record it holds, the record's world
- * position, the last distance to the target, and its sound cue. */
+/** @brief One of the two positional cues: the record it holds, the
+ * record's world position, the last distance to the target, and its sound
+ * cue. */
 struct StyleCueSlot {
-    StyleCueRecord *entry; /* +0x000 */
-    LongVec3 pos;          /* +0x004 */
-    s32 lastDist;          /* +0x010 */
-    SoundCueSet cueSet;    /* +0x014 */
+    StyleCueRecord *entry; /**< +0x000 the record the slot plays */
+    LongVec3 pos;          /**< +0x004 the record's world position */
+    s32 lastDist;          /**< +0x010 the last distance measured to the target */
+    SoundCueSet cueSet;    /**< +0x014 the slot's sound cue */
 }; /* 0x68 bytes */
 
 extern StyleCueSlot *FlushStyleCue(StyleCueSlot *slot);
@@ -1519,10 +1520,12 @@ extern s32 sStyleSpawnOffsetY;
 extern s32 sStyleSpawnOffsetZ;
 extern u8 sStyleKind3Colors[][3];
 
+/** @brief sStyleSpawnRotation seen as a one-field struct, through which
+ * StyleFillEffectKind3 stores the effect's rotation. */
 /* MATCHING: the rotation store goes through a one-field struct, so the
  * sStyleGrid load may schedule above it (a plain pointer store blocks it). */
 typedef struct PtrBoxK3 {
-    Ratio16 *p; /* +0x000 */
+    Ratio16 *p; /**< +0x000 the spawn rotation */
 } PtrBoxK3;
 
 /* Appends one kind-3 effect. With decor variant active and band colours B
@@ -1561,10 +1564,12 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
 extern s32 sStyleKind2AltColor;
 extern u8 sStyleKind2Colors[][3];
 
+/** @brief One word of sStyleSpawnColors seen as a one-field struct, through
+ * which StyleFillEffectKind2 stores the effect's two colours. */
 /* MATCHING: the first colour store goes through a one-field struct, as
  * PtrBoxK3's does, so the sStyleDay load may schedule above it. */
 typedef struct S32BoxK2 {
-    s32 v; /* +0x000 */
+    s32 v; /**< +0x000 a colour: first an RGB triple's address, then sStyleKind2AltColor or 0 */
 } S32BoxK2;
 
 /* Appends one kind-2 effect with a random colour and, except on every
@@ -2773,14 +2778,14 @@ void Actor__MoveOrFindNearbyLink(Actor *self, void (*move)(Actor *, s32, void *)
     }
 }
 
-/* A window of one chunk slot's cells, in cells: from (startCol, startRow),
- * numCols to the right and numRows DOWN (to lower row indices;
+/** @brief A window of one chunk slot's cells, in cells: from (startCol,
+ * startRow), numCols to the right and numRows DOWN (to lower row indices;
  * Actor__ScanGridWindow). */
 typedef struct GridQuery {
-    s16 startCol;
-    s16 startRow;
-    s32 numCols;
-    s32 numRows;
+    s16 startCol; /**< the window's first column */
+    s16 startRow; /**< the window's first (highest) row */
+    s32 numCols;  /**< columns scanned, rightward */
+    s32 numRows;  /**< rows scanned, toward lower row indices */
 } GridQuery;
 
 void *AcceptGridElem(void *cell, void *offset, void *pos);

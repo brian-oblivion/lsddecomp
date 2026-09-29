@@ -162,13 +162,13 @@ void FileResource__FreeBuffer(FileResource *self);
  * when one of its requests completes; the clients poll them. Bit 0 (1) is
  * left a literal: it is also FileResource__OnRequestDone's bit, and the
  * queue node field that sets it (`unk4`) has no established meaning. @{ */
-#define CD_FLAG_DONE 0x002         /**< some request completed */
-#define CD_FLAG_NONE_PENDING 0x004 /**< ... and pendingRequests reached 0 */
-#define CD_FLAG_OPEN_DONE 0x010
-#define CD_FLAG_CLOSE_DONE 0x020
-#define CD_FLAG_SEEK_DONE 0x040
-#define CD_FLAG_READ_DONE 0x080
-#define CD_FLAG_LOAD_FILE_DONE 0x200
+#define CD_FLAG_DONE 0x002           /**< some request completed */
+#define CD_FLAG_NONE_PENDING 0x004   /**< ... and pendingRequests reached 0 */
+#define CD_FLAG_OPEN_DONE 0x010      /**< an open request completed */
+#define CD_FLAG_CLOSE_DONE 0x020     /**< a close request completed */
+#define CD_FLAG_SEEK_DONE 0x040      /**< a seek request completed */
+#define CD_FLAG_READ_DONE 0x080      /**< a read request completed */
+#define CD_FLAG_LOAD_FILE_DONE 0x200 /**< a load-file request completed */
 /** @} */
 
 /** @brief Slot +0x060 of every FileResource table: empty. */

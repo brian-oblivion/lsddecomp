@@ -92,17 +92,22 @@ typedef struct SvmSreg {
 extern SvmSreg _svm_sreg_buf[]; /**< The voices' register shadows, 24. */
 extern u8 _svm_sreg_dirty[]; /**< One byte per voice (24): the SVM_SREG_DIRTY_* bits of the _svm_sreg_buf fields SpuVmFlush must copy out. */
 
-/** _svm_sreg_dirty's bits, one per SvmSreg field. SpuVmFlush tests VOL_L
+/** @name Voice register dirty bits
+ * _svm_sreg_dirty's bits, one per SvmSreg field. SpuVmFlush tests VOL_L
  * (and copies volL and volR), PITCH, ADDR and ADSR1 (copying adsr1 and
- * adsr2); VOL_R and ADSR2 are set with their pair but never tested. */
-#define SVM_SREG_DIRTY_VOL_L 0x01
-#define SVM_SREG_DIRTY_VOL_R 0x02
-#define SVM_SREG_DIRTY_PITCH 0x04
-#define SVM_SREG_DIRTY_ADDR 0x08
-#define SVM_SREG_DIRTY_ADSR1 0x10
-#define SVM_SREG_DIRTY_ADSR2 0x20
+ * adsr2); VOL_R and ADSR2 are set with their pair but never tested. @{ */
+#define SVM_SREG_DIRTY_VOL_L 0x01 /**< volL changed */
+#define SVM_SREG_DIRTY_VOL_R 0x02 /**< volR changed */
+#define SVM_SREG_DIRTY_PITCH 0x04 /**< pitch changed */
+#define SVM_SREG_DIRTY_ADDR 0x08  /**< the start address changed */
+#define SVM_SREG_DIRTY_ADSR1 0x10 /**< adsr1 changed */
+#define SVM_SREG_DIRTY_ADSR2 0x20 /**< adsr2 changed */
+/** both volumes changed */
 #define SVM_SREG_DIRTY_VOL (SVM_SREG_DIRTY_VOL_L | SVM_SREG_DIRTY_VOL_R)
+/** both envelope words changed */
 #define SVM_SREG_DIRTY_ADSR (SVM_SREG_DIRTY_ADSR1 | SVM_SREG_DIRTY_ADSR2)
+
+/** @} */
 
 /**
  * @brief One SPU voice's hardware registers, 0x10 bytes, as SpuRegs::voice

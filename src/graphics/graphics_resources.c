@@ -87,20 +87,20 @@ extern u8 sMovieClearColor[4];          /* a zero word: play's clearImage color,
 #define MOVIE_SYNC_HEIGHT 128       /* frames shorter than this DrawSync before each strip */
 #define MOVIE_KEEP_ACTIVE_POLLS 100 /* pollActive's stop interval while keepActive */
 
-/* A TodSet's or TriggerWorld's buffer: a word, a count, then that many
- * offsets from the buffer's start, which BuildTods / BuildResources
+/** @brief A TodSet's or TriggerWorld's buffer: a word, a count, then that
+ * many offsets from the buffer's start, which BuildTods / BuildResources
  * overwrite with the objects built over them. */
 typedef struct SubBlockTable {
     /* +0x00 */ u8 pad0[4];
-    /* +0x04 */ u32 count;
-    /* +0x08 */ s32 entries[1];
+    /* +0x04 */ u32 count;      /**< how many sub-blocks follow */
+    /* +0x08 */ s32 entries[1]; /**< each sub-block's offset, then the object built over it */
 } SubBlockTable;
 
-/* A method table's ctor slot, unprototyped: the allocators that check the
- * ctor's result call it through this. */
+/** @brief A method table's ctor slot, unprototyped: the allocators that
+ * check the ctor's result call it through this. */
 typedef struct UnprototypedCtorTable {
     /* +0x000 */ u8 pad0[8];
-    /* +0x008 */ s32 (*ctor)();
+    /* +0x008 */ s32 (*ctor)(); /**< the class's ctor; nonzero when it succeeded */
 } UnprototypedCtorTable;
 
 /* Allocate a TimBlockSrc and construct it over the file `name`. */
@@ -114,18 +114,19 @@ TimBlockSrc *New_TimBlockSrc(char *name) {
     return NULL;
 }
 
-/* A TIM-block file's header: a block count, then the blocks' file offsets
- * and their sizes. */
+/** @brief A TIM-block file's header: a block count, then the blocks' file
+ * offsets and their sizes. */
 typedef struct TimBlockHeader {
-    /* +0x00 */ u32 count;
-    /* +0x04 */ u32 offsets[4];
-    /* +0x14 */ u32 sizes[4];
+    /* +0x00 */ u32 count;      /**< how many TIM blocks the file holds */
+    /* +0x04 */ u32 offsets[4]; /**< each block's offset in the file, seeked to before its read */
+    /* +0x14 */ u32 sizes[4]; /**< each block's size in bytes; FindMaxTimBlockSize takes the largest */
 } TimBlockHeader;
 
-/* The same header as AdvanceLoadState copies it out of the sector buffer. */
+/** @brief The same header as AdvanceLoadState copies it out of the sector
+ * buffer. */
 /* MATCHING: bytes, so the copy is a byte-aligned block move. */
 typedef struct TimBlockHeaderBytes {
-    u8 bytes[sizeof(TimBlockHeader)];
+    u8 bytes[sizeof(TimBlockHeader)]; /**< a TimBlockHeader's bytes */
 } TimBlockHeaderBytes;
 
 extern s16 sTimBlockClutShift;
@@ -496,11 +497,11 @@ void TimArraySrc__Finalize(TimArraySrc *self) {
 
 extern s16 sTimClutRowShift;
 
-/* A TimArraySrc's buffer: an image count, then each image's byte offset
- * from the start of the buffer. */
+/** @brief A TimArraySrc's buffer: an image count, then each image's byte
+ * offset from the start of the buffer. */
 typedef struct TimArrayBuf {
-    /* +0x00 */ s32 count;
-    /* +0x04 */ s32 offsets[1];
+    /* +0x00 */ s32 count;      /**< how many TIM images follow */
+    /* +0x04 */ s32 offsets[1]; /**< each image's offset from the buffer's start */
 } TimArrayBuf;
 
 /* onRequestDone (+0x064): once the buffer is in, build one TimImage over each of
@@ -835,13 +836,13 @@ void ModelData__Load(ModelData *self) {
     ((s32 (*)())self->methods->processBuffer)(self);
 }
 
-/* A ModelData's buffer (a .MOM file: InitDreamAux requests ETC\\SYMSPY.MOM
- * through New_ModelData): the LinkResource's TMD at `tmdOffset`, the
- * TodSet's data from +0x0C. */
+/** @brief A ModelData's buffer (a .MOM file: InitDreamAux requests
+ * ETC\\SYMSPY.MOM through New_ModelData): the LinkResource's TMD at
+ * `tmdOffset`, the TodSet's data from +0x0C. */
 typedef struct ModelDataHeader {
     /* +0x00 */ u8 pad0[8];
-    /* +0x08 */ s32 tmdOffset;
-    /* +0x0C */ u8 tods[1];
+    /* +0x08 */ s32 tmdOffset; /**< the TMD's offset from the buffer's start */
+    /* +0x0C */ u8 tods[1];    /**< the TodSet's data */
 } ModelDataHeader;
 
 /* +0x078: when it owns them, build the LinkResource and the TodSet over

@@ -20,8 +20,10 @@ typedef struct FlatLightObjMethods FlatLightObjMethods;
  * to GsF_LIGHT *.
  */
 typedef struct {
-    /* +0x000 */ s32 vx, vy, vz; /**< the light's direction */
-    /* +0x00C */ ColorRgb rgb;   /**< the light's colour */
+    /* +0x000 */ s32 vx,       /**< the light's direction, x */
+        vy,                    /**< the light's direction, y */
+        vz;                    /**< the light's direction, z */
+    /* +0x00C */ ColorRgb rgb; /**< the light's colour */
 } FlatLightParams;
 
 /**

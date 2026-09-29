@@ -130,7 +130,8 @@ struct TitleMenu {
  * StampSaveTitleFileLetter's letter field (3..5) and letter field plus
  * "Day" (3..8). */
 typedef struct {
-    s8 lead, trail; /**< the Shift-JIS lead and trail bytes */
+    s8 lead,   /**< the Shift-JIS lead byte */
+        trail; /**< the Shift-JIS trail byte */
 } FullWidthChar;
 
 /** Three full-width characters, copied whole. */

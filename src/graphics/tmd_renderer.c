@@ -36,49 +36,49 @@ extern s32 sSortNdiv;               /* GsDIV1..5: subdivision level */
 extern s32 sSortUseGlobalLightMode; /* GsLLMOD */
 extern s32 sSortLightMode;          /* GsFOG | GsMATE */
 
-/*
- * The per-object draw context SortTmdObject builds in the PS1 scratchpad
- * (its caller passes 0x1F800000) and hands to every function below. Only
- * the fields this file touches are named.
+/**
+ * @brief The per-object draw context SortTmdObject builds in the PS1
+ * scratchpad (its caller passes 0x1F800000) and hands to every function
+ * below. Only the fields this file touches are named.
  */
 typedef struct PolyDrawCtx {
-    /* +0x000 */ GsOT_TAG *otBase;  /* the GsOT's org */
-    /* +0x004 */ s32 otShift;       /* otz >> otShift indexes otBase */
-    /* +0x008 */ s32 unk8;          /* set to 10 per object; nothing reads it */
-    /* +0x00C */ SVECTOR *vertices; /* the TMD object's vertex array */
-    /* +0x010 */ SVECTOR *normals;  /* the TMD object's normal array */
-    /* +0x014 */ u8 primLen;        /* SetupPrimCode's cached P_TAG length byte */
-    /* +0x015 */ u8 primCode;       /* ... and finished GPU command byte */
+    /* +0x000 */ GsOT_TAG *otBase;  /**< the GsOT's org */
+    /* +0x004 */ s32 otShift;       /**< otz >> otShift indexes otBase */
+    /* +0x008 */ s32 unk8;          /**< set to 10 per object; nothing reads it */
+    /* +0x00C */ SVECTOR *vertices; /**< the TMD object's vertex array */
+    /* +0x010 */ SVECTOR *normals;  /**< the TMD object's normal array */
+    /* +0x014 */ u8 primLen;        /**< SetupPrimCode's cached P_TAG length byte */
+    /* +0x015 */ u8 primCode;       /**< ... and finished GPU command byte */
     u8 pad016[0x018 - 0x016];
-    /* +0x018 */ u32 packetType;     /* the current group's TMD mode/flag word */
-    /* +0x01C */ s32 semiTrans;      /* the group's ABE bit */
-    /* +0x020 */ s32 otz;            /* avsz3 result */
-    /* +0x024 */ s32 dp;             /* IR0, the depth-cue factor */
-    /* +0x028 */ s32 opz;            /* nclip result (MAC0) */
-    /* +0x02C */ s32 dpShift;        /* dp >> dpShift is the CLUT row offset */
-    /* +0x030 */ GsOT_TAG *otSlot;   /* &otBase[otz >> otShift] */
-    /* +0x034 */ ColorRgb faceColor; /* sTexturedFaceColor's copy */
+    /* +0x018 */ u32 packetType;     /**< the current group's TMD mode/flag word */
+    /* +0x01C */ s32 semiTrans;      /**< the group's ABE bit */
+    /* +0x020 */ s32 otz;            /**< the face's average screen depth */
+    /* +0x024 */ s32 dp;             /**< the face's depth-cue factor; ONE or more culls it */
+    /* +0x028 */ s32 opz;            /**< the face's winding; 0 or less culls it as back-facing */
+    /* +0x02C */ s32 dpShift;        /**< dp >> dpShift is the CLUT row offset */
+    /* +0x030 */ GsOT_TAG *otSlot;   /**< &otBase[otz >> otShift] */
+    /* +0x034 */ ColorRgb faceColor; /**< sTexturedFaceColor's copy */
     u8 pad037[0x038 - 0x037];
-    /* +0x038 */ MATRIX savedRotMatrix;
+    /* +0x038 */ MATRIX savedRotMatrix; /**< the rotation matrix, saved while a child's is concatenated with its parent's */
     u8 pad058[0x05C - 0x058];
-    /* +0x05C */ s32 flag;        /* GTE FLAG */
-    /* +0x060 */ DVECTOR sxy[4];  /* the face's screen XYs; [3] only for a quad */
-    /* +0x070 */ DVECTOR bboxMin; /* FlagLargePolyForDivide's screen box */
-    /* +0x074 */ DVECTOR bboxMax;
-    /* +0x078 */ s32 divide; /* set when the face must go through RCpoly* subdivision */
+    /* +0x05C */ s32 flag; /**< the projection's error flags: SZ3/OTZ saturation alone forces subdivision, anything else culls */
+    /* +0x060 */ DVECTOR sxy[4];  /**< the face's screen XYs; [3] only for a quad */
+    /* +0x070 */ DVECTOR bboxMin; /**< FlagLargePolyForDivide's screen box, top left */
+    /* +0x074 */ DVECTOR bboxMax; /**< ... and bottom right */
+    /* +0x078 */ s32 divide;      /**< set when the face must go through RCpoly* subdivision */
     u8 pad07C[0x088 - 0x07C];
-    /* +0x088 */ RVECTOR *divVtx3[3]; /* sDivPolygon3's r0..r2 */
-    /* +0x094 */ RVECTOR *divVtx4[4]; /* sDivPolygon4's r0..r3 */
-    /* +0x0A4 */ SVECTOR *faceVtx[4]; /* the current face's vertices */
+    /* +0x088 */ RVECTOR *divVtx3[3]; /**< sDivPolygon3's r0..r2 */
+    /* +0x094 */ RVECTOR *divVtx4[4]; /**< sDivPolygon4's r0..r3 */
+    /* +0x0A4 */ SVECTOR *faceVtx[4]; /**< the current face's vertices */
 } PolyDrawCtx;
 
-/* The first word of a group's first TMD packet. Sony's TMD_P_* structs
- * spell it as four bytes (out, in, dummy, cd: olen, ilen, flag, mode); this
- * renderer reads the first two as the group's packet count and the last two
- * as one flag | mode << 8 word. */
+/** @brief The first word of a group's first TMD packet. Sony's TMD_P_*
+ * structs spell it as four bytes (out, in, dummy, cd: olen, ilen, flag,
+ * mode); this renderer reads the first two as the group's packet count and
+ * the last two as one flag | mode << 8 word. */
 typedef struct TmdGroupHeader {
-    u16 count;
-    u16 type;
+    u16 count; /**< how many packets the group holds */
+    u16 type;  /**< the group's packets' flag | mode << 8, as TMD_TYPE builds it */
 } TmdGroupHeader;
 
 /* A TMD packet's type as SortTmdObject switches on it: the mode byte

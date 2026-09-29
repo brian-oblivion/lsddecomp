@@ -43,6 +43,7 @@ PREDEFINED             = "INCLUDE_ASM(dir, name)=" \
                          "APPLICATION_SLOTS(Self, CtorParams):=" \
                          "BASICCLASS_FIELDS(Methods):=" \
                          "BASICCLASS_SLOTS(Self, CtorParams):=" \
+                         "BASICCLASS_SLOTS_R(Self, CtorRet, CtorParams):=" \
                          "BOXFILL_FIELDS(Methods):=" \
                          "BOXFILL_SLOTS(Self, CtorParams):=" \
                          "CHARSPRITE_FIELDS(Methods):=" \

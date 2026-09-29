@@ -30,11 +30,14 @@
 #include "common.h"
 #include "cd_driver.h"
 
-/* Each special day's six records, of which a CinematicCall's entry picks
- * one: FILM\SPDAYnnA/B.STR (its two movies), then IMG1\SPDAYnnC..F.TIM.
- * Special day 0 is SPDAY01. */
-#define SPECIAL_DAY_RECORD_COUNT 6
-#define SPECIAL_DAY_MOVIE_COUNT 2
+/** @name Special day records
+ * Each special day's six records, of which a CinematicCall's entry picks
+ * one: FILM\\SPDAYnnA/B.STR (its two movies), then IMG1\\SPDAYnnC..F.TIM.
+ * Special day 0 is SPDAY01. @{ */
+#define SPECIAL_DAY_RECORD_COUNT 6 /**< records per special day */
+#define SPECIAL_DAY_MOVIE_COUNT 2  /**< of them, the leading .STR movies */
+
+/** @} */
 
 /**
  * @brief The cinematic DreamSys's getCinematic names, and what

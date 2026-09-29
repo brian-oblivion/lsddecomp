@@ -378,13 +378,13 @@ bool IsDayInPeriodPhase(s32 day, s32 phase) {
     return false;
 }
 
-/* One placement: the cell (column, row) inside the chunk, a yaw from
- * sDreamAuxSpawnRotations and an offset inside the cell from
+/** @brief One placement: the cell (column, row) inside the chunk, a yaw
+ * from sDreamAuxSpawnRotations and an offset inside the cell from
  * sDreamAuxPosTable. */
 typedef struct {
-    u16 cell;
-    s8 rotationIndex;
-    s8 offsetIndex;
+    u16 cell;         /**< the cell's key inside the chunk */
+    s8 rotationIndex; /**< the yaw, an index into sDreamAuxSpawnRotations */
+    s8 offsetIndex;   /**< the offset in the cell, an index into sDreamAuxPosTable */
 } DreamAuxSpawnInfo;
 
 extern DreamAuxSpawnInfo sDreamAuxSpawnInfo[];

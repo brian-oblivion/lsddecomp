@@ -63,25 +63,25 @@ typedef s64 int64_t;
  * and the other u_long * APIs without a cast. */
 
 #ifndef _UCHAR_T
-#define _UCHAR_T
+#define _UCHAR_T /**< u_char is defined */
 /** @brief Sony's unsigned 8-bit integer. */
 typedef u8 u_char;
 #endif
 
 #ifndef _USHORT_T
-#define _USHORT_T
+#define _USHORT_T /**< u_short is defined */
 /** @brief Sony's unsigned 16-bit integer. */
 typedef u16 u_short;
 #endif
 
 #ifndef _UINT_T
-#define _UINT_T
+#define _UINT_T /**< u_int is defined */
 /** @brief Sony's unsigned 32-bit integer. */
 typedef u32 u_int;
 #endif
 
 #ifndef _ULONG_T
-#define _ULONG_T
+#define _ULONG_T /**< u_long is defined */
 /** @brief Sony's unsigned 32-bit `long`, the same type as u32 here. */
 typedef u32 u_long;
 #endif
@@ -93,7 +93,7 @@ typedef int bool;
 enum { false = 0, true = 1 };
 
 #ifndef NULL
-#define NULL 0
+#define NULL 0 /**< the null pointer */
 #endif
 
 #endif

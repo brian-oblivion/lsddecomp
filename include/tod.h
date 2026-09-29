@@ -15,30 +15,32 @@ struct ResourceSource;
  * object id in bits 0..15 (the low byte is kept), packet type in 16..19,
  * flag in 20..23, length in words in 24..31.
  * @{ */
-#define TOD_PACKET_TYPE_SHIFT 16
-#define TOD_PACKET_FLAG_SHIFT 20
-#define TOD_PACKET_LEN_SHIFT 24
-#define TOD_PACKET_NIBBLE 0xF /**< the type and flag fields' mask */
+#define TOD_PACKET_TYPE_SHIFT 16 /**< the packet type's first bit */
+#define TOD_PACKET_FLAG_SHIFT 20 /**< the flag's first bit */
+#define TOD_PACKET_LEN_SHIFT 24  /**< the length's first bit */
+#define TOD_PACKET_NIBBLE 0xF    /**< the type and flag fields' mask */
 /** @} */
 
 /** @name TOD packet types
  * The packet types the game reads: ScanTodPackets tests model-id and
  * object-control packets, TodActor__ApplyTodPacket applies the first four.
  * @{ */
-#define TOD_PACKET_ATTRIBUTE 0
+#define TOD_PACKET_ATTRIBUTE 0 /**< data: a mask and bits, ANDed and ORed into the attribute */
+/** data: rotation, scale and translation, as the flag's TOD_COORD_* bits say */
 #define TOD_PACKET_COORDINATE 1
 #define TOD_PACKET_MODEL_ID 2 /**< data: the TMD id the object is drawn with */
-#define TOD_PACKET_PARENT 3
+#define TOD_PACKET_PARENT 3 /**< data: the parent's object id; 0 or TOD_PARENT_ROOT for the actor */
 #define TOD_PACKET_OBJECT_CONTROL 8 /**< the flag says create or kill */
 #define TOD_OBJECT_CREATE 0         /**< an object-control packet's flag: create */
 /** @} */
 
 /** @name TOD coordinate packet flags
  * @{ */
+/** add to (rotate, translate) or multiply (scale) the current values */
 #define TOD_COORD_DIFFERENTIAL 1
-#define TOD_COORD_ROTATE 2
-#define TOD_COORD_SCALE 4
-#define TOD_COORD_TRANSLATE 8
+#define TOD_COORD_ROTATE 2    /**< the packet carries a rotation */
+#define TOD_COORD_SCALE 4     /**< the packet carries a scale */
+#define TOD_COORD_TRANSLATE 8 /**< the packet carries a translation */
 
 /** @} */
 

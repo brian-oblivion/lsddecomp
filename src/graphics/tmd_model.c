@@ -17,23 +17,23 @@
 
 extern s32 sTmdModelBoundsCount; /* boxes in the bounds buffer: 1, set by the ctor */
 
-/* A counted box list of one: TmdModel__GetHull's local (its count is set
- * to 1, as the hull's is, and never read). */
+/** @brief A counted box list of one: TmdModel__GetHull's local (its count
+ * is set to 1, as the hull's is, and never read). */
 typedef struct BoxList {
-    s32 count;  /* +0x000 */
-    TmdBox box; /* +0x004 */
+    s32 count;  /**< +0x000 how many boxes; never read */
+    TmdBox box; /**< +0x004 the model's bounding box */
 } BoxList;
 
-/* The eight corners of a box as two faces of four (TmdHull's v[0..3] and
- * v[4..7]: the min-z face, then the max-z face). */
+/** @brief The eight corners of a box as two faces of four (TmdHull's v[0..3]
+ * and v[4..7]: the min-z face, then the max-z face). */
 typedef struct BoxCorners {
-    TmdVec3 face[2][4];
+    TmdVec3 face[2][4]; /**< the min-z face's four corners, then the max-z face's */
 } BoxCorners;
 
-/* A segment: start and direction (end - start). */
+/** @brief A segment: start and direction (end - start). */
 typedef struct Ray {
-    TmdVec3 org; /* +0x000 */
-    TmdVec3 dir; /* +0x006 */
+    TmdVec3 org; /**< +0x000 the segment's start */
+    TmdVec3 dir; /**< +0x006 end minus start */
 } Ray;
 
 /* A TMD packet's mode byte is its GPU command code (<libgs.h>'s GPU_COM_*),
@@ -53,11 +53,11 @@ enum RayResult { RAY_MISS = 0, RAY_HIT = 1, RAY_PARALLEL = 2 };
  * still counts as on the face. */
 #define FACE_BOX_MARGIN 24
 
-/* TmdModel__RaycastFaces' per-face scratch: Square0's output VECTOR, then
- * the face's bounding box. */
+/** @brief TmdModel__RaycastFaces' per-face scratch: Square0's output
+ * VECTOR, then the face's bounding box. */
 typedef union VectorOrBox {
-    VECTOR v;
-    TmdBox b;
+    VECTOR v; /**< the hit's offset from the origin, squared per axis */
+    TmdBox b; /**< the face's bounding box, which the hit must lie within FACE_BOX_MARGIN of */
 } VectorOrBox;
 
 extern TmdBox sTmdModelBoundsBuf[];

@@ -15,9 +15,9 @@
 /** @name Pad events
  * dispatchEvents' event codes: one base per edge plus the button's index in
  * sButtonMasks (PAD_EVENT_PRESSED + PAD_BUTTON_START is Start going down). @{ */
-#define PAD_EVENT_HELD 0x02
-#define PAD_EVENT_PRESSED 0x12
-#define PAD_EVENT_RELEASED 0x22
+#define PAD_EVENT_HELD 0x02     /**< a button is down this frame */
+#define PAD_EVENT_PRESSED 0x12  /**< a button went down this frame */
+#define PAD_EVENT_RELEASED 0x22 /**< a button came up this frame */
 /** @} */
 
 /** Pad's class id (gPadMethods word +0x000). A single nibble, so

@@ -42,18 +42,23 @@ typedef struct SoundCueSlot {
     /* +0x10 */ s32 endVol; /**< Request: the volume the tone ramps to, before attenuation; reset each tick. */
 } SoundCueSlot;             /* 0x14 bytes */
 
-/* SoundCueSlot::program's two requests that are not a VAB program. */
-#define SOUND_CUE_NONE (-1) /* no request (ServiceSoundCueSet's reset value) */
-#define SOUND_CUE_STOP (-2) /* stop the slot's voice */
+/** @name Cue requests
+ * SoundCueSlot::program's two requests that are not a VAB program. @{ */
+#define SOUND_CUE_NONE (-1) /**< no request (ServiceSoundCueSet's reset value) */
+#define SOUND_CUE_STOP (-2) /**< stop the slot's voice */
+/** @} */
 
-/* SoundCueSet::attenuationSteps for a new cue (InitSoundCueSet). */
+/** SoundCueSet::attenuationSteps for a new cue (InitSoundCueSet). */
 #define SOUND_CUE_ATTENUATION_STEPS 10
 
-/* SoundCueSlot::vol and endVol as ServiceSoundCueSet resets them each tick:
+/** @name Default cue volumes
+ * SoundCueSlot::vol and endVol as ServiceSoundCueSet resets them each tick:
  * playTone keys the tone at vol and ramps it to endVol (SsUtAutoVol);
- * 127 is libsnd's full volume. */
-#define SOUND_CUE_DEFAULT_VOL 127
-#define SOUND_CUE_DEFAULT_END_VOL 64
+ * 127 is libsnd's full volume. @{ */
+#define SOUND_CUE_DEFAULT_VOL 127    /**< the key-on volume */
+#define SOUND_CUE_DEFAULT_END_VOL 64 /**< the volume the tone ramps to */
+
+/** @} */
 
 /**
  * @brief A three-voice sound cue. Not a class: it has no method table, and

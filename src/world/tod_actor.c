@@ -58,24 +58,24 @@
 /* PlayTone's volume, both arguments of the bank's playTone (vol, endVol). */
 #define TODACTOR_TONE_VOLUME 110
 
-/* A TodSet's buffer once TodSet__BuildTods has run: a word, a count, then
- * the table whose each entry (an offset into the buffer) it replaced with
- * the Tod it built over that sub-block. */
+/** @brief A TodSet's buffer once TodSet__BuildTods has run: a word, a
+ * count, then the table whose each entry (an offset into the buffer) it
+ * replaced with the Tod it built over that sub-block. */
 typedef struct TodSetBuffer {
     u8 pad00[0x08]; /* +0x000 a word and the entry count: not read here */
-    Tod *tods[1];   /* +0x008 */
+    Tod *tods[1];   /**< +0x008 the Tods built over the sub-blocks */
 } TodSetBuffer;
 
 /* The i-th Tod of a TodSet (TodActor__SetTod, TodActor__Tick). */
 #define TODSET_TOD(set, i) (((TodSetBuffer *)(set)->buffer)->tods[i])
 
-/* The ctor's descriptor, forwarded through setupModelData into
+/** @brief The ctor's descriptor, forwarded through setupModelData into
  * TodActor__AcquireModelData: the ModelData at +0x0C is borrowed; when there
  * is none, New_ModelData(&desc->src) makes one and the TodActor owns it. */
 typedef struct TodActorDesc {
-    /* +0x000 */ ResourceSource src;
+    /* +0x000 */ ResourceSource src; /**< the file to make a ModelData from when modelData is NULL */
     /* +0x008 */ u8 pad8[4];
-    /* +0x00C */ ModelData *modelData;
+    /* +0x00C */ ModelData *modelData; /**< a ModelData to borrow, or NULL */
 } TodActorDesc;
 
 void *New_TodActor(void *desc, void *sound) {

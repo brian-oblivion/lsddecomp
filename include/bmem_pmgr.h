@@ -35,8 +35,8 @@ struct BMemBlockHdr {
 /** @name sizeAndFlags
  * A block's size counts its header word and its footer; the flags are the
  * block's own state and its lower neighbour's. @{ */
-#define BMEM_SIZE_MASK 0x0FFFFFFF
-#define BMEM_FLAG_MASK 0xF0000000
+#define BMEM_SIZE_MASK 0x0FFFFFFF /**< the block's byte size */
+#define BMEM_FLAG_MASK 0xF0000000 /**< the BMEM_FREE and BMEM_PREV_FREE bits */
 #define BMEM_FREE 0x40000000      /**< this block is on the free list */
 #define BMEM_PREV_FREE 0x80000000 /**< the block below this one is free */
 /** @} */
@@ -47,14 +47,19 @@ struct BMemBlockHdr {
  * BMemPMgrFree finds a free lower neighbour to merge with. A block is at
  * least BMEM_MIN_BLOCK bytes: a header word and a payload that can hold the
  * two free-list links and the footer. @{ */
-#define BMEM_HEADER_SIZE 4
-#define BMEM_MIN_PAYLOAD 12
-#define BMEM_MIN_BLOCK 16
-#define BMEM_BLOCK_SIZE(b) ((b)->sizeAndFlags & BMEM_SIZE_MASK)
+#define BMEM_HEADER_SIZE 4  /**< the header word before the payload */
+#define BMEM_MIN_PAYLOAD 12 /**< room for the two free-list links and the footer */
+#define BMEM_MIN_BLOCK 16   /**< BMEM_HEADER_SIZE plus BMEM_MIN_PAYLOAD */
+#define BMEM_BLOCK_SIZE(b) ((b)->sizeAndFlags & BMEM_SIZE_MASK) /**< block b's size in bytes */
+/** the block above b */
 #define BMEM_NEXT_BLOCK(b) ((BMemBlockHdr *)((u8 *)(b) + BMEM_BLOCK_SIZE(b)))
+/** free block b's last word */
 #define BMEM_FOOTER(b) (*(BMemBlockHdr **)((u8 *)(b) + BMEM_BLOCK_SIZE(b) - 4))
+/** the footer of the block below b */
 #define BMEM_PREV_FOOTER(b) (*(BMemBlockHdr **)((u8 *)(b) - 4))
+/** what BMemPMgrAlloc returns for b */
 #define BMEM_PAYLOAD(b) ((void *)((u8 *)(b) + BMEM_HEADER_SIZE))
+/** the block a payload belongs to */
 #define BMEM_HEADER_OF(payload) ((BMemBlockHdr *)((u8 *)(payload) - BMEM_HEADER_SIZE))
 /** @} */
 
@@ -80,9 +85,9 @@ struct BMemPMgr {
  * zero-size sentinel block word that stops BMemPMgrFree's merge with the
  * block above. BMEMPMGR_HEADER_SIZE is where firstBlock starts; the struct
  * above names only the fields the code touches. @{ */
-#define BMEMPMGR_HEADER_SIZE 28
-#define BMEMPMGR_SENTINEL_SIZE 4
-#define BMEMPMGR_MIN_POOL_SIZE 1024
+#define BMEMPMGR_HEADER_SIZE 28     /**< the pool header's bytes, before firstBlock */
+#define BMEMPMGR_SENTINEL_SIZE 4    /**< the zero-size block word past the last block */
+#define BMEMPMGR_MIN_POOL_SIZE 1024 /**< smaller requested pools are raised to this */
 /** @} */
 
 /** @brief Creates the game's one pool: mallocs its header, poolSize bytes of

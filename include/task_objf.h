@@ -238,7 +238,12 @@ extern TaskObjFMethods *GetTaskObjFMethods(void);
  * the two card slots), as six single bytes. BuildMemcardPath copies one as
  * a whole struct. */
 typedef struct McDevicePath {
-    s8 b0, b1, b2, b3, b4, b5; /**< the NUL-terminated name */
+    s8 b0,  /**< 'b' */
+        b1, /**< 'u' */
+        b2, /**< the slot digit, '0' or '1' */
+        b3, /**< '0' */
+        b4, /**< ':' */
+        b5; /**< the terminating NUL */
 } McDevicePath;
 
 /** The buffer a card file's full path ("bu00:" plus the file name) is built

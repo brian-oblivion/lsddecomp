@@ -500,34 +500,34 @@ void ContRpn2(s16 a0, s16 a1, u8 a2) {
     rec->deltaLeft = ReadDeltaValue(a0, a1);
 }
 
-/* The SPU envelope registers ADSR1/ADSR2 (VagAtr.adsr1/adsr2) split into
- * their bit fields: _SsUtResolveADSR unpacks a pair into one, and
+/** @brief The SPU envelope registers ADSR1/ADSR2 (VagAtr.adsr1/adsr2) split
+ * into their bit fields: _SsUtResolveADSR unpacks a pair into one, and
  * _SsUtBuildADSR packs one back. The rates and the level are the field
  * values shifted down; the four modes hold the masked bit as-is (nonzero
  * means exponential, or decreasing for sustainDir). */
 typedef struct {
-    s16 attackRate;   /* ADSR1 bits 14-8 */
-    s16 decayRate;    /* ADSR1 bits 7-4 */
-    s16 sustainLevel; /* ADSR1 bits 3-0 */
-    s16 sustainRate;  /* ADSR2 bits 12-6 */
-    s16 releaseRate;  /* ADSR2 bits 4-0 */
-    s16 attackMode;   /* ADSR1 bit 15 */
-    s16 sustainMode;  /* ADSR2 bit 15 */
-    s16 releaseMode;  /* ADSR2 bit 5 */
-    s16 sustainDir;   /* ADSR2 bit 14 */
+    s16 attackRate;   /**< ADSR1 bits 14-8 */
+    s16 decayRate;    /**< ADSR1 bits 7-4 */
+    s16 sustainLevel; /**< ADSR1 bits 3-0 */
+    s16 sustainRate;  /**< ADSR2 bits 12-6 */
+    s16 releaseRate;  /**< ADSR2 bits 4-0 */
+    s16 attackMode;   /**< ADSR1 bit 15 */
+    s16 sustainMode;  /**< ADSR2 bit 15 */
+    s16 releaseMode;  /**< ADSR2 bit 5 */
+    s16 sustainDir;   /**< ADSR2 bit 14 */
 } AdsrFields;
 
-/* SsUtGetProgAtr's fill at function entry. From +0x10 the same memory is
- * both the VagAtr buffer the rpnBytes==2 loops hand to SsUtGet/SetVagAtr
- * and, with the 18 bytes after it, the two by-value arguments of
- * Snd_setVabAttr. */
+/** @brief SsUtGetProgAtr's fill at function entry. From +0x10 the same
+ * memory is both the VagAtr buffer the rpnBytes==2 loops hand to
+ * SsUtGet/SetVagAtr and, with the 18 bytes after it, the two by-value
+ * arguments of Snd_setVabAttr. */
 typedef struct {
-    ProgAtr prog; /* +0x00: SsUtGetProgAtr's fill */
+    ProgAtr prog; /**< +0x00: SsUtGetProgAtr's fill */
 
-    VagAtr vag; /* +0x10: passed by value to Snd_setVabAttr, and the
+    VagAtr vag; /**< +0x10: passed by value to Snd_setVabAttr, and the
                  * SsUtGet/SetVagAtr buffer of the rpnBytes==2 loops */
 
-    AdsrFields adsr; /* +0x30: passed by value to Snd_setVabAttr */
+    AdsrFields adsr; /**< +0x30: passed by value to Snd_setVabAttr */
 } DataEntryLocals;
 
 /* Snd_setVabAttr is defined later in this unit; this is its signature. */

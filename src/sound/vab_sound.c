@@ -30,12 +30,13 @@
 #include "wbgm.h"
 #include "data_source.h"
 
-/* What `buffer` points at: 8 bytes nothing here reads, then each cell's
- * first record, one per cell of the chunk's 20 x 20 lattice, row-major. A
- * cell's further records are reached by the byte offset in `next`. */
+/** @brief What `buffer` points at: 8 bytes nothing here reads, then each
+ * cell's first record, one per cell of the chunk's 20 x 20 lattice,
+ * row-major. A cell's further records are reached by the byte offset in
+ * `next`. */
 typedef struct PlacementGridBuffer {
     u8 pad0[8];
-    PlacementGridRecord cells[STAGE_SLOT_LATTICE_CELLS];
+    PlacementGridRecord cells[STAGE_SLOT_LATTICE_CELLS]; /**< each cell's first record, row-major */
 } PlacementGridBuffer;
 
 /* LinkResource__GetModel as PlacementGrid__ResolveEntry calls it through

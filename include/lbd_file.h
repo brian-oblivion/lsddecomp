@@ -12,7 +12,7 @@
 typedef struct LbdFile LbdFile;
 typedef struct LbdFileMethods LbdFileMethods;
 
-/* `headerReady` once StageMap__OnDrawSystemEvent has linked the header's
+/** `headerReady` once StageMap__OnDrawSystemEvent has linked the header's
  * placements into the slot's cells (1 is "read, not yet consumed"). */
 #define LBDFILE_HEADER_CONSUMED 2
 
@@ -23,7 +23,7 @@ enum LbdFileLoadState {
     LBDFILE_LOAD_DATA = 10   /**< loadDataBlock's read into `dataBuffer` is pending. */
 };
 
-/* The header block: loadHeader's read size and the ctor's `buffer`
+/** The header block: loadHeader's read size and the ctor's `buffer`
  * allocation (0xB358). */
 #define LBDFILE_HEADER_BLOCK_SIZE 45912
 

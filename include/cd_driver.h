@@ -277,49 +277,59 @@ typedef struct CdRequestNode {
     /* +0x20 */ struct CdRequestNode *next; /**< Next node, NULL for the last. */
 } CdRequestNode;                            /* size 0x24 */
 
-/* A queue node's `op`: EnqueueCdRequest's third argument, dispatched back by
- * CdDriver__RunRequestQueue to the owner's slot of the same name. */
-#define CD_OP_OPEN 2
-#define CD_OP_CLOSE 3
-#define CD_OP_SEEK 4
-#define CD_OP_READ 5
-#define CD_OP_LOAD_FILE 7
+/** @name Request ops
+ * A queue node's `op`: EnqueueCdRequest's third argument, dispatched back by
+ * CdDriver__RunRequestQueue to the owner's slot of the same name. @{ */
+#define CD_OP_OPEN 2      /**< open the node's file */
+#define CD_OP_CLOSE 3     /**< close the open file */
+#define CD_OP_SEEK 4      /**< seek to param0 with mode param1 */
+#define CD_OP_READ 5      /**< read param1 bytes into param0 */
+#define CD_OP_LOAD_FILE 7 /**< load the node's whole file */
+/** @} */
 
-/* Which of the two state machines ServiceCdDriver ticks. */
-#define CD_TICK_NONE 0          /* neither: ResetCdStateMachine's value */
-#define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
-#define CD_TICK_LOAD_FILE 2     /* TickCdLoadFileStateMachine */
+/** @name Ticked state machine
+ * Which of the two state machines ServiceCdDriver ticks. @{ */
+#define CD_TICK_NONE 0          /**< neither: ResetCdStateMachine's value */
+#define CD_TICK_STATE_MACHINE 1 /**< TickCdStateMachine */
+#define CD_TICK_LOAD_FILE 2     /**< TickCdLoadFileStateMachine */
+/** @} */
 
-/* Which method's request the state machine is running: StartCdOperation's
+/** @name Running operation
+ * Which method's request the state machine is running: StartCdOperation's
  * first argument and GetCdOperation's (and so
  * GetActiveDataSourceOperation's) result. Each value is passed by exactly one
  * method. 0 is also what ResetCdStateMachine leaves when nothing runs: Close
- * resets straight after starting. */
-#define CD_OPERATION_CLOSE 0
-#define CD_OPERATION_OPEN 1
-#define CD_OPERATION_SEEK 2
-#define CD_OPERATION_READ 3
-#define CD_OPERATION_LOAD_FILE 4
+ * resets straight after starting. @{ */
+#define CD_OPERATION_CLOSE 0     /**< CdDriver__Close, or nothing running */
+#define CD_OPERATION_OPEN 1      /**< CdDriver__Open */
+#define CD_OPERATION_SEEK 2      /**< CdDriver__Seek */
+#define CD_OPERATION_READ 3      /**< CdDriver__Read */
+#define CD_OPERATION_LOAD_FILE 4 /**< CdDriver__LoadFile */
+/** @} */
 
-/* The state machines' phase: StartCdOperation's second argument and
- * GetCdState's result. */
-#define CD_STATE_IDLE 0        /* ResetCdStateMachine's value */
-#define CD_STATE_SETLOC 1      /* issue CdControl(CdlSetloc) */
-#define CD_STATE_SETLOC_WAIT 2 /* poll CdSync for it */
-#define CD_STATE_READ 7        /* issue CdRead */
-#define CD_STATE_READ_WAIT 8   /* poll CdReadSync */
+/** @name State machine phase
+ * The state machines' phase: StartCdOperation's second argument and
+ * GetCdState's result. @{ */
+#define CD_STATE_IDLE 0        /**< ResetCdStateMachine's value */
+#define CD_STATE_SETLOC 1      /**< issue CdControl(CdlSetloc) */
+#define CD_STATE_SETLOC_WAIT 2 /**< poll CdSync for it */
+#define CD_STATE_READ 7        /**< issue CdRead */
+#define CD_STATE_READ_WAIT 8   /**< poll CdReadSync */
+/** @} */
 
-/* A CD-ROM data sector's user data (2048 bytes; <libcd.h>'s CdlModeSize0/1
+/** @name Sectors
+ * A CD-ROM data sector's user data (2048 bytes; <libcd.h>'s CdlModeSize0/1
  * clear). CdRead counts sectors, so byte sizes and offsets are shifted by
  * CD_SECTOR_SHIFT (ReadCdFile, CdDriver__Seek), and GetCdFileSize reports a
- * file's size in whole sectors. */
-#define CD_SECTOR_SIZE 2048
-#define CD_SECTOR_SHIFT 11
+ * file's size in whole sectors. @{ */
+#define CD_SECTOR_SIZE 2048 /**< bytes of user data per sector */
+#define CD_SECTOR_SHIFT 11  /**< log2 of CD_SECTOR_SIZE */
+/** @} */
 
-/* A path buffer for BuildCdFilePath's "\\<data directory><name>;1". */
+/** A path buffer for BuildCdFilePath's "\\<data directory><name>;1". */
 #define CD_PATH_SIZE 64
 
-/* The file lookups call CdSearchFile this many times before they print
+/** The file lookups call CdSearchFile this many times before they print
  * "File not found" and give up (OpenCdFile, ResolveFileEntries). */
 #define CD_SEARCH_ATTEMPTS 101
 

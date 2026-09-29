@@ -689,14 +689,16 @@ enum ClipResult {
     CLIP_P2_INSIDE = 3  /**< only p2 is inside */
 };
 
-/** CalcBoxOutcode's bits: per axis, MAX when the point is past the box's
- * maximum and MIN when it is before its minimum. */
-#define OUTCODE_Y_MIN 0x01
-#define OUTCODE_Y_MAX 0x02
-#define OUTCODE_X_MIN 0x04
-#define OUTCODE_X_MAX 0x08
-#define OUTCODE_Z_MIN 0x10
-#define OUTCODE_Z_MAX 0x20
+/** @name Box outcodes
+ * CalcBoxOutcode's bits: per axis, MAX when the point is past the box's
+ * maximum and MIN when it is before its minimum. @{ */
+#define OUTCODE_Y_MIN 0x01 /**< below the box's minimum y */
+#define OUTCODE_Y_MAX 0x02 /**< past the box's maximum y */
+#define OUTCODE_X_MIN 0x04 /**< below the box's minimum x */
+#define OUTCODE_X_MAX 0x08 /**< past the box's maximum x */
+#define OUTCODE_Z_MIN 0x10 /**< below the box's minimum z */
+#define OUTCODE_Z_MAX 0x20 /**< past the box's maximum z */
+/** @} */
 
 /**
  * @brief Finds where a segment crosses the box's boundary by halving it from

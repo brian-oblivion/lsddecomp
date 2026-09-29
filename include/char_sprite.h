@@ -28,11 +28,13 @@
 typedef struct CharSprite CharSprite;
 typedef struct CharSpriteMethods CharSpriteMethods;
 
-/** The font texture's layout, as GetCellRect reads it: cells of
+/** @name Font grid
+ * The font texture's layout, as GetCellRect reads it: cells of
  * CHARSPRITE_CELL_SIZE square, CHARSPRITE_GRID_COLUMNS to a row, cell n at
- * column n % columns, row n / columns, from sCharSpriteCellRect. */
-#define CHARSPRITE_GRID_COLUMNS 32
-#define CHARSPRITE_CELL_SIZE 8
+ * column n % columns, row n / columns, from sCharSpriteCellRect. @{ */
+#define CHARSPRITE_GRID_COLUMNS 32 /**< cells per row of the font texture */
+#define CHARSPRITE_CELL_SIZE 8     /**< a cell's width and height, in texels */
+/** @} */
 
 /**
  * ScreenSprite's slots, then CharSprite's own, for CharSpriteMethods and
