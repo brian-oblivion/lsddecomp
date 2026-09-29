@@ -63,7 +63,7 @@ struct FrameClockMethods {
  * (FRAMECLOCK_CLASS_ID), table gFrameClockMethods, a direct BasicClass
  * subclass (its ctor chains to BasicClass's first) that overrides the ctor,
  * finalize, removeParentRef and notifyParents and adds seven slots; methods
- * in src/graphics/sprite.c; no class derives from it. The object is 0x1C
+ * in src/graphics/frame_clock.c; no class derives from it. The object is 0x1C
  * bytes (New_FrameClock).
  *
  * removeParentRef and notifyParents are overridden only to keep
