@@ -1328,16 +1328,10 @@ void Entity__CueStutterTodMaybeTall(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         dayYearPhase =
             ((DreamSys *)self->peer)->methods->getCurrentDayAndYear((DreamSys *)self->peer, 0) % 3;
-        if (dayYearPhase == 0) {
-            if (rand() % 3 != 0) {
-                goto skipScaleBump;
-            }
-        } else if (dayYearPhase != 2) {
-            goto skipScaleBump;
+        if (dayYearPhase == 0 ? rand() % 3 == 0 : dayYearPhase == 2) {
+            self->methods->updateScale(self, 1, sScaleY4);
         }
-        self->methods->updateScale(self, 1, sScaleY4);
     }
-skipScaleBump:
     if (out->tick % 22 == 0) {
         out->attenuation = self->methods->getProximityRatio(self);
         out->slots[0].program = 2;
@@ -1520,16 +1514,10 @@ void Entity__CueWatchDreamerMaybeGiant(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         dayYearPhase =
             ((DreamSys *)self->peer)->methods->getCurrentDayAndYear((DreamSys *)self->peer, 0) % 3;
-        if (dayYearPhase == 0) {
-            if (rand() % 3 != 0) {
-                goto skipScaleBump;
-            }
-        } else if (dayYearPhase != 1) {
-            goto skipScaleBump;
+        if (dayYearPhase == 0 ? rand() % 3 == 0 : dayYearPhase == 1) {
+            self->methods->updateScale(self, 1, sScaleSix);
         }
-        self->methods->updateScale(self, 1, sScaleSix);
     }
-skipScaleBump:
     if (out->tick == 0) {
         out->attenuation = 0;
         out->slots[0].program = 18;
