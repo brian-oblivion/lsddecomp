@@ -4,7 +4,7 @@
  *
  * Declares the FadeBox class (object and method table), its channel-mask,
  * state, mode and event constants, and its methods, which are defined in
- * src/ui/screen_widgets.c.
+ * src/ui/fade_box.c.
  */
 #ifndef FADE_BOX_H
 #define FADE_BOX_H
@@ -84,7 +84,7 @@ struct FadeBoxMethods {
  * @brief A BoxFill whose colour ramps a step per update until a tick count runs out.
  *
  * Class id 0x164 (FADEBOX_CLASS_ID), method table gFadeBoxMethods, parent
- * BoxFill; methods in src/ui/screen_widgets.c; no subclasses. The ctor
+ * BoxFill; methods in src/ui/fade_box.c; no subclasses. The ctor
  * chains to BoxFill's ctor, then Reset stores the default channel mask and
  * a step of 10 and turns the box's display and semi-transparency off.
  *
@@ -158,7 +158,7 @@ extern FadeBoxMethods *GetFadeBoxMethods(void);
 /** The +0x040 reset slot's occupant, FadeBox__Reset, as the ctor calls it. */
 typedef void (*FadeBoxResetFn)(FadeBox *self, s32 channels);
 
-/* The class's own methods, in ROM order (screen_widgets.c). */
+/* The class's own methods, in ROM order (fade_box.c). */
 
 /**
  * @brief Allocates a FadeBox and runs its ctor through the method table.

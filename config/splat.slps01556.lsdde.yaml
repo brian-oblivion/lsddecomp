@@ -1337,7 +1337,7 @@ segments:
       - [0x30470, o, libgs/gs_108]      # GsSetLightMode  (was func_8003FC70)
       - [0x304FC, o, libgte/fgo_00]     # TransposeMatrix (was func_8003FCFC)
       - [0x3054C, o, libgte/fog_01]     # SetFogNear      (was func_8003FD4C)
-      - [0x305B0, c, ui/screen_widgets]
+      - [0x305B0, c, ui/fade_box]
       # (carve history; merged into ScreenWidgets above, round 100)
       # code_2cc8c_f: #30..#59, 0x30E64..0x3197C (psyq_memset follows, so no
       # data tail). Zero blocked functions.
@@ -1936,7 +1936,7 @@ segments:
       - [0x5EF30, .data, app/task_core]  # gTaskCoreMethods and its three constants
       - [0x5F078, .data, app/intermediate_base]  # gIntermediateBaseMethods
       - [0x5F0E4, .data, app/viewport]  # gViewportMethods
-      - [0x5F19C, .data, ui/screen_widgets]  # gFadeBoxMethods, its colour tables
+      - [0x5F19C, .data, ui/fade_box]  # gFadeBoxMethods, its colour tables
       - [0x5F2C0, .data, ui/box_fill]  # gBoxFillMethods
       - [0x5F390, .data, ui/text_row]  # gTextRowMethods
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)
