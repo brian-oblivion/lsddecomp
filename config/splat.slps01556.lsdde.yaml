@@ -1738,6 +1738,8 @@ segments:
       # are STRINGS referenced by symbol, which a standalone rodata object
       # resolves fine (the 0xA8C precedent), so no attach is expected; the
       # slice owns no `jtbl_` reference either.
+      # Actor, New_Actor (0x80056FE4) to GetActorMethods.
+      - [0x477E4, c, world/actor]
       # VariantSprite, New_VariantSprite (0x80057C94) to GetVariantSpriteMethods.
       - [0x48494, c, world/variant_sprite]
       # GraphRoom, New_GraphRoom (0x80057F68) to GetGraphRoomMethods: its own
