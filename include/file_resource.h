@@ -15,7 +15,7 @@
  * subclasses), the ResourceSource and ResourceRequest descriptors, the flag
  * bits the CD driver reports request completion with, and FileResource's own
  * methods, defined in src/app/game_shell.c. The functions that bind the
- * active driver into these tables are data_source.h's.
+ * active driver into these tables are data_source.h's (src/app/data_source.c).
  */
 
 typedef struct FileResource FileResource;

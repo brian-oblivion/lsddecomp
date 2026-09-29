@@ -377,8 +377,8 @@ void CdDriver__RunRequestQueue(void) {
 /*
  * The module level: the three request methods that are not per-request, the
  * queue's front end (EnqueueCdRequest), the driver mode, the file table, the
- * lock and the service tick. The game reaches it through game_shell.c's
- * data-source wrappers while the active data source is DATASOURCE_CD.
+ * lock and the service tick. The game reaches it through data_source.c's
+ * wrappers while the active data source is DATASOURCE_CD.
  */
 
 extern char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */

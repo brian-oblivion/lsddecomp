@@ -150,9 +150,9 @@ void NullDriver__NoOpSlot50(void) {}
  * sequence and libsnd's set-up), and the SoundCueSet functions
  * (include/sound_cue_set.h).
  *
- * NullDriver is the data source game_shell.c selects when it is not reading
+ * NullDriver is the data source data_source.c selects when it is not reading
  * the CD. GetNullDriverMode, SetNullDriverMode and
- * GetNullDriverUseVSyncCallback answer the queries game_shell.c's
+ * GetNullDriverUseVSyncCallback answer the queries data_source.c's
  * GetActiveDataSource* functions otherwise forward to CdDriver: they keep
  * the two mode words and report no VSync callback.
  */

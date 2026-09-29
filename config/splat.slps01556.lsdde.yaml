@@ -533,6 +533,8 @@ segments:
       # object reclassifies it. Text-only, no data sections, and nothing else
       # in the unit moves: strcat was already at the end, so this is a pure
       # suffix split with no new unit name and no rodata attach to move.
+      # The data-source layer, GetActiveDataSourceMethods (0x80026CAC) to BuildFileName.
+      - [0x174AC, c, app/data_source]
       - [0x17930, o, libc2/strcat]
       # code_179d8 was 274 functions and 44% blocker-dense in aggregate, but
       # the density is CLUSTERED, so the aggregate is a bad carve guide. A
@@ -1902,7 +1904,8 @@ segments:
       - [0x5DB38, o, libetc/intr_vb, .data]
       - [0x5DB60, o, libetc/vsync, .data]
       - [0x5DB70, .data, app/pad]  # gPadMethods
-      - [0x5DBC8, .data, app/game_shell]  # gGameApplicationMethods .. sDataSourceClientGetters
+      - [0x5DBC8, .data, app/game_shell]  # gGameApplicationMethods, gFileResourceMethods
+      - [0x5DCAC, .data, app/data_source]  # sDataSourceClientGetters
       - [0x5DCE8, .data, cd/cd_driver]  # gCdDriverMethods, sCdSeekEntry
       - [0x5DD7C, o, libcd/sys, .data]       # 0x80 -> 0x5DDFC; D_8006D5FC (game data) follows exactly
       - [0x5DDFC, data]

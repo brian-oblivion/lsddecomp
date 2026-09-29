@@ -34,7 +34,7 @@ struct NullDriverMethods {
  * DATASOURCE_NULL), a FileResource subclass and CdDriver's sibling. No class
  * derives from it.
  *
- * SetActiveDataSource (src/app/game_shell.c) binds this table's
+ * SetActiveDataSource (src/app/data_source.c) binds this table's
  * driver-interface slots into FileResource's table and every client table
  * whenever the active source is not DATASOURCE_CD, and
  * GetActiveDataSourceMethods returns it then, so with that source active the
@@ -89,7 +89,7 @@ void NullDriver__StopService(void);
 /** @brief Slot +0x074, cancelRequests: does nothing. */
 void NullDriver__CancelRequests(void);
 
-/* The driver's mode, as game_shell.c's data-source wrappers read and set it
+/* The driver's mode, as data_source.c's wrappers read and set it
  * (CdDriver's counterparts take a third argument). */
 
 /**

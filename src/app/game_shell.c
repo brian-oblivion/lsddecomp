@@ -1,56 +1,28 @@
 /*
- * game_shell.c -- two classes, in address order, and the layer on top of the
- * second:
+ * game_shell.c -- two classes, in address order:
  *  - GameApplication (include/game_application.h, which documents the class
  *    and the order its hooks run in): its allocator and ctor, the RNG seed
  *    and initSystems overrides, then each hook Application__RunMainLoop
  *    calls, with the helpers it uses, and the table getter;
  *  - FileResource (include/file_resource.h), the base of everything loaded
- *    from a file, then the active-data-source layer and the data directory
- *    (include/data_source.h).
- * The two method tables and the data-source clients' getter list end the
- * file.
+ *    from a file. The active-data-source layer on top of it follows in
+ *    data_source.c.
+ * The two method tables end the file.
  */
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
-#include <libgs.h>
 #include <libetc.h>
 #include "game_application.h"
 #include "dream_sys.h"
 #include "link_resource.h"
-#include "task_core.h"
 #include "stream_task.h"
 #include "graph_room.h"
 #include "title_menu.h"
 #include "day_task.h"
 #include "data_source.h"
-#include "null_driver.h"
-#include "cd_driver.h"
 #include "bmem_pmgr.h"
-#include "game_files.h"
-#include <strings.h>
 #include <stdio.h>
-#include "placement_grid.h"
-#include "tim_image.h"
-#include "tile_atlas.h"
-#include "tile_map.h"
-#include "tim_array_src.h"
-#include "tim_block_src.h"
-#include "vab_stream_obj.h"
-#include "requested_file.h"
-#include "lbd_file.h"
-#include "tod.h"
-#include "tod_set.h"
-#include "model_data.h"
-#include "trigger_world.h"
-
-/* The table getters of every class SetActiveDataSource rebinds, NULL-
- * terminated; defined at the end, right after gFileResourceMethods. */
-/* A class's table getter, as sDataSourceClientGetters lists them. */
-typedef void *(*MethodsGetterFn)(void);
-
-extern MethodsGetterFn sDataSourceClientGetters[];
 
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
 
@@ -344,12 +316,9 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
 }
 
 /*
- * FileResource's own methods (include/file_resource.h), then the
- * active-data-source layer on top of them and the data directory CD paths
- * are built in (include/data_source.h). strcat, which BuildFileName calls,
- * is Sony's libc2 object, linked after this file.
+ * FileResource's own methods (include/file_resource.h). The
+ * active-data-source layer on top of them follows in data_source.c.
  */
-
 
 void *FileResource__Release(FileResource *self) {
     self->freeGuard = 0;
@@ -427,186 +396,9 @@ FileResourceMethods *GetFileResourceMethods(void) {
     return &gFileResourceMethods;
 }
 
-extern s32 sActiveDataSource;
-
-FileResourceMethods *GetActiveDataSourceMethods(void) {
-    if (sActiveDataSource == DATASOURCE_NULL) {
-        return (FileResourceMethods *)GetNullDriverMethods();
-    } else {
-        return (FileResourceMethods *)GetCdDriverMethods();
-    }
-}
-
-ResourceRequest *ResourceRequest__Set(ResourceRequest *self, void *buffer, char *name, s32 mode) {
-    self->src.buffer = buffer;
-    self->src.name = name;
-    self->mode = mode;
-    return self;
-}
-
-/* Install a new active data source, then copy its method block
- * (CopyDataSourceSlots) into FileResource's own table and into the table of
- * every registered client. */
-void SetActiveDataSource(s32 source) {
-    FileResourceMethods *src;
-    FileResourceMethods *methods;
-    MethodsGetterFn getMethods;
-    MethodsGetterFn *entry;
-
-    entry = sDataSourceClientGetters;
-    sActiveDataSource = source;
-    if (source == DATASOURCE_CD) {
-        src = (FileResourceMethods *)GetCdDriverMethods();
-    } else {
-        src = (FileResourceMethods *)GetNullDriverMethods();
-    }
-    methods = GetFileResourceMethods();
-    /* MATCHING: gotos, because retail's loop is entered at its bottom test;
-     * a while or for loop tests at the top. */
-    goto copy;
-next:
-    entry++;
-    methods = getMethods();
-copy:
-    CopyDataSourceSlots(methods, src);
-    getMethods = *entry;
-    if (getMethods != NULL) {
-        goto next;
-    }
-}
-
-/* Copy the eleven data-source interface slots of one method table into
- * another: SetActiveDataSource's rebinding step. +0x05C..+0x064 are the
- * base's own and are not copied. */
-void CopyDataSourceSlots(FileResourceMethods *dst, FileResourceMethods *src) {
-    dst->slot40 = src->slot40;
-    dst->open = src->open;
-    dst->close = src->close;
-    dst->seek = src->seek;
-    dst->slot50 = src->slot50;
-    dst->read = src->read;
-    dst->loadFile = src->loadFile;
-    dst->runRequestQueue = src->runRequestQueue;
-    dst->requestLoadFile = src->requestLoadFile;
-    dst->stopService = src->stopService;
-    dst->cancelRequests = src->cancelRequests;
-}
-
-void LockActiveDataSource(void) {
-    if (sActiveDataSource == DATASOURCE_CD) {
-        LockCd();
-    }
-}
-
-void UnlockActiveDataSource(void) {
-    if (sActiveDataSource == DATASOURCE_CD) {
-        UnlockCd();
-    }
-}
-
-s32 IsActiveDataSourceBusy(void) {
-    if (sActiveDataSource == DATASOURCE_CD) {
-        return IsCdBusy();
-    }
-    return 0;
-}
-
-s32 IsActiveDataSourceIdle(void) {
-    if (sActiveDataSource == DATASOURCE_CD) {
-        return IsCdIdle();
-    }
-    return 1;
-}
-
-s32 GetActiveDataSourceOperation(void) {
-    if (sActiveDataSource == DATASOURCE_CD) {
-        return GetCdOperation();
-    }
-    return 0;
-}
-
-s32 GetActiveDataSourceState(void) {
-    if (sActiveDataSource == DATASOURCE_CD) {
-        return GetCdState();
-    }
-    return 0;
-}
-
-typedef s32 (*DataSourceSetDriverModeFn)(s32, s32, s32);
-
-/* SetNullDriverMode takes two arguments and SetCdDriverMode three. Both are
- * called through the three-argument type, and the VAB driver ignores the
- * third. Assigning SetNullDriverMode to `fn` warns about incompatible pointer
- * types, and that is harmless. */
-
-void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
-    DataSourceSetDriverModeFn fn;
-
-    fn = SetNullDriverMode;
-    if (sActiveDataSource == DATASOURCE_CD) {
-        fn = SetCdDriverMode;
-    }
-    /* Retry until the driver accepts: SetCdDriverMode refuses while sCdBusy. */
-    do {
-    } while (fn(async, mode2, useVSyncCallback) == 0);
-}
-
-s32 GetActiveDataSourceDriverMode(s32 *outMode2) {
-    if (sActiveDataSource == DATASOURCE_CD) {
-        return GetCdDriverMode(outMode2);
-    } else {
-        return GetNullDriverMode(outMode2);
-    }
-}
-
-s32 GetActiveDataSourceUseVSyncCallback(void) {
-    if (sActiveDataSource == DATASOURCE_CD) {
-        return GetCdUseVSyncCallback();
-    } else {
-        return GetNullDriverUseVSyncCallback();
-    }
-}
-
-extern s32 sFileTableRegistered;
-
-s32 RegisterFileTableEntries(CdFileEntry *table, s32 count) {
-    s32 first;
-
-    if (sActiveDataSource == DATASOURCE_CD) {
-        sFileTableRegistered = 1;
-        SetFileTable(table);
-        first = GetFileTableCount();
-        SetFileTableCount(first + count);
-        return ResolveFileEntries(&table[first], count);
-    }
-    return 1;
-}
-
-extern char *sDataDirectory;
-
-void SetDataDirectory(char *dir) {
-    sDataDirectory = dir;
-}
-
-char *GetDataDirectory(void) {
-    return sDataDirectory;
-}
-
-char *BuildFileName(char *dest, char *name, char *dir, char *ext) {
-    dest[0] = '\0';
-    if (dir != NULL) {
-        strcat(dest, dir);
-    }
-    strcat(dest, name);
-    strcat(dest, ext);
-    return dest;
-}
-
-/* The two classes' method tables, then the getters of every class
- * SetActiveDataSource rebinds. A (void *) entry is a function whose declared
- * type differs from its slot's: a method inherited from a parent class and
- * declared on the parent's type, or a table getter returning its own class's
- * table type. */
+/* The two classes' method tables. A (void *) entry is a function whose
+ * declared type differs from its slot's: a method inherited from a parent
+ * class and declared on the parent's type. */
 
 /* GameApplication (include/game_application.h): Application's table with
  * the ctor, the RNG seed and initSystems, then the hooks
@@ -676,24 +468,4 @@ FileResourceMethods gFileResourceMethods = {
     /* +0x070 stopService */ NULL,
     /* +0x074 cancelRequests */ NULL,
     /* +0x078 processBuffer */ NULL,
-};
-
-/* The table getter of every data-source client, NULL-terminated.
- * SetActiveDataSource rebinds each table's file-I/O slots. */
-MethodsGetterFn sDataSourceClientGetters[] = {
-    (void *)GetPlacementGridMethods,
-    (void *)GetTimImageMethods,
-    (void *)GetTileAtlasMethods,
-    (void *)GetTileMapMethods,
-    (void *)GetTimArraySrcMethods,
-    (void *)GetTimBlockSrcMethods,
-    (void *)GetLinkResourceMethods,
-    (void *)GetVabStreamObjMethods,
-    (void *)GetRequestedFileMethods,
-    (void *)GetLbdFileMethods,
-    (void *)GetTodMethods,
-    (void *)GetTodSetMethods,
-    (void *)GetModelDataMethods,
-    (void *)GetTriggerWorldMethods,
-    NULL,
 };
