@@ -41,7 +41,7 @@ struct StreamTaskMethods {
                                 BasicClass *sound, DrawRect *initData));
     /* +0x124 */ void (*setKeepActive)(StreamTask *self, s32 keepActive); /**< @see StreamTask__SetKeepActive */
     /* +0x128 */ void (*setLoopCount)(StreamTask *self, s32 count); /**< @see StreamTask__SetLoopCount */
-    /* +0x12C */ void (*setSkipOnConfirm)(StreamTask *self, s32 enable); /**< @see StreamTask__SetSkipOnConfirm; game_shell.c passes 0 */
+    /* +0x12C */ void (*setSkipOnConfirm)(StreamTask *self, s32 enable); /**< @see StreamTask__SetSkipOnConfirm; game_application.c passes 0 */
     /* +0x130 */ void (*setUnkD0)(StreamTask *self, s32 value); /**< @see StreamTask__SetUnkD0 */
     /* +0x134 */ void (*setAbortBeforeFade)(StreamTask *self, s32 enable); /**< @see StreamTask__SetAbortBeforeFade */
 };
@@ -54,7 +54,7 @@ struct StreamTaskMethods {
  *
  * What it does: it owns a MoviePlayer (`player`, movie_player.h) and runs one
  * "ETC\*.STR" stream through it inside TaskCore's fade/state machine. Every
- * caller is game_shell.c's GameApplication (intro logo, opening, special day
+ * caller is game_application.c's GameApplication (intro logo, opening, special day
  * and cinematic streams): New_StreamTask(NULL, NULL, NULL, NULL), optionally
  * setFrameBound / setSkipOnConfirm(0), then init with the stream, then
  * release. It calls the player's play, advance, abort, setAutoPlay and

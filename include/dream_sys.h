@@ -237,7 +237,7 @@ struct TimImage;
  * getter GetDreamSysMethods; an Actor subclass (include/actor.h) whose ctor
  * calls Actor's first, and no class derives from it. Every method is in
  * src/world/dream_sys.c. One instance, made by GameApplication__GameApplication
- * (src/app/game_shell.c, New_DreamSys) and kept in GameApplication::dreamSys;
+ * (src/app/game_application.c, New_DreamSys) and kept in GameApplication::dreamSys;
  * the same object is GraphRoom::dreamSys, the `target` objm.c hands
  * SetDreamAuxWorld (dream_aux.c's sDreamAuxWorld), and the `peer` every
  * Entity links to. The object is 0x928 bytes (New_DreamSys); Actor's fields

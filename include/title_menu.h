@@ -58,7 +58,7 @@ struct TitleMenuMethods {
  * save title ("LSD   Day001") is shown as a TextRow. src/ui/title_menu.c
  * holds the allocator, the ctor, every other method and the getter.
  *
- * Who makes one: GameApplication__RunTitleMenu (src/app/game_shell.c) runs
+ * Who makes one: GameApplication__RunTitleMenu (src/app/game_application.c) runs
  * it with GameApplication__RunTask(New_TitleMenu, dreamSys, ...) after the
  * day's GraphRoom; while it returns 2 (GRAPH) it runs GraphRoom again and
  * then the menu again.

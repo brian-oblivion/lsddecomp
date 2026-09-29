@@ -3,10 +3,10 @@
  * @brief DayTask, the task that runs one day of the dream, its method
  *        table, and the phases and results it moves through; and
  *        RegisterRecordTableFiles, the record-table registration its ctor
- *        and the image-view callback in src/app/game_shell.c run.
+ *        and the image-view callback in src/app/game_application.c run.
  *
  * Application__RunMainLoop (src/app/application.c) calls
- * GameApplication__RunDayTask (src/app/game_shell.c) when the GraphRoom poll
+ * GameApplication__RunDayTask (src/app/game_application.c) when the GraphRoom poll
  * returns 2, and that builds one with New_DayTask(the application's
  * IntermediateBaseInitArgs, its DreamSys, config->dayTaskSyncDriver), runs
  * its init to completion, acts on the DayTaskResult init returns and

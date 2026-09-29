@@ -9,7 +9,7 @@
  * logos, movies, title menu and days the outer loop runs.
  *
  * Declares the class, its configuration record and its methods, defined in
- * src/app/game_shell.c.
+ * src/app/game_application.c.
  */
 
 typedef struct GameApplication GameApplication;
@@ -60,7 +60,7 @@ struct GameApplicationMethods {
  * runMainLoop, which never returns. Application brings the console up and
  * owns the outer loop; this class fills the loop's six hooks with the game's
  * sequence and owns the game's DreamSys (dream_sys.h). Class id 0x1F60,
- * method table gGameApplicationMethods; methods in src/app/game_shell.c. No
+ * method table gGameApplicationMethods; methods in src/app/game_application.c. No
  * class derives from it.
  *
  * Lifecycle:

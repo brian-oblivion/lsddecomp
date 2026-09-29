@@ -45,7 +45,7 @@ GameApplication *New_GameApplication(GameApplicationConfig *config) {
     return NULL;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/app/game_shell", New_GameApplication);
+INCLUDE_ASM("asm/nonmatchings/app/game_application", New_GameApplication);
 #endif
 
 /* ctor: Application's ctor with config->dataSource, this table, the config
