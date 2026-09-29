@@ -1,7 +1,7 @@
 /*
  * vab_sound.c -- two subjects in one file: PlacementGrid, then the
- * VAB sound backend (NullDriver, VabStreamObj and the SoundCueSet's init,
- * flush and per-tick service), with ReturnZero between them.
+ * VAB sound backend (NullDriver and VabStreamObj), with ReturnZero between
+ * them. The SoundCueSet functions follow in sound_cue_set.c.
  *
  * PlacementGrid (include/placement_grid.h), New_PlacementGrid to
  * GetPlacementGridMethods: the model placements of one map chunk's 20 x 20
@@ -17,14 +17,11 @@
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
-#include <libgs.h>
 #include "null_driver.h"
 #include "placement_grid.h"
 #include "link_resource.h"
 #include "stage_map.h"
 #include <libsnd.h>
-#include "vab_stream_obj.h"
-#include "sound_cue_set.h"
 #include "bmem_pmgr.h"
 #include <strings.h>
 #include "wbgm.h"
@@ -147,8 +144,7 @@ void NullDriver__NoOpSlot50(void) {}
  * The VAB sound backend: the rest of NullDriver's empty slots and its mode
  * accessors (include/null_driver.h), the VabStreamObj class
  * (include/vab_stream_obj.h, whose class documentation describes the load
- * sequence and libsnd's set-up), and the SoundCueSet functions
- * (include/sound_cue_set.h).
+ * sequence and libsnd's set-up).
  *
  * NullDriver is the data source data_source.c selects when it is not reading
  * the CD. GetNullDriverMode, SetNullDriverMode and
@@ -381,10 +377,6 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
     }
 }
 
-/* PlayTone's packed index: program << VAB_TONE_BITS | tone. */
-#define VAB_TONE_BITS 4
-#define VAB_TONES_PER_PROG 16
-
 /* Key on the tone a packed index names, at vol, and ramp it to endVol.
  * Returns the voice, or VAB_NO_VOICE. */
 s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 vol, s32 endVol) {
@@ -473,95 +465,6 @@ s32 GetOpenVabCount(void) {
 
 s32 GetSsTicksPerSecond(void) {
     return sSsTicksPerSecond;
-}
-
-s32 InitSoundCueSet(VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
-                    SoundCueCallbackFn callback) {
-    SoundCueSlot *slot;
-    s32 count;
-    s32 sentinel;
-
-    if (set->tag != 0) {
-        return 0;
-    }
-    slot = set->slots;
-    sentinel = VAB_NO_VOICE;
-    count = ARRAY_COUNT(set->slots) - 1;
-    set->tag = tag;
-    set->owner = owner;
-    set->callback = callback;
-    do {
-        slot->voice = sentinel;
-        count--;
-        slot++;
-    } while (count >= 0);
-    set->tick = 0;
-    set->attenuationSteps = SOUND_CUE_ATTENUATION_STEPS;
-    return 1;
-}
-
-void FlushSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
-    s32 i;
-    SoundCueSlot *slot;
-
-    slot = set->slots;
-    for (i = 0; i < ARRAY_COUNT(set->slots); i++) {
-        if (slot->voice >= 0) {
-            slot->voice = sound->methods->stopVoice(sound, slot->voice);
-        }
-        slot++;
-    }
-    set->tag = 0;
-}
-
-void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
-    s32 i;
-    SoundCueSlot *slot;
-    s32 vol;
-    s32 endVol;
-    s32 toneIndex;
-
-    if (set->tag > 0) {
-        /* MATCHING: both loops are do-whiles, entered without a test; a for loop adds
-         * a test on entry. This one also steps its count first in the body. */
-        i = 0;
-        slot = &set->slots[0];
-        do {
-            i++;
-            slot->program = SOUND_CUE_NONE;
-            slot->octave = 0;
-            slot->vol = SOUND_CUE_DEFAULT_VOL;
-            slot->endVol = SOUND_CUE_DEFAULT_END_VOL;
-            slot++;
-        } while (i < ARRAY_COUNT(set->slots));
-
-        set->attenuation = 0;
-        if (set->callback != NULL) {
-            set->callback(set->owner, set);
-        }
-
-        if (set->attenuation >= 0) {
-            slot = &set->slots[0];
-            i = 0;
-            do {
-                if (slot->program >= 0) {
-                    if (slot->voice >= 0) {
-                        sound->methods->stopVoice(sound, slot->voice);
-                    }
-                    sound->methods->setPitchOffset(sound, slot->octave);
-                    toneIndex = slot->program * VAB_TONES_PER_PROG;
-                    vol = slot->vol - (slot->vol / set->attenuationSteps) * set->attenuation;
-                    endVol = slot->endVol - (slot->endVol / set->attenuationSteps) * set->attenuation;
-                    slot->voice = sound->methods->playTone(sound, toneIndex, vol, endVol);
-                } else if (slot->program == SOUND_CUE_STOP && slot->voice >= 0) {
-                    sound->methods->stopVoice(sound, slot->voice);
-                }
-                i++;
-                slot++;
-            } while (i < ARRAY_COUNT(set->slots));
-        }
-        set->tick++;
-    }
 }
 
 /* The file's three method tables, in the order the image keeps them. A
