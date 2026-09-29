@@ -307,8 +307,8 @@ int CdStream__Sync(CdStream *self, int mode) {
 }
 
 /* The slot's type in cd_stream.h keeps its callers' (self, fn, arg), though
- * the body is empty and reads none of them.
- * MATCHING: a narrower slot type would change the callers' argument set-up. */
+ * the body is empty and reads none of them. */
+/* MATCHING: a narrower slot type would change the callers' argument set-up. */
 void CdStream__SetEndCallback(CdStream *self) {}
 
 CdStreamMethods *GetCdStreamMethods(void) {
