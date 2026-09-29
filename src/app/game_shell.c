@@ -48,7 +48,10 @@
 
 /* The table getters of every class SetActiveDataSource rebinds, NULL-
  * terminated; defined at the end, right after gFileResourceMethods. */
-extern void *(*sDataSourceClientGetters[])(void);
+/* A class's table getter, as sDataSourceClientGetters lists them. */
+typedef void *(*MethodsGetterFn)(void);
+
+extern MethodsGetterFn sDataSourceClientGetters[];
 
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
 
@@ -444,8 +447,8 @@ ResourceRequest *ResourceRequest__Set(ResourceRequest *self, void *buffer, char 
 void SetActiveDataSource(s32 source) {
     FileResourceMethods *src;
     FileResourceMethods *methods;
-    void *(*getMethods)(void);
-    void *(**entry)(void);
+    MethodsGetterFn getMethods;
+    MethodsGetterFn *entry;
 
     entry = sDataSourceClientGetters;
     sActiveDataSource = source;
@@ -674,7 +677,7 @@ FileResourceMethods gFileResourceMethods = {
 
 /* The table getter of every data-source client, NULL-terminated.
  * SetActiveDataSource rebinds each table's file-I/O slots. */
-void *(*sDataSourceClientGetters[])(void) = {
+MethodsGetterFn sDataSourceClientGetters[] = {
     (void *)GetPlacementGridMethods,
     (void *)GetTimImageMethods,
     (void *)GetTileAtlasMethods,

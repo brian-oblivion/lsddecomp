@@ -50,6 +50,7 @@ PREDEFINED             = "INCLUDE_ASM(dir, name)=" \
                          "CHARSPRITE_SLOTS(Self, CtorParams):=" \
                          "DAYTASK_FIELDS(Methods):=" \
                          "DAYTASK_SLOTS(Self, CtorParams):=" \
+                         "FILERESOURCE_BASE_SLOTS(Self, CtorParams):=" \
                          "FILERESOURCE_FIELDS(Methods):=" \
                          "FILERESOURCE_SLOTS(Self, CtorParams):=" \
                          "GRIDCELL_FIELDS(Methods):=" \
