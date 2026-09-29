@@ -107,7 +107,7 @@ struct TextEntryMethods {
  *   `panelSprite` (CARD\COMINPUT.TIM), the text row and the '_' cursor
  *   (CARD\FONTICON.TIM).
  *
- * Its one maker is TaskObjF__AttachTextEntry (title_menu.c, mode 1), which
+ * Its one maker is TaskObjF__AttachTextEntry (task_objf.c, mode 1), which
  * edits the memory-card save title and also drives
  * loadCardResources/attachTarget/detachTarget/release.
  *

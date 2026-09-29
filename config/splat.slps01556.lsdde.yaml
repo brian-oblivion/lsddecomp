@@ -260,7 +260,7 @@ segments:
       #   D_80011530  class_3bb8c_f       jtbl_8001157C/jtbl_80011594  _g
       #   D_800115D0  (unreferenced)      D_80011610/D_8001161C  class_3bb8c_h
       - [0x1C34, rodata]
-      - [0x1D7C, .rodata, ui/title_menu]   # jtbl_8001157C + jtbl_80011594
+      - [0x1D7C, .rodata, ui/task_objf]   # jtbl_8001157C + jtbl_80011594
       - [0x1DD0, rodata]
       # Split at the ownership boundary (third instance of the shared-slot
       # case this round -- see PARALLEL-RUNS Gate 2). Ownership, one grep per
@@ -1573,6 +1573,8 @@ segments:
       # 21, which sit in `psyq_*` segments -- but they are library code by
       # construction too, so the same remedy is the first thing to try there.
       # Six objects, 0x10 bytes each, tiling 0x410E8..0x41148 exactly:
+      # TaskObjF, New_TaskObjF (0x8004E2E0) to StampSaveTitleFileLetter; owns jtbl_8001157C and jtbl_80011594.
+      - [0x3EAE0, c, ui/task_objf]
       - [0x410E8, o, libapi/a51]        # lseek   (was func_800508E8)
       - [0x410F8, o, libapi/a54]        # close   (was func_800508F8)
       - [0x41108, o, libapi/a69]        # delete  (was func_80050908)
@@ -1980,7 +1982,8 @@ segments:
       - [0x76DC8, .data, world/day_task]  # gDayTaskMethods, DayTask's view points
       - [0x76E68, .data, world/timed_task]  # gTimedTaskMethods
       - [0x76EE8, .data, world/stage_map]  # gStageMapMethods, the chunk and footprint tables
-      - [0x771D8, .data, ui/title_menu]  # gNodeGuardedViewportMethods .. sCardIconRect: the title menu, the card messages
+      - [0x771D8, .data, ui/title_menu]  # gNodeGuardedViewportMethods .. sDisplayBufferRects: the title menu
+      - [0x775C4, .data, ui/task_objf]  # gTaskObjFMethods .. sCardIconRect: the memory card's messages
       - [0x776D0, .data, ui/input_dialogs]  # gTextEntryMethods, sTextEntryPanelRect
       - [0x77788, .data, ui/item_list]  # gItemListMethods, sItemListPanelRect
       - [0x77834, .data, world/objm]  # gObjMMethods, the view points, the per-stage pending extras

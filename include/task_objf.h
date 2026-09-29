@@ -5,7 +5,7 @@
  * Declares the TaskObjF class (object and method table), its operation and
  * state enums, the memory-card geometry constants and the structs of a save
  * file's header and icon, and TaskObjF's methods, which are defined in
- * src/ui/title_menu.c.
+ * src/ui/task_objf.c.
  */
 #ifndef TASK_OBJF_H
 #define TASK_OBJF_H
@@ -84,7 +84,7 @@ struct TaskObjFMethods {
  * @brief The memory-card save/load controller: checks the card, edits the title, picks and moves the file.
  *
  * Class id 0xB (TASKOBJF_CLASS_ID), method table gTaskObjFMethods, parent
- * BasicClass; no class below it. All its methods are in src/ui/title_menu.c.
+ * BasicClass; no class below it. All its methods are in src/ui/task_objf.c.
  *
  *  - The ctor runs InitCARD/StartCARD/_bu_init once per boot
  *    (sTaskObjFCount) and setCardSlot(cardSlot); +0x040..+0x068 wrap the
@@ -303,7 +303,7 @@ typedef struct McSaveHeader {
  * "Day", and a space goes after the day number. With none it only blanks
  * the letter field. TaskObjF__WriteMemcardSaveFile calls it before its
  * retry loop, and with no name when the loop gives up. Defined in
- * src/ui/title_menu.c.
+ * src/ui/task_objf.c.
  * @param titleText the full-width save title, "LSD   Day001" in layout.
  * @param fileName  the save file's name (namePrefix + "-NN"), or NULL.
  * @return a pointer into sSaveTitleGlyphs, which no caller reads.

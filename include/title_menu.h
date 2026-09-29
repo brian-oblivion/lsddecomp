@@ -176,6 +176,20 @@ extern TitleMenuMethods gTitleMenuMethods;
  */
 extern TitleMenuMethods *GetTitleMenuMethods(void);
 
+/** @name The save title's layout
+ * The save title is full-width (2-byte SJIS) characters. TitleMenu's (the
+ * buffer sSaveTitle points at) starts as "LSD   Day001", all full-width:
+ * "LSD" (0..2), the letter field (3..5: a space, the save file's letter, a
+ * space), "Day" (6..8), the day number (9..11), then padding.
+ * StampSaveTitleDay and StampSaveTitleFileLetter (task_objf.h) write it.
+ * @{ */
+#define SAVE_TITLE_LETTER_FIELD 3 /**< the letter field's first character */
+#define SAVE_TITLE_LETTER 4       /**< the save file's letter */
+#define SAVE_TITLE_DAY 9          /**< the day number's first digit */
+#define SAVE_TITLE_DAY_DIGITS 3   /**< the day number's width */
+#define SAVE_TITLE_PADDING 12     /**< where the padding starts */
+/** @} */
+
 /**
  * @brief Writes the day into the save title as three full-width digits (characters 9..11).
  *

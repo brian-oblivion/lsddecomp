@@ -121,7 +121,7 @@ struct ItemListMethods {
  * and two ticks later setState(ITEMLIST_STATE_REPORT) passes `result` to
  * notifyParents; the parent reads the chosen item with getCursorIndex.
  *
- * Lifecycle: its one maker is TaskObjF__AttachItemList (src/ui/title_menu.c):
+ * Lifecycle: its one maker is TaskObjF__AttachItemList (src/ui/task_objf.c):
  * New_ItemList(titles, ITEMLIST_MODE_FULLWIDTH), addChild, loadResources,
  * attachTarget(input source, tick source, sound); TaskObjF__DetachItemList
  * undoes it (detachTarget, releaseResources, release). The strings are the
