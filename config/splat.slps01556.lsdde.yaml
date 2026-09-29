@@ -1886,6 +1886,8 @@ segments:
       - [0x5FE84, data]
       - [0x5FFC8, o, libpress/vlc, .data]     # 0x18 -> 0x5FFE0 (dlabel D_8006F7E0)
       - [0x5FFE0, data]
+      - [0x71FE0, .data, cd/cd_stream]  # gCdStreamMethods
+      - [0x72060, data]                 # four CD-ROM register addresses, 0x1F801800..03
       - [0x72070, o, libcd/c_003, .data]      # 0x10 -> 0x72080 (dlabel D_80081870)
       - [0x72080, data]
       - [0x720A0, o, libcd/c_011, .data]      # 0x50 -> 0x720F0 (dlabel D_800818A0)

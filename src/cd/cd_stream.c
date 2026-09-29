@@ -9,7 +9,7 @@
  * nothing unless `self` is that stream, so only one CdStream streams at a
  * time. `state` (enum CdStreamState) runs open -> SEEKING -> startRead ->
  * READING -> stop -> STOPPED -> restart -> IDLE and seeks again; close tears
- * the stream down from any state.
+ * the stream down from any state. The method table ends the file.
  */
 #include "common.h"
 #include <libcd.h>
@@ -314,3 +314,42 @@ void CdStream__SetEndCallback(CdStream *self) {}
 CdStreamMethods *GetCdStreamMethods(void) {
     return &gCdStreamMethods;
 }
+
+/* CdStream's method table (include/cd_stream.h): BasicClass's slots with
+ * the ctor and finalize, then the stream's ring, open, seek, read, stop,
+ * mute and frame slots. A (void *) entry is a method declared on another
+ * type than its slot's. */
+CdStreamMethods gCdStreamMethods = {
+    CDSTREAM_CLASS_ID,
+    (void *)BasicClass__Release,
+    CdStream__CdStream,
+    CdStream__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    CdStream__SetRing,
+    CdStream__Open,
+    CdStream__Close,
+    CdStream__Seek,
+    CdStream__StartRead,
+    CdStream__Stop,
+    CdStream__Restart,
+    CdStream__NoOpSlot5C,
+    CdStream__NoOpSlot60,
+    CdStream__Mute,
+    CdStream__Demute,
+    CdStream__GetNextFrame,
+    CdStream__FreeRing,
+    CdStream__UnsetRing,
+    CdStream__ClearRing,
+    (void *)CdStream__SetEndCallback,
+};

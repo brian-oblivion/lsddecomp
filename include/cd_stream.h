@@ -13,6 +13,9 @@
 typedef struct CdStream CdStream;
 typedef struct CdStreamMethods CdStreamMethods;
 
+/** CdStream's class id (gCdStreamMethods word +0x000). */
+#define CDSTREAM_CLASS_ID 0x40
+
 /**
  * @brief CdStream::state. Open seeks (SEEKING), startRead reads (READING),
  * stop pauses the drive (STOPPED), restart goes back to IDLE and seeks again.
