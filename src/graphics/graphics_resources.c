@@ -1386,7 +1386,10 @@ void MoviePlayer__RequestRestart(MoviePlayer *self) {
  * runs out), else decode once started. */
 /* The original has no return statement when this player is not the active
  * one, or is neither starting nor started: the caller gets whatever result
- * was left over. */
+ * was left over. For an inactive player that is non-zero (StreamTask__Update's
+ * call leaves the slot's own address there), so StreamTask takes the movie as
+ * done and fades out; the body below says so with a 1. Neither starting nor
+ * started, it is the 0 just read from `started`. */
 #ifdef NON_MATCHING
 s32 MoviePlayer__Advance(MoviePlayer *self) {
     MoviePlayer *cur = sActiveMoviePlayer;
@@ -1409,7 +1412,7 @@ s32 MoviePlayer__Advance(MoviePlayer *self) {
         }
         return cur->methods->decodeFrame(cur);
     }
-    return 0;
+    return 1;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/graphics/graphics_resources", MoviePlayer__Advance);
