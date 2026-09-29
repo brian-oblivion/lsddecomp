@@ -1872,7 +1872,10 @@ segments:
       - [0x5DD7C, o, libcd/sys, .data]       # 0x80 -> 0x5DDFC; D_8006D5FC (game data) follows exactly
       - [0x5DDFC, data]
       - [0x5E138, o, libcd/iso9660, .data]   # 8 bytes (two 0x1F8010xx DMA register addresses) -> 0x5E140
-      - [0x5E140, data]
+      - [0x5E140, .data, sound/vab_sound]  # gPlacementGridMethods, gNullDriverMethods, gVabStreamObjMethods
+      - [0x5E2D4, data]
+      - [0x5EC8C, .data, sound/wbgm]  # gWBgmMethods
+      - [0x5ECF0, .data, app/application]  # gApplicationMethods
       - [0x5ED58, .data, graphics/tim_image]  # gTimImageMethods
       - [0x5EDF8, data]
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)

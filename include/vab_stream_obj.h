@@ -12,6 +12,9 @@
 typedef struct VabStreamObj VabStreamObj;
 typedef struct VabStreamObjMethods VabStreamObjMethods;
 
+/** VabStreamObj's class id (gVabStreamObjMethods word +0x000). */
+#define VABSTREAMOBJ_CLASS_ID 0xA03
+
 /**
  * @brief The two bytes of Sony's VagAtr (<libsnd.h>, 32 bytes) that PlayTone
  * reads, at VagAtr's own offsets. Kept reduced so this header does not bring

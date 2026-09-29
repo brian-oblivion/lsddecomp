@@ -12,6 +12,9 @@
 typedef struct NullDriver NullDriver;
 typedef struct NullDriverMethods NullDriverMethods;
 
+/** NullDriver's class id (gNullDriverMethods word +0x000). */
+#define NULLDRIVER_CLASS_ID 0x23
+
 /**
  * @brief NullDriver's method table: FileResource's slots up to +0x074
  * (FILERESOURCE_BASE_SLOTS), the eleven

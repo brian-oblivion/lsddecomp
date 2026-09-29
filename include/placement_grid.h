@@ -12,6 +12,9 @@
 typedef struct PlacementGrid PlacementGrid;
 typedef struct PlacementGridMethods PlacementGridMethods;
 
+/** PlacementGrid's class id (gPlacementGridMethods word +0x000). */
+#define PLACEMENTGRID_CLASS_ID 0xE03
+
 /**
  * @brief One placement record in a PlacementGrid's buffer, 12 bytes: each
  * cell's first record sits at buffer + 8 + cell * 12, and further records

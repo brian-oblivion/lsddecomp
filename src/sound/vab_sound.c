@@ -11,7 +11,8 @@
  * points at it.
  *
  * The type LinkResource's getModel is called through,
- * PlacementGridGetModelFn, is this file's own.
+ * PlacementGridGetModelFn, is this file's own. The three classes' method
+ * tables end the file.
  */
 #include "common.h"
 #include <libgte.h>
@@ -560,3 +561,126 @@ void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
         set->tick++;
     }
 }
+
+/* The file's three method tables, in the order the image keeps them. A
+ * (void *) entry is a function whose declared type differs from its slot's:
+ * a method inherited from a parent class and declared on the parent's type,
+ * or an empty method declared (void). */
+
+/* PlacementGrid (include/placement_grid.h): FileResource's table with the
+ * ctor, finalize and onRequestDone, and processBuffer's occupant,
+ * ResolveEntry. */
+PlacementGridMethods gPlacementGridMethods = {
+    PLACEMENTGRID_CLASS_ID,
+    (void *)FileResource__Release,
+    PlacementGrid__PlacementGrid,
+    PlacementGrid__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    PlacementGrid__OnRequestDone,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    PlacementGrid__ResolveEntry,
+};
+
+/* NullDriver (include/null_driver.h): FileResource's slots up to +0x074,
+ * the eleven data-source slots all empty. */
+NullDriverMethods gNullDriverMethods = {
+    NULLDRIVER_CLASS_ID,
+    (void *)FileResource__Release,
+    (void *)NullDriver__NullDriver,
+    (void *)NullDriver__Destroy,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NullDriver__NoOpSlot40,
+    (void *)NullDriver__Open,
+    (void *)NullDriver__Close,
+    (void *)NullDriver__Seek,
+    NullDriver__NoOpSlot50,
+    (void *)NullDriver__Read,
+    (void *)NullDriver__LoadFile,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    (void *)FileResource__OnRequestDone,
+    NullDriver__RunRequestQueue,
+    (void *)NullDriver__RequestLoadFile,
+    (void *)NullDriver__StopService,
+    (void *)NullDriver__CancelRequests,
+};
+
+/* VabStreamObj (include/vab_stream_obj.h): FileResource's table with the
+ * ctor, finalize, the load-state step as onRequestDone and OnBodyReady as
+ * processBuffer, then its voice slots. */
+VabStreamObjMethods gVabStreamObjMethods = {
+    VABSTREAMOBJ_CLASS_ID,
+    (void *)FileResource__Release,
+    VabStreamObj__VabStreamObj,
+    VabStreamObj__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    VabStreamObj__AdvanceLoadState,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    VabStreamObj__OnBodyReady,
+    VabStreamObj__LoadVagAttrs,
+    VabStreamObj__PlayTone,
+    VabStreamObj__StopVoice,
+    VabStreamObj__Mute,
+    VabStreamObj__Unmute,
+    VabStreamObj__NoOpSlot90,
+    VabStreamObj__NoOpSlot94,
+    VabStreamObj__NoOpSlot98,
+    VabStreamObj__SetPitchOffset,
+};
