@@ -129,8 +129,7 @@ was the linkStage column, read as a flat array); they are one symbol now.
 - **House style: one slot per line, each commented with its offset and
   field name** (`/* +0x008 */ Foo__Foo, /* ctor */`), as `item_list.c`
   and the world tables are. A reader looks a slot up by offset; a bare list
-  makes them count. (The graphics and rest tables went in bare, and are a
-  follow-up.)
+  makes them count. Every table in the tree is written this way.
 - **Unlabelled strings a table points at:** `tools/rename.py` refuses a
   name nothing references yet, so write the C with the `D_` name, let the
   link fail once, then rename. A label that sits at the wrong address (a
