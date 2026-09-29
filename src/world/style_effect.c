@@ -363,7 +363,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
         (u32)self->tick > MODEL_CHILD_DRIFT_DELAY) {
         slot = self->modelChildren;
         self->methods->updateRotation(self, 0, sSpinRotStep);
-        i = 0;
+        i = 0; /* MATCHING: set here, before the call; set in the for header the code differs */
         /* MATCHING: the step's pointer is taken after the call; taken earlier, the code differs */
         stepZ = &sModelChildDriftZ[tableIndex];
         extraZ = 0;
