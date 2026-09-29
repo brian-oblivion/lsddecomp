@@ -206,14 +206,17 @@ enum EntityActivateKind {
 /** deactivateKind: when Entity__UpdateDeactivationState deactivates an active
  * Entity. 0 and 3 make no test; 1 and 2 test as activateKind does; from
  * ENTITY_DEACTIVATE_TIMED up, it deactivates on the tick that equals
- * deactivateKind * 15. */
+ * deactivateKind * ENTITY_DEACTIVATE_TICK_UNIT. */
 enum EntityDeactivateKind {
     ENTITY_DEACTIVATE_NONE = 0, /**< never */
     ENTITY_DEACTIVATE_NEAR = 1, /**< while near */
     ENTITY_DEACTIVATE_FAR = 2,  /**< while not near */
     ENTITY_DEACTIVATE_NONE_ALT = 3, /**< never either: what sets it apart from 0 is not in Entity code */
-    ENTITY_DEACTIVATE_TIMED = 10 /**< and above: on tick deactivateKind * 15 */
+    ENTITY_DEACTIVATE_TIMED = 10 /**< and above: on tick deactivateKind * ENTITY_DEACTIVATE_TICK_UNIT */
 };
+
+/** A timed deactivateKind counts in steps of this many ticks. */
+#define ENTITY_DEACTIVATE_TICK_UNIT 15
 
 /** A linkStage of 127 ends the dream instead of linking: Entity__NotifyLinkStage
  * sends ENTITY_EFFECT_EVENT_VIDEO when the row has an eventVideo, else

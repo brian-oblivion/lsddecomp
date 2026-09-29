@@ -410,7 +410,7 @@ s32 Entity__UpdateDeactivationState(Entity *self) {
         if (row->deactivateKind != ENTITY_DEACTIVATE_NONE &&
             row->deactivateKind != ENTITY_DEACTIVATE_NONE_ALT) {
             if (row->deactivateKind >= ENTITY_DEACTIVATE_TIMED) {
-                if (self->tick == row->deactivateKind * 15) {
+                if (self->tick == row->deactivateKind * ENTITY_DEACTIVATE_TICK_UNIT) {
                     doDeactivate = 1;
                 }
             } else if (row->activeRange != 0) {
