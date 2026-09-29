@@ -599,7 +599,7 @@ u8 ScanTodPackets(Tod *self, u8 *out, u32 *tmdId, u32 *data) {
     s32 index;
 
     packetCount = ((TodFrame *)data)->packetCount;
-    data += 2;
+    data = ((TodFrame *)data)->packets;
     i = 0;
     created = 0;
     index = 0;
