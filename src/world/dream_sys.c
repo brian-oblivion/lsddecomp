@@ -2116,7 +2116,7 @@ s32 DreamSys__TickStaircaseYawMinus90(DreamSys *self) {
             (self->staircaseFrame >= 15 && self->staircaseFrame < 17)) {
             self->methods->updateRotation(self, 0, sRotationYawMinus45);
         }
-        flag = (u32)self->staircaseFrame < 9;
+        flag = (self->staircaseFrame >= 0 && self->staircaseFrame < 9);
     }
     if (flag) {
         self->lookOffsetCommand = LOOK_OFFSET_COMMAND_DOWN;
@@ -2365,7 +2365,7 @@ void DreamSys__AddFlashback(DreamSys *self, s32 stage, PlayerSpawnPoint *pos, s3
     if (self->amountFlashbacksAvailable < ARRAY_COUNT(self->storedFlashbacks)) {
         entry += self->amountFlashbacksAvailable++;
     } else {
-        entry += (u32)self->tick % 9;
+        entry += (u32)self->tick % 9; /* MATCHING: an unsigned remainder, as retail takes it */
     }
     entry->stageID = stage;
     entry->position = *pos;
