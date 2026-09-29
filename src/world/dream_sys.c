@@ -1025,11 +1025,11 @@ s32 DreamSys__StartDay(DreamSys *self) {
 
 s32 DreamSys__EndDay(DreamSys *self, s32 outcome) {
     self->currentDay = self->storedDay;
-    if (!self->isFlashbackSession && outcome == 0) {
+    if (!self->isFlashbackSession && outcome == DAY_OUTCOME_ENDED) {
         self->methods->calcUnlockScore(self);
         self->methods->updateDreamChart(self, &self->moodPreviousDays[self->currentDay]);
         self->methods->advanceDay(self);
-    } else if (outcome == 2) {
+    } else if (outcome == DAY_OUTCOME_NEW_GAME) {
         self->methods->initNewGame(self);
         self->newGamePending = 1;
     }

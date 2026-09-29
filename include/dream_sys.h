@@ -816,14 +816,21 @@ s32 DreamSys__AdvanceDay(DreamSys *self);
  */
 s32 DreamSys__StartDay(DreamSys *self);
 
+/** EndDay's `outcome`: how DayTask's dream ended. */
+enum DreamSysDayOutcome {
+    DAY_OUTCOME_ENDED = 0,   /**< the dream ended normally: the day is scored and advanced */
+    DAY_OUTCOME_CLOSED = 1,  /**< closed with the pause overlay up (OBJM_NOTIFY_CLOSE) */
+    DAY_OUTCOME_NEW_GAME = 2 /**< closed likewise into a new game (OBJM_NOTIFY_CLOSE_NEW_GAME) */
+};
+
 /**
  * @brief Slot +0x1B8: ends a dream. Restores the day StartDay began (a
- *        flashback moves it); outside a flashback session, outcome 0 scores
- *        the unlock progress, logs the day's mood into moodPreviousDays and
- *        advances the day, and outcome 2 starts a new game.
+ *        flashback moves it); outside a flashback session,
+ *        DAY_OUTCOME_ENDED scores the unlock progress, logs the day's mood
+ *        into moodPreviousDays and advances the day, and
+ *        DAY_OUTCOME_NEW_GAME starts a new game.
  * @param self    The DreamSys.
- * @param outcome 0 the dream ended normally, 1 closed, 2 closed into a new
- *                game.
+ * @param outcome An enum DreamSysDayOutcome.
  * @return isFlashbackSession.
  */
 s32 DreamSys__EndDay(DreamSys *self, s32 outcome);

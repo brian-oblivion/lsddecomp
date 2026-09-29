@@ -204,7 +204,7 @@ void DayTask__AdvancePhase(DayTask *self, BasicClass *sender, s32 event) {
             case DAYTASK_PHASE_READY:
                 result = self->dreamSys->methods->startDay(self->dreamSys);
                 if (result < 0) {
-                    self->dreamSys->methods->endDay(self->dreamSys, 0);
+                    self->dreamSys->methods->endDay(self->dreamSys, DAY_OUTCOME_ENDED);
                     self->result = DAYTASK_RESULT_CINEMATIC;
                     self->methods->setState(self, INTERMEDIATEBASE_STATE_STOP);
                     return;
@@ -242,7 +242,7 @@ void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event) {
         case OBJM_STATE_TIME_UP:
             self->objM->methods->deinit(self->objM);
             self->objM->methods->release(self->objM);
-            result = self->dreamSys->methods->endDay(self->dreamSys, 0);
+            result = self->dreamSys->methods->endDay(self->dreamSys, DAY_OUTCOME_ENDED);
             if (result == 0) {
                 cinematic = self->dreamSys->methods->getCinematic(self->dreamSys);
                 self->result = cinematic.entry < 0 ? DAYTASK_RESULT_ENDED : DAYTASK_RESULT_CINEMATIC;
@@ -262,8 +262,8 @@ void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event) {
         case OBJM_NOTIFY_CLOSE_NEW_GAME:
             self->objM->methods->deinit(self->objM);
             self->objM->methods->release(self->objM);
-            /* endDay(1) on CLOSE, endDay(2) (a new game) on CLOSE_NEW_GAME */
-            self->dreamSys->methods->endDay(self->dreamSys, event != OBJM_NOTIFY_CLOSE ? 2 : 1);
+            self->dreamSys->methods->endDay(
+                self->dreamSys, event != OBJM_NOTIFY_CLOSE ? DAY_OUTCOME_NEW_GAME : DAY_OUTCOME_CLOSED);
             self->result = DAYTASK_RESULT_CLOSED;
             self->methods->setState(self, INTERMEDIATEBASE_STATE_STOP);
             break;
