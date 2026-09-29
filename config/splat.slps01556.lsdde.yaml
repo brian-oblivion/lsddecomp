@@ -1350,6 +1350,8 @@ segments:
       - [0x3311c, c, graphics/flat_light_obj]       # game code (revision 18; was psyq_3311c)
       - [0x3328C, o, libgs/gs_107]     # GsSetFlatLight, gte_set_lc, gte_read_lc
       - [0x33808, c, graphics/graphics_resources] # game code (revision 18; was the head of psyq_33808)
+      # Tod, New_Tod (0x80043E84) to GetTodMethods.
+      - [0x34684, c, graphics/tod]
       # BgLayer, New_BgLayer (0x800441B4) to GetBgLayerMethods.
       - [0x349B4, c, graphics/bg_layer]
       # ModelData, New_ModelData (0x8004468C) to GetModelDataMethods.
@@ -1916,7 +1918,8 @@ segments:
       - [0x5F750, .data, graphics/frame_clock]  # gFrameClockMethods
       - [0x5F7AC, .data, graphics/light_rig]  # gLightRigMethods
       - [0x5F86C, .data, graphics/flat_light_obj]  # gFlatLightObjMethods
-      - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods .. gTodMethods
+      - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods .. gTimArraySrcMethods
+      - [0x5FA40, .data, graphics/tod]  # gTodMethods
       - [0x5FAC4, .data, graphics/bg_layer]  # gBgLayerMethods
       - [0x5FB84, .data, graphics/model_data]  # gModelDataMethods
       - [0x5FC0C, .data, graphics/trigger_world]  # gTriggerWorldMethods

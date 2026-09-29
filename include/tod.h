@@ -125,7 +125,7 @@ struct TodMethods {
  * id 0x4F03 sits under TimBlockSrc's 0xF03, the ctor chains to
  * GetActiveDataSourceMethods()->ctor, so it is TimBlockSrc's sibling and
  * carries none of its layout. One subclass, TodSet, which builds a Tod over
- * each TOD in its buffer. Methods in src/graphics/graphics_resources.c. The
+ * each TOD in its buffer. Methods in src/graphics/tod.c. The
  * object is 0x2C bytes (New_Tod).
  */
 struct Tod {
