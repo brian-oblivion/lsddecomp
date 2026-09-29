@@ -463,6 +463,8 @@
     },
     "14": {
       "checklist": {
+        "data-graphics": true,
+        "data-rest": true,
         "data-setup": true,
         "data-world": true
       },
