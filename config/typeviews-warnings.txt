@@ -24,7 +24,7 @@ vab_sound: warning: unused variable `unused'
 scene_node: warning: unused variable `pad'
 scene_node: warning: unused variable `unused'
 char_sprite: warning: unused variable `pad'
-task: warning: assignment from incompatible pointer type
+task_core: warning: assignment from incompatible pointer type
 title_menu: warning: `state' might be used uninitialized in this function
 title_menu: warning: control reaches end of non-void function
 tmd_model: warning: `p' might be used uninitialized in this function

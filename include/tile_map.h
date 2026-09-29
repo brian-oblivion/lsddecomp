@@ -55,7 +55,7 @@ struct TileMapMethods {
  * Methods in src/graphics/tile_map.c. The object is 0x44 bytes
  * (New_TileMap).
  *
- * Its one builder is TaskCore__TaskCore (src/app/task.c): New_TileAtlas(0),
+ * Its one builder is TaskCore__TaskCore (src/app/task_core.c): New_TileAtlas(0),
  * then New_TileMap(0, atlas), then New_BgLayer(tileMap, BGLAYER_MODE_SCREEN); TaskCore__Finalize
  * releases the three.
  */

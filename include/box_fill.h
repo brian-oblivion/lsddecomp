@@ -143,7 +143,7 @@ struct BoxFillMethods {
  *  - +0x04C attachToParent: BoxFill__AttachToParent's third argument is a
  *    BoxFillPos screen position where SceneNode's slot types a LongVec3
  *    offset. Callers cast to BoxFillAttachToParentFn (the style layer in
- *    style_layer.c, task.c) or, through a SceneNode pointer, cast the
+ *    style_layer.c, task_core.c) or, through a SceneNode pointer, cast the
  *    argument (Viewport__SetFadeBox). BoxFill__AttachAbsolute passes it a
  *    fourth argument, which it ignores.
  * The ctor returns nothing where SceneNode's slot returns `void *`; every

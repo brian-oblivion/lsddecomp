@@ -165,7 +165,7 @@ segments:
       # its references the other way. That remainder is renamed by each
       # carve of this block (code_2cc8c_b -> code_2cc8c_c in round 11), so
       # the owning function is named here rather than the segment.
-      - [0x1890, .rodata, app/task]
+      - [0x1890, .rodata, app/task_core]
       # 0x1908 holds jtbl_80011108, func_8003FB1C's jump table. ATTACHED to
       # code_2cc8c_e in round 14 when that segment was carved: its words are
       # `.L` labels LOCAL to func_8003FB1C's own .s file, which a standalone
@@ -1291,6 +1291,8 @@ segments:
       # (func_8003FB1C) and D_80011194 (func_8003FC70) are both still in the
       # unit, which now starts at 0x3030C / func_8003FB0C.
       #   ^ ROUND 34: the first half of that is no longer true -- see below.
+      # TaskCore, New_TaskCore (0x8003BE94) to GetDefaultMovieFrame; owns jtbl_80011090 and jtbl_800110D0.
+      - [0x2C694, c, app/task_core]
       # IntermediateBase, IntermediateBase__IntermediateBase (0x8003DFDC) to GetIntermediateBaseMethods.
       - [0x2E7DC, c, app/intermediate_base]
       # Viewport, New_Viewport (0x8003E5D8) to GetRootNode; drawNode is in viewport_draw.
@@ -1924,7 +1926,8 @@ segments:
       - [0x5EC8C, .data, sound/wbgm]  # gWBgmMethods
       - [0x5ECF0, .data, app/application]  # gApplicationMethods
       - [0x5ED58, .data, graphics/tim_image]  # gTimImageMethods
-      - [0x5EDF8, .data, app/task]  # gStreamTaskMethods .. sTaskCoreViewOrigin
+      - [0x5EDF8, .data, app/task]  # gStreamTaskMethods
+      - [0x5EF30, .data, app/task_core]  # gTaskCoreMethods and its three constants
       - [0x5F078, .data, app/intermediate_base]  # gIntermediateBaseMethods
       - [0x5F0E4, .data, app/viewport]  # gViewportMethods
       - [0x5F19C, .data, ui/screen_widgets]  # gFadeBoxMethods .. gTextRowMethods
