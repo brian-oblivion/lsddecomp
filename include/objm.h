@@ -32,9 +32,9 @@ struct TextRow;
  * @brief The day's scene style, a plain record (ObjM::styleConfig).
  *
  * RegisterStyleConfig returns sStyleConfig after FillStyleFromConfig fills
- * its last four words from the stage's config bytes (dream_scene.c, whose
- * local StyleM views the same words), or InitStyleAndWorld's caller supplies
- * one. ObjM__SetupSceneStyle hands the first three to the StageMap's lights,
+ * its last four words from the stage's config bytes (the style layer,
+ * src/world/style_layer.c), or InitStyleAndWorld's caller supplies one.
+ * ObjM__SetupSceneStyle hands the first three to the StageMap's lights,
  * ObjM__EnterStyleSession the rest to the viewport, ObjM__PollTimBlockLoad a
  * colour to the TimBlockSrc.
  */
