@@ -462,7 +462,9 @@
       "status": "auto"
     },
     "14": {
-      "checklist": {},
+      "checklist": {
+        "data-setup": true
+      },
       "reason": "",
       "status": "auto"
     },
