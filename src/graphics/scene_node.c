@@ -788,22 +788,22 @@ void SceneNode__NoOpSlotB0(void) {}
 
 /* Adds this node as a child (addChild) to every parent of `node` that is
  * an Actor. */
-/* MATCHING: two nested do/while loops, not a goto loop, so SCENENODE_CLASS_ID is set up once,
- * before both */
 void SceneNode__AddToActorParents(SceneNode *self, void *node) {
     SceneNode *parent;
     void *cursor;
 
     parent = NULL;
     do {
-        do {
+        for (;;) {
             BasicClass__GetNextParentRef(node, (BasicClass **)&parent, (BasicClassListNode **)&cursor);
             if (parent != NULL && (parent->methods->header & CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID) {
-                goto found;
+                break;
             }
-        } while (cursor != NULL);
-        parent = NULL;
-    found:
+            if (cursor == NULL) {
+                parent = NULL;
+                break;
+            }
+        }
         if (parent != NULL && (u8)parent->methods->header == ACTOR_CLASS_ID) {
             parent->methods->addChild(parent, (BasicClass *)self);
         }
