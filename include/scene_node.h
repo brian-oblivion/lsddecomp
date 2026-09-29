@@ -669,6 +669,7 @@ extern s32 GetSetHitHeightGate(s32 value);
  * SceneNode attribute setters (src/graphics/scene_node.c) replace. */
 #define ATTR_LDIM_SHIFT 0      /**< GsLDIM0..GsLDIM7, 3 bits */
 #define ATTR_LIGHTMODE_SHIFT 3 /**< GsFOG|GsMATE|GsLLMOD, 3 bits */
+#define ATTR_LLMOD_SHIFT 5     /**< GsLLMOD, the light mode's top bit */
 #define ATTR_LOFF_SHIFT 6      /**< GsLOFF */
 #define ATTR_ZIGNR_SHIFT 7     /**< GsZIGNR */
 #define ATTR_NBACKC_SHIFT 8    /**< GsNBACKC */
