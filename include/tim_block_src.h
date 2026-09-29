@@ -74,7 +74,7 @@ struct TimBlockSrcMethods {
  * Parent FileResource, through the active data-source driver. The classes
  * whose ids sit under 0xF03 (Tod, TodSet, ModelData, TriggerWorld) are not
  * its subclasses: their ctors chain to the driver's, not to this class's,
- * and none carries its layout. Methods in src/graphics/graphics_resources.c.
+ * and none carries its layout. Methods in src/graphics/tim_block_src.c.
  * The object is 0x84 bytes (New_TimBlockSrc).
  */
 struct TimBlockSrc {
