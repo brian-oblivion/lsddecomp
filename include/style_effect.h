@@ -9,8 +9,8 @@
  * @brief StyleEffect, the Actor the style layer keeps at an offset from the
  *        scene's target: a model, a row of three models, or five sprites.
  *
- * Methods in src/world/dream_scene.c, New_StyleEffect through
- * GetStyleEffectMethods.
+ * Methods in src/world/style_effect.c, New_StyleEffect through
+ * GetStyleEffectMethods, then SetStyleEffectSources.
  */
 
 typedef struct StyleEffect StyleEffect;

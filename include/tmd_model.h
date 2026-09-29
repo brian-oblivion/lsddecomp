@@ -254,7 +254,7 @@ void TmdModel__AddFirstPrimClut(TmdModel *self, s32 *xy);
 
 /**
  * @brief Points the first primitive's CLUT id at the CLUT at VRAM
- *        (xy[0], xy[1]). SetStyleEffectSources (src/world/dream_scene.c)
+ *        (xy[0], xy[1]). SetStyleEffectSources (src/world/style_effect.c)
  *        calls it.
  * @param self The model; its first primitive must be textured.
  * @param xy   The CLUT's VRAM position, two s16s.
