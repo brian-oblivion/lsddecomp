@@ -54,6 +54,30 @@ enum DreamSysMoveCommand {
     MOVE_COMMAND_RIGHT = 4    /**< a side step right (R2) */
 };
 
+/** DreamSys::turnCommand, an index into sTurnRotations: a pending 6-degree
+ * turn from the d-pad (the staircase walks set it too). */
+enum DreamSysTurnCommand {
+    TURN_COMMAND_NONE = 0, /**< no turn pending */
+    TURN_COMMAND_LEFT = 1, /**< d-pad left: -6 degrees of yaw */
+    TURN_COMMAND_RIGHT = 2 /**< d-pad right: +6 degrees of yaw */
+};
+
+/** DreamSys::lookOffsetCommand, an index into sLookOffsetSteps and
+ * sLookOffsetLimits: a pending step of the view's reference point. */
+enum DreamSysLookOffsetCommand {
+    LOOK_OFFSET_COMMAND_NONE = 0, /**< no step pending; lookOffset springs back */
+    LOOK_OFFSET_COMMAND_UP = 1,   /**< triangle: the reference point 600 higher (y -600) */
+    LOOK_OFFSET_COMMAND_DOWN = 2  /**< square (two staircase walks set it too): 600 lower */
+};
+
+/** DreamSys::lookYawCommand, an index into sLookYawSteps and sLookYawLimits:
+ * a pending sideways look. */
+enum DreamSysLookYawCommand {
+    LOOK_YAW_COMMAND_NONE = 0, /**< no look pending; lookYaw springs back */
+    LOOK_YAW_COMMAND_LEFT = 1, /**< L1: -45 degrees */
+    LOOK_YAW_COMMAND_RIGHT = 2 /**< R1: +45 degrees */
+};
+
 /** DreamSys::moveMode indexes sMoveModeSpeeds {0, 24, 64, 128, 384}. The
  * pad handler switches to MOVE_MODE_RUN only while moving forward, and a
  * staircase walk takes about a seventh of the frames in it. */
@@ -296,15 +320,15 @@ struct DreamSys {
      * SelectLookCallback installs it by lookCallbackMode. */
     void (*lookCallback)(struct DreamSys *self);
     s32 lookCallbackMode; /**< a DreamSysLookCallback: SelectLookCallback's last mode */
-    /** A pending view-height step (1 from triangle, 2 from square; a
-     * staircase walk sets 2), an index into sLookOffsetSteps and
-     * sLookOffsetLimits; StepLookOffset consumes it. */
+    /** A pending view-height step, a DreamSysLookOffsetCommand, an index
+     * into sLookOffsetSteps and sLookOffsetLimits; StepLookOffset consumes
+     * it. */
     s32 lookOffsetCommand;
     /** How far the view height is moved: StepLookOffset adds each step to
      * it and to viewport->refView.vr.y, and springs it back by 600 a tick
      * with no command pending. */
     s32 lookOffset;
-    /** A pending sideways look step (1 from L1, 2 from R1), an index into
+    /** A pending sideways look step, a DreamSysLookYawCommand, an index into
      * sLookYawSteps and sLookYawLimits; StepLookYaw consumes it. */
     s32 lookYawCommand;
     /** How far the view is turned sideways, in degrees: StepLookYaw's
@@ -321,9 +345,8 @@ struct DreamSys {
      * direction, and forced and staircase movement set it to
      * MOVE_COMMAND_FORWARD. */
     s32 moveCommand;
-    /** A pending turn of 6 degrees (1 from d-pad left, 2 from right; the
-     * staircase walks set it too), an index into sTurnRotations;
-     * ApplyPendingTurn consumes it. */
+    /** A pending turn of 6 degrees, a DreamSysTurnCommand, an index into
+     * sTurnRotations; ApplyPendingTurn consumes it. */
     s32 turnCommand;
     /** Whether the player was stepping forward when StepLookYaw last ran;
      * FlipMoveCommand clears it. The tunnel and staircase links require it. */
