@@ -360,7 +360,7 @@ struct StageMapMethods {
  *
  * Class id 0x114 (STAGEMAP_CLASS_ID), table gStageMapMethods, parent LightRig
  * (include/light_rig.h; its ctor and finalize chain to LightRig's first); no
- * class below it. Methods in src/world/dream_day.c, New_StageMap through
+ * class below it. Methods in src/world/stage_map.c, New_StageMap through
  * GetStageMapMethods. The object is 0x1E8 bytes (New_StageMap).
  *
  * Lifecycle. ObjM configures it for its stage: setConfig with the stage's

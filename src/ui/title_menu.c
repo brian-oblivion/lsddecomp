@@ -14,9 +14,9 @@
  * - the four method tables, the menu's layout and the card's messages.
  * Each class runs from its New_ (allocate, then the ctor through the
  * class's table) to its table getter; a ctor chains to its parent's, then
- * installs its own table. The first two belong with dream_day.c's code:
- * DayTask's ctor makes the NodeGuardedViewport, and StageMap is GridCell's
- * only maker.
+ * installs its own table. The first two belong with their makers' code:
+ * DayTask's ctor (dream_day.c) makes the NodeGuardedViewport, and StageMap
+ * (stage_map.c) is GridCell's only maker.
  */
 #include "common.h"
 #include <libgte.h>

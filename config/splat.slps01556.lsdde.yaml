@@ -1375,6 +1375,8 @@ segments:
       # Gate 2).
       - [0x39cb4, c, world/stage_grid]
       - [0x39e08, c, world/dream_day]
+      # StageMap, New_StageMap (0x8004A4C8) to GetStageMapMethods.
+      - [0x3ACC8, c, world/stage_map]
       # class_3bb8c is 365 functions -- the largest uncarved block in the
       # game, and the one holding all 13 PSX BIOS trampolines (`jr $t2`,
       # not expressible in C). Carved in slices from the front, like Entity.
@@ -1895,7 +1897,8 @@ segments:
       - [0x720F0, data]
       - [0x72140, .data, cd/game_files]  # gLbdFileMethods .. sMovieFrameCounts: the file table
       - [0x769D4, .data, world/stage_grid]  # the stage grids and their chunk moods
-      - [0x76DC8, .data, world/dream_day]  # DayTask, TimedTask, StageMap: method tables and chunk tables
+      - [0x76DC8, .data, world/dream_day]  # gDayTaskMethods, DayTask's view points, gTimedTaskMethods
+      - [0x76EE8, .data, world/stage_map]  # gStageMapMethods, the chunk and footprint tables
       - [0x771D8, .data, ui/title_menu]  # gNodeGuardedViewportMethods .. sCardIconRect: the title menu, the card messages
       - [0x776D0, .data, ui/input_dialogs]  # gTextEntryMethods, sTextEntryPanelRect
       - [0x77788, .data, ui/item_list]  # gItemListMethods, sItemListPanelRect

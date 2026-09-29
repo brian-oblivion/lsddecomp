@@ -46,7 +46,7 @@ struct LinkResourceMethods {
  * (New_LinkResource).
  *
  * Callers link the models it builds: tod_actor.c's TOD model-id packet passes
- * getModel's result to SceneNode__LinkModel, and dream_day.c links the
+ * getModel's result to SceneNode__LinkModel, and stage_map.c links the
  * TmdObject behind one with GsLinkObject4. Holders: ModelData's
  * `linkResource` (over the TMD in a MOM file), PlacementGrid's
  * `linkResource`, DayTask's `dreamerTmd` ("ETC\DREAMER.TMD") and the
