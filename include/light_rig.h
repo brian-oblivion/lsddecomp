@@ -62,8 +62,8 @@ struct LightRigMethods {
 /**
  * LightRig: a SceneNode owning three flat lights and the ambient colour.
  * Class id 0x14, table gLightRigMethods, parent SceneNode, whose ctor it
- * chains to first; methods in src/graphics/light_rig.c. One class derives from
- * it: StageMap (0x114, the grid manager, include/stage_map.h), whose ctor
+ * chains to first; methods in src/graphics/light_rig.c. One class derives
+ * from it: StageMap (0x114, the grid manager, include/stage_map.h), whose ctor
  * and finalize chain to this class's and whose table inherits getLight
  * unchanged. The object is 0x54 bytes (New_LightRig): `lights` at +0x044,
  * `ambient` at +0x050, then one byte of word padding; StageMap's first own

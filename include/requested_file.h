@@ -45,8 +45,8 @@ struct RequestedFileMethods {
 /**
  * RequestedFile: a FileResource that asks for one named file when it is
  * built. Class id 0xB03, table gRequestedFileMethods, parent FileResource;
- * methods in src/graphics/sprite.c; no subclasses. The object is 0x30 bytes
- * (New_RequestedFile).
+ * methods in src/graphics/requested_file.c; no subclasses. The object is
+ * 0x30 bytes (New_RequestedFile).
  *
  * Like every FileResource client it runs on the active driver: the ctor and
  * finalize chain to GetActiveDataSourceMethods()'s, and

@@ -1335,6 +1335,8 @@ segments:
       - [0x319E8, o, libc2/sprintf]    # sprintf
       - [0x32248, o, libc2/memmove]    # memmove
       - [0x322b4, c, graphics/sprite]       # game code (revision 18; was psyq_322b4)
+      # RequestedFile, New_RequestedFile (0x800422CC) to GetRequestedFileMethods.
+      - [0x32ACC, c, graphics/requested_file]
       # FrameClock, New_FrameClock (0x80042400) to GetFrameClockMethods.
       - [0x32C00, c, graphics/frame_clock]
       # LightRig, New_LightRig (0x80042694) to GetLightRigMethods.
@@ -1889,7 +1891,8 @@ segments:
       - [0x5EDF8, .data, app/task]  # gStreamTaskMethods .. gViewportMethods
       - [0x5F19C, .data, ui/screen_widgets]  # gFadeBoxMethods .. gTextRowMethods
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)
-      - [0x5F474, .data, graphics/sprite]  # gCharSpriteMethods .. gRequestedFileMethods
+      - [0x5F474, .data, graphics/sprite]  # gCharSpriteMethods .. gSpriteMethods
+      - [0x5F6D8, .data, graphics/requested_file]  # gRequestedFileMethods
       - [0x5F750, .data, graphics/frame_clock]  # gFrameClockMethods
       - [0x5F7AC, .data, graphics/light_rig]  # gLightRigMethods
       - [0x5F86C, .data, graphics/flat_light_obj]  # gFlatLightObjMethods
