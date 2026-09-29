@@ -261,7 +261,9 @@ else
     tar xzf "$POPTMP/pop.tar.gz" -C tools/psyq-obj-parser
     rm -rf "$POPTMP"
     chmod +x "$POP"
-    "$POP" -h >/dev/null 2>&1 || die "$POP does not run on this host"
+    # It exits 255 even for -h, so test that it printed its usage, not its
+    # status (the `|| true` keeps that 255 out of pipefail).
+    { "$POP" -h 2>&1 || true; } | grep -q 'Usage:' || die "$POP does not run on this host"
     ok "$POP"
 fi
 # Idempotent: re-extracts nothing that is already under sdk/work/, and dies
