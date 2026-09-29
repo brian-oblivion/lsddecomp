@@ -83,13 +83,12 @@ enum TriggerCondition {
     TRIGGER_COND_ODD_DAY = 21            /**< An odd day. */
 };
 
-/** @name Chained records
- * A record whose moodIndex is TRIGGER_CHAIN_MOOD_ROW is followed by the
- * one TRIGGER_CHAIN_STRIDE records on (ProcessDreamAuxTriggerRecord). @{ */
+/** A trigger record whose moodIndex is this chains on to the record
+ * TRIGGER_CHAIN_STRIDE records later (ProcessDreamAuxTriggerRecord). */
 #define TRIGGER_CHAIN_MOOD_ROW 2
-#define TRIGGER_CHAIN_STRIDE 7
 
-/** @} */
+/** How many records on a chained record's successor is. */
+#define TRIGGER_CHAIN_STRIDE 7
 
 /**
  * @brief One spawn record of a stage's table (sDreamAuxGroupRecords[stage]).
