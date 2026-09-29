@@ -29,6 +29,18 @@ enum { BASICCLASS_EVENT_FINALIZED = 1 };
  * is the is-kind-of test for a class one level below BasicClass. */
 #define CLASS_ID_ROOT_MASK 0xF
 
+/** @name Deeper class-id masks
+ * Each nibble of a class id is one level of derivation, lowest first, so
+ * keeping the low N nibbles is the is-kind-of test for a class N levels below
+ * BasicClass: `(header & CLASS_ID_LEVEL2_MASK) == BGLAYER_CLASS_ID` holds for
+ * a BgLayer (0x54: SceneNode 0x4, then 0x5) and anything derived from it. @{ */
+#define CLASS_ID_LEVEL2_MASK 0xFF    /**< two levels: Sprite, BgLayer, BoxFill */
+#define CLASS_ID_LEVEL3_MASK 0xFFF   /**< three levels: ScreenSprite, StageMap */
+#define CLASS_ID_LEVEL4_MASK 0xFFFF  /**< four levels: DreamSys */
+#define CLASS_ID_LEVEL5_MASK 0xFFFFF /**< five levels: Entity, ObjM */
+
+/** @} */
+
 /** One node of a BasicClass child or parent-reference list. 8 bytes: the
  * size PushBasicClassListNode asks the pool allocator for. */
 struct BasicClassListNode {

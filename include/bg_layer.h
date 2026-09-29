@@ -14,7 +14,7 @@ typedef struct BgLayer BgLayer;
 typedef struct BgLayerMethods BgLayerMethods;
 
 /** BgLayer's class id (gBgLayerMethods word +0x000). Two nibbles, so
- * `(header & 0xFF) == BGLAYER_CLASS_ID` is its is-kind-of test
+ * `(header & CLASS_ID_LEVEL2_MASK) == BGLAYER_CLASS_ID` is its is-kind-of test
  * (Viewport__DrawNode). */
 #define BGLAYER_CLASS_ID 0x54
 

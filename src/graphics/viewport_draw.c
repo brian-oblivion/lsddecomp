@@ -117,10 +117,10 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
     } while (cursor != NULL);
 
     classId = node->methods->header;
-    if ((classId & 0xFF) == BGLAYER_CLASS_ID) {
+    if ((classId & CLASS_ID_LEVEL2_MASK) == BGLAYER_CLASS_ID) {
         GsSortBg((GsBG *)&((BgLayer *)node)->bgAttribute, self->ot[self->otIndex],
                  (1 << self->otLength) - 1);
-    } else if ((classId & 0xFF) == BOXFILL_CLASS_ID) {
+    } else if ((classId & CLASS_ID_LEVEL2_MASK) == BOXFILL_CLASS_ID) {
         BoxFill *box = (BoxFill *)node; /* MATCHING: a copy of node, not a cast at each use */
         if (box->relative) {
             box->boxX = ((self->screenSize.width >> 1) * box->posX) / 100;
@@ -130,7 +130,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             box->boxY = box->posY;
         }
         GsSortBoxFill((GsBOXF *)&box->boxAttribute, self->ot[self->otIndex], box->pri);
-    } else if ((classId & 0xFF) != SPRITE_CLASS_ID) {
+    } else if ((classId & CLASS_ID_LEVEL2_MASK) != SPRITE_CLASS_ID) {
         GsGetLws(node->coord2, lw, ls);
         GsSetLightMatrix(lw);
         GsSetLsMatrix(ls);
@@ -138,7 +138,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             SortTmdObject((GsDOBJ2 *)&node->attribute, self->ot[self->otIndex],
                           OTZ_BITS - self->otLength, getScratchAddr(0));
         }
-    } else if ((classId & 0xFFF) == SCREENSPRITE_CLASS_ID) {
+    } else if ((classId & CLASS_ID_LEVEL3_MASK) == SCREENSPRITE_CLASS_ID) {
         /* MATCHING: a copy of node; each ternary is one store */
         ScreenSprite *screenSprite = (ScreenSprite *)node;
         GsSPRITE *gsSprite = (GsSPRITE *)&screenSprite->sprite;
