@@ -61,7 +61,7 @@ struct NodeGuardedViewportMethods {
  *    the override makes that second call a no-op.
  *  - Four own slots, +0x0B8..+0x0C4, hold empty functions nothing calls.
  *
- * Lifecycle: DayTask__DayTask (src/world/dream_day.c), the one construction
+ * Lifecycle: DayTask__DayTask (src/world/day_task.c), the one construction
  * site, builds it as its IntermediateBaseInitArgs' viewport. DayTask__Init
  * hands it to the DreamSys (setViewport), and ObjM, built from the same init
  * args, drives it through Viewport's slots: InitStyleAndWorld and

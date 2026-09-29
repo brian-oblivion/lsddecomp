@@ -63,7 +63,7 @@ AREAS = {
     "area-graphics-res": ("src/graphics",),
     "area-ui": ("src/ui",),
     "area-dream-sys": ("src/world/dream_sys.c", "src/world/stage_grid.c", "src/world/tod_actor.c"),
-    "area-dream-day": ("src/world/dream_day.c", "src/world/timed_task.c", "src/world/stage_map.c",
+    "area-dream-day": ("src/world/day_task.c", "src/world/timed_task.c", "src/world/stage_map.c",
                        "src/world/entity.c"),
     "area-dream-scene": ("src/world",),
     "area-psyq-shared": ("src/psyq",),

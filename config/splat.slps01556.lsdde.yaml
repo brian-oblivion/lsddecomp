@@ -247,7 +247,7 @@ segments:
       # slot (strings, then jtbl_8001157C and jtbl_80011594, whose targets
       # are at 0x8004Fxxx/0x8005xxx and still live in `asm`) stays a
       # standalone rodata object from 0x1C34.
-      - [0x1C0C, .rodata, world/dream_day]
+      - [0x1C0C, .rodata, world/day_task]
       # Slot 0x1C34 is shared by FIVE units. Only the two JUMP TABLES need
       # attaching -- they hold `.L` labels local to class_3bb8c_g's own
       # function .s files, which a standalone rodata object cannot resolve.
@@ -1374,7 +1374,7 @@ segments:
       # monolithic `asm` segment awaiting a carve (docs/PARALLEL-RUNS.md
       # Gate 2).
       - [0x39cb4, c, world/stage_grid]
-      - [0x39e08, c, world/dream_day]
+      - [0x39e08, c, world/day_task]
       # TimedTask, New_TimedTask (0x8004A130) to GetTimedTaskMethods.
       - [0x3A930, c, world/timed_task]
       # StageMap, New_StageMap (0x8004A4C8) to GetStageMapMethods.
@@ -1899,7 +1899,7 @@ segments:
       - [0x720F0, data]
       - [0x72140, .data, cd/game_files]  # gLbdFileMethods .. sMovieFrameCounts: the file table
       - [0x769D4, .data, world/stage_grid]  # the stage grids and their chunk moods
-      - [0x76DC8, .data, world/dream_day]  # gDayTaskMethods, DayTask's view points
+      - [0x76DC8, .data, world/day_task]  # gDayTaskMethods, DayTask's view points
       - [0x76E68, .data, world/timed_task]  # gTimedTaskMethods
       - [0x76EE8, .data, world/stage_map]  # gStageMapMethods, the chunk and footprint tables
       - [0x771D8, .data, ui/title_menu]  # gNodeGuardedViewportMethods .. sCardIconRect: the title menu, the card messages

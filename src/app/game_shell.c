@@ -31,7 +31,6 @@
 #include "game_files.h"
 #include <strings.h>
 #include <stdio.h>
-#include "dream_day.h"
 #include "placement_grid.h"
 #include "tim_image.h"
 #include "tile_atlas.h"

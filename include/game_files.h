@@ -7,7 +7,7 @@
  * in src/cd/game_files.c.
  *
  * A record is one CdFileEntry (cd_driver.h) of the record table, whose name
- * is a zero-padded path; RegisterRecordTableFiles (src/world/dream_day.c)
+ * is a zero-padded path; RegisterRecordTableFiles (src/world/day_task.c)
  * hands the table to the CD driver as its file table, which fills in each
  * entry's disc position and size. In order, the table holds:
  *  - the seven sound banks' SND\\name.VH/VB pairs and SND\\SE.VH/VB;

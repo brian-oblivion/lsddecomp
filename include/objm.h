@@ -127,7 +127,7 @@ struct ObjMMethods {
  * 0x2F230): TimedTask's second subclass, after DayTask. No class derives from
  * it.
  *
- * Built by DayTask__StartObjM (src/world/dream_day.c): New_ObjM(DayTask's
+ * Built by DayTask__StartObjM (src/world/day_task.c): New_ObjM(DayTask's
  * sound, bgm, etcTim, dreamerTmd, stage), added as a child and init'ed with
  * DayTask's init args and its DreamSys. So the inherited IntermediateBase
  * fields hold that DayTask's init-arg objects: frameClock its FrameClock,

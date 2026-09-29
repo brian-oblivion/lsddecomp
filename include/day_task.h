@@ -1,7 +1,9 @@
 /**
  * @file day_task.h
  * @brief DayTask, the task that runs one day of the dream, its method
- *        table, and the phases and results it moves through.
+ *        table, and the phases and results it moves through; and
+ *        RegisterRecordTableFiles, the record-table registration its ctor
+ *        and the image-view callback in src/app/game_shell.c run.
  *
  * Application__RunMainLoop (src/app/application.c) calls
  * GameApplication__RunDayTask (src/app/game_shell.c) when the GraphRoom poll
@@ -81,7 +83,7 @@ struct DayTaskMethods {
  *
  * Class id 0x1F230, table gDayTaskMethods, parent TimedTask
  * (include/timed_task.h); no class derives from it. Methods in
- * src/world/dream_day.c. The object is 0x50 bytes (New_DayTask); its own
+ * src/world/day_task.c. The object is 0x50 bytes (New_DayTask); its own
  * fields run from TimedTask's 0x38.
  *
  * Lifecycle, by `phase`:
@@ -248,5 +250,22 @@ void DayTask__OnDreamSysNotify(void);
  * @param event Its state or notify code (OBJM_STATE_*, OBJM_NOTIFY_*).
  */
 void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event);
+
+/**
+ * @brief Registers the record table's sound-bank and stage records
+ *        (GetRecordTable) with the CD driver, in at most two batches,
+ *        retrying each until RegisterFileTableEntries accepts it.
+ *
+ * The first call takes the whole count when `all` is set (and counts as two
+ * calls), else half of it; the second call takes the count the first left;
+ * any later call registers nothing. Each batch is handed the table from its
+ * first entry. DayTask's ctor calls it with 1,
+ * GameApplication__RegisterFilesCallback (ShowImage's view callback) with 0.
+ *
+ * @param all Non-zero on the first call to register every record at once.
+ * @return RegisterFileTableEntries' first non-zero result for the batch (1
+ *         when the CD driver is not the active data source).
+ */
+s32 RegisterRecordTableFiles(s32 all);
 
 #endif

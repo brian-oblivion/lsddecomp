@@ -1,14 +1,14 @@
 /*
- * dream_day.c -- the dream day's task, in address order: DayTask
- * (include/day_task.h, which says what it is and how it lives), then
- * RegisterRecordTableFiles (include/dream_day.h). TimedTask, DayTask's
- * parent, follows in timed_task.c, and the StageMap DayTask's scene builds
- * in stage_map.c. NodeGuardedViewport, which DayTask uses, is defined in
- * src/ui/title_menu.c.
+ * DayTask's methods (include/day_task.h, which says what the task that runs
+ * one day of the dream is and how it lives), in ROM order: New_DayTask
+ * through GetDayTaskMethods, then RegisterRecordTableFiles, which its ctor
+ * runs. TimedTask, DayTask's parent, follows in timed_task.c, and the
+ * StageMap DayTask's scene builds in stage_map.c. NodeGuardedViewport,
+ * which DayTask uses, is defined in src/ui/title_menu.c.
  */
 #include "common.h"
 #include <libgte.h>
-#include "dream_day.h"
+#include "day_task.h"
 #include "node_guarded_viewport.h"
 #include "stage_map.h"
 #include "wbgm.h"
