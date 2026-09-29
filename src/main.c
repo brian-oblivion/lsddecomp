@@ -17,11 +17,23 @@
 #include "game_application.h"
 #include "pad.h"
 #include "bmem_pmgr.h"
+#include "data_source.h"
 #include <kernel.h>
 
 extern BMemPMgr *sStartupBMemPMgr;
 extern GameApplication *sGameApplication;
-extern GameApplicationConfig sGameApplicationConfig;
+
+/* The shipped game's configuration (the fields are documented in
+ * game_application.h): data from the CD-ROM, and the movies, intro logos
+ * and title menu all on. */
+GameApplicationConfig sGameApplicationConfig = {
+    DATASOURCE_CD, /* dataSource */
+    0,             /* dayTaskSyncDriver */
+    1,             /* playStreams */
+    1,             /* showIntroLogos */
+    1,             /* pollGraphRoom */
+    1,             /* dreamSysConfigOption */
+};
 
 /* SetMem's argument: the RAM size in megabytes (Psy-Q libapi takes 2, a
  * production console, or 8, a development board). */
