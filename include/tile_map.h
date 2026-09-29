@@ -22,6 +22,16 @@ typedef struct TileMapMethods TileMapMethods;
 /** TileMap's class id (gTileMapMethods word +0x000). */
 #define TILEMAP_CLASS_ID 0x203
 
+/** @name The background grid
+ * TileMap's default grid and TileAtlas's cells (include/tile_atlas.h):
+ * 20 x 15 cells of 16 x 16 texels, one atlas cell per map cell.
+ * @{ */
+#define TILEMAP_COLS 20 /**< cells across */
+#define TILEMAP_ROWS 15 /**< cells down */
+#define TILE_SIZE 16    /**< a cell's width and height, in texels */
+
+/** @} */
+
 /**
  * @brief TileMap's method table, gTileMapMethods: FileResource's slots, with
  *        no new ones.

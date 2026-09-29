@@ -40,7 +40,7 @@ struct TileAtlasMethods {
  *
  * TileMap__BuildMap takes `cells` as its GsMAP's base. Parent FileResource,
  * through the active data-source driver; no subclasses. Methods in
- * src/graphics/graphics_resources.c. The object is 0x38 bytes
+ * src/graphics/tile_atlas.c. The object is 0x38 bytes
  * (New_TileAtlas).
  *
  * Its one builder is TaskCore__TaskCore (src/app/task.c): New_TileAtlas(0),
