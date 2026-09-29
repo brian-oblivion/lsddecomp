@@ -1857,40 +1857,39 @@ void Entity__CueConfrontDreamerThenLinkOnTouch(Entity *self, SoundCueSet *out) {
     if (self->state == 0) {
         self->methods->deactivate(self);
         self->methods->stopSoundCue(self);
-        goto tail;
-    }
-    if (out->tick % 100 == 0) {
-        out->attenuation = self->methods->getProximityRatio(self);
-        out->slots[0].program = 12;
-        out->slots[0].octave = -1;
-    }
-    if (self->moodTimer < 3) {
-        self->methods->moveLocalY(self, 150, 0);
-    } else if (self->moodTimer < 7) {
-        self->methods->moveLocalY(self, (self->moodTimer & 1) ? -50 : 50, 0);
-    } else if (self->moodTimer == 100) {
-        if (rand() & 1) {
-            self->state = CONFRONT_ADVANCE;
-            self->methods->stopTod(self);
+    } else {
+        if (out->tick % 100 == 0) {
+            out->attenuation = self->methods->getProximityRatio(self);
+            out->slots[0].program = 12;
+            out->slots[0].octave = -1;
         }
-    } else if (self->moodTimer == 240) {
-        ((DreamSys *)self->peer)
-            ->methods->setTickCallbacks((DreamSys *)self->peer, MOVE_CALLBACK_TICK_MOVE,
-                                        LOOK_CALLBACK_STEP_LOOK);
-    }
-    if (self->state == CONFRONT_ADVANCE) {
-        if (self->moodTimer < 130) {
-            self->methods->moveLocalY(self, 10, 0);
-        } else if (self->moodTimer < 160) {
-            self->methods->moveLocalZ(self, -30, 0);
-        } else if (self->moodTimer < 301) {
-            /* nothing */
-        } else {
-            SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
-            self->methods->moveLocalZ(self, -30, 0);
+        if (self->moodTimer < 3) {
+            self->methods->moveLocalY(self, 150, 0);
+        } else if (self->moodTimer < 7) {
+            self->methods->moveLocalY(self, (self->moodTimer & 1) ? -50 : 50, 0);
+        } else if (self->moodTimer == 100) {
+            if (rand() & 1) {
+                self->state = CONFRONT_ADVANCE;
+                self->methods->stopTod(self);
+            }
+        } else if (self->moodTimer == 240) {
+            ((DreamSys *)self->peer)
+                ->methods->setTickCallbacks((DreamSys *)self->peer, MOVE_CALLBACK_TICK_MOVE,
+                                            LOOK_CALLBACK_STEP_LOOK);
+        }
+        if (self->state == CONFRONT_ADVANCE) {
+            if (self->moodTimer < 130) {
+                self->methods->moveLocalY(self, 10, 0);
+            } else if (self->moodTimer < 160) {
+                self->methods->moveLocalZ(self, -30, 0);
+            } else if (self->moodTimer < 301) {
+                /* nothing */
+            } else {
+                SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
+                self->methods->moveLocalZ(self, -30, 0);
+            }
         }
     }
-tail:
     if (self->methods->distanceToPeer(self, self->peer) < 512) {
         self->methods->deactivate(self);
         self->methods->notifyParents(self, ENTITY_EFFECT_LINK_STAGE);
