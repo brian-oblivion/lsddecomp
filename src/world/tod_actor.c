@@ -519,19 +519,8 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     }
                 }
             }
-            {
-                GsCOORDINATE2 *partCoord;
-                s32 x, y, z;
-
-                partCoord = part->coord2;
-                x = param->trans.vx;
-                y = param->trans.vy;
-                z = param->trans.vz;
-                partCoord->coord.t[0] = x;
-                partCoord->coord.t[1] = y;
-                partCoord->coord.t[2] = z;
-                __asm__(""); /* MATCHING: an ordering barrier; it keeps the t[2] store ahead of the break */
-            }
+            /* MATCHING: one struct copy, every load before every store */
+            *(LongVec3 *)part->coord2->coord.t = *(LongVec3 *)&param->trans;
             break;
         }
         case TOD_PACKET_MODEL_ID: {
