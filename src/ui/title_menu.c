@@ -316,7 +316,7 @@ void TitleMenu__OnDeinit(TitleMenu *self) {
 
     i = 0;
     rect = sDisplayBufferRects;
-    for (; i < 2; i++) {
+    for (; i < ARRAY_COUNT(sDisplayBufferRects); i++) {
         ((DrawSystem *)self->initArgs->drawSystem)
             ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->clearColor, rect);
         rect++;
@@ -341,7 +341,7 @@ void TitleMenu__ConfirmSlot(TitleMenu *self) {
     GetTaskCoreMethods()->confirmSlot((TaskCore *)self);
     switch (self->activeSlot) {
         case TITLEMENU_FLASHBACK:
-            self->result = 0;
+            self->result = TASKCORE_RESULT_DONE;
             self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 1);
             fn = self->methods->exit;
             break;
@@ -432,7 +432,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, ColorRgb *color) {
 
     channels = (u8 *)&rgb;
     GetTaskCoreMethods()->broadcastToSlots((TaskCore *)self, (u8 *)color);
-    if (self->inputMode != 0) {
+    if (self->inputMode != TASKCORE_INPUT_NONE) {
         channels[0] = 0;
         channels[1] = 0;
         channels[2] = 0;
@@ -1506,7 +1506,8 @@ void TaskObjF__TickStateDelay(TaskObjF *self) {
 void TaskObjF__AttachTextEntry(TaskObjF *self) {
     if (self->spriteParent != 0 && self->inputSource != 0) {
         if (self->textEntry == NULL) {
-            self->textEntry = New_TextEntry(&self->title[self->titleEditPos * 2], 1);
+            self->textEntry =
+                New_TextEntry(&self->title[self->titleEditPos * 2], TEXTENTRY_MODE_FULLWIDTH);
             self->ownsWidget = 1;
         }
         self->methods->addChild(self, (BasicClass *)self->textEntry);
