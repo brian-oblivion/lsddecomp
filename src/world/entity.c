@@ -16,8 +16,10 @@
 #include "viewport.h"
 #include "bmem_pmgr.h"
 
-/* MATCHING: playTod is called through EntityPlayTodFn (void); through the s32 slot, calls stop merging */
-/* MATCHING: tod_actor.h's moveLocalZ/moveLocalY must return void, or the handlers' calls stop merging */
+/* MATCHING: playTod is called through EntityPlayTodFn (void); through the s32 slot,
+ * the handlers' identical calls are no longer shared */
+/* MATCHING: tod_actor.h's moveLocalZ/moveLocalY must return void, or the handlers'
+ * identical calls are no longer shared */
 
 /* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
  * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what
@@ -116,7 +118,7 @@ FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *size, void *offset, void
     FadeBoxMethods *boxMethods;
     void *attachOffset;
 
-    cached = self->fadeBox; /* MATCHING: `cached`, `boxMethods` and `attachOffset` are each load-bearing */
+    cached = self->fadeBox; /* MATCHING: kept, as are boxMethods and attachOffset; folding one away differs */
     if (cached == NULL) {
         if (size == NULL) {
             size = sEntityFadeBoxDefaultSize;
@@ -980,11 +982,11 @@ void Entity__CueRunAndLunge(Entity *self, SoundCueSet *out) {
     s32 zDelta;
     void (**moveZOrFindLink)(Entity *self, s32 val, void *notify);
 
-    do { /* MATCHING: without the do/while(0), `self` and `out` swap registers */
+    do { /* MATCHING: without the do/while (0) the code comes out differently */
         if (out->tick % self->todFrameCount == 0) {
             out->attenuation = self->methods->getProximityRatio(self);
             out->slots[0].program = 26;
-            __asm__(""); /* MATCHING: keeps v1 = 110 below the program store */
+            __asm__(""); /* MATCHING: an ordering barrier; v1 = 110 stays after the store */
             v1 = 110;
             goto compare;
         }
@@ -2203,7 +2205,7 @@ extern s32 sCueStepForwardAndBackDone;
 void Entity__CueStepForwardAndBack(Entity *self, SoundCueSet *out) {
     enum { PITCH_UP = 11, STRETCH_NORMAL = 12, STRETCH_TALL = 13 };
 
-    s32 rollOrDy; /* MATCHING: one local for the roll and then the y move; two allocate differently */
+    s32 rollOrDy; /* MATCHING: one local for the roll and then the y move; two compile differently */
     void *table;
 
     if (out->tick == 0) {

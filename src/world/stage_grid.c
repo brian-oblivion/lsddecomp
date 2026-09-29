@@ -47,7 +47,7 @@ StageGridDimensions *GetStageGridDimensions(s32 stage) {
 /* Searches every stage's chunks in row-major order for the first whose mood
  * equals *mood. Returns -1, leaving *chunk unwritten, when none does. */
 s32 GetStageChunkFromMood(StageChunk *chunk, MoodGraphPoint *mood) {
-    u32 stage; /* MATCHING: a signed counter compiles slti, not sltiu */
+    u32 stage; /* MATCHING: unsigned; a signed counter compiles a signed compare */
     s32 row;
     s32 column;
     MoodGraphPoint *chunkMood;

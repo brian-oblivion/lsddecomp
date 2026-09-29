@@ -690,7 +690,7 @@ void StageMap__ApplyToSenderFootprint(StageMap *self, SceneNode *sender, s32 com
     }
 
     savedRectCount = self->rectCount;
-    savedRects = self->rects; /* MATCHING: a whole-struct copy; an indexed loop is not a block move */
+    savedRects = self->rects;
 
     if (self->config->isVertical == 0) {
         StageMap__SetFootprintFromCell(self, &desc, 3);
@@ -833,7 +833,7 @@ s32 StageMap__SetTargetAndLoadChunks(StageMap *self, void *outPos, SceneNode *ta
     s32 chunkIndex;
 
     self->target = target;
-    self->targetCell.base = *cell; /* MATCHING: Descriptor10 is all s8/s16, so this copies as unaligned words */
+    self->targetCell.base = *cell;
     chunkIndex = ComputeCellWorldOffsets(outPos, chunkCentre, self->config, &self->origin, cell);
     return self->methods->loadChunksAround(self, chunkIndex, (LongVec3 *)chunkCentre, sDefaultTargetSpecs);
 }
@@ -869,7 +869,7 @@ s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dim
         chunkPos[0] = x - STAGE_CHUNK_SIZE / 2;
     }
     chunkPos[1] = origin->y;
-    halfCell = STAGE_CELL_SIZE / 2; /* MATCHING: a local, set here, places the constant's load */
+    halfCell = STAGE_CELL_SIZE / 2; /* MATCHING: a local set here; the literal at each use differs */
     chunkPos[2] = z + row * STAGE_CHUNK_SIZE;
     outPos[0] = (cell->b2 << STAGE_CELL_SHIFT) + chunkPos[0] + (cell->h4 + halfCell);
     outPos[1] = cell->h6 + chunkPos[1];
@@ -961,7 +961,7 @@ void StageMap__LoadChunksAround(StageMap *self, s32 centreChunk, LongVec3 *centr
         }
 
         for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
-            slot = &self->slots[i]; /* MATCHING: the first loop's `slot`; a second local swaps a register */
+            slot = &self->slots[i]; /* MATCHING: the first loop's `slot`; a second local differs */
             slot->loader->elemKey = slot->neighbour;
         }
 
@@ -1045,7 +1045,7 @@ s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 col
     }
 
     out->file = self->chunkFileFn(self->chunkFileCtx, out->chunkIndex.word, 0, 0);
-    do { /* MATCHING: removing it drifts the image */
+    do { /* MATCHING: an empty do/while (0); without it the code comes out differently */
     } while (0);
     result = 1;
     goto storeKey;
@@ -1058,7 +1058,7 @@ storeKey:
     return result;
 }
 
-/* MATCHING: `tail` from `entry` inside the loop, `entry` itself advancing; a copy swaps two registers */
+/* MATCHING: `tail` from `entry` inside the loop, `entry` itself advancing; a copy differs */
 void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entry, s32 count) {
     s32 i;
     ChunkSlot *slot;
@@ -1203,7 +1203,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
             GsLinkObject4((u_long)((TmdModel *)(*cell)->model)->object,
                           (GsDOBJ2 *)&(*cell)->attribute, 0);
             coord = (*cell)->coord2;
-            /* MATCHING: keeps the rec.x/.y/.z loads below the coord2 load */
+            /* MATCHING: an ordering barrier; it keeps the rec.x/.y/.z reads after coord2's */
             __asm__("");
             x = rec.x;
             y = rec.y;
@@ -1438,7 +1438,7 @@ void StageMap__RefreshFootprint(StageMap *self) {
     StageMap__SetFootprintVisible(self, 1);
 }
 
-/* MATCHING: the (u16) casts make the halfword loads unsigned */
+/* MATCHING: the (u16) casts make the angle reads unsigned */
 void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32 aheadCells) {
     GsCOORD2PARAM *param;
     Descriptor10Ext desc;
@@ -1452,7 +1452,7 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32
     void *rot;
 
     param = self->target->coord2->param;
-    rot = &param->rotate; /* MATCHING: here, before the call, so it lives across it */
+    rot = &param->rotate; /* MATCHING: here, before the call, not after it */
     self->methods->getTargetDescriptor(self, &desc, 0);
     cellCol = desc.base.b2;
     cellRow = desc.base.b3;
@@ -1589,7 +1589,7 @@ s32 StageMap__SplitFootprintRect(StageMap *self, CellRect *rect, s32 count, s32 
             belowKey = key + 2;
             rect->slotIndex = self->methods->findSlotIndexByNeighbour(self, belowKey);
             rect->col = col + STAGE_CHUNK_HALF_CELLS;
-            /* MATCHING: stored in both arms; merged, they move the col reload below */
+            /* MATCHING: stored in both arms; merged after the if, col is read back elsewhere */
             rect->height = span;
         } else {
             belowKey = key + 3;

@@ -69,7 +69,7 @@ void StyleEffect__Finalize(StyleEffect *self) {
 }
 
 void StyleEffect__SetParams(StyleEffect *self, StyleEffectParams *params) {
-    self->params = *params; /* MATCHING: one struct copy: the 4-aligned block moves 4 words a loop */
+    self->params = *params;
     self->tick = 0;
 }
 
@@ -191,7 +191,7 @@ void StyleEffect__ReleaseByKind(StyleEffect *self) {
     }
 }
 
-/* Plain Vec3 add: dst = a + b. Frameless -- no self/vtable involved. */
+/* Plain Vec3 add: dst = a + b. Not a method: no self. */
 void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b) {
     dst->x = a->x + b->x;
     dst->y = a->y + b->y;
@@ -275,7 +275,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
         slot = self->modelChildren;
         self->methods->updateRotation(self, 0, sSpinRotStep);
         i = 0;
-        /* MATCHING: the step's pointer is taken here, after the call; held earlier, two registers swap */
+        /* MATCHING: the step's pointer is taken after the call; taken earlier, the code differs */
         stepZ = &sModelChildDriftZ[tableIndex];
         extraZ = 0;
         for (; i < ARRAY_COUNT(self->modelChildren); i++) {

@@ -75,7 +75,7 @@ void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
     xRem = ratios[0].num % ratios[0].den;
     xFrac = (xRem << FIX12_SHIFT) / ratios[0].den;
     xRatio = (xWhole << FIX12_SHIFT) + xFrac;
-    xScale = (s16)xRatio; /* MATCHING: here; in the else arm it loses a move */
+    xScale = (s16)xRatio; /* MATCHING: truncated here; in the else arm it is a word shorter */
 
     yWhole = ratios[1].num / ratios[1].den;
     yRem = ratios[1].num % ratios[1].den;

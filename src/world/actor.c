@@ -115,7 +115,7 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                     s32 forward = (offset >= 0);
                     s32 delta;
 
-                    /* MATCHING: goto, not if/else, for retail's branch order */
+                    /* MATCHING: goto, not if/else, which lays the two faces out the other way */
                     if (offset < 0) {
                         goto backward;
                     }
@@ -159,7 +159,7 @@ void Actor__AddTranslation(Actor *self, LongVec3 *delta) {
 /* Sets (set != 0) or adds to the offset from the parent, coord2->coord.t,
  * then clears coord2->flg so libgs recomputes the matrix. */
 void Actor__UpdateTranslation(Actor *self, s32 set, LongVec3 *v) {
-    Actor *actor = self; /* MATCHING: a second name for self; without it $a0 is used, not $t0 */
+    Actor *actor = self; /* MATCHING: a second name for self; without it the code differs */
     GsCOORDINATE2 *coord = actor->coord2;
 
     if (set) {
@@ -331,7 +331,7 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *queries, ChunkSlot **slots,
         key = slotKey + 1;
         if (key < dims->rows) {
             slots[1] = map->methods->findSlotByNeighbour(map, key);
-            count = 2; /* MATCHING: after the call, for the delay-slot fill */
+            count = 2; /* MATCHING: after the call, not before it */
             queries[1] = queries[0];
         }
         key = slotKey - 1;
@@ -403,7 +403,7 @@ void *Actor__ScanGridWindow(Actor *self, void *offset, void *pos, GridQuery *que
         for (col = 0; col < query->numCols; col++) {
             GridCell *node;
 
-            /* MATCHING: *bucket re-read at each use; a local costs a register */
+            /* MATCHING: *bucket re-read at each use; a local compiles differently */
             if (AcceptGridElem(*bucket, offset, pos) != NULL) {
                 return *bucket;
             }

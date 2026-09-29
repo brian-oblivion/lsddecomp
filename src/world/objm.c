@@ -46,7 +46,7 @@ ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, TimImage *etcTim,
     if (self != NULL) {
         methods = GetObjMMethods();
         methods->ctor(self, sound, bgm, etcTim, dreamerTmd, stage);
-        return self; /* MATCHING: two returns, not one */
+        return self;
     }
     return NULL;
 }
@@ -161,7 +161,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 i
         stage = *(s32 volatile *)&self->stage;
         self->tickPeriod = 16;
         three = 3;
-        /* MATCHING: without the barrier `three`'s li moves past the store above. */
+        /* MATCHING: an ordering barrier; without it the 3 is set up ahead of the store above. */
         __asm__("");
         flag = (stage == 5);
         if (stage == 6) {
@@ -452,7 +452,7 @@ void ObjM__EnterTimeUp(ObjM *self) {
     self->state = OBJM_STATE_TIME_UP;
     if (self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &color, -1) == 0) {
         phase = (self->frameCounter + self->stage) & 3;
-        t = phase; /* MATCHING: the copy keeps retail's extra move. */
+        t = phase; /* MATCHING: tested through a copy; testing phase compiles differently. */
         if (t == 0) {
             self->methods->notifyParents(self, OBJM_STATE_TIME_UP);
             return;

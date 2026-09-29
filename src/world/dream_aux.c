@@ -122,7 +122,7 @@ void ReleaseDreamAuxEntities(void) {
     u32 i;
     DreamAuxSlot *slot;
 
-    /* MATCHING: assignments, not initializers, order the two spills */
+    /* MATCHING: assignments, not initializers, so i and slot are set up in retail's order */
     i = 0;
     slot = sDreamAuxSlots;
 
@@ -293,7 +293,7 @@ bool CheckDreamAuxTriggerCondition(s32 day, TriggerRecord *record) {
     goto have_idx;
 
 negate:
-    id = ~condition + 1; /* MATCHING: nor + addiu; -condition is one negu */
+    id = ~condition + 1; /* MATCHING: not -condition; retail complements and adds one */
 
 have_idx:
 

@@ -28,7 +28,8 @@ extern struct ColorRgb sItemListRowColor;
 extern struct ColorRgb sItemListCursorColor;
 
 void ItemList__SetState(ItemList *self, s32 state) {
-    /* MATCHING: the gotos keep retail's branch polarity and block order. */
+    /* MATCHING: gotos; an if/else chain tests the ranges and lays out the arms in
+     * another order. */
     self->closeTicks = 0;
     if (state < ITEMLIST_RESULT_CHOSEN) {
         goto end;
@@ -106,7 +107,7 @@ void ItemList__ScrollRight(ItemList *self) {
     if (!self->panelSprite) {
         return;
     }
-    current = self->column; /* MATCHING: the double read keeps retail's registers */
+    current = self->column; /* MATCHING: read, then copied; one local compiles differently */
     column = current;
     if (column + ITEMLIST_ROW_CHARS >= self->maxTextLen) {
         return;
@@ -143,7 +144,8 @@ void ItemList__CursorUp(ItemList *self, s32 unused1, s32 unused2, s32 forwarded)
     if (cursor - 1 < 0) {
         return;
     }
-    /* MATCHING: this polarity, and newTop/newCursor, keep retail's block order and registers. */
+    /* MATCHING: this test polarity, and newTop/newCursor read back after each step; the
+     * other polarity swaps the arms, and passing the fields compiles differently. */
     if (cursor - self->topIndex > 0) {
         self->methods->stepCursorInView(self, 0, 1, forwarded);
     } else {
@@ -166,12 +168,12 @@ void ItemList__CursorDown(ItemList *self, s32 unused1, s32 unused2, s32 forwarde
     if (self->cursorIndex + 1 >= self->itemCount) {
         return;
     }
-    prevTop = self->topIndex - 1; /* MATCHING: its own statement, or cc1 folds the -1 */
+    prevTop = self->topIndex - 1; /* MATCHING: its own statement; inline, the -1 folds away */
     if (self->cursorIndex - prevTop < ARRAY_COUNT(self->rows)) {
         self->methods->stepCursorInView(self, 1, 1, forwarded);
     } else {
         self->topIndex++;
-        newTop = self->topIndex; /* MATCHING: newTop/newCursor keep retail's registers */
+        newTop = self->topIndex; /* MATCHING: read back after each step, as in CursorUp */
         self->cursorIndex++;
         newCursor = self->cursorIndex;
         self->methods->refreshRows(self, newTop, self->column, newCursor, 1);
@@ -186,7 +188,7 @@ extern s32 sItemListRowOriginY;
 
 void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32 top, s32 column,
                           s32 cursor) {
-    char buf[32]; /* MATCHING: declared first, or cc1 keeps its address in a register */
+    char buf[32]; /* MATCHING: declared first; declared later it compiles differently */
     ScreenSpritePos pos;
     TextRow **row;
     s32 count;
@@ -219,13 +221,13 @@ void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32
 void ItemList__ReleaseRows(ItemList *self) {
     s32 count;
     s32 i;
-    u8 unused[8]; /* MATCHING: retail's 0x28-byte frame */
+    u8 unused[8]; /* MATCHING: never used; it gives retail's 0x28-byte stack */
 
     if (!self->panelSprite) {
         return;
     }
     count = self->itemCount;
-    i = 0; /* MATCHING: here and a do/while, as retail tests count once */
+    i = 0; /* MATCHING: here, and a do/while, as retail tests count once */
     if (count > ARRAY_COUNT(self->rows)) {
         count = ARRAY_COUNT(self->rows);
     }
@@ -242,14 +244,14 @@ void ItemList__ReleaseRows(ItemList *self) {
 void ItemList__RefreshRows(ItemList *self, s32 top, s32 column, s32 cursor, s32 notify) {
     s32 count;
     s32 i;
-    char buf[32]; /* MATCHING: retail's frame size */
+    char buf[32]; /* MATCHING: 32 bytes; it gives retail's stack frame */
     TextRow **row;
 
     if (!self->panelSprite) {
         return;
     }
     count = self->itemCount;
-    row = &self->rows[0]; /* MATCHING: before the clamp, in its delay slot */
+    row = &self->rows[0]; /* MATCHING: set before the clamp, not after it */
     if (count > ARRAY_COUNT(self->rows)) {
         count = ARRAY_COUNT(self->rows);
     }
@@ -265,7 +267,7 @@ void ItemList__RefreshRows(ItemList *self, s32 top, s32 column, s32 cursor, s32 
 }
 
 char *ItemList__FormatRowText(ItemList *self, char *dest, s32 row, s32 top, s32 column) {
-    s32 item = top + row; /* MATCHING: this operand order */
+    s32 item = top + row; /* MATCHING: top + row, not row + top */
     s32 len;
     s32 i;
 
@@ -290,7 +292,7 @@ void ItemList__SetView(ItemList *self, s32 top, s32 column, s32 cursor, s32 high
     if (highlight == 0) {
         return;
     }
-    cursor -= top; /* MATCHING: reuses cursor's register for the index */
+    cursor -= top; /* MATCHING: cursor becomes the row index; a new local compiles differently */
     row = self->rows[cursor];
     row->methods->setColor(row, &sItemListCursorColor);
 }
@@ -303,7 +305,7 @@ void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 notify) {
         return;
     }
     idx = self->cursorIndex - self->topIndex;
-    row = &self->rows[idx]; /* MATCHING: one address, stepped, as retail */
+    row = &self->rows[idx]; /* MATCHING: one row pointer, stepped; indexing twice differs */
     (*row)->methods->setColor(*row, &sItemListRowColor);
     if (dir) {
         self->cursorIndex++;

@@ -311,7 +311,7 @@ void StyleUpdateDecorSet(void) {
     Viewport *viewport;
     s32 height;
     s32 fade;
-    u8 rgb[8]; /* MATCHING: 8, not 3 (the frame keeps pos at sp+0x18) */
+    u8 rgb[8]; /* MATCHING: 8 bytes, not the 3 it uses, to place pos where retail's stack has it */
     BoxFillPos pos;
     s32 colorOfs;
     s32 i;
@@ -533,7 +533,7 @@ extern u8 sStyleKind3Colors[][3];
 /** @brief sStyleSpawnRotation seen as a one-field struct, through which
  * StyleFillEffectKind3 stores the effect's rotation. */
 /* MATCHING: the rotation store goes through a one-field struct, so the
- * sStyleGrid load may schedule above it (a plain pointer store blocks it). */
+ * sStyleGrid read can come before it; a plain pointer store keeps it after. */
 typedef struct PtrBoxK3 {
     Ratio16 *p; /**< +0x000 the spawn rotation */
 } PtrBoxK3;
@@ -578,7 +578,7 @@ extern u8 sStyleKind2Colors[][3];
 /** @brief One word of sStyleSpawnColors seen as a one-field struct, through
  * which StyleFillEffectKind2 stores the effect's two colours. */
 /* MATCHING: the first colour store goes through a one-field struct, as
- * PtrBoxK3's does, so the sStyleDay load may schedule above it. */
+ * PtrBoxK3's does, so the sStyleDay read can come before it. */
 typedef struct S32BoxK2 {
     s32 v; /**< +0x000 a colour: first an RGB triple's address, then sStyleKind2AltColor or 0 */
 } S32BoxK2;
@@ -595,7 +595,7 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     color = (S32BoxK2 *)sStyleSpawnColors;
     color->v = (s32)sStyleKind2Colors[(u32)r % 3];
     color++;
-    altColor = (sStyleDay / 20) * 20; /* MATCHING: not `% 20`, which jump.c folds */
+    altColor = (sStyleDay / 20) * 20; /* MATCHING: not `sStyleDay % 20`, which compiles differently */
     if (sStyleDay != altColor) {
         altColor = sStyleKind2AltColor;
     } else {
@@ -645,7 +645,7 @@ extern s32 sStyleSpawnYChoice1;
  * picks as SetupStyleSpawnParamsRandom. Both parameters are unused; it has
  * that function's signature because StyleFillEffectKind0 calls either
  * through one pointer. */
-/* MATCHING: each rand() is used inline; one local for all three adds a move after every call. */
+/* MATCHING: each rand() is used inline; one local for all three is a word longer per call. */
 void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     s32 dayMod3;
 
@@ -721,7 +721,7 @@ StyleCueRecord *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *t
             grid->methods->computeCellOffsets(grid, pos, &buf);
             dx = pos->x - target->x;
             if (dx < 0) {
-                dx = ~dx + 1; /* MATCHING: not -dx (the nor fills the delay slot) */
+                dx = ~dx + 1; /* MATCHING: not -dx; retail complements and adds one */
             }
             dz = pos->z - target->z;
             if (dz >= 0) {
@@ -767,7 +767,7 @@ s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
     }
     dx = slot->pos.x - target->x;
     if (dx < 0) {
-        dx = ~dx + 1; /* MATCHING: not -dx (the nor fills the delay slot) */
+        dx = ~dx + 1; /* MATCHING: not -dx; retail complements and adds one */
     }
     dz = slot->pos.z - target->z;
     if (dz >= 0) {
@@ -778,7 +778,7 @@ s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
     slot->lastDist = dist;
     cue = slot->entry->cue;
     if (dist < sStyleCueDistanceTable[-cue]) {
-        dist = 1; /* MATCHING: not `return 1` (jump.c folds that to slt) */
+        dist = 1; /* MATCHING: not `return 1`, which folds into the compare's result */
         return dist;
     }
     return 0;
@@ -819,7 +819,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
             if (ServiceStyleCueIfNear(sStyleCueSlots[i], target, unused) == 0) {
                 sStyleCueSlots[i] = FlushStyleCue(sStyleCueSlots[i]);
             }
-            /* MATCHING: a no-op pair that gives target/i retail's registers */
+            /* MATCHING: a no-op pair; without it target and i are kept differently */
             i++;
             i--;
         } else {
