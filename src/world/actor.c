@@ -40,16 +40,14 @@ void *New_Actor(void) {
 }
 
 Actor *Actor__Actor(Actor *self) {
-    if (GetSceneNodeMethods()->ctor((SceneNode *)self) == NULL) {
-        goto fail;
+    if (GetSceneNodeMethods()->ctor((SceneNode *)self) != NULL) {
+        self->methods = GetActorMethods();
+        self->state = 0;
+        self->grid = NULL;
+        self->ticker = NULL;
+        self->methods->reset(self);
+        return self;
     }
-    self->methods = GetActorMethods();
-    self->state = 0;
-    self->grid = NULL;
-    self->ticker = NULL;
-    self->methods->reset(self);
-    return self;
-fail:
     return NULL;
 }
 
@@ -115,15 +113,11 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                     s32 forward = (offset >= 0);
                     s32 delta;
 
-                    /* MATCHING: goto, not if/else, which lays the two faces out the other way */
-                    if (offset < 0) {
-                        goto backward;
+                    if (offset >= 0) {
+                        delta = offset + self->pendingExtra;
+                    } else {
+                        delta = offset - self->pendingExtra;
                     }
-                    delta = offset + self->pendingExtra;
-                    goto offsetHull;
-                backward:
-                    delta = offset - self->pendingExtra;
-                offsetHull:
                     RotateAndOffsetHullList(&hull, alongX, forward, delta);
                 }
                 self->methods->transformAndNotifyParents(self, &hull, event);
