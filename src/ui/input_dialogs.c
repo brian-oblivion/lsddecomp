@@ -125,7 +125,8 @@ void TextEntry__OnNotify(TextEntry *self, void *sender, s32 event) {
     if (kind == PAD_CLASS_ID) {
         self->methods->handleCommand(self, sender, event);
     } else if (kind == FRAMECLOCK_CLASS_ID) {
-        /* MATCHING: passes (sender, event) as handleCommand's call does; the two calls share code. */
+        /* MATCHING: passes (sender, event) as handleCommand's call does, so the
+         * two calls share code. */
         self->methods->tickState(self, sender, event);
     }
 }
@@ -479,7 +480,7 @@ TextEntryMethods *GetTextEntryMethods(void) {
 ItemList *New_ItemList(char **items, s32 mode) {
     ItemList *self = BMemPMgrAlloc(sizeof(ItemList));
 
-    /* MATCHING: goto, not an early return: NULL fills the branch's delay slot. */
+    /* MATCHING: goto, not an early return, which compiles differently. */
     if (self == NULL) {
         goto fail;
     }
@@ -622,7 +623,7 @@ extern char sItemListStrFontIcon[];       /* "FONTICON" */
  * Loads CARD\SELECT.TIM as the panel sprite, placed at sItemListPanelPos
  * under `parent`, and has createRows build the rows from CARD\FONTICON.TIM.
  * Does nothing without a parent or when already loaded. The same shape as
- * TextEntry__LoadCardResources (input_dialogs.c).
+ * TextEntry__LoadCardResources, above.
  */
 void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
     char path[CARD_TIM_PATH_SIZE];
@@ -668,7 +669,7 @@ void ItemList__AttachTarget(ItemList *self, void *inputSource, void *tickSource,
     ItemListAddChildWideFn addChildWide;
     s32 zero;
 
-    /* MATCHING: the cached slot and zero and the do/while (0) fill a delay slot. */
+    /* MATCHING: the cached slot, `zero` and the do/while (0) give retail's order. */
     zero = 0;
     addChildWide = (ItemListAddChildWideFn)self->methods->addChild;
     do {

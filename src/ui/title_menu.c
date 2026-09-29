@@ -188,8 +188,8 @@ void GridCell__DispatchLinkCommand(GridCell *self, BasicClass *sender, s32 event
     }
 }
 
-/* SceneNode's handling, then tryAttachNearby for the Actor move events (ACTOR_EVENT_UNSWEPT..MOVED_Y), the body of
- * Actor__OnActorLinkCommand. tryAttachNearby keeps SceneNode's one-parameter
+/* SceneNode's handling, then tryAttachNearby for the Actor move events
+ * (ACTOR_EVENT_UNSWEPT..MOVED_Y), the body of Actor__OnActorLinkCommand. tryAttachNearby keeps SceneNode's one-parameter
  * slot type; this caller passes the sender and event too. */
 void GridCell__OnActorLinkCommand(GridCell *self, void *sender, s32 event) {
     GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
@@ -425,7 +425,8 @@ void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
  * While the menu takes input it is black with one channel lit, the channel
  * moving each frame; otherwise `color` with red lifted for the first frames
  * of each cycle and the moving channel after. */
-/* MATCHING: `channels` is taken before the first call, and `rgb = *color` is one struct copy. */
+/* MATCHING: `channels` is taken before the first call, and `rgb = *color` is one
+ * struct copy. */
 void TitleMenu__CycleSaveTitleColor(TitleMenu *self, ColorRgb *color) {
     ColorRgb rgb;
     u8 *channels;
@@ -861,7 +862,7 @@ s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size) {
     s32 handle;
     s32 blocks;
 
-    /* MATCHING: the u32 cast makes the shift retail's srl. */
+    /* MATCHING: the u32 cast makes it an unsigned shift, as retail's is. */
     blocks = (u32)(size + MEMCARD_SAVE_HEADER_SIZE + MEMCARD_BLOCK_SIZE - 1) >> MEMCARD_BLOCK_SHIFT;
     path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, sMcTempFileSuffix);
     handle = open(path, MEMCARD_OPEN_BLOCKS(blocks) | O_CREAT);
@@ -995,7 +996,8 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
     header->iconDisplayFlag = iconFrames + MEMCARD_ICON_FLAG_BASE;
     header->blockCount = ((u32)size + (MEMCARD_BLOCK_SIZE - 1)) >> MEMCARD_BLOCK_SHIFT;
     strcpy(header->title, title);
-    /* MATCHING: IconPaletteHalf (halfwords) and IconFrame (bytes) set how each whole-struct copy is done. */
+    /* MATCHING: IconPaletteHalf (halfwords) and IconFrame (bytes) set how each
+     * whole-struct copy is done. */
     header->palette[0] = iconSrc->palette[0];
     header->palette[1] = iconSrc->palette[1];
     header->frame0 = iconSrc->frame0;
@@ -1171,7 +1173,7 @@ void TaskObjF__FreeBuffers(TaskObjF *self) {
 /* An existing file first asks to overwrite; confirming re-enters from
  * SAVE_OVERWRITE_WARNING to edit the title, and the edited title re-enters
  * from EDIT_TITLE to save. */
-/* MATCHING: one setState call per branch, which the build merges into one. */
+/* MATCHING: one setState call per branch; they compile to one shared call, as retail's. */
 void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleEditPos,
                          u8 iconFrames, struct TimImage *icon, void *data, s32 size) {
     s32 state;
@@ -1209,7 +1211,8 @@ void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleE
 
 /* Returns 1 when checkCardStatus succeeds on a formatted, unchanged card;
  * otherwise sets the state that says why and returns 0. */
-/* MATCHING: the unreachable `formatted` branch and the goto to one setState call set the branch layout. */
+/* MATCHING: the unreachable `formatted` branch and the goto to one setState call
+ * give retail's branch layout. */
 s32 TaskObjF__Validate(TaskObjF *self) {
     s32 error;
     s32 cardChanged;
@@ -1289,7 +1292,8 @@ void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
  * onTextEntryResult and onItemListResult.
  */
 
-/* MATCHING: `methods` is cached, and the cases stay in this order (entry actions before widgets). */
+/* MATCHING: `methods` is cached, and the cases stay in this order (entry actions
+ * before widgets). */
 void TaskObjF__SetState(TaskObjF *self, s32 state) {
     TaskObjFMethods *methods = self->methods;
     s32 ok;
