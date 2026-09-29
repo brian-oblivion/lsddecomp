@@ -22,6 +22,13 @@ typedef struct Entity Entity;
 typedef struct EntityMethods EntityMethods;
 typedef struct EntityMoodRow EntityMoodRow;
 
+/** A mood row's handler: the SoundCueSet callback Entity__StartSoundCue
+ * installs, given the Entity as its owner. */
+typedef void (*EntityMoodCueFn)(Entity *self, SoundCueSet *out);
+
+/** Rows in sEntityMoodTable: one per moodIndex, Entity__MoodCue00 to 129. */
+#define ENTITY_MOOD_ROW_COUNT 130
+
 /**
  * @brief Entity's method table: TodActor's slots, then Entity's own; 97
  *        slots, 0x184 bytes.
@@ -87,7 +94,7 @@ struct EntityMethods {
  * row's handler as the callback, and reset selects tick callback 'B'
  * (Entity__TickSoundCue, +0x11C), which services the set once per tick.
  *
- * The MoodCue handlers. Each row's `handler` (gEntityMoodHandlerTable) is
+ * The MoodCue handlers. Each row's `handler` (sEntityMoodTable, at the end of entity.c) is
  * one `Entity__Cue<Behaviour>` function, named for the small script it runs
  * (Entity__CueHoverOverDreamerOnBlueElseRise, Entity__CueTone23Once); a
  * comment on each in src/world/entity.c names its row. They are not in the
@@ -165,13 +172,12 @@ extern EntityMethods *GetEntityMethods(void);
  * @brief One row of the mood table, 16 bytes: New_Entity's moodIndex selects
  *        it, and every per-mood setting of an Entity is a column of it.
  *
- * Signed columns are `s8` (plain `char` is unsigned in this build).
- * sEntityLinkStageTable and sEntityEventVideoTable are the linkStage and
- * eventVideo columns seen as flat arrays (the row base + 7 and + 8, indexed
- * moodIndex * 16).
+ * Signed columns are `s8` (plain `char` is unsigned in this build). The
+ * table itself, ENTITY_MOOD_ROW_COUNT rows, is defined at the end of
+ * src/world/entity.c.
  */
 struct EntityMoodRow {
-    u8 pad00[0x02];
+    s8 unread00[2]; /**< +0x00: no code reads it; every value is in -10..10, the range of a mood graph axis */
     s8 unlockKind; /**< +0x02: times 1000 is the unlock score (Entity__GetUnlockEffect); 1 to 9: Entity__Reset turns fog on; -9 to -1: Entity__IsNearTarget moves the tested point by it times 1024 in y */
     s8 activateKind; /**< +0x03: an EntityActivateKind, read by Entity__UpdateActivationState; 0: Entity__AttachToParent activates at once */
     u8 deactivateKind; /**< +0x04: an EntityDeactivateKind, read by Entity__UpdateDeactivationState */
@@ -182,7 +188,7 @@ struct EntityMoodRow {
     s8 nearTolerance; /**< +0x09: Entity__IsNearTarget's tolerance for every range test on this row (activation, deactivation, proximity, cue start/stop) */
     s8 proximityThreshold; /**< +0x0A: Entity__GetProximityRatio's range, in ENTITY_RANGE_UNITs */
     s8 cueRange; /**< +0x0B: 0: the cue starts at attach (when the entity activated there) and never on range; else its magnitude is the distance within which the cue starts (Entity__UpdateSoundCueStart), and a NEGATIVE value also stops it once the target leaves that range (Entity__UpdateSoundCueStop) */
-    SoundCueCallbackFn handler; /**< +0x0C: the `Entity__Cue<Behaviour>` handler Entity__StartSoundCue installs (gEntityMoodHandlerTable) */
+    EntityMoodCueFn handler; /**< +0x0C: the `Entity__Cue<Behaviour>` handler Entity__StartSoundCue installs; NULL: the row has no cue script */
 };
 
 /** activateKind: when Entity__UpdateActivationState activates an inactive
