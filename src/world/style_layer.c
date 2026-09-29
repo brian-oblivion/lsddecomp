@@ -1075,7 +1075,7 @@ void StyleScrollVramStrips(void) {
         rect = &sStyleStripRectA;
         scratch = (DrawPoint *)&sStyleStripScratchA;
         count = 1; /* MATCHING: a local set in each branch, not a literal argument */
-    } else if ((u32)(sStyleStage - 3) < 3) {
+    } else if (sStyleStage >= 3 && sStyleStage < 6) {
         count = 1;
         rect = &sStyleStripRectB;
         scratch = (DrawPoint *)&sStyleStripScratchB;
