@@ -181,7 +181,6 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
  * else APPLICATION_LOOP_OPENING (it timed out). */
 s32 GameApplication__RunTitleMenu(GameApplication *self) {
     s32 status;
-    s32 graphResult; /* MATCHING: GRAPH, set after the GraphRoom check, not the constant */
 
     if (self->config->pollGraphRoom != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
@@ -197,19 +196,18 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
             }
         }
 
-        graphResult = TITLEMENU_RESULT_GRAPH;
-    retry:
-        status = GameApplication__RunTask((NewTaskFn)New_TitleMenu, self->dreamSys,
-                                          (IntermediateBaseInitArgs *)self->aux);
-        if (status == graphResult) {
+        for (;;) {
+            status = GameApplication__RunTask((NewTaskFn)New_TitleMenu, self->dreamSys,
+                                              (IntermediateBaseInitArgs *)self->aux);
+            if (status != TITLEMENU_RESULT_GRAPH) {
+                break;
+            }
             GameApplication__RunTask((NewTaskFn)New_GraphRoom, self->dreamSys,
                                      (IntermediateBaseInitArgs *)self->aux);
-            goto retry;
         }
 
         self->skipGraphRoomPoll = 0;
-        /* MATCHING: status == TASKCORE_RESULT_DONE ? DAY : OPENING; a ternary compiles differently. */
-        return ((u32)status < 1) << 1;
+        return status == TASKCORE_RESULT_DONE ? APPLICATION_LOOP_DAY : APPLICATION_LOOP_OPENING;
     }
     return APPLICATION_LOOP_DAY;
 }
