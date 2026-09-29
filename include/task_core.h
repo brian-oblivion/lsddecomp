@@ -159,7 +159,7 @@ struct TaskCoreTarget {
     /* +0x06C */ u8 pad06C[4];                                                                     \
     /* +0x070 */ const char *subHandlePath; /**< setSubHandle's path; nonzero: the handle is owned */ \
     /* +0x074 */ BasicClass *subHandle; /**< New_TimImage(subHandlePath), or the caller's; NULL: onInit also passes baseColor with sDefaultMovieFrame */ \
-    /* +0x078 */ struct BgLayer *bgLayer; /**< New_BgLayer(tileMap, 1); bg_layer.h */ \
+    /* +0x078 */ struct BgLayer *bgLayer; /**< New_BgLayer(tileMap, BGLAYER_MODE_SCREEN); bg_layer.h */ \
     /* +0x07C */ struct TileMap *tileMap; /**< New_TileMap(0, tileAtlas); tile_map.h */ \
     /* +0x080 */ struct TileAtlas *tileAtlas; /**< New_TileAtlas(0); tile_atlas.h */ \
     /* +0x084 */ s32 fadeRate;          /**< setFadeRate; reset: 9 */                                \

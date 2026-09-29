@@ -241,7 +241,7 @@ void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankP
     self->tileAtlas = atlas;
     tileMap = New_TileMap(0, atlas);
     self->tileMap = tileMap;
-    self->bgLayer = New_BgLayer(tileMap, 1);
+    self->bgLayer = New_BgLayer(tileMap, BGLAYER_MODE_SCREEN);
     self->methods->resetCounters(self);
 }
 

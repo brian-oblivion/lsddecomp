@@ -43,7 +43,7 @@ struct TileMapMethods {
  * (New_TileMap).
  *
  * Its one builder is TaskCore__TaskCore (src/app/task.c): New_TileAtlas(0),
- * then New_TileMap(0, atlas), then New_BgLayer(tileMap, 1); TaskCore__Finalize
+ * then New_TileMap(0, atlas), then New_BgLayer(tileMap, BGLAYER_MODE_SCREEN); TaskCore__Finalize
  * releases the three.
  */
 struct TileMap {
