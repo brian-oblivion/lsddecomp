@@ -25,7 +25,7 @@ typedef struct TaskCoreItemList TaskCoreItemList; /* defined in src/app/task.c, 
 enum TaskCoreState {
     TASKCORE_STATE_FADE_IN = 4, /* update from START: tickFadeInCallback until the fade-in is done */
     TASKCORE_STATE_ACTIVE = 5,  /* the target's initialSlot selected, inputMode CHOOSING_SLOT */
-    TASKCORE_STATE_TIMED_OUT = 6,       /* update: frameCounter passed frameBound; result 1, exit */
+    TASKCORE_STATE_TIMED_OUT = 6, /* update: frameCounter passed frameBound; result TIMED_OUT, exit */
     TASKCORE_STATE_FADE_OUT = 7,        /* exit: tickFadeOutCallback until the fade-out is done */
     TASKCORE_STATE_FADED_OUT = 8,       /* update goes on to IntermediateBase's STOP */
     TASKCORE_STATE_CURSOR_MOVED = 9,    /* setActiveSlot, setSlotCursor */
@@ -44,6 +44,13 @@ enum TaskCoreInputMode {
     TASKCORE_INPUT_CHOOSING_SLOT = 1, /* Up/Down move between the target's slots */
     TASKCORE_INPUT_SCROLLING = 2      /**< Up/Down move the active slot's item cursor */
 };
+
+/** @name Results
+ * `result`, which init returns. A subclass adds its own from 2 up
+ * (STREAMTASK_RESULT_SKIPPED, TITLEMENU_RESULT_GRAPH, GRAPHROOM_RESULT_SCORED). @{ */
+#define TASKCORE_RESULT_DONE 0      /**< onInit's: the task ended normally */
+#define TASKCORE_RESULT_TIMED_OUT 1 /**< setState(TIMED_OUT): the frame bound ran out */
+/** @} */
 
 /** @name Tones
  * playSound's tones: VabStreamObj__PlayTone indices, program << 4 | tone. @{ */
@@ -143,7 +150,7 @@ struct TaskCoreTarget {
     /* +0x02C */ s32 maxPackets;        /**< reset: 300 (TitleMenu, GraphRoom: 400); onInit: the viewport's setMaxPackets */ \
     /* +0x030 */ s32 packetSize;        /**< reset: 64; onInit: the viewport's setPacketSize */      \
     /* +0x034 */ s32 clearOnDeinit;     /**< reset: 1 (TitleMenu 0); nonzero: onDeinit clears the screen to clearColor */ \
-    /* +0x038 */ s32 result;            /**< TaskCore__Init returns it; onInit 0, setState(6) 1 */   \
+    /* +0x038 */ s32 result;            /**< TaskCore__Init returns it; TASKCORE_RESULT_* */   \
     /* +0x03C */ s32 inputMode;         /**< 0 none, 1 choosing a slot, 2 scrolling its items; onPadEvent needs nonzero */ \
     /* +0x040 */ s32 frameBound;        /**< setFrameBound; update: frameCounter past it is setState(6) */ \
     /* +0x044 */ char *soundBankPath;   /**< the ctor's; nonzero: finalize releases `sound` */       \
@@ -210,7 +217,7 @@ struct TaskCoreMethods {
  * done) -> ACTIVE (the target's initialSlot selected, inputMode
  * CHOOSING_SLOT) ... FADE_OUT (tickFadeOutCallback, TickFadeOut) ->
  * FADED_OUT -> STOP (IntermediateBase's onStop). While inputMode is not
- * NONE, frameCounter passing frameBound is setState(TIMED_OUT): result = 1,
+ * NONE, frameCounter passing frameBound is setState(TIMED_OUT): result = TIMED_OUT,
  * then exit, which calls exitCallback and goes to FADE_OUT. The states from
  * CURSOR_MOVED on set the state back to ACTIVE and reset the frame counter;
  * SLOT_CONFIRMED runs confirmSlot, ITEM_CONFIRMED commitElementScroll,
@@ -296,13 +303,14 @@ void TaskCore__Reset(TaskCore *self);
  * @param self the task
  * @param args the objects to work with
  * @param mode INTERMEDIATEBASE_INIT_RUN runs the task to its end inside this call
- * @return `result`: 0, or 1 when the frame bound ran out */
+ * @return `result`: TASKCORE_RESULT_DONE, or TASKCORE_RESULT_TIMED_OUT
+ *         when the frame bound ran out */
 s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode);
 
 /** @brief onInit: hangs the slot widgets and the BgLayer under the light
  * rig, sets the fade-in colour, clears the default movie frame (no sub
  * handle) and the screen to baseColor, and configures and opens the
- * viewport's OT; result = 0.
+ * viewport's OT; result = TASKCORE_RESULT_DONE.
  * @param self the task */
 void TaskCore__OnInit(TaskCore *self);
 

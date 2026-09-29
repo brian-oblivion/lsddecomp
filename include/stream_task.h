@@ -22,7 +22,7 @@ typedef struct StreamTaskMethods StreamTaskMethods;
 enum StreamTaskState { STREAMTASK_STATE_SKIPPED = 18 };
 
 /** `result` after a confirm press skipped the stream (TaskCore's timeout
- * sets 1). */
+ * sets TASKCORE_RESULT_TIMED_OUT). */
 #define STREAMTASK_RESULT_SKIPPED 2
 
 /** setFrameBound's unit in this override: bound * 15 frames, where

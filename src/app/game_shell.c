@@ -153,8 +153,8 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
  * it is day 1 or skipGraphRoomPoll is set (the last DayTask CLOSED), runs the
  * GraphRoom, then PlaySpecialDayMovies if it scored. Then the TitleMenu,
  * again after a GraphRoom each time it returns GRAPH. Returns
- * APPLICATION_LOOP_DAY for the menu's result 0, else
- * APPLICATION_LOOP_OPENING. */
+ * APPLICATION_LOOP_DAY when the menu ended normally (TASKCORE_RESULT_DONE),
+ * else APPLICATION_LOOP_OPENING (it timed out). */
 s32 GameApplication__RunTitleMenu(GameApplication *self) {
     s32 status;
     s32 graphResult; /* MATCHING: GRAPH, set after the GraphRoom check, not the constant */
@@ -184,8 +184,7 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
         }
 
         self->skipGraphRoomPoll = 0;
-        /* MATCHING: status == 0 ? APPLICATION_LOOP_DAY : APPLICATION_LOOP_OPENING,
-         * spelled as retail computes it; the ternary compiles differently. */
+        /* MATCHING: status == TASKCORE_RESULT_DONE ? DAY : OPENING; a ternary compiles differently. */
         return ((u32)status < 1) << 1;
     }
     return APPLICATION_LOOP_DAY;

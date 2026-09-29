@@ -313,7 +313,7 @@ void TaskCore__OnInit(TaskCore *self) {
     viewportMethods->attachViewChild(viewport, self->lightRig, &sTaskCoreViewOrigin,
                                      &sTaskCoreViewOrigin, NULL);
     viewportMethods->initOt(viewport);
-    self->result = 0;
+    self->result = TASKCORE_RESULT_DONE;
 }
 
 /* Closes the viewport's OT, detaches the view and the BgLayer, and clears the
@@ -415,7 +415,7 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
             self->inputMode = TASKCORE_INPUT_CHOOSING_SLOT;
             break;
         case TASKCORE_STATE_TIMED_OUT:
-            self->result = 1;
+            self->result = TASKCORE_RESULT_TIMED_OUT;
             methods->exit(self);
             break;
         case TASKCORE_STATE_FADE_IN:
