@@ -220,9 +220,8 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
         gte_SetRotMatrix(&ctx->savedRotMatrix);
     }
 
-    /* MATCHING: obj->attribute read afresh for each global, not once into a
-     * local; retail makes all four reads before the first store, and stores
-     * unk8 after them. */
+    /* MATCHING: obj->attribute read afresh for each global, not once into a local;
+     * all four reads come before the first store, and unk8 is stored after them. */
     sSortNdiv = (obj->attribute >> ATTR_DIV_SHIFT) & 0x7;
     sSortLightOff = (obj->attribute >> ATTR_LOFF_SHIFT) & 0x1;
     sSortUseGlobalLightMode = (obj->attribute >> ATTR_LLMOD_SHIFT) & 0x1;
@@ -688,9 +687,8 @@ void SetupPrimCode(void *prim, PolyDrawCtx *ctx) {
  * `prim` is only ever handed straight through, so it stays void * here.
  */
 s32 ProjectTriFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, void (*storeSxy)(void *)) {
-    /* MATCHING: the slots are written through a plain pointer; written as
-     * ctx->faceVtx[i], the stores come out mixed in among the vertex
-     * address computations. */
+    /* MATCHING: the slots are written through a plain pointer; as ctx->faceVtx[i]
+     * the stores come out mixed in among the vertex address computations. */
     SVECTOR **vtx = ctx->faceVtx;
 
     vtx[0] = &ctx->vertices[idx0];

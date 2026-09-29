@@ -154,9 +154,8 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
         gsSprite->y += gsSprite->my;
         GsSortSprite(gsSprite, self->ot[self->otIndex], 0);
     } else {
-        /* MATCHING: declared here, not at the top, so they sit where retail keeps
-         * them on the stack; scr is never used and holds 8 bytes retail leaves
-         * untouched */
+        /* MATCHING: declared here, not at the top, so they sit where retail's are on
+         * the stack; scr is never used and holds 8 bytes retail leaves untouched */
         VECTOR pos;
         SVECTOR scr;
         Sprite *worldSprite;
