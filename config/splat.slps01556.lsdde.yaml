@@ -1375,6 +1375,8 @@ segments:
       # Gate 2).
       - [0x39cb4, c, world/stage_grid]
       - [0x39e08, c, world/dream_day]
+      # TimedTask, New_TimedTask (0x8004A130) to GetTimedTaskMethods.
+      - [0x3A930, c, world/timed_task]
       # StageMap, New_StageMap (0x8004A4C8) to GetStageMapMethods.
       - [0x3ACC8, c, world/stage_map]
       # class_3bb8c is 365 functions -- the largest uncarved block in the
@@ -1897,7 +1899,8 @@ segments:
       - [0x720F0, data]
       - [0x72140, .data, cd/game_files]  # gLbdFileMethods .. sMovieFrameCounts: the file table
       - [0x769D4, .data, world/stage_grid]  # the stage grids and their chunk moods
-      - [0x76DC8, .data, world/dream_day]  # gDayTaskMethods, DayTask's view points, gTimedTaskMethods
+      - [0x76DC8, .data, world/dream_day]  # gDayTaskMethods, DayTask's view points
+      - [0x76E68, .data, world/timed_task]  # gTimedTaskMethods
       - [0x76EE8, .data, world/stage_map]  # gStageMapMethods, the chunk and footprint tables
       - [0x771D8, .data, ui/title_menu]  # gNodeGuardedViewportMethods .. sCardIconRect: the title menu, the card messages
       - [0x776D0, .data, ui/input_dialogs]  # gTextEntryMethods, sTextEntryPanelRect
