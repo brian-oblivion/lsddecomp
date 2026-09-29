@@ -526,9 +526,8 @@ typedef enum DreamColors {
  * (DreamSys__DispatchInstanceEffect), +0x0E0 onGridCellLinkCommand
  * (DreamSys__WallLink) and +0x0E8 onLinkUpdate (DreamSys__OnLinkUpdate).
  *
- * Two inherited slots are called with a type other than their own, each
- * through a function-pointer cast: reset (+0x040), whose result the ctor
- * returns (DreamSysResetRetFn), and attachToParent (+0x04C), which
+ * One inherited slot is called with a type other than its own, through a
+ * function-pointer cast: attachToParent (+0x04C), which
  * DreamSys__SpawnAtLink takes as (self, parent) with no offset
  * (DreamSysAttachToParentFn, ObjM__SetupSceneStyle's cast). The table is
  * 139 slots, 0x22C bytes.
@@ -565,14 +564,14 @@ struct DreamSysMethods {
     /* +0x148 */ void (*stepLookYaw)(DreamSys *self);    /**< @see DreamSys__StepLookYaw */
     /* +0x14C */ void (*noOpLook2)(DreamSys *self); /**< @see DreamSys__NoOpLook2 (a lookCallback choice) */
     /* +0x150 */ void (*noOpLook3)(DreamSys *self); /**< @see DreamSys__NoOpLook3 (a lookCallback choice) */
-    /* +0x154 */ s32 (*tickMove)(DreamSys *self);       /**< @see DreamSys__TickMove */
-    /* +0x158 */ s32 (*tickMoveFree)(DreamSys *self);   /**< @see DreamSys__TickMoveFree */
-    /* +0x15C */ s32 (*tickMoveForced)(DreamSys *self); /**< @see DreamSys__TickMoveForced */
-    /* +0x160 */ s32 (*tickMoveHeld)(DreamSys *self);   /**< @see DreamSys__TickMoveHeld */
+    /* +0x154 */ void (*tickMove)(DreamSys *self);       /**< @see DreamSys__TickMove */
+    /* +0x158 */ void (*tickMoveFree)(DreamSys *self);   /**< @see DreamSys__TickMoveFree */
+    /* +0x15C */ void (*tickMoveForced)(DreamSys *self); /**< @see DreamSys__TickMoveForced */
+    /* +0x160 */ void (*tickMoveHeld)(DreamSys *self);   /**< @see DreamSys__TickMoveHeld */
     /* +0x164 */ s32 (*advanceMoveCycle)(DreamSys *self, s32 bob); /**< @see DreamSys__AdvanceMoveCycle */
     /* +0x168 */ void (*startVoice)(DreamSys *self);               /**< @see DreamSys__StartVoice */
     /* +0x16C */ void (*stopVoice)(DreamSys *self);                /**< @see DreamSys__StopVoice */
-    /* +0x170 */ s32 (*applyMoveCommand)(DreamSys *self, s32 command); /**< @see DreamSys__ApplyMoveCommand */
+    /* +0x170 */ void (*applyMoveCommand)(DreamSys *self, s32 command); /**< @see DreamSys__ApplyMoveCommand */
     /* +0x174 */ void (*applyPendingTurn)(DreamSys *self); /**< @see DreamSys__ApplyPendingTurn */
     /* +0x178 */ void (*tickDrift)(DreamSys *self);        /**< @see DreamSys__TickDrift */
     /* +0x17C */ void (*stopDrift)(DreamSys *self, s32 keepCues); /**< @see DreamSys__StopDrift */
@@ -627,11 +626,6 @@ struct DreamSysMethods {
     /* +0x224 */ void (*restoreLinkSnapshot)(DreamSys *self); /**< @see DreamSys__RestoreLinkSnapshot */
     /* +0x228 */ s32 (*getSetConfigOption)(DreamSys *self, s32 value); /**< @see DreamSys__GetSetConfigOption */
 };
-
-/** reset (+0x040) as DreamSys__DreamSys calls it, with a result the ctor
- * returns. ResetSessionState, the occupant, returns none, and New_DreamSys
- * ignores the ctor's result. */
-typedef DreamSys *(*DreamSysResetRetFn)(DreamSys *self);
 
 /** attachToParent (+0x04C) as its occupant, DreamSys__SpawnAtLink, takes it:
  * (self, parent), no offset. ObjM__SetupSceneStyle (objm.c) calls it
@@ -1101,11 +1095,9 @@ MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day);
  * @param modelSource The LinkResource whose model 0 becomes a child.
  * @param soundObj    The sound bank.
  * @param viewport    The camera.
- * @return Whatever reset leaves as its result (ResetSessionState returns
- *         none); New_DreamSys ignores it.
  */
-DreamSys *DreamSys__DreamSys(DreamSys *self, struct LinkResource *modelSource,
-                             struct VabStreamObj *soundObj, struct Viewport *viewport);
+void DreamSys__DreamSys(DreamSys *self, struct LinkResource *modelSource,
+                        struct VabStreamObj *soundObj, struct Viewport *viewport);
 
 /**
  * @brief Slot +0x040, reset: hides the object, turns it to face yaw 180, and
@@ -1347,34 +1339,29 @@ void DreamSys__NoOpLook3(void);
  * @brief Slot +0x154, the move callback: by moveOverride, the pending turn
  *        and the free move, the forced move, or the held move.
  * @param self The DreamSys.
- * @return The move's result.
  */
-s32 DreamSys__TickMove(DreamSys *self);
+void DreamSys__TickMove(DreamSys *self);
 
 /**
  * @brief Slot +0x158: the player's own movement: one tick of the step cycle
  *        with the view bob, then the step.
  * @param self The DreamSys.
- * @return movementBlocked when it is set; otherwise nothing meaningful.
  */
-s32 DreamSys__TickMoveFree(DreamSys *self);
+void DreamSys__TickMoveFree(DreamSys *self);
 
 /**
  * @brief Slot +0x15C: forced movement: steps forward, without stepping or
  *        bobbing while movement is blocked.
  * @param self The DreamSys.
- * @return AdvanceMoveCycle's result while blocked; otherwise nothing
- *         meaningful.
  */
-s32 DreamSys__TickMoveForced(DreamSys *self);
+void DreamSys__TickMoveForced(DreamSys *self);
 
 /**
  * @brief Slot +0x160: held movement: sets moveCommand forward and does
  *        nothing else.
  * @param self The DreamSys.
- * @return MOVE_COMMAND_FORWARD.
  */
-s32 DreamSys__TickMoveHeld(DreamSys *self);
+void DreamSys__TickMoveHeld(DreamSys *self);
 
 /**
  * @brief Slot +0x164: one tick of the four-tick step cycle. Plays the
@@ -1410,9 +1397,8 @@ void DreamSys__StopVoice(DreamSys *self);
  *        event 4).
  * @param self    The DreamSys.
  * @param command A DreamSysMoveCommand; 0 does nothing.
- * @return Nothing meaningful.
  */
-s32 DreamSys__ApplyMoveCommand(DreamSys *self, s32 command);
+void DreamSys__ApplyMoveCommand(DreamSys *self, s32 command);
 
 /**
  * @brief Slot +0x174: applies a pending turn (6 degrees left or right).

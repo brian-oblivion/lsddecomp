@@ -179,20 +179,20 @@ Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *resetArg, s32
 }
 
 /* Sprite's reset (+0x040) as its ctor calls it: with all five ctor
- * arguments, returning what the ctor returns. The slot is SceneNode's, typed
- * without them (sprite.h, "Not settled"), and Sprite__Reset reads the first
- * three. Local, where CharSpriteResetFn and VariantSpriteResetFn sit in their
- * headers, because only this ctor calls through it. */
-typedef void *(*SpriteResetFn)(Sprite *self, void *texture, s32 abr, SpriteRect *rect,
-                               void *resetArg, s32 resetWord);
+ * arguments. The slot is SceneNode's, typed without them (sprite.h, "Not
+ * settled"), and Sprite__Reset reads the first three. Local, where
+ * CharSpriteResetFn and VariantSpriteResetFn sit in their headers, because
+ * only this ctor calls through it. */
+typedef void (*SpriteResetFn)(Sprite *self, void *texture, s32 abr, SpriteRect *rect,
+                              void *resetArg, s32 resetWord);
 
 /* gSpriteMethods slot +0x008 (ctor): the SceneNode ctor, install the table,
  * and hand every argument to reset. */
-void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *resetArg,
-                     s32 resetWord) {
+void Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *resetArg,
+                    s32 resetWord) {
     GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetSpriteMethods();
-    return ((SpriteResetFn)self->methods->reset)(self, texture, abr, rect, resetArg, resetWord);
+    ((SpriteResetFn)self->methods->reset)(self, texture, abr, rect, resetArg, resetWord);
 }
 
 /* gSpriteMethods slot +0x040 (reset): bind the texture and cell, rebuild the GsSPRITE. */
@@ -619,7 +619,7 @@ LongVec3 sVec3Zero = {0, 0, 0};
 SpriteMethods gSpriteMethods = {
     /* +0x000 header */ SPRITE_CLASS_ID,
     /* +0x004 release */ (void *)BasicClass__Release,
-    /* +0x008 ctor */ Sprite__Sprite,
+    /* +0x008 ctor */ (void *)Sprite__Sprite,
     /* +0x00C finalize */ (void *)SceneNode__Finalize,
     /* +0x010 addChild */ (void *)SceneNode__AddChild,
     /* +0x014 removeChild */ (void *)SceneNode__RemoveChild,

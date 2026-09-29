@@ -1553,6 +1553,9 @@ ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, u8 *out) {
     return self->lastEventSlot;
 }
 
+/* The original returns NULL when no slot matches only because the loop's exit
+ * test leaves 0 as the result; it has no return statement there. */
+#ifdef NON_MATCHING
 ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 neighbour) {
     s32 i;
     ChunkSlot *slot;
@@ -1563,7 +1566,11 @@ ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 neighbour) {
             return slot;
         }
     }
+    return NULL;
 }
+#else
+INCLUDE_ASM("asm/nonmatchings/world/dream_day", StageMap__FindSlotByNeighbour);
+#endif
 
 /* MATCHING: `edge` is assigned inside each upper-bound test */
 ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos) {
