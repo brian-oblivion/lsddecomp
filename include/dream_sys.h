@@ -270,7 +270,7 @@ struct DreamSys {
      * refView: vp and vr are the two points ProjectPointAtDistance
      * interpolates between, AdvanceMoveCycle's view bob moves vp.y and vr.y,
      * and StepLookOffset, StopDrift and TickDrift move vr.y (looking up and
-     * down). Entity__MoodCue74 calls its setClearColor (+0x064). */
+     * down). Entity__CueBlueSkyPushDreamer calls its setClearColor (+0x064). */
     struct Viewport *viewport;
     /** The ctor's `modelSource`, a LinkResource (GameApplication passes
      * New_LinkResource("ETC\DREAME5.TMD")), whose model 0 the ctor adds as a

@@ -83,6 +83,8 @@ sCdSyncQueueMode
 sCdTickStep
 sCdTimeoutCounter
 sCdUseVSyncCallback
+sCueBlueSkyClearColor
+sCueStepForwardAndBackDone
 sDataDirectory
 sDayDigits
 sDefaultBMemPMgr
@@ -136,8 +138,6 @@ sMcDevicePath0
 sMcDevicePath1
 sMcTempFileSuffix
 sMdecInitialized
-sMoodCue74ClearColor
-sMoodCue78TransitionDone
 sMovieClearColor
 sMoviePollCounter
 sNameCharTable
