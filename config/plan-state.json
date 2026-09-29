@@ -467,7 +467,9 @@
       "status": "auto"
     },
     "15": {
-      "checklist": {},
+      "checklist": {
+        "literals-graphics": true
+      },
       "reason": "",
       "status": "auto"
     },
