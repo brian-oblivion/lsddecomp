@@ -4,7 +4,7 @@
  *
  * Declares the GridCell class (object, method table, and its slot and field
  * macros), its class id, size and flag constants, and its methods, which
- * are defined in src/ui/title_menu.c.
+ * are defined in src/ui/node_guarded_viewport.c.
  */
 #ifndef GRID_CELL_H
 #define GRID_CELL_H
@@ -59,7 +59,7 @@ struct GridCellMethods {
  *
  * Class id 0x24 (GRIDCELL_CLASS_ID), method table gGridCellMethods, parent
  * SceneNode (the ctor chains to SceneNode's first); no class below it.
- * Methods in src/ui/title_menu.c.
+ * Methods in src/ui/node_guarded_viewport.c.
  *
  * Lifecycle: only StageMap__StageMap (src/world/stage_map.c) creates them.
  * For each of its seven elements it makes one GridCell as the element's

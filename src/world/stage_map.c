@@ -6,7 +6,7 @@
  * path a command takes to the cells; placing, tracking and loading chunks;
  * the drawn window and the scale ramp. Its method table and the chunk and
  * footprint tables open the file. GridCell, the cell class, is defined in
- * src/ui/title_menu.c.
+ * src/ui/node_guarded_viewport.c.
  */
 #include "common.h"
 #include <libgte.h>

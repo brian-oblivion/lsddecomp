@@ -4,7 +4,7 @@
  * through GetDayTaskMethods, then RegisterRecordTableFiles, which its ctor
  * runs. TimedTask, DayTask's parent, follows in timed_task.c, and the
  * StageMap DayTask's scene builds in stage_map.c. NodeGuardedViewport,
- * which DayTask uses, is defined in src/ui/title_menu.c.
+ * which DayTask uses, is defined in src/ui/node_guarded_viewport.c.
  */
 #include "common.h"
 #include <libgte.h>

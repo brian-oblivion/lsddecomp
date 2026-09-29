@@ -4,7 +4,7 @@
  *
  * Declares the NodeGuardedViewport class (object, method table, and its
  * slot and field macros) and its methods, which are defined in
- * src/ui/title_menu.c.
+ * src/ui/node_guarded_viewport.c.
  */
 #ifndef NODE_GUARDED_VIEWPORT_H
 #define NODE_GUARDED_VIEWPORT_H
@@ -47,7 +47,7 @@ struct NodeGuardedViewportMethods {
  *
  * Class id 0x17, method table gNodeGuardedViewportMethods, parent Viewport:
  * its ctor chains to Viewport's (GetViewportMethods()->ctor) first. Methods
- * in src/ui/title_menu.c. No class derives from it.
+ * in src/ui/node_guarded_viewport.c. No class derives from it.
  *
  * What it changes:
  *  - update (+0x09C, NodeGuardedViewport__Update) calls Viewport__Update

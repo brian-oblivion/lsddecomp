@@ -1475,7 +1475,7 @@ segments:
       # never through the caller's frame.
       # Clear of both remainder hazards (zero `jlabel`, zero `jr $t2`), so
       # no rodata slot to attach and no hasm/.word disposition here either.
-      - [0x3DA54, c, ui/title_menu]
+      - [0x3DA54, c, ui/node_guarded_viewport]
       # class_3bb8c_d / _e / _f: front of the 305-function class_3bb8c
       # remainder, split into three ~20-function C units in round 14. The
       # tail (#59 onward, 0x403E4) deliberately STAYS asm as class_3bb8c_g
@@ -1573,6 +1573,8 @@ segments:
       # 21, which sit in `psyq_*` segments -- but they are library code by
       # construction too, so the same remedy is the first thing to try there.
       # Six objects, 0x10 bytes each, tiling 0x410E8..0x41148 exactly:
+      # TitleMenu, New_TitleMenu (0x8004D518) to GetTitleMenuMethods.
+      - [0x3DD18, c, ui/title_menu]
       # TaskObjF, New_TaskObjF (0x8004E2E0) to StampSaveTitleFileLetter; owns jtbl_8001157C and jtbl_80011594.
       - [0x3EAE0, c, ui/task_objf]
       - [0x410E8, o, libapi/a51]        # lseek   (was func_800508E8)
@@ -1982,7 +1984,8 @@ segments:
       - [0x76DC8, .data, world/day_task]  # gDayTaskMethods, DayTask's view points
       - [0x76E68, .data, world/timed_task]  # gTimedTaskMethods
       - [0x76EE8, .data, world/stage_map]  # gStageMapMethods, the chunk and footprint tables
-      - [0x771D8, .data, ui/title_menu]  # gNodeGuardedViewportMethods .. sDisplayBufferRects: the title menu
+      - [0x771D8, .data, ui/node_guarded_viewport]  # gNodeGuardedViewportMethods, gGridCellMethods
+      - [0x77360, .data, ui/title_menu]  # gTitleMenuMethods .. sDisplayBufferRects: the title menu
       - [0x775C4, .data, ui/task_objf]  # gTaskObjFMethods .. sCardIconRect: the memory card's messages
       - [0x776D0, .data, ui/input_dialogs]  # gTextEntryMethods, sTextEntryPanelRect
       - [0x77788, .data, ui/item_list]  # gItemListMethods, sItemListPanelRect
