@@ -40,7 +40,7 @@ struct TriggerWorldMethods {
  * Building it replaces each table entry with a ModelData made over it (not
  * owning its resources). Parent ModelData (its ctor chains to ModelData's,
  * with `owns` 0, so ModelData's own build and release never act on it); no
- * subclasses. Methods in src/graphics/graphics_resources.c. The object is 0x3C
+ * subclasses. Methods in src/graphics/trigger_world.c. The object is 0x3C
  * bytes (New_TriggerWorld).
  *
  * Its one user, FireDreamAuxTriggerEntries (src/world/dream_aux.c), builds
