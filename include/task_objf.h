@@ -154,6 +154,14 @@ struct TaskObjF {
  * (TitleMenu__OnNotify). */
 #define TASKOBJF_CLASS_ID 0xB
 
+/** @name Tones
+ * playSound's tones, VabStreamObj__PlayTone indices (program << 4 | tone). @{ */
+#define TASKOBJF_TONE_PROCEED 0x00 /**< advanceState: circle retries, formats or goes on */
+#define TASKOBJF_TONE_BACK 0x10    /**< circle on an error message, or cross: the operation ends */
+#define TASKOBJF_TONE_VOLUME 127   /**< playSound's PlayTone vol and endVol */
+
+/** @} */
+
 /** TaskObjF::opMode: the operation beginLoad or beginSave started. */
 enum TaskObjFOpMode {
     TASKOBJF_OP_NONE = 0, /**< init, and the terminal states */

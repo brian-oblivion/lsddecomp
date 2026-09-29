@@ -1412,7 +1412,7 @@ void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 event) {
 
 void TaskObjF__PlaySound(TaskObjF *self, s32 index) {
     if (self->sound != NULL) {
-        self->sound->methods->playTone(self->sound, index, 127, 127);
+        self->sound->methods->playTone(self->sound, index, TASKOBJF_TONE_VOLUME, TASKOBJF_TONE_VOLUME);
     }
 }
 
@@ -1424,7 +1424,7 @@ void TaskObjF__AdvanceState(TaskObjF *self) {
         case TASKOBJF_STATE_CARD_CHANGED:
         case TASKOBJF_STATE_SAVE_OVERWRITE_WARNING:
         case TASKOBJF_STATE_LOAD_WARNING:
-            methods->playSound(self, 0 << 4);
+            methods->playSound(self, TASKOBJF_TONE_PROCEED);
             if (self->state == TASKOBJF_STATE_LOAD_WARNING) {
                 strcpy(self->fileName, self->namePrefix);
                 strcat(self->fileName, self->foundSuffixes[self->selectedIndex]);
@@ -1439,7 +1439,7 @@ void TaskObjF__AdvanceState(TaskObjF *self) {
             }
             break;
         case TASKOBJF_STATE_UNFORMATTED_SAVE:
-            methods->playSound(self, 0 << 4);
+            methods->playSound(self, TASKOBJF_TONE_PROCEED);
             methods->setState(self, TASKOBJF_STATE_FORMATTING);
             break;
         case TASKOBJF_STATE_CARD_ERROR:
@@ -1449,7 +1449,7 @@ void TaskObjF__AdvanceState(TaskObjF *self) {
         case TASKOBJF_STATE_SAVE_ERROR:
         case TASKOBJF_STATE_LOAD_NOT_FOUND:
         case TASKOBJF_STATE_LOAD_ERROR:
-            methods->playSound(self, 1 << 4);
+            methods->playSound(self, TASKOBJF_TONE_BACK);
             methods->setState(self, TASKOBJF_STATE_ABORTED);
             break;
     }
@@ -1461,7 +1461,7 @@ void TaskObjF__AbortFromState(TaskObjF *self) {
         case TASKOBJF_STATE_UNFORMATTED_SAVE:
         case TASKOBJF_STATE_SAVE_OVERWRITE_WARNING:
         case TASKOBJF_STATE_LOAD_WARNING:
-            self->methods->playSound(self, 1 << 4);
+            self->methods->playSound(self, TASKOBJF_TONE_BACK);
             self->methods->setState(self, TASKOBJF_STATE_ABORTED);
             break;
         default:
