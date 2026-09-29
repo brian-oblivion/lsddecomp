@@ -625,7 +625,7 @@ s32 TaskCore__TickFadeOutCallback(TaskCore *self) {
     if (self->fadeOutCallback != NULL) {
         done = self->fadeOutCallback(self);
         if (done == 0) {
-            goto epilogue; /* MATCHING: an early return here branches differently */
+            goto epilogue; /* MATCHING: an early return here returns a constant 0, not done */
         }
     }
     self->methods->setState(self, TASKCORE_STATE_FADED_OUT);
@@ -1648,30 +1648,25 @@ void Viewport__Flip(Viewport *self) {
     }
 
     self->otIndex = self->drawSystem->methods->getActiveBuffer(self->drawSystem);
-    if (self->drawEnabled == 0) {
-        goto tail_check;
-    }
+    if (self->drawEnabled != 0) {
+        ResetGraph(1);
+        self->drawSystem->methods->swapBuffers(self->drawSystem);
 
-    ResetGraph(1);
-    self->drawSystem->methods->swapBuffers(self->drawSystem);
+        if (self->extraSwap != 0 && self->otIndex == 0) {
+            self->drawSystem->methods->swapBuffers(self->drawSystem);
+        }
 
-    if (self->extraSwap != 0) {
-        if (self->otIndex == 0) {
+        idx = self->otIndex;
+        GsSortClear(self->clearColor.r, self->clearColor.g, self->clearColor.b, self->ot[idx]);
+
+        idx = self->otIndex;
+        GsDrawOt(self->ot[idx]);
+
+        if (self->extraSwap != 0 && self->otIndex == 0) {
             self->drawSystem->methods->swapBuffers(self->drawSystem);
         }
     }
 
-    idx = self->otIndex;
-    GsSortClear(self->clearColor.r, self->clearColor.g, self->clearColor.b, self->ot[idx]);
-
-    idx = self->otIndex;
-    GsDrawOt(self->ot[idx]);
-
-    if (self->extraSwap != 0 && self->otIndex == 0) {
-        self->drawSystem->methods->swapBuffers(self->drawSystem);
-    }
-
-tail_check:
     self->otIndex = (self->otIndex == 0);
 }
 
