@@ -107,13 +107,6 @@ struct LbdFile {
 typedef void (*LbdFileLoadHeaderFn)(LbdFile *self, char *name);
 
 /**
- * @brief A no-argument view of releaseDataBlock (+0x084), the type
- * LbdFile__LoadDataBlock calls it through; the occupant still receives the
- * caller's `self`.
- */
-typedef void (*LbdFileReleaseDataBlockNoArgFn)(void);
-
-/**
  * @brief releaseHeader (+0x07C) with the extra argument
  * StageMap__ClearSlotCells passes, the grid element, which
  * LbdFile__ReleaseHeader never reads.
