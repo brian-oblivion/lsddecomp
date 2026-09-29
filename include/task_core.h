@@ -295,7 +295,7 @@ void TaskCore__Reset(TaskCore *self);
 /** @brief init override: IntermediateBase's init, then the result.
  * @param self the task
  * @param args the objects to work with
- * @param mode 0 runs the task to its end inside this call
+ * @param mode INTERMEDIATEBASE_INIT_RUN runs the task to its end inside this call
  * @return `result`: 0, or 1 when the frame bound ran out */
 s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode);
 

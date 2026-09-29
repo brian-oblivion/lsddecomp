@@ -21,8 +21,18 @@ typedef struct IntermediateBaseInitArgs IntermediateBaseInitArgs;
 /** The two states IntermediateBase__SetState acts on itself; a subclass's
  * own states sit above them (task_core.h's enum TaskCoreState). */
 enum IntermediateBaseState {
-    INTERMEDIATEBASE_STATE_START = 2, /**< init's (mode 0); onStart starts the DrawSystem */
-    INTERMEDIATEBASE_STATE_STOP = 3   /**< onStop stops the DrawSystem */
+    INTERMEDIATEBASE_STATE_START = 2, /**< init's (INTERMEDIATEBASE_INIT_RUN); onStart starts the DrawSystem */
+    INTERMEDIATEBASE_STATE_STOP = 3 /**< onStop stops the DrawSystem */
+};
+
+/** init's `mode`, kept as initMode. */
+enum IntermediateBaseInitMode {
+    /** Attach to the viewport, start, and run the task to its STOP before
+     * init returns; then deinit. How the game runs a whole task. */
+    INTERMEDIATEBASE_INIT_RUN = 0,
+    /** Any nonzero value: add the children and run onInit only; whoever
+     * holds the task drives it (ObjM's init passes its DreamSys pointer). */
+    INTERMEDIATEBASE_INIT_ATTACH = 1
 };
 
 /** init's argument: the objects a task works with. The caller owns it; the
@@ -70,7 +80,7 @@ struct IntermediateBaseInitArgs {
     /* +0x018 */ BasicClass *viewport;  /**< initArgs->viewport, or init's own New_Viewport() */     \
     /* +0x01C */ s32 frameCounter;      /**< update adds 1; resetCounters, onStart, onStop clear it */ \
     /* +0x020 */ s32 state;             /**< setState's argument; resetCounters clears it */         \
-    /* +0x024 */ s32 initMode           /**< init's mode: 0 attaches to the viewport and runs to the end */
+    /* +0x024 */ s32 initMode           /**< init's mode, an enum IntermediateBaseInitMode */
 /* clang-format on */
 
 /** IntermediateBase's method table: BasicClass's slots and
@@ -95,7 +105,8 @@ struct IntermediateBaseMethods {
  * TaskCore__Init its +0x038 result), then releases it.
  * init(args, mode) keeps `args`, takes frameClock, lightRig and viewport
  * from it or creates its own, adds args->drawSystem, args->pad and the
- * frame clock as children, runs onInit and records `mode`. With mode 0 it
+ * frame clock as children, runs onInit and records `mode`. With
+ * INTERMEDIATEBASE_INIT_RUN it
  * also attaches the DrawSystem and the frame clock to the viewport and the
  * frame clock to the light rig, then calls setState(START) and deinit, so
  * the whole job runs inside init. deinit runs onDeinit, undoes the
@@ -135,12 +146,14 @@ void IntermediateBase__OnNotify(IntermediateBase *self, BasicClass *sender, s32 
  * @param self the task */
 void IntermediateBase__ResetCounters(IntermediateBase *self);
 
-/** @brief Binds the task to its objects and, in mode 0, runs it to the end
+/** @brief Binds the task to its objects and, with INTERMEDIATEBASE_INIT_RUN,
+ * runs it to the end
  * (see the class documentation).
  * @param self the task
  * @param args the objects to work with; kept by pointer
- * @param mode 0: attach, start and deinit before returning; else only
- *        attach */
+ * @param mode an enum IntermediateBaseInitMode: INTERMEDIATEBASE_INIT_RUN
+ *        attaches, starts and deinits before returning; any other value only
+ *        attaches */
 void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *args, s32 mode);
 
 /** @brief Runs onDeinit, detaches what init attached, removes the children

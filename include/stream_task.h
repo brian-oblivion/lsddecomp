@@ -155,7 +155,7 @@ void StreamTask__Finalize(StreamTask *self);
 void StreamTask__Reset(StreamTask *self);
 
 /** @brief init override: stores the stream to play, then TaskCore's init in
- * mode 0, which plays it to the end.
+ * INTERMEDIATEBASE_INIT_RUN, which plays it to the end.
  * @param self the task
  * @param args the objects to work with
  * @param streamName the movie's path

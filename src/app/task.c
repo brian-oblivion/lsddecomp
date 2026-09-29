@@ -100,7 +100,7 @@ void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, const ch
     self->streamName = streamName;
     self->streamGroup = streamGroup;
     self->autoPlay = autoPlay;
-    GetTaskCoreMethods()->init((TaskCore *)self, args, 0);
+    GetTaskCoreMethods()->init((TaskCore *)self, args, INTERMEDIATEBASE_INIT_RUN);
 }
 
 void StreamTask__OnInit(StreamTask *self) {
@@ -1213,7 +1213,7 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
     methods->addChild(self, self->frameClock);
     methods->onInit(self, 0, 0, 0);
     self->initMode = mode;
-    if (mode == 0) {
+    if (mode == INTERMEDIATEBASE_INIT_RUN) {
         viewport->methods->addChild(viewport, args->drawSystem);
         viewport->methods->addChild(viewport, self->frameClock);
         self->lightRig->methods->addChild(self->lightRig, self->frameClock);
@@ -1229,7 +1229,7 @@ void IntermediateBase__Deinit(IntermediateBase *self) {
     methods = self->methods;
     methods->onDeinit(self);
     viewport = self->viewport;
-    if (self->initMode == 0) {
+    if (self->initMode == INTERMEDIATEBASE_INIT_RUN) {
         self->lightRig->methods->removeChild(self->lightRig, self->frameClock);
         viewport->methods->removeChild(viewport, self->frameClock);
         viewport->methods->removeChild(viewport, self->initArgs->drawSystem);

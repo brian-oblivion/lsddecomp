@@ -121,7 +121,7 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
     task->methods->setExitCallback(task, (void (*)(void *))GameApplication__RegisterFilesCallback, self);
     task->methods->setFrameBound(task, 0);
     task->methods->setSubHandle(task, path, 0);
-    task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, 0);
+    task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, INTERMEDIATEBASE_INIT_RUN);
     task->methods->release(task);
 }
 
@@ -191,12 +191,13 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
     return APPLICATION_LOOP_DAY;
 }
 
-/* Builds a task with newTask(dreamSys), runs its init to the end (mode 0),
+/* Builds a task with newTask(dreamSys), runs its init to the end
+ * (INTERMEDIATEBASE_INIT_RUN),
  * releases it and returns init's result. */
 s32 GameApplication__RunTask(NewTaskFn newTask, struct DreamSys *dreamSys,
                              IntermediateBaseInitArgs *initArgs) {
     IntermediateBase *task = newTask(dreamSys);
-    s32 result = task->methods->init(task, initArgs, 0);
+    s32 result = task->methods->init(task, initArgs, INTERMEDIATEBASE_INIT_RUN);
 
     task->methods->release(task);
     return result;
@@ -294,7 +295,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
         task = New_TaskCore(0, 0, 0);
         task->methods->setFrameBound(task, 10);
         task->methods->setSubHandle(task, path, 0);
-        task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, 0);
+        task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, INTERMEDIATEBASE_INIT_RUN);
         task->methods->release(task);
     }
 }
