@@ -482,7 +482,9 @@
       "status": "auto"
     },
     "18": {
-      "checklist": {},
+      "checklist": {
+        "noop-slots": true
+      },
       "reason": "",
       "status": "auto"
     },

@@ -208,7 +208,9 @@ PHASE4 = {
         "mood-cues": ("the Entity__MoodCueNN handlers named for what they do (a MoodCue row and its handler "
                       "are the entity's script)", "opus", ()),
         "noop-slots": ("the *__NoOpSlotNN occupants and remaining slotNN fields named for the slot's role, "
-                       "read from the callers and the classes that override it", "opus", ()),
+                       "read from the callers and the classes that override it; a slot nothing calls and "
+                       "no class overrides keeps its position name, which is the only fact about it",
+                       "opus", ()),
     }),
     "19": ("one class, one file", {
         "split-setup": ("a multi-class unit split into one file per class in ROM order, byte-identical, and "
