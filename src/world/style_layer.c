@@ -496,8 +496,8 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
     }
     for (i = 0; i < count; i++) {
         setup(pos, offsetY);
-        *slots =
-            New_StyleEffect(0, (StyleEffectParams *)&sStyleSpawnOffsetX, (SceneNode *)sStyleGrid, pos);
+        *slots = New_StyleEffect(STYLE_EFFECT_MODEL_ROW, (StyleEffectParams *)&sStyleSpawnOffsetX,
+                                 (SceneNode *)sStyleGrid, pos);
         slots++;
     }
     return slots;
@@ -516,8 +516,8 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
     sStyleSpawnScale = sStyleKind1Scale;
     for (i = 0; i < count; i++) {
         SetupStyleSpawnParamsRandom(pos, offsetY);
-        *slots =
-            New_StyleEffect(1, (StyleEffectParams *)&sStyleSpawnOffsetX, (SceneNode *)sStyleGrid, pos);
+        *slots = New_StyleEffect(STYLE_EFFECT_MODEL, (StyleEffectParams *)&sStyleSpawnOffsetX,
+                                 (SceneNode *)sStyleGrid, pos);
         slots++;
     }
     return slots;
@@ -564,9 +564,10 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     rotation = (PtrBoxK3 *)&sStyleSpawnRotation;
     rotation->p = sStyleSpawnRotations[0];
     /* MATCHING: the block's address is taken back from its rotation member */
-    *slots = New_StyleEffect(
-        3, (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
-        (SceneNode *)sStyleGrid, pos);
+    *slots =
+        New_StyleEffect(STYLE_EFFECT_JITTER_SPRITES,
+                        (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
+                        (SceneNode *)sStyleGrid, pos);
     slots++;
     return slots;
 }
@@ -606,9 +607,10 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     *rotation = sStyleSpawnRotations[0];
     sStyleSpawnTableIndex = rand() % 6;
     /* MATCHING: the block's address is taken back from its rotation member */
-    *slots = New_StyleEffect(
-        2, (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
-        (SceneNode *)sStyleGrid, pos);
+    *slots =
+        New_StyleEffect(STYLE_EFFECT_SPRITES,
+                        (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
+                        (SceneNode *)sStyleGrid, pos);
     slots++;
     return slots;
 }
