@@ -796,7 +796,7 @@ segments:
       # Owns NO jump table (the 0xFD8 slot's seven jtbl blocks all fall
       # outside 0x8002BC40..0x8002C408), so unlike _b and _c it needs no
       # rodata attach.
-      - [0x1C92C, c, sound/vab_sound]     # 0x1C92C..0x1D718: code_179d8_d and _e, merged round 100 (track 8), plus ServiceSoundCueSet (round 103)
+      - [0x1C92C, c, sound/placement_grid]     # PlacementGrid and ReturnZero, 0x1C92C..0x1CBC0 (the head of code_179d8_d and _e, merged round 100)
       # (carve history; merged into PlacementGridVabSound above, round 100)
       # code_179d8_e: functions 120..148 of the original, 0x1CC08..0x1D508
       # (29 functions).  Census 2026-09-04, three-grep screen per function:
@@ -1933,7 +1933,7 @@ segments:
       - [0x5DD7C, o, libcd/sys, .data]       # 0x80 -> 0x5DDFC; D_8006D5FC (game data) follows exactly
       - [0x5DDFC, data]
       - [0x5E138, o, libcd/iso9660, .data]   # 8 bytes (two 0x1F8010xx DMA register addresses) -> 0x5E140
-      - [0x5E140, .data, sound/vab_sound]  # gPlacementGridMethods
+      - [0x5E140, .data, sound/placement_grid]  # gPlacementGridMethods
       - [0x5E1BC, .data, sound/null_driver]  # gNullDriverMethods
       - [0x5E234, .data, sound/vab_stream_obj]  # gVabStreamObjMethods
       - [0x5E2D4, data]

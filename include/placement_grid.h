@@ -86,7 +86,7 @@ struct PlacementGridMethods {
  * LinkResource over the models that follow the placements in `linkResource`,
  * and calls ResolveEntry until it returns 0, filling one GridCell from each
  * CellPlacement. StageMap__UnloadAllSlots releases the LinkResource.
- * Methods in src/sound/vab_sound.c.
+ * Methods in src/sound/placement_grid.c.
  */
 struct PlacementGrid {
     FILERESOURCE_FIELDS(PlacementGridMethods);
