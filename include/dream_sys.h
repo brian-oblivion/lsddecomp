@@ -63,8 +63,8 @@ enum DreamSysMoveCommand {
 enum DreamSysLookCallback {
     LOOK_CALLBACK_NONE = 0,      /**< no look callback */
     LOOK_CALLBACK_STEP_LOOK = 1, /**< stepLook */
-    LOOK_CALLBACK_SLOT14C = 2,   /**< slot14C, an empty method */
-    LOOK_CALLBACK_SLOT150 = 3    /**< slot150, an empty method */
+    LOOK_CALLBACK_NOOP_2 = 2,    /**< noOpLook2, an empty method; nothing selects it */
+    LOOK_CALLBACK_NOOP_3 = 3     /**< noOpLook3, an empty method; nothing selects it */
 };
 
 /** DreamSys::moveCallbackMode: what SelectMoveCallback installs in moveCallback. */
@@ -540,8 +540,8 @@ struct DreamSysMethods {
     /* +0x140 */ void (*stepLook)(DreamSys *self);       /**< @see DreamSys__StepLook */
     /* +0x144 */ void (*stepLookOffset)(DreamSys *self); /**< @see DreamSys__StepLookOffset */
     /* +0x148 */ void (*stepLookYaw)(DreamSys *self);    /**< @see DreamSys__StepLookYaw */
-    /* +0x14C */ void (*slot14C)(DreamSys *self); /**< @see DreamSys__NoOpSlot14C (a lookCallback choice) */
-    /* +0x150 */ void (*slot150)(DreamSys *self); /**< @see DreamSys__NoOpSlot150 (a lookCallback choice) */
+    /* +0x14C */ void (*noOpLook2)(DreamSys *self); /**< @see DreamSys__NoOpLook2 (a lookCallback choice) */
+    /* +0x150 */ void (*noOpLook3)(DreamSys *self); /**< @see DreamSys__NoOpLook3 (a lookCallback choice) */
     /* +0x154 */ s32 (*tickMove)(DreamSys *self);       /**< @see DreamSys__TickMove */
     /* +0x158 */ s32 (*tickMoveFree)(DreamSys *self);   /**< @see DreamSys__TickMoveFree */
     /* +0x15C */ s32 (*tickMoveForced)(DreamSys *self); /**< @see DreamSys__TickMoveForced */
@@ -1306,11 +1306,11 @@ void DreamSys__StepLookOffset(DreamSys *self);
  */
 void DreamSys__StepLookYaw(DreamSys *self);
 
-/** @brief Slot +0x14C, a look-callback choice: does nothing. */
-void DreamSys__NoOpSlot14C(void);
+/** @brief noOpLook2 (slot +0x14C), lookCallback mode 2: does nothing. */
+void DreamSys__NoOpLook2(void);
 
-/** @brief Slot +0x150, a look-callback choice: does nothing. */
-void DreamSys__NoOpSlot150(void);
+/** @brief noOpLook3 (slot +0x150), lookCallback mode 3: does nothing. */
+void DreamSys__NoOpLook3(void);
 
 /**
  * @brief Slot +0x154, the move callback: by moveOverride, the pending turn
