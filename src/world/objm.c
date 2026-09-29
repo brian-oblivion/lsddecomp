@@ -186,7 +186,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 i
     GetSetHitHeightGate(flag);
 
     self->dreamSys->methods->setPendingExtra(self->dreamSys, sStagePendingExtras[self->stage]);
-    self->state = 5;
+    self->state = OBJM_STATE_LINK_DYNAMIC;
 }
 
 /* onDeinit. */
@@ -408,11 +408,11 @@ void ObjM__TickStyle(ObjM *self) {
               0, 0);
 }
 
-/* While ObjM's state is 0 each DreamSys link code runs its enterState slot
+/* While ObjM is OBJM_STATE_IDLE each DreamSys link code runs its enterState slot
  * (DREAMSYS_LINK_DAY_START none); otherwise any code from 9 up clears the
  * DreamSys's own state. */
 void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code) {
-    if (self->state == 0) {
+    if (self->state == OBJM_STATE_IDLE) {
         switch (code) {
             case DREAMSYS_TIME_UP:
                 self->methods->enterTimeUp(self);
@@ -449,12 +449,12 @@ void ObjM__EnterTimeUp(ObjM *self) {
     s32 t;
     s32 step;
 
-    self->state = 4;
+    self->state = OBJM_STATE_TIME_UP;
     if (self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &color, -1) == 0) {
         phase = (self->frameCounter + self->stage) & 3;
         t = phase; /* MATCHING: the copy keeps retail's extra move. */
         if (t == 0) {
-            self->methods->notifyParents(self, 4);
+            self->methods->notifyParents(self, OBJM_STATE_TIME_UP);
             return;
         }
         step = 10;
@@ -482,7 +482,7 @@ void ObjM__EnterLinkDynamic(ObjM *self) {
     if (self->dreamSys->currentStage < 0) {
         self->methods->enterLinkWall(self);
     } else {
-        self->state = 5;
+        self->state = OBJM_STATE_LINK_DYNAMIC;
         color = self->dreamSys->methods->getDreamColor(self->dreamSys);
         ObjM__StartFadeUp(self, color, 0, 10, 1);
         self->dreamSys->methods->blockMovement(self->dreamSys);
@@ -492,7 +492,7 @@ void ObjM__EnterLinkDynamic(ObjM *self) {
 void ObjM__EnterLinkWall(ObjM *self) {
     s32 color;
 
-    self->state = 6;
+    self->state = OBJM_STATE_LINK_WALL;
     color = self->dreamSys->methods->getDreamColor(self->dreamSys);
     ObjM__StartFadeUp(self, color, 0, 30, 1);
     self->dreamSys->methods->blockMovement(self->dreamSys);
