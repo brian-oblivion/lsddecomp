@@ -805,6 +805,8 @@ segments:
       # are 2-instruction `jr $ra; nop` leaves splat generates itself, so
       # the real queue is ~11 bodies.  Owns NO switch jump table (zero
       # `jtbl_` references in the slice), so no rodata attach.
+      # VabStreamObj, New_VabStreamObj (0x8002C480) to GetSsTicksPerSecond.
+      - [0x1CC80, c, sound/vab_stream_obj]
       # The SoundCueSet functions, InitSoundCueSet (0x8002CC34) to ServiceSoundCueSet.
       - [0x1D434, c, sound/sound_cue_set]
       # (carve history of the three slices merged into libsnd_vmanager below,
@@ -1929,7 +1931,8 @@ segments:
       - [0x5DD7C, o, libcd/sys, .data]       # 0x80 -> 0x5DDFC; D_8006D5FC (game data) follows exactly
       - [0x5DDFC, data]
       - [0x5E138, o, libcd/iso9660, .data]   # 8 bytes (two 0x1F8010xx DMA register addresses) -> 0x5E140
-      - [0x5E140, .data, sound/vab_sound]  # gPlacementGridMethods, gNullDriverMethods, gVabStreamObjMethods
+      - [0x5E140, .data, sound/vab_sound]  # gPlacementGridMethods, gNullDriverMethods
+      - [0x5E234, .data, sound/vab_stream_obj]  # gVabStreamObjMethods
       - [0x5E2D4, data]
       - [0x5EC8C, .data, sound/wbgm]  # gWBgmMethods
       - [0x5ECF0, .data, app/application]  # gApplicationMethods

@@ -90,7 +90,7 @@ struct VabStreamObjMethods {
  * @brief One VAB sound bank, loaded from disc through the active data source
  * and played through Sony's libsnd (class id 0xA03). A FileResource subclass
  * and a sibling of the drivers (CdDriver, NullDriver), not derived from
- * either; no class derives from it. Methods in src/sound/vab_sound.c.
+ * either; no class derives from it. Methods in src/sound/vab_stream_obj.c.
  *
  * **Loading.** Like every data-source client, its ctor and finalize chain to
  * the active driver's (GetActiveDataSourceMethods), and GetVabStreamObjMethods
