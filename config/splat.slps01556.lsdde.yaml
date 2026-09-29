@@ -1291,6 +1291,8 @@ segments:
       # (func_8003FB1C) and D_80011194 (func_8003FC70) are both still in the
       # unit, which now starts at 0x3030C / func_8003FB0C.
       #   ^ ROUND 34: the first half of that is no longer true -- see below.
+      # Viewport, New_Viewport (0x8003E5D8) to GetRootNode; drawNode is in viewport_draw.
+      - [0x2EDD8, c, app/viewport]
       # Sony's libgs gs_106, GsSetProjection (0x8003F28C), carried as C.
       - [0x2FA8C, c, psyq/libgs_gs_106]
       - [0x2FAAC, o, libgs/gs_131]
@@ -1920,7 +1922,8 @@ segments:
       - [0x5EC8C, .data, sound/wbgm]  # gWBgmMethods
       - [0x5ECF0, .data, app/application]  # gApplicationMethods
       - [0x5ED58, .data, graphics/tim_image]  # gTimImageMethods
-      - [0x5EDF8, .data, app/task]  # gStreamTaskMethods .. gViewportMethods
+      - [0x5EDF8, .data, app/task]  # gStreamTaskMethods .. gIntermediateBaseMethods
+      - [0x5F0E4, .data, app/viewport]  # gViewportMethods
       - [0x5F19C, .data, ui/screen_widgets]  # gFadeBoxMethods .. gTextRowMethods
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)
       - [0x5F474, .data, graphics/char_sprite]  # gCharSpriteMethods, sCharSpriteCellRect

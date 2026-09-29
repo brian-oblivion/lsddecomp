@@ -3,7 +3,7 @@
  * (+0x0A0 of gViewportMethods, inherited by gNodeGuardedViewportMethods,
  * include/viewport.h): it draws a SceneNode and its SceneNode children into
  * the Viewport's current ordering table, picking a libgs sort call by the
- * node's class. The rest of the Viewport class is in src/app/task.c.
+ * node's class. The rest of the Viewport class is in src/app/viewport.c.
  */
 #include "common.h"
 #include <libgte.h>
