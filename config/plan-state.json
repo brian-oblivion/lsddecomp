@@ -480,7 +480,8 @@
     "16": {
       "checklist": {
         "comments-graphics": true,
-        "comments-rest": true
+        "comments-rest": true,
+        "comments-world": true
       },
       "reason": "",
       "status": "auto"
