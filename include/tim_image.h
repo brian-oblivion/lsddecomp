@@ -14,6 +14,10 @@
 typedef struct TimImage TimImage;
 typedef struct TimImageMethods TimImageMethods;
 
+/** TimImage's class id (gTimImageMethods word +0x000): FileResource's 0x3,
+ * one level down. */
+#define TIMIMAGE_CLASS_ID 0x103
+
 /**
  * @brief TimImage's method table, gTimImageMethods: FileResource's slots,
  *        then nine of its own.
