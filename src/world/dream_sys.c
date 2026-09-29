@@ -2018,13 +2018,15 @@ s32 DreamSys__TickStaircaseYawPlus90(DreamSys *self) {
     if (self->moveMode != MOVE_MODE_RUN) {
         if (self->staircaseFrame >= 133)
             return 1;
-        if ((u32)(self->staircaseFrame - 43) < 15 || (u32)(self->staircaseFrame - 75) < 15) {
+        if ((self->staircaseFrame >= 43 && self->staircaseFrame < 58) ||
+            (self->staircaseFrame >= 75 && self->staircaseFrame < 90)) {
             self->turnCommand = TURN_COMMAND_RIGHT;
         }
     } else {
         if (self->staircaseFrame >= 19)
             return 1;
-        if ((u32)(self->staircaseFrame - 8) < 2 || (u32)(self->staircaseFrame - 13) < 2) {
+        if ((self->staircaseFrame >= 8 && self->staircaseFrame < 10) ||
+            (self->staircaseFrame >= 13 && self->staircaseFrame < 15)) {
             self->methods->updateRotation(self, 0, sRotationYawPlus45);
         }
     }
@@ -2042,19 +2044,21 @@ s32 DreamSys__TickStaircaseYawMinus135(DreamSys *self) {
     if (self->moveMode != MOVE_MODE_RUN) {
         if (self->staircaseFrame >= 149)
             return 1;
-        if ((u32)(self->staircaseFrame - 22) < 15 || (u32)(self->staircaseFrame - 57) < 16 ||
-            (u32)(self->staircaseFrame - 110) < 15) {
+        if ((self->staircaseFrame >= 22 && self->staircaseFrame < 37) ||
+            (self->staircaseFrame >= 57 && self->staircaseFrame < 73) ||
+            (self->staircaseFrame >= 110 && self->staircaseFrame < 125)) {
             self->turnCommand = TURN_COMMAND_LEFT;
         }
-        flag = (u32)(self->staircaseFrame - 57) < 53;
+        flag = (self->staircaseFrame >= 57 && self->staircaseFrame < 110);
     } else {
         if (self->staircaseFrame >= 25)
             return 1;
-        if ((u32)(self->staircaseFrame - 6) < 2 || (u32)(self->staircaseFrame - 11) < 2 ||
-            (u32)(self->staircaseFrame - 20) < 2) {
+        if ((self->staircaseFrame >= 6 && self->staircaseFrame < 8) ||
+            (self->staircaseFrame >= 11 && self->staircaseFrame < 13) ||
+            (self->staircaseFrame >= 20 && self->staircaseFrame < 22)) {
             self->methods->updateRotation(self, 0, sRotationYawMinus45);
         }
-        flag = (u32)(self->staircaseFrame - 3) < 14;
+        flag = (self->staircaseFrame >= 3 && self->staircaseFrame < 17);
     }
     if (flag) {
         self->lookOffsetCommand = LOOK_OFFSET_COMMAND_DOWN;
@@ -2070,7 +2074,7 @@ s32 DreamSys__TickStaircaseYawPlus45(DreamSys *self) {
     }
     if (self->moveMode != MOVE_MODE_RUN) {
         if (self->staircaseFrame < 101) {
-            if ((u32)(self->staircaseFrame - 43) < 15) {
+            if (self->staircaseFrame >= 43 && self->staircaseFrame < 58) {
                 self->turnCommand = TURN_COMMAND_RIGHT;
             }
         } else {
@@ -2078,7 +2082,7 @@ s32 DreamSys__TickStaircaseYawPlus45(DreamSys *self) {
         }
     } else {
         if (self->staircaseFrame < 15) {
-            if ((u32)(self->staircaseFrame - 8) < 2) {
+            if (self->staircaseFrame >= 8 && self->staircaseFrame < 10) {
                 self->methods->updateRotation(self, 0, sRotationYawPlus45);
             }
         } else {
@@ -2099,14 +2103,16 @@ s32 DreamSys__TickStaircaseYawMinus90(DreamSys *self) {
     if (self->moveMode != MOVE_MODE_RUN) {
         if (self->staircaseFrame >= 113)
             return 1;
-        if ((u32)(self->staircaseFrame - 30) < 15 || (u32)(self->staircaseFrame - 82) < 15) {
+        if ((self->staircaseFrame >= 30 && self->staircaseFrame < 45) ||
+            (self->staircaseFrame >= 82 && self->staircaseFrame < 97)) {
             self->turnCommand = TURN_COMMAND_LEFT;
         }
-        flag = (u32)(self->staircaseFrame - 30) < 52;
+        flag = (self->staircaseFrame >= 30 && self->staircaseFrame < 82);
     } else {
         if (self->staircaseFrame >= 19)
             return 1;
-        if ((u32)(self->staircaseFrame - 6) < 2 || (u32)(self->staircaseFrame - 15) < 2) {
+        if ((self->staircaseFrame >= 6 && self->staircaseFrame < 8) ||
+            (self->staircaseFrame >= 15 && self->staircaseFrame < 17)) {
             self->methods->updateRotation(self, 0, sRotationYawMinus45);
         }
         flag = (u32)self->staircaseFrame < 9;
