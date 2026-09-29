@@ -3,10 +3,8 @@
 
 /**
  * @file common.h
- * @brief The header every unit includes first: the fixed-width types
- *        (types.h), the macros that splice a function's disassembly into
- *        a unit, a few
- *        C89 helper macros, and the dream chart's point type.
+ * @brief Included first by every unit: the integer types (types.h),
+ *        small C89 helper macros and the dream chart's point type.
  */
 
 #include "include_asm.h"
@@ -32,19 +30,19 @@
 #define FIX12_SHIFT 12
 
 /**
- * @brief One point on the dream chart, the game's two-axis mood graph: a
- * day's mood, or the mood an entity contributes to it (DreamSys keeps one
- * per previous day and sums them). Read either as the two signed axes or
- * as one halfword to copy the pair at once.
+ * @brief A position on the dream chart, the two-axis mood graph the game
+ * scores each day on. The same type holds a whole day's mood and the
+ * nudge one entity gives it; DreamSys keeps one per past day and adds them
+ * up. Access the axes separately, or copy both as one halfword.
  */
 typedef union MoodGraphPoint {
-    s16 value; /**< Both axes as one halfword, for copying the point whole. */
+    s16 value; /**< Both axes packed together, for whole-point copies. */
 
-    /** @brief The point's two axes, one signed byte each. */
+    /** @brief The two axes, a signed byte each. */
     struct axis {
-        s8 dynamic; /**< The chart's static-to-dynamic axis. */
-        s8 upper;   /**< The chart's downer-to-upper axis. */
-    } axis;         /**< The point read as its two axes. */
+        s8 dynamic; /**< The static-to-dynamic axis. */
+        s8 upper;   /**< The downer-to-upper axis. */
+    } axis;         /**< The point as separate axes. */
 } MoodGraphPoint;
 
 #endif
