@@ -11,6 +11,8 @@
  *  - FrameClock (include/frame_clock.h): the per-frame clock.
  *  - LightRig (include/light_rig.h): three flat lights and the ambient
  *    colour.
+ * The three sprite classes' method tables close the file; RequestedFile's,
+ * FrameClock's and LightRig's are still in the data disassembly.
  */
 #include "common.h"
 #include <libgte.h>
@@ -27,7 +29,7 @@
 #include "data_source.h"
 #include "scene_node.h"
 
-/* Defined in other units. */
+/* Two constants defined at the end of the file, among the method tables. */
 
 /* The zero offset ScreenSprite__AttachToParent attaches with. */
 extern LongVec3 sVec3Zero;
@@ -267,7 +269,6 @@ void Sprite__Update(Sprite *self, void *sender, s32 event) {}
 /* Slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gVariantSpriteMethods (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
 void Sprite__SetColor(Sprite *self, ColorRgb *rgb) {
-    /* MATCHING: ColorRgb is three u8s, so this whole-struct copy moves exactly three bytes */
     self->sprite.rgb = *rgb;
 }
 
@@ -391,27 +392,27 @@ void FrameClock__Tick(FrameClock *self) {
     self->methods->notifyParents(self, event);
 }
 
-/* gFrameClockMethods slot +0x048. */
+/* gFrameClockMethods slot +0x048 (getFrameCount): the frames counted so far. */
 s32 FrameClock__GetFrameCount(FrameClock *self) {
     return self->frameCount;
 }
 
-/* gFrameClockMethods slot +0x04C. */
+/* gFrameClockMethods slot +0x04C (pause): tick stops counting and notifies PAUSED. */
 void FrameClock__Pause(FrameClock *self) {
     self->paused = 1;
 }
 
-/* gFrameClockMethods slot +0x050. */
+/* gFrameClockMethods slot +0x050 (resume): tick counts again, unless stopped. */
 void FrameClock__Resume(FrameClock *self) {
     self->paused = 0;
 }
 
-/* gFrameClockMethods slot +0x054. */
+/* gFrameClockMethods slot +0x054 (isPaused). */
 s32 FrameClock__IsPaused(FrameClock *self) {
     return self->paused;
 }
 
-/* gFrameClockMethods slot +0x058. */
+/* gFrameClockMethods slot +0x058 (stop): tick notifies STOPPED until the next reset. */
 void FrameClock__Stop(FrameClock *self) {
     self->stopped = 1;
 }
@@ -493,3 +494,175 @@ void LightRig__SetAmbientColor(LightRig *self, ColorRgb *rgb, s32 swap) {
 LightRigMethods *GetLightRigMethods(void) {
     return &gLightRigMethods;
 }
+
+/* The sprite classes' method tables and the two constants between them, in
+ * the order the image keeps them. Each table fills its class's header's slots
+ * with the class's own method or the parent's. A (void *) entry is a
+ * method whose declared parameters differ from the slot's, usually one
+ * inherited from a parent class and declared on the parent's type. */
+
+/* CharSprite (include/char_sprite.h): ScreenSprite's table with the ctor
+ * and reset, then setCell and getCell. */
+CharSpriteMethods gCharSpriteMethods = {
+    CHARSPRITE_CLASS_ID,
+    (void *)BasicClass__Release,
+    (void *)CharSprite__CharSprite,
+    (void *)SceneNode__Finalize,
+    (void *)SceneNode__AddChild,
+    (void *)SceneNode__RemoveChild,
+    (void *)SceneNode__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)SceneNode__OnNotify,
+    NULL,
+    (void *)CharSprite__Reset,
+    (void *)Sprite__UpdateRotation,
+    (void *)SceneNode__UpdateScale,
+    (void *)ScreenSprite__AttachToParent,
+    (void *)SceneNode__DetachFromParent,
+    (void *)SceneNode__DetachAttachedChildren,
+    (void *)SceneNode__GetNextAttachedChild,
+    (void *)SceneNode__NoOpFinalizeHook,
+    (void *)Sprite__SetDisplay,
+    (void *)Sprite__SetSemiTrans,
+    (void *)Sprite__SetSemiTransRate,
+    (void *)SceneNode__SetLighting,
+    (void *)SceneNode__SetLightMode,
+    (void *)SceneNode__SetLightDim,
+    (void *)SceneNode__SetUseZ,
+    (void *)SceneNode__SetSubdivision,
+    (void *)SceneNode__SetBackClip,
+    (void *)SceneNode__GetRotMatrix,
+    (void *)SceneNode__NotifyWithHull,
+    (void *)SceneNode__GetModelHull,
+    (void *)SceneNode__TransformAndNotifyParents,
+    (void *)SceneNode__OnPadEvent,
+    (void *)Sprite__Update,
+    (void *)SceneNode__DispatchLinkCommand,
+    (void *)SceneNode__TryAttachNearby,
+    (void *)SceneNode__ComposeAndApplyRotation,
+    (void *)SceneNode__CheckBoundsOverlap,
+    (void *)SceneNode__RaycastHullAgainstFaces,
+    SceneNode__NoOpSlotB0,
+    (void *)SceneNode__AddToActorParents,
+    (void *)Sprite__SetColor,
+    (void *)ScreenSprite__SetPosition,
+    (void *)ScreenSprite__SetPivotAnchor,
+    CharSprite__SetCell,
+    CharSprite__GetCell,
+};
+
+SpriteRect sCharSpriteCellRect = {0, 0, CHARSPRITE_CELL_SIZE, CHARSPRITE_CELL_SIZE};
+
+/* ScreenSprite (include/screen_sprite.h): Sprite's table with the ctor,
+ * reset and attachToParent, then setPosition and setPivotAnchor. */
+ScreenSpriteMethods gScreenSpriteMethods = {
+    SCREENSPRITE_CLASS_ID,
+    (void *)BasicClass__Release,
+    (void *)ScreenSprite__ScreenSprite,
+    (void *)SceneNode__Finalize,
+    (void *)SceneNode__AddChild,
+    (void *)SceneNode__RemoveChild,
+    (void *)SceneNode__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)SceneNode__OnNotify,
+    NULL,
+    ScreenSprite__Reset,
+    (void *)Sprite__UpdateRotation,
+    (void *)SceneNode__UpdateScale,
+    (void *)ScreenSprite__AttachToParent,
+    (void *)SceneNode__DetachFromParent,
+    (void *)SceneNode__DetachAttachedChildren,
+    (void *)SceneNode__GetNextAttachedChild,
+    (void *)SceneNode__NoOpFinalizeHook,
+    (void *)Sprite__SetDisplay,
+    (void *)Sprite__SetSemiTrans,
+    (void *)Sprite__SetSemiTransRate,
+    (void *)SceneNode__SetLighting,
+    (void *)SceneNode__SetLightMode,
+    (void *)SceneNode__SetLightDim,
+    (void *)SceneNode__SetUseZ,
+    (void *)SceneNode__SetSubdivision,
+    (void *)SceneNode__SetBackClip,
+    (void *)SceneNode__GetRotMatrix,
+    (void *)SceneNode__NotifyWithHull,
+    (void *)SceneNode__GetModelHull,
+    (void *)SceneNode__TransformAndNotifyParents,
+    (void *)SceneNode__OnPadEvent,
+    (void *)Sprite__Update,
+    (void *)SceneNode__DispatchLinkCommand,
+    (void *)SceneNode__TryAttachNearby,
+    (void *)SceneNode__ComposeAndApplyRotation,
+    (void *)SceneNode__CheckBoundsOverlap,
+    (void *)SceneNode__RaycastHullAgainstFaces,
+    SceneNode__NoOpSlotB0,
+    (void *)SceneNode__AddToActorParents,
+    (void *)Sprite__SetColor,
+    ScreenSprite__SetPosition,
+    ScreenSprite__SetPivotAnchor,
+};
+
+LongVec3 sVec3Zero = {0, 0, 0};
+
+/* Sprite (include/sprite.h): SceneNode's table with Sprite's ctor, reset,
+ * rotation, display, semi-transparency and update, then setColor. */
+SpriteMethods gSpriteMethods = {
+    SPRITE_CLASS_ID,
+    (void *)BasicClass__Release,
+    Sprite__Sprite,
+    (void *)SceneNode__Finalize,
+    (void *)SceneNode__AddChild,
+    (void *)SceneNode__RemoveChild,
+    (void *)SceneNode__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)SceneNode__OnNotify,
+    NULL,
+    (void *)Sprite__Reset,
+    (void *)Sprite__UpdateRotation,
+    (void *)SceneNode__UpdateScale,
+    (void *)SceneNode__AttachToParent,
+    (void *)SceneNode__DetachFromParent,
+    (void *)SceneNode__DetachAttachedChildren,
+    (void *)SceneNode__GetNextAttachedChild,
+    (void *)SceneNode__NoOpFinalizeHook,
+    Sprite__SetDisplay,
+    (void *)Sprite__SetSemiTrans,
+    (void *)Sprite__SetSemiTransRate,
+    (void *)SceneNode__SetLighting,
+    (void *)SceneNode__SetLightMode,
+    (void *)SceneNode__SetLightDim,
+    (void *)SceneNode__SetUseZ,
+    (void *)SceneNode__SetSubdivision,
+    (void *)SceneNode__SetBackClip,
+    (void *)SceneNode__GetRotMatrix,
+    (void *)SceneNode__NotifyWithHull,
+    (void *)SceneNode__GetModelHull,
+    (void *)SceneNode__TransformAndNotifyParents,
+    (void *)SceneNode__OnPadEvent,
+    Sprite__Update,
+    (void *)SceneNode__DispatchLinkCommand,
+    (void *)SceneNode__TryAttachNearby,
+    (void *)SceneNode__ComposeAndApplyRotation,
+    (void *)SceneNode__CheckBoundsOverlap,
+    (void *)SceneNode__RaycastHullAgainstFaces,
+    SceneNode__NoOpSlotB0,
+    (void *)SceneNode__AddToActorParents,
+    Sprite__SetColor,
+};

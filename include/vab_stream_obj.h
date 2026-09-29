@@ -42,6 +42,11 @@ enum VabStreamLoadState {
     VABSTREAM_LOAD_BODY = 6    /**< Waiting for "<base>.VB". */
 };
 
+/** "No voice": what playTone returns when nothing was keyed on, what
+ * stopVoice returns for its caller to store back, and a free SoundCueSlot's
+ * voice. A real voice is 0 or more. */
+#define VAB_NO_VOICE (-1)
+
 /**
  * @brief The type VabStreamObj's processBuffer slot (+0x078) is called
  * through: FileResource declares that slot untyped, and this class's
@@ -95,7 +100,7 @@ struct VabStreamObjMethods {
  *
  * **Playing.** playTone(index, vol, endVol) keys on program `index >> 4`,
  * tone `index & 0xF`, at the tone's centre note plus `pitchOffset`, and
- * returns the voice or -1. stopVoice(voice) keys one voice off, or every
+ * returns the voice or VAB_NO_VOICE. stopVoice(voice) keys one voice off, or every
  * voice when `voice` >= 24. The holders keep the object as whatever their
  * own field type is (TaskCore::sound, TimedTask::sound, DreamSys::soundObj,
  * WBgm::vab) and cast to VabStreamObj * where they call through it. The
@@ -183,7 +188,7 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self);
  * @param index  `program << 4 | tone`; negative plays nothing.
  * @param vol    Key-on volume, 0..127.
  * @param endVol Volume the tone ramps to, 0..127.
- * @return The voice, or -1.
+ * @return The voice, or VAB_NO_VOICE.
  */
 s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 vol, s32 endVol);
 
@@ -192,7 +197,7 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 vol, s32 endVol);
  * or more.
  * @param self  The bank.
  * @param voice The voice PlayTone returned.
- * @return -1, the "no voice" value callers store back.
+ * @return VAB_NO_VOICE, for the caller to store back.
  */
 s32 VabStreamObj__StopVoice(VabStreamObj *self, s32 voice);
 

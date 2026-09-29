@@ -150,9 +150,17 @@ struct TaskObjF {
 };
 
 /** TaskObjF's class id (gTaskObjFMethods word +0x000). A single nibble, so
- * `(header & 0xF) == TASKOBJF_CLASS_ID` is its is-kind-of test
+ * `(header & CLASS_ID_ROOT_MASK) == TASKOBJF_CLASS_ID` is its is-kind-of test
  * (TitleMenu__OnNotify). */
 #define TASKOBJF_CLASS_ID 0xB
+
+/** @name Tones
+ * playSound's tones, VabStreamObj__PlayTone indices (program << 4 | tone). @{ */
+#define TASKOBJF_TONE_PROCEED 0x00 /**< advanceState: circle retries, formats or goes on */
+#define TASKOBJF_TONE_BACK 0x10    /**< circle on an error message, or cross: the operation ends */
+#define TASKOBJF_TONE_VOLUME 127   /**< playSound's PlayTone vol and endVol */
+
+/** @} */
 
 /** TaskObjF::opMode: the operation beginLoad or beginSave started. */
 enum TaskObjFOpMode {

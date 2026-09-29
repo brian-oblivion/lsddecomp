@@ -6,7 +6,7 @@
  * an axis-aligned box or its eight corners, keep a shared bounds buffer, and
  * cast a segment against every face. Then one free function over a TmdHull,
  * RotateAndOffsetHullList, and the two setters of the first primitive's
- * CLUT id.
+ * CLUT id. The method table closes the file.
  */
 #include "common.h"
 #include <libgte.h>
@@ -40,8 +40,8 @@ typedef struct Ray {
  * plus this bit for a semi-transparent face (libgpu's setSemiTrans bit). */
 #define TMD_MODE_ABE 0x02
 
-/* MATCHING: ~x + 1, not -x: retail negates with nor/addiu, and -x also
- * changes what CSE keeps live across the branches. */
+/* MATCHING: ~x + 1, not -x: retail negates by complementing and adding one,
+ * and -x also changes which values are kept across the branches. */
 #define ABS_fa50(x) ((x) < 0 ? ~(x) + 1 : (x))
 
 /* One face's result in TmdModel__RaycastFaces: the segment's line meets the
@@ -110,8 +110,8 @@ void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box) {
     s32 i;
     s32 n;
     TmdVertex *v;
-    /* MATCHING: the five field pointers are hoisted in retail; without them
-     * the function changes size. */
+    /* MATCHING: retail takes the five field pointers once, before the loop;
+     * without them the function is a different length. */
     s16 *miny = &box->min.y;
     s16 *minz = &box->min.z;
     s16 *maxx = &box->max.x;
@@ -178,7 +178,7 @@ void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
     out->v[7].x = b.box.max.x;
     out->v[7].y = b.box.min.y;
     out->v[7].z = b.box.max.z;
-    out->count = 1; /* MATCHING: the literal, not b.count, which is reloaded */
+    out->count = 1; /* MATCHING: the literal again; b.count reads the local back */
 }
 
 void RotateAndOffsetHullList(TmdHull *h, s32 turn, s32 back, s32 delta) {
@@ -198,8 +198,8 @@ void RotateAndOffsetHullList(TmdHull *h, s32 turn, s32 back, s32 delta) {
             c->face[0][1] = tmp.face[1][1];
             c->face[1][1] = tmp.face[1][2];
             c->face[1][0] = tmp.face[1][3];
-            /* MATCHING: a k per branch; a single k at the top swaps the
-             * counter and pointer registers in all four loops. */
+            /* MATCHING: a k per branch; a single k at the top lays all four
+             * loops out differently. */
             if (back == 0) {
                 s32 k;
                 for (k = 0; k < HULL_FACE_CORNERS; k++) {
@@ -261,9 +261,9 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
     ray.dir.z = end->z - origin->z;
     found = 0;
     while ((p = TmdModel__NextPrimitive(self, p, &nverts, tri, &count)) != NULL) {
-        /* MATCHING: these are declared in the loop body, which puts their
-         * frame slots after nverts and count. */
-        VECTOR unused; /* MATCHING: never read; keeps the frame's layout */
+        /* MATCHING: these are declared in the loop body, which puts them on
+         * the stack after nverts and count. */
+        VECTOR unused; /* MATCHING: never read; keeps retail's stack layout */
         TmdVertex e1;
         TmdVertex e2;
         VECTOR cross;
@@ -274,12 +274,12 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
         VECTOR dirVec;
         VECTOR dirSq;
         VectorOrBox scratch;
-        s32 dist[2]; /* MATCHING: an array, so it stays in memory (dist[1] unused) */
+        s32 dist[2]; /* MATCHING: an array, so it lives on the stack (dist[1] unused) */
         s32 frac;
         s32 q;
         s32 hi;
         s32 t;
-        s16 *minx; /* MATCHING: the six box-field pointers set the frame size */
+        s16 *minx; /* MATCHING: the six box-field pointers give retail's stack size */
         s16 *miny;
         s16 *minz;
         s16 *maxx;
@@ -547,7 +547,7 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
             idx[2] = PRIM(TMD_P_TNG3)->v2;
             size = sizeof(TMD_P_TNG3);
         /* MATCHING: every triangle case jumps to this one tail; a copy per
-         * case changes the register allocation. */
+         * case compiles differently. */
         tri:
             *n = 3;
             break;
@@ -599,8 +599,8 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
     }
     verts = self->object->verts;
     for (i = 0; i < *n; i++) {
-        /* MATCHING: verts[idx[i]] and every equivalent pointer-arithmetic
-         * form swap two registers and cost a word (its match report). */
+        /* MATCHING: verts[idx[i]], and every other way of indexing it,
+         * comes out a word longer. */
         out[i] = *(TmdVec3 *)((u8 *)verts + (idx[i] << 3));
     }
     (*count)++;
@@ -626,3 +626,29 @@ void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy) {
     t->clut = v;
     t->clut = v + xy[1] * 64;
 }
+
+/* TmdModel's method table (include/tmd_model.h): BasicClass's slots with
+ * TmdModel's ctor, then its own four. A (void *) entry is a base method,
+ * declared on BasicClass *. */
+TmdModelMethods gTmdModelMethods = {
+    TMDMODEL_CLASS_ID,
+    (void *)BasicClass__Release,
+    TmdModel__TmdModel,
+    (void *)BasicClass__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    TmdModel__SetQuad,
+    TmdModel__MapModelingData,
+    TmdModel__GetObject,
+    TmdModel__NoOpSlot4C,
+};

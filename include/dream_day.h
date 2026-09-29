@@ -5,7 +5,7 @@
  *        image-view callback in src/app/game_shell.c.
  *
  * Includes include/day_task.h, so an includer also gets DayTask and
- * TimedTask; src/world/dream_scene.c includes it for those.
+ * TimedTask.
  */
 #ifndef DREAM_DAY_H
 #define DREAM_DAY_H

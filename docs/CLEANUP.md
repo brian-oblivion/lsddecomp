@@ -144,8 +144,8 @@ a different compare"), without registers or tool names.
 
 **File-private `#define`s go at the top of the `.c`**, after the includes;
 shared ones go in the header. Most files already do this.
-`dream_scene.c` scatters its defines because it holds several classes;
-track 19 fixes that by splitting the file. `tmd_renderer.c`'s
+The split of `dream_scene.c` (track 19) already put each new file's
+defines at its top. `tmd_renderer.c`'s
 define-before-use-then-`#undef` blocks are a legitimate local style, so
 leave them.
 
@@ -178,11 +178,12 @@ behaviour, then refine when the data is readable. Rename through
 
 ## Track 19: one class, one file
 
-`dream_scene.c` holds half of `ItemList`, `ObjM`, the style layer,
-`StyleEffect`, `Actor` and `VariantSprite` (`GraphRoom` went to
-`graph_room.c` in `split-setup`). A split keeps ROM order: each new file
-takes a contiguous run of functions, and a `.c` is one splat subsegment, so
-cutting a class out of the middle of a unit makes three files, not two.
+`dream_scene.c` held half of `ItemList`, `ObjM`, the style layer,
+`StyleEffect`, `Actor`, `VariantSprite` and `GraphRoom`; it is now seven
+files (`src/ui/item_list.c` holds ItemList's second half, beside the first
+in `input_dialogs.c`). A split keeps ROM order: each new file takes a
+contiguous run of functions, and a `.c` is one splat subsegment, so cutting
+a class out of the middle of a unit makes three files, not two.
 
 **Procedure** (proven on `GraphRoom`, and on a trial cut of `ItemList`'s
 half that also splits an attached jump-table slot):
@@ -226,8 +227,23 @@ half that also splits an attached jump-table slot):
    (`plan.py mark-unit --unit <file> --track 3`, then `--track 7`), since
    its code already passed under the old unit. Runners leave
    `config/plan-state.json` alone.
-8. `tools/lint.sh`, `doxygen Doxyfile`, and grep `include/` and `README.md`
-   for the old file name next to the moved class.
+8. `tools/lint.sh`, `doxygen Doxyfile`, and grep `src/`, `include/` and
+   `README.md` for the old file name next to the moved class.
+
+What else bites, from the `dream_scene.c` split:
+
+- A caller moved away from its callee loses the in-file prototype:
+  `declcheck` (LOCAL) refuses a prototype in a `.c` for another unit's
+  function, so the callee's header must declare it (the style layer got
+  `include/style_layer.h` that way).
+- `apidoc.py` limits a `.c` comment block to 20 lines; a new file's header
+  comment must fit.
+- `config/typeviews-warnings.txt` is keyed by unit: a warning that moves
+  with its function is re-keyed to the new unit.
+- `tools/unitfile.py rename`, used when the old file keeps none of what its
+  name says, rewrites every token of the old name, including
+  `config/plan-state.json` and this file. A runner reverts both and leaves
+  the ledger to the head; fix mentions that would turn wrong first.
 
 ## Not in scope yet
 

@@ -30,7 +30,7 @@ typedef struct FileResourceMethods FileResourceMethods;
     /* +0x040 */ void (*slot40)(void);                          /**< CD: CdDriver__NoOpSlot40 */   \
     /* +0x044 */ void (*open)(Self *self, char *name, s32 arg2, s32 arg3); /**< CD: CdDriver__Open */ \
     /* +0x048 */ void (*close)(Self *self);                     /**< CD: CdDriver__Close */        \
-    /* +0x04C */ s32 (*seek)(Self *self, u32 offset, s32 mode); /**< CD: CdDriver__Seek; LoadFile's seek(0, 2) returns the size */ \
+    /* +0x04C */ s32 (*seek)(Self *self, u32 offset, s32 mode); /**< CD: CdDriver__Seek; mode SEEK_SET moves to offset; LoadFile's seek(0, SEEK_END) returns the size (<stdio.h>) */ \
     /* +0x050 */ void (*slot50)(void);                          /**< CD: CdDriver__NoOpSlot50 */   \
     /* +0x054 */ s32 (*read)(Self *self, void *buf, u32 size);  /**< CD: CdDriver__Read */         \
     /* +0x058 */ void (*loadFile)(Self *self, char *name);      /**< @see FileResource__LoadFile; CD: CdDriver__LoadFile */ \
@@ -74,7 +74,7 @@ struct FileResourceMethods {
  * methods are in src/app/game_shell.c.
  *
  * The object owns one file buffer. FileResource__LoadFile opens a named
- * file, takes its size from seek(0, 2), allocates that much from the
+ * file, takes its size from seek(0, SEEK_END), allocates that much from the
  * BMemPMgr pool, reads the whole file into it and closes it; FreeBuffer
  * releases the buffer unless freeGuard is set. The subclasses are the game's
  * file-backed assets (TimImage, TileMap, TileAtlas, ModelData, Tod,

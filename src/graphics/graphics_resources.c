@@ -14,7 +14,7 @@
  *  - MoviePlayer (movie_player.h): CD-streamed, MDEC-decoded FMV.
  * Each FileResource class has an allocator (New_<Class>), a ctor that adopts
  * a buffer or requests a file (a ResourceSource, include/file_resource.h),
- * a finalizer, and its own load steps.
+ * a finalizer, and its own load steps. The method tables close the file.
  */
 #include "common.h"
 #include <libgte.h>
@@ -42,6 +42,7 @@
 #include "bmem_pmgr.h"
 #include "data_source.h"
 #include "cd_driver.h"
+#include <stdio.h>
 
 extern MoviePlayer *sActiveMoviePlayer; /* the playing movie, or NULL (play sets it, pollActive clears it) */
 extern s32 sMdecInitialized;            /* set by the first ctor, which DecDCTReset(0)s the MDEC */
@@ -213,7 +214,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                     goto fail;
                 }
                 self->sectorSize = max;
-                self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[0], 0);
+                self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[0], SEEK_SET);
                 self->methods->read(self, self->sector, max);
                 self->loadState = TIMBLOCK_LOAD_BLOCK;
             }
@@ -231,7 +232,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 ((TimArraySrcUploadFn)(*p)->methods->processBuffer)(*p);
                 self->blockCount = n;
                 if (n < ((TimBlockHeader *)self->buffer)->count) {
-                    self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[n], 0);
+                    self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[n], SEEK_SET);
                     self->methods->read(self, self->sector, self->sectorSize);
                     self->loadState = TIMBLOCK_LOAD_BLOCK;
                 } else {
@@ -998,7 +999,7 @@ TileMap *New_TileMap(s32 source, TileAtlas *atlas) {
 /* ctor (+0x008): with no `source` (the one caller's), build the default
  * grid at once. What a nonzero `source` would be, no caller shows. */
 void TileMap__TileMap(TileMap *self, s32 source, TileAtlas *atlas) {
-    s32 unused[8]; /* MATCHING: retail's 0x40-byte frame */
+    s32 unused[8]; /* MATCHING: never used; it gives retail's 0x40-byte stack */
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileMapMethods();
@@ -1020,7 +1021,9 @@ void TileMap__Finalize(TileMap *self) {
 /* onRequestDone (+0x064): when idle, BuildMap. */
 void TileMap__Load(TileMap *self) {
     if (self->loadState == 0) {
-        ((TileMapBuildMapFn)self->methods->processBuffer)(); /* MATCHING: retail passes no argument */
+        /* MATCHING: called with no argument, as retail does; the slot still
+         * receives this map, the caller's own `self`. */
+        ((TileMapBuildMapFn)self->methods->processBuffer)();
         self->loaded = 1;
     }
 }
@@ -1070,7 +1073,7 @@ TileAtlas *New_TileAtlas(s32 source) {
 /* ctor (+0x008): with no `source` (the one caller's), build the default
  * cells at once. */
 void TileAtlas__TileAtlas(TileAtlas *self, s32 source) {
-    s32 unused[8]; /* MATCHING: retail's 0x40-byte frame */
+    s32 unused[8]; /* MATCHING: never used; it gives retail's 0x40-byte stack */
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileAtlasMethods();
@@ -1093,10 +1096,12 @@ void TileAtlas__Finalize(TileAtlas *self) {
 
 /* onRequestDone (+0x064): when idle, BuildCells. */
 void TileAtlas__Load(TileAtlas *self) {
-    s32 unused[8]; /* MATCHING: retail's 0x38-byte frame */
+    s32 unused[8]; /* MATCHING: never used; it gives retail's 0x38-byte stack */
 
     if (self->loadState == 0) {
-        ((TileAtlasBuildCellsFn)self->methods->processBuffer)(); /* MATCHING: retail passes no argument */
+        /* MATCHING: called with no argument, as retail does; the slot still
+         * receives this atlas, the caller's own `self`. */
+        ((TileAtlasBuildCellsFn)self->methods->processBuffer)();
         self->loaded = 1;
     }
 }
@@ -1280,7 +1285,7 @@ void MoviePlayer__Finalize(MoviePlayer *self) {
  * cannot be. Then take `frame`, and the first strip at its left edge. */
 s32 MoviePlayer__InitFrame(MoviePlayer *self, DrawRect *frame, s32 external) {
     s32 size;
-    s32 unused[2]; /* MATCHING: retail's 0x28-byte frame */
+    s32 unused[2]; /* MATCHING: never used; it gives retail's 0x28-byte stack */
 
     self->external = external;
     if (external == 0) {
@@ -1533,3 +1538,428 @@ void MoviePlayer__SetAutoPlay(MoviePlayer *self, s32 autoPlay) {
 MoviePlayerMethods *GetMoviePlayerMethods(void) {
     return &gMoviePlayerMethods;
 }
+
+/* The classes' method tables, in the order the image keeps them. Each
+ * fills its class's header's slots with the class's own method or the
+ * parent's. A (void *) entry is a method whose declared parameters differ
+ * from the slot's, usually one inherited from a parent class and declared
+ * on the parent's type. */
+
+/* TimBlockSrc: the block-by-block load step, then the CLUT fades. */
+TimBlockSrcMethods gTimBlockSrcMethods = {
+    TIMBLOCKSRC_CLASS_ID,
+    (void *)FileResource__Release,
+    TimBlockSrc__TimBlockSrc,
+    TimBlockSrc__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    TimBlockSrc__AdvanceLoadState,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    TimBlockSrc__SetEntryShift,
+    TimBlockSrc__FadeAllEntries,
+    TimBlockSrc__FadeEntry,
+};
+
+/* LinkResource: build the TmdModels, map the TMD, then the getters. */
+LinkResourceMethods gLinkResourceMethods = {
+    LINKRESOURCE_CLASS_ID,
+    (void *)FileResource__Release,
+    (void *)LinkResource__LinkResource,
+    LinkResource__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    (void *)LinkResource__BuildModels,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    LinkResource__MapModel,
+    LinkResource__GetTmdObject,
+    LinkResource__GetModel,
+    LinkResource__NoOp,
+};
+
+/* TimArraySrc: build the TimImages, then upload them. */
+TimArraySrcMethods gTimArraySrcMethods = {
+    TIMARRAYSRC_CLASS_ID,
+    (void *)FileResource__Release,
+    TimArraySrc__TimArraySrc,
+    TimArraySrc__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    TimArraySrc__BuildImages,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    TimArraySrc__UploadImages,
+};
+
+/* Tod: scan the animation's packets, with the free packet decoders. */
+TodMethods gTodMethods = {
+    TOD_CLASS_ID,
+    (void *)FileResource__Release,
+    Tod__Tod,
+    Tod__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    (void *)FileResource__OnRequestDone,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    Tod__ScanPackets,
+    ScanTodPackets,
+    DecodeTodPacketWord,
+};
+
+/* BgLayer: SceneNode's table with its reset, rotation and scale, then
+ * setColor. */
+BgLayerMethods gBgLayerMethods = {
+    BGLAYER_CLASS_ID,
+    (void *)BasicClass__Release,
+    (void *)BgLayer__BgLayer,
+    (void *)SceneNode__Finalize,
+    (void *)SceneNode__AddChild,
+    (void *)SceneNode__RemoveChild,
+    (void *)SceneNode__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)SceneNode__OnNotify,
+    NULL,
+    (void *)BgLayer__Reset,
+    (void *)BgLayer__UpdateRotation,
+    (void *)BgLayer__UpdateScale,
+    (void *)SceneNode__AttachToParent,
+    (void *)SceneNode__DetachFromParent,
+    (void *)SceneNode__DetachAttachedChildren,
+    (void *)SceneNode__GetNextAttachedChild,
+    (void *)SceneNode__NoOpFinalizeHook,
+    (void *)SceneNode__SetDisplay,
+    (void *)SceneNode__SetSemiTrans,
+    (void *)SceneNode__SetSemiTransRate,
+    (void *)SceneNode__SetLighting,
+    (void *)SceneNode__SetLightMode,
+    (void *)SceneNode__SetLightDim,
+    (void *)SceneNode__SetUseZ,
+    (void *)SceneNode__SetSubdivision,
+    (void *)SceneNode__SetBackClip,
+    (void *)SceneNode__GetRotMatrix,
+    (void *)SceneNode__NotifyWithHull,
+    (void *)SceneNode__GetModelHull,
+    (void *)SceneNode__TransformAndNotifyParents,
+    (void *)SceneNode__OnPadEvent,
+    (void *)SceneNode__Update,
+    (void *)SceneNode__DispatchLinkCommand,
+    (void *)SceneNode__TryAttachNearby,
+    (void *)SceneNode__ComposeAndApplyRotation,
+    (void *)SceneNode__CheckBoundsOverlap,
+    (void *)SceneNode__RaycastHullAgainstFaces,
+    SceneNode__NoOpSlotB0,
+    (void *)SceneNode__AddToActorParents,
+    BgLayer__SetColor,
+    BgLayer__NoOp,
+};
+
+/* ModelData: load, build and release the model's TMD and TODs, and the
+ * packet scans forwarded to its Tods. */
+ModelDataMethods gModelDataMethods = {
+    MODELDATA_CLASS_ID,
+    (void *)FileResource__Release,
+    (void *)ModelData__ModelData,
+    ModelData__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    ModelData__Load,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    ModelData__BuildResources,
+    ModelData__ReleaseResources,
+    ModelData__ForwardScanPackets,
+    ModelData__ForwardDecodePacketWord,
+};
+
+/* TriggerWorld: ModelData's table over a counted set of model files, then
+ * getModelData. */
+TriggerWorldMethods gTriggerWorldMethods = {
+    TRIGGERWORLD_CLASS_ID,
+    (void *)FileResource__Release,
+    (void *)TriggerWorld__TriggerWorld,
+    TriggerWorld__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    TriggerWorld__Load,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    TriggerWorld__BuildResources,
+    TriggerWorld__ReleaseResources,
+    (void *)ModelData__ForwardScanPackets,
+    (void *)ModelData__ForwardDecodePacketWord,
+    TriggerWorld__GetModelData,
+};
+
+/* TileMap: load, then build the GsMAP. */
+TileMapMethods gTileMapMethods = {
+    TILEMAP_CLASS_ID,
+    (void *)FileResource__Release,
+    TileMap__TileMap,
+    TileMap__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    TileMap__Load,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    TileMap__BuildMap,
+};
+
+/* TileAtlas: load, then build the GsCELLs. */
+TileAtlasMethods gTileAtlasMethods = {
+    TILEATLAS_CLASS_ID,
+    (void *)FileResource__Release,
+    TileAtlas__TileAtlas,
+    TileAtlas__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    TileAtlas__Load,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    TileAtlas__BuildCells,
+};
+
+/* TodSet: Tod's table, building one Tod per animation. */
+TodSetMethods gTodSetMethods = {
+    TODSET_CLASS_ID,
+    (void *)FileResource__Release,
+    (void *)TodSet__TodSet,
+    TodSet__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    (void *)TodSet__BuildTods,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    TodSet__ScanPackets,
+    (void *)ScanTodPackets,
+    (void *)DecodeTodPacketWord,
+};
+
+/* MoviePlayer: BasicClass's table, then play, rewind, the per-frame
+ * advance and decode, and the poll the game loop runs. */
+MoviePlayerMethods gMoviePlayerMethods = {
+    MOVIEPLAYER_CLASS_ID,
+    (void *)BasicClass__Release,
+    MoviePlayer__MoviePlayer,
+    MoviePlayer__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    MoviePlayer__Play,
+    MoviePlayer__Rewind,
+    MoviePlayer__Advance,
+    MoviePlayer__Abort,
+    MoviePlayer__NoOpSlot50,
+    MoviePlayer__NoOpSlot54,
+    MoviePlayer__PullFrame,
+    MoviePlayer__NoOpSlot5C,
+    MoviePlayer__DrawStrip,
+    MoviePlayer__PollActive,
+    MoviePlayer__DecodeFrame,
+    MoviePlayer__SetAutoPlay,
+};

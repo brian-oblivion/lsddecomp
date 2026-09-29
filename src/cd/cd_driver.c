@@ -165,7 +165,7 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
                 sectors = sectors + 1;
             }
             CdIntToPos(CdPosToInt(&self->pos) + sectors, &sCdSeekLoc);
-            if (mode == 0) {
+            if (mode == SEEK_SET) {
                 if (sCdAsyncEnabled != 0) {
                     /* the state machine seeks to &sCdSeekParam->pos: aim it
                      * at a pretend entry whose pos is sCdSeekLoc */
@@ -1013,8 +1013,8 @@ void NoOp3(void) {}
 s32 ReadCdFile(CdDriver *self, void *buf, s32 size) {
     s32 sectors;
     s32 status;
-    char scratch[2048];    /* MATCHING: never used; it puts syncResult where retail keeps it */
-    u_char syncResult[16]; /* MATCHING: CdSync writes 8 bytes; 16 keeps the frame layout */
+    char scratch[CD_SECTOR_SIZE]; /* MATCHING: never used; it puts syncResult where retail keeps it */
+    u_char syncResult[16];        /* MATCHING: CdSync writes 8 bytes; 16 keeps the frame layout */
 
     if (self->isOpen != 0) {
     retry:

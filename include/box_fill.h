@@ -33,7 +33,7 @@ typedef struct BoxFillPos BoxFillPos;
 #define BOXFILL_SEMITRANS_RATE(gsRate) ((gsRate) >> BOXFILL_ATTR_RATE_SHIFT)
 
 /** BoxFill's class id (gBoxFillMethods word +0x000). Two nibbles, so
- * `(header & 0xFF) == BOXFILL_CLASS_ID` is its is-kind-of test, true for
+ * `(header & CLASS_ID_LEVEL2_MASK) == BOXFILL_CLASS_ID` is its is-kind-of test, true for
  * FadeBox (0x164) too (Viewport__DrawNode). */
 #define BOXFILL_CLASS_ID 0x64
 
@@ -43,7 +43,7 @@ typedef struct BoxFillPos BoxFillPos;
  * The ctor's (and Reset's) size argument, setSize's, and FadeBox's
  * pushPosition's. Only the low halfword of each word is kept, in the u16
  * boxW/boxH. Callers pass two-word arrays and pairs of their own
- * (sListViewSize, sGraphPointSize, sStyleDecorBoxSize, and dream_scene.c's
+ * (sListViewSize, sGraphPointSize, sStyleDecorBoxSize, and style_layer.c's
  * BoxFillSize copied from sStyleDecorSizeW), so New_BoxFill and the ctor
  * slot take `void *` and setSize `s32 *`. The same layout as BoxFillPos,
  * which is a position.
@@ -143,7 +143,7 @@ struct BoxFillMethods {
  *  - +0x04C attachToParent: BoxFill__AttachToParent's third argument is a
  *    BoxFillPos screen position where SceneNode's slot types a LongVec3
  *    offset. Callers cast to BoxFillAttachToParentFn (the style layer in
- *    dream_scene.c, task.c) or, through a SceneNode pointer, cast the
+ *    style_layer.c, task.c) or, through a SceneNode pointer, cast the
  *    argument (Viewport__SetFadeBox). BoxFill__AttachAbsolute passes it a
  *    fourth argument, which it ignores.
  * The ctor returns nothing where SceneNode's slot returns `void *`; every

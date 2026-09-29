@@ -9,7 +9,7 @@
  *        the memory card's load-file picker.
  *
  * Methods in src/ui/input_dialogs.c (New_ItemList .. ItemList__DetachTarget)
- * and src/world/dream_scene.c (ItemList__SetState .. GetItemListMethods).
+ * and src/ui/item_list.c (ItemList__SetState .. GetItemListMethods).
  */
 
 /* The objects it holds, by tag (`target` is TaskObjF's `sound`, a
@@ -22,7 +22,7 @@ struct ColorRgb;
 struct VabStreamObj;
 
 /** ItemList's class id (gItemListMethods word +0x000). Two nibbles, so
- * `(u8)header == ITEMLIST_CLASS_ID` is its is-kind-of test (TaskObjF's
+ * `(header & CLASS_ID_LEVEL2_MASK) == ITEMLIST_CLASS_ID` is its is-kind-of test (TaskObjF's
  * addChild/removeChild/onNotify). */
 #define ITEMLIST_CLASS_ID 0x20
 

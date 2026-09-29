@@ -13,7 +13,8 @@
  *
  * RotateVramRectRight is not a TimImage method (no method table lists it): it
  * circularly scrolls a VRAM rectangle right, one column at a time, through the
- * draw singleton's moveImage slot, for dream_scene.c's StyleScrollVramStrips.
+ * draw singleton's moveImage slot, for style_layer.c's StyleScrollVramStrips.
+ * The method table closes the file.
  */
 #include "common.h"
 #include <libgte.h>
@@ -146,3 +147,50 @@ void RotateVramRectRight(DrawRect *area, s32 count, DrawPoint *scratch) {
         }
     }
 }
+
+/* TimImage's method table (include/tim_image.h): FileResource's slots with
+ * TimImage's ctor and finalize, Upload in processBuffer, then its own
+ * nine. A (void *) entry is a method whose declared parameters differ from
+ * the slot's, usually a base method on BasicClass * or FileResource *. */
+TimImageMethods gTimImageMethods = {
+    TIMIMAGE_CLASS_ID,
+    (void *)FileResource__Release,
+    TimImage__TimImage,
+    TimImage__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    (void *)FileResource__FreeBuffer,
+    NoOp,
+    (void *)FileResource__OnRequestDone,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    TimImage__Upload,
+    TimImage__NoOpSlot7C,
+    TimImage__NoOpSlot80,
+    TimImage__NoOpSlot84,
+    TimImage__NoOpSlot88,
+    TimImage__NoOpSlot8C,
+    TimImage__NoOpSlot90,
+    TimImage__NoOpSlot94,
+    TimImage__SetFlag,
+    TimImage__GetTimInfo,
+};

@@ -39,7 +39,7 @@ typedef struct SpriteRect SpriteRect;
 typedef struct SpriteGs SpriteGs;
 
 /** Sprite's class id (gSpriteMethods word +0x000). Two nibbles, so
- * `(header & 0xFF) == SPRITE_CLASS_ID` is its is-kind-of test, true for
+ * `(header & CLASS_ID_LEVEL2_MASK) == SPRITE_CLASS_ID` is its is-kind-of test, true for
  * every subclass too: ScreenSprite (0x144) and VariantSprite (0x1F44)
  * (Viewport__DrawNode). */
 #define SPRITE_CLASS_ID 0x44

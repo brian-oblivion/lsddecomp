@@ -21,7 +21,7 @@
 /** @} */
 
 /** Pad's class id (gPadMethods word +0x000). A single nibble, so
- * `(header & 0xF) == PAD_CLASS_ID` is its is-kind-of test (TextEntry's
+ * `(header & CLASS_ID_ROOT_MASK) == PAD_CLASS_ID` is its is-kind-of test (TextEntry's
  * addChild/removeChild/onNotify). */
 #define PAD_CLASS_ID 0x2
 

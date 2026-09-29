@@ -19,6 +19,9 @@ struct TileAtlas;
 typedef struct TileMap TileMap;
 typedef struct TileMapMethods TileMapMethods;
 
+/** TileMap's class id (gTileMapMethods word +0x000). */
+#define TILEMAP_CLASS_ID 0x203
+
 /**
  * @brief TileMap's method table, gTileMapMethods: FileResource's slots, with
  *        no new ones.
@@ -43,7 +46,7 @@ struct TileMapMethods {
  * (New_TileMap).
  *
  * Its one builder is TaskCore__TaskCore (src/app/task.c): New_TileAtlas(0),
- * then New_TileMap(0, atlas), then New_BgLayer(tileMap, 1); TaskCore__Finalize
+ * then New_TileMap(0, atlas), then New_BgLayer(tileMap, BGLAYER_MODE_SCREEN); TaskCore__Finalize
  * releases the three.
  */
 struct TileMap {

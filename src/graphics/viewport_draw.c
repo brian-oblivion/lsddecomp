@@ -67,7 +67,8 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
     u32 classId;
 
     dirty = 0;
-    /* MATCHING: explicit pointers; retail keeps both addresses in s-registers */
+    /* MATCHING: both matrices through pointer locals, set once here; retail keeps
+     * the two addresses for the whole function rather than recomputing them */
     ls = &lsBuf;
     lw = &lwBuf;
     if ((u8)node->methods->header == GRIDCELL_CLASS_ID && (s32)node->attribute < 0) { /* GsDOFF, bit 31 */
@@ -77,7 +78,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
     coord2 = node->coord2;
     if (coord2->flg == 0) {
         elem = &coord2->coord.m[0][0];
-        scale = (u32 *)&coord2->param->scale; /* MATCHING: read unsigned (srl) */
+        scale = (u32 *)&coord2->param->scale; /* MATCHING: unsigned, so products shift unsigned */
         dirty = 1;
         end = &coord2->coord.m[3][0];
         RotMatrix(&coord2->param->rotate, &coord2->coord);
@@ -117,10 +118,10 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
     } while (cursor != NULL);
 
     classId = node->methods->header;
-    if ((classId & 0xFF) == BGLAYER_CLASS_ID) {
+    if ((classId & CLASS_ID_LEVEL2_MASK) == BGLAYER_CLASS_ID) {
         GsSortBg((GsBG *)&((BgLayer *)node)->bgAttribute, self->ot[self->otIndex],
                  (1 << self->otLength) - 1);
-    } else if ((classId & 0xFF) == BOXFILL_CLASS_ID) {
+    } else if ((classId & CLASS_ID_LEVEL2_MASK) == BOXFILL_CLASS_ID) {
         BoxFill *box = (BoxFill *)node; /* MATCHING: a copy of node, not a cast at each use */
         if (box->relative) {
             box->boxX = ((self->screenSize.width >> 1) * box->posX) / 100;
@@ -130,7 +131,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             box->boxY = box->posY;
         }
         GsSortBoxFill((GsBOXF *)&box->boxAttribute, self->ot[self->otIndex], box->pri);
-    } else if ((classId & 0xFF) != SPRITE_CLASS_ID) {
+    } else if ((classId & CLASS_ID_LEVEL2_MASK) != SPRITE_CLASS_ID) {
         GsGetLws(node->coord2, lw, ls);
         GsSetLightMatrix(lw);
         GsSetLsMatrix(ls);
@@ -138,7 +139,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             SortTmdObject((GsDOBJ2 *)&node->attribute, self->ot[self->otIndex],
                           OTZ_BITS - self->otLength, getScratchAddr(0));
         }
-    } else if ((classId & 0xFFF) == SCREENSPRITE_CLASS_ID) {
+    } else if ((classId & CLASS_ID_LEVEL3_MASK) == SCREENSPRITE_CLASS_ID) {
         /* MATCHING: a copy of node; each ternary is one store */
         ScreenSprite *screenSprite = (ScreenSprite *)node;
         GsSPRITE *gsSprite = (GsSPRITE *)&screenSprite->sprite;
@@ -153,8 +154,8 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
         gsSprite->y += gsSprite->my;
         GsSortSprite(gsSprite, self->ot[self->otIndex], 0);
     } else {
-        /* MATCHING: declared here, not at the top, for the frame layout; scr is
-         * never used and reserves 8 frame bytes retail leaves untouched */
+        /* MATCHING: declared here, not at the top, so they sit where retail's are on
+         * the stack; scr is never used and holds 8 bytes retail leaves untouched */
         VECTOR pos;
         SVECTOR scr;
         Sprite *worldSprite;
@@ -178,7 +179,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             pos.vy = (pos.vy * self->projH) / pos.vz;
             pos.vz = (pos.vz - self->nearZ) / self->zDiv;
             worldSprite = (Sprite *)node;
-            /* MATCHING: ~v + 1, not -v (nor/addiu, not negu) */
+            /* MATCHING: ~v + 1, not -v: retail negates by complementing and adding one */
             if ((pos.vx < 0 ? ~pos.vx + 1 : pos.vx) <= SPRITE_POS_LIMIT) {
                 worldSprite->sprite.x = pos.vx;
             } else {

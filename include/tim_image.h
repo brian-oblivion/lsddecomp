@@ -14,6 +14,10 @@
 typedef struct TimImage TimImage;
 typedef struct TimImageMethods TimImageMethods;
 
+/** TimImage's class id (gTimImageMethods word +0x000): FileResource's 0x3,
+ * one level down. */
+#define TIMIMAGE_CLASS_ID 0x103
+
 /**
  * @brief TimImage's method table, gTimImageMethods: FileResource's slots,
  *        then nine of its own.
@@ -157,7 +161,7 @@ struct DrawRect; /* include/draw_system.h */
  *
  * Each step moves the last column to `scratch`, the rest right by one, and
  * the scratch column back as column 0, through the draw system's moveImage.
- * Not a TimImage method; dream_scene.c's StyleScrollVramStrips calls it.
+ * Not a TimImage method; style_layer.c's StyleScrollVramStrips calls it.
  * @param area    The rectangle to rotate.
  * @param count   How many columns to rotate it by; 0 does nothing.
  * @param scratch The top of a free one-column VRAM area as tall as `area`.

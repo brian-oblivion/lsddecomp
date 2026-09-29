@@ -477,6 +477,7 @@
     },
     "16": {
       "checklist": {
+        "comments-graphics": true,
         "comments-rest": true
       },
       "reason": "",
@@ -497,6 +498,7 @@
     },
     "19": {
       "checklist": {
+        "split-dream-scene": true,
         "split-setup": true
       },
       "reason": "",
@@ -919,6 +921,7 @@
       ],
       "status": "open",
       "units_done": {
+        "actor": "2026-09-29",
         "application": "2026-09-25",
         "bmem_pmgr": "2026-09-24",
         "cd_driver": "2026-09-21",
@@ -926,7 +929,6 @@
         "draw_system": "2026-09-25",
         "dream_aux": "2026-09-21",
         "dream_day": "2026-09-23",
-        "dream_scene": "2026-09-24",
         "dream_sys": "2026-09-22",
         "entity": "2026-09-19",
         "flat_light_obj": "2026-09-25",
@@ -935,6 +937,7 @@
         "graph_room": "2026-09-29",
         "graphics_resources": "2026-09-25",
         "input_dialogs": "2026-09-24",
+        "item_list": "2026-09-24",
         "libcard_card": "2026-09-23",
         "libcd_bios": "2026-09-23",
         "libgs_gs_101": "2026-09-24",
@@ -944,11 +947,14 @@
         "libsnd_vmanager": "2026-09-25",
         "libspu_s_ih": "2026-09-24",
         "main": "2026-09-25",
+        "objm": "2026-09-29",
         "pad": "2026-09-24",
         "scene_node": "2026-09-23",
         "screen_widgets": "2026-09-20",
         "sprite": "2026-09-25",
         "stage_grid": "2026-09-23",
+        "style_effect": "2026-09-29",
+        "style_layer": "2026-09-29",
         "task": "2026-09-23",
         "tim_image": "2026-09-25",
         "title_menu": "2026-09-22",
@@ -956,6 +962,7 @@
         "tmd_renderer": "2026-09-17",
         "tod_actor": "2026-09-24",
         "vab_sound": "2026-09-24",
+        "variant_sprite": "2026-09-29",
         "viewport_draw": "2026-09-25",
         "wbgm": "2026-09-25"
       }
@@ -1652,6 +1659,7 @@
       ],
       "status": "auto",
       "units_done": {
+        "actor": "2026-09-29",
         "application": "2026-09-28",
         "bmem_pmgr": "2026-09-27",
         "cd_driver": "2026-09-27",
@@ -1659,7 +1667,6 @@
         "draw_system": "2026-09-28",
         "dream_aux": "2026-09-27",
         "dream_day": "2026-09-27",
-        "dream_scene": "2026-09-27",
         "dream_sys": "2026-09-26",
         "entity": "2026-09-27",
         "flat_light_obj": "2026-09-28",
@@ -1668,13 +1675,17 @@
         "graph_room": "2026-09-29",
         "graphics_resources": "2026-09-26",
         "input_dialogs": "2026-09-27",
+        "item_list": "2026-09-27",
         "libsnd_vmanager": "2026-09-27",
         "main": "2026-09-28",
+        "objm": "2026-09-29",
         "pad": "2026-09-28",
         "scene_node": "2026-09-28",
         "screen_widgets": "2026-09-27",
         "sprite": "2026-09-27",
         "stage_grid": "2026-09-28",
+        "style_effect": "2026-09-29",
+        "style_layer": "2026-09-29",
         "task": "2026-09-27",
         "tim_image": "2026-09-27",
         "title_menu": "2026-09-27",
@@ -1682,6 +1693,7 @@
         "tmd_renderer": "2026-09-26",
         "tod_actor": "2026-09-27",
         "vab_sound": "2026-09-27",
+        "variant_sprite": "2026-09-29",
         "viewport_draw": "2026-09-27",
         "wbgm": "2026-09-28"
       }

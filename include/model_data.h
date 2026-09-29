@@ -14,6 +14,9 @@ struct ResourceSource;
 typedef struct ModelData ModelData;
 typedef struct ModelDataMethods ModelDataMethods;
 
+/** ModelData's class id (gModelDataMethods word +0x000). */
+#define MODELDATA_CLASS_ID 0x5F03
+
 /**
  * @brief ModelData's slots, for its table and TriggerWorld's: FileResource's,
  *        then three of its own.

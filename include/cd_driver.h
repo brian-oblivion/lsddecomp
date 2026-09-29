@@ -160,13 +160,14 @@ void CdDriver__Close(CdDriver *self);
  *
  * Outside the queue modes it returns GetCdFileSize without moving. From
  * outside the queue it enqueues a CD_OP_SEEK request and returns 0.
- * Dispatched with the drive free and the file open: with `mode` 0 it seeks,
+ * Dispatched with the drive free and the file open: with `mode` SEEK_SET it seeks,
  * through the state machine (async) or on the spot (sync-queue); with any
  * other `mode` it ends the operation at once and returns the file's size
  * rounded up to a whole sector.
  * @param self   The FileResource object whose file is open.
  * @param offset Byte offset from the start of the file.
- * @param mode   0 to seek; anything else to ask for the size.
+ * @param mode   SEEK_SET (<stdio.h>) to seek; anything else (FileResource__LoadFile
+ *               passes SEEK_END) to ask for the size.
  * @return The rounded size for a size query, GetCdFileSize's result outside
  *         the queue modes, and 0 otherwise.
  */

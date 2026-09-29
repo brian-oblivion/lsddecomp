@@ -2,7 +2,7 @@
  * SceneNode's methods (include/scene_node.h documents each), in the order
  * of gSceneNodeMethods' slots +0x008 to +0x0B4, then the table getter, the
  * methods in no slot, and the free vector, bit-field and box-clipping
- * helpers they call.
+ * helpers they call. The method table and the Reset inputs close the file.
  *
  * The link test runs across several of them. A sender, on a hull event,
  * fetches its model's hull, rotates it by its world matrix and notifies its
@@ -196,7 +196,7 @@ SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *parent, LongVec
 
     if (self->parent == NULL) {
         self->parent = parent;
-        /* MATCHING: coord2 through a local, reloaded after addChild */
+        /* MATCHING: coord2 through a local, read again after addChild */
         coord2 = self->coord2;
         coord2->super = parent->coord2;
         parent->methods->addChild(parent, (BasicClass *)self);
@@ -673,7 +673,7 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *
  * BisectSegmentToBox writes the crossing to `out` when it is non-NULL. With
  * both ends outside and not on the same side of any face, the segment is
  * halved and each half tried in turn, until it can no longer be halved. */
-/* MATCHING: the final if (mid.y) with two identical arms; a plain return adds a register move */
+/* MATCHING: the final if (mid.y) with two identical arms; a plain return is longer */
 s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2) {
     u8 code1;
     u8 code2;
@@ -796,7 +796,8 @@ void SceneNode__NoOpSlotB0(void) {}
 
 /* Adds this node as a child (addChild) to every parent of `node` that is
  * an Actor. */
-/* MATCHING: two nested do/while loops, not gotos, so SCENENODE_CLASS_ID is hoisted out of them */
+/* MATCHING: two nested do/while loops, not a goto loop, so SCENENODE_CLASS_ID is set up once,
+ * before both */
 void SceneNode__AddToActorParents(SceneNode *self, void *node) {
     SceneNode *parent;
     void *cursor;
@@ -842,7 +843,7 @@ void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src) {
 /* dst = `src` rotated by the node's rotation (as RotateLocalVector) plus the
  * node's world position, coord2->workm.t. A node with no parent reads the
  * position through NULL. */
-/* MATCHING: the parent test is repeated per axis; hoisting it changes the code */
+/* MATCHING: the parent test is repeated per axis; testing it once changes the code */
 void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 unused) {
     MATRIX rot;
     long *worldPos;
@@ -863,7 +864,6 @@ void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 u
 /* out[i] = GsCOORD2PARAM.rotate's angle i (ONE to the turn) in degrees, over
  * 1: `* 45 >> 9` is `* 360 / ONE` reduced by 8, rounding down. The Ratio16[3]
  * shape FaceTarget builds and updateRotation takes. */
-/* MATCHING: num is written before den; the scheduler puts each den store first */
 void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
     GsCOORD2PARAM *src;
 
@@ -1030,7 +1030,7 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 zeroPitch, s3
 }
 
 /* `pair` (a Ratio16) as 20.12 fixed point, from the quotient and the
- * remainder so that num * ONE cannot overflow; the / and % share one div. */
+ * remainder so that num * ONE cannot overflow; the / and % share one division. */
 s32 RatioToFixed12(void *pair) {
     Ratio16 *p;
     s32 whole, rem, frac;
@@ -1109,7 +1109,8 @@ void ApplyMatrixToSVArray(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m) {
 
 /* dst[i] = m * src[i] over `count` LongVec3s, through ApplyMatrixLV.
  * dst == src works in place. */
-/* MATCHING: the dead six-argument call sizes the frame's outgoing-argument area */
+/* MATCHING: the dead six-argument call gives the function retail's stack room for
+ * six outgoing arguments */
 void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m) {
     LongVec3 *end;
 
@@ -1154,3 +1155,59 @@ s32 GetSetHitHeightGate(s32 value) {
     sHitHeightGate = value;
     return old;
 }
+
+/* SceneNode's method table (include/scene_node.h names each slot): the
+ * inherited BasicClass slots, SceneNode's overrides of them, then its own.
+ * A (void *) entry is a method whose declared parameters differ from the
+ * slot's, usually a base method taking BasicClass *. */
+SceneNodeMethods gSceneNodeMethods = {
+    SCENENODE_CLASS_ID,
+    (void *)BasicClass__Release,
+    SceneNode__SceneNode,
+    SceneNode__Finalize,
+    SceneNode__AddChild,
+    SceneNode__RemoveChild,
+    SceneNode__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)SceneNode__OnNotify,
+    NULL,
+    SceneNode__Reset,
+    SceneNode__UpdateRotation,
+    SceneNode__UpdateScale,
+    SceneNode__AttachToParent,
+    SceneNode__DetachFromParent,
+    SceneNode__DetachAttachedChildren,
+    SceneNode__GetNextAttachedChild,
+    (void *)SceneNode__NoOpFinalizeHook,
+    SceneNode__SetDisplay,
+    SceneNode__SetSemiTrans,
+    SceneNode__SetSemiTransRate,
+    SceneNode__SetLighting,
+    SceneNode__SetLightMode,
+    SceneNode__SetLightDim,
+    SceneNode__SetUseZ,
+    SceneNode__SetSubdivision,
+    SceneNode__SetBackClip,
+    (void *)SceneNode__GetRotMatrix,
+    SceneNode__NotifyWithHull,
+    SceneNode__GetModelHull,
+    SceneNode__TransformAndNotifyParents,
+    (void *)SceneNode__OnPadEvent,
+    (void *)SceneNode__Update,
+    SceneNode__DispatchLinkCommand,
+    (void *)SceneNode__TryAttachNearby,
+    SceneNode__ComposeAndApplyRotation,
+    SceneNode__CheckBoundsOverlap,
+    (void *)SceneNode__RaycastHullAgainstFaces,
+    SceneNode__NoOpSlotB0,
+    SceneNode__AddToActorParents,
+};
+
+Ratio16 sRotationZero[3] = {{0, 1}, {0, 1}, {0, 1}};
+Ratio16 sSceneNodeScaleOne[3] = {{1, 1}, {1, 1}, {1, 1}};

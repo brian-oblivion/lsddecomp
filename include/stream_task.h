@@ -22,7 +22,7 @@ typedef struct StreamTaskMethods StreamTaskMethods;
 enum StreamTaskState { STREAMTASK_STATE_SKIPPED = 18 };
 
 /** `result` after a confirm press skipped the stream (TaskCore's timeout
- * sets 1). */
+ * sets TASKCORE_RESULT_TIMED_OUT). */
 #define STREAMTASK_RESULT_SKIPPED 2
 
 /** setFrameBound's unit in this override: bound * 15 frames, where
@@ -155,7 +155,7 @@ void StreamTask__Finalize(StreamTask *self);
 void StreamTask__Reset(StreamTask *self);
 
 /** @brief init override: stores the stream to play, then TaskCore's init in
- * mode 0, which plays it to the end.
+ * INTERMEDIATEBASE_INIT_RUN, which plays it to the end.
  * @param self the task
  * @param args the objects to work with
  * @param streamName the movie's path

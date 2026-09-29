@@ -1,7 +1,8 @@
 /*
  * DrawSystem: the game's screen and graphics singleton (include/draw_system.h).
  * This file holds all of its methods, the table getter, and the
- * GetDrawSystem/SetDrawSystem accessors for the one instance.
+ * GetDrawSystem/SetDrawSystem accessors for the one instance, then the
+ * method table.
  *
  * main() builds it with New_DrawSystem; Application__InitSystems stores it
  * with SetDrawSystem and sets the screen up through initGraph. Start runs
@@ -191,3 +192,44 @@ DrawSystem *GetDrawSystem(void) {
 void SetDrawSystem(DrawSystem *obj) {
     sDrawSystem = obj;
 }
+
+/* DrawSystem's method table (include/draw_system.h): BasicClass's slots with
+ * DrawSystem's ctor, then its own: set-up, the VSync loop, the VRAM
+ * transfers and the frame counters. A (void *) entry is a base method,
+ * declared on BasicClass *. */
+DrawSystemMethods gDrawSystemMethods = {
+    DRAWSYSTEM_CLASS_ID,
+    (void *)BasicClass__Release,
+    DrawSystem__DrawSystem,
+    (void *)BasicClass__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    DrawSystem__Init,
+    DrawSystem__InitGraph,
+    DrawSystem__Start,
+    DrawSystem__Stop,
+    DrawSystem__SwapBuffers,
+    DrawSystem__GetActiveBuffer,
+    DrawSystem__LoadImage,
+    DrawSystem__StoreImage,
+    DrawSystem__NoOpSlot60,
+    (void *)DrawSystem__MoveImage,
+    DrawSystem__RunLoop,
+    DrawSystem__CountFrames,
+    DrawSystem__SetVSyncCount,
+    DrawSystem__GetVSyncCount,
+    DrawSystem__ClearImage,
+    DrawSystem__GetDims,
+    DrawSystem__SetSyncMode,
+    DrawSystem__SetCallback,
+};
