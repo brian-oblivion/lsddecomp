@@ -256,7 +256,8 @@ void *Actor__ScanLinkCandidates(Actor *self, void *offset, void *pos, s32 count,
  * vertical grid, the same cell in the slots above and below
  * (BuildLinkQueries with span 1). On a hit the cell becomes linkTarget, the
  * actor moves by the ray's offset (addTranslation) and notifyWithHull gets
- * -1; with no hit, linkTarget is NULL and it gets -2. Returns whether it
+ * ACTOR_EVENT_FLOOR_FOUND; with no hit, linkTarget is NULL and it gets
+ * ACTOR_EVENT_NO_FLOOR. Returns whether it
  * linked; 0 as well when the actor has no grid or no slot holds its
  * position. */
 s32 Actor__FindNearbyLink(Actor *self) {
@@ -276,10 +277,10 @@ s32 Actor__FindNearbyLink(Actor *self) {
             self->linkTarget = result;
             if (result != NULL) {
                 self->methods->addTranslation(self, &offset);
-                self->methods->notifyWithHull(self, -1);
+                self->methods->notifyWithHull(self, ACTOR_EVENT_FLOOR_FOUND);
                 return 1;
             }
-            self->methods->notifyWithHull(self, -2);
+            self->methods->notifyWithHull(self, ACTOR_EVENT_NO_FLOOR);
             return 0;
         }
     }

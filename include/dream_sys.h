@@ -1128,10 +1128,11 @@ void DreamSys__DetachFromParent(DreamSys *self);
 
 /**
  * @brief Slot +0x088: Actor's notifyWithHull, then the answer to a step's
- *        floor search (Actor__FindNearbyLink). -1, floor found: its cell
- *        picks the footstep sound (voiceSelect), and on stage 9 a stage-timer
- *        link is tried. -2, no floor: a stage-timer link is tried where the
- *        chunk has loaded, otherwise the step is undone.
+ *        floor search (Actor__FindNearbyLink). ACTOR_EVENT_FLOOR_FOUND: its
+ *        cell picks the footstep sound (voiceSelect), and on stage 9 a
+ *        stage-timer link is tried. ACTOR_EVENT_NO_FLOOR: a stage-timer link
+ *        is tried where the chunk's header is consumed, otherwise the step
+ *        is undone.
  * @param self  The DreamSys.
  * @param event The event.
  */

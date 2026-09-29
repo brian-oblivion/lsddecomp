@@ -271,9 +271,9 @@ void DreamSys__NotifyLinkAttempt(DreamSys *self, s32 event) {
     s32 voice;
 
     GetActorMethods()->notifyWithHull((Actor *)self, event);
-    if (event == -2)
-        goto handle_neg2;
-    if (event != -1)
+    if (event == ACTOR_EVENT_NO_FLOOR)
+        goto no_floor;
+    if (event != ACTOR_EVENT_FLOOR_FOUND)
         return;
 
     voice = self->linkTarget->flags36 & 0x7F;
@@ -286,19 +286,19 @@ void DreamSys__NotifyLinkAttempt(DreamSys *self, s32 event) {
 
     if (self->currentStage != 9)
         return;
-    goto shared_tail;
+    goto try_stage_timer_link;
 
-handle_neg2:
+no_floor:
     if (self->grid->methods->findSlotForPosition(self->grid, (LongVec3 *)self->coord2->coord.t)
-            ->loader->headerReady != 2)
-        goto neg2_mismatch;
+            ->loader->headerReady != LBDFILE_HEADER_CONSUMED)
+        goto undo_step;
 
-shared_tail:
+try_stage_timer_link:
     self->methods->tryStageTimerLink(
         self, (PlayerSpawnPoint *)self->grid->methods->getTargetDescriptor(self->grid, 0, 0));
     return;
 
-neg2_mismatch:
+undo_step:
     self->methods->restoreLinkSnapshot(self);
 }
 

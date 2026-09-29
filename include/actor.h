@@ -28,8 +28,11 @@ struct StageMap;
  * (Actor__MoveAlongLocalAxis), and the range Actor__NotifyMove handles: for
  * the three moves it sweeps the model's hull by lastOffsetValue before
  * passing it on, for ACTOR_EVENT_UNSWEPT it passes the hull as it is.
+ * FindNearbyLink sends the two negative ones, the answer to its floor search.
  */
 enum ActorMoveEvent {
+    ACTOR_EVENT_NO_FLOOR = -2, /**< FindNearbyLink: no GridCell under the actor; linkTarget is NULL. */
+    ACTOR_EVENT_FLOOR_FOUND = -1, /**< FindNearbyLink: a GridCell is linkTarget and the actor stands on it. */
     ACTOR_EVENT_UNSWEPT = 5, /**< The hull as it is; no sender of 5 is in the game's code. */
     ACTOR_EVENT_MOVED_Z = 6, /**< After moveLocalZ. */
     ACTOR_EVENT_MOVED_X = 7, /**< After moveLocalX. */
