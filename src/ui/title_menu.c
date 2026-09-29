@@ -717,9 +717,13 @@ s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 
  * status, with no return statement. */
 /* MATCHING: no return statement; an explicit return adds two words. */
 s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 *formatted) {
-    if (TaskObjF__CardInfoStatus(self, error, cardChanged) != 0) {
-        TaskObjF__CardLoadStatus(self, error, formatted);
+    s32 status;
+
+    status = TaskObjF__CardInfoStatus(self, error, cardChanged);
+    if (status != 0) {
+        status = TaskObjF__CardLoadStatus(self, error, formatted);
     }
+    return status;
 }
 
 s32 TaskObjF__CardInfoStatus(TaskObjF *self, s32 *error, s32 *cardChanged) {
