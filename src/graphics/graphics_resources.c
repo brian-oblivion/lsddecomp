@@ -42,6 +42,7 @@
 #include "bmem_pmgr.h"
 #include "data_source.h"
 #include "cd_driver.h"
+#include <stdio.h>
 
 extern MoviePlayer *sActiveMoviePlayer; /* the playing movie, or NULL (play sets it, pollActive clears it) */
 extern s32 sMdecInitialized;            /* set by the first ctor, which DecDCTReset(0)s the MDEC */
@@ -213,7 +214,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                     goto fail;
                 }
                 self->sectorSize = max;
-                self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[0], 0);
+                self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[0], SEEK_SET);
                 self->methods->read(self, self->sector, max);
                 self->loadState = TIMBLOCK_LOAD_BLOCK;
             }
@@ -231,7 +232,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 ((TimArraySrcUploadFn)(*p)->methods->processBuffer)(*p);
                 self->blockCount = n;
                 if (n < ((TimBlockHeader *)self->buffer)->count) {
-                    self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[n], 0);
+                    self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[n], SEEK_SET);
                     self->methods->read(self, self->sector, self->sectorSize);
                     self->loadState = TIMBLOCK_LOAD_BLOCK;
                 } else {

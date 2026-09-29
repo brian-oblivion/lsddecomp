@@ -165,7 +165,7 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
                 sectors = sectors + 1;
             }
             CdIntToPos(CdPosToInt(&self->pos) + sectors, &sCdSeekLoc);
-            if (mode == 0) {
+            if (mode == SEEK_SET) {
                 if (sCdAsyncEnabled != 0) {
                     /* the state machine seeks to &sCdSeekParam->pos: aim it
                      * at a pretend entry whose pos is sCdSeekLoc */

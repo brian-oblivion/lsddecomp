@@ -28,6 +28,7 @@
 #include "bmem_pmgr.h"
 #include "game_files.h"
 #include <strings.h>
+#include <stdio.h>
 #include "dream_day.h"
 
 /* The table getters of every class SetActiveDataSource rebinds, NULL-
@@ -371,10 +372,10 @@ void FileResource__LoadFile(FileResource *self, char *name) {
     savedIsOpen = self->isOpen;
     self->isOpen = 0;
     self->methods->open(self, name, 1, 0);
-    size = self->methods->seek(self, 0, 2);
+    size = self->methods->seek(self, 0, SEEK_END);
     buffer = BMemPMgrAlloc(size);
     if (buffer != NULL) {
-        self->methods->seek(self, 0, 0);
+        self->methods->seek(self, 0, SEEK_SET);
         self->methods->read(self, buffer, size);
         self->methods->close(self);
         self->buffer = buffer;

@@ -12,6 +12,7 @@
 #include "game_files.h"
 #include <rand.h>
 #include "data_source.h"
+#include <stdio.h>
 
 /* sRecordTable's record indices. The first RECORD_TABLE_COUNT are the
  * sound banks (SND\*.VH/VB) and then each stage's files; the movie records
@@ -155,7 +156,7 @@ s32 LbdFile__LoadDataBlock(LbdFile *self) {
         return 0;
     }
     self->loadState = LBDFILE_LOAD_DATA;
-    self->methods->seek(self, ((LbdFileHeader *)self->buffer)->dataOffset, 0);
+    self->methods->seek(self, ((LbdFileHeader *)self->buffer)->dataOffset, SEEK_SET);
     self->methods->read(self, self->dataBuffer, size);
     return 1;
 }
