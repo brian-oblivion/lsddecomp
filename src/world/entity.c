@@ -1084,24 +1084,17 @@ void Entity__CueRiseFasterThenPitchUp(Entity *self, SoundCueSet *out) {
 /* Row 26: runs forward 384 a tick, climbing what it meets, with one 11520 lunge at moodTimer 110;
  * sounds program 26 every animation cycle. */
 void Entity__CueRunAndLunge(Entity *self, SoundCueSet *out) {
-    s32 v1;
     s32 zDelta;
     void (**moveZOrFindLink)(Entity *self, s32 val, void *notify);
 
-    do { /* MATCHING: without the do/while (0) the code comes out differently */
-        if (out->tick % self->todFrameCount == 0) {
-            out->attenuation = self->methods->getProximityRatio(self);
-            out->slots[0].program = 26;
-            __asm__(""); /* MATCHING: an ordering barrier; v1 = 110 stays after the store */
-            v1 = 110;
-            goto compare;
-        }
-    } while (0);
-    v1 = 110;
-compare:
+    if (out->tick % self->todFrameCount == 0) {
+        out->attenuation = self->methods->getProximityRatio(self);
+        out->slots[0].program = 26;
+    }
+    /* MATCHING: the method slot is looked up before the lunge test; looked up at the call it differs */
     moveZOrFindLink = &self->methods->moveLocalZOrFindLink;
     zDelta = -384;
-    if (self->moodTimer == v1) {
+    if (self->moodTimer == 110) {
         zDelta = -11520;
     }
     (*moveZOrFindLink)(self, zDelta, 0);
