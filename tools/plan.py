@@ -574,12 +574,15 @@ REVISITED_RE = re.compile(r"REVISITED[,:]?\s*\(?round (\d+)")
 
 def revisits_done(func):
     """How many revisits a stall has had: distinct rounds on its REVISITED
-    lines (the line format varies; a round mentioned twice is one revisit)."""
+    lines (the line format varies; a round mentioned twice is one revisit),
+    plus the rounds the ledger records (`plan.py revisited`), which is where
+    they go now that match reports live on archive/process."""
+    ledger = set(load_state()["tracks"]["1"].get("revisited", {}).get(func, {}))
     p = REPORTS / f"{func}.md"
     if not p.exists():
-        return 0
+        return len(ledger)
     t = p.read_text(errors="replace")
-    n = len(set(REVISITED_RE.findall(t)))
+    n = len(set(REVISITED_RE.findall(t)) | ledger)
     return n if n else (1 if "REVISITED" in t else 0)
 
 
@@ -1847,6 +1850,10 @@ def main():
     c.add_argument("--item", required=True, choices=sorted({k for v in CHECK_ITEMS.values() for k in v}))
     c.add_argument("--track", choices=sorted(CHECK_ITEMS), help="only needed when two tracks share an item name")
     c.add_argument("--undo", action="store_true")
+    rv = sub.add_parser("revisited", help="record a track-1 revisit of a stall that did not close it")
+    rv.add_argument("--func", required=True)
+    rv.add_argument("--round", required=True, type=int)
+    rv.add_argument("--note", required=True, help="what was tried and why it did not match")
     sm = sub.add_parser("set-model")
     sm.add_argument("--role", required=True, choices=["match_runner", "naming_runner", "polish_runner"])
     sm.add_argument("--model", required=True, choices=["sonnet", "opus", "auto"])
@@ -1954,6 +1961,12 @@ def main():
         st["tracks"][owners[0]].setdefault("checklist", {})[a.item] = not a.undo
         save_state(st)
         print(f"track {owners[0]}: {a.item} {'un' if a.undo else ''}ticked")
+        return
+    if a.cmd == "revisited":
+        rec = st["tracks"]["1"].setdefault("revisited", {}).setdefault(a.func, {})
+        rec[str(a.round)] = a.note
+        save_state(st)
+        print(f"track 1: {a.func} revisited in round {a.round} ({len(rec)} revisit(s))")
         return
     if a.cmd == "set-model":
         st["models"][a.role] = None if a.model == "auto" else a.model

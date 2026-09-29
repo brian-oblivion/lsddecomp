@@ -11,6 +11,20 @@
   "tracks": {
     "1": {
       "reason": "",
+      "revisited": {
+        "MoviePlayer__Advance": {
+          "108": "retail never writes the result when another player is active; any well-defined return adds an instruction",
+          "109": "retail never writes the result when another player is active; any well-defined return adds an instruction"
+        },
+        "MoviePlayer__DecodeFrame": {
+          "108": "retail never writes the result when another player is active; any well-defined return adds an instruction",
+          "109": "retail never writes the result when another player is active; any well-defined return adds an instruction"
+        },
+        "New_GameApplication": {
+          "108": "retail never writes the result on the NULL path; about 20 well-defined spellings all write it (one word differs)",
+          "109": "retail never writes the result on the NULL path; about 20 well-defined spellings all write it (one word differs)"
+        }
+      },
       "rounds": [
         {
           "attempts": 2,
