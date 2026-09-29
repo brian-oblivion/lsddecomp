@@ -223,7 +223,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *self, LinkResource *modelSource, VabStrea
     self->methods->addChild(self, model);
     self->methods->getSetDreamTimeLimit(self, -1);
     self->movementBlocked = 1;
-    self->moveOverride = 0;
+    self->moveOverride = MOVE_OVERRIDE_NONE;
     self->newGamePending = 1;
     self->methods->initNewGame(self);
     /* MATCHING: returns reset's result, which New_DreamSys ignores */
@@ -256,7 +256,7 @@ void DreamSys__SpawnAtLink(DreamSys *self, StageMap *grid) {
         self->methods->getSetDreamTimeLimit(self, entry->timeLimit + 4);
         self->currentFlashbackIndex++;
     }
-    if (self->moveOverride != 0 && self->exitRotation != 0) {
+    if (self->moveOverride != MOVE_OVERRIDE_NONE && self->exitRotation != 0) {
         self->methods->updateRotation(self, 1, (void *)self->exitRotation);
     }
 }
@@ -303,7 +303,7 @@ undo_step:
 }
 
 void DreamSys__OnPadEvent(DreamSys *self, s32 sender, s32 event) {
-    if (self->moveOverride != 0)
+    if (self->moveOverride != MOVE_OVERRIDE_NONE)
         return;
     if (self->movementBlocked != 0)
         return;
@@ -717,7 +717,7 @@ void DreamSys__StepLookYaw(DreamSys *self) {
 
 void DreamSys__FlipMoveCommand(DreamSys *self) {
     self->moveCommandLatch = 0;
-    if (self->moveCommand != 0) {
+    if (self->moveCommand != MOVE_COMMAND_NONE) {
         if (self->moveCommand & 1)
             self->moveCommand = self->moveCommand + 1;
         else
@@ -730,10 +730,10 @@ void DreamSys__NoOpLook2(void) {}
 void DreamSys__NoOpLook3(void) {}
 
 s32 DreamSys__TickMove(DreamSys *self) {
-    if (self->moveOverride == 0) {
+    if (self->moveOverride == MOVE_OVERRIDE_NONE) {
         self->methods->applyPendingTurn(self);
         return self->methods->tickMoveFree(self);
-    } else if (self->moveOverride != 2) {
+    } else if (self->moveOverride != MOVE_OVERRIDE_HELD) {
         return self->methods->tickMoveForced(self);
     } else {
         return self->methods->tickMoveHeld(self);
@@ -764,7 +764,7 @@ s32 DreamSys__AdvanceMoveCycle(DreamSys *self, s32 bob) {
     Viewport *viewport;
     s32 delta;
 
-    if (self->moveCommand != 0) {
+    if (self->moveCommand != MOVE_COMMAND_NONE) {
         ret = self->moveCommand;
         count = self->moveCycleTick + 1;
         self->moveCycleTick = count;
@@ -787,7 +787,7 @@ s32 DreamSys__AdvanceMoveCycle(DreamSys *self, s32 bob) {
             viewport->refView.vr.y += delta;
         }
 
-        if (self->moveCommand == 0)
+        if (self->moveCommand == MOVE_COMMAND_NONE)
             self->moveCycleTick = 0;
     }
 
