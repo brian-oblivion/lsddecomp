@@ -57,11 +57,11 @@ struct MoviePlayerMethods {
  * on the player play made active (sActiveMoviePlayer), and pollActive clears
  * it when the movie is over.
  *
- * Parent BasicClass; no subclasses. Methods in
- * src/graphics/movie_player.c. The object is 0x6C bytes
- * (New_MoviePlayer). Its one holder is StreamTask (`player`,
- * src/app/task.c), which builds it with New_MoviePlayer(GetDefaultMovieFrame(),
- * 0, 0) and calls setAutoPlay, play, advance (every tick), abort and release.
+ * Parent BasicClass; no subclasses. Methods in src/graphics/movie_player.c.
+ * The object is 0x6C bytes (New_MoviePlayer). Its one holder is StreamTask
+ * (`player`, src/app/stream_task.c), which builds it with
+ * New_MoviePlayer(GetDefaultMovieFrame(), 0, 0) and calls setAutoPlay, play,
+ * advance (every tick), abort and release.
  */
 struct MoviePlayer {
     BASICCLASS_FIELDS(MoviePlayerMethods);

@@ -6,7 +6,7 @@
  * the viewport; then, in sections 1 to 3 below, its pad dispatch, state
  * machine, fades and menu methods up to its table getter, and
  * GetDefaultMovieFrame. Its method table and three constants close the
- * file. StreamTask, which derives from it, is in task.c.
+ * file. StreamTask, which derives from it, is in stream_task.c.
  */
 #include "common.h"
 #include "fade_box.h"
@@ -942,7 +942,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, s32 withSound) {
 
 /* Section 3. The end of TaskCore's run: TaskCore__GetActiveItemCursor,
  * GetTaskCoreMethods and GetDefaultMovieFrame, one TaskCore method and two
- * plain accessors for data used far more widely (task.c, graph_room.c).
+ * plain accessors for data used far more widely (stream_task.c, graph_room.c).
  */
 
 s32 TaskCore__GetActiveItemCursor(TaskCore *self) {

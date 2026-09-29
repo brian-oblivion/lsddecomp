@@ -10,7 +10,7 @@
  * MoviePlayer inside TaskCore's fade and state machine.
  *
  * Declares the class, its own state and result, and its methods, all
- * defined in src/app/task.c.
+ * defined in src/app/stream_task.c.
  */
 
 typedef struct StreamTask StreamTask;
@@ -48,8 +48,8 @@ struct StreamTaskMethods {
 
 /**
  * StreamTask -- class id 0x1130, method table gStreamTaskMethods, a TaskCore
- * subclass (task_core.h). No class derives from it. src/app/task.c holds the
- * whole class: allocator, ctor, every override, the setters and the getter.
+ * subclass (task_core.h). No class derives from it. src/app/stream_task.c
+ * holds the whole class: allocator, ctor, every override, the setters and the getter.
  * The object is 0xDC bytes (New_StreamTask): TaskCore's 0xA4, then its own.
  *
  * What it does: it owns a MoviePlayer (`player`, movie_player.h) and runs one

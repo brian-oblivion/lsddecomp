@@ -4,11 +4,11 @@
  * machine), in ROM order: New_StreamTask through GetStreamTaskMethods; its
  * method table closes the file. TaskCore, its parent, follows in
  * task_core.c, then IntermediateBase and Viewport in intermediate_base.c
- * and viewport.c. include/task.h holds the declarations this file shares
- * with screen_widgets.c.
+ * and viewport.c.
  */
 #include "common.h"
-#include "task.h"
+#include "stream_task.h"
+#include "movie_player.h"
 #include "bmem_pmgr.h"
 
 StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound,

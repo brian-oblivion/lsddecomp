@@ -15,14 +15,11 @@
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
-#include <libgs.h>
 #include "frame_clock.h"
-#include "task.h"
+#include "fade_box.h"
 #include "text_row.h"
 #include "bmem_pmgr.h"
-#include "full_width_sjis.h"
 #include <strings.h>
-#include "scene_node.h"
 
 /* FadeBox's colour tables, eight RGB entries each, indexed at a 3-byte
  * stride by a channel mask: sFadeBoxMaskColors holds each mask's own

@@ -574,4 +574,10 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, s32 withSound);
  * @return the cursor */
 s32 TaskCore__GetActiveItemCursor(TaskCore *self);
 
+/** @brief The default movie frame, {x 640, y 0, w 320, h 240}: StreamTask's
+ * default initData and its MoviePlayer's frame, and the rectangle
+ * TaskCore__OnInit clears when the task has no sub handle.
+ * @return &sDefaultMovieFrame */
+DrawRect *GetDefaultMovieFrame(void);
+
 #endif
