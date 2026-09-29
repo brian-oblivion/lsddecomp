@@ -30,8 +30,25 @@ typedef struct {
 } Block64;
 
 /* The unit's own read-only table of libetc's 16 button masks, in enum
- * PadButton order (PADLup, PADLdown, ... PADstart). */
-extern Block64 sDefaultButtonMasks;
+ * PadButton order. */
+const Block64 sDefaultButtonMasks = {{
+    PADLup,    /* PAD_BUTTON_LUP */
+    PADLdown,  /* PAD_BUTTON_LDOWN */
+    PADLleft,  /* PAD_BUTTON_LLEFT */
+    PADLright, /* PAD_BUTTON_LRIGHT */
+    PADRup,    /* PAD_BUTTON_RUP */
+    PADRdown,  /* PAD_BUTTON_RDOWN */
+    PADRleft,  /* PAD_BUTTON_RLEFT */
+    PADRright, /* PAD_BUTTON_RRIGHT */
+    PADi,      /* PAD_BUTTON_I */
+    PADj,      /* PAD_BUTTON_J */
+    PADselect, /* PAD_BUTTON_SELECT */
+    PADR1,     /* PAD_BUTTON_R1 */
+    PADR2,     /* PAD_BUTTON_R2 */
+    PADL1,     /* PAD_BUTTON_L1 */
+    PADL2,     /* PAD_BUTTON_L2 */
+    PADstart,  /* PAD_BUTTON_START */
+}};
 
 Pad *New_Pad(s32 mode, s32 port) {
     Pad *self;
@@ -153,26 +170,26 @@ PadMethods *GetPadMethods(void) {
  * finalize, then init, updateMasks, dispatchEvents, loadButtonTable and the
  * two empty slots. */
 PadMethods gPadMethods = {
-    PAD_CLASS_ID,
-    (void *)BasicClass__Release,
-    Pad__Pad,
-    Pad__Finalize,
-    (void *)BasicClass__AddChild,
-    (void *)BasicClass__RemoveChild,
-    (void *)BasicClass__RemoveAllChildren,
-    (void *)BasicClass__GetNextChild,
-    (void *)BasicClass__AddParentRef,
-    (void *)BasicClass__RemoveParentRef,
-    (void *)BasicClass__ClearParentRefs,
-    (void *)BasicClass__GetNextParentRef,
-    (void *)BasicClass__NotifyParents,
-    BasicClass__NoOpSlot34,
-    (void *)BasicClass__OnNotify,
-    NULL,
-    Pad__Init,
-    Pad__UpdateMasks,
-    Pad__DispatchEvents,
-    Pad__NoOpSlot4C,
-    Pad__LoadButtonTable,
-    Pad__NoOpSlot54,
+    /* +0x000 header */ PAD_CLASS_ID,
+    /* +0x004 release */ (void *)BasicClass__Release,
+    /* +0x008 ctor */ Pad__Pad,
+    /* +0x00C finalize */ Pad__Finalize,
+    /* +0x010 addChild */ (void *)BasicClass__AddChild,
+    /* +0x014 removeChild */ (void *)BasicClass__RemoveChild,
+    /* +0x018 removeAllChildren */ (void *)BasicClass__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)BasicClass__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 init */ Pad__Init,
+    /* +0x044 updateMasks */ Pad__UpdateMasks,
+    /* +0x048 dispatchEvents */ Pad__DispatchEvents,
+    /* +0x04C slot4C */ Pad__NoOpSlot4C,
+    /* +0x050 loadButtonTable */ Pad__LoadButtonTable,
+    /* +0x054 slot54 */ Pad__NoOpSlot54,
 };

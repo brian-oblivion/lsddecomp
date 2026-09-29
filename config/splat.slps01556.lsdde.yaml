@@ -89,7 +89,7 @@ segments:
       - [0xBD4, rodata]   # 0xEBC..0xF25 is libetc/intr's .rdata, SHADOWED (see the manifest)
       - [0xF28, o, libetc/intr_dma, .rdata]   # "DMA bus error" strings
       - [0xF54, o, libetc/vsync, .rdata]      # "VSync: timeout"
-      - [0xF64, rodata]   # Pad's sDefaultButtonMasks (src/Pad.c): the only object between vsync and 0xFA4 that can own rodata
+      - [0xF64, .rodata, app/pad]   # Pad's sDefaultButtonMasks: the only object between vsync and 0xFA4 that can own rodata
       - [0xFA4, rodata]   # GameApplicationFileResource
       # 0xFD8 slot, SPLIT at 0x1010 by ownership (round 47 carve of
       # code_179d8_s).  The two strings belong to OTHER units --
@@ -1827,12 +1827,13 @@ segments:
       # D_80066828. Declared `data` rather than `rodata` deliberately:
       # section_order puts .rodata FIRST, which would have relocated these
       # bytes to the top of the image.
-      # code_55dd4's own data is only the 0x18 bytes 0x57028..0x57040; what
-      # followed was libc2/ctype's `_ctype_` table, and the old 0x57070 split
-      # point was the MIDDLE of it, never a real boundary. The table's first
+      # Those bytes are only the 0x18 at 0x57028..0x57040, and they are
+      # main.c's sGameApplicationConfig (only main reads it); what followed
+      # was libc2/ctype's `_ctype_` table, and the old 0x57070 split point
+      # was the MIDDLE of it, never a real boundary. The table's first
       # byte is at 0x57040 and the `_ctype_` symbol itself at 0x57041, one
       # past the start, because the table is indexed from EOF = -1.
-      - [0x57028, data]
+      - [0x57028, .data, main]  # sGameApplicationConfig
       - [0x57040, o, libc2/ctype, .data]      # _ctype_, 0x81 bytes
       # The splat script puts the whole image in ONE output section with
       # SUBALIGN(2), which overrides each input section's own alignment. Where
