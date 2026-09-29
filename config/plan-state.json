@@ -472,7 +472,9 @@
       "status": "auto"
     },
     "16": {
-      "checklist": {},
+      "checklist": {
+        "comments-rest": true
+      },
       "reason": "",
       "status": "auto"
     },
