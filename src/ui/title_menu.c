@@ -253,10 +253,15 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSy
     target->hiddenSlots[TITLEMENU_FLASHBACK] = (void *)locked;
 }
 
-/* The save title's day number, full-width characters 9..11 of
- * "LSD   Day001" (StampSaveTitleFileLetter's layout of the title, below). */
+/* The save title is full-width (2-byte SJIS) characters. TitleMenu's (the
+ * buffer sSaveTitle points at) starts as "LSD   Day001", all full-width:
+ * "LSD" (0..2), the letter field (3..5: a space, the save file's letter, a
+ * space), "Day" (6..8), the day number (9..11), then padding. */
+#define SAVE_TITLE_LETTER_FIELD 3
+#define SAVE_TITLE_LETTER 4
 #define SAVE_TITLE_DAY 9
 #define SAVE_TITLE_DAY_DIGITS 3
+#define SAVE_TITLE_PADDING 12
 
 /* Formats the day as three full-width digits in sDayDigits's buffer and
  * copies them into the save title's day number, characters 9..11. */
@@ -369,18 +374,19 @@ void TitleMenu__Exit(TitleMenu *self) {
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
 }
 
-/* sSaveTitle is 2-byte full-width characters; the characters from here on
- * are padding after "LSD   Day001". */
-#define SAVE_TITLE_PADDING 12
 /* beginSave's titleEditPos: the player's text goes in from the character
  * after the padding's first space. */
 #define SAVE_TITLE_EDIT_POS 13
+/* beginSave's iconFrames: CARD\FILEICN1.TIM's three icon frames, the save
+ * header's frame0..frame2. */
+#define SAVE_ICON_FRAMES 3
 
 /* The setTarget override: `target` is the TaskCoreTarget the ctor passes
  * (&sTitleMenuTarget); only its `handle` is read, as the TextRow's texture. On a
  * new game the title's padding is reblanked and its letter field cleared
- * first. The TextRow has a cell a character plus 4, eight of them shown
- * from cell 4, with a gap before cell 9. */
+ * first. The TextRow has a cell a character plus 4 and shows the file's
+ * letter, "Day" and the day number (characters 4..11), with a gap before
+ * the number. */
 void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
     u32 cellCount;
     char *text;
@@ -397,9 +403,9 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
     text = BMemPMgrAlloc(cellCount);
     DecodeFullWidthSjis(text, sSaveTitle);
     self->saveTitle = New_TextRow(target->handle, cellCount, text);
-    self->saveTitle->visibleCount = 8;
-    self->saveTitle->firstVisible = 4;
-    self->saveTitle->gapIndex = 9;
+    self->saveTitle->visibleCount = SAVE_TITLE_PADDING - SAVE_TITLE_LETTER;
+    self->saveTitle->firstVisible = SAVE_TITLE_LETTER;
+    self->saveTitle->gapIndex = SAVE_TITLE_DAY;
     BMemPMgrFree(text);
 }
 
@@ -511,8 +517,9 @@ void TitleMenu__SaveToCard(TitleMenu *self) {
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
         sSaveFileName[0] = '\0';
     }
-    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, sSaveTitle, SAVE_TITLE_EDIT_POS,
-                                       3, self->saveIcon, self->saveBlock, self->saveBlockSize);
+    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, sSaveTitle,
+                                       SAVE_TITLE_EDIT_POS, SAVE_ICON_FRAMES, self->saveIcon,
+                                       self->saveBlock, self->saveBlockSize);
 }
 
 void TitleMenu__LoadFromCard(TitleMenu *self) {
@@ -1584,13 +1591,8 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
     return &gTaskObjFMethods;
 }
 
-/* The save title is full-width (2-byte SJIS) characters. TitleMenu's (the
- * buffer sSaveTitle points at) starts as "LSD   Day001", all full-width:
- * "LSD" (0..2), the letter field (3..5), "Day" (6..8), the day number
- * (9..11), then padding. */
-#define SAVE_TITLE_LETTER_FIELD 3
-#define SAVE_TITLE_LETTER 4
-/* SAVE_TITLE_PADDING (12) is defined above, with sSaveTitle. */
+/* The save title's layout (SAVE_TITLE_LETTER_FIELD and the rest) is
+ * defined above, with StampSaveTitleDay. */
 /* sSaveTitleGlyphs: the full-width letters a..o (0..14), one per save file
  * -01..-15, then three full-width spaces and "Day" (15..20). */
 #define SAVE_TITLE_GLYPH_SPACES 15
