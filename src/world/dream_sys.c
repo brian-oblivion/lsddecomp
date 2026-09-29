@@ -1312,12 +1312,12 @@ s32 DreamSys__GetSetDreamTimeLimit(DreamSys *self, s32 value) {
     result = self->dreamTimeLimit;
     self->dreamTimeLimit = value;
     if (result >= 0)
-        result = (u32)result / DREAM_TICKS_PER_SECOND;
+        result = (u32)result / DREAM_TICKS_PER_SECOND; /* MATCHING: an unsigned divide, as retail does */
     return result;
 }
 
 s32 DreamSys__GetDreamTimerScaled(DreamSys *self) {
-    return (u32)self->tick / DREAM_TICKS_PER_SECOND;
+    return (u32)self->tick / DREAM_TICKS_PER_SECOND; /* MATCHING: an unsigned divide, as retail does */
 }
 
 void DreamSys__SetSoundObj(DreamSys *self, VabStreamObj *value) {
@@ -1335,6 +1335,7 @@ void DreamSys__SetEtcTim(DreamSys *self, struct TimImage *value) {
 void DreamSys__UpdateTickState(DreamSys *self) {
     if (self->movementBlocked == 0) {
         self->linkCommandFlag = 0;
+        /* MATCHING: an unsigned remainder, as retail takes it; both fields are s32 */
         self->tickBoundary = ((u32)self->tick % (u32)self->tickPeriod) == 0;
     }
 }

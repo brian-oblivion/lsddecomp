@@ -333,6 +333,7 @@ extern ColorRgb sGraphPointHighlightColor;
 
 void GraphRoom__TickHighlight(GraphRoom *self) {
     if (self->scored != 0) {
+        /* MATCHING: frameCounter tested unsigned, as retail does; its base class declares it s32 */
         if ((u32)self->frameCounter >= 31) {
             if (self->highlightCount < GRAPH_SCORE_MOOD_COUNT) {
                 if (((u32)self->frameCounter % 24) == 0) {
