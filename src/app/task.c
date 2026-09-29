@@ -12,8 +12,8 @@
  *  - IntermediateBase (include/intermediate_base.h), TaskCore's parent, whole;
  *  - Viewport (include/viewport.h), except drawNode (viewport_draw.c): its
  *    allocator to its table getter, then GetRootNode;
- *  - Sony's GsSetProjection (libgs/gs_106), carried as C because no SDK
- *    object places it; then the four classes' method tables.
+ * then the four classes' method tables. Sony's GsSetProjection, which
+ * follows in ROM, is src/psyq/libgs_gs_106.c.
  * include/task.h holds the declarations this file shares with
  * screen_widgets.c, which follows it.
  */
@@ -1359,8 +1359,7 @@ void Viewport__RemoveAllChildren(Viewport *self) {
  * Section 4. Viewport's methods from onNotify (+0x038) to the end of
  * gViewportMethods, in table order (include/viewport.h documents the class);
  * the ctor, finalize and the child overrides are in section 3, drawNode in
- * viewport_draw.c. Then the table getter, GetRootNode (update's helper) and
- * Sony's GsSetProjection.
+ * viewport_draw.c. Then the table getter and GetRootNode (update's helper).
  */
 
 /* Forwards to the base onNotify, then dispatches on the sender's class-id
@@ -1714,12 +1713,6 @@ SceneNode *GetRootNode(SceneNode *node) {
         node = node->parent;
     }
     return node;
-}
-
-/* Sony's libgs GsSetProjection (gs_106). No SDK object places it, so it is
- * carried as C; it is Sony's code, not the game's. */
-void GsSetProjection(long h) {
-    SetGeomScreen(h);
 }
 
 /* The task classes' and Viewport's method tables and TaskCore's three
