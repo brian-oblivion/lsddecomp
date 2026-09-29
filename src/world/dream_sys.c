@@ -1455,7 +1455,7 @@ void DreamSys__SelectMoveCallback(DreamSys *self, s32 mode) {
             self->moveCallback = NULL;
             break;
         case MOVE_CALLBACK_TICK_MOVE:
-            self->moveCallback = (void (*)(DreamSys *))vt->tickMove;
+            self->moveCallback = vt->tickMove;
             break;
         case MOVE_CALLBACK_TICK_DRIFT:
             self->moveCallback = vt->tickDrift;
@@ -1557,32 +1557,33 @@ void DreamSys__NoOpLook2(void) {}
 
 void DreamSys__NoOpLook3(void) {}
 
-s32 DreamSys__TickMove(DreamSys *self) {
+void DreamSys__TickMove(DreamSys *self) {
     if (self->moveOverride == MOVE_OVERRIDE_NONE) {
         self->methods->applyPendingTurn(self);
-        return self->methods->tickMoveFree(self);
-    } else if (self->moveOverride != MOVE_OVERRIDE_HELD) {
-        return self->methods->tickMoveForced(self);
+        self->methods->tickMoveFree(self);
+    } else if (self->moveOverride == MOVE_OVERRIDE_HELD) {
+        self->methods->tickMoveHeld(self);
     } else {
-        return self->methods->tickMoveHeld(self);
+        self->methods->tickMoveForced(self);
     }
 }
 
-s32 DreamSys__TickMoveFree(DreamSys *self) {
+void DreamSys__TickMoveFree(DreamSys *self) {
     if (self->movementBlocked != 0)
-        return self->movementBlocked;
-    return self->methods->applyMoveCommand(self, self->methods->advanceMoveCycle(self, 1));
+        return;
+    self->methods->applyMoveCommand(self, self->methods->advanceMoveCycle(self, 1));
 }
 
-s32 DreamSys__TickMoveForced(DreamSys *self) {
+void DreamSys__TickMoveForced(DreamSys *self) {
     self->moveCommand = MOVE_COMMAND_FORWARD;
-    if (self->movementBlocked != 0)
-        return self->methods->advanceMoveCycle(self, 0);
-    return self->methods->applyMoveCommand(self, self->methods->advanceMoveCycle(self, 1));
+    if (self->movementBlocked == 0)
+        self->methods->applyMoveCommand(self, self->methods->advanceMoveCycle(self, 1));
+    else
+        self->methods->advanceMoveCycle(self, 0);
 }
 
-s32 DreamSys__TickMoveHeld(DreamSys *self) {
-    return self->moveCommand = MOVE_COMMAND_FORWARD;
+void DreamSys__TickMoveHeld(DreamSys *self) {
+    self->moveCommand = MOVE_COMMAND_FORWARD;
 }
 
 s32 DreamSys__AdvanceMoveCycle(DreamSys *self, s32 bob) {
@@ -1669,7 +1670,7 @@ void DreamSys__StopVoice(DreamSys *self) {
     }
 }
 
-s32 DreamSys__ApplyMoveCommand(DreamSys *self, s32 command) {
+void DreamSys__ApplyMoveCommand(DreamSys *self, s32 command) {
     s32 delta;
     PlayerSpawnPoint *pos;
 
