@@ -13,6 +13,15 @@ struct ResourceSource;
 typedef struct TodSet TodSet;
 typedef struct TodSetMethods TodSetMethods;
 
+/** @brief A TodSet's or TriggerWorld's (include/trigger_world.h) buffer: a
+ * word, a count, then that many offsets from the buffer's start, which
+ * BuildTods / BuildResources overwrite with the objects built over them. */
+typedef struct SubBlockTable {
+    /* +0x00 */ u8 pad0[4];
+    /* +0x04 */ u32 count;      /**< how many sub-blocks follow */
+    /* +0x08 */ s32 entries[1]; /**< each sub-block's offset, then the object built over it */
+} SubBlockTable;
+
 /** TodSet's class id (gTodSetMethods word +0x000). */
 #define TODSET_CLASS_ID 0x14F03
 
@@ -35,7 +44,7 @@ struct TodSetMethods {
  * Building it replaces each table entry with the Tod made over it. Parent Tod
  * (its ctor chains to Tod's first); no subclasses, and no fields of its own:
  * the object is 0x2C bytes (New_TodSet). Methods in
- * src/graphics/graphics_resources.c. ModelData__BuildResources builds one over
+ * src/graphics/tod_set.c. ModelData__BuildResources builds one over
  * a MOM file's TODs, and ModelData forwards its packet scans to it.
  */
 struct TodSet {

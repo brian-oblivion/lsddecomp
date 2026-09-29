@@ -182,7 +182,15 @@ void FileResource__FreeBuffer(FileResource *self);
 #define CD_FLAG_SEEK_DONE 0x040      /**< a seek request completed */
 #define CD_FLAG_READ_DONE 0x080      /**< a read request completed */
 #define CD_FLAG_LOAD_FILE_DONE 0x200 /**< a load-file request completed */
+
 /** @} */
+
+/** @brief A method table's ctor slot, unprototyped: the allocators that
+ * check the ctor's result call it through this. */
+typedef struct UnprototypedCtorTable {
+    /* +0x000 */ u8 pad0[8];
+    /* +0x008 */ s32 (*ctor)(); /**< the class's ctor; nonzero when it succeeded */
+} UnprototypedCtorTable;
 
 /** @brief Slot +0x060 of every FileResource table: empty. */
 void NoOp(void);

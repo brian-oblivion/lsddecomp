@@ -5,20 +5,20 @@
  *  - TimBlockSrc (tim_block_src.h), TimArraySrc (tim_array_src.h): TIM
  *    blocks read one CD read at a time into TimImages, and the CLUT fades;
  *  - LinkResource (link_resource.h): a TMD file's TmdModels;
- *  - Tod (tod.h), TodSet (tod_set.h): TOD animations and their packets;
+ *  - Tod (tod.h): a TOD animation and its packets;
  *  - ModelData (model_data.h), TriggerWorld (trigger_world.h): a model
  *    file's TMD and TODs, and a counted set of model files;
  *  - TileMap (tile_map.h), TileAtlas (tile_atlas.h): the GsMAP and GsCELLs
  *    of the 20 x 15 background grid, built rather than loaded;
  *  - BgLayer (bg_layer.h): a SceneNode drawing one GsBG over a TileMap.
- * MoviePlayer, the FMV player, follows in movie_player.c.
+ * TodSet, a set of Tods, and MoviePlayer, the FMV player, follow in
+ * tod_set.c and movie_player.c.
  * Each FileResource class has an allocator (New_<Class>), a ctor that adopts
  * a buffer or requests a file (a ResourceSource, include/file_resource.h),
  * a finalizer, and its own load steps. The method tables close the file.
  */
 #include "common.h"
 #include <libgte.h>
-#include <libgpu.h>
 #include "tim_block_src.h"
 #include "trigger_world.h"
 #include "tim_image.h"
@@ -61,22 +61,6 @@
 #define TPAGE_WIDTH 64   /* a texture page's VRAM width */
 #define TPAGE_HEIGHT 256 /* ... and height */
 #define TPAGE_LOWER 0x10 /* the tpage word's page-y bit: pages from VRAM y 256 */
-
-/** @brief A TodSet's or TriggerWorld's buffer: a word, a count, then that
- * many offsets from the buffer's start, which BuildTods / BuildResources
- * overwrite with the objects built over them. */
-typedef struct SubBlockTable {
-    /* +0x00 */ u8 pad0[4];
-    /* +0x04 */ u32 count;      /**< how many sub-blocks follow */
-    /* +0x08 */ s32 entries[1]; /**< each sub-block's offset, then the object built over it */
-} SubBlockTable;
-
-/** @brief A method table's ctor slot, unprototyped: the allocators that
- * check the ctor's result call it through this. */
-typedef struct UnprototypedCtorTable {
-    /* +0x000 */ u8 pad0[8];
-    /* +0x008 */ s32 (*ctor)(); /**< the class's ctor; nonzero when it succeeded */
-} UnprototypedCtorTable;
 
 /* Allocate a TimBlockSrc and construct it over the file `name`. */
 TimBlockSrc *New_TimBlockSrc(char *name) {
@@ -1128,83 +1112,6 @@ TileAtlasMethods *GetTileAtlasMethods(void) {
     return &gTileAtlasMethods;
 }
 
-/* Allocate and construct a TodSet; NULL, the object freed, when the ctor
- * fails. */
-TodSet *New_TodSet(ResourceSource *src) {
-    void *obj = BMemPMgrAlloc(sizeof(TodSet));
-
-    if (obj != NULL) {
-        if (((UnprototypedCtorTable *)GetTodSetMethods())->ctor(obj, src)) {
-            return obj;
-        }
-        BMemPMgrFree(obj);
-    }
-    return NULL;
-}
-
-/* ctor (+0x008): Tod's; with an adopted buffer, build the Tods (NULL when
- * that fails). */
-void *TodSet__TodSet(TodSet *self, ResourceSource *src) {
-    GetTodMethods()->ctor((Tod *)self, src);
-    self->methods = GetTodSetMethods();
-    if (src->buffer != NULL) {
-        if (((s32 (*)())self->methods->onRequestDone)(self)) {
-            return NULL;
-        }
-    }
-    return self;
-}
-
-/* finalize (+0x00C): release the Tods. */
-void TodSet__Finalize(TodSet *self) {
-    SubBlockTable *buf = self->buffer;
-
-    ReleaseBasicClassArray((BasicClass **)buf->entries, buf->count);
-    GetTodMethods()->finalize((Tod *)self);
-}
-
-/* onRequestDone (+0x064): build a Tod over each of the buffer's sub-blocks, in
- * place of its offset; 1, with those built released, when one fails. */
-s32 TodSet__BuildTods(TodSet *self) {
-    ResourceRequest req;
-    SubBlockTable *buf;
-    Tod **p;
-    s32 i;
-    s32 n;
-
-    ResourceRequest__Set(&req, 0, 0, 1);
-    buf = self->buffer;
-    i = 0;
-    n = buf->count;
-    p = (Tod **)buf->entries;
-    for (; i < n; i++) {
-        req.src.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
-        *p = New_Tod(&req.src);
-        if (*p == NULL) {
-            while (i != 0) {
-                i--;
-                p--;
-                (*p)->methods->release(*p);
-            }
-            return 1;
-        }
-        p++;
-    }
-    return 0;
-}
-
-/* +0x078: scanTodPackets over the first frame of the TOD that follows the
- * counted array. */
-u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *tmdId) {
-    SubBlockTable *buf = self->buffer;
-
-    return self->methods->scanTodPackets(self, out, tmdId, ((TodFile *)&buf->entries[buf->count])->frames);
-}
-
-TodSetMethods *GetTodSetMethods(void) {
-    return &gTodSetMethods;
-}
-
 /* The classes' method tables, in the order the image keeps them. Each
  * fills its class's header's slots with the class's own method or the
  * parent's. A (void *) entry is a method whose declared parameters differ
@@ -1558,41 +1465,4 @@ TileAtlasMethods gTileAtlasMethods = {
     /* +0x070 stopService */ NULL,
     /* +0x074 cancelRequests */ NULL,
     /* +0x078 processBuffer */ TileAtlas__BuildCells,
-};
-
-/* TodSet: Tod's table, building one Tod per animation. */
-TodSetMethods gTodSetMethods = {
-    /* +0x000 header */ TODSET_CLASS_ID,
-    /* +0x004 release */ (void *)FileResource__Release,
-    /* +0x008 ctor */ (void *)TodSet__TodSet,
-    /* +0x00C finalize */ TodSet__Finalize,
-    /* +0x010 addChild */ (void *)BasicClass__AddChild,
-    /* +0x014 removeChild */ (void *)BasicClass__RemoveChild,
-    /* +0x018 removeAllChildren */ (void *)BasicClass__RemoveAllChildren,
-    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
-    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
-    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
-    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
-    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
-    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
-    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
-    /* +0x038 onNotify */ (void *)BasicClass__OnNotify,
-    /* +0x03C slot3C */ NULL,
-    /* +0x040 slot40 */ NULL,
-    /* +0x044 open */ NULL,
-    /* +0x048 close */ NULL,
-    /* +0x04C seek */ NULL,
-    /* +0x050 slot50 */ NULL,
-    /* +0x054 read */ NULL,
-    /* +0x058 loadFile */ NULL,
-    /* +0x05C freeBuffer */ (void *)FileResource__FreeBuffer,
-    /* +0x060 slot60 */ NoOp,
-    /* +0x064 onRequestDone */ (void *)TodSet__BuildTods,
-    /* +0x068 runRequestQueue */ NULL,
-    /* +0x06C requestLoadFile */ NULL,
-    /* +0x070 stopService */ NULL,
-    /* +0x074 cancelRequests */ NULL,
-    /* +0x078 processBuffer */ TodSet__ScanPackets,
-    /* +0x07C scanTodPackets */ (void *)ScanTodPackets,
-    /* +0x080 decodePacketWord */ (void *)DecodeTodPacketWord,
 };

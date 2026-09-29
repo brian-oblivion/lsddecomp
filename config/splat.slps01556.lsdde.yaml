@@ -1350,6 +1350,8 @@ segments:
       - [0x3311c, c, graphics/flat_light_obj]       # game code (revision 18; was psyq_3311c)
       - [0x3328C, o, libgs/gs_107]     # GsSetFlatLight, gte_set_lc, gte_read_lc
       - [0x33808, c, graphics/graphics_resources] # game code (revision 18; was the head of psyq_33808)
+      # TodSet, New_TodSet (0x800451B8) to GetTodSetMethods.
+      - [0x359B8, c, graphics/tod_set]
       # MoviePlayer, New_MoviePlayer (0x80045438) to GetMoviePlayerMethods.
       - [0x35C38, c, graphics/movie_player]
       - [0x36654, asm, psyq_36654]     # libpress/libpress from DecDCTReset
@@ -1904,7 +1906,8 @@ segments:
       - [0x5F750, .data, graphics/frame_clock]  # gFrameClockMethods
       - [0x5F7AC, .data, graphics/light_rig]  # gLightRigMethods
       - [0x5F86C, .data, graphics/flat_light_obj]  # gFlatLightObjMethods
-      - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods .. gTodSetMethods
+      - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods .. gTileAtlasMethods
+      - [0x5FD90, .data, graphics/tod_set]  # gTodSetMethods
       - [0x5FE14, .data, graphics/movie_player]  # gMoviePlayerMethods
       - [0x5FE84, data]
       - [0x5FFC8, o, libpress/vlc, .data]     # 0x18 -> 0x5FFE0 (dlabel D_8006F7E0)
