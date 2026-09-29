@@ -1877,7 +1877,8 @@ segments:
       - [0x5EC8C, .data, sound/wbgm]  # gWBgmMethods
       - [0x5ECF0, .data, app/application]  # gApplicationMethods
       - [0x5ED58, .data, graphics/tim_image]  # gTimImageMethods
-      - [0x5EDF8, data]
+      - [0x5EDF8, .data, app/task]  # gStreamTaskMethods .. gViewportMethods
+      - [0x5F19C, .data, ui/screen_widgets]  # gFadeBoxMethods .. gTextRowMethods
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)
       - [0x5F474, .data, graphics/sprite]  # gCharSpriteMethods .. gLightRigMethods
       - [0x5F86C, .data, graphics/flat_light_obj]  # gFlatLightObjMethods

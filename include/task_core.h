@@ -15,6 +15,10 @@
 
 typedef struct TaskCore TaskCore;
 typedef struct TaskCoreMethods TaskCoreMethods;
+
+/** TaskCore's class id (gTaskCoreMethods word +0x000). */
+#define TASKCORE_CLASS_ID 0x130
+
 typedef struct TaskCoreTarget TaskCoreTarget;
 typedef struct TaskCoreItemList TaskCoreItemList; /* defined in src/app/task.c, its one reader */
 

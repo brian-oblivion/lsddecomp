@@ -9,7 +9,8 @@
  * derives from CharSprite, not BoxFill. Each class runs from its New_ to
  * its method-table getter. Then DecodeFullWidthSjis, EncodeFullWidthSjis
  * and FormatFullWidthNumber (include/full_width_sjis.h), free functions
- * over plain byte buffers.
+ * over plain byte buffers. The three method tables and FadeBox's colour
+ * tables end the file.
  */
 #include "common.h"
 #include <libgte.h>
@@ -28,8 +29,9 @@
  * channels at 0xFF (0 and 7 white), sFadeBoxBlackColors is all black.
  * sBoxFillDefaultColor ({128, 128, 128}) is BoxFill__Reset's colour when it
  * is given none. */
-extern u8 sFadeBoxMaskColors[];
-extern u8 sFadeBoxBlackColors[];
+#define FADEBOX_COLOR_TABLE_SIZE (8 * 3) /* eight masks, three bytes each */
+extern u8 sFadeBoxMaskColors[FADEBOX_COLOR_TABLE_SIZE];
+extern u8 sFadeBoxBlackColors[FADEBOX_COLOR_TABLE_SIZE];
 extern u8 sBoxFillDefaultColor[3];
 
 FadeBox *New_FadeBox(void *size, s32 channels, s32 pri) {
@@ -624,3 +626,218 @@ void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded) {
     }
     EncodeFullWidthSjis(dst, (u8 *)(unpadded != 0 ? text : padded));
 }
+
+/* The three widgets' method tables and FadeBox's colour tables, in the
+ * order the image keeps them. A (void *) entry is a method whose declared
+ * type differs from its slot's, usually one inherited from a parent class
+ * and declared on the parent's type. */
+
+/* FadeBox (include/fade_box.h): BoxFill's table with reset and update,
+ * then the fade's own slots. */
+FadeBoxMethods gFadeBoxMethods = {
+    FADEBOX_CLASS_ID,
+    (void *)BasicClass__Release,
+    (void *)FadeBox__FadeBox,
+    (void *)SceneNode__Finalize,
+    (void *)SceneNode__AddChild,
+    (void *)SceneNode__RemoveChild,
+    (void *)SceneNode__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)SceneNode__OnNotify,
+    NULL,
+    (void *)FadeBox__Reset,
+    (void *)SceneNode__UpdateRotation,
+    (void *)SceneNode__UpdateScale,
+    (void *)BoxFill__AttachToParent,
+    (void *)SceneNode__DetachFromParent,
+    (void *)SceneNode__DetachAttachedChildren,
+    (void *)SceneNode__GetNextAttachedChild,
+    (void *)SceneNode__NoOpFinalizeHook,
+    (void *)BoxFill__SetDisplay,
+    (void *)BoxFill__SetSemiTrans,
+    (void *)BoxFill__SetSemiTransRate,
+    (void *)SceneNode__SetLighting,
+    (void *)SceneNode__SetLightMode,
+    (void *)SceneNode__SetLightDim,
+    (void *)SceneNode__SetUseZ,
+    (void *)SceneNode__SetSubdivision,
+    (void *)SceneNode__SetBackClip,
+    (void *)SceneNode__GetRotMatrix,
+    (void *)SceneNode__NotifyWithHull,
+    (void *)SceneNode__GetModelHull,
+    (void *)SceneNode__TransformAndNotifyParents,
+    (void *)SceneNode__OnPadEvent,
+    FadeBox__Update,
+    (void *)SceneNode__DispatchLinkCommand,
+    (void *)SceneNode__TryAttachNearby,
+    (void *)SceneNode__ComposeAndApplyRotation,
+    (void *)SceneNode__CheckBoundsOverlap,
+    (void *)SceneNode__RaycastHullAgainstFaces,
+    SceneNode__NoOpSlotB0,
+    (void *)SceneNode__AddToActorParents,
+    (void *)BoxFill__SetColor,
+    (void *)BoxFill__SetPosition,
+    (void *)BoxFill__SetSize,
+    (void *)BoxFill__AttachAbsolute,
+    (void *)BoxFill__SetPri,
+    (void *)BoxFill__SetMask,
+    FadeBox__SetStep,
+    FadeBox__StartFadeDown,
+    FadeBox__StartFadeUp,
+    FadeBox__Configure,
+    FadeBox__Stop,
+    FadeBox__GetColor,
+    FadeBox__PushPosition,
+    FadeBox__PopPosition,
+    FadeBox__SetDivisorMode,
+};
+
+/* clang-format off */
+u8 sFadeBoxMaskColors[FADEBOX_COLOR_TABLE_SIZE] = {
+    /* mask  r     g     b */
+    /* 0 */ 0xFF, 0xFF, 0xFF,
+    /* 1 */ 0x00, 0x00, 0xFF,
+    /* 2 */ 0x00, 0xFF, 0x00,
+    /* 3 */ 0x00, 0xFF, 0xFF,
+    /* 4 */ 0xFF, 0x00, 0x00,
+    /* 5 */ 0xFF, 0x00, 0xFF,
+    /* 6 */ 0xFF, 0xFF, 0x00,
+    /* 7 */ 0xFF, 0xFF, 0xFF,
+};
+
+u8 sFadeBoxBlackColors[FADEBOX_COLOR_TABLE_SIZE] = {
+    /* mask  r     g     b */
+    /* 0 */ 0x00, 0x00, 0x00,
+    /* 1 */ 0x00, 0x00, 0x00,
+    /* 2 */ 0x00, 0x00, 0x00,
+    /* 3 */ 0x00, 0x00, 0x00,
+    /* 4 */ 0x00, 0x00, 0x00,
+    /* 5 */ 0x00, 0x00, 0x00,
+    /* 6 */ 0x00, 0x00, 0x00,
+    /* 7 */ 0x00, 0x00, 0x00,
+};
+/* clang-format on */
+
+/* BoxFill (include/box_fill.h): SceneNode's table with reset, the
+ * attach, display and semi-transparency overrides, then its colour, position,
+ * size, priority and mask setters. */
+BoxFillMethods gBoxFillMethods = {
+    BOXFILL_CLASS_ID,
+    (void *)BasicClass__Release,
+    (void *)BoxFill__BoxFill,
+    (void *)SceneNode__Finalize,
+    (void *)SceneNode__AddChild,
+    (void *)SceneNode__RemoveChild,
+    (void *)SceneNode__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)SceneNode__OnNotify,
+    NULL,
+    (void *)BoxFill__Reset,
+    (void *)SceneNode__UpdateRotation,
+    (void *)SceneNode__UpdateScale,
+    (void *)BoxFill__AttachToParent,
+    (void *)SceneNode__DetachFromParent,
+    (void *)SceneNode__DetachAttachedChildren,
+    (void *)SceneNode__GetNextAttachedChild,
+    (void *)SceneNode__NoOpFinalizeHook,
+    BoxFill__SetDisplay,
+    (void *)BoxFill__SetSemiTrans,
+    (void *)BoxFill__SetSemiTransRate,
+    (void *)SceneNode__SetLighting,
+    (void *)SceneNode__SetLightMode,
+    (void *)SceneNode__SetLightDim,
+    (void *)SceneNode__SetUseZ,
+    (void *)SceneNode__SetSubdivision,
+    (void *)SceneNode__SetBackClip,
+    (void *)SceneNode__GetRotMatrix,
+    (void *)SceneNode__NotifyWithHull,
+    (void *)SceneNode__GetModelHull,
+    (void *)SceneNode__TransformAndNotifyParents,
+    (void *)SceneNode__OnPadEvent,
+    (void *)SceneNode__Update,
+    (void *)SceneNode__DispatchLinkCommand,
+    (void *)SceneNode__TryAttachNearby,
+    (void *)SceneNode__ComposeAndApplyRotation,
+    (void *)SceneNode__CheckBoundsOverlap,
+    (void *)SceneNode__RaycastHullAgainstFaces,
+    SceneNode__NoOpSlotB0,
+    (void *)SceneNode__AddToActorParents,
+    (void *)BoxFill__SetColor,
+    BoxFill__SetPosition,
+    BoxFill__SetSize,
+    BoxFill__AttachAbsolute,
+    BoxFill__SetPri,
+    BoxFill__SetMask,
+};
+
+/* TextRow (include/text_row.h): CharSprite's table with the text row's
+ * reset, attach, display, colour, position and cell overrides, then setText
+ * and setCellPitch. */
+TextRowMethods gTextRowMethods = {
+    TEXTROW_CLASS_ID,
+    (void *)BasicClass__Release,
+    (void *)TextRow__TextRow,
+    TextRow__Finalize,
+    (void *)SceneNode__AddChild,
+    (void *)SceneNode__RemoveChild,
+    (void *)SceneNode__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)SceneNode__OnNotify,
+    NULL,
+    (void *)TextRow__Reset,
+    (void *)Sprite__UpdateRotation,
+    (void *)SceneNode__UpdateScale,
+    (void *)TextRow__AttachToParent,
+    (void *)TextRow__DetachFromParent,
+    (void *)SceneNode__DetachAttachedChildren,
+    (void *)SceneNode__GetNextAttachedChild,
+    (void *)SceneNode__NoOpFinalizeHook,
+    (void *)TextRow__SetDisplay,
+    (void *)Sprite__SetSemiTrans,
+    (void *)Sprite__SetSemiTransRate,
+    (void *)SceneNode__SetLighting,
+    (void *)SceneNode__SetLightMode,
+    (void *)SceneNode__SetLightDim,
+    (void *)SceneNode__SetUseZ,
+    (void *)SceneNode__SetSubdivision,
+    (void *)SceneNode__SetBackClip,
+    (void *)SceneNode__GetRotMatrix,
+    (void *)SceneNode__NotifyWithHull,
+    (void *)SceneNode__GetModelHull,
+    (void *)SceneNode__TransformAndNotifyParents,
+    (void *)SceneNode__OnPadEvent,
+    (void *)Sprite__Update,
+    (void *)SceneNode__DispatchLinkCommand,
+    (void *)SceneNode__TryAttachNearby,
+    (void *)SceneNode__ComposeAndApplyRotation,
+    (void *)SceneNode__CheckBoundsOverlap,
+    (void *)SceneNode__RaycastHullAgainstFaces,
+    SceneNode__NoOpSlotB0,
+    (void *)SceneNode__AddToActorParents,
+    TextRow__SetColor,
+    TextRow__SetPosition,
+    (void *)ScreenSprite__SetPivotAnchor,
+    (void *)TextRow__SetCellAt,
+    (void *)TextRow__NoOpGetCell,
+    TextRow__SetText,
+    TextRow__NoOpSlotD0,
+    TextRow__SetCellPitch,
+};
