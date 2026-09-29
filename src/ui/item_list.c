@@ -5,7 +5,8 @@
  * closing and reporting (SetState, TickClosing), the Pad events
  * (HandleInputCode, PlaySound), the cursor and scroll methods, the four
  * visible rows (create, release, refresh, format), the view and cursor
- * helpers, and the table getter GetItemListMethods.
+ * helpers, the table getter GetItemListMethods, then the table and the
+ * panel's cell.
  */
 #include "common.h"
 #include <libgte.h>
@@ -325,3 +326,49 @@ s32 ItemList__GetCursorIndex(ItemList *self) {
 ItemListMethods *GetItemListMethods(void) {
     return &gItemListMethods;
 }
+
+/* ItemList's method table (include/item_list.h): BasicClass's slots with
+ * the ctor, finalize and onNotify, then the list's view, resource, attach,
+ * state, input and sound slots, and its scroll, cursor and row slots. A
+ * (void *) entry is a method declared on another type than its slot's. */
+ItemListMethods gItemListMethods = {
+    ITEMLIST_CLASS_ID,
+    (void *)BasicClass__Release,
+    ItemList__ItemList,
+    ItemList__Finalize,
+    (void *)ItemList__AddChild,
+    (void *)ItemList__RemoveChild,
+    ItemList__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    ItemList__OnNotify,
+    NULL,
+    ItemList__ResetView,
+    ItemList__LoadResources,
+    ItemList__ReleaseResources,
+    ItemList__AttachTarget,
+    ItemList__DetachTarget,
+    ItemList__SetState,
+    (void *)ItemList__TickClosing,
+    ItemList__HandleInputCode,
+    ItemList__PlaySound,
+    {NULL, NULL, NULL, NULL, NULL, NULL}, /* pad64: nothing calls these slots */
+    ItemList__ScrollRight,
+    ItemList__ScrollLeft,
+    (void *)ItemList__CursorUp,
+    (void *)ItemList__CursorDown,
+    ItemList__CreateRows,
+    ItemList__ReleaseRows,
+    ItemList__RefreshRows,
+    (void *)ItemList__StepCursorInView,
+    ItemList__GetCursorIndex,
+};
+
+/* SELECT's cell, the item-list panel ItemList__LoadResources
+ * (input_dialogs.c) shows: 256 x 160 from (0, 0). */
+SpriteRect sItemListPanelRect = {0, 0, 256, 160};

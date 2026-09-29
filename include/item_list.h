@@ -144,6 +144,10 @@ struct ItemList {
 /** @brief ItemList's method table (see ItemListMethods). */
 extern ItemListMethods gItemListMethods;
 
+/** @brief SELECT's cell, the panel sprite ItemList__LoadResources shows:
+ * 256 x 160 from (0, 0). */
+extern struct SpriteRect sItemListPanelRect;
+
 /**
  * @brief Returns ItemList's method table.
  * @return &gItemListMethods.

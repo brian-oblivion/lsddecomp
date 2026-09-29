@@ -2,8 +2,9 @@
  * input_dialogs.c -- the two pad-driven widgets of the memory-card screens,
  * in ROM order: TextEntry whole (include/text_entry.h), the editor for the
  * save title, then the first half of ItemList (include/item_list.h), the
- * list the player picks a save file from. ItemList's list methods and its
- * getter follow in item_list.c.
+ * list the player picks a save file from; TextEntry's method table and
+ * panel cell end the file. ItemList's list methods, its getter, its table
+ * and its panel cell follow in item_list.c.
  *
  * Both keep a Pad and a FrameClock child by class, draw through a
  * ScreenSprite panel and TextRows built from CARD\ TIMs, and do nothing
@@ -616,7 +617,6 @@ void ItemList__ResetView(ItemList *self) {
 extern char sStrSelect[];                 /* "SELECT" */
 extern char sItemListCardPathPrefix[];    /* "CARD\\" */
 extern char sItemListTimExt[];            /* ".TIM" */
-extern SpriteRect sItemListPanelRect;     /* SELECT's cell: 256 x 160 from (0, 0) */
 extern ScreenSpritePos sItemListPanelPos; /* (-100, -60) */
 extern char sItemListStrFontIcon[];       /* "FONTICON" */
 
@@ -686,3 +686,49 @@ void ItemList__DetachTarget(ItemList *self) {
     self->methods->removeChild(self, self->tickSource);
     self->target = NULL;
 }
+
+/* TextEntry's method table (include/text_entry.h): BasicClass's slots with
+ * the ctor, finalize and onNotify, then the editor's setText, card
+ * resources, attach, state, command and sound slots, and its cursor and
+ * character slots. A (void *) entry is a method declared on another type
+ * than its slot's. */
+TextEntryMethods gTextEntryMethods = {
+    TEXTENTRY_CLASS_ID,
+    (void *)BasicClass__Release,
+    TextEntry__TextEntry,
+    TextEntry__Finalize,
+    (void *)TextEntry__AddChild,
+    (void *)TextEntry__RemoveChild,
+    TextEntry__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    TextEntry__OnNotify,
+    NULL,
+    TextEntry__SetText,
+    TextEntry__LoadCardResources,
+    TextEntry__ReleaseCardResources,
+    TextEntry__AttachTarget,
+    TextEntry__DetachTarget,
+    TextEntry__SetState,
+    (void *)TextEntry__TickState,
+    TextEntry__HandleCommand,
+    TextEntry__PlaySound,
+    {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* pad64: nothing calls these slots */
+    TextEntry__MoveCursorRight,
+    TextEntry__MoveCursorLeft,
+    TextEntry__NextChar,
+    TextEntry__PrevChar,
+    TextEntry__ToggleActOnHeld,
+    TextEntry__ResetChar,
+    TextEntry__ResetAllChars,
+    TextEntry__SetCursorPos,
+    TextEntry__SetCharAt,
+};
+
+/* COMINPUT's cell, the text-entry panel: 224 x 120 from (0, 0). */
+SpriteRect sTextEntryPanelRect = {0, 0, 224, 120};
