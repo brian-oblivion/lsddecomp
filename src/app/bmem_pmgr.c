@@ -18,7 +18,8 @@
  */
 
 #include "common.h"
-/* MATCHING: BMemPMgrAlloc/Free are defined K&R with a second parameter (bmem_pmgr.h) */
+/* This file defines BMemPMgrAlloc and BMemPMgrFree K&R with a second
+ * parameter, so it skips bmem_pmgr.h's one-argument prototypes. */
 #define BMEMPMGR_DEFINER
 #include "bmem_pmgr.h"
 #include <malloc.h>
@@ -108,7 +109,7 @@ void *BMemPMgrAlloc(size, pool)
     }
     if (size != 0) {
         if (size & 0x3) {
-            /* MATCHING: one expression reassociates the + 4 into the subtract. */
+            /* MATCHING: two statements; as one expression the + 4 folds into the subtract. */
             padded = size + 4;
             size = padded - (size & 0x3);
         }
@@ -123,10 +124,10 @@ void *BMemPMgrAlloc(size, pool)
                 cursor->sizeAndFlags &= ~BMEM_FREE;
                 result = BMEM_PAYLOAD(cursor);
                 if (blockSize < (u32)size + BMEM_MIN_BLOCK) {
-                    /* MATCHING: nextBlock is one variable in both arms, or it takes the wrong register. */
+                    /* MATCHING: one nextBlock for both arms; a local per arm differs. */
                     nextBlock = BMEM_NEXT_BLOCK(cursor);
                     nextBlock->sizeAndFlags &= ~BMEM_PREV_FREE;
-                    /* MATCHING: every unlink scopes its own n/p; shared locals take other registers. */
+                    /* MATCHING: each unlink half has its own n/p; shared locals differ. */
                     {
                         BMemBlockHdr *n = cursor->next;
                         BMemBlockHdr *p = cursor->prev;
@@ -141,7 +142,7 @@ void *BMemPMgrAlloc(size, pool)
                         BMemBlockHdr *n = cursor->next;
                         BMemBlockHdr *p;
 
-                        /* MATCHING: the dead store to `unused` picks the store's register. */
+                        /* MATCHING: the dead copy into `unused` stays; dropping it differs. */
                         p = unused = cursor->prev;
                         if (n != NULL) {
                             n->prev = p;
@@ -213,7 +214,7 @@ void *BMemPMgrFree(ptr, pool)
             header = BMEM_PREV_FOOTER(header);
             header->sizeAndFlags =
                 (header->sizeAndFlags & BMEM_FLAG_MASK) | (freedSize + BMEM_BLOCK_SIZE(header));
-            /* MATCHING: every unlink scopes its own n/p; shared locals take other registers. */
+            /* MATCHING: each unlink half has its own n/p; shared locals differ. */
             {
                 BMemBlockHdr *n = header->next;
                 BMemBlockHdr *p = header->prev;
@@ -254,7 +255,7 @@ void *BMemPMgrFree(ptr, pool)
                 BMemBlockHdr *p = next->prev;
                 BMemBlockHdr *n = next->next;
 
-                /* MATCHING: reusing the dead nextSize for the test picks its register. */
+                /* MATCHING: the test reuses the dead nextSize; a fresh local differs. */
                 nextSize = n != NULL;
                 if (nextSize) {
                     n->prev = p;
@@ -316,7 +317,8 @@ void BasicClass__RemoveAllChildren(BasicClass *self) {
     BasicClass **childPtr;
     BasicClassListNode *cursor;
 
-    /* MATCHING: the named childPtr and the comma-tested if/do-while keep the loop's register and order. */
+    /* MATCHING: the named childPtr and the comma-tested if/do-while give retail's
+     * loop; a plain while differs. */
     childPtr = &child;
     cursor = self->children;
     if (GetNextBasicClass(childPtr, &cursor), child != NULL) {
