@@ -1036,8 +1036,8 @@ DreamSys *New_DreamSys(LinkResource *modelSource, VabStreamObj *soundObj, Viewpo
     return NULL;
 }
 
-DreamSys *DreamSys__DreamSys(DreamSys *self, LinkResource *modelSource, VabStreamObj *soundObj,
-                             Viewport *viewport) {
+void DreamSys__DreamSys(DreamSys *self, LinkResource *modelSource, VabStreamObj *soundObj,
+                        Viewport *viewport) {
     void *model;
 
     GetActorMethods()->ctor((Actor *)self);
@@ -1053,8 +1053,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *self, LinkResource *modelSource, VabStrea
     self->moveOverride = MOVE_OVERRIDE_NONE;
     self->newGamePending = 1;
     self->methods->initNewGame(self);
-    /* MATCHING: returns reset's result, which New_DreamSys ignores */
-    return ((DreamSysResetRetFn)self->methods->reset)(self);
+    self->methods->reset(self);
 }
 
 void DreamSys__ResetSessionState(DreamSys *self) {

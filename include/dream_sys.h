@@ -526,9 +526,8 @@ typedef enum DreamColors {
  * (DreamSys__DispatchInstanceEffect), +0x0E0 onGridCellLinkCommand
  * (DreamSys__WallLink) and +0x0E8 onLinkUpdate (DreamSys__OnLinkUpdate).
  *
- * Two inherited slots are called with a type other than their own, each
- * through a function-pointer cast: reset (+0x040), whose result the ctor
- * returns (DreamSysResetRetFn), and attachToParent (+0x04C), which
+ * One inherited slot is called with a type other than its own, through a
+ * function-pointer cast: attachToParent (+0x04C), which
  * DreamSys__SpawnAtLink takes as (self, parent) with no offset
  * (DreamSysAttachToParentFn, ObjM__SetupSceneStyle's cast). The table is
  * 139 slots, 0x22C bytes.
@@ -627,11 +626,6 @@ struct DreamSysMethods {
     /* +0x224 */ void (*restoreLinkSnapshot)(DreamSys *self); /**< @see DreamSys__RestoreLinkSnapshot */
     /* +0x228 */ s32 (*getSetConfigOption)(DreamSys *self, s32 value); /**< @see DreamSys__GetSetConfigOption */
 };
-
-/** reset (+0x040) as DreamSys__DreamSys calls it, with a result the ctor
- * returns. ResetSessionState, the occupant, returns none, and New_DreamSys
- * ignores the ctor's result. */
-typedef DreamSys *(*DreamSysResetRetFn)(DreamSys *self);
 
 /** attachToParent (+0x04C) as its occupant, DreamSys__SpawnAtLink, takes it:
  * (self, parent), no offset. ObjM__SetupSceneStyle (objm.c) calls it
@@ -1101,11 +1095,9 @@ MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day);
  * @param modelSource The LinkResource whose model 0 becomes a child.
  * @param soundObj    The sound bank.
  * @param viewport    The camera.
- * @return Whatever reset leaves as its result (ResetSessionState returns
- *         none); New_DreamSys ignores it.
  */
-DreamSys *DreamSys__DreamSys(DreamSys *self, struct LinkResource *modelSource,
-                             struct VabStreamObj *soundObj, struct Viewport *viewport);
+void DreamSys__DreamSys(DreamSys *self, struct LinkResource *modelSource,
+                        struct VabStreamObj *soundObj, struct Viewport *viewport);
 
 /**
  * @brief Slot +0x040, reset: hides the object, turns it to face yaw 180, and
