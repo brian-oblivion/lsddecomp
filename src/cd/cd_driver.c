@@ -233,11 +233,6 @@ s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
     return 0;
 }
 
-/* FileResource__LoadFile takes (self, name); loadFile's direct path hands
- * it this method's own self and name by leaving them where they arrived. */
-/* MATCHING: called through a no-argument type, so no argument is reloaded before the call */
-typedef void (*LoadFileNoArgsFn)(void);
-
 void CdDriver__LoadFile(CdDriver *self, char *name) {
     CdFileEntry *entry;
     s32 sectorCount;
@@ -246,7 +241,7 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
     s32 status;
 
     if (sCdAsyncEnabled == 0 && sCdSyncQueueMode == 0) {
-        ((LoadFileNoArgsFn)FileResource__LoadFile)();
+        FileResource__LoadFile((FileResource *)self, name);
         self->flags |= CD_FLAG_LOAD_FILE_DONE;
         self->methods->onRequestDone(self);
         return;
