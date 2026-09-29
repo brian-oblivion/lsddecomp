@@ -13,17 +13,17 @@ typedef struct NullDriver NullDriver;
 typedef struct NullDriverMethods NullDriverMethods;
 
 /**
- * @brief NullDriver's method table: FileResource's 29 slots, the eleven
+ * @brief NullDriver's method table: FileResource's slots up to +0x074
+ * (FILERESOURCE_BASE_SLOTS), the eleven
  * driver-interface slots (+0x040..+0x058, +0x068..+0x074) overridden with
  * empty bodies.
  *
  * The ctor's parameter list is FileResource's: every chained call reaches it
- * as GetActiveDataSourceMethods()->ctor(self). The table ends after +0x074;
- * the word where FileResource's processBuffer would be is
- * gVabStreamObjMethods's header.
+ * as GetActiveDataSourceMethods()->ctor(self). The table has no
+ * processBuffer slot: the word after +0x074 is gVabStreamObjMethods's header.
  */
 struct NullDriverMethods {
-    FILERESOURCE_SLOTS(NullDriver, (NullDriver * self));
+    FILERESOURCE_BASE_SLOTS(NullDriver, (NullDriver * self));
 };
 
 /**

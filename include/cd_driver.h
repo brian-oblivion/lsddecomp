@@ -66,16 +66,16 @@ typedef struct CdDriver CdDriver;
 typedef struct CdDriverMethods CdDriverMethods;
 
 /**
- * @brief CdDriver's method table: FileResource's 29 slots, eleven of them
+ * @brief CdDriver's method table: FileResource's slots up to +0x074
+ * (FILERESOURCE_BASE_SLOTS), eleven of them
  * (+0x040..+0x058 and +0x068..+0x074) the driver interface.
  *
  * The slot names and types are FileResource's, so open, close, loadFile,
  * onRequestDone and stopService return void and read's buffer is `void *`.
- * The table ends after +0x074; the word where FileResource's processBuffer
- * would be is the next table's header.
+ * The table has no processBuffer slot: it ends after +0x074.
  */
 struct CdDriverMethods {
-    FILERESOURCE_SLOTS(CdDriver, (CdDriver * self));
+    FILERESOURCE_BASE_SLOTS(CdDriver, (CdDriver * self));
 };
 
 /**

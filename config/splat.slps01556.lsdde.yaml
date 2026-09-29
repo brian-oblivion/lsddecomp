@@ -1873,8 +1873,7 @@ segments:
       - [0x5ED58, .data, graphics/tim_image]  # gTimImageMethods
       - [0x5EDF8, data]
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)
-      - [0x5F474, .data, graphics/sprite]  # gCharSpriteMethods .. gSpriteMethods
-      - [0x5F6D8, data]
+      - [0x5F474, .data, graphics/sprite]  # gCharSpriteMethods .. gLightRigMethods
       - [0x5F86C, .data, graphics/flat_light_obj]  # gFlatLightObjMethods
       - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods .. gMoviePlayerMethods
       - [0x5FE84, data]
