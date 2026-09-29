@@ -1350,6 +1350,8 @@ segments:
       - [0x3311c, c, graphics/flat_light_obj]       # game code (revision 18; was psyq_3311c)
       - [0x3328C, o, libgs/gs_107]     # GsSetFlatLight, gte_set_lc, gte_read_lc
       - [0x33808, c, graphics/graphics_resources] # game code (revision 18; was the head of psyq_33808)
+      # LinkResource, New_LinkResource (0x80043840) to GetLinkResourceMethods.
+      - [0x34040, c, graphics/link_resource]
       # TimArraySrc, New_TimArraySrc (0x80043B88) to GetTimArraySrcMethods.
       - [0x34388, c, graphics/tim_array_src]
       # Tod, New_Tod (0x80043E84) to GetTodMethods.
@@ -1920,7 +1922,8 @@ segments:
       - [0x5F750, .data, graphics/frame_clock]  # gFrameClockMethods
       - [0x5F7AC, .data, graphics/light_rig]  # gLightRigMethods
       - [0x5F86C, .data, graphics/flat_light_obj]  # gFlatLightObjMethods
-      - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods, gLinkResourceMethods
+      - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods
+      - [0x5F93C, .data, graphics/link_resource]  # gLinkResourceMethods
       - [0x5F9C4, .data, graphics/tim_array_src]  # gTimArraySrcMethods
       - [0x5FA40, .data, graphics/tod]  # gTodMethods
       - [0x5FAC4, .data, graphics/bg_layer]  # gBgLayerMethods

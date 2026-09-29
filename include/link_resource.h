@@ -42,7 +42,7 @@ struct LinkResourceMethods {
  * Parent FileResource, through whichever data-source driver is active when it
  * is built (its ctor chains to GetActiveDataSourceMethods()->ctor), so its
  * fields follow FileResource's own 0x2C bytes. No subclasses. Methods in
- * src/graphics/graphics_resources.c. The object is 0x30 bytes
+ * src/graphics/link_resource.c. The object is 0x30 bytes
  * (New_LinkResource).
  *
  * Callers link the models it builds: tod_actor.c's TOD model-id packet passes
