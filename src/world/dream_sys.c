@@ -389,14 +389,14 @@ tick_only:
 
 void DreamSys__DispatchChunkChange(DreamSys *self, void *sender, s32 event) {
     GetActorMethods()->dispatchLinkCommand((Actor *)self, sender, event);
-    if ((((BasicClass *)sender)->methods->header & 0xFFF) == STAGEMAP_CLASS_ID) {
+    if ((((BasicClass *)sender)->methods->header & CLASS_ID_LEVEL3_MASK) == STAGEMAP_CLASS_ID) {
         self->methods->processChunkChange(self, sender, event);
     }
 }
 
 void DreamSys__DispatchInstanceEffect(DreamSys *self, void *sender, s32 effect) {
     GetActorMethods()->onActorLinkCommand((Actor *)self, sender, effect);
-    if ((((BasicClass *)sender)->methods->header & 0xFFFFF) == ENTITY_CLASS_ID) {
+    if ((((BasicClass *)sender)->methods->header & CLASS_ID_LEVEL5_MASK) == ENTITY_CLASS_ID) {
         self->methods->instanceEffectsOnJournal(self, sender, effect);
     }
 }

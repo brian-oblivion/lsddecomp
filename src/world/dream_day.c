@@ -141,9 +141,9 @@ void DayTask__OnNotify(DayTask *self, BasicClass *sender, s32 event) {
 
     GetTimedTaskMethods()->onNotify((TimedTask *)self, sender, event);
     tag = sender->methods->header;
-    if ((tag & 0xFFFF) == DREAMSYS_CLASS_ID) {
+    if ((tag & CLASS_ID_LEVEL4_MASK) == DREAMSYS_CLASS_ID) {
         self->methods->onDreamSysNotify(self, sender, event);
-    } else if ((tag & 0xFFFFF) == OBJM_CLASS_ID) {
+    } else if ((tag & CLASS_ID_LEVEL5_MASK) == OBJM_CLASS_ID) {
         self->methods->onObjMNotify(self, sender, event);
     }
 }
@@ -591,7 +591,7 @@ void StageMap__UpdateIfEnabled(StageMap *self) {
 }
 
 void StageMap__DispatchLinkCommand(StageMap *self, BasicClass *sender, s32 command) {
-    if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
+    if ((sender->methods->header & CLASS_ID_LEVEL2_MASK) == ACTOR_CLASS_ID) {
         self->methods->forwardAcceptedCommand(self, sender, command);
     }
 }

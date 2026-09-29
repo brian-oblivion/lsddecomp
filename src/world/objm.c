@@ -77,11 +77,11 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
 
     GetTimedTaskMethods()->onNotify((TimedTask *)self, sender, event);
     tag = sender->methods->header;
-    if ((tag & 0xFFF) == STAGEMAP_CLASS_ID) {
+    if ((tag & CLASS_ID_LEVEL3_MASK) == STAGEMAP_CLASS_ID) {
         self->methods->onStageMapNotify(self, sender, event);
-    } else if ((tag & 0xFFF) == FADEBOX_CLASS_ID) {
+    } else if ((tag & CLASS_ID_LEVEL3_MASK) == FADEBOX_CLASS_ID) {
         self->methods->onFadeNotify(self, (struct FadeBox *)sender, event);
-    } else if ((tag & 0xFFFF) == DREAMSYS_CLASS_ID) {
+    } else if ((tag & CLASS_ID_LEVEL4_MASK) == DREAMSYS_CLASS_ID) {
         self->methods->onDreamSysNotify(self, sender, event);
     }
 }

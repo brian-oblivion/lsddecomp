@@ -15,7 +15,7 @@
 #include "sound_cue_set.h"
 
 /** gEntityMethods' class id (TodActor's 0xF234 with a 1 above it):
- * `(header & 0xFFFFF) == ENTITY_CLASS_ID` is its is-kind-of test. */
+ * `(header & CLASS_ID_LEVEL5_MASK) == ENTITY_CLASS_ID` is its is-kind-of test. */
 #define ENTITY_CLASS_ID 0x1F234
 
 typedef struct Entity Entity;

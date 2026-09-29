@@ -20,7 +20,7 @@ typedef struct DreamSys DreamSys;
 typedef struct DreamSysMethods DreamSysMethods;
 
 /** DreamSys's class id (gDreamSysMethods word +0x000). Four nibbles, so
- * `(header & 0xFFFF) == DREAMSYS_CLASS_ID` tests for it or a class below it
+ * `(header & CLASS_ID_LEVEL4_MASK) == DREAMSYS_CLASS_ID` tests for it or a class below it
  * (ObjM__OnNotify). */
 #define DREAMSYS_CLASS_ID 0x1F34
 
