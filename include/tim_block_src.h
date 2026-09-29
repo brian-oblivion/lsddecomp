@@ -23,6 +23,11 @@ typedef struct TimBlockSrcMethods TimBlockSrcMethods;
 /** TimBlockSrc's class id (gTimBlockSrcMethods word +0x000). */
 #define TIMBLOCKSRC_CLASS_ID 0xF03
 
+/** The VRAM y of the fade CLUTs, 256-colour rows: TimBlockSrc lays its four
+ * ramps out from there and TimArraySrc maps an image's CLUT row back to its
+ * ramp from it. */
+#define CLUT_FADE_Y 480
+
 /**
  * @brief One CLUT row's fade ramp: the CLUT row itself, then `mask - 1` rows
  *        below it stepping toward `color`.
