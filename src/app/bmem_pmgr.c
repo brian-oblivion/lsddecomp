@@ -33,7 +33,8 @@ extern BMemPMgr *sDefaultBMemPMgr;
  * malloc-failure message. */
 extern char sBMemPMgrInitFailFmt[];
 
-/* MATCHING: bmem_pmgr.h declares this without a prototype, so main() can pass its dead second argument. */
+/* MATCHING: bmem_pmgr.h declares this without a prototype, so main() can pass
+ * its dead second argument. */
 void *BMemPMgrInit(s32 poolSize) {
     BMemPMgr *pool;
 
