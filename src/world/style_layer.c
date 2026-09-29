@@ -943,36 +943,34 @@ StyleCueRecord *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *t
     s32 dx, dz, dist;
     StageMap *grid;
 
-    if (target == 0) {
-        goto fail;
-    }
-    records = sStyleCueRecordLists[sStyleStage];
-    remaining = sStyleCueRecordCounts[sStyleStage] - sStyleCueRecordIndex;
-    entry = (StyleCueRecord *)(sStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
-    for (j = 0; j < remaining; j++, entry++) {
-        sStyleCueRecordIndex++;
-        if (entry->cue > 0) {
-            buf.key = entry->key;
-            buf.offset = sStyleCueOffsets[entry->offsetIndex];
-            grid = (StageMap *)sStyleGrid;
-            grid->methods->computeCellOffsets(grid, pos, &buf);
-            dx = pos->x - target->x;
-            if (dx < 0) {
-                dx = ~dx + 1; /* MATCHING: not -dx; retail complements and adds one */
-            }
-            dz = pos->z - target->z;
-            if (dz >= 0) {
-                dist = dx + dz;
-            } else {
-                dist = dx - dz;
-            }
-            *outDist = dist;
-            if (dist < sStyleCueDistanceTable[entry->cue]) {
-                return entry;
+    if (target != 0) {
+        records = sStyleCueRecordLists[sStyleStage];
+        remaining = sStyleCueRecordCounts[sStyleStage] - sStyleCueRecordIndex;
+        entry = (StyleCueRecord *)(sStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
+        for (j = 0; j < remaining; j++, entry++) {
+            sStyleCueRecordIndex++;
+            if (entry->cue > 0) {
+                buf.key = entry->key;
+                buf.offset = sStyleCueOffsets[entry->offsetIndex];
+                grid = (StageMap *)sStyleGrid;
+                grid->methods->computeCellOffsets(grid, pos, &buf);
+                dx = pos->x - target->x;
+                if (dx < 0) {
+                    dx = ~dx + 1; /* MATCHING: not -dx; retail complements and adds one */
+                }
+                dz = pos->z - target->z;
+                if (dz >= 0) {
+                    dist = dx + dz;
+                } else {
+                    dist = dx - dz;
+                }
+                *outDist = dist;
+                if (dist < sStyleCueDistanceTable[entry->cue]) {
+                    return entry;
+                }
             }
         }
     }
-fail:
     return 0;
 }
 
