@@ -28,6 +28,7 @@
 #include "bmem_pmgr.h"
 #include "game_files.h"
 #include <strings.h>
+#include <stdio.h>
 #include "dream_day.h"
 
 /* The table getters of every class SetActiveDataSource rebinds, NULL-
@@ -120,7 +121,7 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
     task->methods->setExitCallback(task, (void (*)(void *))GameApplication__RegisterFilesCallback, self);
     task->methods->setFrameBound(task, 0);
     task->methods->setSubHandle(task, path, 0);
-    task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, 0);
+    task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, INTERMEDIATEBASE_INIT_RUN);
     task->methods->release(task);
 }
 
@@ -152,8 +153,8 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
  * it is day 1 or skipGraphRoomPoll is set (the last DayTask CLOSED), runs the
  * GraphRoom, then PlaySpecialDayMovies if it scored. Then the TitleMenu,
  * again after a GraphRoom each time it returns GRAPH. Returns
- * APPLICATION_LOOP_DAY for the menu's result 0, else
- * APPLICATION_LOOP_OPENING. */
+ * APPLICATION_LOOP_DAY when the menu ended normally (TASKCORE_RESULT_DONE),
+ * else APPLICATION_LOOP_OPENING (it timed out). */
 s32 GameApplication__RunTitleMenu(GameApplication *self) {
     s32 status;
     s32 graphResult; /* MATCHING: GRAPH, set after the GraphRoom check, not the constant */
@@ -183,19 +184,19 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
         }
 
         self->skipGraphRoomPoll = 0;
-        /* MATCHING: status == 0 ? APPLICATION_LOOP_DAY : APPLICATION_LOOP_OPENING,
-         * spelled as retail computes it; the ternary compiles differently. */
+        /* MATCHING: status == TASKCORE_RESULT_DONE ? DAY : OPENING; a ternary compiles differently. */
         return ((u32)status < 1) << 1;
     }
     return APPLICATION_LOOP_DAY;
 }
 
-/* Builds a task with newTask(dreamSys), runs its init to the end (mode 0),
+/* Builds a task with newTask(dreamSys), runs its init to the end
+ * (INTERMEDIATEBASE_INIT_RUN),
  * releases it and returns init's result. */
 s32 GameApplication__RunTask(NewTaskFn newTask, struct DreamSys *dreamSys,
                              IntermediateBaseInitArgs *initArgs) {
     IntermediateBase *task = newTask(dreamSys);
-    s32 result = task->methods->init(task, initArgs, 0);
+    s32 result = task->methods->init(task, initArgs, INTERMEDIATEBASE_INIT_RUN);
 
     task->methods->release(task);
     return result;
@@ -265,7 +266,7 @@ s32 GameApplication__RunDayTask(GameApplication *self) {
 
 /* The special day record or event movie DreamSys's getCinematic names: a
  * movie is streamed (gated by config->playStreams, no skip on confirm), a
- * TIM image (movie id -1) is shown for 10 seconds. */
+ * TIM image (MOVIE_ID_NONE) is shown for 10 seconds. */
 void GameApplication__PlayCinematic(GameApplication *self) {
     CinematicCall cc;
 
@@ -279,7 +280,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
     path = GetSpecialDayOrEventRecord(&movieId, cc)->name;
     SetActiveDataSourceDriverMode(0, 0, 0);
 
-    if (movieId != -1) {
+    if (movieId != MOVIE_ID_NONE) {
         if (self->config->playStreams != 0) {
             StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
@@ -293,7 +294,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
         task = New_TaskCore(0, 0, 0);
         task->methods->setFrameBound(task, 10);
         task->methods->setSubHandle(task, path, 0);
-        task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, 0);
+        task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, INTERMEDIATEBASE_INIT_RUN);
         task->methods->release(task);
     }
 }
@@ -328,11 +329,6 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
  * is Sony's libc2 object, linked after this file.
  */
 
-/* sActiveDataSource's two observed values are the header words of the two
- * sibling classes it selects between: gCdDriverMethods (the CD-ROM read driver,
- * cd_driver.c) and gNullDriverMethods (NullDriver, the null driver, include/null_driver.h). */
-#define DATASOURCE_CD 0x13
-#define DATASOURCE_NULL 0x23
 
 void *FileResource__Release(FileResource *self) {
     self->freeGuard = 0;
@@ -371,10 +367,10 @@ void FileResource__LoadFile(FileResource *self, char *name) {
     savedIsOpen = self->isOpen;
     self->isOpen = 0;
     self->methods->open(self, name, 1, 0);
-    size = self->methods->seek(self, 0, 2);
+    size = self->methods->seek(self, 0, SEEK_END);
     buffer = BMemPMgrAlloc(size);
     if (buffer != NULL) {
-        self->methods->seek(self, 0, 0);
+        self->methods->seek(self, 0, SEEK_SET);
         self->methods->read(self, buffer, size);
         self->methods->close(self);
         self->buffer = buffer;

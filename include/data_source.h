@@ -33,6 +33,13 @@
 
 struct CdFileEntry; /* cd_driver.h */
 
+/** @name Data sources
+ * SetActiveDataSource's `source` (GameApplicationConfig::dataSource): the
+ * class id, the header word of its method table, of the driver it selects. @{ */
+#define DATASOURCE_CD 0x13   /**< CdDriver, gCdDriverMethods: the CD-ROM */
+#define DATASOURCE_NULL 0x23 /**< NullDriver, gNullDriverMethods: every method empty */
+/** @} */
+
 /** @brief The active driver's method table.
  * @return the null driver's table when it is active, else the CD driver's */
 extern FileResourceMethods *GetActiveDataSourceMethods(void);

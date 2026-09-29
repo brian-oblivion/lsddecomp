@@ -100,7 +100,7 @@ void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, const ch
     self->streamName = streamName;
     self->streamGroup = streamGroup;
     self->autoPlay = autoPlay;
-    GetTaskCoreMethods()->init((TaskCore *)self, args, 0);
+    GetTaskCoreMethods()->init((TaskCore *)self, args, INTERMEDIATEBASE_INIT_RUN);
 }
 
 void StreamTask__OnInit(StreamTask *self) {
@@ -241,7 +241,7 @@ void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankP
     self->tileAtlas = atlas;
     tileMap = New_TileMap(0, atlas);
     self->tileMap = tileMap;
-    self->bgLayer = New_BgLayer(tileMap, 1);
+    self->bgLayer = New_BgLayer(tileMap, BGLAYER_MODE_SCREEN);
     self->methods->resetCounters(self);
 }
 
@@ -313,7 +313,7 @@ void TaskCore__OnInit(TaskCore *self) {
     viewportMethods->attachViewChild(viewport, self->lightRig, &sTaskCoreViewOrigin,
                                      &sTaskCoreViewOrigin, NULL);
     viewportMethods->initOt(viewport);
-    self->result = 0;
+    self->result = TASKCORE_RESULT_DONE;
 }
 
 /* Closes the viewport's OT, detaches the view and the BgLayer, and clears the
@@ -415,7 +415,7 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
             self->inputMode = TASKCORE_INPUT_CHOOSING_SLOT;
             break;
         case TASKCORE_STATE_TIMED_OUT:
-            self->result = 1;
+            self->result = TASKCORE_RESULT_TIMED_OUT;
             methods->exit(self);
             break;
         case TASKCORE_STATE_FADE_IN:
@@ -1213,7 +1213,7 @@ void IntermediateBase__Init(IntermediateBase *self, IntermediateBaseInitArgs *ar
     methods->addChild(self, self->frameClock);
     methods->onInit(self, 0, 0, 0);
     self->initMode = mode;
-    if (mode == 0) {
+    if (mode == INTERMEDIATEBASE_INIT_RUN) {
         viewport->methods->addChild(viewport, args->drawSystem);
         viewport->methods->addChild(viewport, self->frameClock);
         self->lightRig->methods->addChild(self->lightRig, self->frameClock);
@@ -1229,7 +1229,7 @@ void IntermediateBase__Deinit(IntermediateBase *self) {
     methods = self->methods;
     methods->onDeinit(self);
     viewport = self->viewport;
-    if (self->initMode == 0) {
+    if (self->initMode == INTERMEDIATEBASE_INIT_RUN) {
         self->lightRig->methods->removeChild(self->lightRig, self->frameClock);
         viewport->methods->removeChild(viewport, self->frameClock);
         viewport->methods->removeChild(viewport, self->initArgs->drawSystem);

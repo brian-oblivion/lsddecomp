@@ -30,6 +30,10 @@
 #include "full_width_sjis.h"
 #include "data_source.h"
 
+/* Both widgets' resource loaders build "CARD\\" + name + ".TIM" in a path
+ * buffer of this size (BuildFileName's dest). */
+#define CARD_TIM_PATH_SIZE 32
+
 /* The cursor sprite's position at index 0, (-62, -12): loadCardResources
  * attaches the cursor there, setCursorPos moves it to x + index * 7, y. */
 extern ScreenSpritePos sTextEntryCursorPos;
@@ -157,7 +161,7 @@ extern ScreenSpritePos sTextEntryPanelPos; /* (-70, -60) */
 extern ScreenSpritePos sTextEntryTextPos;  /* (-62, -15) */
 
 void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
-    char path[32];
+    char path[CARD_TIM_PATH_SIZE];
     char *dir;
     char *ext;
     TimImage *panelTim;
@@ -263,11 +267,11 @@ void TextEntry__HandleCommand(TextEntry *self, void *sender, s32 command) {
             } else {
                 strcpy(self->textBuf, self->editBuf);
             }
-            self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
+            self->methods->playSound(self, TEXTENTRY_TONE_BUTTON);
             self->methods->setState(self, TEXTENTRY_RESULT_ACCEPTED);
             return;
         case PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN:
-            self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
+            self->methods->playSound(self, TEXTENTRY_TONE_BUTTON);
             self->methods->setState(self, TEXTENTRY_RESULT_CANCELLED);
             return;
         case PAD_EVENT_PRESSED + PAD_BUTTON_L2:
@@ -335,7 +339,7 @@ void TextEntry__PlaySound(TextEntry *self, s32 tone) {
 
     target = self->target;
     if (target != NULL) {
-        target->methods->playTone(target, tone, 96, 96);
+        target->methods->playTone(target, tone, TEXTENTRY_TONE_VOLUME, TEXTENTRY_TONE_VOLUME);
     }
 }
 
@@ -436,7 +440,7 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
         cursor->methods->setPosition(cursor, &screenPos);
         self->cursorIndex = pos;
         if (notify) {
-            self->methods->playSound(self, 0);
+            self->methods->playSound(self, TEXTENTRY_TONE_CURSOR);
         }
     }
 }
@@ -451,7 +455,7 @@ void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify) {
         self->cursorIndex = pos;
         self->charIndex = charIndex;
         if (notify) {
-            self->methods->playSound(self, 0);
+            self->methods->playSound(self, TEXTENTRY_TONE_CURSOR);
         }
     }
 }
@@ -608,9 +612,6 @@ void ItemList__ResetView(ItemList *self) {
     self->column = 0;
     self->cursorIndex = 0;
 }
-
-/* loadResources' path buffer, BuildFileName's dest: "CARD\\" + name + ".TIM". */
-#define CARD_TIM_PATH_SIZE 32
 
 extern char sStrSelect[];                 /* "SELECT" */
 extern char sItemListCardPathPrefix[];    /* "CARD\\" */

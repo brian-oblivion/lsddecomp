@@ -14,7 +14,7 @@ typedef struct BgLayer BgLayer;
 typedef struct BgLayerMethods BgLayerMethods;
 
 /** BgLayer's class id (gBgLayerMethods word +0x000). Two nibbles, so
- * `(header & 0xFF) == BGLAYER_CLASS_ID` is its is-kind-of test
+ * `(header & CLASS_ID_LEVEL2_MASK) == BGLAYER_CLASS_ID` is its is-kind-of test
  * (Viewport__DrawNode). */
 #define BGLAYER_CLASS_ID 0x54
 
@@ -57,7 +57,7 @@ typedef void (*BgLayerResetFn)(BgLayer *self, struct TileMap *src, s32 mode);
  * Viewport__DrawNode (src/graphics/viewport_draw.c) passes a BgLayer's GsBG,
  * from `bgAttribute` on, to GsSortBg. Its one owner is TaskCore
  * (src/app/task.c): TaskCore__TaskCore builds one over its TileMap
- * (New_BgLayer(tileMap, 1)), OnInit attaches it to the LightRig and sets its
+ * (New_BgLayer(tileMap, BGLAYER_MODE_SCREEN)), OnInit attaches it to the LightRig and sets its
  * colour, OnDeinit detaches it, Finalize releases it, and the fades
  * (TaskCore__TickFadeIn, TaskCore__TickFadeOut) call setColor every frame.
  */

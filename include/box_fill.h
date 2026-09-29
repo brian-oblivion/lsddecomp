@@ -33,7 +33,7 @@ typedef struct BoxFillPos BoxFillPos;
 #define BOXFILL_SEMITRANS_RATE(gsRate) ((gsRate) >> BOXFILL_ATTR_RATE_SHIFT)
 
 /** BoxFill's class id (gBoxFillMethods word +0x000). Two nibbles, so
- * `(header & 0xFF) == BOXFILL_CLASS_ID` is its is-kind-of test, true for
+ * `(header & CLASS_ID_LEVEL2_MASK) == BOXFILL_CLASS_ID` is its is-kind-of test, true for
  * FadeBox (0x164) too (Viewport__DrawNode). */
 #define BOXFILL_CLASS_ID 0x64
 

@@ -71,8 +71,9 @@ struct TitleMenuMethods {
  *  - 0 START is the target's exitSlot: TaskCore ends the menu with exit,
  *    which this class extends to store SHAKE's setting (itemCursors[5])
  *    through DreamSys's getSetScreenShake.
- *  - 1 FLASHBACK: result 0 and a flashback session opened; 4 GRAPH: result
- *    2. Both then end the menu through exit.
+ *  - 1 FLASHBACK: result TASKCORE_RESULT_DONE and a flashback session
+ *    opened; 4 GRAPH: result TITLEMENU_RESULT_GRAPH. Both then end the menu
+ *    through exit.
  *  - 2 SAVE runs saveToCard, 3 LOAD loadFromCard.
  *  - 5 SHAKE is the one entry with an item list (the target's slotLists[5]).
  *  - FLASHBACK starts locked (hiddenSlots[1] = 1); refreshMenu clears the
@@ -238,8 +239,9 @@ void TitleMenu__SetState(TitleMenu *self, s32 state);
 /**
  * @brief TaskCore's confirmSlot, then acts on the chosen entry.
  *
- * FLASHBACK opens a flashback session and exits with result 0, GRAPH exits
- * with TITLEMENU_RESULT_GRAPH, SAVE runs saveToCard and LOAD loadFromCard.
+ * FLASHBACK opens a flashback session and exits with result
+ * TASKCORE_RESULT_DONE, GRAPH exits with TITLEMENU_RESULT_GRAPH, SAVE runs
+ * saveToCard and LOAD loadFromCard.
  * @param self the menu.
  */
 void TitleMenu__ConfirmSlot(TitleMenu *self);

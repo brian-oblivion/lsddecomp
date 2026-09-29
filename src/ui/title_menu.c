@@ -182,7 +182,7 @@ void GridCell__Reset(void) {}
  * byte of the sender's class id); Actor__DispatchLinkCommand makes the same
  * test for a GridCell sender. */
 void GridCell__DispatchLinkCommand(GridCell *self, BasicClass *sender, s32 event) {
-    if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
+    if ((sender->methods->header & CLASS_ID_LEVEL2_MASK) == ACTOR_CLASS_ID) {
         self->methods->onActorLinkCommand(self, sender, event);
     }
 }
@@ -253,10 +253,15 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSy
     target->hiddenSlots[TITLEMENU_FLASHBACK] = (void *)locked;
 }
 
-/* The save title's day number, full-width characters 9..11 of
- * "LSD   Day001" (StampSaveTitleFileLetter's layout of the title, below). */
+/* The save title is full-width (2-byte SJIS) characters. TitleMenu's (the
+ * buffer sSaveTitle points at) starts as "LSD   Day001", all full-width:
+ * "LSD" (0..2), the letter field (3..5: a space, the save file's letter, a
+ * space), "Day" (6..8), the day number (9..11), then padding. */
+#define SAVE_TITLE_LETTER_FIELD 3
+#define SAVE_TITLE_LETTER 4
 #define SAVE_TITLE_DAY 9
 #define SAVE_TITLE_DAY_DIGITS 3
+#define SAVE_TITLE_PADDING 12
 
 /* Formats the day as three full-width digits in sDayDigits's buffer and
  * copies them into the save title's day number, characters 9..11. */
@@ -316,7 +321,7 @@ void TitleMenu__OnDeinit(TitleMenu *self) {
 
     i = 0;
     rect = sDisplayBufferRects;
-    for (; i < 2; i++) {
+    for (; i < ARRAY_COUNT(sDisplayBufferRects); i++) {
         ((DrawSystem *)self->initArgs->drawSystem)
             ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->clearColor, rect);
         rect++;
@@ -341,7 +346,7 @@ void TitleMenu__ConfirmSlot(TitleMenu *self) {
     GetTaskCoreMethods()->confirmSlot((TaskCore *)self);
     switch (self->activeSlot) {
         case TITLEMENU_FLASHBACK:
-            self->result = 0;
+            self->result = TASKCORE_RESULT_DONE;
             self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 1);
             fn = self->methods->exit;
             break;
@@ -369,18 +374,19 @@ void TitleMenu__Exit(TitleMenu *self) {
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
 }
 
-/* sSaveTitle is 2-byte full-width characters; the characters from here on
- * are padding after "LSD   Day001". */
-#define SAVE_TITLE_PADDING 12
 /* beginSave's titleEditPos: the player's text goes in from the character
  * after the padding's first space. */
 #define SAVE_TITLE_EDIT_POS 13
+/* beginSave's iconFrames: CARD\FILEICN1.TIM's three icon frames, the save
+ * header's frame0..frame2. */
+#define SAVE_ICON_FRAMES 3
 
 /* The setTarget override: `target` is the TaskCoreTarget the ctor passes
  * (&sTitleMenuTarget); only its `handle` is read, as the TextRow's texture. On a
  * new game the title's padding is reblanked and its letter field cleared
- * first. The TextRow has a cell a character plus 4, eight of them shown
- * from cell 4, with a gap before cell 9. */
+ * first. The TextRow has a cell a character plus 4 and shows the file's
+ * letter, "Day" and the day number (characters 4..11), with a gap before
+ * the number. */
 void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
     u32 cellCount;
     char *text;
@@ -397,9 +403,9 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
     text = BMemPMgrAlloc(cellCount);
     DecodeFullWidthSjis(text, sSaveTitle);
     self->saveTitle = New_TextRow(target->handle, cellCount, text);
-    self->saveTitle->visibleCount = 8;
-    self->saveTitle->firstVisible = 4;
-    self->saveTitle->gapIndex = 9;
+    self->saveTitle->visibleCount = SAVE_TITLE_PADDING - SAVE_TITLE_LETTER;
+    self->saveTitle->firstVisible = SAVE_TITLE_LETTER;
+    self->saveTitle->gapIndex = SAVE_TITLE_DAY;
     BMemPMgrFree(text);
 }
 
@@ -432,7 +438,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, ColorRgb *color) {
 
     channels = (u8 *)&rgb;
     GetTaskCoreMethods()->broadcastToSlots((TaskCore *)self, (u8 *)color);
-    if (self->inputMode != 0) {
+    if (self->inputMode != TASKCORE_INPUT_NONE) {
         channels[0] = 0;
         channels[1] = 0;
         channels[2] = 0;
@@ -511,8 +517,9 @@ void TitleMenu__SaveToCard(TitleMenu *self) {
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
         sSaveFileName[0] = '\0';
     }
-    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, sSaveTitle, SAVE_TITLE_EDIT_POS,
-                                       3, self->saveIcon, self->saveBlock, self->saveBlockSize);
+    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, sSaveTitle,
+                                       SAVE_TITLE_EDIT_POS, SAVE_ICON_FRAMES, self->saveIcon,
+                                       self->saveBlock, self->saveBlockSize);
 }
 
 void TitleMenu__LoadFromCard(TitleMenu *self) {
@@ -620,11 +627,11 @@ void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
         self->tickSource = child;
         return;
     }
-    if ((u8)classId == TEXTENTRY_CLASS_ID) {
+    if ((classId & CLASS_ID_LEVEL2_MASK) == TEXTENTRY_CLASS_ID) {
         self->textEntry = (struct TextEntry *)child;
         return;
     }
-    if ((u8)classId == ITEMLIST_CLASS_ID) {
+    if ((classId & CLASS_ID_LEVEL2_MASK) == ITEMLIST_CLASS_ID) {
         self->itemList = (struct ItemList *)child;
     }
 }
@@ -640,9 +647,9 @@ void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child) {
         self->inputSource = NULL;
     } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->tickSource = NULL;
-    } else if ((u8)classId == TEXTENTRY_CLASS_ID) {
+    } else if ((classId & CLASS_ID_LEVEL2_MASK) == TEXTENTRY_CLASS_ID) {
         self->textEntry = NULL;
-    } else if ((u8)classId == ITEMLIST_CLASS_ID) {
+    } else if ((classId & CLASS_ID_LEVEL2_MASK) == ITEMLIST_CLASS_ID) {
         self->itemList = NULL;
     }
     GetBasicClassMethods()->removeChild((BasicClass *)self, child);
@@ -1265,7 +1272,7 @@ void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
     } else if (kind == FRAMECLOCK_CLASS_ID) {
         methods->tickStateDelay(self, sender, event);
     } else {
-        kind = (u8)tag;
+        kind = tag & CLASS_ID_LEVEL2_MASK;
         if (kind == TEXTENTRY_CLASS_ID) {
             methods->onTextEntryResult(self, sender, event);
         } else if (kind == ITEMLIST_CLASS_ID) {
@@ -1412,7 +1419,7 @@ void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 event) {
 
 void TaskObjF__PlaySound(TaskObjF *self, s32 index) {
     if (self->sound != NULL) {
-        self->sound->methods->playTone(self->sound, index, 127, 127);
+        self->sound->methods->playTone(self->sound, index, TASKOBJF_TONE_VOLUME, TASKOBJF_TONE_VOLUME);
     }
 }
 
@@ -1424,7 +1431,7 @@ void TaskObjF__AdvanceState(TaskObjF *self) {
         case TASKOBJF_STATE_CARD_CHANGED:
         case TASKOBJF_STATE_SAVE_OVERWRITE_WARNING:
         case TASKOBJF_STATE_LOAD_WARNING:
-            methods->playSound(self, 0 << 4);
+            methods->playSound(self, TASKOBJF_TONE_PROCEED);
             if (self->state == TASKOBJF_STATE_LOAD_WARNING) {
                 strcpy(self->fileName, self->namePrefix);
                 strcat(self->fileName, self->foundSuffixes[self->selectedIndex]);
@@ -1439,7 +1446,7 @@ void TaskObjF__AdvanceState(TaskObjF *self) {
             }
             break;
         case TASKOBJF_STATE_UNFORMATTED_SAVE:
-            methods->playSound(self, 0 << 4);
+            methods->playSound(self, TASKOBJF_TONE_PROCEED);
             methods->setState(self, TASKOBJF_STATE_FORMATTING);
             break;
         case TASKOBJF_STATE_CARD_ERROR:
@@ -1449,7 +1456,7 @@ void TaskObjF__AdvanceState(TaskObjF *self) {
         case TASKOBJF_STATE_SAVE_ERROR:
         case TASKOBJF_STATE_LOAD_NOT_FOUND:
         case TASKOBJF_STATE_LOAD_ERROR:
-            methods->playSound(self, 1 << 4);
+            methods->playSound(self, TASKOBJF_TONE_BACK);
             methods->setState(self, TASKOBJF_STATE_ABORTED);
             break;
     }
@@ -1461,7 +1468,7 @@ void TaskObjF__AbortFromState(TaskObjF *self) {
         case TASKOBJF_STATE_UNFORMATTED_SAVE:
         case TASKOBJF_STATE_SAVE_OVERWRITE_WARNING:
         case TASKOBJF_STATE_LOAD_WARNING:
-            self->methods->playSound(self, 1 << 4);
+            self->methods->playSound(self, TASKOBJF_TONE_BACK);
             self->methods->setState(self, TASKOBJF_STATE_ABORTED);
             break;
         default:
@@ -1506,7 +1513,8 @@ void TaskObjF__TickStateDelay(TaskObjF *self) {
 void TaskObjF__AttachTextEntry(TaskObjF *self) {
     if (self->spriteParent != 0 && self->inputSource != 0) {
         if (self->textEntry == NULL) {
-            self->textEntry = New_TextEntry(&self->title[self->titleEditPos * 2], 1);
+            self->textEntry =
+                New_TextEntry(&self->title[self->titleEditPos * 2], TEXTENTRY_MODE_FULLWIDTH);
             self->ownsWidget = 1;
         }
         self->methods->addChild(self, (BasicClass *)self->textEntry);
@@ -1583,13 +1591,8 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
     return &gTaskObjFMethods;
 }
 
-/* The save title is full-width (2-byte SJIS) characters. TitleMenu's (the
- * buffer sSaveTitle points at) starts as "LSD   Day001", all full-width:
- * "LSD" (0..2), the letter field (3..5), "Day" (6..8), the day number
- * (9..11), then padding. */
-#define SAVE_TITLE_LETTER_FIELD 3
-#define SAVE_TITLE_LETTER 4
-/* SAVE_TITLE_PADDING (12) is defined above, with sSaveTitle. */
+/* The save title's layout (SAVE_TITLE_LETTER_FIELD and the rest) is
+ * defined above, with StampSaveTitleDay. */
 /* sSaveTitleGlyphs: the full-width letters a..o (0..14), one per save file
  * -01..-15, then three full-width spaces and "Day" (15..20). */
 #define SAVE_TITLE_GLYPH_SPACES 15

@@ -16,10 +16,10 @@ typedef struct GameApplication GameApplication;
 typedef struct GameApplicationMethods GameApplicationMethods;
 
 /** The ctor's argument: which parts of the sequence run. One instance,
- * sGameApplicationConfig = {0x13, 0, 1, 1, 1, 1}, kept at self->config; each
+ * sGameApplicationConfig = {DATASOURCE_CD, 0, 1, 1, 1, 1}, kept at self->config; each
  * gate below is read `!= 0` by the methods it names. */
 typedef struct GameApplicationConfig {
-    /* +0x00 */ s32 dataSource; /**< Application's ctor argument (0x13 = the CD driver's class id) */
+    /* +0x00 */ s32 dataSource; /**< Application's ctor argument: DATASOURCE_CD (data_source.h) */
 
     /** New_DayTask's syncDriver, in RunDayTask: that ctor passes
      * (syncDriver == 0) to SetActiveDataSourceDriverMode. */

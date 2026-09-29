@@ -35,7 +35,7 @@ typedef void (*SoundCueCallbackFn)(void *owner, SoundCueSet *set);
  * and the voice that was keyed for it.
  */
 typedef struct SoundCueSlot {
-    /* +0x00 */ s32 voice; /**< playTone's result, stopVoice's argument; -1 when none. */
+    /* +0x00 */ s32 voice; /**< playTone's result, stopVoice's argument; VAB_NO_VOICE when none. */
     /* +0x04 */ s32 program; /**< Request: >= 0 plays VAB program `program` (tone 0); SOUND_CUE_NONE; SOUND_CUE_STOP. */
     /* +0x08 */ s32 octave; /**< Request: setPitchOffset's argument; reset to 0 each tick. */
     /* +0x0C */ s32 vol;    /**< Request: the key-on volume before attenuation; reset each tick. */
@@ -79,7 +79,7 @@ struct VabStreamObj; /* include/vab_stream_obj.h */
 
 /**
  * @brief Starts a cue, unless one is already running: stores the tag, owner
- * and callback, frees every slot's voice (-1), zeroes the tick and sets
+ * and callback, frees every slot's voice (VAB_NO_VOICE), zeroes the tick and sets
  * attenuationSteps.
  * @param sound    The VabStreamObj whose voices the cue plays (unused here).
  * @param set      The cue.

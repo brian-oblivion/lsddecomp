@@ -17,7 +17,7 @@ struct VabStreamObj;
 struct TextRow;
 
 /** TextEntry's class id (gTextEntryMethods word +0x000). Two nibbles, so
- * `(u8)header == TEXTENTRY_CLASS_ID` is its is-kind-of test (TaskObjF's
+ * `(header & CLASS_ID_LEVEL2_MASK) == TEXTENTRY_CLASS_ID` is its is-kind-of test (TaskObjF's
  * addChild/removeChild/onNotify). */
 #define TEXTENTRY_CLASS_ID 0x10
 
@@ -40,6 +40,15 @@ enum TextEntryResult {
 /** setState's last state: notify the parents with `closeState`. tickState
  * enters it on the second tick after a close. */
 #define TEXTENTRY_STATE_REPORT 4
+
+/** @name Tones
+ * playSound's tones, VabStreamObj__PlayTone indices (program << 4 | tone):
+ * the same two TaskCore's menus play (task_core.h). @{ */
+#define TEXTENTRY_TONE_CURSOR 0x00 /**< setCursorPos, setCharAt: the cursor or a character moved */
+#define TEXTENTRY_TONE_BUTTON 0x10 /**< circle or cross: the entry closes */
+#define TEXTENTRY_TONE_VOLUME 96   /**< playSound's PlayTone vol and endVol */
+
+/** @} */
 
 /**
  * @brief TextEntry's method table: BasicClass's slots, then TextEntry's own.
