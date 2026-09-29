@@ -99,7 +99,7 @@ void GraphRoom__BuildGraphPoints(GraphRoom *self) {
     s32 i;
 
     self->points[0] = New_BoxFill(sGraphPointSize, &sGraphPointNewestColor, 0);
-    rgb = sGraphPointBaseColor; /* MATCHING: a 3-byte struct copy, byte by byte */
+    rgb = sGraphPointBaseColor;
     for (i = 1; i < ARRAY_COUNT(self->points); i++) {
         s32 step;
 
@@ -194,7 +194,8 @@ extern MoodGraphPoint sGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT];
  * window PopulateGraphPoints walks, newest first), recording in
  * matchedDayIndices the oldest dot holding each. Fails at once when
  * graphScored is set, and sets it on success. */
-/* MATCHING: the targets/days caches, dead else and chained assignment keep the table unhoisted */
+/* MATCHING: the targets/days caches, the dead else and the chained assignment take the
+ * table's address on every pass; indexing sGraphScoreMoods takes it once, before the loops */
 s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
     u32 i;
     MoodGraphPoint *days;
