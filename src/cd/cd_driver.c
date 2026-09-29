@@ -553,6 +553,8 @@ s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
     for (; entries < end; entries++) {
         BuildCdFilePath(path, entries->name);
 
+        /* MATCHING: a hit jumps past the not-found message; a break, then a test
+         * of tries, compiles to a different loop exit. */
         for (tries = 0; tries < CD_SEARCH_ATTEMPTS; tries++) {
             if (CdSearchFile(&info, path) != 0) {
                 goto found;
@@ -788,6 +790,8 @@ void TickCdStateMachine(void) {
     s32 newState;
 
     LockCd();
+    /* MATCHING: arms that change state break to one SetCdState call and the rest jump
+     * to the unlock; a SetCdState call in each arm is not merged back into one. */
     switch (sCdState) {
         case CD_STATE_SETLOC:
             if (CdControlF(CdlSetloc, (u_char *)&sCdSeekParam->pos) == 0) {
@@ -845,6 +849,8 @@ void TickCdLoadFileStateMachine(void) {
     s32 newState;
 
     LockCd();
+    /* MATCHING: arms that change state break to one SetCdState call and the rest jump
+     * to the unlock; a SetCdState call in each arm is not merged back into one. */
     switch (sCdState) {
         case CD_STATE_SETLOC:
             if (CdControlF(CdlSetloc, (u_char *)&sCdSeekParam->pos) == 0) {
