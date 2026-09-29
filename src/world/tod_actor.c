@@ -251,13 +251,13 @@ s32 TodActor__FindPartIndex(TodActor *self, s32 id) {
     s32 count;
     s32 i;
     u8 wanted;
-    u8 unused[8]; /* MATCHING: retail's 8-byte frame; without it the frame is empty */
+    u8 unused[8]; /* MATCHING: never used; it gives retail's 8-byte stack, which is otherwise empty */
 
     if (self->partIds == NULL) {
         return -1;
     }
     ids = self->partIds;
-    __asm__(""); /* MATCHING: keeps the copy of ids above the partCount load, not in blez's delay slot */
+    __asm__(""); /* MATCHING: an ordering barrier; without it ids is copied after the partCount test */
     count = self->partCount;
     if (count <= 0) {
         return -1;
@@ -292,7 +292,7 @@ void TodActor__TeardownParts(TodActor *self) {
  * second fills partIds and turns tmdId[0] into the index of the object drawn
  * with that TMD id, which becomes mainPart. 0, or 1 with the parts released. */
 s32 TodActor__CreateParts(TodActor *self) {
-    u32 tmdId[4]; /* MATCHING: [1] changes the frame; only [0] is used */
+    u32 tmdId[4]; /* MATCHING: four words for retail's stack; only [0] is used */
     s32 count;
     s32 i;
     Actor **p;
@@ -533,7 +533,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                 partCoord->coord.t[0] = x;
                 partCoord->coord.t[1] = y;
                 partCoord->coord.t[2] = z;
-                __asm__(""); /* MATCHING: keeps the t[2] store ahead of break's jump, whose delay slot stays a nop */
+                __asm__(""); /* MATCHING: an ordering barrier; it keeps the t[2] store ahead of the break */
             }
             break;
         }
