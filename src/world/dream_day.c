@@ -355,7 +355,7 @@ void TimedTask__Deinit(TimedTask *self) {
     GetIntermediateBaseMethods()->deinit((IntermediateBase *)self);
 }
 
-void TimedTask__NoOpSlot58(void) {}
+void TimedTask__NoOpOnPadEvent(void) {}
 
 void TimedTask__CheckTimeout(TimedTask *self, BasicClass *sender, s32 event) {
     GetIntermediateBaseMethods()->update((IntermediateBase *)self, sender, event);

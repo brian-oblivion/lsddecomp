@@ -101,7 +101,7 @@ struct Ratio16 {
     /* +0x050 */ SceneNode *(*detachFromParent)(Self *self); /* SceneNode__DetachFromParent */ \
     /* +0x054 */ void (*detachAttachedChildren)(Self *self); /* SceneNode__DetachAttachedChildren */ \
     /* +0x058 */ void (*getNextAttachedChild)(Self *self, SceneNode **entry, BasicClassListNode **cursor); /* SceneNode__GetNextAttachedChild */ \
-    /* +0x05C */ void (*finalizeHook)(Self *self, s32 arg1); /* SceneNode__NoOpSlot5C; Finalize calls it with (self, 0); no subclass overrides it */ \
+    /* +0x05C */ void (*finalizeHook)(Self *self, s32 arg1); /* SceneNode__NoOpFinalizeHook; Finalize calls it with (self, 0); no subclass overrides it */ \
     /* +0x060 */ s32 (*setDisplay)(Self *self, s32 on); /* SceneNode__SetDisplay */ \
     /* +0x064 */ u32 (*setSemiTransOn)(Self *self, s32 on); /* SceneNode__SetSemiTrans; not setSemiTrans, which is <libgpu.h>'s macro */ \
     /* +0x068 */ u32 (*setSemiTransRate)(Self *self, u32 rate); /* SceneNode__SetSemiTransRate */ \
@@ -313,10 +313,10 @@ void SceneNode__DetachAttachedChildren(SceneNode *self);
 void SceneNode__GetNextAttachedChild(SceneNode *self, SceneNode **child, BasicClassListNode **cursor);
 
 /**
- * @brief Slot +0x05C: empty. Finalize calls it with (self, 0), and no subclass
- *        overrides it.
+ * @brief finalizeHook (slot +0x05C): empty. Finalize calls it with
+ *        (self, 0), and no subclass overrides it.
  */
-void SceneNode__NoOpSlot5C(void);
+void SceneNode__NoOpFinalizeHook(void);
 
 /**
  * @brief Shows or hides the node: writes !on to GsDOFF.

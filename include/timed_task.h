@@ -34,7 +34,7 @@ enum TimedTaskState {
  * IntermediateBase's slots, then TimedTask's own, for TimedTaskMethods and
  * the subclasses' tables to expand first. gTimedTaskMethods overrides the
  * ctor, finalize, resetCounters (TimedTask__CancelTimeout), init, deinit,
- * onPadEvent (+0x058, TimedTask__NoOpSlot58), update
+ * onPadEvent (+0x058, TimedTask__NoOpOnPadEvent), update
  * (TimedTask__CheckTimeout) and setState. Slots +0x074..+0x07C are NULL in
  * this class's own table (the last three words of its 0x80 bytes);
  * setState(4) calls +0x07C.
@@ -159,7 +159,7 @@ void TimedTask__Deinit(TimedTask *self);
 /**
  * @brief onPadEvent (slot +0x058): empty; a TimedTask ignores the pad.
  */
-void TimedTask__NoOpSlot58(void);
+void TimedTask__NoOpOnPadEvent(void);
 
 /**
  * @brief update (slot +0x05C): IntermediateBase's update (counts the frame),

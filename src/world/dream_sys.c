@@ -607,11 +607,11 @@ void DreamSys__SelectLookCallback(DreamSys *self, s32 mode) {
         case LOOK_CALLBACK_STEP_LOOK:
             self->lookCallback = vt->stepLook;
             break;
-        case LOOK_CALLBACK_SLOT14C:
-            self->lookCallback = vt->slot14C;
+        case LOOK_CALLBACK_NOOP_2:
+            self->lookCallback = vt->noOpLook2;
             break;
-        case LOOK_CALLBACK_SLOT150:
-            self->lookCallback = vt->slot150;
+        case LOOK_CALLBACK_NOOP_3:
+            self->lookCallback = vt->noOpLook3;
             break;
     }
 }
@@ -725,9 +725,9 @@ void DreamSys__FlipMoveCommand(DreamSys *self) {
     }
 }
 
-void DreamSys__NoOpSlot14C(void) {}
+void DreamSys__NoOpLook2(void) {}
 
-void DreamSys__NoOpSlot150(void) {}
+void DreamSys__NoOpLook3(void) {}
 
 s32 DreamSys__TickMove(DreamSys *self) {
     if (self->moveOverride == 0) {
