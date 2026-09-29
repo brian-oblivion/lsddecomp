@@ -54,12 +54,10 @@ Pad *New_Pad(s32 mode, s32 port) {
     Pad *self;
 
     self = BMemPMgrAlloc(sizeof(Pad));
-    if (self == NULL) {
-        goto fail;
+    if (self != NULL) {
+        GetPadMethods()->ctor(self, mode, port);
+        return self;
     }
-    GetPadMethods()->ctor(self, mode, port);
-    return self;
-fail:
     return NULL;
 }
 
@@ -153,6 +151,7 @@ void Pad__LoadButtonTable(void) {
 
     dst = sButtonMasks;
     local = sDefaultButtonMasks;
+    /* MATCHING: i is cleared ahead of src; cleared in the for header, the two setups swap. */
     i = 0;
     src = local.w;
     for (; i < PAD_BUTTON_COUNT; i++) {
