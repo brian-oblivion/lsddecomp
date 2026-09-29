@@ -469,6 +469,18 @@
         "data-world": true
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 4,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 4,
+          "model": "opus",
+          "note": "Phase 4 round 1. data-setup (head, premium): sEntityMoodTable in C, tools/datatable.py, procedure. data-world, data-graphics, data-rest moved every table their units own; method tables slot-per-line (head's style decision), RequestedFile/CdDriver/NullDriver via FILERESOURCE_BASE_SLOTS. Left: .sdata/.sbss/.rodata externs (gpsyms.py limit).",
+          "round": 108,
+          "runners": 3
+        }
+      ],
       "status": "auto"
     },
     "15": {
@@ -478,6 +490,18 @@
         "literals-world": true
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 3,
+          "model": "opus",
+          "note": "Phase 4 round 1. literals-graphics, literals-rest, literals-world (item_list.c covered by world after the split). Stage ids stay numbers until a stage table names them.",
+          "round": 108,
+          "runners": 3
+        }
+      ],
       "status": "auto"
     },
     "16": {
@@ -487,6 +511,18 @@
         "comments-world": true
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 3,
+          "model": "opus",
+          "note": "Phase 4 round 1. comments-rest, comments-graphics, comments-world: MATCHING notes without registers or tools; notes on natural spellings dropped. Rewritten notes mostly restate the old claim; no alternative spelling was re-measured.",
+          "round": 108,
+          "runners": 3
+        }
+      ],
       "status": "auto"
     },
     "17": {
@@ -494,6 +530,18 @@
         "ub-calls": true
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 1,
+          "model": "opus",
+          "note": "Phase 4 round 1. ub-calls: 21 cases, 16 natural and byte-identical, 5 stalled under NON_MATCHING (now queued as track-1 revisits; progress.py/plan.py count a NON_MATCHING body as a stall).",
+          "round": 108,
+          "runners": 1
+        }
+      ],
       "status": "auto"
     },
     "18": {
@@ -502,6 +550,18 @@
         "noop-slots": true
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 2,
+          "model": "opus",
+          "note": "Phase 4 round 1. mood-cues: 107 handlers named Entity__Cue<Behaviour>. noop-slots: 6 of 50 named; 44 never called or overridden keep their position name (done-when amended).",
+          "round": 108,
+          "runners": 2
+        }
+      ],
       "status": "auto"
     },
     "19": {
@@ -510,6 +570,18 @@
         "split-setup": true
       },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 2,
+          "model": "opus",
+          "note": "Phase 4 round 1. split-setup (head, premium): GraphRoom to graph_room.c plus a trial jump-table rodata cut; procedure. split-dream-scene: six files, dream_scene.c gone (item_list.c in src/ui).",
+          "round": 108,
+          "runners": 1
+        }
+      ],
       "status": "auto"
     },
     "1b": {
