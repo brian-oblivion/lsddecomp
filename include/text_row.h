@@ -4,7 +4,7 @@
  *
  * Declares the TextRow class (object and method table), its pitch
  * constants, the function types its mismatched overrides are called
- * through, and its methods, which are defined in src/ui/screen_widgets.c.
+ * through, and its methods, which are defined in src/ui/text_row.c.
  */
 #ifndef TEXT_ROW_H
 #define TEXT_ROW_H
@@ -40,7 +40,7 @@ struct TextRowMethods {
  * Class id 0x11144, method table gTextRowMethods, parent CharSprite: the
  * ctor chains to CharSprite's first (GetCharSpriteMethods()->ctor with cell
  * 0x20), so the id tree (0x1144 -> 0x11144) is the ctor chain. Methods in
- * src/ui/screen_widgets.c. No class derives from it, so it defines no
+ * src/ui/text_row.c. No class derives from it, so it defines no
  * FIELDS/SLOTS macros.
  *
  * - The ctor makes `count` CharSprites (New_CharSprite, same texture, cell
