@@ -1201,20 +1201,23 @@ void Entity__CueTone1Slow(Entity *self, SoundCueSet *out) {
 
 /* ---- MoodCue handlers, rows 39 to 58 and 115 ---------------------------
  *
- * Rows 39 to 52, 55 to 58 and 115. Entity__MoodCue45 is empty: its row has
+ * Rows 39 to 52, 55 to 58 and 115. Entity__CueIdle is empty: its row has
  * no per-tick effect. Entity__RollScaleOrDelayedDrift is not a row:
- * Entity__MoodCue43 and Entity__MoodCue44 call it first thing every tick.
+ * Entity__CueShuffleSideways and Entity__CueStepTurnThenShuffle call it first thing every tick.
  */
 
 /* The z den of a scale template, three Ratio16s {1/1, 1/1, 1/zDenom} that
  * end here (sScaleX3's data runs on into the template's first ten bytes).
- * Entity__MoodCue41 writes the den and passes the template. */
+ * Entity__CueRunOffOrStopAndJitterDepth writes the den and passes the template. */
 extern s16 sScaleTemplateZDenom;
 
-/* Defined after Entity__MoodCue43, which calls it. */
+/* Defined after Entity__CueShuffleSideways, which calls it. */
 void Entity__RollScaleOrDelayedDrift(Entity *self);
 
-void Entity__MoodCue39(Entity *self, SoundCueSet *out) {
+/* Row 39: at the start, on some days of the dream calendar (getCurrentDayAndYear), stretches to
+ * four times its height; sounds program 2 every 22 ticks, and at random stops and restarts its
+ * animation. */
+void Entity__CueStutterTodMaybeTall(Entity *self, SoundCueSet *out) {
     s32 dayYearPhase;
 
     if (self->moodTimer == 0) {
@@ -1241,7 +1244,9 @@ skipScaleBump:
     }
 }
 
-void Entity__MoodCue40(Entity *self, SoundCueSet *out) {
+/* Row 40: walks forward 30 a tick, climbing what it meets, and turns every 200 ticks (-90, 180,
+ * +90, 180 degrees), then round again; sounds program 3 every seventh tick. */
+void Entity__CuePatrolTurning(Entity *self, SoundCueSet *out) {
     Ratio16 *table = NULL;
 
     if (out->tick % 7 == 0) {
@@ -1269,7 +1274,10 @@ void Entity__MoodCue40(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue41(Entity *self, SoundCueSet *out) {
+/* Row 41: four times in five runs 256 a tick and is gone at moodTimer 500
+ * (Entity__StepYawInWindowsThenDeactivate); one time in five it stops at 320 and from then on
+ * squashes its depth to a random 1/1 to 1/32 every fourth tick. */
+void Entity__CueRunOffOrStopAndJitterDepth(Entity *self, SoundCueSet *out) {
     s32 roll;
     s16 *zDenom;
 
@@ -1292,7 +1300,9 @@ void Entity__MoodCue41(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue42(Entity *self, SoundCueSet *out) {
+/* Row 42: slides forward 30 a tick, still, for 20 ticks; then plays its animation with program
+ * 5, and stops it and the tone after three cycles. */
+void Entity__CueSlideInThenAnimateOnce(Entity *self, SoundCueSet *out) {
     s32 divisor;
 
     if (self->moodTimer < 20) {
@@ -1311,7 +1321,10 @@ void Entity__MoodCue42(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue43(Entity *self, SoundCueSet *out) {
+/* Row 43: rolls a size or a drift at the start (Entity__RollScaleOrDelayedDrift); sounds program
+ * 18 on two voices at animation frames 0 and 15; from moodTimer 321 shuffles sideways 60 a tick
+ * at random while twitching its heading. */
+void Entity__CueShuffleSideways(Entity *self, SoundCueSet *out) {
     s32 dx;
     s32 rotPick;
     Ratio16 *table;
@@ -1334,7 +1347,11 @@ void Entity__MoodCue43(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue44(Entity *self, SoundCueSet *out) {
+/* Row 44: rolls a size or a drift at the start (Entity__RollScaleOrDelayedDrift); sounds program
+ * 3 at animation frames 7 and 22; steps forward from moodTimer 300 to 319, turns from 321 to
+ * 339, then shuffles sideways 128 a tick at random, reporting the move, while twitching its
+ * heading. */
+void Entity__CueStepTurnThenShuffle(Entity *self, SoundCueSet *out) {
     s32 dx;
     s32 dxPick;
     s32 rotPick;
@@ -1384,10 +1401,12 @@ void Entity__RollScaleOrDelayedDrift(Entity *self) {
     }
 }
 
-/* Row 45 has no per-tick effect. */
-void Entity__MoodCue45(void) {}
+/* Row 45: does nothing; the row has no per-tick effect. */
+void Entity__CueIdle(void) {}
 
-void Entity__MoodCue46(Entity *self, SoundCueSet *out) {
+/* Row 46: at the start, on some days of the dream calendar (getCurrentDayAndYear), grows to six
+ * times its size; sounds program 18 once and faces the dreamer. */
+void Entity__CueWatchDreamerMaybeGiant(Entity *self, SoundCueSet *out) {
     s32 dayYearPhase;
 
     if (self->moodTimer == 0) {
@@ -1410,7 +1429,10 @@ skipScaleBump:
     SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
 }
 
-void Entity__MoodCue47(Entity *self) {
+/* Row 47: once the dreamer has reached it, gives 30 ticks: if the link button is pressed, it
+ * takes the dreamer's movement, lifts the dreamer 100 a tick and ends the dream at moodTimer
+ * 100; if not, it ends the dream into the row's video. */
+void Entity__CueLiftDreamerIfLinkPressedElseVideo(Entity *self) {
     if (self->targetReached == 0) {
         return;
     }
@@ -1439,7 +1461,9 @@ void Entity__MoodCue47(Entity *self) {
     }
 }
 
-void Entity__MoodCue48(Entity *self, SoundCueSet *out) {
+/* Row 48: bobs up and down 30 a tick and walks forward 30 a tick, reporting the move; at
+ * animation frame 38 faces the dreamer and sounds program 6. */
+void Entity__CueBobAndWalk(Entity *self, SoundCueSet *out) {
     s32 dy;
     EntityMethods *methods;
 
@@ -1454,7 +1478,11 @@ void Entity__MoodCue48(Entity *self, SoundCueSet *out) {
     self->methods->moveLocalZ(self, -30, (void *)1);
 }
 
-void Entity__MoodCue49(Entity *self, SoundCueSet *out) {
+/* Row 49: sounds program 4 on three voices on tick 6 and runs forward 256 a tick. Once the
+ * dreamer has reached it, it links to the row's stage 10 ticks later, unless the link button is
+ * pressed first: then it turns the dreamer, takes its movement, carries it along at its own
+ * position and links 100 ticks later. */
+void Entity__CueRunCarryDreamerIfLinkPressed(Entity *self, SoundCueSet *out) {
     DreamSysMethods *peerMethods;
     void *translation;
 
@@ -1492,7 +1520,9 @@ void Entity__MoodCue49(Entity *self, SoundCueSet *out) {
     self->methods->moveLocalZ(self, -256, 0);
 }
 
-void Entity__MoodCue50(Entity *self, SoundCueSet *out) {
+/* Row 50: sounds program 7 on three voices at animation frames 15 and 70 for five animation
+ * cycles, then deactivates and is done. */
+void Entity__CueChordFiveTodLoopsThenLeave(Entity *self, SoundCueSet *out) {
     if (self->moodTimer < self->todFrameCount * 5) {
         if (self->todFrame == 15 || self->todFrame == 70) {
             out->attenuation = 0;
@@ -1506,7 +1536,8 @@ void Entity__MoodCue50(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue51(Entity *self, SoundCueSet *out) {
+/* Row 51's handler, and row 113's through Entity__CueWalkWithTurnsMaybeGiantRow113 (entity.h). */
+void Entity__CueWalkWithTurnsMaybeGiant(Entity *self, SoundCueSet *out) {
     Ratio16 *table;
 
     if (self->moodTimer == 0 && rand() % 5 == 0 && self->state == 0) {
@@ -1534,7 +1565,10 @@ void Entity__MoodCue51(Entity *self, SoundCueSet *out) {
     self->methods->moveLocalZ(self, -80, (void *)1);
 }
 
-void Entity__MoodCue52(Entity *self, SoundCueSet *out) {
+/* Row 52: runs forward 512 a tick, climbing what it meets, with program 9 every 20 ticks; turns
+ * about at moodTimer 84, veers 9 degrees a tick from 188 to 199, and at 200 deactivates with
+ * program 30 and is done. */
+void Entity__CueRunTurnBackThenVanish(Entity *self, SoundCueSet *out) {
     out->attenuation = self->methods->getProximityRatio(self);
     if (self->moodTimer < 188) {
         if (self->moodTimer == 84) {
@@ -1553,7 +1587,9 @@ void Entity__MoodCue52(Entity *self, SoundCueSet *out) {
     self->methods->moveLocalZOrFindLink(self, -512, 0);
 }
 
-void Entity__MoodCue55(Entity *self, SoundCueSet *out) {
+/* Row 55: one time in three stretches to twice its height at the start; sounds program 19 at
+ * frames 9, 17 and 23 of every 32 (a second voice on 23). */
+void Entity__CueTone19RhythmMaybeTall(Entity *self, SoundCueSet *out) {
     s32 frame = self->todFrame;
 
     if (self->moodTimer == 0) {
@@ -1573,13 +1609,19 @@ void Entity__MoodCue55(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue56(Entity *self) {
+/* Row 56: rises 200 on the cue's first tick. */
+void Entity__CueLiftOnce(Entity *self) {
     if (self->moodTimer == 0) {
         self->methods->moveLocalY(self, -200, 0);
     }
 }
 
-void Entity__MoodCue57(Entity *self, SoundCueSet *out) {
+/* Row 57: one time in three it starts still and 6144 underground, runs forward 512 a tick with
+ * program 12, climbs out from moodTimer 128 to 321, and at 322 animates and is done. Otherwise
+ * it plays its animation with tones; at frame 48, if the dreamer is near, it fades the screen
+ * down and half the time ends the dream into the row's video; at frame 59 it deactivates and is
+ * done. */
+void Entity__CueSurfaceRunningOrFadeOutNearDreamer(Entity *self, SoundCueSet *out) {
     s32 frame;
 
     if (self->moodTimer == 0) {
@@ -1627,7 +1669,12 @@ void Entity__MoodCue57(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue58(Entity *self, SoundCueSet *out) {
+/* Row 58: sounds program 12 now and then. In a yellow dream, once the dreamer is within 1024, it
+ * takes the dreamer's movement, lifts it for 50 ticks, sways it side to side and ends the dream
+ * at moodTimer 500. Otherwise one time in three, once the dreamer is within 1024, it stops,
+ * sinks for 10 ticks, then falls on its side with programs 18 and 3, hides its second part and
+ * is done. */
+void Entity__CueLevitateDreamerOnYellowOrCollapse(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         out->attenuation = 0;
         out->slots[0].program = 12;
@@ -1684,7 +1731,12 @@ void Entity__MoodCue58(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue115(Entity *self, SoundCueSet *out) {
+/* Row 115: waits, inactive, for the dreamer to come within 2048; then it and the dreamer turn to
+ * face each other, it activates, takes the dreamer's movement and look, and bounces. Half the
+ * time, at moodTimer 100, it stops, sinks, steps forward and at last walks at the dreamer; at
+ * 240 the dreamer's control is given back. Within 512 of the dreamer it deactivates and links to
+ * the row's stage. */
+void Entity__CueConfrontDreamerThenLinkOnTouch(Entity *self, SoundCueSet *out) {
     if (self->state == 0) {
         if (Entity__IsTargetInRange(self, 2048) != 0) {
             self->state = 11;
@@ -1744,11 +1796,13 @@ tail:
 /* ---- MoodCue handlers, rows 59 to 81 ------------------------------------
  *
  * Rows 59, 61, 62, 64 to 71 and 73 to 81 (rows 60, 63 and 72 have none).
- * Entity__MoodCue108 (below) runs Entity__MoodCue71 and then sets its scale
+ * Entity__MoodCue108 (below) runs Entity__CueWalkInRandomLane and then sets its scale
  * to sScaleSix.
  */
 
-void Entity__MoodCue59(Entity *self, SoundCueSet *out) {
+/* Row 59: half the time sinks 2048 at the start; walks forward 128 a tick with program 12 every
+ * tenth tick; one time in ten starts the stage's scale ramp at moodTimer 300. */
+void Entity__CueWalkMaybeSunkMaybeStretchStage(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0 && rand() % 10 == 0) {
         self->state = 12;
     }
@@ -1768,7 +1822,8 @@ void Entity__MoodCue59(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue61(Entity *self, SoundCueSet *out) {
+/* Row 61: sounds program 18 at animation frame 30, unattenuated. */
+void Entity__CueTone18AtFrame30(Entity *self, SoundCueSet *out) {
     if (self->todFrame == 30) {
         out->slots[0].program = 18;
         out->attenuation = 0;
@@ -1776,7 +1831,12 @@ void Entity__MoodCue61(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue62(Entity *self, SoundCueSet *out) {
+/* Row 62: creeps forward 5 a tick, facing the dreamer from moodTimer 101, with program 3 every
+ * 30 animation frames; at 300, if the dreamer is within 4096, takes its movement, and at 500
+ * gives it back. Once the dreamer is within 1024, half the time it sounds program 6, maybe
+ * shrinks the stage (its scale ramp), and 70 ticks later ends the dream, plainly or into the
+ * row's video. */
+void Entity__CueCreepUpAndHoldDreamer(Entity *self, SoundCueSet *out) {
     if (self->todFrame % 30 == 0) {
         out->slots[0].program = 3;
         out->attenuation = 0;
@@ -1815,7 +1875,8 @@ void Entity__MoodCue62(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue64(Entity *self, SoundCueSet *out) {
+/* Row 64: sounds program 5 for 20 ticks out of every 300 and creeps forward 10 a tick. */
+void Entity__CueCreepWithTone5Bursts(Entity *self, SoundCueSet *out) {
     s32 phase = out->tick % 300;
 
     out->attenuation = self->methods->getProximityRatio(self);
@@ -1828,7 +1889,9 @@ void Entity__MoodCue64(Entity *self, SoundCueSet *out) {
     self->methods->moveLocalZ(self, -10, 0);
 }
 
-void Entity__MoodCue65(Entity *self, SoundCueSet *out) {
+/* Row 65: one time in three, at the start, shrinks to half size, rises 300 and turns 90 degrees;
+ * it then walks forward 20 a tick and turns back at moodTimer 2000. */
+void Entity__CueMaybeHalfSizeWalkAloft(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         if (rand() % 3 == 0) {
             self->methods->updateScale(self, 1, sScaleHalf);
@@ -1845,14 +1908,17 @@ void Entity__MoodCue65(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue66(Entity *self, SoundCueSet *out) {
+/* Row 66: sounds program 13 every 30 ticks. */
+void Entity__CueTone13Every30(Entity *self, SoundCueSet *out) {
     out->attenuation = self->methods->getProximityRatio(self);
     if (out->tick % 30 == 0) {
         out->slots[0].program = 13;
     }
 }
 
-void Entity__MoodCue67(Entity *self, SoundCueSet *out) {
+/* Row 67: one time in three runs forward 512 a tick from moodTimer 501, dropping 2048 and facing
+ * the dreamer at 502. */
+void Entity__CueMaybeDropAndRunAt500(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         if (rand() % 3 == 0) {
             self->state = 11;
@@ -1869,7 +1935,11 @@ void Entity__MoodCue67(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue68(Entity *self, SoundCueSet *out) {
+/* Row 68: faces the dreamer and chases at 374 or 192 a tick (picked at the start), reporting the
+ * move, with a pattern of programs 28 and 23. If the link button is pressed, it rolls over and
+ * sinks for 8 ticks, ends its cue with programs 18 and 3, and half the time is done; otherwise
+ * it chases again. */
+void Entity__CueChaseDreamerTumbleIfLinkPressed(Entity *self, SoundCueSet *out) {
     out->attenuation = self->methods->getProximityRatio(self);
     if (out->tick == 0) {
         self->lastOffsetValue = (rand() & 1) ? -374 : -192;
@@ -1913,7 +1983,9 @@ void Entity__MoodCue68(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue69(Entity *self, SoundCueSet *out) {
+/* Row 69: layers three tones: program 25 at the end of each animation cycle, program 21 every
+ * fourth tick and program 13 every 200. */
+void Entity__CueLayeredTones(Entity *self, SoundCueSet *out) {
     out->attenuation = self->methods->getProximityRatio(self);
     if (self->todFrame == self->todFrameCount - 1) {
         out->slots[0].program = 25;
@@ -1929,7 +2001,9 @@ void Entity__MoodCue69(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue70(Entity *self, SoundCueSet *out) {
+/* Row 70: runs 256 a tick for 600 ticks, forward or (half the time) backward, turning about at
+ * moodTimer 300. */
+void Entity__CueRunOutAndBack(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         if (rand() & 1) {
             self->state = 11;
@@ -1943,7 +2017,8 @@ void Entity__MoodCue70(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue71(Entity *self, SoundCueSet *out) {
+/* Row 71's handler, and row 108's through Entity__CueWalkInRandomLaneGiant (entity.h). */
+void Entity__CueWalkInRandomLane(Entity *self, SoundCueSet *out) {
     s32 lane;
 
     out->attenuation = self->methods->getProximityRatio(self);
@@ -1958,7 +2033,9 @@ void Entity__MoodCue71(Entity *self, SoundCueSet *out) {
     self->methods->moveLocalZ(self, -30, 0);
 }
 
-void Entity__MoodCue73(Entity *self, SoundCueSet *out) {
+/* Row 73: on its first tick turns the dreamer 90 degrees, takes the dreamer's movement and look,
+ * and sounds program 25 on three voices; deactivates when its animation has played once. */
+void Entity__CueTurnAndHoldDreamer(Entity *self, SoundCueSet *out) {
     out->attenuation = 0;
     if (out->tick == 0) {
         ((DreamSys *)self->peer)->methods->updateRotation((DreamSys *)self->peer, 1, sRotationYawPlus90);
@@ -1974,13 +2051,18 @@ void Entity__MoodCue73(Entity *self, SoundCueSet *out) {
     }
 }
 
-/* {0, 100, 190}: the clear colour Entity__MoodCue74 gives the peer's viewport. */
-extern ColorRgb sMoodCue74ClearColor;
+/* {0, 100, 190}: the clear colour Entity__CueBlueSkyPushDreamer gives the peer's viewport. */
+extern ColorRgb sCueBlueSkyClearColor;
 
-void Entity__MoodCue74(Entity *self, SoundCueSet *out) {
+/* Row 74: turns the sky blue (the viewport's clear colour) at the start. Two times in three,
+ * unless the dreamer's z is below 610, it pushes the dreamer back 128 a tick from
+ * mid-animation and links to the row's stage 30 ticks before the animation ends; otherwise it
+ * pushes the dreamer forward faster and faster from moodTimer 20 to 119, giving its control back
+ * at 85. */
+void Entity__CueBlueSkyPushDreamer(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         ((DreamSys *)self->peer)
-            ->viewport->methods->setClearColor(((DreamSys *)self->peer)->viewport, &sMoodCue74ClearColor);
+            ->viewport->methods->setClearColor(((DreamSys *)self->peer)->viewport, &sCueBlueSkyClearColor);
         self->state = rand() % 3;
         if (((DreamSys *)self->peer)->coord2->coord.t[2] < 610) {
             self->state = 0;
@@ -2006,7 +2088,9 @@ void Entity__MoodCue74(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue75(Entity *self, SoundCueSet *out) {
+/* Row 75: faces the dreamer and sounds program 25 on three voices on its first tick; when its
+ * animation has played once, stops it and links to the row's stage. */
+void Entity__CueFaceDreamerThenLinkAfterTod(Entity *self, SoundCueSet *out) {
     if (out->tick == 0) {
         out->attenuation = 0;
         out->slots[0].program = 25;
@@ -2020,7 +2104,9 @@ void Entity__MoodCue75(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue76(Entity *self, SoundCueSet *out) {
+/* Row 76: until the dreamer reaches it, stands still turning 9 degrees a tick; then plays its
+ * animation, and on its last frame stops and shrinks by 1/64. */
+void Entity__CueSpinUntilReachedThenShrink(Entity *self, SoundCueSet *out) {
     if (self->targetReached != 0) {
         ((EntityPlayTodFn)self->methods->playTod)(self);
         if (self->todFrame == self->todFrameCount - 1) {
@@ -2033,7 +2119,10 @@ void Entity__MoodCue76(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue77(Entity *self, SoundCueSet *out) {
+/* Row 77: plays its first animation once, then its second, walking a route at 50 a tick,
+ * climbing what it meets, with quarter turns at set times; half the time the route is a short
+ * one that ends the cue at moodTimer 174. Sounds program 17 every fifth tick. */
+void Entity__CueWalkTurningRoute(Entity *self, SoundCueSet *out) {
     out->attenuation = self->methods->getProximityRatio(self);
     if (out->tick % 5 == 0) {
         out->slots[0].program = 17;
@@ -2071,16 +2160,20 @@ void Entity__MoodCue77(Entity *self, SoundCueSet *out) {
     }
 }
 
-/* Entity__MoodCue78's: cleared on the cue's first tick, set when its phase
+/* Entity__CueStepForwardAndBack's: cleared on the cue's first tick, set when its phase
  * 11 ends the cue at tick 510; at tick 520 a set flag ends it again. */
-extern s32 sMoodCue78TransitionDone;
+extern s32 sCueStepForwardAndBackDone;
 
-void Entity__MoodCue78(Entity *self, SoundCueSet *out) {
+/* Row 78: each animation cycle rests, steps forward 110 a tick, steps back 110 a tick, then
+ * animates; sounds program 28 while animating. One time in three it rises 380, pitches up 90
+ * degrees and ends at tick 510; one time in three, from tick 330, it switches between double and
+ * normal height every 60 ticks. */
+void Entity__CueStepForwardAndBack(Entity *self, SoundCueSet *out) {
     s32 rollOrDy; /* MATCHING: one local for the roll and then the y move; two allocate differently */
     void *table;
 
     if (out->tick == 0) {
-        sMoodCue78TransitionDone = 0;
+        sCueStepForwardAndBackDone = 0;
         rollOrDy = rand() % 3;
         if (rollOrDy == 1) {
             self->state = 11;
@@ -2119,7 +2212,7 @@ void Entity__MoodCue78(Entity *self, SoundCueSet *out) {
         self->methods->updateRotation(self, 0, sRotationXPlus90);
         self->methods->stopSoundCue(self);
         self->state = ENTITY_STATE_DONE;
-        sMoodCue78TransitionDone = 1;
+        sCueStepForwardAndBackDone = 1;
     } else if (self->state >= 12 && out->tick >= 330 && (out->tick % 60) == 30) {
         rollOrDy = 0;
         if (rand() & 1) {
@@ -2137,13 +2230,15 @@ void Entity__MoodCue78(Entity *self, SoundCueSet *out) {
         self->methods->moveLocalY(self, rollOrDy, 0);
     }
 
-    if (out->tick == 520 && sMoodCue78TransitionDone != 0) {
+    if (out->tick == 520 && sCueStepForwardAndBackDone != 0) {
         self->methods->stopSoundCue(self);
         self->state = ENTITY_STATE_DONE;
     }
 }
 
-void Entity__MoodCue79(Entity *self, SoundCueSet *out) {
+/* Row 79: turns 2 degrees a tick with program 25 every tenth tick; when the dreamer reaches it,
+ * ends the dream into the row's video. */
+void Entity__CueSpinVideoWhenReached(Entity *self, SoundCueSet *out) {
     out->attenuation = self->methods->getProximityRatio(self);
     if (out->tick % 10 == 0) {
         out->slots[0].program = 25;
@@ -2156,7 +2251,9 @@ void Entity__MoodCue79(Entity *self, SoundCueSet *out) {
     }
 }
 
-void Entity__MoodCue80(Entity *self, SoundCueSet *out) {
+/* Row 80: faces the dreamer; plays its animation once, with program 16 at frame 20, then stops
+ * and shoots up 512 a tick. */
+void Entity__CueAnimateThenShootUp(Entity *self, SoundCueSet *out) {
     if (self->moodTimer < self->todFrameCount) {
         if (self->todFrame != 0) {
             if (self->todFrame == 20) {
@@ -2171,8 +2268,13 @@ void Entity__MoodCue80(Entity *self, SoundCueSet *out) {
     SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
 }
 
-/* Row 81's handler, and row 120's (its data words differ). */
-void Entity__MoodCue81(Entity *self, SoundCueSet *out) {
+/* Row 81's handler, and row 120's (its data words differ). It walks forward 20 a tick, climbing
+ * what it meets, with program 28, faces the dreamer from moodTimer 501, and moves the dreamer
+ * 2048 along its facing when it comes within 2048. One time in three, once the dreamer has reached
+ * it, it instead faces the dreamer with a tone pattern and either grows and chases at 374 a tick
+ * until within 512, or takes the dreamer's movement, turns the dreamer to face it, and
+ * approaches at 96 a tick (or not at all), ending the dream within 2400. */
+void Entity__CueWalkThenChaseOrHoldDreamer(Entity *self, SoundCueSet *out) {
     s32 dz;
     s32 state;
 
@@ -2591,7 +2693,7 @@ void Entity__MoodCue96(Entity *self, SoundCueSet *out) {
  *
  * Rows 98, 102 to 106, 108 to 111, 113, 114, 117, 118, 121, 123, 125, 128
  * and 129. Entity__StepYawInWindowsThenDeactivate is not a row:
- * Entity__MoodCue111 (twice) and Entity__MoodCue40 call it.
+ * Entity__MoodCue111 (twice) and Entity__CueRunOffOrStopAndJitterDepth call it.
  */
 
 void Entity__MoodCue98(Entity *self, SoundCueSet *out) {
@@ -2706,7 +2808,7 @@ void Entity__MoodCue106(Entity *self, SoundCueSet *out) {
 }
 
 void Entity__MoodCue108(Entity *self, SoundCueSet *out) {
-    Entity__MoodCue71(self, out);
+    Entity__CueWalkInRandomLane(self, out);
     self->methods->updateScale(self, 1, sScaleSix);
 }
 
@@ -2798,7 +2900,7 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 
 }
 
 void Entity__MoodCue113(Entity *self, SoundCueSet *out) {
-    Entity__MoodCue51(self, out);
+    Entity__CueWalkWithTurnsMaybeGiant(self, out);
 }
 
 void Entity__MoodCue114(Entity *self, SoundCueSet *out) {

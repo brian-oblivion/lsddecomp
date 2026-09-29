@@ -496,7 +496,7 @@ s32 Entity__UpdateSoundCueStop(Entity *self);
  * @param self The entity.
  * @param out Its sound cue set.
  */
-void Entity__MoodCue51(Entity *self, SoundCueSet *out);
+void Entity__CueWalkWithTurnsMaybeGiant(Entity *self, SoundCueSet *out);
 
 /**
  * @brief Row 71's handler, run by row 108's before it scales the entity
@@ -506,10 +506,10 @@ void Entity__MoodCue51(Entity *self, SoundCueSet *out);
  * @param self The entity.
  * @param out Its sound cue set.
  */
-void Entity__MoodCue71(Entity *self, SoundCueSet *out);
+void Entity__CueWalkInRandomLane(Entity *self, SoundCueSet *out);
 
 /**
- * @brief A shared handler body (Entity__MoodCue40, Entity__MoodCue111):
+ * @brief A shared handler body (Entity__CueRunOffOrStopAndJitterDepth, Entity__MoodCue111):
  *        plays program 4 on three voices on tick 6, turns 1 degree a tick in
  *        three moodTimer windows from windowStart (+0..91, +341..433,
  *        +698..791), moves zStep a tick, and at deactivateTimer deactivates
