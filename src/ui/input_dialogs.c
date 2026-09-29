@@ -629,7 +629,7 @@ void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
     char path[CARD_TIM_PATH_SIZE];
     char *dir;
     char *ext;
-    TimImage *panelTim; /* MATCHING: two handles, not one reused */
+    TimImage *panelTim;
     TimImage *fontTim;
 
     if (parent == NULL) {

@@ -71,7 +71,6 @@ extern const char sTitleMenuSoundBankPath[];
 extern const char sTitleTimPath[];
 
 /* "CARD\FILEICN1.TIM", TitleMenu__BeginCardAccess's path for New_TimImage. */
-/* MATCHING: the string's symbol, not a literal; a literal adds a second copy of the bytes. */
 extern const char sSaveIconTimPath[];
 
 /* The two 320 x 240 display buffers, stacked in VRAM at y 0 and y 240:

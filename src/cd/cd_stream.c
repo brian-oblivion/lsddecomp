@@ -47,8 +47,6 @@ extern CdStream *sActiveCdStream; /* the stream that owns the drive, or NULL */
 extern s32 sCdStreamAudioMixSet;
 extern char sCdStreamVersionSuffix[]; /* ";1" */
 
-/* MATCHING: the ctor call and return sit inside `if (obj != NULL)`; an early
- * `return NULL` adds a jump. */
 CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved) {
     CdStream *obj = BMemPMgrAlloc(sizeof(CdStream));
 
