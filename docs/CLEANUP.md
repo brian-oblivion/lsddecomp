@@ -112,6 +112,28 @@ was the linkStage column, read as a flat array); they are one symbol now.
    nothing lies between: its `.data` holds both, in definition order. A gap
    owned by another file splits the run.
 
+**Method tables** (from `data-graphics`, 21 tables):
+
+- The first word is the class id: write it as `<CLASS>_CLASS_ID` from the
+  class's header (add the define there if it's missing).
+- Check `sizeof(<Class>Methods)` against the table's extent before writing
+  it. `RequestedFile`, `CdDriver` and `NullDriver` have tables one slot
+  shorter than `FileResource`'s struct (no `processBuffer`), so they need a
+  shorter slot list in `include/file_resource.h` first.
+- An entry whose function's declared type differs from its slot's (an
+  inherited base method on `BasicClass *`, an empty method declared
+  `(void)`) is written `(void *)Fn`, with one comment above the run of
+  tables saying so; matching entries stay bare so they're still checked.
+
+**Limits.** A unit's `.data` is one run, so a table that can't move yet
+blocks every table after it in the same unit. `.sdata` variables can't
+move: `tools/gpsyms.py` takes the `$gp` symbol list from the
+`asm/data/*.sdata.s` labels, and a variable defined in C would drop off it
+and change how every reader addresses it. `.bss`/`.sbss` hold no
+initialized data, so there's nothing to write. `make extract` leaves stale
+`asm/data/*.s` files behind; grep for a moved table's `dlabel` still hits
+them, but they aren't linked.
+
 Then each area moves the data it owns. An `extern` stays only for data
 another file defines.
 
