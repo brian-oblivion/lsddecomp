@@ -1869,7 +1869,7 @@ segments:
       - [0x76DC8, data]              # class_39e08
       - [0x783dc, data]               # DreamSys's data slot
       - [0x79528, data]
-      - [0x7A6A4, .data, world/entity]    # sEntityMoodTable, 130 rows of 16 bytes
+      - [0x7A2D4, .data, world/entity]    # gEntityMethods, the motion templates, sEntityMoodTable
       - [0x7AEC4, .data, world/tod_actor]  # gTodActorMethods
       - [0x7B008, sdata]
       - [0x7B010, o, libc2/prnt, .sdata]      # "(null)", 7 bytes
