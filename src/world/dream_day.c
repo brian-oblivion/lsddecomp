@@ -158,7 +158,7 @@ s32 DayTask__Init(DayTask *self) {
     dreamSys->methods->addChild(dreamSys, self->initArgs->pad);
     dreamSys->methods->addChild(dreamSys, self->initArgs->frameClock);
     dreamSys->methods->setViewport(dreamSys, (Viewport *)self->initArgs->viewport);
-    return GetTimedTaskMethods()->init((TimedTask *)self, self->initArgs, 0);
+    return GetTimedTaskMethods()->init((TimedTask *)self, self->initArgs, INTERMEDIATEBASE_INIT_RUN);
 }
 
 void DayTask__Deinit(DayTask *self) {
@@ -346,7 +346,7 @@ void TimedTask__CancelTimeout(TimedTask *self) {
 }
 
 s32 TimedTask__Init(TimedTask *self, IntermediateBaseInitArgs *args, s32 mode) {
-    self->result = 0;
+    self->result = TIMEDTASK_RESULT_DONE;
     GetIntermediateBaseMethods()->init((IntermediateBase *)self, args, mode);
     return self->result;
 }
@@ -392,7 +392,7 @@ void TimedTask__PlaySound(TimedTask *self, s32 tone) {
     VabStreamObj *sound = (VabStreamObj *)self->sound;
 
     if (sound != NULL) {
-        sound->methods->playTone(sound, tone, 127, 127);
+        sound->methods->playTone(sound, tone, TIMEDTASK_TONE_VOLUME, TIMEDTASK_TONE_VOLUME);
     }
 }
 

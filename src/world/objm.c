@@ -95,7 +95,7 @@ void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dr
     ((StageMap *)args->lightRig)
         ->methods->setCallback((StageMap *)args->lightRig, (ChunkFileFn)ObjM__GetGridRecord, self);
     self->dreamSys = dreamSys;
-    GetTimedTaskMethods()->init((TimedTask *)self, args, 1);
+    GetTimedTaskMethods()->init((TimedTask *)self, args, INTERMEDIATEBASE_INIT_ATTACH);
     self->methods->addChild(self, (BasicClass *)dreamSys);
 }
 
