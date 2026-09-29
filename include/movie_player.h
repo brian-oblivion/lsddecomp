@@ -58,7 +58,7 @@ struct MoviePlayerMethods {
  * it when the movie is over.
  *
  * Parent BasicClass; no subclasses. Methods in
- * src/graphics/graphics_resources.c. The object is 0x6C bytes
+ * src/graphics/movie_player.c. The object is 0x6C bytes
  * (New_MoviePlayer). Its one holder is StreamTask (`player`,
  * src/app/task.c), which builds it with New_MoviePlayer(GetDefaultMovieFrame(),
  * 0, 0) and calls setAutoPlay, play, advance (every tick), abort and release.
