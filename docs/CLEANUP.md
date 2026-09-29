@@ -154,7 +154,7 @@ What else bites, from the `world` tables:
 - **A unit has one `.data` section,** so its C data must be one unbroken
   run, defined in the file in address order. When the order in memory is
   not the order the code wants, define the whole run in one block after the
-  includes and drop the scattered `extern`s (`dream_sys.c`, `dream_day.c`).
+  includes and drop the scattered `extern`s (`dream_sys.c`, `day_task.c`).
   A function a table names needs a prototype before the table: its header's,
   or one in the `.c` for a function only the table names.
 - **GCC word-aligns every array, struct and union** it emits, so the zero
@@ -266,7 +266,16 @@ half that also splits an attached jump-table slot):
 3. **Split the text subsegment** in `config/splat.slps01556.lsdde.yaml`: add
    `- [0x<offset>, c, <dir>/<file>]` after the unit's own line, in address
    order, with a one-line comment saying what the file holds.
-4. **Split the rodata, if the new file owns any.** Find the unit's
+4. **Split the data.** A unit's C tables are one run in the data list
+   (track 14), in the same class order as its text. Give the new file its
+   own `- [<offset>, .data, <dir>/<file>]` line at its first table's file
+   offset, in address order, and move its tables with its code. The old
+   unit's data must stay one run too, so **cut from the unit's end
+   backwards**: taking the last class leaves a prefix, while taking a
+   middle class leaves the old unit's data on both sides of the new file's
+   and the link cannot place it. Check `objdump -h` on each object: its
+   `.data` is the gap to the next line.
+5. **Split the rodata, if the new file owns any.** Find the unit's
    `.rodata` line (`grep -n '<dir>/<unit>]' config/splat*.yaml`).
    - Jump tables (`jtbl_…`, attached with the dot form `.rodata`) go with the
      function that switches on them: their words are labels local to that
@@ -280,21 +289,21 @@ half that also splits an attached jump-table slot):
    - A string written as a C literal is emitted in the object that holds
      the function, so a cut between it and its neighbours' strings has to
      land where tuboundary says `possible`.
-5. **Move the C.** The run of functions, their section banner and the
+6. **Move the C.** The run of functions, their section banner and the
    `#define`s and `extern`s only they use go to the new `.c`, defines at the
    top after the includes. Give the file a header comment in the style of
    its siblings (what class, which functions, in ROM order). Include only
    what it needs; the build says what is missing. Fix the header's
    `Methods in src/...` line and the old file's header comment.
-6. **Rebuild from a fresh extract:** `make extract`, then
+7. **Rebuild from a fresh extract:** `make extract`, then
    `./build-and-verify.sh`. A split that is wrong fails the link or the
    SHA1, so a green build is the whole proof. Check the new file compiled
    without implicit-declaration warnings (`grep -A2 '<file>.c:' /tmp/b.log`).
-7. **Ledger:** the head marks the new unit passed where the old one was
+8. **Ledger:** the head marks the new unit passed where the old one was
    (`plan.py mark-unit --unit <file> --track 3`, then `--track 7`), since
    its code already passed under the old unit. Runners leave
    `config/plan-state.json` alone.
-8. `tools/lint.sh`, `doxygen Doxyfile`, and grep `src/`, `include/` and
+9. `tools/lint.sh`, `doxygen Doxyfile`, and grep `src/`, `include/` and
    `README.md` for the old file name next to the moved class.
 
 What else bites, from the `dream_scene.c` split:
@@ -311,6 +320,10 @@ What else bites, from the `dream_scene.c` split:
   name says, rewrites every token of the old name, including
   `config/plan-state.json` and this file. A runner reverts both and leaves
   the ledger to the head; fix mentions that would turn wrong first.
+- `unitfile.py rename` refuses when `include/<new>.h` exists beside
+  `include/<old>.h`: fold what the old header declares into the class's
+  header by hand and delete it first (`dream_day.h` went into
+  `day_task.h`).
 
 ## Not in scope yet
 
