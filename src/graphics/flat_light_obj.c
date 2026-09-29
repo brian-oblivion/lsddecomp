@@ -41,7 +41,6 @@ void FlatLightObj__SetLightId(FlatLightObj *self, s32 lightId) {
 
 void FlatLightObj__SetColor(FlatLightObj *self, s32 update, ColorRgb *rgb) {
     if (update) {
-        /* MATCHING: a whole-struct copy; three per-byte stores compile 3 words longer */
         self->light.rgb = *rgb;
     }
     GsSetFlatLight(self->lightId, (GsF_LIGHT *)&self->light);
