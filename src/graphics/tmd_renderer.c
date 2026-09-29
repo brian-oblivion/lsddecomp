@@ -192,8 +192,8 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 
     ctx->otBase = ot->org;
     ctx->otShift = otShift;
-    InitDivPolygonPtrs(ctx->divVtx3, sDivPolygon3, 3);
-    InitDivPolygonPtrs(ctx->divVtx4, sDivPolygon4, 4);
+    InitDivPolygonPtrs(ctx->divVtx3, sDivPolygon3, ARRAY_COUNT(ctx->divVtx3));
+    InitDivPolygonPtrs(ctx->divVtx4, sDivPolygon4, ARRAY_COUNT(ctx->divVtx4));
 
     packetsLeft = OBJ_TMD(obj)->primn;
     packet = (u8 *)OBJ_TMD(obj)->primtop;
