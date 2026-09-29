@@ -353,12 +353,13 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
     s32 tableIndex;
     s32 extraZ;
     s32 period;
-    s32 tick;
+    u32 tick; /* MATCHING: unsigned; retail takes the period remainder of the tick unsigned */
     Actor **slot;
     s32 i;
     s32 *stepZ;
 
     tableIndex = self->params.tableIndex;
+    /* MATCHING: tick compared unsigned, as retail does; SceneNode declares it s32 */
     if (self->params.modelChildLayout != 0 && sModelChildDriftZ[tableIndex] != 0 &&
         (u32)self->tick > MODEL_CHILD_DRIFT_DELAY) {
         slot = self->modelChildren;
@@ -379,12 +380,12 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
         period = MODEL_CHILD_DRIFT_RANGE / sModelChildDriftZ[tableIndex];
         tick = self->tick;
         if (period >= 0) {
-            if ((u32)tick % (u32)period == 0) {
+            if (tick % period == 0) {
                 StyleEffect__PlaceModelChildren(self, 1);
             }
         } else {
             u32 absPeriod = ~period + 1;
-            if ((u32)tick % absPeriod == 0) {
+            if (tick % absPeriod == 0) {
                 StyleEffect__PlaceModelChildren(self, 1);
             }
         }
