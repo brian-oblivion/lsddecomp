@@ -1991,8 +1991,7 @@ void StageMap__ForEachSlotCell(StageMap *self, StageMapCellFn cellFn, ChunkSlot 
     GridCell **end;
 
     end = slot->cells + STAGE_SLOT_CELLS;
-    cell = slot->cells;
-    for (; cell < end; cell++) {
+    for (cell = slot->cells; cell < end; cell++) {
         cellFn(self, *cell);
     }
 }
