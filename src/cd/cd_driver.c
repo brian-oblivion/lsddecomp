@@ -553,6 +553,8 @@ s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
     for (; entries < end; entries++) {
         BuildCdFilePath(path, entries->name);
 
+        /* MATCHING: a hit jumps past the not-found message; a break, then a test
+         * of tries, compiles to a different loop exit. */
         for (tries = 0; tries < CD_SEARCH_ATTEMPTS; tries++) {
             if (CdSearchFile(&info, path) != 0) {
                 goto found;
@@ -788,6 +790,8 @@ void TickCdStateMachine(void) {
     s32 newState;
 
     LockCd();
+    /* MATCHING: arms that change state break to one SetCdState call and the rest jump
+     * to the unlock; a SetCdState call in each arm is not merged back into one. */
     switch (sCdState) {
         case CD_STATE_SETLOC:
             if (CdControlF(CdlSetloc, (u_char *)&sCdSeekParam->pos) == 0) {
@@ -845,6 +849,8 @@ void TickCdLoadFileStateMachine(void) {
     s32 newState;
 
     LockCd();
+    /* MATCHING: arms that change state break to one SetCdState call and the rest jump
+     * to the unlock; a SetCdState call in each arm is not merged back into one. */
     switch (sCdState) {
         case CD_STATE_SETLOC:
             if (CdControlF(CdlSetloc, (u_char *)&sCdSeekParam->pos) == 0) {
@@ -1006,7 +1012,7 @@ void NoOp3(void) {}
 
 /* MATCHING: the seek retry and the CdSync wait are gotos, only the CdReadSync wait a
  * do-while */
-s32 ReadCdFile(CdDriver *self, void *buf, s32 size) {
+s32 ReadCdFile(CdDriver *self, void *buf, u32 size) {
     s32 sectors;
     s32 status;
     char scratch[CD_SECTOR_SIZE]; /* MATCHING: never used; it puts syncResult where retail keeps it */
@@ -1014,7 +1020,7 @@ s32 ReadCdFile(CdDriver *self, void *buf, s32 size) {
 
     if (self->isOpen != 0) {
     retry:
-        sectors = (u32)size >> CD_SECTOR_SHIFT;
+        sectors = size >> CD_SECTOR_SHIFT;
         CdControl(CdlSetloc, (u_char *)&self->pos, 0);
     sync:
         status = CdSync(0, syncResult);

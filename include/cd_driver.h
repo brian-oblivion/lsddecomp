@@ -602,7 +602,7 @@ extern s32 GetCdFileSize(CdDriver *self);
  * @param size Byte count.
  * @return 0.
  */
-extern s32 ReadCdFile(CdDriver *self, void *buf, s32 size);
+extern s32 ReadCdFile(CdDriver *self, void *buf, u32 size);
 
 /**
  * @brief Whether the service tick is driven from VSyncCallback, the CD half

@@ -36,10 +36,10 @@ extern char sBMemPMgrInitFailFmt[];
 
 /* MATCHING: bmem_pmgr.h declares this without a prototype, so main() can pass
  * its dead second argument. */
-void *BMemPMgrInit(s32 poolSize) {
+void *BMemPMgrInit(u32 poolSize) {
     BMemPMgr *pool;
 
-    if ((u32)poolSize < BMEMPMGR_MIN_POOL_SIZE) {
+    if (poolSize < BMEMPMGR_MIN_POOL_SIZE) {
         poolSize = BMEMPMGR_MIN_POOL_SIZE;
     }
     pool = malloc(BMEMPMGR_HEADER_SIZE + poolSize + BMEMPMGR_SENTINEL_SIZE);
@@ -91,7 +91,7 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool) {
  * pass (bmem_pmgr.h, at the declaration). */
 /* clang-format off */
 void *BMemPMgrAlloc(size, pool)
-    s32 size;
+    u32 size;
     BMemPMgr *pool;
 {
     /* clang-format on */
@@ -115,17 +115,17 @@ void *BMemPMgrAlloc(size, pool)
             padded = size + 4;
             size = padded - (size & 0x3);
         }
-        if ((u32)size < BMEM_MIN_PAYLOAD) {
+        if (size < BMEM_MIN_PAYLOAD) {
             size = BMEM_MIN_PAYLOAD;
         }
         cursor = mgr->freeListTail;
         size += BMEM_HEADER_SIZE;
         while (cursor != NULL) {
             blockSize = BMEM_BLOCK_SIZE(cursor);
-            if (blockSize >= (u32)size) {
+            if (blockSize >= size) {
                 cursor->sizeAndFlags &= ~BMEM_FREE;
                 result = BMEM_PAYLOAD(cursor);
-                if (blockSize < (u32)size + BMEM_MIN_BLOCK) {
+                if (blockSize < size + BMEM_MIN_BLOCK) {
                     /* MATCHING: one nextBlock for both arms; a local per arm differs. */
                     nextBlock = BMEM_NEXT_BLOCK(cursor);
                     nextBlock->sizeAndFlags &= ~BMEM_PREV_FREE;
@@ -153,9 +153,9 @@ void *BMemPMgrAlloc(size, pool)
                         }
                     }
                 } else {
-                    cursor->sizeAndFlags = (cursor->sizeAndFlags & BMEM_FLAG_MASK) | (u32)size;
+                    cursor->sizeAndFlags = (cursor->sizeAndFlags & BMEM_FLAG_MASK) | size;
                     nextBlock = BMEM_NEXT_BLOCK(cursor);
-                    nextBlock->sizeAndFlags = (blockSize - (u32)size) | BMEM_FREE;
+                    nextBlock->sizeAndFlags = (blockSize - size) | BMEM_FREE;
                     nextBlock->prev = cursor->prev;
                     nextBlock->next = cursor->next;
                     {

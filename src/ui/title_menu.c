@@ -551,12 +551,10 @@ TaskObjF *New_TaskObjF(s32 padEnable, s32 cardSlot) {
     TaskObjF *self;
 
     self = BMemPMgrAlloc(sizeof(TaskObjF));
-    if (self == NULL) {
-        goto fail;
+    if (self != NULL) {
+        GetTaskObjFMethods()->ctor(self, padEnable, cardSlot);
+        return self;
     }
-    GetTaskObjFMethods()->ctor(self, padEnable, cardSlot);
-    return self;
-fail:
     return NULL;
 }
 
@@ -1220,8 +1218,8 @@ void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleE
 
 /* Returns 1 when checkCardStatus succeeds on a formatted, unchanged card;
  * otherwise sets the state that says why and returns 0. */
-/* MATCHING: the unreachable `formatted` branch and the goto to one setState call
- * give retail's branch layout. */
+/* MATCHING: the `formatted` test stays though a formatted, unchanged card has
+ * already returned 1; without it the tests are laid out differently. */
 s32 TaskObjF__Validate(TaskObjF *self) {
     s32 error;
     s32 cardChanged;
@@ -1245,15 +1243,13 @@ s32 TaskObjF__Validate(TaskObjF *self) {
         state = TASKOBJF_STATE_CARD_ERROR;
     } else if (cardChanged != 0) {
         state = TASKOBJF_STATE_CARD_CHANGED;
-    } else if (formatted != 0) {
-        goto dispatch;
-    } else if (self->opMode == TASKOBJF_OP_LOAD) {
-        state = TASKOBJF_STATE_UNFORMATTED_LOAD;
-    } else {
-        state = TASKOBJF_STATE_UNFORMATTED_SAVE;
+    } else if (formatted == 0) {
+        if (self->opMode == TASKOBJF_OP_LOAD) {
+            state = TASKOBJF_STATE_UNFORMATTED_LOAD;
+        } else {
+            state = TASKOBJF_STATE_UNFORMATTED_SAVE;
+        }
     }
-
-dispatch:
     self->methods->setState(self, state);
     return 0;
 }

@@ -257,7 +257,7 @@ void TextEntry__TickState(TextEntry *self) {
 
 /* With actOnHeld clear the arrows act on presses, with it set on held
  * buttons. */
-/* MATCHING: arms in this order, default first; the down press jumps into the held down's call. */
+/* MATCHING: arms in this order, default first; retail's jump table and tests follow it. */
 void TextEntry__HandleCommand(TextEntry *self, void *sender, s32 command) {
     switch (command) {
         default:
@@ -321,15 +321,15 @@ void TextEntry__HandleCommand(TextEntry *self, void *sender, s32 command) {
             self->methods->nextChar(self);
             return;
         case PAD_EVENT_PRESSED + PAD_BUTTON_LDOWN:
-            if (self->actOnHeld == 0) {
-                goto callPrevChar;
+            if (self->actOnHeld != 0) {
+                return;
             }
+            self->methods->prevChar(self);
             return;
         case PAD_EVENT_HELD + PAD_BUTTON_LDOWN:
             if (self->actOnHeld == 0) {
                 return;
             }
-        callPrevChar:
             self->methods->prevChar(self);
             return;
     }
@@ -485,13 +485,10 @@ TextEntryMethods *GetTextEntryMethods(void) {
 ItemList *New_ItemList(char **items, s32 mode) {
     ItemList *self = BMemPMgrAlloc(sizeof(ItemList));
 
-    /* MATCHING: goto, not an early return, which compiles differently. */
-    if (self == NULL) {
-        goto fail;
+    if (self != NULL) {
+        GetItemListMethods()->ctor(self, items, mode);
+        return self;
     }
-    GetItemListMethods()->ctor(self, items, mode);
-    return self;
-fail:
     return NULL;
 }
 
