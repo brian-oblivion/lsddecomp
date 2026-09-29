@@ -1012,7 +1012,7 @@ void NoOp3(void) {}
 
 /* MATCHING: the seek retry and the CdSync wait are gotos, only the CdReadSync wait a
  * do-while */
-s32 ReadCdFile(CdDriver *self, void *buf, s32 size) {
+s32 ReadCdFile(CdDriver *self, void *buf, u32 size) {
     s32 sectors;
     s32 status;
     char scratch[CD_SECTOR_SIZE]; /* MATCHING: never used; it puts syncResult where retail keeps it */
@@ -1020,7 +1020,7 @@ s32 ReadCdFile(CdDriver *self, void *buf, s32 size) {
 
     if (self->isOpen != 0) {
     retry:
-        sectors = (u32)size >> CD_SECTOR_SHIFT;
+        sectors = size >> CD_SECTOR_SHIFT;
         CdControl(CdlSetloc, (u_char *)&self->pos, 0);
     sync:
         status = CdSync(0, syncResult);
