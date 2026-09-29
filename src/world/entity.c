@@ -11,6 +11,7 @@
 #include <rand.h>
 #include "entity.h"
 #include "dream_sys.h"
+#include "pad.h"
 #include "stage_map.h"
 #include "viewport.h"
 #include "bmem_pmgr.h"
@@ -601,7 +602,7 @@ void Entity__CueHoldDreamerChargeThenLink(Entity *self, SoundCueSet *out) {
         out->slots[0].program = 20;
         out->slots[1].program = 20;
         out->slots[2].program = 20;
-        ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, 1);
+        ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, true);
     }
     SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
     self->methods->moveLocalZ(self, -90, 0);
@@ -1072,7 +1073,7 @@ void Entity__CueHoverOverDreamerOnBlueElseRise(Entity *self, SoundCueSet *out) {
  * and when its animation has played once stops it and links to the row's stage. */
 void Entity__CueHoldDreamerThenLinkAfterTod(Entity *self, SoundCueSet *out) {
     SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
-    ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, 1);
+    ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, true);
     if ((out->tick % 10) < 3) {
         out->attenuation = 0;
         out->slots[0].program = 13;
@@ -2412,7 +2413,7 @@ void Entity__CueJumpAheadHoldDreamerOrStand(Entity *self, SoundCueSet *out) {
             out->slots[0].program = 18;
             out->attenuation = 0;
             out->slots[1].program = 3;
-            ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, 1);
+            ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, true);
         }
         if (self->moodTimer >= 21) {
             self->methods->moveLocalZ(self, -40, 0);
@@ -2510,7 +2511,7 @@ void Entity__CueFadeAndTurnDreamerThenLink(Entity *self, SoundCueSet *out) {
                 self->moodTimer = -1;
             }
         } else {
-            ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, 1);
+            ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, true);
             self->state = FADE_APPROACH;
             self->moodTimer = -1;
         }
@@ -2657,7 +2658,7 @@ void Entity__CueFadeSkipTodThenLink(Entity *self, SoundCueSet *out) {
     }
     if (self->todFrame >= 25) {
         self->methods->moveLocalZ(self, -20, 0);
-        ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, 1);
+        ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, true);
     }
     if (self->moodTimer == 50) {
         self->methods->notifyParents(self, ENTITY_EFFECT_LINK_STAGE);
@@ -2677,7 +2678,7 @@ void Entity__CueAwaitReachThenLinkAfterTod(Entity *self, SoundCueSet *out) {
         if (self->targetReached != 0) {
             SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
             self->methods->setTod(self, 1);
-            ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, 1);
+            ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, true);
         } else if (self->todFrame == 0) {
             do {
                 self->todFramePtr = self->methods->applyTodFrame(self, self->todFramePtr, 0);
@@ -2841,7 +2842,7 @@ void Entity__CueCircleThenRegrowFacingDreamer(Entity *self, SoundCueSet *out) {
     }
     if (self->targetReached != 0 && self->state == 0) {
         self->state = PUSH_DREAMER;
-        ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, 1);
+        ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, true);
         self->methods->notifyParents(self, ENTITY_EFFECT_LINK_STAGE);
     }
     if (self->state == PUSH_DREAMER) {
@@ -3071,9 +3072,9 @@ void Entity__CueBackAwayMaybeDriveDreamer(Entity *self, SoundCueSet *out) {
     }
     if (self->state == DRIVE_DREAMER) {
         if (self->moodTimer >= 301) {
-            /* DreamSys__OnPadEvent's events 2 and 7: walk forward, then run. */
-            ((DreamSys *)self->peer)->methods->onPadEvent((DreamSys *)self->peer, 0, 2);
-            ((DreamSys *)self->peer)->methods->onPadEvent((DreamSys *)self->peer, 0, 7);
+            /* Up held walks forward; cross held with it runs. */
+            ((DreamSys *)self->peer)->methods->onPadEvent((DreamSys *)self->peer, 0, PAD_EVENT_HELD + PAD_BUTTON_LUP);
+            ((DreamSys *)self->peer)->methods->onPadEvent((DreamSys *)self->peer, 0, PAD_EVENT_HELD + PAD_BUTTON_RDOWN);
         }
     }
 }
