@@ -1189,27 +1189,23 @@ void DreamSys__TimerTick(DreamSys *self, s32 sender, s32 event) {
 
     old = self->tick;
     self->tick = old + 1;
-    if ((u32)old < (u32)self->dreamTimeLimit)
-        goto tick_only;
-
-    if (self->isFlashbackSession) {
-        if (self->state != DREAMSYS_NO_LINK || self->methods->loadNextFlashback(self, 0)) {
-            /* MATCHING: keeps this branch's own copy of the identical
-               `tick = 0; return;` tail, rather than a jump to the one after notifyParents. */
-            __asm__("");
-            self->tick = 0;
-            return;
+    if ((u32)old >= (u32)self->dreamTimeLimit) { /* MATCHING: compared unsigned, as retail does */
+        if (self->isFlashbackSession) {
+            if (self->state != DREAMSYS_NO_LINK || self->methods->loadNextFlashback(self, 0)) {
+                /* MATCHING: a barrier; without it this `tick = 0` jumps to the copy after notifyParents */
+                __asm__("");
+                self->tick = 0;
+                return;
+            }
+        } else {
+            self->methods->flashbackSaving(self, 0, 16);
         }
+        self->methods->notifyParents(self, DREAMSYS_TIME_UP);
+        self->tick = 0;
     } else {
-        self->methods->flashbackSaving(self, 0, 16);
+        self->methods->updateTickState(self);
+        self->methods->runTickCallbacks(self);
     }
-    self->methods->notifyParents(self, DREAMSYS_TIME_UP);
-    self->tick = 0;
-    return;
-
-tick_only:
-    self->methods->updateTickState(self);
-    self->methods->runTickCallbacks(self);
 }
 
 void DreamSys__DispatchChunkChange(DreamSys *self, void *sender, s32 event) {
