@@ -628,17 +628,9 @@ s32 Entity__IsTargetInRange(Entity *self, s32 range) {
     other = self->peer;
     oy = other->coord2->coord.t[1];
     ty = self->coord2->coord.t[1];
-    /* MATCHING: two ifs and a goto; one || with plain returns compiles differently */
-    if (oy + 512 < ty) {
-        goto fail;
-    }
-    if (ty < oy - 512) {
-        goto fail;
-    }
-    if (self->methods->distanceToPeer(self, other) < range) {
+    if (oy + 512 >= ty && ty >= oy - 512 && self->methods->distanceToPeer(self, other) < range) {
         return 1;
     }
-fail:
     return 0;
 }
 
