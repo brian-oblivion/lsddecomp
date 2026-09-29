@@ -561,14 +561,11 @@ void EnableTeleportsForKind(s32 moodIndex) {
 }
 
 void ReleaseDreamAuxEntities(void) {
-    u32 i;
+    u32 i; /* MATCHING: unsigned; a signed counter compiles a signed loop test */
     DreamAuxSlot *slot;
 
-    /* MATCHING: assignments, not initializers, so i and slot are set up in retail's order */
-    i = 0;
     slot = sDreamAuxSlots;
-
-    for (; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
+    for (i = 0; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
         Entity *entity = slot->entity;
 
         if (entity != NULL) {
