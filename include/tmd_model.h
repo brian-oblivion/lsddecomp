@@ -45,8 +45,8 @@ typedef struct TmdBox {
  *         min-z face, v[4..7] the max-z face. TmdModel__GetHull writes a list
  *         of one. */
 typedef struct TmdHull {
-    /* +0x000 */ s32 count;    /**< the number of boxes */
-    /* +0x004 */ TmdVec3 v[8]; /**< the first box's corners; further boxes follow */
+    /* +0x000 */ s32 count;                   /**< the number of boxes */
+    /* +0x004 */ TmdVec3 v[HULL_BOX_CORNERS]; /**< the first box's corners; further boxes follow */
 } TmdHull;
 
 /** @brief One TMD primitive: a 4-byte header, then u16 words, the vertex
