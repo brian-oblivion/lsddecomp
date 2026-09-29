@@ -1846,7 +1846,8 @@ segments:
       - [0x5C69E, pad]                       # 2 bytes; 0x802 is not 2-aligned
       - [0x5C6A0, .data, graphics/tmd_model]  # gTmdModelMethods
       - [0x5C6F0, o, libgte/msc01, .data]    # 0x180 -> 0x5C870 (dlabel D_8006C070)
-      - [0x5C870, data]
+      - [0x5C870, .data, graphics/draw_system]  # gDrawSystemMethods
+      - [0x5C8F8, data]
       - [0x5CA60, o, libgte/msc00, .data]    # 0x10 -> 0x5CA70, exactly where intr's .data starts
       - [0x5CA70, o, libetc/intr, .data]     # 0x109C, the callback tables -> 0x5DB0C
       - [0x5DB0C, o, libetc/vmode, .data]
