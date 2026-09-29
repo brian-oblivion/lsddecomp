@@ -421,12 +421,11 @@ void TodActor__StopTod(TodActor *self) {
 
 void *TodActor__ApplyTodFrame(TodActor *self, void *frame, void *extra) {
     s32 count;
-    u32 i;
+    u32 i; /* MATCHING: unsigned; a signed counter compiles a signed loop test */
 
     count = ((TodFrame *)frame)->packetCount;
     frame = ((TodFrame *)frame)->packets;
-    for (i = 0; i < count;) {
-        i++;
+    for (i = 0; i < count; i++) {
         frame = self->methods->applyTodPacket(self, frame, extra);
     }
     return frame;

@@ -481,7 +481,7 @@ const char sMomPathSymDog[] = "ETC\\SYMDOG.MOM";
 
 void InitDreamAux(void) {
     ResourceRequest req;
-    u32 i;
+    u32 i; /* MATCHING: unsigned; a signed counter compiles a signed loop test */
     s32 record;
 
     for (i = 0; i < ARRAY_COUNT(sDreamAuxGroupRecords); i++) {
@@ -500,7 +500,7 @@ void InitDreamAux(void) {
 
 void ReleaseDreamAuxModels(void) {
     DreamAuxSlot *slot = sDreamAuxSlots;
-    u32 i;
+    u32 i; /* MATCHING: unsigned; a signed counter compiles a signed loop test */
 
     for (i = 0; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
         ModelData *model = slot->model;
@@ -527,7 +527,7 @@ void SetTeleportsEnabled(s32 stage);
 void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct VabStreamObj *sound,
                       struct FrameClock *frameClock) {
     DreamAuxSlot *slot = sDreamAuxSlots;
-    u32 i;
+    u32 i; /* MATCHING: unsigned; a signed counter compiles a signed loop test */
 
     sDreamAuxStage = stage;
     sDreamAuxStageMap = stageMap;
