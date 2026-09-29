@@ -169,8 +169,8 @@ PHASE3 = {
                    "keeping it matching", "opus", ()),
         "lint": ("one disc-free lint (make format check, apidoc.py, readability.py) runnable as CI",
                  "opus", ()),
-        "licence": ("the operator's licence decision, recorded in PROGRESS.md", None, ()),
-        "process-docs": ("the operator's decision on docs/, CLAUDE.md and one-off tools, applied", None,
+        "licence": ("the operator's licence decision: LICENSE and README's Licence section", None, ()),
+        "process-docs": ("the operator's decision on docs/, CLAUDE.md and one-off tools, applied (docs/ to the archive/process branch)", None,
                          ("readme",)),
     }),
 }

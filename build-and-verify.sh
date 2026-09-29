@@ -15,7 +15,7 @@ cd "$(dirname "$0")"
 
 if ! sha1sum -c check.sha1 >/dev/null 2>&1; then
     echo "FATAL: disk/SLPS_015.56 missing or does not match check.sha1." >&2
-    echo "       See README.md ("Building it") -- bring your own copy of SLPS-01556." >&2
+    echo "       See README.md ('Building it') -- bring your own copy of SLPS-01556." >&2
     exit 1
 fi
 

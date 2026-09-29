@@ -128,7 +128,7 @@ clone() {
 # ONLY addiu_at. Retail uses the unfolded indexed form at 502 of 502 sites and
 # the folded form at none, so the flag is required, not optional -- the
 # Makefile passes it and the build does not match without it.
-# See docs/research/addiu-at-blocker.md.
+# See docs/research/addiu-at-blocker.md on the archive/process branch.
 if [ -f tools/maspsx/maspsx.py ]; then
     if grep -q -- '--addiu-at' tools/maspsx/maspsx.py; then
         skip "maspsx addiu_at patch (already applied)"
@@ -136,7 +136,7 @@ if [ -f tools/maspsx/maspsx.py ]; then
         git -C tools/maspsx apply ../../tools/patches/maspsx-addiu-at.patch \
             && ok "maspsx addiu_at patch"
     else
-        die "tools/patches/maspsx-addiu-at.patch does not apply to this maspsx checkout -- upstream has moved. The build WILL NOT match until this is resolved; see docs/research/addiu-at-blocker.md."
+        die "tools/patches/maspsx-addiu-at.patch does not apply to this maspsx checkout -- upstream has moved. The build WILL NOT match until this is resolved; see docs/research/addiu-at-blocker.md on the archive/process branch."
     fi
 fi
 
@@ -151,7 +151,8 @@ fi
 #                        load and a store-to-symbol macro of the loaded register;
 #                        ASPSX decided the hazard before expanding the macro.
 # All byte-exact across the whole image; all required by the Makefile.
-# See docs/research/gp-relative-blocker.md and addiu-at-blocker.md.
+# See docs/research/gp-relative-blocker.md and addiu-at-blocker.md on the
+# archive/process branch.
 if [ -f tools/maspsx/maspsx.py ]; then
     if grep -q -- '--gp-symbols' tools/maspsx/maspsx.py; then
         skip "maspsx lsd-flags patch (already applied)"
@@ -159,7 +160,7 @@ if [ -f tools/maspsx/maspsx.py ]; then
         git -C tools/maspsx apply ../../tools/patches/maspsx-lsd-flags.patch \
             && ok "maspsx lsd-flags patch"
     else
-        die "tools/patches/maspsx-lsd-flags.patch does not apply to this maspsx checkout -- upstream has moved. The build WILL NOT match until this is resolved; see docs/research/gp-relative-blocker.md."
+        die "tools/patches/maspsx-lsd-flags.patch does not apply to this maspsx checkout -- upstream has moved. The build WILL NOT match until this is resolved; see docs/research/gp-relative-blocker.md on the archive/process branch."
     fi
 fi
 
@@ -287,7 +288,7 @@ if [ "$VERIFY" = 1 ]; then
     ./build-and-verify.sh >/dev/null || die "the executable did not rebuild
       byte-for-byte. Do NOT start matching until this passes: every funcdiff
       score is meaningless against a toolchain that cannot reproduce retail."
-    printf '\n\033[32mSetup complete and verified.\033[0m Start with docs/MATCHING-GUIDE.md.\n'
+    printf '\n\033[32mSetup complete and verified.\033[0m See README.md, 'Changing the code'.\n'
 else
     printf '\n\033[33mSetup complete (verification skipped).\033[0m Run ./build-and-verify.sh before matching.\n'
 fi

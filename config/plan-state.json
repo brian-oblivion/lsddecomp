@@ -431,7 +431,9 @@
     },
     "13": {
       "checklist": {
+        "licence": true,
         "lint": true,
+        "process-docs": true,
         "readme": true
       },
       "reason": "",
@@ -445,6 +447,16 @@
           "note": "readme and lint (tools/lint.sh, disc-free: format, apidoc, readability, declcheck, snake_case) done; licence and process-docs are the operator's.",
           "round": 106,
           "runners": 2
+        },
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 2,
+          "model": "premium",
+          "note": "operator decisions applied: CC0 licence (LICENSE, README); docs/ and CREDITS.md to archive/process; CLAUDE.md reduced; Sony headers generated from the SDK disc",
+          "round": 107,
+          "runners": 0
         }
       ],
       "status": "auto"

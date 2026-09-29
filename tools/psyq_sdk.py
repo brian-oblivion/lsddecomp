@@ -377,7 +377,7 @@ def cmd_install(_args):
                  "Drop the redump zip(s) into sdk/ (do not unpack):"]
         for v in missing:
             lines.append(f"    {DISC_NAMES.get(v, 'Runtime Library Version ' + v)}")
-        lines.append(f"  from {ARCHIVE}  -- see README.md, "Building it"")
+        lines.append(f"  from {ARCHIVE}  -- see README.md, 'Building it'")
         die("\n  ".join(lines))
     exe = EXE.read_bytes() if EXE.exists() else None
     for ver in need:
