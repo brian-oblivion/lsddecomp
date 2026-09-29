@@ -1476,19 +1476,11 @@ void DreamSys__StepLookOffset(DreamSys *self) {
         delta = sLookOffsetSteps[idx];
         threshold = sLookOffsetLimits[idx];
         sum = delta + self->lookOffset;
-        if (sum >= 0) {
-            if (sum < threshold)
-                goto apply;
-            self->lookOffsetCommand = LOOK_OFFSET_COMMAND_NONE;
-            return;
+        /* MATCHING: `~sum + 1`, not -sum, which compiles differently */
+        if (sum >= 0 ? sum < threshold : (~sum + 1) < threshold) {
+            self->viewport->refView.vr.y += delta;
+            self->lookOffset = sum;
         }
-        if ((~sum + 1) >= threshold) {
-            self->lookOffsetCommand = LOOK_OFFSET_COMMAND_NONE;
-            return;
-        }
-    apply:
-        self->viewport->refView.vr.y += delta;
-        self->lookOffset = sum;
         self->lookOffsetCommand = LOOK_OFFSET_COMMAND_NONE;
         return;
     }
