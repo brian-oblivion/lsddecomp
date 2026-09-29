@@ -257,7 +257,7 @@ void SceneNode__GetNextAttachedChild(SceneNode *self, SceneNode **child, BasicCl
 
 /* Slot +0x05C: empty, and no subclass table overrides it. Finalize calls it
  * with (self, 0). */
-void SceneNode__NoOpSlot5C(void) {}
+void SceneNode__NoOpFinalizeHook(void) {}
 
 /* GsDOFF is display-off, so `on` is written inverted and the old bit is
  * returned inverted: nonzero means the node was displayed. */
