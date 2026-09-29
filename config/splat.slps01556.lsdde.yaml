@@ -1889,6 +1889,8 @@ segments:
       - [0x771D8, data]              # class_39e08
       - [0x77788, .data, ui/item_list]  # gItemListMethods
       - [0x77828, data]
+      - [0x77834, .data, world/objm]  # gObjMMethods, the view points, the per-stage pending extras
+      - [0x77974, data]
       - [0x782AC, .data, world/graph_room]  # gGraphRoomMethods, sGraphScoreMoods
       - [0x783DC, .data, world/dream_sys]  # DreamSys's method table, its movement tables, the stage spawn and link tables
       - [0x79520, .data, world/dream_aux]  # the resident entity, the placements and each stage's chunk triggers
