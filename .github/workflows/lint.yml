@@ -8,6 +8,11 @@ on:
   push:
   pull_request:
 
+# A newer push to the same branch cancels the run in progress.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -48,3 +53,4 @@ jobs:
           name: doxygen-html
           path: build/doxygen/html
           if-no-files-found: ignore
+          retention-days: 7
