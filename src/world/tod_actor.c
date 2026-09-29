@@ -255,12 +255,11 @@ s32 TodActor__FindPartIndex(TodActor *self, s32 id) {
         return -1;
     }
     ids = self->partIds;
-    __asm__(""); /* MATCHING: an ordering barrier; without it ids is copied after the partCount test */
     count = self->partCount;
+    i = 0;
     if (count <= 0) {
         return -1;
     }
-    i = 0;
     wanted = (u8)id;
     do {
         if (*ids == wanted) {
