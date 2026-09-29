@@ -2439,12 +2439,10 @@ s32 CalcNavigationScore(void) {
 
     sum = 0;
     p = *gpNavChallengesComplete;
-    i = 0;
-    do {
+    for (i = 0; i < NAV_CHALLENGE_COUNT; i++) {
         if (p[i] != 0)
             sum += NAV_CHALLENGE_SCORE;
-        i++;
-    } while (i < NAV_CHALLENGE_COUNT);
+    }
     if (sum >= NAV_CHALLENGE_COUNT * NAV_CHALLENGE_SCORE)
         sum = UNLOCK_SCORE_MAX;
     sum -= *gpDinamicLinkPenalty * DYNAMIC_LINK_PENALTY;

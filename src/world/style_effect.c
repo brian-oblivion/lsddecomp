@@ -513,10 +513,8 @@ void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
     sStyleEffectTmd = tmd;
     sStyleEffectTim = (void *)tim;
     sStyleEffectViewport = (Viewport *)viewport;
-    i = 0;
-    do {
+    for (i = 0; i < 2; i++) {
         model = (TmdModel *)tmd->methods->setBackClip(tmd, sStyleEffectModelIds[i]);
         TmdModel__SetFirstPrimClut(model, sStyleEffectClutPos);
-        i++;
-    } while (i < 2);
+    }
 }
