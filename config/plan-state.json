@@ -498,6 +498,7 @@
     },
     "19": {
       "checklist": {
+        "split-dream-scene": true,
         "split-setup": true
       },
       "reason": "",
