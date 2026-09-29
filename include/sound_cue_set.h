@@ -9,7 +9,7 @@
  * The callback writes a slot's program (and optionally its octave and
  * volumes) on the ticks it wants a tone, timing them on `tick`, which it may
  * set to -1 to restart the count. The owners: Entity embeds one and its
- * callbacks are gEntityMoodHandlerTable's Entity__MoodCueNN handlers
+ * callbacks are the Entity__Cue* handlers of sEntityMoodTable's rows
  * (entity.h); dream_scene.c's style-cue slots embed one and install
  * sStyleCueCallbacks' StyleCueNN; DreamSys embeds one and installs
  * DreamSys__SoundCueCallback.

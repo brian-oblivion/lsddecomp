@@ -83,13 +83,13 @@ screen coordinate reads fine as a number. Name a literal when the name says
 more than the value:
 
 - **Per-script states.** `Entity::state` isn't one enum. Each
-  `Entity__MoodCueNN` handler runs its own small script, and values from 11
+  mood-row handler (`Entity__Cue*`) runs its own small script, and values from 11
   up are that script's private steps (1 is the shared `ENTITY_STATE_DONE`).
   Name them locally:
 
   ```c
   void Entity__CueHoverOverDreamerOnBlueElseRise(Entity *self) {
-      enum { CUE30_APPROACH = 11, CUE30_GROW = 12, CUE30_FOLLOW = 13 };
+      enum { HOVER_APPROACH = 11, HOVER_GROW = 12, HOVER_FOLLOW = 13 };
   ```
 
 - **Enums that already exist.** `entity.c:988` compares `getDreamColor()`
@@ -129,8 +129,8 @@ Some constructs exist only because they reproduce retail's bytes:
 
 ## Track 18: behaviour names
 
-Names that are table positions: 107 `Entity__MoodCueNN` handlers and 56
-`*__NoOpSlotNN` occupants. A handler's body says what the entity does
+Names that were table positions: 107 `Entity__MoodCueNN` handlers (now
+`Entity__Cue<Behaviour>`) and 56 `*__NoOpSlotNN` occupants. A handler's body says what the entity does
 ("rises, then faces the dreamer"), so it can be named for that now. What the
 entity *is* (which character, which stage) needs track 14's table, which says
 which stage row NN links to and which video it ends in. Rename them first by

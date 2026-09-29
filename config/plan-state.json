@@ -487,6 +487,7 @@
     },
     "18": {
       "checklist": {
+        "mood-cues": true,
         "noop-slots": true
       },
       "reason": "",
