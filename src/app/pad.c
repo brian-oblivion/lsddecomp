@@ -30,8 +30,25 @@ typedef struct {
 } Block64;
 
 /* The unit's own read-only table of libetc's 16 button masks, in enum
- * PadButton order (PADLup, PADLdown, ... PADstart). */
-extern Block64 sDefaultButtonMasks;
+ * PadButton order. */
+const Block64 sDefaultButtonMasks = {{
+    PADLup,    /* PAD_BUTTON_LUP */
+    PADLdown,  /* PAD_BUTTON_LDOWN */
+    PADLleft,  /* PAD_BUTTON_LLEFT */
+    PADLright, /* PAD_BUTTON_LRIGHT */
+    PADRup,    /* PAD_BUTTON_RUP */
+    PADRdown,  /* PAD_BUTTON_RDOWN */
+    PADRleft,  /* PAD_BUTTON_RLEFT */
+    PADRright, /* PAD_BUTTON_RRIGHT */
+    PADi,      /* PAD_BUTTON_I */
+    PADj,      /* PAD_BUTTON_J */
+    PADselect, /* PAD_BUTTON_SELECT */
+    PADR1,     /* PAD_BUTTON_R1 */
+    PADR2,     /* PAD_BUTTON_R2 */
+    PADL1,     /* PAD_BUTTON_L1 */
+    PADL2,     /* PAD_BUTTON_L2 */
+    PADstart,  /* PAD_BUTTON_START */
+}};
 
 Pad *New_Pad(s32 mode, s32 port) {
     Pad *self;
