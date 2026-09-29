@@ -2674,7 +2674,7 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
         entry = sStageSpawnPoints[stage];
         for (i = 0; i < count; i++, entry++) {
             if (*(s16 *)&chunk == *(s16 *)&entry->chunk)
-                goto found;
+                goto found; /* MATCHING: a break and a test after the loop compiles an extra compare */
         }
         entry = &sStageSpawnPoints[stage][*(s16 *)&chunk % count];
 
@@ -2692,6 +2692,7 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
 MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day) {
     s32 i;
 
+    /* MATCHING: tested unsigned, as retail does; `i` stays signed, since a u32 changes the `% 12` */
     for (i = 0; (u32)i < ARRAY_COUNT(sSpecialDays); i++) {
         if (day == sSpecialDays[i]) {
             /* One of the special day's records, and one of twelve
