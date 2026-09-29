@@ -477,6 +477,7 @@
     },
     "16": {
       "checklist": {
+        "comments-graphics": true,
         "comments-rest": true
       },
       "reason": "",
