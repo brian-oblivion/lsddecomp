@@ -62,7 +62,7 @@ like this (row 0, from the retail bytes):
 
 ```c
 EntityMoodRow sEntityMoodTable[] = {
-    [0] = { {0, 2}, 20, ENTITY_ACTIVATE_AT_ATTACH, 0, 0, 2, -13, 4, 1, 10, 0, Entity__MoodCue00 },
+    [0] = { {0, 2}, 20, ENTITY_ACTIVATE_AT_ATTACH, 0, 0, 2, -13, 4, 1, 10, 0, Entity__CuePaceOrLiftOffOnPink },
     ...
 ```
 
@@ -88,7 +88,7 @@ more than the value:
   Name them locally:
 
   ```c
-  void Entity__MoodCue30(Entity *self) {
+  void Entity__CueHoverOverDreamerOnBlueElseRise(Entity *self) {
       enum { CUE30_APPROACH = 11, CUE30_GROW = 12, CUE30_FOLLOW = 13 };
   ```
 
