@@ -470,7 +470,9 @@
     },
     "15": {
       "checklist": {
-        "literals-graphics": true
+        "literals-graphics": true,
+        "literals-rest": true,
+        "literals-world": true
       },
       "reason": "",
       "status": "auto"
