@@ -1097,35 +1097,34 @@ void DreamSys__NotifyLinkAttempt(DreamSys *self, s32 event) {
     s32 voice;
 
     GetActorMethods()->notifyWithHull((Actor *)self, event);
-    if (event == ACTOR_EVENT_NO_FLOOR)
-        goto no_floor;
-    if (event != ACTOR_EVENT_FLOOR_FOUND)
-        return;
+    switch (event) {
+        case ACTOR_EVENT_FLOOR_FOUND:
+            voice = self->linkTarget->flags36 & 0x7F;
+            self->voiceSelect = voice;
+            if (voice >= ARRAY_COUNT(sVoiceBySelect))
+                self->voiceSelect = 0;
 
-    voice = self->linkTarget->flags36 & 0x7F;
-    self->voiceSelect = voice;
-    if (voice >= ARRAY_COUNT(sVoiceBySelect))
-        self->voiceSelect = 0;
+            if (self->state == DREAMSYS_LINK_TUNNEL && self->voiceSelect == 0)
+                self->voiceSelect = 2;
 
-    if (self->state == DREAMSYS_LINK_TUNNEL && self->voiceSelect == 0)
-        self->voiceSelect = 2;
-
-    if (self->currentStage != 9)
-        return;
-    goto try_stage_timer_link;
-
-no_floor:
-    if (self->grid->methods->findSlotForPosition(self->grid, (LongVec3 *)self->coord2->coord.t)
-            ->loader->headerReady != LBDFILE_HEADER_CONSUMED)
-        goto undo_step;
-
-try_stage_timer_link:
-    self->methods->tryStageTimerLink(
-        self, (PlayerSpawnPoint *)self->grid->methods->getTargetDescriptor(self->grid, 0, 0));
-    return;
-
-undo_step:
-    self->methods->restoreLinkSnapshot(self);
+            if (self->currentStage == 9) {
+                self->methods->tryStageTimerLink(
+                    self,
+                    (PlayerSpawnPoint *)self->grid->methods->getTargetDescriptor(self->grid, 0, 0));
+            }
+            break;
+        case ACTOR_EVENT_NO_FLOOR:
+            if (self->grid->methods
+                    ->findSlotForPosition(self->grid, (LongVec3 *)self->coord2->coord.t)
+                    ->loader->headerReady == LBDFILE_HEADER_CONSUMED) {
+                self->methods->tryStageTimerLink(
+                    self,
+                    (PlayerSpawnPoint *)self->grid->methods->getTargetDescriptor(self->grid, 0, 0));
+            } else {
+                self->methods->restoreLinkSnapshot(self);
+            }
+            break;
+    }
 }
 
 void DreamSys__OnPadEvent(DreamSys *self, s32 sender, s32 event) {
