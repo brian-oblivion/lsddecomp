@@ -24,12 +24,8 @@
 extern s32 sEntityFadeBoxDefaultSize[2];
 extern s32 sEntityFadeBoxDefaultOffset[2];
 
-extern EntityMoodRow sEntityMoodTable[];
-/* The linkStage and eventVideo columns of sEntityMoodTable as flat arrays,
- * indexed moodIndex * 16. Entity__NotifyIfTargetInRange reads them this way;
- * reading the row's fields would do the same. */
-extern s8 sEntityLinkStageTable[];
-extern s8 sEntityEventVideoTable[];
+/* Defined at the end of this file, after the handlers it lists. */
+extern EntityMoodRow sEntityMoodTable[ENTITY_MOOD_ROW_COUNT];
 
 /* The motion templates (.data, in address order):
  * the constant triples the MoodCue handlers in src/world/entity.c pass to
@@ -348,7 +344,7 @@ void Entity__SetTargetReached(Entity *self, s32 reached) {
 
 void Entity__StartSoundCue(Entity *self) {
     InitSoundCueSet(self->sound, &self->soundCueSet, self->moodIndex + 1, self,
-                    sEntityMoodTable[self->moodIndex].handler);
+                    (SoundCueCallbackFn)sEntityMoodTable[self->moodIndex].handler);
     ((EntityPlayTodFn)self->methods->playTod)(self);
     self->methods->enableTickCallback(self);
     self->moodTimer = 0;
@@ -493,15 +489,15 @@ s32 Entity__UpdateSoundCueStart(Entity *self) {
     return self->soundCueActive;
 }
 
-/* For a row with no link stage (a negative sEntityLinkStageTable entry) and
+/* For a row with no link stage (a negative linkStage) and
  * an event video, sends ENTITY_EFFECT_LINK_STAGE while the player is within
  * the video entry times 512 world units (Entity__IsTargetInRange). `unused`
  * is entity.h's declared second parameter; the one caller,
  * Entity__UpdateDeactivationState, passes 0. */
 void Entity__NotifyIfTargetInRange(Entity *self, s32 unused) {
-    if (sEntityLinkStageTable[self->moodIndex * 16] < 0 &&
-        sEntityEventVideoTable[self->moodIndex * 16] != 0 &&
-        Entity__IsTargetInRange(self, sEntityEventVideoTable[self->moodIndex * 16] << 9)) {
+    if (sEntityMoodTable[self->moodIndex].linkStage < 0 &&
+        sEntityMoodTable[self->moodIndex].eventVideo != 0 &&
+        Entity__IsTargetInRange(self, sEntityMoodTable[self->moodIndex].eventVideo << 9)) {
         self->methods->notifyParents(self, ENTITY_EFFECT_LINK_STAGE);
     }
 }
@@ -649,7 +645,7 @@ void Entity__CueApproachRiseThenSpiralAway(Entity *self, SoundCueSet *out) {
 }
 
 /* Row 8: holds double size and rises 64 a tick. */
-void Entity__CueDoubleSizeAndRise(Entity *self) {
+void Entity__CueDoubleSizeAndRise(Entity *self, SoundCueSet *out) {
     self->methods->updateScale(self, 1, sScaleDouble);
     self->methods->addTranslation(self, sTranslateYMinus64);
 }
@@ -738,7 +734,7 @@ void Entity__CueWanderThenChaseIfLinkPressed(Entity *self, SoundCueSet *out) {
 
 /* Row 12: faces the dreamer while it is low (y below 2000). Half the time, once the dreamer comes
  * within 2560 it starts the stage's scale ramp and 150 ticks later ends the dream. */
-void Entity__CueStretchStageNearDreamerThenEndDream(Entity *self) {
+void Entity__CueStretchStageNearDreamerThenEndDream(Entity *self, SoundCueSet *out) {
     s32 y;
     s32 dist;
     s32 timer;
@@ -806,7 +802,7 @@ void Entity__CueTone15Once(Entity *self, SoundCueSet *out) {
 /* Row 16: half the time walks forward 90 a tick for 64 ticks, turns 90 degrees left or right, drops
  * 256 and runs on at 374 a tick; the other half spins a quarter turn every fifth tick, dashes 2048
  * a tick and flickers (shown one tick in seven). */
-void Entity__CueWalkAndTurnOrSpinFlickering(Entity *self) {
+void Entity__CueWalkAndTurnOrSpinFlickering(Entity *self, SoundCueSet *out) {
     Ratio16 *turn;
     s32 roll;
 
@@ -839,7 +835,7 @@ void Entity__CueWalkAndTurnOrSpinFlickering(Entity *self) {
 }
 
 /* Row 17: holds half size. */
-void Entity__CueHalfSize(Entity *self) {
+void Entity__CueHalfSize(Entity *self, SoundCueSet *out) {
     self->methods->updateScale(self, 1, sScaleHalf);
 }
 
@@ -889,14 +885,14 @@ void Entity__CueWalkToTodBeatTwoTones(Entity *self, SoundCueSet *out) {
 }
 
 /* Row 22: faces the dreamer. */
-void Entity__CueFaceDreamer(Entity *self) {
+void Entity__CueFaceDreamer(Entity *self, SoundCueSet *out) {
     SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
 }
 
 /* Row 23: faces the dreamer throughout. Appears 4096 up and drops back down over 64 ticks, rises
  * and edges in briefly, then rushes forward faster and faster until moodTimer 256 and backs off
  * after. Once the dreamer has reached it, it drifts upward and sideways instead. */
-void Entity__CueDropInRushDreamerThenDriftUp(Entity *self) {
+void Entity__CueDropInRushDreamerThenDriftUp(Entity *self, SoundCueSet *out) {
     s32 zDelta;
 
     SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
@@ -1011,13 +1007,13 @@ void Entity__CueWalkDipThenClimb(Entity *self, SoundCueSet *out) {
 
 /* Row 119: holds six times its size. Rows 117 and 118 have handlers with the same body
  * (Entity__CueSixfoldSizeRow117, Entity__CueSixfoldSizeRow118). */
-void Entity__CueSixfoldSizeRow119(Entity *self) {
+void Entity__CueSixfoldSizeRow119(Entity *self, SoundCueSet *out) {
     self->methods->updateScale(self, 1, sScaleSix);
 }
 
 /* Row 29: in a white dream, triples its size and rises 30720 at the start; one time in five turns 1
  * degree a tick. */
-void Entity__CueTripleAloftOnWhiteMaybeTurn(Entity *self) {
+void Entity__CueTripleAloftOnWhiteMaybeTurn(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         if (((DreamSys *)self->peer)->methods->getDreamColor((DreamSys *)self->peer) == DREAM_COLOR_WHITE) {
             self->methods->updateScale(self, 1, sScaleTriple);
@@ -1034,7 +1030,7 @@ void Entity__CueTripleAloftOnWhiteMaybeTurn(Entity *self) {
  * faces the dreamer and comes at it, drops a little between moodTimer 85 and 114, and from 120
  * hangs 1500 above the dreamer, 1024 off in z; in any other dream it holds double size and rises 30
  * a tick. */
-void Entity__CueHoverOverDreamerOnBlueElseRise(Entity *self) {
+void Entity__CueHoverOverDreamerOnBlueElseRise(Entity *self, SoundCueSet *out) {
     if (self->state == 0) {
         if (((DreamSys *)self->peer)->methods->getDreamColor((DreamSys *)self->peer) == 1) {
             self->state = 11;
@@ -1080,7 +1076,7 @@ void Entity__CueHoldDreamerThenLinkAfterTod(Entity *self, SoundCueSet *out) {
 }
 
 /* Row 32: walks forward 30 a tick. */
-void Entity__CueWalk(Entity *self) {
+void Entity__CueWalk(Entity *self, SoundCueSet *out) {
     self->methods->moveLocalZ(self, -30, 0);
 }
 
@@ -1101,7 +1097,7 @@ void Entity__CueWalkShrinkWhenReached(Entity *self, SoundCueSet *out) {
 
 /* Row 34: walks forward 60 a tick, turning 90 degrees at moodTimer 400 and back at 700; from 800
  * dashes 512 a tick, turning a further 36 degrees, and is gone from 851. */
-void Entity__CueWalkZigzagThenDashAway(Entity *self) {
+void Entity__CueWalkZigzagThenDashAway(Entity *self, SoundCueSet *out) {
     EntityMethods *methods;
     s32 zDelta;
 
@@ -1123,7 +1119,7 @@ void Entity__CueWalkZigzagThenDashAway(Entity *self) {
 }
 
 /* Row 35: jitters back and forth on all three axes, and every 500 ticks bobs up and back down. */
-void Entity__CueWobble(Entity *self) {
+void Entity__CueWobble(Entity *self, SoundCueSet *out) {
     s32 rem500;
     s32 arg1a;
     s32 arg1b;
@@ -1167,7 +1163,7 @@ void Entity__CueWobble(Entity *self) {
 
 /* Row 36: at the start grows to six or two times its size at random; faces the dreamer and backs
  * away 256 a tick while it is within 28672. */
-void Entity__CueGrowThenBackAwayFromDreamer(Entity *self) {
+void Entity__CueGrowThenBackAwayFromDreamer(Entity *self, SoundCueSet *out) {
     Ratio16 *scaleTemplate;
     s32 roll;
 
@@ -1187,7 +1183,7 @@ void Entity__CueGrowThenBackAwayFromDreamer(Entity *self) {
 }
 
 /* Row 37: rises 90 a tick. */
-void Entity__CueRise(Entity *self) {
+void Entity__CueRise(Entity *self, SoundCueSet *out) {
     self->methods->moveLocalY(self, -90, 0);
 }
 
@@ -1401,7 +1397,7 @@ void Entity__RollScaleOrDelayedDrift(Entity *self) {
 }
 
 /* Row 45: does nothing; the row has no per-tick effect. */
-void Entity__CueIdle(void) {}
+void Entity__CueIdle(Entity *self, SoundCueSet *out) {}
 
 /* Row 46: at the start, on some days of the dream calendar (getCurrentDayAndYear), grows to six
  * times its size; sounds program 18 once and faces the dreamer. */
@@ -1431,7 +1427,7 @@ skipScaleBump:
 /* Row 47: once the dreamer has reached it, gives 30 ticks: if the link button is pressed, it takes
  * the dreamer's movement, lifts the dreamer 100 a tick and ends the dream at moodTimer 100; if not,
  * it ends the dream into the row's video. */
-void Entity__CueLiftDreamerIfLinkPressedElseVideo(Entity *self) {
+void Entity__CueLiftDreamerIfLinkPressedElseVideo(Entity *self, SoundCueSet *out) {
     if (self->targetReached == 0) {
         return;
     }
@@ -1609,7 +1605,7 @@ void Entity__CueTone19RhythmMaybeTall(Entity *self, SoundCueSet *out) {
 }
 
 /* Row 56: rises 200 on the cue's first tick. */
-void Entity__CueLiftOnce(Entity *self) {
+void Entity__CueLiftOnce(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         self->methods->moveLocalY(self, -200, 0);
     }
@@ -3051,3 +3047,144 @@ void Entity__CueStillThenFaceOrRunAtDreamer(Entity *self, SoundCueSet *out) {
         }
     }
 }
+
+/* The mood table: row moodIndex is everything per-entity that is data, not
+ * code (struct EntityMoodRow, include/entity.h, has each column's meaning).
+ * act is an EntityActivateKind, dea an EntityDeactivateKind (10 and up: the
+ * tick count / 15), lnk a stage (ENTITY_LINK_STAGE_END_DREAM is 127), vid a
+ * video plus 1. A row with no handler has no sound cue script. */
+/* clang-format off */
+EntityMoodRow sEntityMoodTable[ENTITY_MOOD_ROW_COUNT] = {
+    /*            unread   unlk  act  dea   aR   pR   lnk  vid  tol  thr  cue  handler */
+    /*   0 */ {{  0,   2},   20,   0,   0,   0,   2,  -13,   4,   1,  10,   0, Entity__CuePaceOrLiftOffOnPink},
+    /*   1 */ {{ -2,   5},   -1,   0,   0,   0,   1,   -2,   0,  -6,  10,   1, Entity__CueHoldDreamerChargeThenLink},
+    /*   2 */ {{  0,   0}, -100,   0,   0,   0,   1,   -5,   1,   1,   0,   0, NULL},
+    /*   3 */ {{  0,  -3}, -100,   0,   0,   0,   1,   -6,   1,   1,   0,   0, NULL},
+    /*   4 */ {{  0,  -7}, -100,   0,   0,   0,   1,  -13,   1,   1,   0,   0, NULL},
+    /*   5 */ {{ -4,   4},  -50,   0,   0,   0,   1,  -14,   1,  -2,  10,  -1, Entity__CueTone23Once},
+    /*   6 */ {{  0,   0},  100,   0,   0,   0,   0,    0,   0,   3,   0,  -1, NULL},
+    /*   7 */ {{ -5,   0},   20,   3, 180,   5,   5,    0,   0,   3,  30,   5, Entity__CueApproachRiseThenSpiralAway},
+    /*   8 */ {{  3,   3},  100,   3, 180,   7,   7,    0,   0,   5,   0,   7, Entity__CueDoubleSizeAndRise},
+    /*   9 */ {{ -3,  -1},   20,   1, 180,  12,   6,   -3,   3,   3,  30,  12, Entity__CueWalkToTodBeat},
+    /*  10 */ {{ -7,   3},   50,   0, 180,   0,  10,    0,   0,   3,  60,   0, Entity__CueChordThenWalk},
+    /*  11 */ {{  3,   0},    9,   0, 255,   0,   5,    8,   4,   3,  20,   0, Entity__CueWanderThenChaseIfLinkPressed},
+    /*  12 */ {{ -3,  -5},    5,   0,   0,   0,   3,    0,   0,   2,   0,   0, Entity__CueStretchStageNearDreamerThenEndDream},
+    /*  13 */ {{ -5,   5},  100,   0,   0,   0,   5,    0,   4,   3,  30,   5, Entity__CueVideoAfter36TodLoops},
+    /*  14 */ {{  0,   1}, -100,   0, 120,   0,   5,    0,   0,   3,  20,   5, Entity__CueCreepWithTone13},
+    /*  15 */ {{ -2,  -1},  -20,   0,   0,   0,   4,    0,   0,   3,  30,  -5, Entity__CueTone15Once},
+    /*  16 */ {{ -3,   2},   50,   1,  24,   3,   3,    0,   0,   1,  30,   3, Entity__CueWalkAndTurnOrSpinFlickering},
+    /*  17 */ {{  1,   0},  100,   0,   0,   0,   5,    0,   0,   3,   0,   0, Entity__CueHalfSize},
+    /*  18 */ {{  0,   0}, -100,   0,   0,   0,   2,    0,   0,   1,   0,   0, NULL},
+    /*  19 */ {{  2,   3},  -50,   1,  30,   7,   5,   -2,   2,   3,  30,   7, Entity__CueRunWithTone17},
+    /*  20 */ {{  0,  -4},    8,   1, 180,  12,   5,   -2,   1,   3,  30,  12, Entity__CueWalkMaybeTall},
+    /*  21 */ {{ -1,  -2},   20,   0, 255,   0,   6,   -4,   4,   3,  30,   0, Entity__CueWalkToTodBeatTwoTones},
+    /*  22 */ {{  1,   4},  -20,   0,   0,   0,   2,   -5,   2,   1,   0,   1, Entity__CueFaceDreamer},
+    /*  23 */ {{  5,   1},  -20,   1, 255,   8,   1,    0,   0,   1,   0,   8, Entity__CueDropInRushDreamerThenDriftUp},
+    /*  24 */ {{  2,  -7},   20,   0,   0,   0,   5,    0,   0,   3,  30,   0, Entity__CueDoubleSizeCircleFast},
+    /*  25 */ {{ -5,  -1},   50,   0, 180,   0,   3,    0,   0,   3,  30,   3, Entity__CueRiseFasterThenPitchUp},
+    /*  26 */ {{ -3,   1},    7,   1,  60,  10,   7,    0,   0,   3,  30,  10, Entity__CueRunAndLunge},
+    /*  27 */ {{  8,  -1}, -100,   1,  60,   8,   8,    0,   0,   5,  30,   8, Entity__CueWalkDipThenClimb},
+    /*  28 */ {{  7,   1},   20,   0,   0,   0,  -2,  -11,   1,   1,   0,   0, NULL},
+    /*  29 */ {{ -8,   1},  100,   0,   0,   0,  12,    0,   0,   5,   0,   0, Entity__CueTripleAloftOnWhiteMaybeTurn},
+    /*  30 */ {{  0,  -1},  -50,   0, 180,   0,   5,    0,   0,   3,   0,   3, Entity__CueHoverOverDreamerOnBlueElseRise},
+    /*  31 */ {{  2,  -5}, -100,   1, 120,   1,   1,   -3,   0,   1,  30,   1, Entity__CueHoldDreamerThenLinkAfterTod},
+    /*  32 */ {{  0,   4},   50,   1,   0,  15,  15,    0,   0,   5,   0,  15, Entity__CueWalk},
+    /*  33 */ {{  2,   8},    8,   1, 180,  12,   2,   -8,   1,   2,  30,  12, Entity__CueWalkShrinkWhenReached},
+    /*  34 */ {{ -8,   4},  -50,   0,  60,   3,   3,  -14,   2,   1,   0,   3, Entity__CueWalkZigzagThenDashAway},
+    /*  35 */ {{  6,   0},  -20,   0,   0,   0,   2,    0,   0,   1,   0,   0, Entity__CueWobble},
+    /*  36 */ {{  0,   7},    7,   1,   2,  17,  12,    0,   0,   8,   0,  17, Entity__CueGrowThenBackAwayFromDreamer},
+    /*  37 */ {{ -2,   6},  100,   1, 120,   6,   6,    0,   0,   5,   0,   6, Entity__CueRise},
+    /*  38 */ {{ -5,   2}, -100,   1, 120,  10,  10,    0,   0,   3,  30,  10, Entity__CueTone1Slow},
+    /*  39 */ {{ -1,  -1},   20,   1, 120,  20,  20,   -5,   1,   3,  20,  20, Entity__CueStutterTodMaybeTall},
+    /*  40 */ {{  3,   3}, -100,   0, 180,   0,   4,  -14,   2,   3,  30,   0, Entity__CuePatrolTurning},
+    /*  41 */ {{ -9,   5},  -50,   1,   0,  15,  15,  -10,   8,   3,  50,  15, Entity__CueRunOffOrStopAndJitterDepth},
+    /*  42 */ {{  2,   1},    1,   0, 120,   0,   4,    0,   0,   4,  30,   4, Entity__CueSlideInThenAnimateOnce},
+    /*  43 */ {{ -3,   0},   20,   1, 180,   6,   6,   -4,   2,   2,  10,   6, Entity__CueShuffleSideways},
+    /*  44 */ {{  0,  -2},  -20,   1, 180,   6,   6,   -7,   2,   2,  10,   6, Entity__CueStepTurnThenShuffle},
+    /*  45 */ {{  5,   3},  -20,   1,   0,   8,   6,    0,   0,   3,  10,   8, Entity__CueIdle},
+    /*  46 */ {{  3,  -1},  -20,   1,   0,   2,   2,   -6,   2,   1,  20,   2, Entity__CueWatchDreamerMaybeGiant},
+    /*  47 */ {{  9,   9},  -50,   0,   0,   0,   1,    0,   2,   1,  30,   0, Entity__CueLiftDreamerIfLinkPressedElseVideo},
+    /*  48 */ {{ -4,  -4},   50,   1,  90,   1,   1,   -9,   1,   1,  30,   1, Entity__CueBobAndWalk},
+    /*  49 */ {{ -2,  -6}, -100,   1,  30,   5,   1,   -3,   0,   1,  30,   5, Entity__CueRunCarryDreamerIfLinkPressed},
+    /*  50 */ {{  9,   0},   20,   1,   0,   6,   6,    0,   0,   1,   0,   6, Entity__CueChordFiveTodLoopsThenLeave},
+    /*  51 */ {{  1,  -1},  -50,   1,  30,   6,   6,   -5,   1,   3,  20,   6, Entity__CueWalkWithTurnsMaybeGiant},
+    /*  52 */ {{ -3,   1},  -50,   1,  30,   8,   8,   -5,   1,   3,  30,   8, Entity__CueRunTurnBackThenVanish},
+    /*  53 */ {{  0,   0},   50,   0,   0,   0,   4,    0,   0,   2,  30,   0, NULL},
+    /*  54 */ {{  0,   0},  -50,   0,   0,   0,   4,    0,   0,   2,  30,   0, NULL},
+    /*  55 */ {{  7,   0},  100,   1,   0,  15,   8,  -13,   2,   2,  20,  15, Entity__CueTone19RhythmMaybeTall},
+    /*  56 */ {{  0,  -4}, -100,   0,   0,   0,   5,   -6,   2,   3,   0,   0, Entity__CueLiftOnce},
+    /*  57 */ {{ -9,  -3},  -50,   1,   0,  15,  15,    0,   3,   3,  30,  15, Entity__CueSurfaceRunningOrFadeOutNearDreamer},
+    /*  58 */ {{ -3,  -6},  -20,   1,   0,   1,   1,    0,   0,   1,  30,   1, Entity__CueLevitateDreamerOnYellowOrCollapse},
+    /*  59 */ {{ -3,   1},  -50,   1, 180,  15,   8,    0,   0,   3,  30,  15, Entity__CueWalkMaybeSunkMaybeStretchStage},
+    /*  60 */ {{  0,  -9}, -100,   0,   0,   0,   5,    0,   0,   3,   0,   5, NULL},
+    /*  61 */ {{  5,  -1},   20,   1,   0,  10,   1,   -6,   3,   3,  30,  10, Entity__CueTone18AtFrame30},
+    /*  62 */ {{ -4,  -5},   -1,   1,  60,   2,   2,    0,   5,   1,  10,   2, Entity__CueCreepUpAndHoldDreamer},
+    /*  63 */ {{  0,   8},   20,   2,   1,   1,   3,    0,   0,   2,   0,   0, NULL},
+    /*  64 */ {{  2,   1},   50,   0,   0,   0,  12,    0,   0,   5,  40,   0, Entity__CueCreepWithTone5Bursts},
+    /*  65 */ {{  1,   0},  -20,   0, 255,   0,   3,   -3,   2,   1,   0,   0, Entity__CueMaybeHalfSizeWalkAloft},
+    /*  66 */ {{ -4,  -1},   20,   0,   0,   0,   3,   -8,   1,   1,  20,   0, Entity__CueTone13Every30},
+    /*  67 */ {{  0,   0},  -50,   0, 220,   0,   3,    0,   0,   1,   0,   0, Entity__CueMaybeDropAndRunAt500},
+    /*  68 */ {{  0,  -1},   50,   1, 180,   5,   5,   12,   0,   1,  30,   3, Entity__CueChaseDreamerTumbleIfLinkPressed},
+    /*  69 */ {{  0,   0},   -4,   0,   0,   0,   3,    0,   0,   3, 100,   3, Entity__CueLayeredTones},
+    /*  70 */ {{  2,   2},   50,   0, 180,   0,  10,    0,   0,   6,  30,   0, Entity__CueRunOutAndBack},
+    /*  71 */ {{  9,   0},  100,   1, 180,   6,   3,   -3,   1,   1,  10,   6, Entity__CueWalkInRandomLane},
+    /*  72 */ {{  0,   0},    0,   0,   0,   0,   0,    0,   0,   3,  30,   0, NULL},
+    /*  73 */ {{  4,   0},    9,   0,   0,   0,   1,    0,   0,   1,  30,  -1, Entity__CueTurnAndHoldDreamer},
+    /*  74 */ {{  0,   1},  100,   0,   0,   0,   1,   -4,   0,   1,  30,   1, Entity__CueBlueSkyPushDreamer},
+    /*  75 */ {{  0,   0},  100,   0,   0,   0,   3,   13,   0,   1,  10,   3, Entity__CueFaceDreamerThenLinkAfterTod},
+    /*  76 */ {{  6,   2},  -20,   1,  60,  17,   3,   -5,   6,   2,   0,  17, Entity__CueSpinUntilReachedThenShrink},
+    /*  77 */ {{  9,   0},  100,   0,  60,   0,   1,   -5,   1,  -2,  10,   1, Entity__CueWalkTurningRoute},
+    /*  78 */ {{ -2,   3},   20,   0,   0,   0,   1,    0,   0,   1,  10,   0, Entity__CueStepForwardAndBack},
+    /*  79 */ {{ -6,   7},   -6,   0,   0,   0,   2,    0,   1,   1,  20,   0, Entity__CueSpinVideoWhenReached},
+    /*  80 */ {{  5,   5}, -100,   0, 120,   0,   2,   -3,   4,   1,  10,   1, Entity__CueAnimateThenShootUp},
+    /*  81 */ {{ -3,   3},   50,   0, 180,   0,   1,  127,   0,   1,  30,   0, Entity__CueWalkThenChaseOrHoldDreamer},
+    /*  82 */ {{  4,  -5},  -20,   0,   0,   0,   3,   -5,   0,   1,   0,   1, Entity__CueJumpAheadHoldDreamerOrStand},
+    /*  83 */ {{  3,  -1},  -50,   1,   0,   1,   1,    0,   0,   3,  10,   1, Entity__CueTone12ForOneTod},
+    /*  84 */ {{ -5,   5},  -50,   1, 120,   3,   3,    0,   3,   3,  30,   3, Entity__CueToneSequenceOverTod},
+    /*  85 */ {{  3,   0},   20,   1,   0,   8,   1,  -10,   3,   1,   0,   1, Entity__CueFadeAndTurnDreamerThenLink},
+    /*  86 */ {{  0,  -8}, -100,   1,   0,  10,   3,    0,   0,   1,   0,   3, Entity__CuePauseThenAnimateOnce},
+    /*  87 */ {{  3,   0},  -50,   0,   0,   0,   3,    8,   0,   1,  20,   0, Entity__CueTone18OnTodLoop},
+    /*  88 */ {{  0,   3},  -50,   0,   0,   0,   3,   11,   0,   1,  20,   0, Entity__CueTone18MidTodLoop},
+    /*  89 */ {{  0,  -7},    0,   0,   0,   0,   2,    0,   5,  -4,  10,   1, Entity__CueAnimateOnceMaybeVideo},
+    /*  90 */ {{  0,   5},   -1,   0,   0,   0,   1,   -9,   1,  -2,  10,  -1, Entity__CueRandomHighToneOnce},
+    /*  91 */ {{  0,   1}, -100,   1,   0,   1,   1,   -6,   0,  -4,  10,   1, Entity__CueFadeSkipTodThenLink},
+    /*  92 */ {{ -3,  -4},   -1,   0,   0,   0,   1,   -6,   2,  -8,  10,   0, Entity__CueAwaitReachThenLinkAfterTod},
+    /*  93 */ {{  2,   8},   50,   0,  60,   0,   3,    0,   0,   1,  20,   3, Entity__CueAnimateThenRun},
+    /*  94 */ {{  0,   5},  100,   0,  40,   8,   8,  -11,   3,   3,  30,   0, Entity__CueAnimateThenRunMaybeGiantOrTurn},
+    /*  95 */ {{  4,   2}, -100,   1,  20,   3,   1,    0,   0,   2,  10,   1, Entity__CueSilentAnimateThenRun},
+    /*  96 */ {{  2,   0}, -100,   0,   0,   0,   2,  -14,   2,   1,  20,   0, Entity__CueRandomTodEachCycle},
+    /*  97 */ {{  0,   0},    0,   0,   0,   0,   0,    0,   0,   3,  30,   0, NULL},
+    /*  98 */ {{-10, -10},   20,   0, 180,   0,   1,    0,   0,   1,   0,   0, Entity__CueWalkFadeAndResetFlashbacks},
+    /*  99 */ {{ 10,  10},  -20,   0,   0,   0,  -2,    0,   0,   1,  30,  -1, NULL},
+    /* 100 */ {{-10, -10},  100,   0,   0,   0,   0,    0,   0,   3,  30,   0, NULL},
+    /* 101 */ {{  9,   9},  100,   1,   0,   0,   0,    0,   0,   3,  30,   0, NULL},
+    /* 102 */ {{ -5,   0},   20,   3, 180,   5,   1,  -13,   0,   3,  30,   5, Entity__CueCircleThenRegrowFacingDreamer},
+    /* 103 */ {{ -6,   7},  100,   1, 180,   5,   5,  -10,   0,   2,   0,   5, Entity__CueWalkMaybeSpiralDownToLink},
+    /* 104 */ {{  2,   2},   -4,   1,   0,   2,   2,    0,   0,   1,   0,   2, Entity__CueQuarterSizeRiseBriefly},
+    /* 105 */ {{  0,  -3}, -100,   0,  60,   0,   2,    0,   0,   1,   0,   0, Entity__CueFlicker},
+    /* 106 */ {{  0,   5},   -1,   0,  60,   0,   1,    0,   0,  -2,  10,   1, Entity__CueSwayOrStandThin},
+    /* 107 */ {{  0,   5},   -1,   0,  60,   0,   1,   -2,   1,  -2,  10,  -1, Entity__CueAnimateThenRun},
+    /* 108 */ {{  9,   0},  100,   1, 180,   6,   3,   -3,   1,   1,  10,   6, Entity__CueWalkInRandomLaneGiant},
+    /* 109 */ {{  3,   3},  100,   0, 180,   0,   7,   -2,   4,   5,   0,   0, Entity__CueHalfSizeCreep},
+    /* 110 */ {{  3,   0},    9,   0, 120,   0,   5,  -13,   1,   3,   0,   0, Entity__CueTurnAroundWhenApproached},
+    /* 111 */ {{ -9,   5},  -50,   1,   0,  15,  15,   -4,   8,   3,  50,  15, Entity__CueWanderPauseOnPink},
+    /* 112 */ {{  8,   8},  100,   0, 180,   0,  15,   -6,   2,   3,  50,   0, NULL},
+    /* 113 */ {{  1,  -1},  -50,   1,  30,   6,   6,   -5,   1,   3,  20,   6, Entity__CueWalkWithTurnsMaybeGiantRow113},
+    /* 114 */ {{  1,   1},  -80,   1,  90,   6,   6,   -5,   1,   3,  20,   6, Entity__CueTwitchYaw},
+    /* 115 */ {{ -3,  -6},  -20,   1,   0,   1,   1,   -6,   1,   1,  30,   1, Entity__CueConfrontDreamerThenLinkOnTouch},
+    /* 116 */ {{ -3,  -6},  -20,   1,   0,   1,   1,   -6,   3,   1,  30,   1, NULL},
+    /* 117 */ {{ -4,  -5},   -1,   1,  60,   8,   8,  -11,   8,   3,  10,   8, Entity__CueSixfoldSizeRow117},
+    /* 118 */ {{  6,   0},  -20,   0,   0,   0,   2,   -3,   8,   1,   0,   0, Entity__CueSixfoldSizeRow118},
+    /* 119 */ {{  7,   1},   20,   0,   0,   0, -10,    0,   0,   5,   0,   0, Entity__CueSixfoldSizeRow119},
+    /* 120 */ {{ -6,   8},   20,   1, 120,   8,   1,    8,   0,   1,  30,   8, Entity__CueWalkThenChaseOrHoldDreamer},
+    /* 121 */ {{  1,   1},   20,   1,  90,   8,   3,   -4,   1,   3,  30,   8, Entity__CueQuarterSize},
+    /* 122 */ {{  0,  -1},  -50,   1,  90,   3,   5,    0,   0,   3,   0,   3, Entity__CueHoverOverDreamerOnBlueElseRise},
+    /* 123 */ {{ -7,   6},    8,   0, 140,   0,   3,    0,   0,   3,   0,   3, Entity__CueBackAwayMaybeDriveDreamer},
+    /* 124 */ {{  4,   4}, -100,   0, 120,   0,   5,    0,   0,   3,  20,   5, NULL},
+    /* 125 */ {{ -5,   6},    9,   1, 255,   5,   5,  -14,   1,   3,  20,   5, Entity__CueSmallCreepMaybeVanish},
+    /* 126 */ {{ -5,   4},    9,   0, 140,   0,   5,   -4,   3,   3,   0,   0, Entity__CueBackAwayMaybeDriveDreamer},
+    /* 127 */ {{  5,   1},  -20,   0, 120,   0,   3,   -5,   1,   1,   0,   0, NULL},
+    /* 128 */ {{ -4,  -4},   50,   1,   0,   1,   1,  -14,   1,   1,   0,   1, Entity__CueTinyWalkTowardDreamer},
+    /* 129 */ {{  2,  -3},  -20,   0, 120,   0,   2,  -14,   1,   1,   0,   1, Entity__CueStillThenFaceOrRunAtDreamer},
+};
+/* clang-format on */
