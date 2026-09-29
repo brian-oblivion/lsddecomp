@@ -13,9 +13,9 @@
  *  - StyleEffect (include/style_effect.h), whole, the Actor the style layer
  *    keeps at an offset from its target, then SetStyleEffectSources;
  *  - Actor (include/actor.h), whole, the base of TodActor, DreamSys and
- *    StyleEffect;
- *  - VariantSprite (include/variant_sprite.h), whole.
- * GraphRoom, which follows in ROM, is graph_room.c.
+ *    StyleEffect.
+ * VariantSprite and GraphRoom, which follow in ROM, are variant_sprite.c and
+ * graph_room.c.
  * The game's own files most likely ended after each class's table getter.
  */
 #include "common.h"
@@ -2716,19 +2716,15 @@ void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
     Actor__MoveAlongLocalAxis(self, &sActorLocalMoveZ, val, notify, ACTOR_EVENT_MOVED_Z);
 }
 
-/* ---- Actor's movement and link search; VariantSprite's ctor -------------
+/* ---- Actor's movement and link search -----------------------------------
  *
  * Actor's movement and link-search methods (include/actor.h, occupants of
- * the base table gActorMethods, +0x0C8..+0x0EC), and VariantSprite's
- * allocator and ctor.
+ * the base table gActorMethods, +0x0C8..+0x0EC), and its table getter.
  *
  * The link search: Actor__FindNearbyLink asks the StageMap grid which cell
  * holds the Actor's position, BuildLinkQueries turns it into up to three
  * cell windows, ScanLinkCandidates and ScanGridWindow walk them, and
  * AcceptGridElem casts a vertical ray at each cell's model.
- *
- * New_VariantSprite and VariantSprite__VariantSprite are of an unrelated
- * class (include/variant_sprite.h) that happens to follow in ROM.
  */
 
 /* The local move vector's x and y (s16; the z, sActorLocalMoveZ, is the next
@@ -3001,114 +2997,4 @@ void Actor__SetPendingExtra(Actor *self, s32 extra) {
 
 ActorMethods *GetActorMethods(void) {
     return &gActorMethods;
-}
-
-/* VariantSprite's allocator; its other methods follow in the next two
- * sections. */
-VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture) {
-    void *obj = BMemPMgrAlloc(sizeof(VariantSprite));
-    if (obj != NULL) {
-        GetVariantSpriteMethods()->ctor(obj, variant, resetArg, texture);
-        return obj;
-    }
-    return NULL;
-}
-
-/* VariantSprite's two texture cells, forwarded as the Sprite ctor's `rect`
- * (Sprite__Reset copies it into Sprite.rect): u,v = (0x00,0x20) and
- * (0x10,0x20), 16x16. */
-extern SpriteRect sVariantSpriteCells[2];
-
-/* Sprite's ctor with the variant's cell, then this class's table, and the
- * reset slot (VariantSprite__SetVariantClut) with the variant, through
- * VariantSpriteResetFn. Returns nothing: it ends in that call. */
-void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetArg, void *texture) {
-    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &sVariantSpriteCells[variant], resetArg, 0);
-    self->methods = GetVariantSpriteMethods();
-    self->unkA4 = 0;
-    ((VariantSpriteResetFn)self->methods->reset)(self, variant);
-}
-
-/* ---- VariantSprite (include/variant_sprite.h) ---------------------------
- *
- * A Sprite whose variant, 0 or 1, picks its texture cell and CLUT. Its ctor
- * and allocator are just above, the empty leaves and the table getter at the
- * head of the next section.
- *
- * - VariantSprite__SetVariantClut (reset, +0x040, called last by the ctor
- *   with the variant): records the variant and points the GsSPRITE's CLUT
- *   at that variant's row, replacing the one Sprite's reset took from the
- *   texture.
- * - VariantSprite__UpdateScale (updateScale, +0x048): two num/den ratios
- *   into GsSPRITE scalex/scaley.
- */
-
-/* The two variants' CLUT positions, one {x, y} table in VRAM:
- * {976, 511} and {992, 511}, adjacent 16-colour rows on the bottom line. */
-/* MATCHING: two externs, one address base for x and one for y. */
-extern const s16 sVariantSpriteClutX[];
-extern const s16 sVariantSpriteClutY[];
-
-/* One {x, y} entry of that table, in s16s: the stride both lookups index by. */
-#define VARIANT_CLUT_STRIDE 2
-
-void VariantSprite__SetVariantClut(VariantSprite *self, s32 variant) {
-    self->variant = variant;
-    self->sprite.cx = sVariantSpriteClutX[variant * VARIANT_CLUT_STRIDE];
-    self->sprite.cy = sVariantSpriteClutY[variant * VARIANT_CLUT_STRIDE];
-}
-
-/*
- * Overrides SceneNode__UpdateScale. `ratios` is two num/den pairs, x then y
- * (the callers' tables hold three, sSpriteScaleLarge's {6,5} and
- * sSpriteScaleSmall's {4,6}; the third is not read), each turned into 20.12
- * by the split division RatioToFixed12 uses. The ratios go to the GsSPRITE's
- * scalex/scaley, or, while Sprite's accumulateScale is set, multiply accumScaleX/Y
- * instead. `set` is not read.
- */
-void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
-    s32 xWhole, xRem, xFrac, xRatio;
-    s32 yWhole, yRem, yFrac, yRatio;
-    s16 xScale, yScale;
-
-    xWhole = ratios[0].num / ratios[0].den;
-    xRem = ratios[0].num % ratios[0].den;
-    xFrac = (xRem << FIX12_SHIFT) / ratios[0].den;
-    xRatio = (xWhole << FIX12_SHIFT) + xFrac;
-    xScale = (s16)xRatio; /* MATCHING: here; in the else arm it loses a move */
-
-    yWhole = ratios[1].num / ratios[1].den;
-    yRem = ratios[1].num % ratios[1].den;
-    yFrac = (yRem << FIX12_SHIFT) / ratios[1].den;
-    yRatio = (yWhole << FIX12_SHIFT) + yFrac;
-    yScale = (s16)yRatio;
-
-    if (self->accumulateScale != 0) {
-        self->accumScaleX = ((s16)xRatio * self->accumScaleX) >> FIX12_SHIFT;
-        self->accumScaleY = ((s16)yRatio * self->accumScaleY) >> FIX12_SHIFT;
-    } else {
-        self->sprite.scalex = xScale;
-        self->sprite.scaley = yScale;
-    }
-}
-
-/* ---- VariantSprite's tail ---------------------------------------------
- *
- * VariantSprite: four empty methods and the table getter.
- */
-
-/* VariantSprite's (include/variant_sprite.h) four empty leaves and its table
- * getter. VariantSprite__Update is the +0x098 update override of
- * Sprite__Update, typed as that slot; the other three occupy the class's own
- * slots +0x0BC/+0x0C0/+0x0C4, which nothing calls. */
-void VariantSprite__Update(VariantSprite *self, void *sender, s32 event) {}
-
-void VariantSprite__NoOpSlotBC(void) {}
-
-void VariantSprite__NoOpSlotC0(void) {}
-
-void VariantSprite__NoOpSlotC4(void) {}
-
-VariantSpriteMethods *GetVariantSpriteMethods(void) {
-    return &gVariantSpriteMethods;
 }

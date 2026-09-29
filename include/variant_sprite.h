@@ -8,7 +8,7 @@
  * @brief VariantSprite, a world-space Sprite whose variant, 0 or 1, picks its
  *        texture cell and CLUT: the sprites StyleEffect carries.
  *
- * Methods in src/world/dream_scene.c, New_VariantSprite through
+ * Methods in src/world/variant_sprite.c, New_VariantSprite through
  * GetVariantSpriteMethods.
  */
 
