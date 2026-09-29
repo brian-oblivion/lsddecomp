@@ -27,7 +27,7 @@ typedef struct BoxList {
 /** @brief The eight corners of a box as two faces of four (TmdHull's v[0..3]
  * and v[4..7]: the min-z face, then the max-z face). */
 typedef struct BoxCorners {
-    TmdVec3 face[2][4]; /**< the min-z face's four corners, then the max-z face's */
+    TmdVec3 face[2][HULL_FACE_CORNERS]; /**< the min-z face's four corners, then the max-z face's */
 } BoxCorners;
 
 /** @brief A segment: start and direction (end - start). */
@@ -202,24 +202,24 @@ void RotateAndOffsetHullList(TmdHull *h, s32 turn, s32 back, s32 delta) {
              * counter and pointer registers in all four loops. */
             if (back == 0) {
                 s32 k;
-                for (k = 0; k < 4; k++) {
+                for (k = 0; k < HULL_FACE_CORNERS; k++) {
                     c->face[0][k].x += delta;
                 }
             } else {
                 s32 k;
-                for (k = 0; k < 4; k++) {
+                for (k = 0; k < HULL_FACE_CORNERS; k++) {
                     c->face[1][k].x += delta;
                 }
             }
         } else {
             if (back == 0) {
                 s32 k;
-                for (k = 0; k < 4; k++) {
+                for (k = 0; k < HULL_FACE_CORNERS; k++) {
                     c->face[0][k].z += delta;
                 }
             } else {
                 s32 k;
-                for (k = 0; k < 4; k++) {
+                for (k = 0; k < HULL_FACE_CORNERS; k++) {
                     c->face[1][k].z += delta;
                 }
             }
@@ -477,7 +477,7 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
                 idx[1] = p->h[10];
                 idx[2] = p->h[11];
                 idx[3] = p->h[12];
-                size = 32;
+                size = sizeof(TMD_P_F4) + 3 * sizeof(u32);
             } else {
                 idx[0] = PRIM(TMD_P_F4)->v0;
                 idx[1] = PRIM(TMD_P_F4)->v1;
@@ -560,7 +560,7 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
                 idx[1] = p->h[11];
                 idx[2] = p->h[13];
                 idx[3] = p->h[15];
-                size = 36;
+                size = sizeof(TMD_P_G4) + 3 * sizeof(u32);
             } else {
                 idx[0] = PRIM(TMD_P_G4)->v0;
                 idx[1] = PRIM(TMD_P_G4)->v1;

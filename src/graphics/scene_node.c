@@ -30,9 +30,10 @@
 extern Ratio16 sRotationZero[3];
 extern Ratio16 sSceneNodeScaleOne[3];
 
-/* UpdateRotation's divisor: its inputs are degrees, and a degree count in
- * 20.12 fixed point divided by 360 is the angle in 4096ths of a turn (ONE to
- * the turn), GsCOORD2PARAM.rotate's unit. */
+/* Degrees in a full turn. UpdateRotation's inputs are degrees, and a degree
+ * count in 20.12 fixed point divided by this is the angle in 4096ths of a
+ * turn (ONE to the turn), GsCOORD2PARAM.rotate's unit; FaceTarget converts
+ * ratan2's angles back to degrees with it. */
 #define DEGREES_PER_TURN 360
 
 SceneNode *New_SceneNode(void) {
@@ -1008,8 +1009,8 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 zeroPitch, s3
         out[0].num = ratan2(1, dy);
     }
 
-    out[0].num = (out[0].num + ONE / 4) * 360 / ONE;
-    out[1].num = out[1].num * 360 / ONE;
+    out[0].num = (out[0].num + ONE / 4) * DEGREES_PER_TURN / ONE;
+    out[1].num = out[1].num * DEGREES_PER_TURN / ONE;
 
     out[2].num = 0;
     out[2].den = 1;
@@ -1019,7 +1020,7 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 zeroPitch, s3
         out[0].num = 0;
     }
     if (noHalfTurn == 0) {
-        out[1].num = out[1].num + 180;
+        out[1].num = out[1].num + DEGREES_PER_TURN / 2;
     }
 
     self->methods->updateRotation(self, 1, out);

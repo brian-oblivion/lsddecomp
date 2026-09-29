@@ -21,6 +21,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "draw_system.h"
+#include "scene_node.h"
 #include "gte.h"
 #include "tmd_renderer.h"
 
@@ -191,8 +192,8 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 
     ctx->otBase = ot->org;
     ctx->otShift = otShift;
-    InitDivPolygonPtrs(ctx->divVtx3, sDivPolygon3, 3);
-    InitDivPolygonPtrs(ctx->divVtx4, sDivPolygon4, 4);
+    InitDivPolygonPtrs(ctx->divVtx3, sDivPolygon3, ARRAY_COUNT(ctx->divVtx3));
+    InitDivPolygonPtrs(ctx->divVtx4, sDivPolygon4, ARRAY_COUNT(ctx->divVtx4));
 
     packetsLeft = OBJ_TMD(obj)->primn;
     packet = (u8 *)OBJ_TMD(obj)->primtop;
@@ -220,10 +221,10 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 
     /* MATCHING: four struct reads of attribute, hoisted by the scheduler
      * above the global stores; unk8 is stored after them as a field. */
-    sSortNdiv = (obj->attribute >> 9) & 0x7;
-    sSortLightOff = (obj->attribute >> 6) & 0x1;
-    sSortUseGlobalLightMode = (obj->attribute >> 5) & 0x1;
-    sSortLightMode = (obj->attribute >> 3) & 0x3;
+    sSortNdiv = (obj->attribute >> ATTR_DIV_SHIFT) & 0x7;
+    sSortLightOff = (obj->attribute >> ATTR_LOFF_SHIFT) & 0x1;
+    sSortUseGlobalLightMode = (obj->attribute >> ATTR_LLMOD_SHIFT) & 0x1;
+    sSortLightMode = (obj->attribute >> ATTR_LIGHTMODE_SHIFT) & 0x3;
     ctx->unk8 = 10;
 
     ctx->faceColor = sTexturedFaceColor;
