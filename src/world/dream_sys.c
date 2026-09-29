@@ -369,8 +369,8 @@ void DreamSys__TimerTick(DreamSys *self, s32 sender, s32 event) {
 
     if (self->isFlashbackSession) {
         if (self->state != DREAMSYS_NO_LINK || self->methods->loadNextFlashback(self, 0)) {
-            /* MATCHING: keeps GCC from cross-jumping this branch to the identical
-               `tick = 0; return;` tail after notifyParents. */
+            /* MATCHING: keeps this branch's own copy of the identical
+               `tick = 0; return;` tail, rather than a jump to the one after notifyParents. */
             __asm__("");
             self->tick = 0;
             return;
@@ -796,8 +796,8 @@ s32 DreamSys__AdvanceMoveCycle(DreamSys *self, s32 bob) {
     return ret;
 }
 
-/* MATCHING: `headingArg` and `scratch` give their values the live ranges
-   retail's register allocation needs; the plain form does not match. */
+/* MATCHING: the program index read into `scratch`, reused for program 9, and
+   the tone passed as a copy `headingArg`; one expression per call compiles differently. */
 void DreamSys__StartVoice(DreamSys *self) {
     VabStreamObj *obj;
     s32 idx;
@@ -1127,7 +1127,7 @@ bool DreamSys__TryStageTimerLink(DreamSys *self, PlayerSpawnPoint *currentPos) {
 }
 
 /* MATCHING: the body nests inside `if (result >= 0)`; an early
-   `return false` fills two delay slots differently. */
+   `return false` compiles differently. */
 bool DreamSys__TryInstantTeleportLink(DreamSys *self, PlayerSpawnPoint *currentPos) {
     s32 result;
     s32 bonus;
