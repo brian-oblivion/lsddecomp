@@ -278,7 +278,7 @@ MoodGraphPoint sGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT] = {{{-1, 1}}, {{1, 1}}, 
 /* MATCHING: the targets/days caches, the dead else and the chained assignment take the
  * table's address on every pass; indexing sGraphScoreMoods takes it once, before the loops */
 s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
-    u32 i;
+    u32 i; /* MATCHING: unsigned, as retail tests it; a signed counter compiles a signed test */
     MoodGraphPoint *days;
     s32 dot;
     MoodGraphPoint *targets;
@@ -287,7 +287,7 @@ s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
     s32 limit;
 
     if (log->graphScored != 0) {
-        goto fail;
+        return 0;
     }
 
     if (log->currentYear != 0) {
@@ -317,7 +317,7 @@ s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
             day--;
         }
         if (matches == 0) {
-            goto fail;
+            goto fail; /* MATCHING: to the shared return 0; returning here lays the loop out differently */
         }
     }
 
