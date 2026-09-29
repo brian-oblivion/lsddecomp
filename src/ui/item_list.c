@@ -68,11 +68,11 @@ void ItemList__HandleInputCode(ItemList *self, void *source, s32 code) {
     /* MATCHING: the cases stay in this order; retail lays their bodies out in it. */
     switch (code) {
         case PAD_EVENT_PRESSED + PAD_BUTTON_RRIGHT:
-            self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
+            self->methods->playSound(self, ITEMLIST_TONE_BUTTON);
             self->methods->setState(self, ITEMLIST_RESULT_CHOSEN);
             break;
         case PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN:
-            self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
+            self->methods->playSound(self, ITEMLIST_TONE_BUTTON);
             self->methods->setState(self, ITEMLIST_RESULT_CANCELLED);
             break;
         case PAD_EVENT_HELD + PAD_BUTTON_LRIGHT:
@@ -94,7 +94,7 @@ void ItemList__PlaySound(ItemList *self, s32 tone) {
     struct VabStreamObj *target = self->target;
 
     if (target != NULL) {
-        target->methods->playTone(target, tone, 96, 96);
+        target->methods->playTone(target, tone, ITEMLIST_TONE_VOLUME, ITEMLIST_TONE_VOLUME);
     }
 }
 
@@ -260,7 +260,7 @@ void ItemList__RefreshRows(ItemList *self, s32 top, s32 column, s32 cursor, s32 
     }
     ItemList__SetView(self, top, column, cursor, 0);
     if (notify) {
-        self->methods->playSound(self, 0);
+        self->methods->playSound(self, ITEMLIST_TONE_CURSOR);
     }
 }
 
@@ -314,7 +314,7 @@ void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 notify) {
     }
     (*row)->methods->setColor(*row, &sItemListCursorColor);
     if (notify) {
-        self->methods->playSound(self, 0);
+        self->methods->playSound(self, ITEMLIST_TONE_CURSOR);
     }
 }
 

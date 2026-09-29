@@ -223,7 +223,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *self, LinkResource *modelSource, VabStrea
     self->methods->addChild(self, model);
     self->methods->getSetDreamTimeLimit(self, -1);
     self->movementBlocked = 1;
-    self->moveOverride = 0;
+    self->moveOverride = MOVE_OVERRIDE_NONE;
     self->newGamePending = 1;
     self->methods->initNewGame(self);
     /* MATCHING: returns reset's result, which New_DreamSys ignores */
@@ -256,7 +256,7 @@ void DreamSys__SpawnAtLink(DreamSys *self, StageMap *grid) {
         self->methods->getSetDreamTimeLimit(self, entry->timeLimit + 4);
         self->currentFlashbackIndex++;
     }
-    if (self->moveOverride != 0 && self->exitRotation != 0) {
+    if (self->moveOverride != MOVE_OVERRIDE_NONE && self->exitRotation != 0) {
         self->methods->updateRotation(self, 1, (void *)self->exitRotation);
     }
 }
@@ -271,9 +271,9 @@ void DreamSys__NotifyLinkAttempt(DreamSys *self, s32 event) {
     s32 voice;
 
     GetActorMethods()->notifyWithHull((Actor *)self, event);
-    if (event == -2)
-        goto handle_neg2;
-    if (event != -1)
+    if (event == ACTOR_EVENT_NO_FLOOR)
+        goto no_floor;
+    if (event != ACTOR_EVENT_FLOOR_FOUND)
         return;
 
     voice = self->linkTarget->flags36 & 0x7F;
@@ -286,24 +286,24 @@ void DreamSys__NotifyLinkAttempt(DreamSys *self, s32 event) {
 
     if (self->currentStage != 9)
         return;
-    goto shared_tail;
+    goto try_stage_timer_link;
 
-handle_neg2:
+no_floor:
     if (self->grid->methods->findSlotForPosition(self->grid, (LongVec3 *)self->coord2->coord.t)
-            ->loader->headerReady != 2)
-        goto neg2_mismatch;
+            ->loader->headerReady != LBDFILE_HEADER_CONSUMED)
+        goto undo_step;
 
-shared_tail:
+try_stage_timer_link:
     self->methods->tryStageTimerLink(
         self, (PlayerSpawnPoint *)self->grid->methods->getTargetDescriptor(self->grid, 0, 0));
     return;
 
-neg2_mismatch:
+undo_step:
     self->methods->restoreLinkSnapshot(self);
 }
 
 void DreamSys__OnPadEvent(DreamSys *self, s32 sender, s32 event) {
-    if (self->moveOverride != 0)
+    if (self->moveOverride != MOVE_OVERRIDE_NONE)
         return;
     if (self->movementBlocked != 0)
         return;
@@ -318,29 +318,29 @@ void DreamSys__OnPadEvent(DreamSys *self, s32 sender, s32 event) {
             self->moveCommand = MOVE_COMMAND_BACK;
             break;
         case PAD_EVENT_HELD + PAD_BUTTON_LLEFT:
-            self->turnCommand = 1;
+            self->turnCommand = TURN_COMMAND_LEFT;
             break;
         case PAD_EVENT_HELD + PAD_BUTTON_LRIGHT:
-            self->turnCommand = 2;
+            self->turnCommand = TURN_COMMAND_RIGHT;
             break;
         case PAD_EVENT_HELD + PAD_BUTTON_RUP:
-            self->lookOffsetCommand = 1;
+            self->lookOffsetCommand = LOOK_OFFSET_COMMAND_UP;
             break;
         case PAD_EVENT_HELD + PAD_BUTTON_RDOWN:
             if (self->moveCommand == MOVE_COMMAND_FORWARD)
                 self->methods->changeMoveMode(self, MOVE_MODE_RUN);
             break;
         case PAD_EVENT_HELD + PAD_BUTTON_RLEFT:
-            self->lookOffsetCommand = 2;
+            self->lookOffsetCommand = LOOK_OFFSET_COMMAND_DOWN;
             break;
         case PAD_EVENT_HELD + PAD_BUTTON_R1:
-            self->lookYawCommand = 2;
+            self->lookYawCommand = LOOK_YAW_COMMAND_RIGHT;
             break;
         case PAD_EVENT_HELD + PAD_BUTTON_R2:
             self->moveCommand = MOVE_COMMAND_RIGHT;
             break;
         case PAD_EVENT_HELD + PAD_BUTTON_L1:
-            self->lookYawCommand = 1;
+            self->lookYawCommand = LOOK_YAW_COMMAND_LEFT;
             break;
         case PAD_EVENT_HELD + PAD_BUTTON_L2:
             self->moveCommand = MOVE_COMMAND_LEFT;
@@ -389,14 +389,14 @@ tick_only:
 
 void DreamSys__DispatchChunkChange(DreamSys *self, void *sender, s32 event) {
     GetActorMethods()->dispatchLinkCommand((Actor *)self, sender, event);
-    if ((((BasicClass *)sender)->methods->header & 0xFFF) == STAGEMAP_CLASS_ID) {
+    if ((((BasicClass *)sender)->methods->header & CLASS_ID_LEVEL3_MASK) == STAGEMAP_CLASS_ID) {
         self->methods->processChunkChange(self, sender, event);
     }
 }
 
 void DreamSys__DispatchInstanceEffect(DreamSys *self, void *sender, s32 effect) {
     GetActorMethods()->onActorLinkCommand((Actor *)self, sender, effect);
-    if ((((BasicClass *)sender)->methods->header & 0xFFFFF) == ENTITY_CLASS_ID) {
+    if ((((BasicClass *)sender)->methods->header & CLASS_ID_LEVEL5_MASK) == ENTITY_CLASS_ID) {
         self->methods->instanceEffectsOnJournal(self, sender, effect);
     }
 }
@@ -451,9 +451,9 @@ void DreamSys__ResetLinkState(DreamSys *self, s32 moveMode, s32 tickPeriod) {
     self->moveCycleTick = 0;
     self->voiceSelect = 0;
     self->moveCommand = MOVE_COMMAND_NONE;
-    self->turnCommand = 0;
-    self->lookOffsetCommand = 0;
-    self->lookYawCommand = 0;
+    self->turnCommand = TURN_COMMAND_NONE;
+    self->lookOffsetCommand = LOOK_OFFSET_COMMAND_NONE;
+    self->lookYawCommand = LOOK_YAW_COMMAND_NONE;
     self->lookOffset = 0;
     self->lookYaw = 0;
     self->methods->setGateFlags(self, 0, 1, 1, 1);
@@ -650,24 +650,24 @@ void DreamSys__StepLookOffset(DreamSys *self) {
     s32 sum;
 
     idx = self->lookOffsetCommand;
-    if (idx != 0) {
+    if (idx != LOOK_OFFSET_COMMAND_NONE) {
         delta = sLookOffsetSteps[idx];
         threshold = sLookOffsetLimits[idx];
         sum = delta + self->lookOffset;
         if (sum >= 0) {
             if (sum < threshold)
                 goto apply;
-            self->lookOffsetCommand = 0;
+            self->lookOffsetCommand = LOOK_OFFSET_COMMAND_NONE;
             return;
         }
         if ((~sum + 1) >= threshold) {
-            self->lookOffsetCommand = 0;
+            self->lookOffsetCommand = LOOK_OFFSET_COMMAND_NONE;
             return;
         }
     apply:
         self->viewport->refView.vr.y += delta;
         self->lookOffset = sum;
-        self->lookOffsetCommand = 0;
+        self->lookOffsetCommand = LOOK_OFFSET_COMMAND_NONE;
         return;
     }
     if (self->lookOffset != 0) {
@@ -690,7 +690,7 @@ void DreamSys__StepLookYaw(DreamSys *self) {
 
     self->moveCommandLatch = (self->moveCommand == MOVE_COMMAND_FORWARD);
     idx = self->lookYawCommand;
-    if (idx != 0) {
+    if (idx != LOOK_YAW_COMMAND_NONE) {
         delta = sLookYawSteps[idx];
         threshold = sLookYawLimits[idx];
         sum = delta + self->lookYaw;
@@ -699,7 +699,7 @@ void DreamSys__StepLookYaw(DreamSys *self) {
             self->methods->updateRotation(self, 0, &sTurnRotationYaw[-1]);
             self->lookYaw = sum;
         }
-        self->lookYawCommand = 0;
+        self->lookYawCommand = LOOK_YAW_COMMAND_NONE;
         flipTarget = self;
     } else if (self->lookYaw != 0) {
         delta = -LOOK_YAW_RETURN_STEP;
@@ -717,7 +717,7 @@ void DreamSys__StepLookYaw(DreamSys *self) {
 
 void DreamSys__FlipMoveCommand(DreamSys *self) {
     self->moveCommandLatch = 0;
-    if (self->moveCommand != 0) {
+    if (self->moveCommand != MOVE_COMMAND_NONE) {
         if (self->moveCommand & 1)
             self->moveCommand = self->moveCommand + 1;
         else
@@ -730,10 +730,10 @@ void DreamSys__NoOpLook2(void) {}
 void DreamSys__NoOpLook3(void) {}
 
 s32 DreamSys__TickMove(DreamSys *self) {
-    if (self->moveOverride == 0) {
+    if (self->moveOverride == MOVE_OVERRIDE_NONE) {
         self->methods->applyPendingTurn(self);
         return self->methods->tickMoveFree(self);
-    } else if (self->moveOverride != 2) {
+    } else if (self->moveOverride != MOVE_OVERRIDE_HELD) {
         return self->methods->tickMoveForced(self);
     } else {
         return self->methods->tickMoveHeld(self);
@@ -764,7 +764,7 @@ s32 DreamSys__AdvanceMoveCycle(DreamSys *self, s32 bob) {
     Viewport *viewport;
     s32 delta;
 
-    if (self->moveCommand != 0) {
+    if (self->moveCommand != MOVE_COMMAND_NONE) {
         ret = self->moveCommand;
         count = self->moveCycleTick + 1;
         self->moveCycleTick = count;
@@ -787,7 +787,7 @@ s32 DreamSys__AdvanceMoveCycle(DreamSys *self, s32 bob) {
             viewport->refView.vr.y += delta;
         }
 
-        if (self->moveCommand == 0)
+        if (self->moveCommand == MOVE_COMMAND_NONE)
             self->moveCycleTick = 0;
     }
 
@@ -868,9 +868,9 @@ void DreamSys__ApplyPendingTurn(DreamSys *self) {
     s32 idx;
 
     idx = self->turnCommand;
-    if (idx != 0) {
+    if (idx != TURN_COMMAND_NONE) {
         self->methods->updateRotation(self, 0, sTurnRotations[idx]);
-        self->turnCommand = 0;
+        self->turnCommand = TURN_COMMAND_NONE;
     }
 }
 
@@ -1025,11 +1025,11 @@ s32 DreamSys__StartDay(DreamSys *self) {
 
 s32 DreamSys__EndDay(DreamSys *self, s32 outcome) {
     self->currentDay = self->storedDay;
-    if (!self->isFlashbackSession && outcome == 0) {
+    if (!self->isFlashbackSession && outcome == DAY_OUTCOME_ENDED) {
         self->methods->calcUnlockScore(self);
         self->methods->updateDreamChart(self, &self->moodPreviousDays[self->currentDay]);
         self->methods->advanceDay(self);
-    } else if (outcome == 2) {
+    } else if (outcome == DAY_OUTCOME_NEW_GAME) {
         self->methods->initNewGame(self);
         self->newGamePending = 1;
     }
@@ -1206,7 +1206,7 @@ s32 DreamSys__TickStaircaseYawPlus90(DreamSys *self) {
         if (self->staircaseFrame >= 133)
             return 1;
         if ((u32)(self->staircaseFrame - 43) < 15 || (u32)(self->staircaseFrame - 75) < 15) {
-            self->turnCommand = 2;
+            self->turnCommand = TURN_COMMAND_RIGHT;
         }
     } else {
         if (self->staircaseFrame >= 19)
@@ -1231,7 +1231,7 @@ s32 DreamSys__TickStaircaseYawMinus135(DreamSys *self) {
             return 1;
         if ((u32)(self->staircaseFrame - 22) < 15 || (u32)(self->staircaseFrame - 57) < 16 ||
             (u32)(self->staircaseFrame - 110) < 15) {
-            self->turnCommand = 1;
+            self->turnCommand = TURN_COMMAND_LEFT;
         }
         flag = (u32)(self->staircaseFrame - 57) < 53;
     } else {
@@ -1244,7 +1244,7 @@ s32 DreamSys__TickStaircaseYawMinus135(DreamSys *self) {
         flag = (u32)(self->staircaseFrame - 3) < 14;
     }
     if (flag) {
-        self->lookOffsetCommand = 2;
+        self->lookOffsetCommand = LOOK_OFFSET_COMMAND_DOWN;
     }
     self->moveCommand = MOVE_COMMAND_FORWARD;
     self->staircaseFrame++;
@@ -1258,7 +1258,7 @@ s32 DreamSys__TickStaircaseYawPlus45(DreamSys *self) {
     if (self->moveMode != MOVE_MODE_RUN) {
         if (self->staircaseFrame < 101) {
             if ((u32)(self->staircaseFrame - 43) < 15) {
-                self->turnCommand = 2;
+                self->turnCommand = TURN_COMMAND_RIGHT;
             }
         } else {
             return 1;
@@ -1287,7 +1287,7 @@ s32 DreamSys__TickStaircaseYawMinus90(DreamSys *self) {
         if (self->staircaseFrame >= 113)
             return 1;
         if ((u32)(self->staircaseFrame - 30) < 15 || (u32)(self->staircaseFrame - 82) < 15) {
-            self->turnCommand = 1;
+            self->turnCommand = TURN_COMMAND_LEFT;
         }
         flag = (u32)(self->staircaseFrame - 30) < 52;
     } else {
@@ -1299,7 +1299,7 @@ s32 DreamSys__TickStaircaseYawMinus90(DreamSys *self) {
         flag = (u32)self->staircaseFrame < 9;
     }
     if (flag) {
-        self->lookOffsetCommand = 2;
+        self->lookOffsetCommand = LOOK_OFFSET_COMMAND_DOWN;
     }
     self->moveCommand = MOVE_COMMAND_FORWARD;
     self->staircaseFrame++;

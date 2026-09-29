@@ -40,10 +40,6 @@
  * part's coordinate parameters are Sony's GsCOORD2PARAM.
  */
 
-/* Header word of gModelDataMethods, the class New_ModelData allocates and
- * TodActor.modelData points at. */
-#define MODEL_DATA_CLASS_HEADER 0x5F03
-
 /* A TOD rotation is in 1/4096 degree; divided by 360 it is a GTE angle
  * (ONE to the turn), which ApplyTodPacket then wraps with % ONE. */
 #define TOD_ROTATE_PER_ANGLE 360
@@ -127,7 +123,7 @@ void TodActor__OnNotify(TodActor *self, BasicClass *sender, s32 event) {
 
     base = GetActorMethods();
     base->onNotify((Actor *)self, sender, event);
-    if ((u16)sender->methods->header == MODEL_DATA_CLASS_HEADER &&
+    if ((sender->methods->header & CLASS_ID_LEVEL4_MASK) == MODELDATA_CLASS_ID &&
         event == BASICCLASS_EVENT_FINALIZED && self->ownsModelData == 0) {
         self->methods->release(self);
     }

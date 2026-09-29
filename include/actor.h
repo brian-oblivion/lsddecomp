@@ -19,7 +19,7 @@ typedef struct ActorMethods ActorMethods;
 struct StageMap;
 
 /** Actor's class id (gActorMethods word +0x000). Two nibbles, so
- * `(u8)header == ACTOR_CLASS_ID` tests for Actor or a class below it
+ * `(header & CLASS_ID_LEVEL2_MASK) == ACTOR_CLASS_ID` tests for Actor or a class below it
  * (TodActor, 0x234): StageMap__DispatchLinkCommand. */
 #define ACTOR_CLASS_ID 0x34
 
@@ -28,8 +28,11 @@ struct StageMap;
  * (Actor__MoveAlongLocalAxis), and the range Actor__NotifyMove handles: for
  * the three moves it sweeps the model's hull by lastOffsetValue before
  * passing it on, for ACTOR_EVENT_UNSWEPT it passes the hull as it is.
+ * FindNearbyLink sends the two negative ones, the answer to its floor search.
  */
 enum ActorMoveEvent {
+    ACTOR_EVENT_NO_FLOOR = -2, /**< FindNearbyLink: no GridCell under the actor; linkTarget is NULL. */
+    ACTOR_EVENT_FLOOR_FOUND = -1, /**< FindNearbyLink: a GridCell is linkTarget and the actor stands on it. */
     ACTOR_EVENT_UNSWEPT = 5, /**< The hull as it is; no sender of 5 is in the game's code. */
     ACTOR_EVENT_MOVED_Z = 6, /**< After moveLocalZ. */
     ACTOR_EVENT_MOVED_X = 7, /**< After moveLocalX. */
@@ -93,8 +96,8 @@ struct ActorMethods {
  *
  * Children and companions: addChild/removeChild/removeAllChildren chain
  * SceneNode's and also record two companions by the child's class id: a
- * StageMap (`(id & 0xFFF) == 0x114`, include/stage_map.h) is the grid,
- * kept in `grid`; a FrameClock (`(id & 0xF) == 5`) is kept in `ticker`.
+ * StageMap (`(id & CLASS_ID_LEVEL3_MASK) == STAGEMAP_CLASS_ID`) is the grid,
+ * kept in `grid`; a FrameClock (`(id & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID`) is kept in `ticker`.
  * SceneNode's onNotify routes the FrameClock's events to `update` (+0x098),
  * which the subclasses override (TodActor's Update, Entity__Update,
  * DreamSys__TimerTick).

@@ -15,7 +15,7 @@ typedef struct FadeBox FadeBox;
 typedef struct FadeBoxMethods FadeBoxMethods;
 
 /** FadeBox's class id (gFadeBoxMethods word +0x000). Three nibbles, so
- * `(header & 0xFFF) == FADEBOX_CLASS_ID` tests for it or a class below it
+ * `(header & CLASS_ID_LEVEL3_MASK) == FADEBOX_CLASS_ID` tests for it or a class below it
  * (ObjM__OnNotify). */
 #define FADEBOX_CLASS_ID 0x164
 

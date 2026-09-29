@@ -54,6 +54,14 @@ enum ItemListResult {
  * or cuts every item's text at `column` to it. */
 #define ITEMLIST_ROW_CHARS 26
 
+/** @name Tones
+ * playSound's tones, VabStreamObj__PlayTone indices (program << 4 | tone). @{ */
+#define ITEMLIST_TONE_CURSOR 0x00 /**< refreshRows, stepCursorInView: the cursor moved */
+#define ITEMLIST_TONE_BUTTON 0x10 /**< circle or cross: the list closes */
+#define ITEMLIST_TONE_VOLUME 96   /**< playSound's PlayTone vol and endVol */
+
+/** @} */
+
 /**
  * @brief ItemList's method table: BasicClass's fifteen slots, with a ctor
  * that takes (items, mode), then its own.
@@ -136,7 +144,7 @@ struct ItemList {
     /* +0x030 */ s32 closeTicks; /**< tickClosing's call counter; setState zeroes it. */
     /* +0x034 */ void *inputSource; /**< The Pad child (class id low nibble 2); onNotify sends its events to handleInputCode. */
     /* +0x038 */ void *tickSource; /**< The FrameClock child (low nibble 5); onNotify sends its events to tickClosing. */
-    /* +0x03C */ struct VabStreamObj *target; /**< attachTarget's sound; playSound plays a tone on it at volume 96, 96. */
+    /* +0x03C */ struct VabStreamObj *target; /**< attachTarget's sound; playSound plays a tone on it at ITEMLIST_TONE_VOLUME. */
     /* +0x040 */ struct TextRow *rows[4]; /**< The visible rows (createRows); index = item - topIndex. */
     /* +0x050 */ struct ScreenSprite *panelSprite; /**< The SELECT panel (loadResources); non-NULL gates every list method. */
 }; /* 0x54 bytes: New_ItemList */
@@ -290,10 +298,10 @@ void ItemList__TickClosing(ItemList *self);
 void ItemList__HandleInputCode(ItemList *self, void *source, s32 code);
 
 /**
- * @brief playSound (slot +0x060): plays `tone` on `target` at volume 96,
- * 96, when there is a target.
+ * @brief playSound (slot +0x060): plays `tone` on `target` at
+ * ITEMLIST_TONE_VOLUME, when there is a target.
  * @param self The list.
- * @param tone VAB program and tone, program << 4 | tone.
+ * @param tone ITEMLIST_TONE_CURSOR or ITEMLIST_TONE_BUTTON.
  */
 void ItemList__PlaySound(ItemList *self, s32 tone);
 

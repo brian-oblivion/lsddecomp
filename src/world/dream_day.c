@@ -141,9 +141,9 @@ void DayTask__OnNotify(DayTask *self, BasicClass *sender, s32 event) {
 
     GetTimedTaskMethods()->onNotify((TimedTask *)self, sender, event);
     tag = sender->methods->header;
-    if ((tag & 0xFFFF) == DREAMSYS_CLASS_ID) {
+    if ((tag & CLASS_ID_LEVEL4_MASK) == DREAMSYS_CLASS_ID) {
         self->methods->onDreamSysNotify(self, sender, event);
-    } else if ((tag & 0xFFFFF) == OBJM_CLASS_ID) {
+    } else if ((tag & CLASS_ID_LEVEL5_MASK) == OBJM_CLASS_ID) {
         self->methods->onObjMNotify(self, sender, event);
     }
 }
@@ -158,7 +158,7 @@ s32 DayTask__Init(DayTask *self) {
     dreamSys->methods->addChild(dreamSys, self->initArgs->pad);
     dreamSys->methods->addChild(dreamSys, self->initArgs->frameClock);
     dreamSys->methods->setViewport(dreamSys, (Viewport *)self->initArgs->viewport);
-    return GetTimedTaskMethods()->init((TimedTask *)self, self->initArgs, 0);
+    return GetTimedTaskMethods()->init((TimedTask *)self, self->initArgs, INTERMEDIATEBASE_INIT_RUN);
 }
 
 void DayTask__Deinit(DayTask *self) {
@@ -204,7 +204,7 @@ void DayTask__AdvancePhase(DayTask *self, BasicClass *sender, s32 event) {
             case DAYTASK_PHASE_READY:
                 result = self->dreamSys->methods->startDay(self->dreamSys);
                 if (result < 0) {
-                    self->dreamSys->methods->endDay(self->dreamSys, 0);
+                    self->dreamSys->methods->endDay(self->dreamSys, DAY_OUTCOME_ENDED);
                     self->result = DAYTASK_RESULT_CINEMATIC;
                     self->methods->setState(self, INTERMEDIATEBASE_STATE_STOP);
                     return;
@@ -242,7 +242,7 @@ void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event) {
         case OBJM_STATE_TIME_UP:
             self->objM->methods->deinit(self->objM);
             self->objM->methods->release(self->objM);
-            result = self->dreamSys->methods->endDay(self->dreamSys, 0);
+            result = self->dreamSys->methods->endDay(self->dreamSys, DAY_OUTCOME_ENDED);
             if (result == 0) {
                 cinematic = self->dreamSys->methods->getCinematic(self->dreamSys);
                 self->result = cinematic.entry < 0 ? DAYTASK_RESULT_ENDED : DAYTASK_RESULT_CINEMATIC;
@@ -262,8 +262,8 @@ void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event) {
         case OBJM_NOTIFY_CLOSE_NEW_GAME:
             self->objM->methods->deinit(self->objM);
             self->objM->methods->release(self->objM);
-            /* endDay(1) on CLOSE, endDay(2) (a new game) on CLOSE_NEW_GAME */
-            self->dreamSys->methods->endDay(self->dreamSys, event != OBJM_NOTIFY_CLOSE ? 2 : 1);
+            self->dreamSys->methods->endDay(
+                self->dreamSys, event != OBJM_NOTIFY_CLOSE ? DAY_OUTCOME_NEW_GAME : DAY_OUTCOME_CLOSED);
             self->result = DAYTASK_RESULT_CLOSED;
             self->methods->setState(self, INTERMEDIATEBASE_STATE_STOP);
             break;
@@ -346,7 +346,7 @@ void TimedTask__CancelTimeout(TimedTask *self) {
 }
 
 s32 TimedTask__Init(TimedTask *self, IntermediateBaseInitArgs *args, s32 mode) {
-    self->result = 0;
+    self->result = TIMEDTASK_RESULT_DONE;
     GetIntermediateBaseMethods()->init((IntermediateBase *)self, args, mode);
     return self->result;
 }
@@ -392,7 +392,7 @@ void TimedTask__PlaySound(TimedTask *self, s32 tone) {
     VabStreamObj *sound = (VabStreamObj *)self->sound;
 
     if (sound != NULL) {
-        sound->methods->playTone(sound, tone, 127, 127);
+        sound->methods->playTone(sound, tone, TIMEDTASK_TONE_VOLUME, TIMEDTASK_TONE_VOLUME);
     }
 }
 
@@ -591,7 +591,7 @@ void StageMap__UpdateIfEnabled(StageMap *self) {
 }
 
 void StageMap__DispatchLinkCommand(StageMap *self, BasicClass *sender, s32 command) {
-    if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
+    if ((sender->methods->header & CLASS_ID_LEVEL2_MASK) == ACTOR_CLASS_ID) {
         self->methods->forwardAcceptedCommand(self, sender, command);
     }
 }

@@ -24,8 +24,15 @@ enum TimedTaskState {
     TIMEDTASK_STATE_TIMED_OUT = 4 /**< the timeout fired */
 };
 
-/** TimedTask::result after the timeout fired. */
-#define TIMEDTASK_RESULT_TIMED_OUT 1
+/** @name Results
+ * TimedTask::result, which init returns. @{ */
+#define TIMEDTASK_RESULT_DONE 0      /**< init's: the job ended normally */
+#define TIMEDTASK_RESULT_TIMED_OUT 1 /**< setState(TIMED_OUT): the timeout fired */
+
+/** @} */
+
+/** playSound's PlayTone vol and endVol: full volume. */
+#define TIMEDTASK_TONE_VOLUME 127
 
 /** setTimeout(n) arms the timeout at n * TIMEDTASK_TIMEOUT_UNIT_FRAMES frames. */
 #define TIMEDTASK_TIMEOUT_UNIT_FRAMES 20
@@ -190,7 +197,7 @@ void TimedTask__SetTimeout(TimedTask *self, s32 timeout);
 
 /**
  * @brief playSound (slot +0x070): plays a tone at full volume on the sound
- *        object (VabStreamObj__PlayTone(tone, 127, 127)), if there is one.
+ *        object (VabStreamObj__PlayTone at TIMEDTASK_TONE_VOLUME), if there is one.
  * @param self The task.
  * @param tone The tone to play.
  */

@@ -83,7 +83,7 @@ void GraphRoom__Update(GraphRoom *self, BasicClass *sender, s32 event) {
 
 void GraphRoom__OnPadConfirm(GraphRoom *self) {
     if (self->scored == 0) {
-        self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
+        self->methods->playSound(self, TASKCORE_TONE_BUTTON);
         self->methods->exit(self);
     }
 }
@@ -128,7 +128,7 @@ void GraphRoom__ReleaseGraphPoints(GraphRoom *self) {
 s32 GraphRoom__Init(GraphRoom *self, IntermediateBaseInitArgs *args, s32 mode) {
     s32 result;
     GetTaskCoreMethods()->init((TaskCore *)self, args, mode);
-    result = 2;
+    result = GRAPHROOM_RESULT_SCORED;
     if (self->scored == 0) {
         result = self->result;
     }

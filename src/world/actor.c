@@ -61,7 +61,7 @@ void Actor__AddChild(Actor *self, BasicClass *child) {
 
     GetSceneNodeMethods()->addChild((SceneNode *)self, child);
     classId = child->methods->header;
-    if ((classId & 0xFFF) == STAGEMAP_CLASS_ID) {
+    if ((classId & CLASS_ID_LEVEL3_MASK) == STAGEMAP_CLASS_ID) {
         self->grid = (struct StageMap *)child;
     } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->ticker = child;
@@ -71,7 +71,7 @@ void Actor__AddChild(Actor *self, BasicClass *child) {
 void Actor__RemoveChild(Actor *self, BasicClass *child) {
     s32 classId = child->methods->header;
 
-    if ((classId & 0xFFF) == STAGEMAP_CLASS_ID) {
+    if ((classId & CLASS_ID_LEVEL3_MASK) == STAGEMAP_CLASS_ID) {
         self->grid = NULL;
     } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->ticker = NULL;
@@ -128,7 +128,7 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                 }
                 self->methods->transformAndNotifyParents(self, &hull, event);
                 if (self->linkTarget != NULL) {
-                    if ((u8)self->linkTarget->methods->header == ACTOR_CLASS_ID) {
+                    if ((self->linkTarget->methods->header & CLASS_ID_LEVEL2_MASK) == ACTOR_CLASS_ID) {
                         ((Actor *)self->linkTarget)->methods->onLinkUpdate((Actor *)self->linkTarget);
                     }
                 }
@@ -141,9 +141,9 @@ void Actor__NotifyMove(Actor *self, s32 event) {
  * any class below it) to onActorLinkCommand, from a GridCell to
  * onGridCellLinkCommand, from anything else nowhere. */
 void Actor__DispatchLinkCommand(Actor *self, BasicClass *sender, s32 event) {
-    if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
+    if ((sender->methods->header & CLASS_ID_LEVEL2_MASK) == ACTOR_CLASS_ID) {
         self->methods->onActorLinkCommand(self, sender, event);
-    } else if ((u8)sender->methods->header == GRIDCELL_CLASS_ID) {
+    } else if ((sender->methods->header & CLASS_ID_LEVEL2_MASK) == GRIDCELL_CLASS_ID) {
         self->methods->onGridCellLinkCommand(self, sender, event);
     }
 }
@@ -256,7 +256,8 @@ void *Actor__ScanLinkCandidates(Actor *self, void *offset, void *pos, s32 count,
  * vertical grid, the same cell in the slots above and below
  * (BuildLinkQueries with span 1). On a hit the cell becomes linkTarget, the
  * actor moves by the ray's offset (addTranslation) and notifyWithHull gets
- * -1; with no hit, linkTarget is NULL and it gets -2. Returns whether it
+ * ACTOR_EVENT_FLOOR_FOUND; with no hit, linkTarget is NULL and it gets
+ * ACTOR_EVENT_NO_FLOOR. Returns whether it
  * linked; 0 as well when the actor has no grid or no slot holds its
  * position. */
 s32 Actor__FindNearbyLink(Actor *self) {
@@ -276,10 +277,10 @@ s32 Actor__FindNearbyLink(Actor *self) {
             self->linkTarget = result;
             if (result != NULL) {
                 self->methods->addTranslation(self, &offset);
-                self->methods->notifyWithHull(self, -1);
+                self->methods->notifyWithHull(self, ACTOR_EVENT_FLOOR_FOUND);
                 return 1;
             }
-            self->methods->notifyWithHull(self, -2);
+            self->methods->notifyWithHull(self, ACTOR_EVENT_NO_FLOOR);
             return 0;
         }
     }
