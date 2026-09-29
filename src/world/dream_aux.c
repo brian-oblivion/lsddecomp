@@ -229,8 +229,8 @@ TriggerWorld *FireDreamAuxTriggerEntries(s32 day, DreamAuxTriggerEntry *trigger,
     return NULL;
 }
 
-/* Spawns `record`'s Entities if its condition holds, and follows a mood-2
- * record's chain. True only when an Entity could not be made. */
+/* Spawns `record`'s Entities if its condition holds, and follows a
+ * TRIGGER_CHAIN_MOOD_ROW record's chain. True only when an Entity could not be made. */
 bool ProcessDreamAuxTriggerRecord(s32 day, DreamAuxTriggerEntry *trigger, TriggerRecord *record,
                                   TriggerWorld *world) {
     s8 *spawn;
@@ -264,8 +264,8 @@ bool ProcessDreamAuxTriggerRecord(s32 day, DreamAuxTriggerEntry *trigger, Trigge
     }
 
 skip:
-    if (record->moodIndex == 2) {
-        return ProcessDreamAuxTriggerRecord(day, trigger, record + 7, world);
+    if (record->moodIndex == TRIGGER_CHAIN_MOOD_ROW) {
+        return ProcessDreamAuxTriggerRecord(day, trigger, record + TRIGGER_CHAIN_STRIDE, world);
     }
 
 fail:
