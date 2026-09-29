@@ -125,7 +125,8 @@ typedef struct TimBlockHeader {
 
 /** @brief The same header as AdvanceLoadState copies it out of the sector
  * buffer. */
-/* MATCHING: bytes, so the copy is a byte-aligned block move. */
+/* MATCHING: bytes, so the copy is a byte-aligned block move; copying the
+ * TimBlockHeader itself loses retail's test of the pointers' alignment. */
 typedef struct TimBlockHeaderBytes {
     u8 bytes[sizeof(TimBlockHeader)]; /**< a TimBlockHeader's bytes */
 } TimBlockHeaderBytes;
@@ -200,7 +201,6 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
     switch (self->loadState) {
         case TIMBLOCK_LOAD_HEADER:
             if (self->flags & CD_FLAG_READ_DONE) {
-                /* MATCHING: a byte-aligned struct copy; a word-aligned one loses retail's runtime alignment test */
                 *(TimBlockHeaderBytes *)self->buffer = *(TimBlockHeaderBytes *)self->sector;
                 BMemPMgrFree(self->sector);
                 max = FindMaxTimBlockSize((FileResource *)self);
