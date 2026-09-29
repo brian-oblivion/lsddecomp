@@ -41,7 +41,7 @@ struct NullDriverMethods {
  * file-I/O interface does nothing. VAB sound streaming is VabStreamObj's, a
  * separate FileResource subclass. Nothing allocates a NullDriver and no
  * method reads `self`, so the object is FileResource's fields and its size
- * is unknown. Methods in src/sound/vab_sound.c.
+ * is unknown. Methods in src/sound/null_driver.c.
  */
 struct NullDriver {
     FILERESOURCE_FIELDS(NullDriverMethods);
