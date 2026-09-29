@@ -1573,6 +1573,8 @@ segments:
       # 21, which sit in `psyq_*` segments -- but they are library code by
       # construction too, so the same remedy is the first thing to try there.
       # Six objects, 0x10 bytes each, tiling 0x410E8..0x41148 exactly:
+      # GridCell, New_GridCell (0x8004D38C) to GetGridCellMethods.
+      - [0x3DB8C, c, world/grid_cell]
       # TitleMenu, New_TitleMenu (0x8004D518) to GetTitleMenuMethods.
       - [0x3DD18, c, ui/title_menu]
       # TaskObjF, New_TaskObjF (0x8004E2E0) to StampSaveTitleFileLetter; owns jtbl_8001157C and jtbl_80011594.
@@ -1984,7 +1986,8 @@ segments:
       - [0x76DC8, .data, world/day_task]  # gDayTaskMethods, DayTask's view points
       - [0x76E68, .data, world/timed_task]  # gTimedTaskMethods
       - [0x76EE8, .data, world/stage_map]  # gStageMapMethods, the chunk and footprint tables
-      - [0x771D8, .data, ui/node_guarded_viewport]  # gNodeGuardedViewportMethods, gGridCellMethods
+      - [0x771D8, .data, ui/node_guarded_viewport]  # gNodeGuardedViewportMethods
+      - [0x772A0, .data, world/grid_cell]  # gGridCellMethods
       - [0x77360, .data, ui/title_menu]  # gTitleMenuMethods .. sDisplayBufferRects: the title menu
       - [0x775C4, .data, ui/task_objf]  # gTaskObjFMethods .. sCardIconRect: the memory card's messages
       - [0x776D0, .data, ui/input_dialogs]  # gTextEntryMethods, sTextEntryPanelRect
