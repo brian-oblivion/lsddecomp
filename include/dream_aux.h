@@ -11,7 +11,7 @@
  *
  * Defined in src/world/dream_aux.c, except IsStyleVariantEven
  * (src/world/style_layer.c). DayTask (src/world/dream_day.c) and ObjM
- * (src/world/dream_scene.c) are its clients.
+ * (src/world/objm.c) are its clients.
  *
  * Lifecycle: DayTask's ctor calls InitDreamAux, which clears every trigger
  * record's latch and loads the resident entity's ModelData

@@ -214,7 +214,7 @@ struct TimImage;
  * calls Actor's first, and no class derives from it. Every method is in
  * src/world/dream_sys.c. One instance, made by GameApplication__GameApplication
  * (src/app/game_shell.c, New_DreamSys) and kept in GameApplication::dreamSys;
- * the same object is GraphRoom::dreamSys, the `target` dream_scene.c hands
+ * the same object is GraphRoom::dreamSys, the `target` objm.c hands
  * SetDreamAuxWorld (dream_aux.c's sDreamAuxWorld), and the `peer` every
  * Entity links to. The object is 0x928 bytes (New_DreamSys); Actor's fields
  * end at +0x058 and DreamSys's own start there.
@@ -611,7 +611,7 @@ struct DreamSysMethods {
 typedef DreamSys *(*DreamSysResetRetFn)(DreamSys *self);
 
 /** attachToParent (+0x04C) as its occupant, DreamSys__SpawnAtLink, takes it:
- * (self, parent), no offset. ObjM__SetupSceneStyle (dream_scene.c) calls it
+ * (self, parent), no offset. ObjM__SetupSceneStyle (objm.c) calls it
  * through this cast. */
 typedef void (*DreamSysAttachToParentFn)(DreamSys *self, void *parent);
 

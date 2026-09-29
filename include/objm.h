@@ -8,7 +8,7 @@
  * @brief ObjM, the TimedTask that runs one scene of a dream day: its world,
  *        its style, its pause overlay and the links that end it.
  *
- * Methods in src/world/dream_scene.c, New_ObjM through GetObjMMethods.
+ * Methods in src/world/objm.c, New_ObjM through GetObjMMethods.
  */
 
 typedef struct ObjM ObjM;

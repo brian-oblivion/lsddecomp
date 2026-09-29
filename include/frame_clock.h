@@ -24,7 +24,7 @@
  * redraws on RUNNING and PAUSED but not STOPPED; DreamSys__TimerTick
  * advances the dream timer on RUNNING only; TodActor__Update ticks on
  * RUNNING and releases itself on STOPPED. `paused` is named from ObjM
- * (src/world/dream_scene.c): ObjM__AdvancePauseSetup calls +0x04C pause on
+ * (src/world/objm.c): ObjM__AdvancePauseSetup calls +0x04C pause on
  * its +0x010 FrameClock in the same step as WBgm__Pause on its WBgm (the
  * same slot, +0x04C), and ObjM__TeardownPauseOverlay calls +0x050 resume
  * beside WBgm__Resume. No caller of stop (+0x058) is known: none reaches
