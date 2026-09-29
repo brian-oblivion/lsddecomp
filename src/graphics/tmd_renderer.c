@@ -108,7 +108,7 @@ typedef struct TmdGroupHeader {
 
 /* Move a textured primitive's CLUT `rows` palette rows down (one row is
  * 1 << 6 in libgpu's getClut encoding). */
-/* MATCHING: the do/while (0); without it all six uses allocate differently */
+/* MATCHING: the do/while (0); without it all six uses compile differently */
 /* clang-format off */
 #define ADD_CLUT_ROWS(p, rows) \
     do { \
@@ -176,7 +176,8 @@ void FlagLargePolyForDivide(void *ctx, s32 count);
  * `packet` is the current TMD packet and `elem` walks beside it, parked on
  * one member; PKT names the packet as seen from `elem`, POLY the primitive.
  */
-/* MATCHING: the two cursors, goto loops, late ctx and &POLY->r0 stores are load-bearing */
+/* MATCHING: retail's shape needs the two packet cursors, a goto loop per case,
+ * ctx set only after the GsDOFF test, and the colour stores through &POLY->r0 */
 void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     PolyDrawCtx *ctx;
     u8 *prim;
@@ -219,8 +220,9 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
         gte_SetRotMatrix(&ctx->savedRotMatrix);
     }
 
-    /* MATCHING: four struct reads of attribute, hoisted by the scheduler
-     * above the global stores; unk8 is stored after them as a field. */
+    /* MATCHING: obj->attribute read afresh for each global, not once into a
+     * local; retail makes all four reads before the first store, and stores
+     * unk8 after them. */
     sSortNdiv = (obj->attribute >> ATTR_DIV_SHIFT) & 0x7;
     sSortLightOff = (obj->attribute >> ATTR_LOFF_SHIFT) & 0x1;
     sSortUseGlobalLightMode = (obj->attribute >> ATTR_LLMOD_SHIFT) & 0x1;
@@ -661,7 +663,8 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
  * shading off) bit from sSortLightOff, the object's GsLOFF bit.
  * TransformAndCullPoly re-stamps the cached length onto every primitive.
  */
-/* MATCHING: two separate statements; one shared local does not match */
+/* MATCHING: the length and code read back from the primitive separately;
+ * one shared local compiles differently */
 void SetupPrimCode(void *prim, PolyDrawCtx *ctx) {
     setSemiTrans(prim, ctx->semiTrans);
     setShadeTex(prim, sSortLightOff);
@@ -685,8 +688,9 @@ void SetupPrimCode(void *prim, PolyDrawCtx *ctx) {
  * `prim` is only ever handed straight through, so it stays void * here.
  */
 s32 ProjectTriFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, void (*storeSxy)(void *)) {
-    /* MATCHING: the slots go through a plain pointer; as ctx->faceVtx[i]
-     * struct stores the scheduler interleaves them with the loads. */
+    /* MATCHING: the slots are written through a plain pointer; written as
+     * ctx->faceVtx[i], the stores come out mixed in among the vertex
+     * address computations. */
     SVECTOR **vtx = ctx->faceVtx;
 
     vtx[0] = &ctx->vertices[idx0];
@@ -905,7 +909,8 @@ void StoreSxyPolyGT4(POLY_GT4 *prim, s32 storeFirst3) {
  * (FillRVectors3/4): colour per vertex for Gouraud, UV per vertex and the
  * CLUT/TPAGE pair for textured.
  */
-/* MATCHING: the divide arm comes first and returns; with the addPrim arm first the blocks swap */
+/* MATCHING: the divide arm comes first and returns; with the addPrim arm first
+ * the two paths come out in the other order */
 void *SubmitPolyF3(POLY_F3 *prim, PolyDrawCtx *ctx) {
     if (ctx->divide != 0) {
         FillDivPolygonHeader(sDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
@@ -1100,8 +1105,8 @@ void FlagLargePolyForDivide(void *ctxIn, s32 count) {
      * constant into the index before adding ctx, and retail adds ctx first. */
     end = (short *)((u8 *)ctx + count * sizeof(DVECTOR) + (offsetof(PolyDrawCtx, sxy) - sizeof(DVECTOR)));
 
-    /* MATCHING: a guarded do/while with yp set inside the guard. Setting yp
-     * before the test moves the frame setup out of the branch delay slot. */
+    /* MATCHING: a guarded do/while with yp set inside the guard; setting yp
+     * before the test orders the set-up differently around the branch. */
     if (xp < end) {
         yp = &ctx->sxy[1].vy;
         do {
@@ -1151,7 +1156,7 @@ void FillDivPolygonHeader(void *divpIn, PolyDrawCtx *ctx, CVECTOR *rgbc, s32 tex
     s32 piv;
 
     /* MATCHING: one store of a temp after the if/else, and the clip area read
-     * after it; a ternary or a store per arm costs a word. */
+     * after it; a ternary or a store per arm is a word longer. */
     if (sNdivOverrideSet) {
         ndiv = sNdivOverride;
     } else {
