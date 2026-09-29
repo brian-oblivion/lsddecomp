@@ -17,7 +17,7 @@ struct VabStreamObj;
 struct TextRow;
 
 /** TextEntry's class id (gTextEntryMethods word +0x000). Two nibbles, so
- * `(u8)header == TEXTENTRY_CLASS_ID` is its is-kind-of test (TaskObjF's
+ * `(header & CLASS_ID_LEVEL2_MASK) == TEXTENTRY_CLASS_ID` is its is-kind-of test (TaskObjF's
  * addChild/removeChild/onNotify). */
 #define TEXTENTRY_CLASS_ID 0x10
 

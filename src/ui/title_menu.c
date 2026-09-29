@@ -182,7 +182,7 @@ void GridCell__Reset(void) {}
  * byte of the sender's class id); Actor__DispatchLinkCommand makes the same
  * test for a GridCell sender. */
 void GridCell__DispatchLinkCommand(GridCell *self, BasicClass *sender, s32 event) {
-    if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
+    if ((sender->methods->header & CLASS_ID_LEVEL2_MASK) == ACTOR_CLASS_ID) {
         self->methods->onActorLinkCommand(self, sender, event);
     }
 }
@@ -627,11 +627,11 @@ void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
         self->tickSource = child;
         return;
     }
-    if ((u8)classId == TEXTENTRY_CLASS_ID) {
+    if ((classId & CLASS_ID_LEVEL2_MASK) == TEXTENTRY_CLASS_ID) {
         self->textEntry = (struct TextEntry *)child;
         return;
     }
-    if ((u8)classId == ITEMLIST_CLASS_ID) {
+    if ((classId & CLASS_ID_LEVEL2_MASK) == ITEMLIST_CLASS_ID) {
         self->itemList = (struct ItemList *)child;
     }
 }
@@ -647,9 +647,9 @@ void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child) {
         self->inputSource = NULL;
     } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->tickSource = NULL;
-    } else if ((u8)classId == TEXTENTRY_CLASS_ID) {
+    } else if ((classId & CLASS_ID_LEVEL2_MASK) == TEXTENTRY_CLASS_ID) {
         self->textEntry = NULL;
-    } else if ((u8)classId == ITEMLIST_CLASS_ID) {
+    } else if ((classId & CLASS_ID_LEVEL2_MASK) == ITEMLIST_CLASS_ID) {
         self->itemList = NULL;
     }
     GetBasicClassMethods()->removeChild((BasicClass *)self, child);
@@ -1272,7 +1272,7 @@ void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
     } else if (kind == FRAMECLOCK_CLASS_ID) {
         methods->tickStateDelay(self, sender, event);
     } else {
-        kind = (u8)tag;
+        kind = tag & CLASS_ID_LEVEL2_MASK;
         if (kind == TEXTENTRY_CLASS_ID) {
             methods->onTextEntryResult(self, sender, event);
         } else if (kind == ITEMLIST_CLASS_ID) {

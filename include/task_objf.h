@@ -150,7 +150,7 @@ struct TaskObjF {
 };
 
 /** TaskObjF's class id (gTaskObjFMethods word +0x000). A single nibble, so
- * `(header & 0xF) == TASKOBJF_CLASS_ID` is its is-kind-of test
+ * `(header & CLASS_ID_ROOT_MASK) == TASKOBJF_CLASS_ID` is its is-kind-of test
  * (TitleMenu__OnNotify). */
 #define TASKOBJF_CLASS_ID 0xB
 

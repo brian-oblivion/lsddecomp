@@ -42,7 +42,7 @@ enum FrameClockEvent {
 };
 
 /** FrameClock's class id (gFrameClockMethods word +0x000). A single nibble,
- * so `(header & 0xF) == FRAMECLOCK_CLASS_ID` is its is-kind-of test (the
+ * so `(header & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID` is its is-kind-of test (the
  * listeners above; TextEntry's addChild/removeChild/onNotify). */
 #define FRAMECLOCK_CLASS_ID 0x5
 

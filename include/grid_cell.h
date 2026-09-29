@@ -15,7 +15,7 @@ typedef struct GridCell GridCell;
 typedef struct GridCellMethods GridCellMethods;
 
 /** GridCell's class id (gGridCellMethods word +0x000). Two nibbles, so
- * `(u8)header == GRIDCELL_CLASS_ID` is its is-kind-of test
+ * `(header & CLASS_ID_LEVEL2_MASK) == GRIDCELL_CLASS_ID` is its is-kind-of test
  * (Actor__DispatchLinkCommand). */
 #define GRIDCELL_CLASS_ID 0x24
 
