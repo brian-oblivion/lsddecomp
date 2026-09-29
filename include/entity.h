@@ -87,22 +87,29 @@ struct EntityMethods {
  * row's handler as the callback, and reset selects tick callback 'B'
  * (Entity__TickSoundCue, +0x11C), which services the set once per tick.
  *
- * The MoodCue handlers. Each Entity__MoodCueNN is the `handler` of
- * gEntityMoodHandlerTable's row NN; they are not in the method table. A
- * handler is a SoundCueSet callback (include/sound_cue_set.h):
+ * The MoodCue handlers. Each row's `handler` (gEntityMoodHandlerTable) is
+ * one `Entity__Cue<Behaviour>` function, named for the small script it runs
+ * (Entity__CueHoverOverDreamerOnBlueElseRise, Entity__CueTone23Once); a
+ * comment on each in src/world/entity.c names its row. They are not in the
+ * method table. A handler is a SoundCueSet callback (include/sound_cue_set.h):
  * ServiceSoundCueSet calls it once per tick as (owner, set) with this Entity
  * as the owner. It requests tones by filling the set's slots (a VAB program
  * of the cue's sound object, or SOUND_CUE_STOP); moves, turns and scales the
  * entity (or the player, its `peer`) on moodTimer (the ticks since
  * startSoundCue), on the cue set's own `tick`, or on todFrame (the frame of
  * its TOD animation); and sends the dream an EntityEffect through
- * notifyParents. Some rows share a handler, which is named for its lowest
- * row; some rows have none. Which dream object owns each row is not
- * established.
+ * notifyParents. Some rows share a handler, and some have none; a handler
+ * whose body repeats another's keeps a Row suffix
+ * (Entity__CueSixfoldSizeRow117, Entity__CueWalkWithTurnsMaybeGiantRow113).
+ * In the names the dreamer is the player (`peer`); Walk, Run and Creep are
+ * moves along local -z, Rise along -y; Link, Video and EndDream are the
+ * EntityEffect sent; `Tone<N>` is VAB program N. Which dream object owns each
+ * row is not established.
  *
  * Inherited slot types Entity's callers depend on: moveLocalZ (+0x0C4) and
  * moveLocalY (+0x0CC) return void; applyTodFrame (+0x134) returns the next
- * frame, which Entity__MoodCue91/92 thread through it; attachToParent
+ * frame, which Entity__CueFadeSkipTodThenLink and
+ * Entity__CueAwaitReachThenLinkAfterTod thread through it; attachToParent
  * (+0x04C) keeps SceneNode's type, so callers of Entity's occupant cast to
  * TodActorAttachToParentFn (include/tod_actor.h); playTod (+0x12C) returns a
  * flag Entity's callers do not read, and they call it through
@@ -175,7 +182,7 @@ struct EntityMoodRow {
     s8 nearTolerance; /**< +0x09: Entity__IsNearTarget's tolerance for every range test on this row (activation, deactivation, proximity, cue start/stop) */
     s8 proximityThreshold; /**< +0x0A: Entity__GetProximityRatio's range, in ENTITY_RANGE_UNITs */
     s8 cueRange; /**< +0x0B: 0: the cue starts at attach (when the entity activated there) and never on range; else its magnitude is the distance within which the cue starts (Entity__UpdateSoundCueStart), and a NEGATIVE value also stops it once the target leaves that range (Entity__UpdateSoundCueStop) */
-    SoundCueCallbackFn handler; /**< +0x0C: the Entity__MoodCueNN Entity__StartSoundCue installs (gEntityMoodHandlerTable) */
+    SoundCueCallbackFn handler; /**< +0x0C: the `Entity__Cue<Behaviour>` handler Entity__StartSoundCue installs (gEntityMoodHandlerTable) */
 };
 
 /** activateKind: when Entity__UpdateActivationState activates an inactive
@@ -488,7 +495,7 @@ s32 Entity__IsTargetInRange(Entity *self, s32 range);
 s32 Entity__UpdateSoundCueStop(Entity *self);
 
 /**
- * @brief Row 51's handler, run by row 113's too (Entity__MoodCue113): at
+ * @brief Row 51's handler, run by row 113's too (Entity__CueWalkWithTurnsMaybeGiantRow113): at
  *        moodTimer 0 in state 0, one time in five, scales to sScaleSix,
  *        moves 800 in local y and enters state 11; plays program 8 every
  *        fifth tick; turns by -90, +90 and (at random) 180 degrees at
@@ -500,7 +507,7 @@ void Entity__CueWalkWithTurnsMaybeGiant(Entity *self, SoundCueSet *out);
 
 /**
  * @brief Row 71's handler, run by row 108's before it scales the entity
- *        (Entity__MoodCue108): on the cue's first tick plays program 0 and
+ *        (Entity__CueWalkInRandomLaneGiant): on the cue's first tick plays program 0 and
  *        moves 0, 51200 or 102400 in local x at random; faces the player
  *        after moodTimer 2400; moves -30 a tick in local z.
  * @param self The entity.
@@ -509,7 +516,7 @@ void Entity__CueWalkWithTurnsMaybeGiant(Entity *self, SoundCueSet *out);
 void Entity__CueWalkInRandomLane(Entity *self, SoundCueSet *out);
 
 /**
- * @brief A shared handler body (Entity__CueRunOffOrStopAndJitterDepth, Entity__MoodCue111):
+ * @brief A shared handler body (Entity__CueRunOffOrStopAndJitterDepth, Entity__CueWanderPauseOnPink):
  *        plays program 4 on three voices on tick 6, turns 1 degree a tick in
  *        three moodTimer windows from windowStart (+0..91, +341..433,
  *        +698..791), moves zStep a tick, and at deactivateTimer deactivates
