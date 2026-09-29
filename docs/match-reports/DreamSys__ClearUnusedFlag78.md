@@ -1,4 +1,6 @@
-# DreamSys__func_59598
+# DreamSys__ClearUnusedFlag78
+
+> Renamed from `DreamSys__func_59598` on 2026-09-29 (tools/rename.py). Address 0x80059598.
 
 > Renamed from `func_80059598` on 2026-09-22 (tools/rename.py). Address 0x80059598.
 
@@ -11,7 +13,7 @@ Setter clearing `unk_0x78`.
 ## The C
 
 ```c
-void DreamSys__func_59598(DreamSys *this)
+void DreamSys__ClearUnusedFlag78(DreamSys *this)
 {
 	this->unk_0x78 = 0;
 }
@@ -36,7 +38,7 @@ see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
 
 ## Naming
 
-`DreamSys__func_59598` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
+`DreamSys__ClearUnusedFlag78` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
 
 Renamed from `func_80059598`.
 

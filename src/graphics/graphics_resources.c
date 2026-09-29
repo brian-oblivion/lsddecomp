@@ -1355,7 +1355,7 @@ void MoviePlayer__RequestStart(MoviePlayer *self) {
 }
 
 /* rewind (+0x044): when active, reset the frame state and restart the stream
- * (its slot7C, handed RequestRestart, is empty). */
+ * (its setEndCallback, handed RequestRestart, is empty). */
 void MoviePlayer__Rewind(MoviePlayer *self) {
     MoviePlayer *cur = sActiveMoviePlayer;
 
@@ -1365,7 +1365,7 @@ void MoviePlayer__Rewind(MoviePlayer *self) {
         cur->frameDone = 1;
         cur->streamEnded = 0;
         cur->finished = 0;
-        cur->stream->methods->slot7C(cur->stream, MoviePlayer__RequestRestart, cur);
+        cur->stream->methods->setEndCallback(cur->stream, MoviePlayer__RequestRestart, cur);
         cur->started = 0;
         cur->stream->methods->restart(cur->stream);
     }
@@ -1412,7 +1412,7 @@ void MoviePlayer__Abort(MoviePlayer *self) {
         cur->stream->methods->close(cur->stream);
         cur->finished = 1;
         if (cur->started == 0) {
-            cur->stream->methods->slot7C(cur->stream, 0, 0);
+            cur->stream->methods->setEndCallback(cur->stream, 0, 0);
             cur->started = 1;
             cur->finished = 1;
         }

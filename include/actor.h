@@ -61,7 +61,7 @@ enum ActorMoveEvent {
     /* +0x0DC */ void (*onActorLinkCommand)(Self *self, void *sender, s32 event);      /* @see Actor__OnActorLinkCommand */ \
     /* +0x0E0 */ void (*onGridCellLinkCommand)(Self *self, void *sender, s32 event); /* @see Actor__OnGridCellLinkCommand */ \
     /* +0x0E4 */ void (*setLastOffsetValue)(Self *self, s16 val);           /* @see Actor__SetLastOffsetValue */ \
-    /* +0x0E8 */ void (*slotE8)(Self *self);                                /* @see Actor__NoOpSlotE8; NotifyMove calls it on an Actor linkTarget */ \
+    /* +0x0E8 */ void (*onLinkUpdate)(Self *self);                                /* @see Actor__OnLinkUpdate; NotifyMove calls it on an Actor linkTarget */ \
     /* +0x0EC */ void (*setPendingExtra)(Self *self, s32 extra)             /* @see Actor__SetPendingExtra */
 /* clang-format on */
 
@@ -192,7 +192,7 @@ void Actor__Reset(Actor *self);
  * hull is first swept: one face pushed out by the last move's distance plus
  * `pendingExtra`, an x face for ACTOR_EVENT_MOVED_X, a z face otherwise; the
  * max face after a forward move, the min face after a backward one. An Actor
- * linkTarget then gets slotE8.
+ * linkTarget then gets onLinkUpdate.
  * @param self  The Actor.
  * @param event The event code (enum ActorMoveEvent, or any other).
  */
@@ -350,7 +350,7 @@ void Actor__OnGridCellLinkCommand(Actor *self, void *sender, s32 event);
 void Actor__SetLastOffsetValue(Actor *self, s16 val);
 
 /** @brief Slot +0x0E8: does nothing; NotifyMove calls it on an Actor linkTarget. */
-void Actor__NoOpSlotE8(void);
+void Actor__OnLinkUpdate(void);
 
 /**
  * @brief setPendingExtra (slot +0x0EC): sets the distance NotifyMove adds to

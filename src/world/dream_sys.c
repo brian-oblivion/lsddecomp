@@ -239,7 +239,7 @@ void DreamSys__ResetSessionState(DreamSys *self) {
     self->staircaseActive = 0;
     self->staircaseMoveGate = 0;
     self->staircaseTickFn = 0;
-    self->unk78 = 0;
+    self->unusedFlag78 = 0;
     self->configOption = 0;
 }
 
@@ -413,10 +413,10 @@ void DreamSys__WallLink(DreamSys *self, void *sender, int event) {
         self->methods->dynamicLink(self);
     }
     self->methods->restoreLinkSnapshot(self);
-    self->methods->slotE8(self);
+    self->methods->onLinkUpdate(self);
 }
 
-void DreamSys__NoOpSlotE8Default(void) {}
+void DreamSys__OnLinkUpdate(void) {}
 
 s32 DreamSys__GetSetFlashbackSession(DreamSys *self, DreamColors *out, s32 value) {
     s32 old;
@@ -467,7 +467,7 @@ void DreamSys__ResetLinkState(DreamSys *self, s32 moveMode, s32 tickPeriod) {
     self->staircaseActive = 0;
     self->staircaseMoveGate = 0;
     self->staircaseTickFn = 0;
-    self->unk78 = 0;
+    self->unusedFlag78 = 0;
     SceneNode__GetRotationDegrees((SceneNode *)self, rotation);
 
     rotation[2].num = 0;
@@ -573,15 +573,15 @@ s32 InterpolateYAtZ(LongVec3 *from, LongVec3 *to, s32 at) {
     return (dv * scaledAt) / dt + from->y;
 }
 
-void DreamSys__func_59590(DreamSys *self) {
-    self->unk7C = 0;
+void DreamSys__ClearUnusedFlag7C(DreamSys *self) {
+    self->unusedFlag7C = 0;
 }
 
-void DreamSys__func_59598(DreamSys *self) {
-    self->unk78 = 0;
+void DreamSys__ClearUnusedFlag78(DreamSys *self) {
+    self->unusedFlag78 = 0;
 }
 
-s32 DreamSys__NoOpSlot12C(DreamSys *self) {
+s32 DreamSys__BeforeMoveCommand(DreamSys *self) {
     return 0;
 }
 
@@ -847,7 +847,7 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *self, s32 command) {
 
     if (command != 0) {
         delta = sMoveCommandSigns[command] * sMoveModeSpeeds[self->moveMode];
-        self->methods->slot12C(self);
+        self->methods->beforeMoveCommand(self);
         pos = (PlayerSpawnPoint *)self->grid->methods->getTargetDescriptor(self->grid, 0, 0);
         if (!self->methods->tryStaircaseLink(self, pos) &&
             !self->methods->tryInstantTeleportLink(self, pos) &&

@@ -1,4 +1,6 @@
-# DreamSys__func_59590
+# DreamSys__ClearUnusedFlag7C
+
+> Renamed from `DreamSys__func_59590` on 2026-09-29 (tools/rename.py). Address 0x80059590.
 
 > Renamed from `func_80059590` on 2026-09-22 (tools/rename.py). Address 0x80059590.
 
@@ -11,7 +13,7 @@ Setter clearing `unk_0x7C`.
 ## The C
 
 ```c
-void DreamSys__func_59590(DreamSys *this)
+void DreamSys__ClearUnusedFlag7C(DreamSys *this)
 {
 	this->unk_0x7C = 0;
 }
@@ -36,7 +38,7 @@ see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
 
 ## Naming
 
-`DreamSys__func_59590` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
+`DreamSys__ClearUnusedFlag7C` -- tier C (round 66, runner alpha, FINISHING-PLAN track 3).
 
 Renamed from `func_80059590`.
 

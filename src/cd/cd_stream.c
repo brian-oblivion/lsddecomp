@@ -309,7 +309,7 @@ int CdStream__Sync(CdStream *self, int mode) {
 }
 
 /* MATCHING: cd_stream.h's slot keeps its callers' (self, fn, arg); a narrower slot drops their argument loads */
-void CdStream__NoOpSlot7C(CdStream *self) {}
+void CdStream__SetEndCallback(CdStream *self) {}
 
 CdStreamMethods *GetCdStreamMethods(void) {
     return &gCdStreamMethods;

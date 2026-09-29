@@ -2622,7 +2622,7 @@ void Actor__Reset(Actor *self) {
  * pendingExtra, an x face for ACTOR_EVENT_MOVED_X (RotateAndOffsetHullList
  * turns the box a quarter first), a z face otherwise; the max face after a
  * forward move, the min face after a backward one. An Actor linkTarget then
- * gets slotE8, which every Actor class leaves empty. */
+ * gets onLinkUpdate, which every Actor class leaves empty. */
 void Actor__NotifyMove(Actor *self, s32 event) {
     GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, event);
     /* MATCHING: two nested ifs; `&&` folds into one unsigned compare */
@@ -2652,7 +2652,7 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                 self->methods->transformAndNotifyParents(self, &hull, event);
                 if (self->linkTarget != NULL) {
                     if ((u8)self->linkTarget->methods->header == ACTOR_CLASS_ID) {
-                        ((Actor *)self->linkTarget)->methods->slotE8((Actor *)self->linkTarget);
+                        ((Actor *)self->linkTarget)->methods->onLinkUpdate((Actor *)self->linkTarget);
                     }
                 }
             }
@@ -2988,7 +2988,7 @@ void Actor__SetLastOffsetValue(Actor *self, s16 val) {
     self->lastOffsetValue = val;
 }
 
-void Actor__NoOpSlotE8(void) {}
+void Actor__OnLinkUpdate(void) {}
 
 void Actor__SetPendingExtra(Actor *self, s32 extra) {
     self->pendingExtra = extra;

@@ -30,7 +30,7 @@ the purpose (nothing happens). Named after the established project
 convention for exactly this shape -- compare `TextRow__NoOpSlotD0`
 (`src/ui/screen_widgets.c`) and `NoOpIgnoreArgs` (`src/world/dream_scene.c`), both
 `Class__NoOpSlotOFFSET`/`NoOpXxx` for an empty vtable-slot implementation
-of otherwise-unknown purpose. `Actor__NoOpSlotE8` (this unit, below)
+of otherwise-unknown purpose. `Actor__OnLinkUpdate` (this unit, below)
 is the sibling case: a DIFFERENT slot with the SAME shape.
 
 ## Verify

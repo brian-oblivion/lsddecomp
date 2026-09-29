@@ -167,7 +167,7 @@ void MoviePlayer__Rewind(MoviePlayer *self);
 
 /**
  * @brief Asks advance for a restart (pendingStart = -1). Rewind hands it to
- *        the stream's slot7C, whose occupant does nothing with it.
+ *        the stream's setEndCallback, whose occupant does nothing with it.
  * @param self The player.
  */
 void MoviePlayer__RequestRestart(MoviePlayer *self);

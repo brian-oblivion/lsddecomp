@@ -1,4 +1,6 @@
-# DreamSys__NoOpSlot12C
+# DreamSys__BeforeMoveCommand
+
+> Renamed from `DreamSys__NoOpSlot12C` on 2026-09-29 (tools/rename.py). Address 0x800595a0.
 
 > Renamed from `func_800595A0` on 2026-09-22 (tools/rename.py). Address 0x800595a0.
 
@@ -11,7 +13,7 @@ Returns 0 unconditionally, ignoring the object. A stub slot that later subclasse
 ## The C
 
 ```c
-s32 DreamSys__NoOpSlot12C(DreamSys *this)
+s32 DreamSys__BeforeMoveCommand(DreamSys *this)
 {
 	return 0;
 }
@@ -36,13 +38,13 @@ see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
 
 ## Naming
 
-`DreamSys__NoOpSlot12C` -- tier A (round 66, runner alpha, FINISHING-PLAN track 3).
+`DreamSys__BeforeMoveCommand` -- tier A (round 66, runner alpha, FINISHING-PLAN track 3).
 
 Renamed from `func_800595A0`.
 
 `return 0;` and nothing else. The unit already names its empty
 slots this way (`DreamSys__NoOpSlot14C`, `DreamSys__NoOpSlot150`,
-`Actor__NoOpSlotD8`, `DreamSys__NoOpSlotE8Default`); the offset +0x12C is
+`Actor__NoOpSlotD8`, `DreamSys__OnLinkUpdate`); the offset +0x12C is
 `tools/classtable.py gDreamSysMethods`. Its one caller,
 `DreamSys__ApplyMoveCommand`, discards the result, so this is an override hook that
 DreamSys itself declines. Tier A: evident from the body alone, and the name asserts

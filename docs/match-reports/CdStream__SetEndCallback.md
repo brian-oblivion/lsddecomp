@@ -1,4 +1,6 @@
-# CdStream__NoOpSlot7C -- MATCHED (exact length, 2/2 words), round 81
+# CdStream__SetEndCallback -- MATCHED (exact length, 2/2 words), round 81
+
+> Renamed from `CdStream__NoOpSlot7C` on 2026-09-29 (tools/rename.py). Address 0x800478f8.
 
 > Renamed from `CdStreamObj__func_800478F8` on 2026-09-26 (tools/rename.py). Address 0x800478f8.
 
@@ -20,7 +22,7 @@ Tier C. Kept the tier-C `Class__func_xxxxx` form: slot +0x07C, the table's last 
 ## Source
 
 ```c
-void CdStream__NoOpSlot7C(CdStreamObj *self) {
+void CdStream__SetEndCallback(CdStreamObj *self) {
 }
 ```
 

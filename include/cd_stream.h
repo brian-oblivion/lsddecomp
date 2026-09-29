@@ -46,8 +46,8 @@ struct CdStreamMethods {
     /* +0x070 */ u32 (*freeRing)(CdStream *self, u32 *base); /**< @see CdStream__FreeRing */
     /* +0x074 */ void (*unsetRing)(CdStream *self);          /**< @see CdStream__UnsetRing */
     /* +0x078 */ void (*clearRing)(CdStream *self);          /**< @see CdStream__ClearRing */
-    /* +0x07C */ void (*slot7C)(CdStream *self, void (*fn)(),
-                                void *arg); /**< @see CdStream__NoOpSlot7C; `fn` and `arg` are what MoviePlayer__Rewind and MoviePlayer__Abort pass, and the empty occupant ignores them. */
+    /* +0x07C */ void (*setEndCallback)(CdStream *self, void (*fn)(),
+                                        void *arg); /**< @see CdStream__SetEndCallback; `fn` and `arg` are what MoviePlayer__Rewind and MoviePlayer__Abort pass, and the empty occupant ignores them. */
 }; /* 31 slots, 0x80 bytes */
 
 /**
@@ -254,7 +254,7 @@ void CdStream__ClearRing(CdStream *self);
  * @brief Slot +0x07C: empty.
  * @param self The stream.
  */
-void CdStream__NoOpSlot7C(CdStream *self);
+void CdStream__SetEndCallback(CdStream *self);
 
 /* ---- Helpers, not slots. */
 

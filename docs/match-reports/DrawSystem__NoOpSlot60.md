@@ -65,7 +65,7 @@ Renamed `DrawSystem__func_80020A1C` -> `DrawSystem__NoOpSlot60`
 (tools/rename.py), tier A by the naming rules' leaf clause: the body is
 `return 0;` and nothing else, so its mechanics are all there is to name. The
 form is the project's existing one for a constant-return empty slot
-(`DreamSys__NoOpSlot12C`, also `s32` returning 0) and for the empty +0x060
+(`DreamSys__BeforeMoveCommand`, also `s32` returning 0) and for the empty +0x060
 overrides of the other tables (`CdStream__NoOpSlot60`). The section above
 saying the placeholder was kept predates this rename. The slot keeps the
 name `slot60`, the house form for an empty slot (`dream_sys.h`,

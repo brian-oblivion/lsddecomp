@@ -290,8 +290,8 @@ struct DreamSys {
     /** Set by the pad (the circle button) and cleared each tick by
      * UpdateTickState and by ResetLinkState; GetLinkCommandFlag reads it. */
     s32 linkCommandFlag;
-    s32 unk78; /**< cleared by DreamSys__func_59598 (slot128), ResetSessionState and ResetLinkState; never read */
-    s32 unk7C; /**< cleared by DreamSys__func_59590 (slot124); nothing else touches it */
+    s32 unusedFlag78; /**< cleared by DreamSys__ClearUnusedFlag78 (clearUnusedFlag78), ResetSessionState and ResetLinkState; never read */
+    s32 unusedFlag7C; /**< cleared by DreamSys__ClearUnusedFlag7C (clearUnusedFlag7C); nothing else touches it */
     /** The look callback RunTickCallbacks calls each tick, or NULL:
      * SelectLookCallback installs it by lookCallbackMode. */
     void (*lookCallback)(struct DreamSys *self);
@@ -501,7 +501,7 @@ typedef enum DreamColors {
  * +0x098 update (DreamSys__TimerTick), +0x09C dispatchLinkCommand
  * (DreamSys__DispatchChunkChange), +0x0DC onActorLinkCommand
  * (DreamSys__DispatchInstanceEffect), +0x0E0 onGridCellLinkCommand
- * (DreamSys__WallLink) and +0x0E8 slotE8 (DreamSys__NoOpSlotE8Default).
+ * (DreamSys__WallLink) and +0x0E8 onLinkUpdate (DreamSys__OnLinkUpdate).
  *
  * Two inherited slots are called with a type other than their own, each
  * through a function-pointer cast: reset (+0x040), whose result the ctor
@@ -529,9 +529,9 @@ struct DreamSysMethods {
     /* +0x11C */ void (*runTickCallbacks)(DreamSys *self); /**< @see DreamSys__RunTickCallbacks */
     /* +0x120 */ s32 (*projectPointAtDistance)(DreamSys *self, s32 *out, s32 dist, s32 *reference,
                                                s32 tolerance); /**< @see DreamSys__ProjectPointAtDistance */
-    /* +0x124 */ void (*slot124)(DreamSys *self); /**< @see DreamSys__func_59590 (never called) */
-    /* +0x128 */ void (*slot128)(DreamSys *self); /**< @see DreamSys__func_59598 (never called) */
-    /* +0x12C */ s32 (*slot12C)(DreamSys *self);  /**< @see DreamSys__NoOpSlot12C */
+    /* +0x124 */ void (*clearUnusedFlag7C)(DreamSys *self); /**< @see DreamSys__ClearUnusedFlag7C (never called) */
+    /* +0x128 */ void (*clearUnusedFlag78)(DreamSys *self); /**< @see DreamSys__ClearUnusedFlag78 (never called) */
+    /* +0x12C */ s32 (*beforeMoveCommand)(DreamSys *self); /**< @see DreamSys__BeforeMoveCommand */
     /* +0x130 */ void (*clearTickCallbacks)(DreamSys *self, bool clearLook); /**< @see DreamSys__ClearTickCallbacks */
     /* +0x134 */ void (*setTickCallbacks)(DreamSys *self, s32 moveMode,
                                           s32 lookMode); /**< @see DreamSys__SetTickCallbacks */
@@ -743,7 +743,7 @@ extern s32 GetTeleportTimeBonus(void);
  *        cell reports SCENENODE_EVENT_LINKED with no link pending, records
  *        the cell as linkCoordinates and tries a static wall link, else (on
  *        a tickBoundary tick) a dynamic link. The step is then undone
- *        (restoreLinkSnapshot) and slotE8 runs.
+ *        (restoreLinkSnapshot) and onLinkUpdate runs.
  * @param self   The DreamSys.
  * @param sender The grid cell.
  * @param event  The cell's event.
@@ -1157,8 +1157,8 @@ void DreamSys__DispatchChunkChange(DreamSys *self, void *sender, s32 event);
  */
 void DreamSys__DispatchInstanceEffect(DreamSys *self, void *sender, s32 effect);
 
-/** @brief Slot +0x0E8, slotE8: does nothing. */
-void DreamSys__NoOpSlotE8Default(void);
+/** @brief Slot +0x0E8, onLinkUpdate: does nothing. */
+void DreamSys__OnLinkUpdate(void);
 
 /**
  * @brief Slot +0x0F0: reads the flashback-session flag, and either sets it
@@ -1247,16 +1247,16 @@ void DreamSys__RunTickCallbacks(DreamSys *self);
 s32 DreamSys__ProjectPointAtDistance(DreamSys *self, s32 *out, s32 dist, s32 *reference, s32 tolerance);
 
 /**
- * @brief Slot +0x124 (never called): clears unk7C.
+ * @brief Slot +0x124 (never called): clears unusedFlag7C.
  * @param self The DreamSys.
  */
-void DreamSys__func_59590(DreamSys *self);
+void DreamSys__ClearUnusedFlag7C(DreamSys *self);
 
 /**
- * @brief Slot +0x128 (never called): clears unk78.
+ * @brief Slot +0x128 (never called): clears unusedFlag78.
  * @param self The DreamSys.
  */
-void DreamSys__func_59598(DreamSys *self);
+void DreamSys__ClearUnusedFlag78(DreamSys *self);
 
 /**
  * @brief Slot +0x12C: does nothing; ApplyMoveCommand calls it before each
@@ -1264,7 +1264,7 @@ void DreamSys__func_59598(DreamSys *self);
  * @param self The DreamSys (unused).
  * @return 0.
  */
-s32 DreamSys__NoOpSlot12C(DreamSys *self);
+s32 DreamSys__BeforeMoveCommand(DreamSys *self);
 
 /**
  * @brief Slot +0x130: removes the move callback and, optionally, the look
