@@ -36,11 +36,17 @@ executable matches retail byte for byte. Sony's library code is linked from
 Sony's own objects (below) rather than decompiled. Every game header is
 documented, and every class has one definition.
 
+What's left is making the code read like the game's own source rather than a
+decompilation: data tables written as C, comments in game terms, code shaped
+by the compiler rewritten, one class per file. That's
+[`docs/CLEANUP.md`](docs/CLEANUP.md).
+
 To measure it yourself:
 
 ```sh
 python3 tools/progress.py      # matched functions and bytes, per file
 python3 tools/readability.py   # remaining readability debt: magic numbers, raw offsets, unk fields
+python3 tools/plan.py          # the cleanup tracks and the ready jobs
 ```
 
 ## Building it
