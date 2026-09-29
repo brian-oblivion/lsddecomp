@@ -8,8 +8,7 @@
  * @brief GraphRoom, the TaskCore that shows the mood graph: up to 100 days
  *        of the dreamer's mood plotted as dots over ETC\\HGRAPH.TIM.
  *
- * Methods in src/world/dream_scene.c, New_GraphRoom through
- * GetGraphRoomMethods.
+ * Methods in src/world/graph_room.c.
  */
 
 typedef struct GraphRoom GraphRoom;
