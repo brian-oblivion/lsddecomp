@@ -2,6 +2,8 @@
 #define TASK_CORE_H
 
 #include "intermediate_base.h"
+#include "draw_system.h"
+#include "screen_sprite.h"
 
 /**
  * @file task_core.h
@@ -20,7 +22,7 @@ typedef struct TaskCoreMethods TaskCoreMethods;
 #define TASKCORE_CLASS_ID 0x130
 
 typedef struct TaskCoreTarget TaskCoreTarget;
-typedef struct TaskCoreItemList TaskCoreItemList; /* defined in src/app/task.c, its one reader */
+typedef struct TaskCoreItemList TaskCoreItemList;
 
 /** TaskCore's states, above IntermediateBase's START/STOP. setState passes
  * each to the parents (notifyParents) before acting on it, so the codes from
@@ -88,6 +90,19 @@ struct TaskCoreTarget {
     /* +0x01C */ char **names;       /**< NULL-terminated; one New_TextRow widget per name */
     /* +0x020 */ struct ScreenSpritePos *slotPositions; /**< per slot: updateSlotElements' position for its widget */
     /* +0x024 */ TaskCoreItemList **slotLists; /**< per slot: NULL, or the item list the slot opens */
+};
+
+/** The item list a slot opens: TaskCoreTarget::slotLists[slot], NULL for a
+ * slot without one (TitleMenu's SHAKE Off/On list is data in title_menu.c).
+ * createSlotElements makes one TextRow per itemNames entry and starts the
+ * slot's cursor at savedCursor; the scroll methods read the rest. */
+struct TaskCoreItemList {
+    /* +0x000 */ u8 pad000[4];
+    /* +0x004 */ s32 savedCursor; /**< the committed item cursor: the list opens at it, commit stores it, cancel returns to it */
+    /* +0x008 */ ColorRgb cursorColor; /**< the colour of the item under the cursor while scrolling */
+    /* +0x00B */ u8 pad00B[5];
+    /* +0x010 */ ScreenSpritePos pos; /**< where the cursor's row is drawn; the list starts savedCursor rows above. CommitElementScroll copies it whole */
+    /* +0x018 */ char **itemNames;    /**< NULL-terminated; one New_TextRow per name */
 };
 
 /** TaskCore's slots, IntermediateBase's first. +0x074..+0x084 are

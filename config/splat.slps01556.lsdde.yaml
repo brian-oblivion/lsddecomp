@@ -1895,6 +1895,7 @@ segments:
       - [0x72140, .data, cd/game_files]  # gLbdFileMethods .. sMovieFrameCounts: the file table
       - [0x769D4, data]               # StageGrid's data slot
       - [0x76DC8, data]              # class_39e08
+      - [0x771D8, .data, ui/title_menu]  # gNodeGuardedViewportMethods .. sCardIconRect: the title menu, the card messages
       - [0x776D0, .data, ui/input_dialogs]  # gTextEntryMethods, sTextEntryPanelRect
       - [0x77788, .data, ui/item_list]  # gItemListMethods, sItemListPanelRect
       - [0x77834, data]

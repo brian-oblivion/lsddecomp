@@ -650,22 +650,6 @@ extern ColorRgb sListViewColor;
 #define SLOT_LIST_FRAME_WIDTH 40
 #define SLOT_LIST_FRAME_ROW_HEIGHT 12
 
-/** @brief The item list a slot opens: TaskCoreTarget::slotLists[slot], NULL
- * for a slot without one (TitleMenu's are data, in its sTitleMenuTarget).
- * createSlotElements makes one TextRow per itemNames entry and starts the
- * slot's cursor at savedCursor; the scroll methods read the rest. */
-struct TaskCoreItemList {
-    u8 pad000[4];
-    s32 savedCursor; /**< +0x004 the committed item cursor: the list opens at it, commit stores it, cancel returns to it */
-    ColorRgb cursorColor; /**< +0x008 the colour of the item under the cursor while scrolling */
-    u8 pad00B[5];
-    /* MATCHING: a struct, not two s32 fields, so CommitElementScroll copies it whole. */
-    /** +0x010 where the cursor's row is drawn; the list starts savedCursor
-     * rows above. */
-    ScreenSpritePos pos;
-    char **itemNames; /**< +0x018 NULL-terminated; one New_TextRow per name */
-};
-
 s32 TaskCore__TickFadeOut(TaskCore *self) {
     s32 level = TASKCORE_FADE_FULL - (self->frameCounter * self->fadeRate);
     u8 color[3];
