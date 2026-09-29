@@ -79,12 +79,12 @@ enum ObjMState {
  * (sound, bgm, etcTim, dreamerTmd, stage), then its own.
  *
  * Overrides of TimedTask's slots: +0x008 ObjM__ObjM, +0x00C ObjM__Finalize,
- * +0x038 ObjM__OnNotify, +0x040 resetCounters (ObjM__NoOpSlot40), +0x044
+ * +0x038 ObjM__OnNotify, +0x040 resetCounters (ObjM__NoOpResetCounters), +0x044
  * init (ObjM__AttachTarget), +0x048 deinit (ObjM__DetachTarget), +0x04C
  * onInit (ObjM__InitStyleAndWorld), +0x050 onDeinit (ObjM__TeardownStyle),
  * +0x054 ObjM__OnDrawSystemEvent, +0x058 onPadEvent
  * (ObjM__DispatchPadEvent), +0x05C ObjM__Update, +0x074 ObjM__TogglePause
- * and +0x07C onTimedOut (ObjM__NoOpSlot7C).
+ * and +0x07C onTimedOut (ObjM__NoOpOnTimedOut).
  *
  * Overrides whose parameter list differs from the inherited slot keep the
  * slot's type: init's occupant takes (args, DreamSys *), and
@@ -240,7 +240,7 @@ void ObjM__Finalize(ObjM *self);
 void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event);
 
 /** @brief resetCounters (slot +0x040): does nothing. */
-void ObjM__NoOpSlot40(void);
+void ObjM__NoOpResetCounters(void);
 
 /**
  * @brief init (slot +0x044): makes ObjM__GetGridRecord the StageMap's chunk
@@ -333,7 +333,7 @@ void ObjM__Update(ObjM *self);
 void ObjM__TogglePause(ObjM *self);
 
 /** @brief onTimedOut (slot +0x07C): does nothing. */
-void ObjM__NoOpSlot7C(void);
+void ObjM__NoOpOnTimedOut(void);
 
 /**
  * @brief setupSceneStyle (slot +0x080): sets the viewport's projection from

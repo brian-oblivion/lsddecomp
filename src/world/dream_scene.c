@@ -418,11 +418,11 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
 
 /* ---- ObjM, resetCounters (+0x040) to enterLinkWall (+0x09C) ---------------
  *
- * In table order; include/objm.h documents each. NoOpSlot40 and NoOpSlot7C
- * are empty.
+ * In table order; include/objm.h documents each. NoOpResetCounters and
+ * NoOpOnTimedOut are empty.
  */
 
-void ObjM__NoOpSlot40(void) {}
+void ObjM__NoOpResetCounters(void) {}
 
 /* init. `args` is the building DayTask's init args: args->lightRig is its
  * StageMap (IntermediateBase__Init keeps it as lightRig), whose callback
@@ -660,7 +660,7 @@ void ObjM__TogglePause(ObjM *self) {
     }
 }
 
-void ObjM__NoOpSlot7C(void) {}
+void ObjM__NoOpOnTimedOut(void) {}
 
 /* Added to the viewport's projection distance; 0 in the image and never
  * written. */
