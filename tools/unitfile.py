@@ -17,7 +17,7 @@ NEW may carry a directory (`sound/SoundDriver`): splat then writes
 src/sound/SoundDriver.c. The UNIT name everywhere else (ledger, tools,
 reports) is the last component, which must stay unique (tools/srcpath.py).
 
-rename: the yaml line(s), `git mv` of src/OLD.c (and include/OLD.h when it
+rename: the yaml line(s) (text, `.rodata` and `.data`), `git mv` of src/OLD.c (and include/OLD.h when it
 exists), whole-token rewrite of OLD / OLD_H guard in code and docs (not
 PROGRESS.md or the archive, nor a report's history sections, nor a prose
 line already naming NEW, as rename.py), the ledger and the warnings
@@ -44,7 +44,8 @@ check: every game file in src/ and include/ whose stem is not snake_case
 merge: B must be the text subsegment IMMEDIATELY after A in the yaml, and if
 both own a `.rodata` line, B's must immediately follow A's (else the merged
 file's rodata would have to absorb what lies between: the tool refuses and
-names it). B's `#include`s join A's; B's body is appended after A's last
+names it). The same holds for their `.data` lines, since a unit's C data is
+one run. B's `#include`s join A's; B's body is appended after A's last
 line under a `/* ---- merged from B ---- */` marker; B's yaml lines go; B's
 file (and header, whose declarations you move by hand) go. With --as-b the
 merged file takes B's name instead, and A's is the one rewritten (a file named
@@ -96,6 +97,11 @@ def find_unit(rows, unit):
     c = [r for r in rows if r[2] == "c" and unit_stem(r[3]) == unit]
     ro = [r for r in rows if r[2] == ".rodata" and unit_stem(r[3]) == unit]
     return (c[0] if c else None), ro
+
+
+def find_data(rows, unit):
+    """The unit's `.data` line(s) in the data list (track 14: its C tables)."""
+    return [r for r in rows if r[2] == ".data" and unit_stem(r[3]) == unit]
 
 
 def token_rx(old):
@@ -242,6 +248,7 @@ def cmd_rename(a):
     c, ro = find_unit(rows, old)
     if c is None:
         sys.exit(f"FATAL: no `c` subsegment named {old} in the yaml")
+    ro = ro + find_data(rows, old)
     # A type-named file (the stem is also an identifier in code) moves by
     # paths only: a token rewrite would rename the type (track 11).
     hit = code_identifier(old) if new != old else None
@@ -334,6 +341,14 @@ def cmd_merge(a):
                  f"(next is {nxt[3] if nxt else 'nothing'}); only adjacent units merge")
     if len(roa) > 1 or len(rob) > 1:
         sys.exit("FATAL: a unit with more than one .rodata line; merge by hand")
+    da, db = find_data(rows, ua), find_data(rows, ub)
+    if len(da) > 1 or len(db) > 1:
+        sys.exit("FATAL: a unit with more than one .data line; merge by hand")
+    if da and db:
+        nxt_d = next((r for r in rows if r[1] > da[0][1]), None)
+        if nxt_d is None or nxt_d[0] != db[0][0]:
+            sys.exit(f"FATAL: {ub}'s .data line does not follow {ua}'s; the merged file's data "
+                     f"would not be one run (CLEANUP.md track 14). Decide that by hand.")
     if roa and rob:
         between = [r for r in rows if roa[0][1] < r[1] < rob[0][1] and r[2] not in TEXT_TYPES]
         if between:
@@ -360,13 +375,15 @@ def cmd_merge(a):
         return 0
     # the surviving text line is A's (it holds the start address); the
     # surviving .rodata line is ro_keep; both are named KEEP
-    drop = {cb[0]} | {r[0] for r in roa + rob if r[0] != ro_keep}
+    # likewise the data: A's `.data` line (B's when A has none) holds the run
+    d_keep = (da or db)[0][0] if (da or db) else None
+    drop = {cb[0]} | {r[0] for r in roa + rob if r[0] != ro_keep} | {r[0] for r in da + db if r[0] != d_keep}
     keep_path = dest.relative_to(ROOT / "src").with_suffix("").as_posix()
     out = []
     for i, l in enumerate(lines):
         if i in drop:
             continue
-        if i in (ca[0], ro_keep):
+        if i in (ca[0], ro_keep, d_keep):
             m = SEG.match(l)
             l = m.group(1) + m.group(3) + m.group(4) + keep_path + m.group(6)
         out.append(l)
