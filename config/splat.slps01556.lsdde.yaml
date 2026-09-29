@@ -1844,7 +1844,7 @@ segments:
       - [0x5BDCC, .data, graphics/scene_node]  # gSceneNodeMethods, sRotationZero, sSceneNodeScaleOne
       - [0x5BE9C, o, libgte/ratan, .data]    # 0x802, the arctan table -> 0x5C69E
       - [0x5C69E, pad]                       # 2 bytes; 0x802 is not 2-aligned
-      - [0x5C6A0, data]                      # D_8006BEA0.., no placed object owns it
+      - [0x5C6A0, .data, graphics/tmd_model]  # gTmdModelMethods
       - [0x5C6F0, o, libgte/msc01, .data]    # 0x180 -> 0x5C870 (dlabel D_8006C070)
       - [0x5C870, data]
       - [0x5CA60, o, libgte/msc00, .data]    # 0x10 -> 0x5CA70, exactly where intr's .data starts

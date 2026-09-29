@@ -6,7 +6,7 @@
  * an axis-aligned box or its eight corners, keep a shared bounds buffer, and
  * cast a segment against every face. Then one free function over a TmdHull,
  * RotateAndOffsetHullList, and the two setters of the first primitive's
- * CLUT id.
+ * CLUT id. The method table closes the file.
  */
 #include "common.h"
 #include <libgte.h>
@@ -626,3 +626,29 @@ void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy) {
     t->clut = v;
     t->clut = v + xy[1] * 64;
 }
+
+/* TmdModel's method table (include/tmd_model.h): BasicClass's slots with
+ * TmdModel's ctor, then its own four. A (void *) entry is a base method,
+ * declared on BasicClass *. */
+TmdModelMethods gTmdModelMethods = {
+    TMDMODEL_CLASS_ID,
+    (void *)BasicClass__Release,
+    TmdModel__TmdModel,
+    (void *)BasicClass__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    TmdModel__SetQuad,
+    TmdModel__MapModelingData,
+    TmdModel__GetObject,
+    TmdModel__NoOpSlot4C,
+};
