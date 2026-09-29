@@ -466,6 +466,33 @@
       "reason": "",
       "status": "auto"
     },
+    "15": {
+      "checklist": {},
+      "reason": "",
+      "status": "auto"
+    },
+    "16": {
+      "checklist": {},
+      "reason": "",
+      "status": "auto"
+    },
+    "17": {
+      "checklist": {},
+      "reason": "",
+      "status": "auto"
+    },
+    "18": {
+      "checklist": {},
+      "reason": "",
+      "status": "auto"
+    },
+    "19": {
+      "checklist": {
+        "split-setup": true
+      },
+      "reason": "",
+      "status": "auto"
+    },
     "1b": {
       "reason": "",
       "rounds": [
@@ -896,6 +923,7 @@
         "flat_light_obj": "2026-09-25",
         "game_files": "2026-09-25",
         "game_shell": "2026-09-24",
+        "graph_room": "2026-09-29",
         "graphics_resources": "2026-09-25",
         "input_dialogs": "2026-09-24",
         "libcard_card": "2026-09-23",
@@ -1628,6 +1656,7 @@
         "flat_light_obj": "2026-09-28",
         "game_files": "2026-09-27",
         "game_shell": "2026-09-27",
+        "graph_room": "2026-09-29",
         "graphics_resources": "2026-09-26",
         "input_dialogs": "2026-09-27",
         "libsnd_vmanager": "2026-09-27",
