@@ -14,7 +14,7 @@
  * FILERESOURCE_BASE_SLOTS, FILERESOURCE_FIELDS for its
  * subclasses), the ResourceSource and ResourceRequest descriptors, the flag
  * bits the CD driver reports request completion with, and FileResource's own
- * methods, defined in src/app/game_shell.c. The functions that bind the
+ * methods, defined in src/app/file_resource.c. The functions that bind the
  * active driver into these tables are data_source.h's (src/app/data_source.c).
  */
 
@@ -84,7 +84,7 @@ struct FileResourceMethods {
 /**
  * FileResource -- the base of every class the game loads from a file: class
  * id 0x3, method table gFileResourceMethods, parent BasicClass. Its own
- * methods are in src/app/game_shell.c.
+ * methods are in src/app/file_resource.c.
  *
  * The object owns one file buffer. FileResource__LoadFile opens a named
  * file, takes its size from seek(0, SEEK_END), allocates that much from the
