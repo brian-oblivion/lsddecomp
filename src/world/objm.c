@@ -231,20 +231,16 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 i
     self->initOption = initOption;
     if (self->stage != 0) {
         s32 stage;
-        s32 three;
 
         /* MATCHING: the volatile read keeps retail's second load of self->stage. */
         stage = *(s32 volatile *)&self->stage;
         self->tickPeriod = 16;
-        three = 3;
-        /* MATCHING: an ordering barrier; without it the 3 is set up ahead of the store above. */
-        __asm__("");
         flag = (stage == 5);
+        self->moveMode = 3;
         if (stage == 6) {
             flag = 1;
         }
-        self->moveMode = three;
-        if (stage == three) {
+        if (stage == 3) {
             flag = 1;
         }
         ((StageMap *)self->lightRig)->methods->setBounds((StageMap *)self->lightRig, 0);
