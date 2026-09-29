@@ -18,6 +18,13 @@ typedef struct BgLayerMethods BgLayerMethods;
  * (Viewport__DrawNode). */
 #define BGLAYER_CLASS_ID 0x54
 
+/** BgLayer__Reset's (and so New_BgLayer's) `mode`: how the layer is sized
+ * and which colour mode its GsBG draws in. */
+enum BgLayerMode {
+    BGLAYER_MODE_MAP = 0,   /**< sized to the tile map, 8-bit CLUT */
+    BGLAYER_MODE_SCREEN = 1 /**< 320 x 240, 15-bit direct (TaskCore's) */
+};
+
 /**
  * @brief BgLayer's method table, gBgLayerMethods: SceneNode's slots, four of
  *        them overridden, then two of its own.
@@ -85,8 +92,9 @@ extern BgLayerMethods *GetBgLayerMethods(void);
 /**
  * @brief Allocates a BgLayer from the pool and constructs it over a tile map.
  * @param src  The tile map whose GsMAP the layer draws.
- * @param mode 0 to size the layer to the map with an 8-bit CLUT, 1 for a
- *             320 x 240 layer of 15-bit texels (TaskCore's).
+ * @param mode An enum BgLayerMode: BGLAYER_MODE_MAP to size the layer to
+ *             the map with an 8-bit CLUT, BGLAYER_MODE_SCREEN for a 320 x 240
+ *             layer of 15-bit texels (TaskCore's).
  * @return The new layer, or NULL when the pool is exhausted.
  */
 BgLayer *New_BgLayer(struct TileMap *src, s32 mode);
@@ -104,9 +112,10 @@ void BgLayer__BgLayer(BgLayer *self, struct TileMap *src, s32 mode);
  *        unscrolled, unscaled and unrotated, pivoting on its centre, in the
  *        default colour.
  * @param self The layer.
- * @param src  The tile map whose GsMAP it draws; mode 0 sizes the layer to it.
- * @param mode 0: sized to the map, 8-bit CLUT; 1: 320 x 240, 15-bit direct.
- *             Any other value leaves the attribute and size as they were.
+ * @param src  The tile map whose GsMAP it draws; BGLAYER_MODE_MAP sizes the
+ *             layer to it.
+ * @param mode An enum BgLayerMode. Any other value leaves the attribute and
+ *             size as they were.
  */
 void BgLayer__Reset(BgLayer *self, struct TileMap *src, s32 mode);
 

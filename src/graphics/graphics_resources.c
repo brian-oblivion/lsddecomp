@@ -56,11 +56,11 @@ extern u8 sMovieClearColor[4];          /* a zero word: play's clearImage color,
 #define CLUT_STP 0x8000 /* a 15-bit colour's semi-transparency bit */
 
 /* GsBG attribute bits 24..25, the colour mode (LIBGS: 0 4-bit CLUT, 1 8-bit
- * CLUT, 2 15-bit direct). BgLayer's mode 1 is the one New_BgLayer's caller
+ * CLUT, 2 15-bit direct). BGLAYER_MODE_SCREEN is the one New_BgLayer's caller
  * uses, over TileAtlas's 15-bit texture pages. */
 #define BG_ATTR_8BIT (1 << 24)
 #define BG_ATTR_15BIT (2 << 24)
-#define BG_SCREEN_W 320 /* mode 1's layer size */
+#define BG_SCREEN_W 320 /* BGLAYER_MODE_SCREEN's layer size */
 #define BG_SCREEN_H 240
 #define BG_SCALE_MAX 30000 /* BgLayer__UpdateScale's clamp, in 20.12 */
 
@@ -666,17 +666,17 @@ void BgLayer__BgLayer(BgLayer *self, TileMap *src, s32 mode) {
     ((BgLayerResetFn)self->methods->reset)(self, src, mode);
 }
 
-/* reset (+0x040): lay the GsBG over `src`'s map, sized to the map (mode 0,
- * 8-bit CLUT) or to the screen (mode 1, 15-bit), at the origin, unscaled,
- * unrotated, pivoting on its centre. */
+/* reset (+0x040): lay the GsBG over `src`'s map, sized to the map
+ * (BGLAYER_MODE_MAP, 8-bit CLUT) or to the screen (BGLAYER_MODE_SCREEN,
+ * 15-bit), at the origin, unscaled, unrotated, pivoting on its centre. */
 extern ColorRgb sBgLayerDefaultColor;
 
 void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
-    if (mode == 0) {
+    if (mode == BGLAYER_MODE_MAP) {
         self->bgAttribute = BG_ATTR_8BIT;
         self->w = src->map.cellw * src->map.ncellw;
         self->h = src->map.cellh * src->map.ncellh;
-    } else if (mode == 1) {
+    } else if (mode == BGLAYER_MODE_SCREEN) {
         self->bgAttribute = BG_ATTR_15BIT;
         self->w = BG_SCREEN_W;
         self->h = BG_SCREEN_H;
