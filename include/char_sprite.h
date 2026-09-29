@@ -28,6 +28,9 @@
 typedef struct CharSprite CharSprite;
 typedef struct CharSpriteMethods CharSpriteMethods;
 
+/** CharSprite's class id (gCharSpriteMethods word +0x000): ScreenSprite's 0x144, one level down. */
+#define CHARSPRITE_CLASS_ID 0x1144
+
 /** @name Font grid
  * The font texture's layout, as GetCellRect reads it: cells of
  * CHARSPRITE_CELL_SIZE square, CHARSPRITE_GRID_COLUMNS to a row, cell n at

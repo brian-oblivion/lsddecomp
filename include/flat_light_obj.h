@@ -12,6 +12,9 @@
 typedef struct FlatLightObj FlatLightObj;
 typedef struct FlatLightObjMethods FlatLightObjMethods;
 
+/** FlatLightObj's class id (gFlatLightObjMethods word +0x000). A single nibble: it derives from BasicClass alone. */
+#define FLATLIGHTOBJ_CLASS_ID 0x6
+
 /**
  * @brief A flat light's direction and colour: <libgs.h>'s GsF_LIGHT, with
  *        r, g, b grouped as one ColorRgb so setColor can copy them whole.

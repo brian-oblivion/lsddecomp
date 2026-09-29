@@ -13,6 +13,9 @@
 typedef struct MoviePlayer MoviePlayer;
 typedef struct MoviePlayerMethods MoviePlayerMethods;
 
+/** MoviePlayer's class id (gMoviePlayerMethods word +0x000). */
+#define MOVIEPLAYER_CLASS_ID 0x70
+
 /**
  * @brief MoviePlayer's method table, gMoviePlayerMethods: BasicClass's slots,
  *        with an s32-returning ctor (MoviePlayer__MoviePlayer), then thirteen

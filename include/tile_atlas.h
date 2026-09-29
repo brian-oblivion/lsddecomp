@@ -17,6 +17,9 @@
 typedef struct TileAtlas TileAtlas;
 typedef struct TileAtlasMethods TileAtlasMethods;
 
+/** TileAtlas's class id (gTileAtlasMethods word +0x000). */
+#define TILEATLAS_CLASS_ID 0x303
+
 /**
  * @brief TileAtlas's method table, gTileAtlasMethods: FileResource's slots,
  *        with no new ones.

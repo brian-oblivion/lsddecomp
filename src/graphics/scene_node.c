@@ -2,7 +2,7 @@
  * SceneNode's methods (include/scene_node.h documents each), in the order
  * of gSceneNodeMethods' slots +0x008 to +0x0B4, then the table getter, the
  * methods in no slot, and the free vector, bit-field and box-clipping
- * helpers they call.
+ * helpers they call. The method table and the Reset inputs close the file.
  *
  * The link test runs across several of them. A sender, on a hull event,
  * fetches its model's hull, rotates it by its world matrix and notifies its
@@ -1155,3 +1155,59 @@ s32 GetSetHitHeightGate(s32 value) {
     sHitHeightGate = value;
     return old;
 }
+
+/* SceneNode's method table (include/scene_node.h names each slot): the
+ * inherited BasicClass slots, SceneNode's overrides of them, then its own.
+ * A (void *) entry is a method whose declared parameters differ from the
+ * slot's, usually a base method taking BasicClass *. */
+SceneNodeMethods gSceneNodeMethods = {
+    SCENENODE_CLASS_ID,
+    (void *)BasicClass__Release,
+    SceneNode__SceneNode,
+    SceneNode__Finalize,
+    SceneNode__AddChild,
+    SceneNode__RemoveChild,
+    SceneNode__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)SceneNode__OnNotify,
+    NULL,
+    SceneNode__Reset,
+    SceneNode__UpdateRotation,
+    SceneNode__UpdateScale,
+    SceneNode__AttachToParent,
+    SceneNode__DetachFromParent,
+    SceneNode__DetachAttachedChildren,
+    SceneNode__GetNextAttachedChild,
+    (void *)SceneNode__NoOpFinalizeHook,
+    SceneNode__SetDisplay,
+    SceneNode__SetSemiTrans,
+    SceneNode__SetSemiTransRate,
+    SceneNode__SetLighting,
+    SceneNode__SetLightMode,
+    SceneNode__SetLightDim,
+    SceneNode__SetUseZ,
+    SceneNode__SetSubdivision,
+    SceneNode__SetBackClip,
+    (void *)SceneNode__GetRotMatrix,
+    SceneNode__NotifyWithHull,
+    SceneNode__GetModelHull,
+    SceneNode__TransformAndNotifyParents,
+    (void *)SceneNode__OnPadEvent,
+    (void *)SceneNode__Update,
+    SceneNode__DispatchLinkCommand,
+    (void *)SceneNode__TryAttachNearby,
+    SceneNode__ComposeAndApplyRotation,
+    SceneNode__CheckBoundsOverlap,
+    (void *)SceneNode__RaycastHullAgainstFaces,
+    SceneNode__NoOpSlotB0,
+    SceneNode__AddToActorParents,
+};
+
+Ratio16 sRotationZero[3] = {{0, 1}, {0, 1}, {0, 1}};
+Ratio16 sSceneNodeScaleOne[3] = {{1, 1}, {1, 1}, {1, 1}};

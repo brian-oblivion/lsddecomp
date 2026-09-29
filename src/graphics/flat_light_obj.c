@@ -1,8 +1,9 @@
 /*
  * FlatLightObj: one Psy-Q flat light as a BasicClass object. This file holds
  * the whole class: the allocator New_FlatLightObj, the constructor, its three
- * own slots (setLightId, setColor, setDirection) and the table getter. The
- * object and its method table are declared in include/flat_light_obj.h.
+ * own slots (setLightId, setColor, setDirection), the table getter and the
+ * table itself. The object and its method table are declared in
+ * include/flat_light_obj.h.
  *
  * setColor and setDirection update the object's copy of the light, then hand
  * all of it to Sony's GsSetFlatLight under the object's light id, so a light
@@ -58,3 +59,28 @@ void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir) {
 FlatLightObjMethods *GetFlatLightObjMethods(void) {
     return &gFlatLightObjMethods;
 }
+
+/* FlatLightObj's method table (include/flat_light_obj.h): BasicClass's slots
+ * with the ctor, then its three setters. A (void *) entry is a base method,
+ * declared on BasicClass *. */
+FlatLightObjMethods gFlatLightObjMethods = {
+    FLATLIGHTOBJ_CLASS_ID,
+    (void *)BasicClass__Release,
+    FlatLightObj__FlatLightObj,
+    (void *)BasicClass__Finalize,
+    (void *)BasicClass__AddChild,
+    (void *)BasicClass__RemoveChild,
+    (void *)BasicClass__RemoveAllChildren,
+    (void *)BasicClass__GetNextChild,
+    (void *)BasicClass__AddParentRef,
+    (void *)BasicClass__RemoveParentRef,
+    (void *)BasicClass__ClearParentRefs,
+    (void *)BasicClass__GetNextParentRef,
+    (void *)BasicClass__NotifyParents,
+    BasicClass__NoOpSlot34,
+    (void *)BasicClass__OnNotify,
+    NULL,
+    FlatLightObj__SetLightId,
+    FlatLightObj__SetColor,
+    FlatLightObj__SetDirection,
+};

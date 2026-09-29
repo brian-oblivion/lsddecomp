@@ -10,6 +10,9 @@
 
 typedef struct TimArraySrc TimArraySrc;
 typedef struct TimArraySrcMethods TimArraySrcMethods;
+
+/** TimArraySrc's class id (gTimArraySrcMethods word +0x000). */
+#define TIMARRAYSRC_CLASS_ID 0xC03
 struct TimImage;
 
 /**

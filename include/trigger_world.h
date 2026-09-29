@@ -13,6 +13,9 @@ struct ResourceSource;
 typedef struct TriggerWorld TriggerWorld;
 typedef struct TriggerWorldMethods TriggerWorldMethods;
 
+/** TriggerWorld's class id (gTriggerWorldMethods word +0x000). */
+#define TRIGGERWORLD_CLASS_ID 0x15F03
+
 /**
  * @brief TriggerWorld's method table, gTriggerWorldMethods: ModelData's slots,
  *        then one of its own.

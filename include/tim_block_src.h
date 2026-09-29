@@ -20,6 +20,9 @@ enum TimBlockLoadState {
 typedef struct TimBlockSrc TimBlockSrc;
 typedef struct TimBlockSrcMethods TimBlockSrcMethods;
 
+/** TimBlockSrc's class id (gTimBlockSrcMethods word +0x000). */
+#define TIMBLOCKSRC_CLASS_ID 0xF03
+
 /**
  * @brief One CLUT row's fade ramp: the CLUT row itself, then `mask - 1` rows
  *        below it stepping toward `color`.
