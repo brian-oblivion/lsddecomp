@@ -348,7 +348,7 @@ void TodActor__DestroyParts(TodActor *self) {
 void TodActor__Tick(TodActor *self) {
     self->tick = self->tick + 1;
     if (self->tickCallbackEnabled != 0) {
-        ((void (*)(void))self->tickCallback)();
+        ((void (*)(TodActor *))self->tickCallback)(self);
     }
     if (self->todPlaying != 0 && self->todFrameCount >= 2) {
         self->todFramePtr = self->methods->applyTodFrame(self, self->todFramePtr, 0);
