@@ -44,7 +44,13 @@
  * GsSortBoxFill unmasked. */
 #define STYLE_DECOR_PRI 0x1FFF
 
-/* How far down (pixels) decor variant 2 draws the set. */
+/* sStyleDecorVariant: whether there is a decoration set, and where it sits.
+ * PickStyleFallbackConfig picks it for variant 0's records 0..5. */
+#define STYLE_DECOR_NONE 0    /* no bands */
+#define STYLE_DECOR_UPPER 1   /* records 0..3: the set at sStyleDecorPosX/Y */
+#define STYLE_DECOR_LOWERED 2 /* records 4..5: STYLE_DECOR_VARIANT2_DROP lower */
+
+/* How far down (pixels) STYLE_DECOR_LOWERED draws the set. */
 #define STYLE_DECOR_VARIANT2_DROP 30
 
 /* StyleUpdateDecorSet's fade step: the viewport's view-point y less its
@@ -213,7 +219,8 @@ extern s32 sStyleDecorVariant;
 /* The config for a stage without a fixed one: the variant from
  * sStyleVariantPicks[(day + stage) & 0xF], then record (day + stage) % count
  * of that variant's table. For variant 0 it also sets the clear colour, the
- * band colours and, for records 0..5, the decor variant (1, or 2 for 4..5). */
+ * band colours and, for records 0..5, the decor variant (STYLE_DECOR_UPPER,
+ * or STYLE_DECOR_LOWERED for 4..5). */
 void *PickStyleFallbackConfig(void) {
     s32 seed;
     s32 variant;
@@ -241,9 +248,9 @@ void *PickStyleFallbackConfig(void) {
         }
         sStyleDecorColors = decorColors;
         if (index < 4) {
-            sStyleDecorVariant = 1;
+            sStyleDecorVariant = STYLE_DECOR_UPPER;
         } else if (index < 6) {
-            sStyleDecorVariant = 2;
+            sStyleDecorVariant = STYLE_DECOR_LOWERED;
         }
     }
     return config;
@@ -270,11 +277,11 @@ void StyleBuildDecorSet(void) {
     Viewport *viewport;
     SceneNode *parent;
 
-    if (sStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == STYLE_DECOR_NONE) {
         return;
     }
     pos = *(BoxFillPos *)&sStyleDecorPosX;
-    if (sStyleDecorVariant == 2) {
+    if (sStyleDecorVariant == STYLE_DECOR_LOWERED) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
     size = *(BoxFillSize *)&sStyleDecorSizeW;
@@ -311,7 +318,7 @@ void StyleUpdateDecorSet(void) {
     BoxFill **slot;
     BoxFill *band;
 
-    if (sStyleDecorVariant == 0) {
+    if (sStyleDecorVariant == STYLE_DECOR_NONE) {
         return;
     }
     viewport = ((StyleSceneRefs *)sStyleSceneRefs)->viewport;
@@ -322,7 +329,7 @@ void StyleUpdateDecorSet(void) {
     }
     pos = *(BoxFillPos *)&sStyleDecorPosX;
     i = 0;
-    if (sStyleDecorVariant == 2) {
+    if (sStyleDecorVariant == STYLE_DECOR_LOWERED) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
     slot = sStyleDecorSlots;
@@ -352,9 +359,9 @@ void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
 
 /* Releases the bands, if StyleBuildDecorSet made them. */
 void StyleReleaseDecorSet(void) {
-    if (sStyleDecorVariant != 0) {
+    if (sStyleDecorVariant != STYLE_DECOR_NONE) {
         ReleaseBasicClassArray((BasicClass **)sStyleDecorSlots, ARRAY_COUNT(sStyleDecorSlots));
-        sStyleDecorVariant = 0;
+        sStyleDecorVariant = STYLE_DECOR_NONE;
     }
 }
 
@@ -539,7 +546,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     PtrBoxK3 *rotation;
 
     SetupStyleSpawnParamsRandom(pos, sStyleSpawnYChoice2);
-    if (sStyleDecorVariant != 0 && sStyleDecorColors == sStyleDecorColorsB) {
+    if (sStyleDecorVariant != STYLE_DECOR_NONE && sStyleDecorColors == sStyleDecorColorsB) {
         sStyleSpawnOffsetX = -45056;
         sStyleSpawnOffsetY = -8192;
         sStyleSpawnOffsetZ = 0;
