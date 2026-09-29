@@ -716,16 +716,17 @@ bool CheckDreamAuxTriggerCondition(s32 day, TriggerRecord *record) {
     s32 id;
 
     if (condition == TRIGGER_COND_ALWAYS) {
-        goto success;
+        record->triggered = 1;
+        return true;
     }
 
+    /* MATCHING: gotos; retail lays the negating arm out after the plain one, which no if/else gives */
     if (condition < 0) {
         if (record->triggered == 0) {
             goto negate;
         }
         return false;
     }
-    /* MATCHING: this arm sits before `negate:` and jumps, as retail's does */
     id = condition;
     goto have_idx;
 
@@ -782,7 +783,6 @@ have_idx:
             break;
     }
 
-success:
     record->triggered = 1;
     return true;
 }
