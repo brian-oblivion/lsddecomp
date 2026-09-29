@@ -341,6 +341,16 @@
           "note": "fresh revision-18 ground, finished: 19 opus matching sessions over code_10ee0, code_3770c, code_39094, code_322b4, code_fa50, code_33808; 213/213 byte-exact, no stalls, one permuter search (func_80043FE4, killed at ~31k iterations once a hand lever matched). Game code 100% matched; track 1 done again. Six sonnet naming passes and three opus track-4 classes (IntermediateBase, Sprite, Actor) ran alongside.",
           "round": 82,
           "runners": 19
+        },
+        {
+          "attempts": 5,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 2,
+          "model": "opus",
+          "note": "REVISIT of the five ub-calls stalls: StageMap__FindSlotByNeighbour (loop test as return value) and LbdFile__LoadDataBlock (both gates in one condition) match as well-defined C. New_GameApplication, MoviePlayer__Advance, MoviePlayer__DecodeFrame: retail returns a value it never set; no well-defined spelling can match. Advance's readable body returns 1 (done), as StreamTask sees it.",
+          "round": 109,
+          "runners": 3
         }
       ],
       "status": "open"
@@ -529,6 +539,7 @@
       "checklist": {
         "shape-graphics": true,
         "shape-rest": true,
+        "shape-world": true,
         "ub-calls": true
       },
       "reason": "",
@@ -542,6 +553,16 @@
           "note": "Phase 4 round 1. ub-calls: 21 cases, 16 natural and byte-identical, 5 stalled under NON_MATCHING (now queued as track-1 revisits; progress.py/plan.py count a NON_MATCHING body as a stall).",
           "round": 108,
           "runners": 1
+        },
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 3,
+          "model": "opus",
+          "note": "Phase 4 round 2. shape-world (61 gotos -> 10, 6 barriers -> 1, 25 window tests natural), shape-graphics (50 gotos -> 41: SortTmdObject's packet loops stay), shape-rest (33 -> 22 gotos, 5 -> 4 barriers, size casts gone via u32 params). Left: tick/frame fields could be u32 in their base headers (cross-area).",
+          "round": 109,
+          "runners": 3
         }
       ],
       "status": "auto"
