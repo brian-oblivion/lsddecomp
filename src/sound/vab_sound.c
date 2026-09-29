@@ -522,6 +522,8 @@ void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
     s32 toneIndex;
 
     if (set->tag > 0) {
+        /* MATCHING: both loops are do-whiles, entered without a test; a for loop adds
+         * a test on entry. This one also steps its count first in the body. */
         i = 0;
         slot = &set->slots[0];
         do {
