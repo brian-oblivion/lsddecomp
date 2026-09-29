@@ -321,6 +321,7 @@ s32 TodActor__CreateParts(TodActor *self) {
     self->mainPart = self->parts[tmdId[0]];
     return 0;
 
+    /* MATCHING: gotos to one shared cleanup, as retail has it; cleaning up at each failure repeats it */
 alloc_fail:
     self->partIds = NULL;
 fail:
