@@ -139,13 +139,56 @@ behaviour, then refine when the data is readable. Rename through
 
 ## Track 19: one class, one file
 
-`dream_scene.c` is 3366 lines and holds half of `ItemList`, `ObjM`, the style
-layer, `StyleEffect`, `Actor`, `VariantSprite` and `GraphRoom`. A split
-keeps ROM order: each new file takes a contiguous run of functions. It needs
-a splat subsegment per file, with the rodata boundaries that
-`tools/tuboundary.py` measures. `split-setup` does one split, proves it
-byte-identical, and writes the steps here. Each new file then gets its
-file-private `#define`s at the top (track 16's rule).
+`dream_scene.c` holds half of `ItemList`, `ObjM`, the style layer,
+`StyleEffect`, `Actor` and `VariantSprite` (`GraphRoom` went to
+`graph_room.c` in `split-setup`). A split keeps ROM order: each new file
+takes a contiguous run of functions, and a `.c` is one splat subsegment, so
+cutting a class out of the middle of a unit makes three files, not two.
+
+**Procedure** (proven on `GraphRoom`, and on a trial cut of `ItemList`'s
+half that also splits an attached jump-table slot):
+
+1. **Pick the cut.** `python3 tools/tuboundary.py --unit <unit>` lists the
+   unit's functions with the verdict at each edge. Cut only at `boundary
+   possible`, normally right after a class's `Get<Class>Methods`. An
+   `unlikely` edge means rodata used by one function on each side would sit
+   in the wrong order; an `impossible` one can't be cut at all.
+2. **Find the file offset** of the first function of the new file:
+   `vram - 0x80010000 + 0x800` (`New_GraphRoom` at `0x80057F68` is
+   `0x48768`).
+3. **Split the text subsegment** in `config/splat.slps01556.lsdde.yaml`: add
+   `- [0x<offset>, c, <dir>/<file>]` after the unit's own line, in address
+   order, with a one-line comment saying what the file holds.
+4. **Split the rodata, if the new file owns any.** Find the unit's
+   `.rodata` line (`grep -n '<dir>/<unit>]' config/splat*.yaml`).
+   - Jump tables (`jtbl_…`, attached with the dot form `.rodata`) go with the
+     function that switches on them: their words are labels local to that
+     function's `.s`. If both sides own tables, split the attached line at
+     the first table the new file owns: `[0x1EF4, .rodata, world/a]`
+     becomes `[0x1EF4, .rodata, world/a]` and `[0x1F4C, .rodata,
+     world/b]`. The offset is the table's `vram - 0x80010000 + 0x800`.
+   - Strings reached through an `extern const char …[]` sit in a standalone
+     `rodata` line and need nothing: they resolve by symbol from any object.
+     `GraphRoom`'s two paths are that case, so its split touched only text.
+   - A string written as a C literal is emitted in the object that holds
+     the function, so a cut between it and its neighbours' strings has to
+     land where tuboundary says `possible`.
+5. **Move the C.** The run of functions, their section banner and the
+   `#define`s and `extern`s only they use go to the new `.c`, defines at the
+   top after the includes. Give the file a header comment in the style of
+   its siblings (what class, which functions, in ROM order). Include only
+   what it needs; the build says what is missing. Fix the header's
+   `Methods in src/...` line and the old file's header comment.
+6. **Rebuild from a fresh extract:** `make extract`, then
+   `./build-and-verify.sh`. A split that is wrong fails the link or the
+   SHA1, so a green build is the whole proof. Check the new file compiled
+   without implicit-declaration warnings (`grep -A2 '<file>.c:' /tmp/b.log`).
+7. **Ledger:** the head marks the new unit passed where the old one was
+   (`plan.py mark-unit --unit <file> --track 3`, then `--track 7`), since
+   its code already passed under the old unit. Runners leave
+   `config/plan-state.json` alone.
+8. `tools/lint.sh`, `doxygen Doxyfile`, and grep `include/` and `README.md`
+   for the old file name next to the moved class.
 
 ## Not in scope yet
 
