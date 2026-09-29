@@ -267,7 +267,6 @@ void Sprite__Update(Sprite *self, void *sender, s32 event) {}
 /* Slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gVariantSpriteMethods (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
 void Sprite__SetColor(Sprite *self, ColorRgb *rgb) {
-    /* MATCHING: ColorRgb is three u8s, so this whole-struct copy moves exactly three bytes */
     self->sprite.rgb = *rgb;
 }
 
@@ -391,27 +390,27 @@ void FrameClock__Tick(FrameClock *self) {
     self->methods->notifyParents(self, event);
 }
 
-/* gFrameClockMethods slot +0x048. */
+/* gFrameClockMethods slot +0x048 (getFrameCount): the frames counted so far. */
 s32 FrameClock__GetFrameCount(FrameClock *self) {
     return self->frameCount;
 }
 
-/* gFrameClockMethods slot +0x04C. */
+/* gFrameClockMethods slot +0x04C (pause): tick stops counting and notifies PAUSED. */
 void FrameClock__Pause(FrameClock *self) {
     self->paused = 1;
 }
 
-/* gFrameClockMethods slot +0x050. */
+/* gFrameClockMethods slot +0x050 (resume): tick counts again, unless stopped. */
 void FrameClock__Resume(FrameClock *self) {
     self->paused = 0;
 }
 
-/* gFrameClockMethods slot +0x054. */
+/* gFrameClockMethods slot +0x054 (isPaused). */
 s32 FrameClock__IsPaused(FrameClock *self) {
     return self->paused;
 }
 
-/* gFrameClockMethods slot +0x058. */
+/* gFrameClockMethods slot +0x058 (stop): tick notifies STOPPED until the next reset. */
 void FrameClock__Stop(FrameClock *self) {
     self->stopped = 1;
 }

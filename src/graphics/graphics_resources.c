@@ -998,7 +998,7 @@ TileMap *New_TileMap(s32 source, TileAtlas *atlas) {
 /* ctor (+0x008): with no `source` (the one caller's), build the default
  * grid at once. What a nonzero `source` would be, no caller shows. */
 void TileMap__TileMap(TileMap *self, s32 source, TileAtlas *atlas) {
-    s32 unused[8]; /* MATCHING: retail's 0x40-byte frame */
+    s32 unused[8]; /* MATCHING: never used; it gives retail's 0x40-byte stack */
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileMapMethods();
@@ -1020,7 +1020,9 @@ void TileMap__Finalize(TileMap *self) {
 /* onRequestDone (+0x064): when idle, BuildMap. */
 void TileMap__Load(TileMap *self) {
     if (self->loadState == 0) {
-        ((TileMapBuildMapFn)self->methods->processBuffer)(); /* MATCHING: retail passes no argument */
+        /* MATCHING: called with no argument, as retail does; the slot still
+         * receives this map, the caller's own `self`. */
+        ((TileMapBuildMapFn)self->methods->processBuffer)();
         self->loaded = 1;
     }
 }
@@ -1070,7 +1072,7 @@ TileAtlas *New_TileAtlas(s32 source) {
 /* ctor (+0x008): with no `source` (the one caller's), build the default
  * cells at once. */
 void TileAtlas__TileAtlas(TileAtlas *self, s32 source) {
-    s32 unused[8]; /* MATCHING: retail's 0x40-byte frame */
+    s32 unused[8]; /* MATCHING: never used; it gives retail's 0x40-byte stack */
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileAtlasMethods();
@@ -1093,10 +1095,12 @@ void TileAtlas__Finalize(TileAtlas *self) {
 
 /* onRequestDone (+0x064): when idle, BuildCells. */
 void TileAtlas__Load(TileAtlas *self) {
-    s32 unused[8]; /* MATCHING: retail's 0x38-byte frame */
+    s32 unused[8]; /* MATCHING: never used; it gives retail's 0x38-byte stack */
 
     if (self->loadState == 0) {
-        ((TileAtlasBuildCellsFn)self->methods->processBuffer)(); /* MATCHING: retail passes no argument */
+        /* MATCHING: called with no argument, as retail does; the slot still
+         * receives this atlas, the caller's own `self`. */
+        ((TileAtlasBuildCellsFn)self->methods->processBuffer)();
         self->loaded = 1;
     }
 }
@@ -1280,7 +1284,7 @@ void MoviePlayer__Finalize(MoviePlayer *self) {
  * cannot be. Then take `frame`, and the first strip at its left edge. */
 s32 MoviePlayer__InitFrame(MoviePlayer *self, DrawRect *frame, s32 external) {
     s32 size;
-    s32 unused[2]; /* MATCHING: retail's 0x28-byte frame */
+    s32 unused[2]; /* MATCHING: never used; it gives retail's 0x28-byte stack */
 
     self->external = external;
     if (external == 0) {
