@@ -1241,42 +1241,36 @@ s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 col
     s32 bit = sNeighbourBits[neighbour];
     s32 result;
 
-    if ((onGridMask & bit) == 0) {
-        result = 0;
-        goto nullCase;
-    }
+    if ((onGridMask & bit) != 0) {
+        if (self->config->isVertical == 0) {
+            const ChunkNeighbourDelta *delta = &sChunkNeighbourDeltas[neighbour];
+            s32 chunk;
+            s32 step;
 
-    if (self->config->isVertical == 0) {
-        const ChunkNeighbourDelta *delta = &sChunkNeighbourDeltas[neighbour];
-        s32 chunk;
-        s32 step;
-
-        if (delta->rowDelta == 0) {
-            step = delta->colDeltaOddRow;
-        } else {
-            step = columns * delta->rowDelta;
-            if (oddRow != 0) {
-                step += delta->colDeltaOddRow;
+            if (delta->rowDelta == 0) {
+                step = delta->colDeltaOddRow;
             } else {
-                step += delta->colDeltaEvenRow;
+                step = columns * delta->rowDelta;
+                if (oddRow != 0) {
+                    step += delta->colDeltaOddRow;
+                } else {
+                    step += delta->colDeltaEvenRow;
+                }
             }
+            chunk = centreChunk + step;
+            out->chunkIndex.word = chunk;
+        } else {
+            out->chunkIndex.word = centreChunk + neighbour;
         }
-        chunk = centreChunk + step;
-        out->chunkIndex.word = chunk;
+
+        out->file = self->chunkFileFn(self->chunkFileCtx, out->chunkIndex.word, 0, 0);
+        do { /* MATCHING: an empty do/while (0); without it the code comes out differently */
+        } while (0);
+        result = 1;
     } else {
-        out->chunkIndex.word = centreChunk + neighbour;
+        out->file = NULL;
+        result = 0;
     }
-
-    out->file = self->chunkFileFn(self->chunkFileCtx, out->chunkIndex.word, 0, 0);
-    do { /* MATCHING: an empty do/while (0); without it the code comes out differently */
-    } while (0);
-    result = 1;
-    goto storeKey;
-
-nullCase:
-    out->file = NULL;
-
-storeKey:
     out->neighbour = neighbour;
     return result;
 }
