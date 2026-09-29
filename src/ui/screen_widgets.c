@@ -219,15 +219,8 @@ void FadeBox__PushPosition(FadeBox *self, BoxFillSize *size, BoxFillPos *pos) {
 }
 
 void FadeBox__PopPosition(FadeBox *self) {
-    s32 x, y;
-
-    x = self->savedPosX;
-    y = self->savedPosY;
-    self->posX = x;
-    self->posY = y;
-    /* MATCHING: an ordering barrier; without it the savedW/savedH reads move above
-     * the posX/posY writes. */
-    __asm__("");
+    /* MATCHING: the position pair is copied whole, as in PushPosition. */
+    *(BoxFillPos *)&self->posX = *(BoxFillPos *)&self->savedPosX;
     self->boxW = self->savedW;
     self->boxH = self->savedH;
 }
