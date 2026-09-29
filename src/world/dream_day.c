@@ -1571,7 +1571,7 @@ ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos) {
     SplitCoord2 *origin;
     s32 edge;
 
-    i = 0;
+    i = 0; /* MATCHING: the counter set first, apart from the for header, as retail orders it */
     span = STAGE_CHUNK_SIZE;
     layerTop = 0;
     for (; i < CHUNK_NEIGHBOUR_COUNT; i++, layerTop -= VERTICAL_LAYER_HEIGHT) {
