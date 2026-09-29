@@ -225,11 +225,9 @@ s32 TodActor__AcquireModelData(TodActor *self, TodActorDesc *desc) {
         self->modelData = New_ModelData(&desc->src);
         self->ownsModelData = 1;
     }
-    if (self->modelData == NULL) {
-        goto fail;
+    if (self->modelData != NULL) {
+        return self->methods->setupParts(self);
     }
-    return self->methods->setupParts(self);
-fail:
     TodActor__ReleaseModelData(self);
     return 1;
 }
