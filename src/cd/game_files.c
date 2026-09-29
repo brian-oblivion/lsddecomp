@@ -144,31 +144,25 @@ void LbdFile__ReleaseHeader(LbdFile *self) {
 }
 
 /* slot +0x080 of gLbdFileMethods: load the data block the header describes */
-/* The original calls releaseDataBlock without passing the loader: the slot
- * gets it only because the loader this method received is still where it arrived. */
-#ifdef NON_MATCHING
+/* MATCHING: both gates in one condition around the body. Two early returns
+ * reload the loader into the first argument before releaseDataBlock. */
 s32 LbdFile__LoadDataBlock(LbdFile *self) {
     s32 size;
-    if (((LbdFileHeader *)self->buffer)->hasData == 0) {
-        return 0;
+
+    if (((LbdFileHeader *)self->buffer)->hasData != 0 && self->loadState == LBDFILE_LOAD_IDLE) {
+        self->methods->releaseDataBlock(self);
+        size = ((LbdFileHeader *)self->buffer)->dataSize;
+        self->dataBuffer = BMemPMgrAlloc(size);
+        if (self->dataBuffer == NULL) {
+            return 0;
+        }
+        self->loadState = LBDFILE_LOAD_DATA;
+        self->methods->seek(self, ((LbdFileHeader *)self->buffer)->dataOffset, SEEK_SET);
+        self->methods->read(self, self->dataBuffer, size);
+        return 1;
     }
-    if (self->loadState != LBDFILE_LOAD_IDLE) {
-        return 0;
-    }
-    self->methods->releaseDataBlock(self);
-    size = ((LbdFileHeader *)self->buffer)->dataSize;
-    self->dataBuffer = BMemPMgrAlloc(size);
-    if (self->dataBuffer == NULL) {
-        return 0;
-    }
-    self->loadState = LBDFILE_LOAD_DATA;
-    self->methods->seek(self, ((LbdFileHeader *)self->buffer)->dataOffset, SEEK_SET);
-    self->methods->read(self, self->dataBuffer, size);
-    return 1;
+    return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/cd/game_files", LbdFile__LoadDataBlock);
-#endif
 
 /* slot +0x084 of gLbdFileMethods */
 void LbdFile__ReleaseDataBlock(LbdFile *self) {
