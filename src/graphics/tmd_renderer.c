@@ -176,10 +176,8 @@ void FlagLargePolyForDivide(void *ctx, s32 count);
  * `packet` is the current TMD packet and `elem` walks beside it, parked on
  * one member; PKT names the packet as seen from `elem`, POLY the primitive.
  */
-/* MATCHING: retail's shape needs the two packet cursors, a goto loop per case
- * (any one as a do/while keeps an extra value live across its packets and the
- * frame grows), ctx set only after the GsDOFF test, and the colour stores
- * through &POLY->r0 */
+/* MATCHING: two packet cursors, a goto loop per case (a do/while grows the frame),
+ * ctx set only after the GsDOFF test, and the colour stores through &POLY->r0 */
 void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     PolyDrawCtx *ctx;
     u8 *prim;

@@ -548,9 +548,8 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
             idx[1] = PRIM(TMD_P_TNG3)->v1;
             idx[2] = PRIM(TMD_P_TNG3)->v2;
             size = sizeof(TMD_P_TNG3);
-        /* MATCHING: every triangle case jumps to this one tail; with the
-         * tail copied into each case the copies are merged back into one,
-         * but the count pointer and the vertex array trade places. */
+        /* MATCHING: every triangle case jumps to this one tail; with a copy
+         * per case the count pointer and the vertex array trade places. */
         tri:
             *n = 3;
             break;
