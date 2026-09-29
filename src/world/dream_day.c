@@ -793,21 +793,17 @@ void StageMap__Reset(StageMap *self) {
 void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *slot) {
     GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, command);
 
-    /* MATCHING: two if+goto tests; an if/else-if chain inverts the branches */
-    if (command == STAGEMAP_EVENT_SLOT_RELEASE)
-        goto release;
-    if (command == STAGEMAP_EVENT_SLOT_DATA_READY)
-        goto record;
-    return;
-
-release:
-    if (slot->heldObj != NULL) {
-        slot->heldObj = slot->heldObj->methods->release(slot->heldObj);
+    switch (command) {
+        case STAGEMAP_EVENT_SLOT_RELEASE:
+            if (slot->heldObj != NULL) {
+                slot->heldObj = slot->heldObj->methods->release(slot->heldObj);
+            }
+            /* fall through */
+        case STAGEMAP_EVENT_SLOT_DATA_READY:
+            self->lastEventSlot = slot;
+            self->methods->notifyParents(self, command);
+            break;
     }
-
-record:
-    self->lastEventSlot = slot;
-    self->methods->notifyParents(self, command);
 }
 
 void StageMap__UpdateIfEnabled(StageMap *self) {
