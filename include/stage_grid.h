@@ -15,6 +15,27 @@
  * own a mood to choose a day's first spawn (GenerateInitialSpawn).
  */
 
+/** The game's stages, each one area of the dream, by the names players know
+ * them by. The value is the stage's index in every per-stage table and the
+ * number of its directory on the disc (STG00..STG13). */
+enum Stage {
+    STAGE_BRIGHT_MOON_COTTAGE = 0, /**< the house a dream can begin in, and its courtyard */
+    STAGE_PIT_AND_TEMPLE = 1,      /**< grass, brick temples with faces, the marching elephant */
+    STAGE_KYOTO = 2,               /**< traditional buildings, shrines and animal statues */
+    STAGE_NATURAL_WORLD = 3,       /**< meadow and horses under a blue sky */
+    STAGE_HAPPY_TOWN = 4,          /**< the face-pattern floor and floating blocks */
+    STAGE_VIOLENCE_DISTRICT = 5,   /**< dark painted city blocks, cars and docks */
+    STAGE_MOONLIGHT_TOWER = 6,     /**< a rooftop under the moon */
+    STAGE_TEMPLE_DOJO = 7,         /**< a temple interior with an attacking dog */
+    STAGE_FLESH_TUNNELS = 8,       /**< the flesh walls, podium and lettered walkway */
+    STAGE_CLOCKWORK_MACHINES = 9,  /**< the round mechanical room with the pendulum */
+    STAGE_LONG_HALLWAY = 10,       /**< the long green tunnel from the cottage */
+    STAGE_SUN_FACES_HEAVE = 11,    /**< the rotating open-mouthed sun */
+    STAGE_BLACK_SPACE = 12,        /**< the black-and-white platform and floating blocks */
+    STAGE_MONUMENT_PARK = 13,      /**< miniature world landmarks */
+    STAGE_COUNT = 14               /**< the number of stages */
+};
+
 /** @brief One stage's chunk grid: its size, and how StageMap lays it out. */
 typedef struct StageGridDimensions {
     s16 columns; /**< chunks per row; also the row stride of the stage's mood and map-chunk tables */

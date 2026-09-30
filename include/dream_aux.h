@@ -19,8 +19,8 @@
  * setup calls SetDreamAuxWorld with the stage, the StageMap, the player
  * DreamSys, the VabStreamObj and the FrameClock every Entity here is built
  * and attached with, which also builds the resident Entity; ObjM's teardown
- * calls ReleaseDreamAuxEntities. The instant teleporters are on for stages 3
- * and 11 and off elsewhere, and a trigger that spawns mood row 11, 56, 78 or
+ * calls ReleaseDreamAuxEntities. The instant teleporters are on in The
+ * Natural World and Sun Faces Heave and off elsewhere, and a trigger that spawns mood row 11, 56, 78 or
  * 93 turns them on (EnableTeleportsForKind).
  *
  * Triggers: when the StageMap has loaded a chunk's data block, ObjM passes
@@ -35,9 +35,6 @@
  * other than 0 and an even day, one time in 12 the resident entity is moved
  * next to the player instead.
  */
-
-/** The stages the per-stage trigger and record tables cover. */
-#define DREAM_AUX_STAGE_COUNT 14
 
 /** Slot i's resident entity uses mood row DREAM_AUX_FIRST_MOOD + i. */
 #define DREAM_AUX_FIRST_MOOD 98

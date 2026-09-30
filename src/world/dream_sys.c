@@ -39,7 +39,6 @@ extern s32 sLinkDstStage;
 extern s32 sLinkSpawnIndex;
 
 /* The number of stages: every per-stage table below has one entry each. */
-#define STAGE_COUNT 14
 
 /* A trigger tile whose value is negative: any tile of the chunk triggers. */
 #define ANY_TILE {{255, 255}}
@@ -651,43 +650,43 @@ StageSpawn *sStagePermalinkSpawns[STAGE_COUNT] = {
     sStg12PermalinkSpawns, NULL,
 };
 StaticLinkTrigger sStg00PermalinkTriggers[3] = {
-    /* chunk      tile      stage spawn */
-    {{ 0,  2}, {{  4,   9}}, 10,  0},
-    {{ 0,  2}, {{  7,   8}},  2,  0},
-    {{ 0,  2}, {{  6,   8}},  3,  0},
+    /* chunk     tile         stage                      spawn */
+    {{ 0,  2}, {{  4,   9}}, STAGE_LONG_HALLWAY,        0},
+    {{ 0,  2}, {{  7,   8}}, STAGE_KYOTO,               0},
+    {{ 0,  2}, {{  6,   8}}, STAGE_NATURAL_WORLD,       0},
 };
 StaticLinkTrigger sStg02PermalinkTriggers[2] = {
-    {{ 2,  1}, ANY_TILE,  6,  0},
-    {{ 5,  3}, {{  2,   8}},  0,  1},
+    {{ 2,  1}, ANY_TILE,     STAGE_MOONLIGHT_TOWER,     0},
+    {{ 5,  3}, {{  2,   8}}, STAGE_BRIGHT_MOON_COTTAGE, 1},
 };
 StaticLinkTrigger sStg03PermalinkTriggers[1] = {
-    {{ 6,  4}, {{  1,   2}},  0,  2},
+    {{ 6,  4}, {{  1,   2}}, STAGE_BRIGHT_MOON_COTTAGE, 2},
 };
 StaticLinkTrigger sStg04PermalinkTriggers[4] = {
-    /* chunk      tile      stage spawn */
-    {{ 2,  1}, ANY_TILE, 11,  0},
-    {{ 3,  1}, ANY_TILE, 11,  0},
-    {{ 4,  1}, ANY_TILE, 11,  0},
-    {{ 4,  2}, ANY_TILE, 11,  0},
+    /* chunk     tile         stage                      spawn */
+    {{ 2,  1}, ANY_TILE,     STAGE_SUN_FACES_HEAVE,     0},
+    {{ 3,  1}, ANY_TILE,     STAGE_SUN_FACES_HEAVE,     0},
+    {{ 4,  1}, ANY_TILE,     STAGE_SUN_FACES_HEAVE,     0},
+    {{ 4,  2}, ANY_TILE,     STAGE_SUN_FACES_HEAVE,     0},
 };
 StaticLinkTrigger sStg05PermalinkTriggers[2] = {
-    {{ 1,  3}, ANY_TILE,  9,  0},
-    {{ 2,  3}, ANY_TILE,  9,  0},
+    {{ 1,  3}, ANY_TILE,     STAGE_CLOCKWORK_MACHINES,  0},
+    {{ 2,  3}, ANY_TILE,     STAGE_CLOCKWORK_MACHINES,  0},
 };
 StaticLinkTrigger sStg06PermalinkTriggers[1] = {
-    {{ 0,  5}, {{  5,   5}},  2,  1},
+    {{ 0,  5}, {{  5,   5}}, STAGE_KYOTO,               1},
 };
 StaticLinkTrigger sStg09PermalinkTriggers[1] = {
-    {{ 0,  1}, {{ 13,  14}},  5,  0},
+    {{ 0,  1}, {{ 13,  14}}, STAGE_VIOLENCE_DISTRICT,   0},
 };
 StaticLinkTrigger sStg10PermalinkTriggers[1] = {
-    {{ 0,  0}, {{  0,  10}},  0,  0},
+    {{ 0,  0}, {{  0,  10}}, STAGE_BRIGHT_MOON_COTTAGE, 0},
 };
 StaticLinkTrigger sStg11PermalinkTriggers[1] = {
-    {{ 1,  1}, {{  9,   9}},  4,  0},
+    {{ 1,  1}, {{  9,   9}}, STAGE_HAPPY_TOWN,          0},
 };
 StaticLinkTrigger sStg12PermalinkTriggers[1] = {
-    {{ 1,  2}, {{ 10,  14}},  3,  1},
+    {{ 1,  2}, {{ 10,  14}}, STAGE_NATURAL_WORLD,       1},
 };
 StaticLinkTrigger *sStagePermalinkTriggers[STAGE_COUNT] = {
     sStg00PermalinkTriggers, NULL, sStg02PermalinkTriggers, sStg03PermalinkTriggers,
@@ -770,65 +769,65 @@ u8 *sTunnelExitHeadings[STAGE_COUNT] = {
     NULL, sStg13TunnelExitHeadings,
 };
 StaticLinkTrigger sStg00TunnelTriggers[2] = {
-    {{ 0,  0}, {{  8,   1}},  3,  0},
-    {{ 0,  0}, {{  9,   1}},  3,  0},
+    {{ 0,  0}, {{  8,   1}}, STAGE_NATURAL_WORLD,       0},
+    {{ 0,  0}, {{  9,   1}}, STAGE_NATURAL_WORLD,       0},
 };
 u8 sStg00TunnelEnterHeadings[2] = {2, 2};
 StaticLinkTrigger sStg01TunnelTriggers[4] = {
-    /* chunk      tile      stage spawn */
-    {{ 1,  0}, {{  8,   1}},  3,  1},
-    {{ 1,  0}, {{  9,   1}},  3,  1},
-    {{ 1,  1}, {{ 18,  17}},  8,  0},
-    {{ 1,  1}, {{ 19,  17}},  8,  0},
+    /* chunk     tile         stage                      spawn */
+    {{ 1,  0}, {{  8,   1}}, STAGE_NATURAL_WORLD,       1},
+    {{ 1,  0}, {{  9,   1}}, STAGE_NATURAL_WORLD,       1},
+    {{ 1,  1}, {{ 18,  17}}, STAGE_FLESH_TUNNELS,       0},
+    {{ 1,  1}, {{ 19,  17}}, STAGE_FLESH_TUNNELS,       0},
 };
 u8 sStg01TunnelEnterHeadings[4] = {2, 2, 0, 0};
 StaticLinkTrigger sStg02TunnelTriggers[6] = {
-    /* chunk      tile      stage spawn */
-    {{ 2,  0}, {{ 10,   1}},  3,  2},
-    {{ 2,  0}, {{ 11,   1}},  3,  2},
-    {{ 3,  5}, {{ 14,  16}},  7,  0},
-    {{ 3,  5}, {{ 14,  17}},  7,  0},
-    {{ 4,  2}, {{  8,   8}}, 13,  0},
-    {{ 4,  2}, {{  9,   8}}, 13,  0},
+    /* chunk     tile         stage                      spawn */
+    {{ 2,  0}, {{ 10,   1}}, STAGE_NATURAL_WORLD,       2},
+    {{ 2,  0}, {{ 11,   1}}, STAGE_NATURAL_WORLD,       2},
+    {{ 3,  5}, {{ 14,  16}}, STAGE_TEMPLE_DOJO,         0},
+    {{ 3,  5}, {{ 14,  17}}, STAGE_TEMPLE_DOJO,         0},
+    {{ 4,  2}, {{  8,   8}}, STAGE_MONUMENT_PARK,       0},
+    {{ 4,  2}, {{  9,   8}}, STAGE_MONUMENT_PARK,       0},
 };
 u8 sStg02TunnelEnterHeadings[6] = {2, 2, 1, 1, 0, 0};
 StaticLinkTrigger sStg03TunnelTriggers[10] = {
-    /* chunk      tile      stage spawn */
-    {{ 7,  8}, {{  8,   9}},  0,  0},
-    {{ 7,  8}, {{  9,   9}},  0,  0},
-    {{ 3,  9}, {{  8,   8}},  1,  0},
-    {{ 3,  9}, {{  9,   8}},  1,  0},
-    {{13,  6}, {{  9,   8}},  2,  0},
-    {{13,  6}, {{ 10,   8}},  2,  0},
-    {{11, 12}, {{  8,   8}},  4,  0},
-    {{11, 12}, {{  9,   8}},  4,  0},
-    {{ 3,  4}, {{  7,   8}},  5,  0},
-    {{ 3,  4}, {{  8,   8}},  5,  0},
+    /* chunk     tile         stage                      spawn */
+    {{ 7,  8}, {{  8,   9}}, STAGE_BRIGHT_MOON_COTTAGE, 0},
+    {{ 7,  8}, {{  9,   9}}, STAGE_BRIGHT_MOON_COTTAGE, 0},
+    {{ 3,  9}, {{  8,   8}}, STAGE_PIT_AND_TEMPLE,      0},
+    {{ 3,  9}, {{  9,   8}}, STAGE_PIT_AND_TEMPLE,      0},
+    {{13,  6}, {{  9,   8}}, STAGE_KYOTO,               0},
+    {{13,  6}, {{ 10,   8}}, STAGE_KYOTO,               0},
+    {{11, 12}, {{  8,   8}}, STAGE_HAPPY_TOWN,          0},
+    {{11, 12}, {{  9,   8}}, STAGE_HAPPY_TOWN,          0},
+    {{ 3,  4}, {{  7,   8}}, STAGE_VIOLENCE_DISTRICT,   0},
+    {{ 3,  4}, {{  8,   8}}, STAGE_VIOLENCE_DISTRICT,   0},
 };
 u8 sStg03TunnelEnterHeadings[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 StaticLinkTrigger sStg04TunnelTriggers[2] = {
-    {{ 2,  0}, {{  8,   1}},  3,  3},
-    {{ 2,  0}, {{  9,   1}},  3,  3},
+    {{ 2,  0}, {{  8,   1}}, STAGE_NATURAL_WORLD,       3},
+    {{ 2,  0}, {{  9,   1}}, STAGE_NATURAL_WORLD,       3},
 };
 u8 sStg04TunnelEnterHeadings[2] = {2, 2};
 StaticLinkTrigger sStg05TunnelTriggers[2] = {
-    {{ 2,  0}, {{  8,   1}},  3,  4},
-    {{ 2,  0}, {{  9,   1}},  3,  4},
+    {{ 2,  0}, {{  8,   1}}, STAGE_NATURAL_WORLD,       4},
+    {{ 2,  0}, {{  9,   1}}, STAGE_NATURAL_WORLD,       4},
 };
 u8 sStg05TunnelEnterHeadings[2] = {2, 2};
 StaticLinkTrigger sStg07TunnelTriggers[2] = {
-    {{ 0,  0}, {{  8,   3}},  2,  1},
-    {{ 0,  0}, {{  9,   3}},  2,  1},
+    {{ 0,  0}, {{  8,   3}}, STAGE_KYOTO,               1},
+    {{ 0,  0}, {{  9,   3}}, STAGE_KYOTO,               1},
 };
 u8 sStg07TunnelEnterHeadings[2] = {2, 2};
 StaticLinkTrigger sStg08TunnelTriggers[2] = {
-    {{ 0,  0}, {{  8,   1}},  1,  1},
-    {{ 0,  0}, {{  9,   1}},  1,  1},
+    {{ 0,  0}, {{  8,   1}}, STAGE_PIT_AND_TEMPLE,      1},
+    {{ 0,  0}, {{  9,   1}}, STAGE_PIT_AND_TEMPLE,      1},
 };
 u8 sStg08TunnelEnterHeadings[2] = {2, 2};
 StaticLinkTrigger sStg13TunnelTriggers[2] = {
-    {{ 0,  0}, {{  8,   1}},  2,  2},
-    {{ 0,  0}, {{  9,   1}},  2,  2},
+    {{ 0,  0}, {{  8,   1}}, STAGE_KYOTO,               2},
+    {{ 0,  0}, {{  9,   1}}, STAGE_KYOTO,               2},
 };
 u8 sStg13TunnelEnterHeadings[2] = {2, 2};
 StaticLinkTrigger *sTunnelTriggers[STAGE_COUNT] = {
@@ -885,32 +884,32 @@ StageSpawn *sTeleportSpawns[STAGE_COUNT] = {
     NULL, NULL,
 };
 StaticLinkTrigger sStg02TeleportTriggers[8] = {
-    /* chunk      tile      stage spawn */
-    {{ 1,  1}, {{  4,  10}},  2,  0},
-    {{ 0,  0}, {{  7,  17}},  2,  1},
-    {{ 4,  1}, {{  7,   0}},  2,  2},
-    {{ 4,  3}, {{  4,  18}},  2,  3},
-    {{ 1,  2}, {{  1,  14}},  2,  5},
-    {{ 2,  1}, {{ 13,  14}},  2,  7},
-    {{ 4,  4}, {{ 13,   3}},  2,  6},
-    {{ 4,  1}, {{ 11,   0}},  2,  8},
+    /* chunk     tile         stage                      spawn */
+    {{ 1,  1}, {{  4,  10}}, STAGE_KYOTO,               0},
+    {{ 0,  0}, {{  7,  17}}, STAGE_KYOTO,               1},
+    {{ 4,  1}, {{  7,   0}}, STAGE_KYOTO,               2},
+    {{ 4,  3}, {{  4,  18}}, STAGE_KYOTO,               3},
+    {{ 1,  2}, {{  1,  14}}, STAGE_KYOTO,               5},
+    {{ 2,  1}, {{ 13,  14}}, STAGE_KYOTO,               7},
+    {{ 4,  4}, {{ 13,   3}}, STAGE_KYOTO,               6},
+    {{ 4,  1}, {{ 11,   0}}, STAGE_KYOTO,               8},
 };
 StaticLinkTrigger sStg03TeleportTriggers[1] = {
-    {{ 7,  4}, {{  0,   5}},  3,  2},
+    {{ 7,  4}, {{  0,   5}}, STAGE_NATURAL_WORLD,       2},
 };
 StaticLinkTrigger sStg05TeleportTriggers[5] = {
-    /* chunk      tile      stage spawn */
-    {{ 3,  1}, {{ 18,  16}},  5,  0},
-    {{ 2,  3}, {{ 11,  11}},  5,  1},
-    {{ 0,  2}, {{ 18,  10}},  5,  2},
-    {{ 2,  2}, {{  9,  16}},  5,  3},
-    {{ 1,  2}, {{ 13,  16}},  5,  4},
+    /* chunk     tile         stage                      spawn */
+    {{ 3,  1}, {{ 18,  16}}, STAGE_VIOLENCE_DISTRICT,   0},
+    {{ 2,  3}, {{ 11,  11}}, STAGE_VIOLENCE_DISTRICT,   1},
+    {{ 0,  2}, {{ 18,  10}}, STAGE_VIOLENCE_DISTRICT,   2},
+    {{ 2,  2}, {{  9,  16}}, STAGE_VIOLENCE_DISTRICT,   3},
+    {{ 1,  2}, {{ 13,  16}}, STAGE_VIOLENCE_DISTRICT,   4},
 };
 StaticLinkTrigger sStg08TeleportTriggers[3] = {
-    /* chunk      tile      stage spawn */
-    {{ 0,  0}, {{  8,  11}},  8,  0},
-    {{ 0,  0}, {{  9,   4}},  8,  1},
-    {{ 0,  1}, {{ 17,   8}},  8,  2},
+    /* chunk     tile         stage                      spawn */
+    {{ 0,  0}, {{  8,  11}}, STAGE_FLESH_TUNNELS,       0},
+    {{ 0,  0}, {{  9,   4}}, STAGE_FLESH_TUNNELS,       1},
+    {{ 0,  1}, {{ 17,   8}}, STAGE_FLESH_TUNNELS,       2},
 };
 StaticLinkTrigger *sTeleportTriggers[STAGE_COUNT] = {
     NULL, NULL, sStg02TeleportTriggers, sStg03TeleportTriggers,
@@ -920,7 +919,7 @@ StaticLinkTrigger *sTeleportTriggers[STAGE_COUNT] = {
 };
 s8 sTeleportTriggersCount[STAGE_COUNT] = {0, 0, 8, 1, 0, 5, 0, 0, 3, 0, 0, 0, 0, 0};
 
-/* The staircases, TestForStaircaseNodes' tables (stage 0 only), with
+/* The staircases, TestForStaircaseNodes' tables (Bright Moon Cottage only), with
  * headings as for the tunnels (DreamSys__CheckStaircaseHeading). */
 StageSpawn sStg00StaircaseSpawns[8] = {
     /* chunk      tile     adj extra */
@@ -947,15 +946,15 @@ u8 *sStaircaseExitHeadings[STAGE_COUNT] = {
     NULL, NULL,
 };
 StaticLinkTrigger sStg00StaircaseTriggers[8] = {
-    /* chunk      tile      stage spawn */
-    {{ 0,  0}, {{  9,   9}},  0,  0},
-    {{ 0,  1}, {{  9,   9}},  0,  1},
-    {{ 0,  2}, {{  9,   9}},  0,  2},
-    {{ 0,  3}, {{  9,   9}},  0,  3},
-    {{ 0,  1}, {{  8,   8}},  0,  4},
-    {{ 0,  2}, {{  8,   8}},  0,  5},
-    {{ 0,  3}, {{  8,   8}},  0,  6},
-    {{ 0,  4}, {{  8,   7}},  0,  7},
+    /* chunk     tile         stage                      spawn */
+    {{ 0,  0}, {{  9,   9}}, STAGE_BRIGHT_MOON_COTTAGE, 0},
+    {{ 0,  1}, {{  9,   9}}, STAGE_BRIGHT_MOON_COTTAGE, 1},
+    {{ 0,  2}, {{  9,   9}}, STAGE_BRIGHT_MOON_COTTAGE, 2},
+    {{ 0,  3}, {{  9,   9}}, STAGE_BRIGHT_MOON_COTTAGE, 3},
+    {{ 0,  1}, {{  8,   8}}, STAGE_BRIGHT_MOON_COTTAGE, 4},
+    {{ 0,  2}, {{  8,   8}}, STAGE_BRIGHT_MOON_COTTAGE, 5},
+    {{ 0,  3}, {{  8,   8}}, STAGE_BRIGHT_MOON_COTTAGE, 6},
+    {{ 0,  4}, {{  8,   7}}, STAGE_BRIGHT_MOON_COTTAGE, 7},
 };
 u8 sStg00StaircaseEnterHeadings[8] = {2, 2, 2, 2, 2, 2, 2, 1};
 StaticLinkTrigger *sStaircaseTriggers[STAGE_COUNT] = {
@@ -1107,7 +1106,7 @@ void DreamSys__NotifyLinkAttempt(DreamSys *self, s32 event) {
             if (self->state == DREAMSYS_LINK_TUNNEL && self->voiceSelect == 0)
                 self->voiceSelect = 2;
 
-            if (self->currentStage == 9) {
+            if (self->currentStage == STAGE_CLOCKWORK_MACHINES) {
                 self->methods->tryStageTimerLink(
                     self,
                     (PlayerSpawnPoint *)self->grid->methods->getTargetDescriptor(self->grid, 0, 0));
@@ -1670,8 +1669,8 @@ void DreamSys__ApplyMoveCommand(DreamSys *self, s32 command) {
             self->methods->saveLinkSnapshot(self);
             /* MATCHING: staircaseMoveGate is u32 for this unsigned `< 1`; its writers store 0 or 1 */
             sMoveCommandDispatch[command](self, delta, (void *)(self->staircaseMoveGate < 1));
-            if (self->currentStage == 0 && self->coord2->coord.t[1] < -2000 &&
-                self->coord2->coord.t[0] >= -499) {
+            if (self->currentStage == STAGE_BRIGHT_MOON_COTTAGE &&
+                self->coord2->coord.t[1] < -2000 && self->coord2->coord.t[0] >= -499) {
                 self->methods->onGridCellLinkCommand(self, self, 4);
             }
         }
@@ -2455,19 +2454,25 @@ s32 GetStageTimeLimit(s32 stage) {
     return sStageTimeLimits[stage];
 }
 
+/* A random link lands on one of the first six stages, Bright Moon Cottage to
+ * Violence District; the others are reached only by fixed links. */
+#define RANDOM_LINK_STAGE_COUNT (STAGE_VIOLENCE_DISTRICT + 1)
+
+/* A random spawn point: on a random one of the first six stages other than
+ * fromStage, or, for a negative fromStage, on stage -fromStage. */
 s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 fromStage, s32 unused) {
     s32 stage;
     s32 index;
     StageSpawn *entry;
-    s32 six;
+    s32 stageCount;
 
-    six = 6;
+    stageCount = RANDOM_LINK_STAGE_COUNT; /* MATCHING: a local; retail loads the 6 into a saved register before the branch */
     if (fromStage >= 0) {
-        stage = rand() % six;
+        stage = rand() % stageCount;
         if (stage == fromStage) {
             stage++;
-            if (stage >= 6)
-                stage = 0;
+            if (stage >= RANDOM_LINK_STAGE_COUNT)
+                stage = STAGE_BRIGHT_MOON_COTTAGE;
         }
     } else {
         stage = -fromStage;
@@ -2533,40 +2538,43 @@ s32 IsHeadingAligned(Ratio16 *rotation, u8 heading) {
    raw word; only ever compared here, never dereferenced field-by-field. */
 extern s32 sStage5TriggerGridPos;
 
-/* The stage links that TryStageTimerLink takes: only stages 1, 3, 5, 9 and
- * 12 have one. Stage 5 links below y -4095 or at the one grid position
- * sStage5TriggerGridPos, stage 9 at y 2048 and up, the others anywhere. On an
- * odd timer the link lands on stage 12 (GetRandomSpawnFromStage's negative
- * form), otherwise away from the current stage. Returns the destination stage
+/* The stage links that TryStageTimerLink takes: only Pit & Temple, The
+ * Natural World, Violence District, Clockwork Machines and Black Space have
+ * one. Violence District links below y -4095 or at the one grid position
+ * sStage5TriggerGridPos, Clockwork Machines at y 2048 and up, the others
+ * anywhere. On an odd timer the link lands on Black Space
+ * (GetRandomSpawnFromStage's negative form), otherwise away from the current
+ * stage. Returns the destination stage
  * (also sLinkDstStage), or -1 for no link. */
 s32 TestForStageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer) {
     s32 result;
 
-    if (stage != 3 && stage != 1 && stage != 5 && stage != 9 && stage != 12)
+    if (stage != STAGE_NATURAL_WORLD && stage != STAGE_PIT_AND_TEMPLE && stage != STAGE_VIOLENCE_DISTRICT &&
+        stage != STAGE_CLOCKWORK_MACHINES && stage != STAGE_BLACK_SPACE)
         return -1;
-    if (stage == 5) {
+    if (stage == STAGE_VIOLENCE_DISTRICT) {
         if (currentPos->position.y >= -4095 && *(s32 *)currentPos != sStage5TriggerGridPos)
             return -1;
-    } else if (stage == 9) {
+    } else if (stage == STAGE_CLOCKWORK_MACHINES) {
         if (currentPos->position.y < 2048)
             return -1;
     }
     if (timer & 1)
-        stage = -12;
+        stage = -STAGE_BLACK_SPACE;
     result = GetRandomSpawnFromStage(target, stage, timer);
     sLinkDstStage = result;
     return result;
 }
 
 /* The rotation TryStageTimerLink stores in stageLinkAngle for every
-   destination but stage 12. */
+   destination but Black Space. */
 extern s32 sLinkAngle180;
 
 s32 GetStageLinkAngle(void) {
     s32 result;
 
     result = 0;
-    if (sLinkDstStage != 12)
+    if (sLinkDstStage != STAGE_BLACK_SPACE)
         result = (s32)&sLinkAngle180;
     return result;
 }
@@ -2592,7 +2600,7 @@ s32 TestForInstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *curren
 }
 
 s32 GetTeleportTimeBonus(void) {
-    return (sLinkSrcStage == 0) ? 10 : 0;
+    return (sLinkSrcStage == STAGE_BRIGHT_MOON_COTTAGE) ? 10 : 0;
 }
 
 s32 TestForStaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {

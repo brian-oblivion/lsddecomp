@@ -659,7 +659,8 @@ extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
  * @brief Sets the height gate SceneNode__RaycastHullAgainstFaces's centre-line
  *        test reads: while it is non-zero, a centre-line hit counts only
  *        above a height of 512, as the edge tests always require.
- *        ObjM__InitStyleAndWorld sets it for stage 0 and stages 3, 5 and 6.
+ *        ObjM__InitStyleAndWorld sets it for Bright Moon Cottage, The Natural
+ *        World, Violence District and Moonlight Tower.
  * @param value The new gate.
  * @return The old gate.
  */

@@ -1140,7 +1140,8 @@ s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b) {
  * SceneNode__RaycastHullAgainstFaces's segment test accepts only a hit whose
  * height (TmdModel__RaycastFaces: above the face box's minimum y) is at least
  * 513, which its edge tests always require. ObjM__InitStyleAndWorld sets it
- * for stage 0 and stages 3, 5 and 6. */
+ * for Bright Moon Cottage, The Natural World, Violence District and
+ * Moonlight Tower. */
 s32 GetSetHitHeightGate(s32 value) {
     s32 old;
 

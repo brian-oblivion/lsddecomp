@@ -113,6 +113,10 @@ sender it hears from.
 ## One day of the dream
 
 `GameApplication__RunDayTask` runs one `DayTask` (`src/world/day_task.c`).
+The dream's areas are its fourteen stages, `enum Stage` in
+`include/stage_grid.h` (Bright Moon Cottage, Kyoto, Happy Town and the
+rest). A stage is a grid of map chunks, and every per-stage table is
+indexed by the enum.
 
 - **The DayTask** loads the day's shared resources: `ETC\ETC.TIM`,
   `ETC\DREAMER.TMD` and the week's BGM. It builds the day's FrameClock, a
@@ -188,8 +192,6 @@ sender it hears from.
 The mechanics are all in the code. What they stand for in the game is not
 always established, and the code says so rather than guess:
 
-- **Stage ids** are still numbers (`currentStage == 9`), and which id is
-  which area hasn't been confirmed in-game.
 - **ObjM's states and the style configs** have mechanical names. The
   headers say which readings the evidence doesn't settle.
 - **Entities** are named for what their MoodCue handler does, not for what

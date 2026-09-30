@@ -114,7 +114,7 @@ s32 sStagePendingExtras[14] = {
 };
 /* clang-format on */
 
-/* The StageMap's bounds on stage 0: columns 0..8, rows 0..9. */
+/* The StageMap's bounds in Bright Moon Cottage: columns 0..8, rows 0..9. */
 CellBounds sStage0Bounds = {0, 0, 8, 9};
 
 /* The viewport's view point and reference point (attachViewChild). */
@@ -229,18 +229,18 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 i
     }
 
     self->initOption = initOption;
-    if (self->stage != 0) {
+    if (self->stage != STAGE_BRIGHT_MOON_COTTAGE) {
         s32 stage;
 
         /* MATCHING: the volatile read keeps retail's second load of self->stage. */
         stage = *(s32 volatile *)&self->stage;
         self->tickPeriod = 16;
-        flag = (stage == 5);
+        flag = (stage == STAGE_VIOLENCE_DISTRICT);
         self->moveMode = 3;
-        if (stage == 6) {
+        if (stage == STAGE_MOONLIGHT_TOWER) {
             flag = 1;
         }
-        if (stage == 3) {
+        if (stage == STAGE_NATURAL_WORLD) {
             flag = 1;
         }
         ((StageMap *)self->lightRig)->methods->setBounds((StageMap *)self->lightRig, 0);

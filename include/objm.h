@@ -169,7 +169,7 @@ struct ObjM {
     /* +0x038 */ s32 stage; /**< The ctor's stage: picks the BGM, the chunk records, the grid, sStagePendingExtras[stage]. */
     /* +0x03C */ struct DreamSys *dreamSys; /**< init's DreamSys (AttachTarget), kept as a child. */
     /* +0x040 */ s32 tickPeriod; /**< 16 (InitStyleAndWorld); the DreamSys's resetLinkState tick period. */
-    /* +0x044 */ s32 moveMode; /**< 2 on stage 0, else 3 (InitStyleAndWorld); resetLinkState's move mode. */
+    /* +0x044 */ s32 moveMode; /**< 2 in Bright Moon Cottage, else 3 (InitStyleAndWorld); resetLinkState's move mode. */
     /* +0x048 */ s32 gridSpan; /**< onInit's gridSpan, 0 meaning DEFAULT_GRID_SPAN; the StageMap's setGridSpan. */
     /* +0x04C */ s32 initOption; /**< onInit's third argument (IntermediateBase__Init passes 0); no reader. */
     /* +0x050 */ struct StyleConfig *styleConfig; /**< RegisterStyleConfig's result, or onInit's override. */

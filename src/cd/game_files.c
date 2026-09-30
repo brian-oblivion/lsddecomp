@@ -147,12 +147,12 @@ CdFileEntry *GetStageBgmRecords(s32 stage) {
     return &GetStageRecords(stage)[STAGE_RECORD_BGM];
 }
 
-/* A random or forced BGM record. Stage 9 never plays BGC.SEQ: a random
+/* A random or forced BGM record. Clockwork Machines never plays BGC.SEQ: a random
  * pick of it (2) becomes BGD, and a forced 3 becomes 4. */
 CdFileEntry *PickStageBgm(s32 stage, s32 unused) {
     u32 r = (u32)SeedAndRandom(0, unused) % STAGE_BGM_COUNT;
     CdFileEntry *rec;
-    if (stage == 9) {
+    if (stage == STAGE_CLOCKWORK_MACHINES) {
         if (r == 2) {
             r = 3;
         }

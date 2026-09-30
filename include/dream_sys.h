@@ -687,10 +687,12 @@ extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos
                           s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
 
 /**
- * @brief The stage links TryStageTimerLink takes: only stages 1, 3, 5, 9 and
- *        12 have one. Stage 5 links below y -4095 or at one grid position,
- *        stage 9 at y 2048 and up, the others anywhere. On an odd timer the
- *        link lands on stage 12, otherwise on a random other stage.
+ * @brief The stage links TryStageTimerLink takes: only Pit & Temple, The
+ *        Natural World, Violence District, Clockwork Machines and Black Space
+ *        have one. Violence District links below y -4095 or at one grid
+ *        position, Clockwork Machines at y 2048 and up, the others anywhere.
+ *        On an odd timer the link lands on Black Space, otherwise on a random
+ *        other stage.
  * @param target     Where to write the destination spawn.
  * @param stage      The current stage.
  * @param currentPos The player's position.
@@ -703,7 +705,7 @@ extern s32 TestForStageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpa
 /**
  * @brief The rotation a stage-timer link leaves the player at.
  * @return A pointer to a half-turn rotation (as an s32), or 0 when the last
- *         link's destination was stage 12.
+ *         link's destination was Black Space.
  */
 extern s32 GetStageLinkAngle(void);
 
@@ -721,7 +723,7 @@ extern s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotat
 
 /**
  * @brief The staircase link test: GetStaticSpawn over the staircase tables,
- *        on stage 0 only.
+ *        in Bright Moon Cottage only.
  * @param target     Where to write the destination spawn.
  * @param currentPos The player's position.
  * @param stage      The current stage.
@@ -1054,7 +1056,7 @@ s32 CalcNavigationScore(void);
 /**
  * @brief A day's first spawn: the first stage chunk that owns `mood`, and a
  *        spawn point of that stage in that chunk (or one picked by the chunk
- *        when none is); with no stage owning it, a random spawn on stage 1.
+ *        when none is); with no stage owning it, a random spawn on Pit & Temple.
  * @param dest      Where to write the spawn.
  * @param timeLimit Where to write the stage's time limit, in seconds.
  * @param mood      The mood to spawn by (the previous day's).
@@ -1065,7 +1067,8 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
 
 /**
  * @brief A random spawn point, counted as a dynamic link. With `fromStage`
- *        >= 0 the stage is a random one of stages 0..5 other than
+ *        >= 0 the stage is a random one of the first six (Bright Moon
+ *        Cottage to Violence District) other than
  *        `fromStage` (a dynamic link away from it); with `fromStage`
  *        negative it is stage -fromStage (a link onto it, as instances make).
  * @param target    Where to write the spawn.
@@ -1128,7 +1131,7 @@ void DreamSys__DetachFromParent(DreamSys *self);
 /**
  * @brief Slot +0x088: Actor's notifyWithHull, then the answer to a step's
  *        floor search (Actor__FindNearbyLink). ACTOR_EVENT_FLOOR_FOUND: its
- *        cell picks the footstep sound (voiceSelect), and on stage 9 a
+ *        cell picks the footstep sound (voiceSelect), and in Clockwork Machines a
  *        stage-timer link is tried. ACTOR_EVENT_NO_FLOOR: a stage-timer link
  *        is tried where the chunk's header is consumed, otherwise the step
  *        is undone.
@@ -1392,7 +1395,7 @@ void DreamSys__StopVoice(DreamSys *self);
  * @brief Slot +0x170: takes a step: tries a staircase, a teleporter and a
  *        tunnel link at the player's position, and with none, saves the
  *        coordinate and moves by the step's signed speed (which finds the
- *        floor and may link). On stage 0, a position with y < -2000 and
+ *        floor and may link). In Bright Moon Cottage, a position with y < -2000 and
  *        x >= -499 is then treated as a wall hit (onGridCellLinkCommand,
  *        event 4).
  * @param self    The DreamSys.

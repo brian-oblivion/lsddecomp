@@ -193,7 +193,7 @@ s8 sStyleKind0Counts[4] = {0, 3, 8, 16};
 s32 sStyleSpawnYChoices[4] = {-6144, -10240, -14336, -20480};
 
 /* The fixed configs, {colorMode, fogLevel, farColorIndex, clearColorIndex}:
- * stage 5's (the others' are .sdata, declared above), then the four
+ * Violence District's (the others' are .sdata, declared above), then the four
  * fallback variants PickStyleFallbackConfig picks from, by day and stage. */
 StyleStageConfig sStyleStage05Configs[2] = {{0, 2, 10, 10}, {0, 1, 14, 13}};
 s8 sStyleVariant0Configs[7][4] = {
@@ -462,8 +462,8 @@ void ApplyStyleDecorationIfSet(void) {
  *    record of the stage's cue list within its cue's distance of the target
  *    and starts the record's SoundCueSet callback; a claimed slot is
  *    serviced while the target stays in range and flushed when it leaves.
- * The target is the grid's target cell as a world position; on stages 2 to
- * 5 StyleScrollVramStrips also rotates a VRAM strip. What a variant, an
+ * The target is the grid's target cell as a world position; from Kyoto to
+ * Violence District StyleScrollVramStrips also rotates a VRAM strip. What a variant, an
  * effect kind or a cue stands for in the game is not established; the names
  * describe mechanics.
  */
@@ -1062,18 +1062,18 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     return lastCue;
 }
 
-/* One step of RotateVramRectRight's one-column VRAM rotation: stage 2 on the
- * strip at y 496, stages 3..5 on the one at y 504. */
+/* One step of RotateVramRectRight's one-column VRAM rotation: Kyoto on the
+ * strip at y 496, The Natural World to Violence District on the one at y 504. */
 void StyleScrollVramStrips(void) {
     DrawRect *rect;
     DrawPoint *scratch;
     s32 count;
 
-    if (sStyleStage == 2) {
+    if (sStyleStage == STAGE_KYOTO) {
         rect = &sStyleStripRectA;
         scratch = (DrawPoint *)&sStyleStripScratchA;
         count = 1; /* MATCHING: a local set in each branch, not a literal argument */
-    } else if (sStyleStage >= 3 && sStyleStage < 6) {
+    } else if (sStyleStage >= STAGE_NATURAL_WORLD && sStyleStage <= STAGE_VIOLENCE_DISTRICT) {
         count = 1;
         rect = &sStyleStripRectB;
         scratch = (DrawPoint *)&sStyleStripScratchB;

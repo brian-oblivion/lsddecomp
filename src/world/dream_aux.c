@@ -458,20 +458,20 @@ DreamAuxTriggerEntry sStg13AuxTriggers[1] = {
 };
 
 /* The per-stage tables and their lengths. */
-TriggerRecord *sDreamAuxGroupRecords[DREAM_AUX_STAGE_COUNT] = {
+TriggerRecord *sDreamAuxGroupRecords[STAGE_COUNT] = {
     sStg00AuxRecords, sStg01AuxRecords, sStg02AuxRecords, sStg03AuxRecords,
     sStg04AuxRecords, sStg05AuxRecords, sStg06AuxRecords, sStg07AuxRecords,
     sStg08AuxRecords, sStg09AuxRecords, sStg10AuxRecords, sStg11AuxRecords,
     sStg12AuxRecords, sStg13AuxRecords,
 };
-s8 sDreamAuxGroupCounts[DREAM_AUX_STAGE_COUNT] = {15, 3, 30, 33, 30, 27, 1, 7, 6, 2, 2, 2, 2, 1};
-DreamAuxTriggerEntry *sDreamAuxTriggerEntries[DREAM_AUX_STAGE_COUNT] = {
+s8 sDreamAuxGroupCounts[STAGE_COUNT] = {15, 3, 30, 33, 30, 27, 1, 7, 6, 2, 2, 2, 2, 1};
+DreamAuxTriggerEntry *sDreamAuxTriggerEntries[STAGE_COUNT] = {
     sStg00AuxTriggers, sStg01AuxTriggers, sStg02AuxTriggers, sStg03AuxTriggers,
     sStg04AuxTriggers, sStg05AuxTriggers, sStg06AuxTriggers, sStg07AuxTriggers,
     sStg08AuxTriggers, sStg09AuxTriggers, sStg10AuxTriggers, sStg11AuxTriggers,
     sStg12AuxTriggers, sStg13AuxTriggers,
 };
-s8 sDreamAuxTriggerCounts[DREAM_AUX_STAGE_COUNT] = {5, 2, 17, 19, 22, 17, 1, 5, 3, 2, 1, 2, 1, 1};
+s8 sDreamAuxTriggerCounts[STAGE_COUNT] = {5, 2, 17, 19, 22, 17, 1, 5, 3, 2, 1, 2, 1, 1};
 /* clang-format on */
 
 /* The two ModelData files InitDreamAux can load. With one slot, only
@@ -545,7 +545,7 @@ void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct Vab
 }
 
 void SetTeleportsEnabled(s32 stage) {
-    SetInstantTeleportersEnabled(stage == 11 || stage == 3);
+    SetInstantTeleportersEnabled(stage == STAGE_SUN_FACES_HEAVE || stage == STAGE_NATURAL_WORLD);
 }
 
 /* Mood rows 11, 56, 78 and 93 turn the instant teleporters on. */
@@ -587,7 +587,7 @@ s32 TryDreamAuxTrigger(s32 data, s16 *chunkKey, s32 day) {
         if (CheckTriggerDayParity(day, trigger)) {
             return (s32)FireDreamAuxTriggerEntries(day, trigger, data);
         }
-        if (sDreamAuxStage != 0 && rand() % 12 == 0 && (day & 1) == 0) {
+        if (sDreamAuxStage != STAGE_BRIGHT_MOON_COTTAGE && rand() % 12 == 0 && (day & 1) == 0) {
             PlaceDreamAuxEntityByPlayer(sDreamAuxSlots);
         }
     }
@@ -611,11 +611,11 @@ DreamAuxTriggerEntry *LookupDreamAuxTrigger(s16 *chunkKey) {
     return NULL;
 }
 
-/* On stage 4, a red dream swaps the stage's trigger 16 for trigger 21. */
+/* In Happy Town, a red dream swaps the stage's trigger 16 for trigger 21. */
 DreamAuxTriggerEntry *RemapTriggerForDreamColor(DreamAuxTriggerEntry *trigger, s32 index) {
     s32 stage = sDreamAuxStage;
 
-    if (stage == 4 && index == 16) {
+    if (stage == STAGE_HAPPY_TOWN && index == 16) {
         DreamSys *player = sDreamAuxWorld;
         s32 color = player->methods->getDreamColor(player);
 

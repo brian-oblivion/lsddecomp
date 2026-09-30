@@ -140,7 +140,7 @@ extern CdFileEntry *PickStageTexture(s32 stage, s32 unused, s32 day);
 extern CdFileEntry *GetStageBgmRecords(s32 stage);
 
 /**
- * @brief The forced or a random BGM record of the stage. Stage 9 never plays
+ * @brief The forced or a random BGM record of the stage. Clockwork Machines never plays
  * BGC.SEQ: a random pick of it becomes BGD, and a forced 3 becomes 4.
  * @param stage  The stage.
  * @param unused Passed to SeedAndRandom, which ignores it.

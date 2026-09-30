@@ -23,7 +23,6 @@
  * sStage13ChunkMoods). GetStageGridDimensionsCount returns it,
  * GetStageGridDimensionsTable writes it out, and GetStageChunkFromMood bounds
  * its stage loop by it. */
-#define STAGE_COUNT 14
 
 /* clang-format off */
 /* Each stage's grid, STG00 to STG13. */
