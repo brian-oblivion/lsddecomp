@@ -35,7 +35,7 @@ wrapped line); in a header it is a `process` hit,
 because a header holds no matching notes. The patterns are a floor, never the
 definition of documented: a `@brief` that restates the name has met nothing.
 
---item takes a track-12 item name from plan.py (e.g. `area-ui`) and
+--item takes an area name (e.g. `area-ui`) and
 restricts the census to its files; exit status is 1 when anything is left.
 """
 import argparse

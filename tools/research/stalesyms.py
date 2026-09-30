@@ -64,7 +64,7 @@ roughly an order of magnitude: a prose mention of an old name is harmless and
 usually historically accurate. Only `#if 0 ... #endif` blocks and ```c fences
 are scanned, which is where linkage actually matters.
 
-Usage:  python3 tools/stalesyms.py [--reports DIR] [--quiet] [--all] [--fix]
+Usage:  python3 tools/research/stalesyms.py [--reports DIR] [--quiet] [--all] [--fix]
         --all also lists the ARCHIVAL (already-matched) reports in full.
         --fix rewrites the stale names inside the `#if 0` blocks of the
         OUTSTANDING live reports (not the head-annotated ones, not the

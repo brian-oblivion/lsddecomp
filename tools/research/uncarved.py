@@ -34,9 +34,9 @@ while no C compiles to it.  A trampoline-dense segment therefore reads as the
 cleanest ground in the executable while being the least matchable.
 
 Usage:
-    python3 tools/uncarved.py              # per-segment summary, best first
-    python3 tools/uncarved.py --functions  # every function, with its screens
-    python3 tools/uncarved.py --windows 20 # rolling clean-density windows
+    python3 tools/research/uncarved.py              # per-segment summary, best first
+    python3 tools/research/uncarved.py --functions  # every function, with its screens
+    python3 tools/research/uncarved.py --windows 20 # rolling clean-density windows
 """
 import argparse
 import os
@@ -44,7 +44,7 @@ import re
 import subprocess
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # splat emits three fields: FILEOFS VRAM WORD.  Anchoring `*/` after only
 # two silently matches nothing, which zeroes every word count AND disables
 # the per-function mflo window (an empty instruction list never loops).

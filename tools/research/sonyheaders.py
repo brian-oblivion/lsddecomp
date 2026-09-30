@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Which game headers and units still re-declare a Sony name their own way.
 
-    python3 tools/sonyheaders.py            # every collision, per file
-    python3 tools/sonyheaders.py --check    # exit 1 if any
-    python3 tools/sonyheaders.py --json
+    python3 tools/research/sonyheaders.py            # every collision, per file
+    python3 tools/research/sonyheaders.py --check    # exit 1 if any
+    python3 tools/research/sonyheaders.py --json
 
 Game code takes Sony's types and prototypes from Sony's headers
 (FINISHING-PLAN track 6, setup `sdk-headers`): `#include "common.h"`, then
@@ -24,7 +24,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 from typeviews import CPP, CC1, makefile_flags  # noqa: E402
 

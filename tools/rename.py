@@ -71,7 +71,7 @@ def frozen_spans(text):
     File history", "## Earlier history") down to the next heading of its
     level or above. They record the names in use when written; a rename made
     them quote commands never run and name retired types (rounds 90, 94, 97).
-    A preserved `#if 0` body inside one stays live (tools/stalesyms.py)."""
+    A preserved `#if 0` body inside one stays live (tools/research/stalesyms.py)."""
     spans, start, level, pos = [], None, 0, 0
     for line in text.split("\n"):
         m = HEADING.match(line)
@@ -448,12 +448,6 @@ def main():
         for i, line in enumerate(text.split("\n"), 1):
             if vacuous.search(line):
                 print(f"  note: {p.relative_to(ROOT)}:{i} now says {new} -> {new}; delete that proposal note")
-
-    # the ledger keys track 4 classes by TABLE symbol: renaming D_8006D430
-    # without it would list the unified class as never unified (revision 27)
-    sys.path.insert(0, str(ROOT / "tools"))
-    import plan
-    plan.ledger_rename({old: new})
 
     # 4. the report
     if report_old.exists():

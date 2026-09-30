@@ -9,18 +9,18 @@
 A unit's NAME lives in the splat yaml (`- [0xD294, c, code_d294]` and its
 `.rodata` line), in its file names (src/OLD.c, the same-stem header
 include/OLD.h and its guard), in the INCLUDE_ASM paths inside it, in the
-ledger (track 3/7 units passed), in the warnings baseline, and in prose in the
+warnings baseline, and in prose in the
 reports and live docs. FINISHING-PLAN track 8 renames and merges units, so
 this is one command, like rename.py for symbols.
 
 NEW may carry a directory (`sound/SoundDriver`): splat then writes
-src/sound/SoundDriver.c. The UNIT name everywhere else (ledger, tools,
+src/sound/SoundDriver.c. The UNIT name everywhere else (tools,
 reports) is the last component, which must stay unique (tools/srcpath.py).
 
 rename: the yaml line(s) (text, `.rodata` and `.data`), `git mv` of src/OLD.c (and include/OLD.h when it
 exists), whole-token rewrite of OLD / OLD_H guard in code and docs (not
 PROGRESS.md or the archive, nor a report's history sections, nor a prose
-line already naming NEW, as rename.py), the ledger and the warnings
+line already naming NEW, as rename.py) and the warnings
 baseline; deletes build/src/OLD.c.o; `make extract`; `./build-and-verify.sh`.
 `OLD.h` is never rewritten while include/OLD.h exists.
 
@@ -28,15 +28,14 @@ PATHS ONLY for a type-named file (track 11): when OLD is also an identifier
 in code (`Entity`, `SceneNode`), a token rewrite would rename the type, so
 only file references move: `src/<dir>/OLD.c`, `asm/nonmatchings/<dir>/OLD`,
 `OLD.c`, `OLD.h` (and include/OLD.h itself) and the guard `OLD_H` become
-NEW's, the ledger's `units_done` keys and header paths follow, and so does
-the warnings baseline's `OLD:` prefix. Prose that names the TYPE is left
+NEW's, and so does the warnings baseline's `OLD:` prefix. Prose that names the TYPE is left
 alone. `rename Entity world/entity` is one such run; a move into a
 directory that keeps the stem is the same rule with nothing but a path to
 change.
 
 header: include/OLD.h -> include/NEW.h for a header no unit owns (a class
 header whose methods live in a unit named otherwise, `ObjM.h`): `OLD.h`
-references, the guard, the ledger's header paths. Paths only, always.
+references and the guard. Paths only, always.
 
 check: every game file in src/ and include/ whose stem is not snake_case
 (FINISHING-PLAN track 11; Sony's src/psyq/ and include/psyq/ excluded).
@@ -55,7 +54,7 @@ goes RED on the first try: two units' local views of the same thing now meet
 in one file (`redefinition of`, `conflicting types`). Those are the job: keep
 one declaration, delete the other, rebuild, until the oracle is byte-identical.
 A merge changes zero bytes when it is right. Only the TU evidence
-(tools/tuboundary.py) says it is right to do at all.
+(tools/research/tuboundary.py) says it is right to do at all.
 """
 import argparse
 import os
@@ -121,8 +120,7 @@ def text_files():
 
 def rename_map(old, new, old_c, new_c, header_moved, paths_only):
     """The text map of one `rename` or `header` run. old_c/new_c are the .c
-    paths relative to ROOT (None for `header`). Shared with replay.py, which
-    reads them off the commit, so both rewrite exactly the same things."""
+    paths relative to ROOT (None for `header`)."""
     m = {}
     if old_c and old_c != new_c:
         m[old_c] = new_c
@@ -280,10 +278,6 @@ def cmd_rename(a):
     src_new.write_text(text)
     touched = rewrite_tokens(mapping)
     warnings_prefix(old, new) if hit else None
-    import plan
-    if new != old:
-        plan.ledger_rename(mapping)
-        plan.ledger_rename_unit(old, new)
     obj = ROOT / "build/src" / f"{old_path}.c.o"
     if obj.exists():
         obj.unlink()
@@ -309,8 +303,6 @@ def cmd_header(a):
         return 0
     subprocess.run(["git", "mv", str(hdr_old), str(hdr_new)], check=True)
     touched = rewrite_tokens(mapping)
-    import plan
-    plan.ledger_rename(mapping)
     print(f"  rewrote {len(touched)} file(s)")
     return build(a.no_build)
 
@@ -348,7 +340,7 @@ def cmd_merge(a):
         nxt_d = next((r for r in rows if r[1] > da[0][1]), None)
         if nxt_d is None or nxt_d[0] != db[0][0]:
             sys.exit(f"FATAL: {ub}'s .data line does not follow {ua}'s; the merged file's data "
-                     f"would not be one run (CLEANUP.md track 14). Decide that by hand.")
+                     f"would not be one run (CLEANUP.md track 14, archive/process). Decide that by hand.")
     if roa and rob:
         between = [r for r in rows if roa[0][1] < r[1] < rob[0][1] and r[2] not in TEXT_TYPES]
         if between:
@@ -402,8 +394,6 @@ def cmd_merge(a):
     subprocess.run(["git", "rm", "-qf", str(sb if dest == sa else sa)], check=True)
     subprocess.run(["git", "add", str(dest)], check=True)
     rewrite_tokens({gone: keep}, skip={dest})
-    import plan
-    plan.ledger_rename({gone: keep}, drop_duplicates=True)
     for u in (ua, ub):
         obj = ROOT / "build/src" / f"{u}.c.o"
         if obj.exists():

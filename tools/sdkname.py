@@ -512,8 +512,6 @@ def main():
                          "with --check exit 1 if it is stale")
     ap.add_argument("--write", action="store_true")
     ap.add_argument("--check", action="store_true")
-    ap.add_argument("--all", action="store_true",
-                    help="every unnamed SDK function that game code calls (plan.py's list)")
     ap.add_argument("--selfcheck", type=int, metavar="N")
     ap.add_argument("--top", type=int, default=5)
     a = ap.parse_args()
@@ -533,13 +531,8 @@ def main():
         return
 
     names = list(a.funcs)
-    if a.all:
-        import json, subprocess
-        out = subprocess.run([sys.executable, "tools/plan.py", "--json"],
-                             capture_output=True, text=True, cwd=ROOT).stdout
-        names += json.loads(out)["tracks"]["2"]["unnamed_list"]
     if not names:
-        ap.error("give function names, --all, or --selfcheck N")
+        ap.error("give function names, or --selfcheck N")
 
     retail = retail_functions_in_psyq_asm()
     placed = placements()

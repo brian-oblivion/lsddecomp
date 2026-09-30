@@ -10,7 +10,7 @@ lives in the object type, `Class6B5CCMethods`, `Class6B5CCSub14`, the macros
 `CLASS6B5CC_FIELDS`/`CLASS6B5CC_SLOTS`, the header's guard `CLASS6B5CC_H`,
 the header's FILE NAME, every method symbol `Class6B5CC__AddChild` (symbols
 file + match report file name), `New_Class6B5CC`, the table
-`gClass6B5CCMethods`, the track-4 ledger, and the warnings baseline. By hand
+`gClass6B5CCMethods`, and the warnings baseline. By hand
 one of those is always missed. FINISHING-PLAN track 6 is dozens of these.
 
 WHAT IT DOES, in order:
@@ -29,14 +29,13 @@ WHAT IT DOES, in order:
      PROGRESS.md, the archive, the rule docs it lists, a report's history
      sections, or a prose line already naming the new token);
   4. `git mv include/OLD.h include/NEW.h` when that header exists;
-  5. rewrites the ledger (config/plan-state.json, through plan.py) and the
-     warnings baseline (config/typeviews-warnings.txt);
+  5. rewrites the warnings baseline (config/typeviews-warnings.txt);
   6. `make extract`, `./build-and-verify.sh`. A rename changes zero bytes: red
      means the rename is wrong, and the tool prints how to revert.
 
 A commit made from this tool is REPLAYABLE (FINISHING-PLAN §3, "Renames
 replay"): put the exact command in the commit message, and a hunk that
-conflicts at merge is resolved by taking main's side and `tools/replay.py`.
+conflicts at merge is resolved by taking main's side and rerunning it.
 
 It does not judge the name: the evidence goes in the class header's banner
 and the reports (FINISHING-PLAN track 6).
@@ -56,6 +55,19 @@ ROOT = Path(__file__).resolve().parent.parent
 IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 TOKEN = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 WARNINGS = ROOT / "config/typeviews-warnings.txt"
+
+
+def class_header(name):
+    """A class's header: include/<Class>.h, else the game header that defines
+    the type (file names are snake_case, so the stem no longer spells the
+    class)."""
+    if (ROOT / f"include/{name}.h").exists():
+        return f"include/{name}.h"
+    rx = re.compile(rf"(?:\}}\s*{re.escape(name)}\s*;|\bstruct\s+{re.escape(name)}\s*\{{)")
+    for h in sorted((ROOT / "include").glob("*.h")):
+        if rx.search(h.read_text(errors="replace")):
+            return f"include/{h.name}"
+    return f"include/{name}.h"
 
 
 def files():
@@ -131,8 +143,7 @@ def main():
     if hdr_old.exists():
         print(f"  header  include/{old}.h -> include/{new}.h")
     else:
-        import plan
-        h = plan.class_header(old)
+        h = class_header(old)
         if (ROOT / h).exists():
             # a snake_case file is named for what it holds, not spelled from
             # the type (track 11): the head decides whether it follows
@@ -164,8 +175,6 @@ def main():
             touched.append(rel)
     if hdr_old.exists():
         subprocess.run(["git", "mv", str(hdr_old), str(hdr_new)], check=True)
-    import plan
-    plan.ledger_rename({**mapping, f"include/{old}.h": f"include/{new}.h"})
     print(f"  rewrote {len(touched)} file(s)")
     if a.no_build:
         print("edited. You must run: make extract && ./build-and-verify.sh")

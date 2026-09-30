@@ -35,9 +35,9 @@ CLEANEST ground left while being the least matchable.  Round 17 measured
 class_3bb8c_h at 15-of-17 "clean" when it was 13 BIOS trampolines.
 
 Usage:
-    python3 tools/nearmiss.py                # whole live queue, clean first
-    python3 tools/nearmiss.py --all          # include blocked functions
-    python3 tools/nearmiss.py --unit code_55dd4
+    python3 tools/research/nearmiss.py                # whole live queue, clean first
+    python3 tools/research/nearmiss.py --all          # include blocked functions
+    python3 tools/research/nearmiss.py --unit code_55dd4
 """
 
 import argparse
@@ -46,9 +46,10 @@ import re
 import subprocess
 import sys
 
-import srcpath
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import srcpath  # noqa: E402
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 INCLUDE_ASM_RE = re.compile(r'^INCLUDE_ASM\("[^"]*",\s*(\w+)\)', re.M)
 SIZE_RE = re.compile(r'nonmatching \w+, 0x([0-9A-Fa-f]+)')

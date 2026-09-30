@@ -2,7 +2,7 @@
 """Game-style names on data only Sony code reads, and Sony's name for each.
 
     python3 tools/sonydata.py            # list them, with Sony's name where a disc gives one
-    python3 tools/sonydata.py --check    # exit 1 if any (plan.py's track 2 reads this)
+    python3 tools/sonydata.py --check    # exit 1 if any 
 
 WHY. FINISHING-PLAN's rule is that nothing Sony owns gets a game name.
 rename.py enforces it for variables config/psyq-objects.ld pins, which covers

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Where the original source files began and ended, from the rodata.
 
-    python3 tools/tuboundary.py              # validation, then every unit edge that is not free
-    python3 tools/tuboundary.py --units      # every C unit: its edges and what lies inside it
-    python3 tools/tuboundary.py --unit <u>   # one unit, gap by gap
-    python3 tools/tuboundary.py --json
+    python3 tools/research/tuboundary.py              # validation, then every unit edge that is not free
+    python3 tools/research/tuboundary.py --units      # every C unit: its edges and what lies inside it
+    python3 tools/research/tuboundary.py --unit <u>   # one unit, gap by gap
+    python3 tools/research/tuboundary.py --json
 
 FINISHING-PLAN track 7 wants one `.c` per ORIGINAL translation unit, named
 for what it holds. The units in src/ were carved for parallel matching (the
@@ -52,10 +52,10 @@ import struct
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import progress  # noqa: E402
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 MAP = ROOT / "build/lsdde.map"
 IMAGE = ROOT / "build/SLPS_015.56"
 VRAM, FILEOFF = 0x80010000, 0x800

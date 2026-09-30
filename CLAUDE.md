@@ -2,8 +2,10 @@
 
 C source that compiles byte-for-byte to the retail `SLPS_015.56` (SLPS-01556).
 All but three game functions are matched (`python3 tools/progress.py`
-names them). Work now is readability: `docs/CLEANUP.md` is the plan and `python3 tools/plan.py` measures it. README.md covers the
-layout, the build and the class framework; read it first.
+names them), and the readability cleanup is finished; `python3
+tools/readability.py` measures what debt is left. README.md covers the
+layout, the build and the class framework; read it first. `tools/research/`
+holds tools no current work uses, kept for reuse.
 
 **Keep this file short.** It holds rules and the loop, never project state,
 counts or history. A number written here is right for one session and wrong

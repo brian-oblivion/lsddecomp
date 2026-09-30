@@ -2,8 +2,8 @@
 """Find `extern` function declarations whose ARITY disagrees with the
 function's definition or with another declaration of the same name.
 
-    python3 tools/externcheck.py            # whole tree; exit 1 on any conflict
-    python3 tools/externcheck.py <func>...  # just these names
+    python3 tools/research/externcheck.py            # whole tree; exit 1 on any conflict
+    python3 tools/research/externcheck.py <func>...  # just these names
 
 WHY THIS EXISTS (round 57). `class_3bb8c_p.c` declared
 `extern s32 func_8001E7BC(void)` and called it with no arguments, while the
@@ -28,11 +28,11 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import progress  # noqa: E402
 import srcpath   # noqa: E402
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 EXTERN_RE = re.compile(r"^\s*extern\s+[^;=(]*?\b(\w+)\s*\(([^;]*?)\)\s*;", re.M)
 # K&R declaration lines between `)` and `{` (func_80017B34, round 73).
 DEF_RE = re.compile(r"^\w[^;=]*?\b(\w+)\s*\(([^;{]*)\)(?:[ \t]*\n[ \t]+[A-Za-z_][^;{}()\n]*;)*\s*\{", re.M)

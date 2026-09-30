@@ -529,7 +529,7 @@ def main():
     # NOT A GOAL. The SDK is linked from Sony's objects where a disc has
     # them and otherwise left as disassembly; matching it proves nothing
     # about this game. What the plan does want from it
-    # is NAMES for the functions game code calls, which tools/plan.py counts.
+    # is NAMES for the functions game code calls.
     print(f"  library (Psy-Q SDK):        {library:5d}  in the image as asm or C"
           f"  (not counted; NOT a matching goal)")
     if library_matched or library_queued:

@@ -56,10 +56,6 @@ fi
 git worktree add -b "$branch" "$dest" main
 
 mkdir -p "$dest/disk"
-# The mid-round broadcast channel (tools/broadcast.sh) is a file in the MAIN
-# checkout; link it so every worktree reads and posts to the same one.
-mkdir -p "$MAIN/.round"
-ln -s "$MAIN/.round" "$dest/.round"
 ln -s "$MAIN/disk/SLPS_015.56" "$dest/disk/SLPS_015.56"
 ln -s "$MAIN/.venv" "$dest/.venv"
 ln -s "$MAIN/lib" "$dest/lib"

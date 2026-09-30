@@ -94,11 +94,6 @@ sdk/*
 lib
 # Sony's headers, generated from sdk/ by psyq_sdk.py install (config/psyq-headers.txt)
 include/psyq
-# ---------------------------------------------------------------------------
-# The mid-round broadcast file (tools/broadcast.sh). Round state, not record:
-# anything worth keeping is in a match report or PROGRESS.md by round end.
-# No trailing slash: worktrees hold a SYMLINK named .round.
-.round
 
 # tools/objdiff_report.py (decomp.dev): generated, and objdiff-cli is fetched
 objdiff.json

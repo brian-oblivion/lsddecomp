@@ -16,7 +16,7 @@ order, padding included (spell padding as a u8[n]).
 Before the table the tool lists every symbol the symbols file places inside
 the table's range. Each one is a label splat cut into the table (usually a
 column read on its own): it has to go from the symbols file, and its
-readers have to read the row field instead (docs/CLEANUP.md track 14).
+readers have to read the row field instead (CLEANUP.md track 14, on archive/process).
 """
 import argparse
 import re

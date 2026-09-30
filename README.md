@@ -40,17 +40,17 @@ Sony's library code is linked from Sony's own objects (below) rather than
 decompiled. Every game header is
 documented, and every class has one definition.
 
-What's left is making the code read like the game's own source rather than a
-decompilation: data tables written as C, comments in game terms, code shaped
-by the compiler rewritten, one class per file. That's
-[`docs/CLEANUP.md`](docs/CLEANUP.md).
+The cleanup that made the code read like the game's own source (data tables
+written as C, comments in game terms, code shaped by the compiler rewritten,
+one class per file) is finished. Its plan, `docs/CLEANUP.md`, and the tools
+that ran it are on the `archive/process` branch with the rest of the
+project's history.
 
 To measure it yourself:
 
 ```sh
 python3 tools/progress.py      # matched functions and bytes, per file
 python3 tools/readability.py   # remaining readability debt: magic numbers, raw offsets, unk fields
-python3 tools/plan.py          # the cleanup tracks and the ready jobs
 ```
 
 ## Building it
@@ -245,7 +245,8 @@ What made it work, and what the experiment taught:
   made it. Hooks block the obvious ways around it: editing the hash files,
   editing generated disassembly, or running a bare `make`.
 - **Measure, don't transcribe.** Project state lived in tools that measure
-  the tree (`progress.py`, `readability.py`, `plan.py`), never in prose.
+  the tree (`progress.py`, `readability.py` and a plan tracker, `plan.py`, now
+  archived), never in prose.
   Numbers written into documents went stale within a round and sent later
   agents to redo finished work.
 - **Wrong causes cost more than wrong scores.** A wrong score gets corrected
