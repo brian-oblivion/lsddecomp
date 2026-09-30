@@ -141,7 +141,7 @@ struct Ratio16 {
     /* +0x018 */ s32 tmd; /* GsDOBJ2.tmd: LinkModel copies the model's +0x10, UnlinkModel clears it */ \
     /* +0x01C */ s32 id; /* GsDOBJ2.id; no accessor */ \
     /* +0x020 */ void *model; /* the TmdModel child LinkModel linked; NULL when none */ \
-    /* +0x024 */ s32 tick; /* zeroed by Reset; gStyleEffectMethods's update increments it */ \
+    /* +0x024 */ u32 tick; /* zeroed by Reset; gStyleEffectMethods's update increments it */ \
     /* +0x028 */ SceneNode *linkTarget; /* dispatchLinkCommand's SCENENODE_EVENT_LINKED sender; TryAttachNearby's hit */ \
     /* +0x02C */ s32 hitMask; /* RaycastHullAgainstFaces: one bit per model bounds box (own) or hull box (the other's) */ \
     /* +0x030 */ TmdHull *notifyVerts; /* TransformAndNotifyParents's hull, set only while the parents are notified */ \

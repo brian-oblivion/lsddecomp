@@ -353,15 +353,14 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
     s32 tableIndex;
     s32 extraZ;
     s32 period;
-    u32 tick; /* MATCHING: unsigned; retail takes the period remainder of the tick unsigned */
+    u32 tick;
     Actor **slot;
     s32 i;
     s32 *stepZ;
 
     tableIndex = self->params.tableIndex;
-    /* MATCHING: tick compared unsigned, as retail does; SceneNode declares it s32 */
     if (self->params.modelChildLayout != 0 && sModelChildDriftZ[tableIndex] != 0 &&
-        (u32)self->tick > MODEL_CHILD_DRIFT_DELAY) {
+        self->tick > MODEL_CHILD_DRIFT_DELAY) {
         slot = self->modelChildren;
         self->methods->updateRotation(self, 0, sSpinRotStep);
         i = 0; /* MATCHING: set here, before the call; set in the for header the code differs */
