@@ -1,8 +1,8 @@
 # LSD: Dream Emulator (PSX) — matching decompilation
 
 C source that compiles byte-for-byte to the retail `SLPS_015.56` (SLPS-01556).
-Every game function is matched. Work now is readability: `docs/CLEANUP.md`
-is the plan and `python3 tools/plan.py` measures it. README.md covers the
+All but three game functions are matched (`python3 tools/progress.py`
+names them). Work now is readability: `docs/CLEANUP.md` is the plan and `python3 tools/plan.py` measures it. README.md covers the
 layout, the build and the class framework; read it first.
 
 **Keep this file short.** It holds rules and the loop, never project state,

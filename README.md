@@ -1,4 +1,4 @@
-# lsddecomp2
+# lsddecomp
 
 A matching decompilation of **LSD: Dream Emulator** (PlayStation, 1998,
 Asmik Ace / OutSide Directors Company, SLPS-01556).
@@ -31,9 +31,13 @@ disassembly generated from your executable at build time).
 
 ## Progress
 
-**Done.** All 1446 of the game's own functions are C, and the rebuilt
-executable matches retail byte for byte. Sony's library code is linked from
-Sony's own objects (below) rather than decompiled. Every game header is
+**The rebuilt executable matches retail byte for byte.** 1443 of the game's
+1446 functions are C. The other three, `MoviePlayer__Advance`,
+`MoviePlayer__DecodeFrame` and `New_GameApplication`, have readable C under
+`#ifdef NON_MATCHING` that doesn't yet compile to the same bytes, so the
+build takes them from the disassembly (`make nonmatching` builds the C).
+Sony's library code is linked from Sony's own objects (below) rather than
+decompiled. Every game header is
 documented, and every class has one definition.
 
 What's left is making the code read like the game's own source rather than a

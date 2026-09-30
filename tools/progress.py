@@ -530,7 +530,7 @@ def main():
     # about this game (FINISHING-PLAN.md). What the plan does want from it
     # is NAMES for the functions game code calls, which tools/plan.py counts.
     print(f"  library (Psy-Q SDK):        {library:5d}  in the image as asm or C"
-          f"  (excluded from game %; NOT a matching goal, see FINISHING-PLAN.md)")
+          f"  (excluded from game %; NOT a matching goal, see git show archive/process:docs/FINISHING-PLAN.md)")
     if library_matched or library_queued:
         print(f"    of which in C units:      {library_matched + library_queued:5d}  ({library_matched} written as C,"
               f" {library_queued} INCLUDE_ASM; Sony code in game segments: config/sdk-in-game.txt,"
