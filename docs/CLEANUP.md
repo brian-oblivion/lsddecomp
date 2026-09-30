@@ -247,8 +247,10 @@ behaviour, then refine when the data is readable. Rename through
 
 `dream_scene.c` held half of `ItemList`, `ObjM`, the style layer,
 `StyleEffect`, `Actor`, `VariantSprite` and `GraphRoom`; it is now seven
-files (`src/ui/item_list.c` holds ItemList's second half, beside the first
-in `input_dialogs.c`). A split keeps ROM order: each new file takes a
+files, and ItemList's first half, which sat at the tail of the TextEntry
+unit right before it, has joined the second in `src/ui/item_list.c`. The
+other multi-class units went the same way (`split-rest`). A split keeps ROM
+order: each new file takes a
 contiguous run of functions, and a `.c` is one splat subsegment, so cutting
 a class out of the middle of a unit makes three files, not two.
 
@@ -296,9 +298,13 @@ half that also splits an attached jump-table slot):
    what it needs; the build says what is missing. Fix the header's
    `Methods in src/...` line and the old file's header comment.
 7. **Rebuild from a fresh extract:** `make extract`, then
-   `./build-and-verify.sh`. A split that is wrong fails the link or the
-   SHA1, so a green build is the whole proof. Check the new file compiled
-   without implicit-declaration warnings (`grep -A2 '<file>.c:' /tmp/b.log`).
+   `./build-and-verify.sh`. Wrong C, a wrong `.data` offset or a misplaced
+   jump table fails the link or the SHA1. A wrong **text** offset does not:
+   the objects carry the bytes, so a `c` line at the wrong offset (in
+   address order still) links green. Check each new line against
+   `build/lsdde.map`: the object's `.text` address, `- 0x80010000 +
+   0x800`, must be the line's offset. Check the new file compiled without
+   implicit-declaration warnings (`grep -A2 '<file>.c:' /tmp/b.log`).
 8. **Ledger:** the head marks the new unit passed where the old one was
    (`plan.py mark-unit --unit <file> --track 3`, then `--track 7`), since
    its code already passed under the old unit. Runners leave
@@ -323,7 +329,36 @@ What else bites, from the `dream_scene.c` split:
 - `unitfile.py rename` refuses when `include/<new>.h` exists beside
   `include/<old>.h`: fold what the old header declares into the class's
   header by hand and delete it first (`dream_day.h` went into
-  `day_task.h`).
+  `day_task.h`). An umbrella header two units shared goes the same way:
+  its declarations to the class headers that own them, its includers to the
+  class headers they use (`task.h`, whose one declaration was TaskCore's).
+
+What else bites, from `split-rest`:
+
+- **The first class is the one a split leaves behind.** A file named for a
+  later class (`sprite.c` held Sprite third, `title_menu.c` TitleMenu
+  third, `game_files.c` its record table after LbdFile) keeps its name by
+  a split and a rename in one step: `git mv` the old file to the first
+  class's name, rename its text, `.rodata` and `.data` lines, and create
+  the named file with the later run.
+- **A define or local type two new files share** goes to the header the
+  sibling includes anyway, with a doc comment: the tile grid's size to
+  `tile_map.h`, `CLUT_FADE_Y` to `tim_block_src.h`, `SubBlockTable` to
+  `tod_set.h`, `UnprototypedCtorTable` to `file_resource.h`, playTone's
+  packed index to `vab_stream_obj.h`, the save title's layout to
+  `title_menu.h`.
+- **An `INCLUDE_ASM` path names the unit** (`asm/nonmatchings/<dir>/<unit>`):
+  a NON_MATCHING body moved to a new file takes the new unit's path
+  (`unitfile.py rename` does it for a rename).
+- **A Sony function carried as C at a unit's edge** becomes its own
+  `src/psyq/<lib>_<obj>.c` unit, as `libgs_gs_101` and `libgs_gs_124`
+  are (`GsSetProjection`, `libgs_gs_106`, was the tail of `task.c`).
+- **Put a new line after the old unit's history comments** when they
+  describe the old unit, not the next one: those blocks read as the old
+  line's notes.
+- A file's directory follows its class, not the unit it was carved from:
+  `grid_cell.c` and `node_guarded_viewport.c` went to `src/world`, beside
+  their only makers, out of the title-menu unit in `src/ui`.
 
 ## Not in scope yet
 
