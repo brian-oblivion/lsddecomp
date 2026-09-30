@@ -2010,6 +2010,8 @@ segments:
       - [0x7B008, sdata]
       - [0x7B010, o, libc2/prnt, .sdata]      # "(null)", 7 bytes
       - [0x7B018, sdata]
+      - [0x7B024, .sdata, graphics/tmd_renderer]  # the DIVPOLYGON clip, the face colour, the ndiv override
+      - [0x7B038, sdata]
       - [0x7B040, o, libc2/puts, .sdata]      # "<NULL>"
       - [0x7B048, sdata]
       - [0x7B128, o, libc2/itoa, .sdata]      # "%d", 3 bytes (dlabel D_8008A928);
@@ -2020,6 +2022,7 @@ segments:
       - [0x7b420, sbss]
       - [0x7B468, sbss]              # libc2/rand's seed (NOLOAD in config/psyq-objects.ld)
       - [0x7B46C, sbss]
+      - [0x7B4A4, .sbss, world/style_effect]  # its model, TIM, viewport and base view height
       - [0x7b4b4, sbss]               # DreamSys's sbss slot
       - [0x7b4cc, sbss]
   - [0x7B800]

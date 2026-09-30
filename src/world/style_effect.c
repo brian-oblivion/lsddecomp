@@ -202,10 +202,10 @@ extern void NoOpIgnoreArgs();
  * model from (setBackClip), the TIM image New_VariantSprite is handed, and
  * the scene's Viewport, whose viewpoint y (refView.vp.y) InitByKind
  * snapshots into sStyleEffectBaseViewY and UpdateByKind follows. */
-extern Actor *sStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
-extern void *sStyleEffectTim;
-extern Viewport *sStyleEffectViewport;
-extern s32 sStyleEffectBaseViewY;
+static Actor *sStyleEffectTmd SBSS = NULL; /* the Actor SetStyleEffectSources ran on */
+static void *sStyleEffectTim SBSS = NULL;
+static Viewport *sStyleEffectViewport SBSS = NULL;
+static s32 sStyleEffectBaseViewY SBSS = 0;
 extern s32 sStyleEffectModelIds[3];
 
 /* Called once, from the class's ctor (StyleEffect__StyleEffect): snapshot the

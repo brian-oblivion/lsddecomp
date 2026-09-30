@@ -25,6 +25,21 @@
  * Exact for multiples of 45 degrees; a constant expression. */
 #define ANGLE_DEG(deg) ((deg) * 4096 / 360)
 
+#if !defined(M2CTX) && !defined(PERMUTER)
+/** Places a definition in small data, the `.sdata` section: the game's
+ * small initialized globals, reached through one base register. Used as
+ * `static s32 sName SDATA = 320;`. The definition must have an initializer,
+ * and its unit's yaml range must be `.sdata`. */
+#define SDATA __attribute__((section(".sdata")))
+/** Places a zero-initialized definition in `.sbss`, the uninitialized half of
+ * small data: `static s32 sName SBSS = 0;`. The `= 0` is required; without
+ * an initializer the section attribute has no effect. */
+#define SBSS __attribute__((section(".sbss")))
+#else
+#define SDATA
+#define SBSS
+#endif
+
 /** 20.12 fixed point: libgte's ONE is 1 << FIX12_SHIFT, so `n << FIX12_SHIFT`
  * is the integer n as a fixed-point value. */
 #define FIX12_SHIFT 12

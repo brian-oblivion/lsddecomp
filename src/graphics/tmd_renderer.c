@@ -115,7 +115,18 @@ typedef struct TmdGroupHeader {
         ((POLY_FT3 *)(p))->clut += (rows) << 6; \
     } while (0)
 /* clang-format on */
-extern ColorRgb sTexturedFaceColor;
+
+/* The clip area every DIVPOLYGON gets: 320 x 240, the screen. */
+static s32 sDivClipWidth SDATA = 320;
+static s32 sDivClipHeight SDATA = 240;
+
+/* The face colour a lit textured primitive starts from: mid-grey, the
+ * PlayStation's 1.0 for a texture's colour. */
+static ColorRgb sTexturedFaceColor SDATA = {128, 128, 128};
+
+/* SetNdivOverride's: when set, sNdivOverride replaces sSortNdiv. */
+static s32 sNdivOverrideSet SDATA = 1;
+static s32 sNdivOverride SDATA = 2;
 
 /* The two subdivision work buffers the SubmitPoly* wrappers hand Sony's
  * RCpoly* packers, a DIVPOLYGON3 and a DIVPOLYGON4 back to back (0x218
@@ -1124,14 +1135,6 @@ void FlagLargePolyForDivide(void *ctxIn, s32 count) {
         ctx->divide = 1;
     }
 }
-
-/* The clip area every DIVPOLYGON gets: 320 x 240, the screen. */
-extern s32 sDivClipWidth;
-extern s32 sDivClipHeight;
-
-/* SetNdivOverride's: when set, sNdivOverride replaces sSortNdiv. */
-extern s32 sNdivOverrideSet;
-extern s32 sNdivOverride;
 
 /*
  * Fill the header of a DIVPOLYGON3 or DIVPOLYGON4 (the two share it):

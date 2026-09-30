@@ -1,47 +1,139 @@
 #!/usr/bin/env python3
-"""Regenerate config/gp-symbols.txt: every symbol defined in a splat sdata/sbss
-data segment. maspsx reads it (--gp-symbols) to emit gp-relative loads and
+"""Regenerate config/gp-symbols.txt: every symbol retail keeps in small data
+(.sdata/.sbss). maspsx reads it (--gp-symbols) to emit gp-relative loads and
 stores for exactly those symbols, which is how retail reaches them.
 
     python3 tools/gpsyms.py            # rewrite config/gp-symbols.txt
     python3 tools/gpsyms.py --check    # exit 1 if the committed file is stale
 
-Derived from asm/data/*.sdata.s and *.sbss.s, so run `make extract` first.
+A small-data symbol lives in one of two places, and both are read:
+
+  - still in the disassembly: a label in asm/data/*.sdata.s or *.sbss.s,
+    which a plain `sdata`/`sbss` segment in the splat yaml writes (so run
+    `make extract` first);
+  - defined in C: a `[0xOFF, .sdata, <unit>]` (or `.sbss`) line in the yaml
+    hands that range to the unit's object, and splat writes no labels for
+    it. Its symbols are the symbols-file entries whose addresses fall in the
+    range, up to the next yaml line.
+
+The C side is checked against the yaml: a definition marked SDATA (or SBSS,
+include/common.h) in src/ whose name the list does not hold means a missing
+yaml line or symbols-file entry, and a symbol in a C-owned range that no
+unit marks means a definition that will not land in small data. Either is
+fatal: a gp-relative access to a symbol that is not in small data, or an
+absolute one to a symbol that is, links and runs but does not match.
 """
 import glob, re, sys
-LABEL = re.compile(r'^(?:dlabel|glabel)\s+(\S+)')
-OUT = 'config/gp-symbols.txt'
 
-def derive():
+OUT = 'config/gp-symbols.txt'
+YAML = 'config/splat.slps01556.lsdde.yaml'
+SYMBOLS = 'config/symbols.slps01556.lsdde.txt'
+FILE_BASE, VRAM_BASE = 0x800, 0x80010000
+
+LABEL = re.compile(r'^(?:dlabel|glabel)\s+(\S+)')
+SEG = re.compile(r'^\s*- \[\s*(0x[0-9A-Fa-f]+)\s*(?:,\s*([.\w]+)\s*)?(?:,\s*([\w/]+)\s*)?[,\]]')
+SYMLINE = re.compile(r'^\s*([A-Za-z_]\w*)\s*=\s*(0x[0-9A-Fa-f]+)\s*;')
+# `static s32 sName SDATA = ...;`, `ColorRgb sName[2] SBSS;`, one per line
+C_DEF = re.compile(r'^[\w\s\*]*?\b([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*(SDATA|SBSS)\b', re.M)
+
+
+def asm_labels():
     syms = set()
     for f in glob.glob('asm/data/*.sdata.s') + glob.glob('asm/data/*.sbss.s'):
         for line in open(f):
             m = LABEL.match(line)
             if m:
                 syms.add(m.group(1))
-    return sorted(syms)
+    return syms
+
+
+def c_ranges():
+    """[(unit, section, vram_lo, vram_hi)] for every C-owned small-data range."""
+    rows = []
+    for line in open(YAML):
+        m = SEG.match(line)
+        if m:
+            rows.append((int(m.group(1), 16), m.group(2), m.group(3)))
+    out = []
+    for i, (off, ty, unit) in enumerate(rows):
+        if ty in ('.sdata', '.sbss') and unit and i + 1 < len(rows):
+            lo = off - FILE_BASE + VRAM_BASE
+            hi = rows[i + 1][0] - FILE_BASE + VRAM_BASE
+            out.append((unit, ty, lo, hi))
+    return out
+
+
+def c_owned():
+    """{symbol: (unit, section)} for the symbols-file entries in C-owned ranges."""
+    ranges = c_ranges()
+    owned = {}
+    for line in open(SYMBOLS):
+        m = SYMLINE.match(line)
+        if not m:
+            continue
+        addr = int(m.group(2), 16)
+        for unit, ty, lo, hi in ranges:
+            if lo <= addr < hi:
+                owned[m.group(1)] = (unit, ty)
+    return owned, ranges
+
+
+def c_marked():
+    """{symbol: (file, 'SDATA'|'SBSS')} for every marked definition in src/."""
+    marked = {}
+    for f in glob.glob('src/**/*.c', recursive=True):
+        text = re.sub(r'/\*.*?\*/', '', open(f, errors='replace').read(), flags=re.S)
+        for m in C_DEF.finditer(text):
+            if re.match(r'\s*(#|extern\b)', m.group(0)):
+                continue
+            marked[m.group(1)] = (f, m.group(2))
+    return marked
+
+
+def derive():
+    syms = asm_labels()
+    owned, ranges = c_owned()
+    marked = c_marked()
+    errors = []
+    for unit, ty, lo, hi in ranges:
+        if not any(u == unit and t == ty for u, t in owned.values()):
+            errors.append(f'{YAML}: {ty} range 0x{lo:08X}..0x{hi:08X} of {unit} holds no symbols-file entry')
+    for name, (unit, ty) in sorted(owned.items()):
+        want = 'SDATA' if ty == '.sdata' else 'SBSS'
+        if name not in marked:
+            errors.append(f'{name}: in {unit}\'s {ty} range, but no src/ definition is marked {want}')
+        elif marked[name][1] != want:
+            errors.append(f'{name}: in {unit}\'s {ty} range, but {marked[name][0]} marks it {marked[name][1]}')
+    for name, (f, how) in sorted(marked.items()):
+        if name not in owned:
+            errors.append(f'{f}: {name} is marked {how}, but no `.{how.lower()}` yaml range of a C unit '
+                          f'holds its symbols-file address')
+    return sorted(syms | set(owned)), errors
+
 
 def main():
-    syms = derive()
+    syms, errors = derive()
+    if errors:
+        for e in errors:
+            print(f'FATAL: {e}', file=sys.stderr)
+        sys.exit(1)
     if not syms:
         sys.exit('no sdata/sbss labels found under asm/data/ -- run make extract')
-    body = ('# GENERATED by tools/gpsyms.py -- symbols defined in the sdata/sbss\n'
-            '# segments of config/splat.slps01556.lsdde.yaml. maspsx --gp-symbols\n'
-            '# addresses these off $gp. Regenerate after any sdata/sbss carve.\n'
+    body = ('# GENERATED by tools/gpsyms.py -- symbols defined in small data: the\n'
+            '# sdata/sbss labels splat writes, and the symbols of C-owned\n'
+            '# .sdata/.sbss ranges in config/splat.slps01556.lsdde.yaml. maspsx\n'
+            '# --gp-symbols addresses these off $gp. Regenerate after any\n'
+            '# sdata/sbss carve.\n'
             + '\n'.join(syms) + '\n')
-    if '--check' in sys.argv:
-        try:
-            cur = open(OUT).read()
-        except FileNotFoundError:
-            cur = ''
-        if cur != body:
-            sys.exit(f'{OUT} is stale -- run python3 tools/gpsyms.py')
-        print(f'OK: {OUT} current ({len(syms)} symbols)')
-        return
     try:
         cur = open(OUT).read()
     except FileNotFoundError:
         cur = ''
+    if '--check' in sys.argv:
+        if cur != body:
+            sys.exit(f'{OUT} is stale -- run python3 tools/gpsyms.py')
+        print(f'OK: {OUT} current ({len(syms)} symbols)')
+        return
     if cur != body:   # untouched when current: every object depends on its mtime
         open(OUT, 'w').write(body)
         print(f'wrote {OUT}: {len(syms)} symbols')
@@ -55,6 +147,7 @@ def main():
     missing = sorted(targets - set(syms))
     if missing:
         print(f'WARNING: {len(missing)} retail %gp_rel targets not in list: {missing[:8]}')
+
 
 if __name__ == '__main__':
     main()
