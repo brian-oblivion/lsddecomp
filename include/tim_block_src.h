@@ -23,6 +23,11 @@ typedef struct TimBlockSrcMethods TimBlockSrcMethods;
 /** TimBlockSrc's class id (gTimBlockSrcMethods word +0x000). */
 #define TIMBLOCKSRC_CLASS_ID 0xF03
 
+/** The VRAM y of the fade CLUTs, 256-colour rows: TimBlockSrc lays its four
+ * ramps out from there and TimArraySrc maps an image's CLUT row back to its
+ * ramp from it. */
+#define CLUT_FADE_Y 480
+
 /**
  * @brief One CLUT row's fade ramp: the CLUT row itself, then `mask - 1` rows
  *        below it stepping toward `color`.
@@ -69,7 +74,7 @@ struct TimBlockSrcMethods {
  * Parent FileResource, through the active data-source driver. The classes
  * whose ids sit under 0xF03 (Tod, TodSet, ModelData, TriggerWorld) are not
  * its subclasses: their ctors chain to the driver's, not to this class's,
- * and none carries its layout. Methods in src/graphics/graphics_resources.c.
+ * and none carries its layout. Methods in src/graphics/tim_block_src.c.
  * The object is 0x84 bytes (New_TimBlockSrc).
  */
 struct TimBlockSrc {

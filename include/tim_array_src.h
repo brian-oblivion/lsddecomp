@@ -34,7 +34,7 @@ struct TimArraySrcMethods {
  *        into one TimImage per image.
  *
  * Parent FileResource, through the active data-source driver; no subclasses.
- * Methods in src/graphics/graphics_resources.c. The object is 0x3C bytes
+ * Methods in src/graphics/tim_array_src.c. The object is 0x3C bytes
  * (New_TimArraySrc).
  *
  * Its one builder is TimBlockSrc__AdvanceLoadState: per block it makes one

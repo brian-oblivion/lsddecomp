@@ -22,6 +22,16 @@ typedef struct TileMapMethods TileMapMethods;
 /** TileMap's class id (gTileMapMethods word +0x000). */
 #define TILEMAP_CLASS_ID 0x203
 
+/** @name The background grid
+ * TileMap's default grid and TileAtlas's cells (include/tile_atlas.h):
+ * 20 x 15 cells of 16 x 16 texels, one atlas cell per map cell.
+ * @{ */
+#define TILEMAP_COLS 20 /**< cells across */
+#define TILEMAP_ROWS 15 /**< cells down */
+#define TILE_SIZE 16    /**< a cell's width and height, in texels */
+
+/** @} */
+
 /**
  * @brief TileMap's method table, gTileMapMethods: FileResource's slots, with
  *        no new ones.
@@ -42,10 +52,10 @@ struct TileMapMethods {
  *
  * BgLayer__Reset points a GsBG's map at `map` and sizes the layer from it.
  * Parent FileResource, through the active data-source driver; no subclasses.
- * Methods in src/graphics/graphics_resources.c. The object is 0x44 bytes
+ * Methods in src/graphics/tile_map.c. The object is 0x44 bytes
  * (New_TileMap).
  *
- * Its one builder is TaskCore__TaskCore (src/app/task.c): New_TileAtlas(0),
+ * Its one builder is TaskCore__TaskCore (src/app/task_core.c): New_TileAtlas(0),
  * then New_TileMap(0, atlas), then New_BgLayer(tileMap, BGLAYER_MODE_SCREEN); TaskCore__Finalize
  * releases the three.
  */

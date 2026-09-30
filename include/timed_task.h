@@ -80,7 +80,7 @@ struct TimedTaskMethods {
  *        play tones on, and `result` itself, which init returns.
  *
  * Class id 0x230, table gTimedTaskMethods, parent IntermediateBase
- * (include/intermediate_base.h); methods in src/world/dream_day.c. 0x38
+ * (include/intermediate_base.h); methods in src/world/timed_task.c. 0x38
  * bytes.
  *
  * Lifecycle. ctor(soundBankPath, sound): with a path, `sound` is

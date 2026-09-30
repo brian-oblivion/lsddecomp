@@ -56,7 +56,7 @@ enum WBgmOpenState {
  * notifyParents(self, DRAWSYSTEM_EVENT_VSYNC) reaches onNotify, which
  * forwards a DrawSystem sender to update.
  *
- * Lifecycle: DayTask__DayTask (src/world/dream_day.c) makes the one instance,
+ * Lifecycle: DayTask__DayTask (src/world/day_task.c) makes the one instance,
  * New_WBgm(PickSoundBank(0), NULL, 1): one of the seven sound bank paths,
  * no SEQ yet, autoPlay on. It keeps it as DayTask::bgm and hands it to
  * New_ObjM, whose ObjM calls pause and resume on it around its pause overlay

@@ -22,10 +22,9 @@
  * GameApplication's ctor installs GetDefaultDataDirectory()'s. BuildFileName joins an
  * optional directory, a name and an extension.
  *
- * All of it is defined in src/app/game_shell.c, after FileResource's methods.
- * The classes that file defines are declared by their own headers:
- * GameApplication in game_application.h, FileResource and ResourceRequest in
- * file_resource.h.
+ * All of it is defined in src/app/data_source.c, which follows
+ * FileResource's methods; ResourceRequest__Set and CopyDataSourceSlots,
+ * among them, are declared in file_resource.h.
  */
 
 #include "common.h"
@@ -116,5 +115,9 @@ extern char *GetDataDirectory(void);
  * @param ext the extension to append
  * @return dest */
 extern char *BuildFileName(char *dest, char *name, char *dir, char *ext);
+
+/** The path buffer TextEntry's and ItemList's resource loaders give
+ * BuildFileName as `dest` for a "CARD\\" + name + ".TIM" path. */
+#define CARD_TIM_PATH_SIZE 32
 
 #endif

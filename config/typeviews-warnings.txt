@@ -1,31 +1,31 @@
 cd_driver: warning: `unassigned' might be used uninitialized in this function
 cd_driver: warning: unused variable `scratch'
-dream_day: warning: `junk' might be used uninitialized in this function
-dream_day: warning: `lateral' might be used uninitialized in this function
-dream_day: warning: `shiftCol' might be used uninitialized in this function
-dream_day: warning: control reaches end of non-void function
-dream_day: warning: unused variable `unused'
+stage_map: warning: `junk' might be used uninitialized in this function
+stage_map: warning: `lateral' might be used uninitialized in this function
+stage_map: warning: `shiftCol' might be used uninitialized in this function
+day_task: warning: control reaches end of non-void function
+stage_map: warning: unused variable `unused'
 dream_sys: warning: control reaches end of non-void function
 entity: warning: passing arg 4 of `Entity__GetOrCreateFadeBox' makes pointer from integer without a cast
-game_shell: warning: assignment from incompatible pointer type
-game_shell: warning: control reaches end of non-void function
-graphics_resources: warning: `sx' might be used uninitialized in this function
-graphics_resources: warning: `sy' might be used uninitialized in this function
-graphics_resources: warning: control reaches end of non-void function
-graphics_resources: warning: control reaches end of non-void function
-graphics_resources: warning: unused variable `unused'
-graphics_resources: warning: unused variable `unused'
-graphics_resources: warning: unused variable `unused'
-graphics_resources: warning: unused variable `unused'
+data_source: warning: assignment from incompatible pointer type
+game_application: warning: control reaches end of non-void function
+bg_layer: warning: `sx' might be used uninitialized in this function
+bg_layer: warning: `sy' might be used uninitialized in this function
+movie_player: warning: control reaches end of non-void function
+movie_player: warning: control reaches end of non-void function
+movie_player: warning: unused variable `unused'
+tile_atlas: warning: unused variable `unused'
+tile_atlas: warning: unused variable `unused'
+tile_map: warning: unused variable `unused'
 actor: warning: unused variable `pad48Tail'
 item_list: warning: unused variable `unused'
-vab_sound: warning: unused variable `unused'
-vab_sound: warning: unused variable `unused'
+null_driver: warning: unused variable `unused'
+null_driver: warning: unused variable `unused'
 scene_node: warning: unused variable `pad'
 scene_node: warning: unused variable `unused'
-sprite: warning: unused variable `pad'
-task: warning: assignment from incompatible pointer type
-title_menu: warning: `state' might be used uninitialized in this function
+char_sprite: warning: unused variable `pad'
+task_core: warning: assignment from incompatible pointer type
+task_objf: warning: `state' might be used uninitialized in this function
 title_menu: warning: control reaches end of non-void function
 tmd_model: warning: `p' might be used uninitialized in this function
 tmd_model: warning: `size' might be used uninitialized in this function

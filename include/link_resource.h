@@ -42,11 +42,11 @@ struct LinkResourceMethods {
  * Parent FileResource, through whichever data-source driver is active when it
  * is built (its ctor chains to GetActiveDataSourceMethods()->ctor), so its
  * fields follow FileResource's own 0x2C bytes. No subclasses. Methods in
- * src/graphics/graphics_resources.c. The object is 0x30 bytes
+ * src/graphics/link_resource.c. The object is 0x30 bytes
  * (New_LinkResource).
  *
  * Callers link the models it builds: tod_actor.c's TOD model-id packet passes
- * getModel's result to SceneNode__LinkModel, and dream_day.c links the
+ * getModel's result to SceneNode__LinkModel, and stage_map.c links the
  * TmdObject behind one with GsLinkObject4. Holders: ModelData's
  * `linkResource` (over the TMD in a MOM file), PlacementGrid's
  * `linkResource`, DayTask's `dreamerTmd` ("ETC\DREAMER.TMD") and the

@@ -165,7 +165,7 @@ segments:
       # its references the other way. That remainder is renamed by each
       # carve of this block (code_2cc8c_b -> code_2cc8c_c in round 11), so
       # the owning function is named here rather than the segment.
-      - [0x1890, .rodata, app/task]
+      - [0x1890, .rodata, app/task_core]
       # 0x1908 holds jtbl_80011108, func_8003FB1C's jump table. ATTACHED to
       # code_2cc8c_e in round 14 when that segment was carved: its words are
       # `.L` labels LOCAL to func_8003FB1C's own .s file, which a standalone
@@ -232,7 +232,7 @@ segments:
       - [0x19B4, o, libc2/sprintf, .rdata]
       # jtbl_80011290 (5 words) is code_322b4's switch table, ATTACHED for its
       # `.L` labels; D_800112A4 onward is psyq_36654's (libpress) and stays plain.
-      - [0x1A90, .rodata, graphics/sprite]
+      - [0x1A90, .rodata, graphics/screen_sprite]
       - [0x1AA4, rodata]
       # 0x1B -> 0x1B6B; retail's next string is at 0x1B6C, which is exactly
       # where SUBALIGN(2) puts it, so no pad line is needed.
@@ -247,7 +247,7 @@ segments:
       # slot (strings, then jtbl_8001157C and jtbl_80011594, whose targets
       # are at 0x8004Fxxx/0x8005xxx and still live in `asm`) stays a
       # standalone rodata object from 0x1C34.
-      - [0x1C0C, .rodata, world/dream_day]
+      - [0x1C0C, .rodata, world/day_task]
       # Slot 0x1C34 is shared by FIVE units. Only the two JUMP TABLES need
       # attaching -- they hold `.L` labels local to class_3bb8c_g's own
       # function .s files, which a standalone rodata object cannot resolve.
@@ -260,7 +260,7 @@ segments:
       #   D_80011530  class_3bb8c_f       jtbl_8001157C/jtbl_80011594  _g
       #   D_800115D0  (unreferenced)      D_80011610/D_8001161C  class_3bb8c_h
       - [0x1C34, rodata]
-      - [0x1D7C, .rodata, ui/title_menu]   # jtbl_8001157C + jtbl_80011594
+      - [0x1D7C, .rodata, ui/task_objf]   # jtbl_8001157C + jtbl_80011594
       - [0x1DD0, rodata]
       # Split at the ownership boundary (third instance of the shared-slot
       # case this round -- see PARALLEL-RUNS Gate 2). Ownership, one grep per
@@ -268,7 +268,7 @@ segments:
       # that unit's own function .s, so it MUST be attached);
       # D_800116A4 unreferenced; D_800116E4 -> class_3bb8c_j, still uncarved,
       # so it must stay in a standalone object.
-      - [0x1E28, .rodata, ui/input_dialogs]   # jtbl_80011628
+      - [0x1E28, .rodata, ui/text_entry]   # jtbl_80011628
       - [0x1EA4, rodata]                   # D_800116A4 / D_800116E4 -> not ours
       # Slot 0x1EF4 has THREE owners, so it splits twice (the shared-slot case
       # from PARALLEL-RUNS Gate 2). Ownership, one grep per symbol:
@@ -526,13 +526,17 @@ segments:
       - [0x1674C, o, libapi/a22]        # BIOS A-function stubs
       - [0x1675C, o, libapi/a20]
       - [0x1676C, o, libapi/a21]
-      - [0x1677c, c, app/game_shell]
+      - [0x1677c, c, app/game_application]
       # ROUND 34: the unit's LAST function, `strcat` (0x80027130, 42w), is
       # Sony's -- libc2/strcat, Psy-Q 3.3, 0xA8 covering exactly it. It had
       # been matched as C since round 8 and counted as game code; linking the
       # object reclassifies it. Text-only, no data sections, and nothing else
       # in the unit moves: strcat was already at the end, so this is a pure
       # suffix split with no new unit name and no rodata attach to move.
+      # FileResource, FileResource__Release (0x800269F0) to GetFileResourceMethods.
+      - [0x171F0, c, app/file_resource]
+      # The data-source layer, GetActiveDataSourceMethods (0x80026CAC) to BuildFileName.
+      - [0x174AC, c, app/data_source]
       - [0x17930, o, libc2/strcat]
       # code_179d8 was 274 functions and 44% blocker-dense in aggregate, but
       # the density is CLUSTERED, so the aggregate is a bad carve guide. A
@@ -792,7 +796,7 @@ segments:
       # Owns NO jump table (the 0xFD8 slot's seven jtbl blocks all fall
       # outside 0x8002BC40..0x8002C408), so unlike _b and _c it needs no
       # rodata attach.
-      - [0x1C92C, c, sound/vab_sound]     # 0x1C92C..0x1D718: code_179d8_d and _e, merged round 100 (track 8), plus ServiceSoundCueSet (round 103)
+      - [0x1C92C, c, sound/placement_grid]     # PlacementGrid and ReturnZero, 0x1C92C..0x1CBC0 (the head of code_179d8_d and _e, merged round 100)
       # (carve history; merged into PlacementGridVabSound above, round 100)
       # code_179d8_e: functions 120..148 of the original, 0x1CC08..0x1D508
       # (29 functions).  Census 2026-09-04, three-grep screen per function:
@@ -801,6 +805,12 @@ segments:
       # are 2-instruction `jr $ra; nop` leaves splat generates itself, so
       # the real queue is ~11 bodies.  Owns NO switch jump table (zero
       # `jtbl_` references in the slice), so no rodata attach.
+      # NullDriver, NullDriver__NullDriver (0x8002C3C0) to GetNullDriverUseVSyncCallback.
+      - [0x1CBC0, c, sound/null_driver]
+      # VabStreamObj, New_VabStreamObj (0x8002C480) to GetSsTicksPerSecond.
+      - [0x1CC80, c, sound/vab_stream_obj]
+      # The SoundCueSet functions, InitSoundCueSet (0x8002CC34) to ServiceSoundCueSet.
+      - [0x1D434, c, sound/sound_cue_set]
       # (carve history of the three slices merged into libsnd_vmanager below,
       # round 100: code_179d8_l, _m and _j)
       # code_179d8_l: FRONT half of what was the `code_179d8_mid_c`
@@ -1190,7 +1200,7 @@ segments:
       - [0x2ba94, o, libcd/event]        # CdInit, def_cbsync, def_cbready, def_cbread
       - [0x2bb9c, c, graphics/tim_image]       # 0x2BB9C..0x2BF70, game code (revision 18)
       - [0x2bf70, o, libgs/gs_122]       # GsGetTimInfo, closing the block at 0x2C054
-      - [0x2c054, c, app/task]
+      - [0x2c054, c, app/stream_task]
       # code_2cc8c is 153 functions. Round 10 carved the first 20-function
       # slice (0x2CC8C..0x2D548) as a C unit; the remainder stays asm as
       # code_2cc8c_b. Blocker census at carve time: 4 of 153 functions
@@ -1287,6 +1297,14 @@ segments:
       # (func_8003FB1C) and D_80011194 (func_8003FC70) are both still in the
       # unit, which now starts at 0x3030C / func_8003FB0C.
       #   ^ ROUND 34: the first half of that is no longer true -- see below.
+      # TaskCore, New_TaskCore (0x8003BE94) to GetDefaultMovieFrame; owns jtbl_80011090 and jtbl_800110D0.
+      - [0x2C694, c, app/task_core]
+      # IntermediateBase, IntermediateBase__IntermediateBase (0x8003DFDC) to GetIntermediateBaseMethods.
+      - [0x2E7DC, c, app/intermediate_base]
+      # Viewport, New_Viewport (0x8003E5D8) to GetRootNode; drawNode is in viewport_draw.
+      - [0x2EDD8, c, app/viewport]
+      # Sony's libgs gs_106, GsSetProjection (0x8003F28C), carried as C.
+      - [0x2FA8C, c, psyq/libgs_gs_106]
       - [0x2FAAC, o, libgs/gs_131]
       - [0x30048, o, libgs/gs_133]
       # ROUND 34: func_8003FB1C is Sony's `Gssub_make_matrix` (libgs/gs_123,
@@ -1325,21 +1343,57 @@ segments:
       - [0x30470, o, libgs/gs_108]      # GsSetLightMode  (was func_8003FC70)
       - [0x304FC, o, libgte/fgo_00]     # TransposeMatrix (was func_8003FCFC)
       - [0x3054C, o, libgte/fog_01]     # SetFogNear      (was func_8003FD4C)
-      - [0x305B0, c, ui/screen_widgets]
+      - [0x305B0, c, ui/fade_box]
       # (carve history; merged into ScreenWidgets above, round 100)
       # code_2cc8c_f: #30..#59, 0x30E64..0x3197C (psyq_memset follows, so no
       # data tail). Zero blocked functions.
+      # BoxFill, New_BoxFill (0x800404D0) to GetBoxFillMethods.
+      - [0x30CD0, c, ui/box_fill]
+      # TextRow, New_TextRow (0x800408CC) to GetTextRowMethods.
+      - [0x310CC, c, ui/text_row]
+      # The full-width Shift-JIS helpers, DecodeFullWidthSjis (0x80040FC0) to FormatFullWidthNumber.
+      - [0x317C0, c, ui/full_width_sjis]
       # psyq_memset chunk A: libc2 memory / formatted-output helpers.
       - [0x3197C, o, libc2/memset]     # memset
       - [0x319A8, o, libc2/itoa]       # itoa
       - [0x319E8, o, libc2/sprintf]    # sprintf
       - [0x32248, o, libc2/memmove]    # memmove
-      - [0x322b4, c, graphics/sprite]       # game code (revision 18; was psyq_322b4)
+      - [0x322b4, c, graphics/char_sprite]       # game code (revision 18; was psyq_322b4)
+      # ScreenSprite, New_ScreenSprite (0x80041C9C) to GetScreenSpriteMethods; owns jtbl_80011290.
+      - [0x3249C, c, graphics/screen_sprite]
+      # Sprite, New_Sprite (0x80041EE8) to GetSpriteMethods.
+      - [0x326E8, c, graphics/sprite]
+      # RequestedFile, New_RequestedFile (0x800422CC) to GetRequestedFileMethods.
+      - [0x32ACC, c, graphics/requested_file]
+      # FrameClock, New_FrameClock (0x80042400) to GetFrameClockMethods.
+      - [0x32C00, c, graphics/frame_clock]
+      # LightRig, New_LightRig (0x80042694) to GetLightRigMethods.
+      - [0x32E94, c, graphics/light_rig]
       # psyq_memset chunk B: three short runs in the libgs/libcd remainder.
       - [0x330F4, o, libgs/gs_110]     # GsSetAmbient
       - [0x3311c, c, graphics/flat_light_obj]       # game code (revision 18; was psyq_3311c)
       - [0x3328C, o, libgs/gs_107]     # GsSetFlatLight, gte_set_lc, gte_read_lc
-      - [0x33808, c, graphics/graphics_resources] # game code (revision 18; was the head of psyq_33808)
+      - [0x33808, c, graphics/tim_block_src] # game code (revision 18; was the head of psyq_33808)
+      # LinkResource, New_LinkResource (0x80043840) to GetLinkResourceMethods.
+      - [0x34040, c, graphics/link_resource]
+      # TimArraySrc, New_TimArraySrc (0x80043B88) to GetTimArraySrcMethods.
+      - [0x34388, c, graphics/tim_array_src]
+      # Tod, New_Tod (0x80043E84) to GetTodMethods.
+      - [0x34684, c, graphics/tod]
+      # BgLayer, New_BgLayer (0x800441B4) to GetBgLayerMethods.
+      - [0x349B4, c, graphics/bg_layer]
+      # ModelData, New_ModelData (0x8004468C) to GetModelDataMethods.
+      - [0x34E8C, c, graphics/model_data]
+      # TriggerWorld, New_TriggerWorld (0x80044A0C) to GetTriggerWorldMethods.
+      - [0x3520C, c, graphics/trigger_world]
+      # TileMap, New_TileMap (0x80044CD4) to GetTileMapMethods.
+      - [0x354D4, c, graphics/tile_map]
+      # TileAtlas, New_TileAtlas (0x80044F30) to GetTileAtlasMethods.
+      - [0x35730, c, graphics/tile_atlas]
+      # TodSet, New_TodSet (0x800451B8) to GetTodSetMethods.
+      - [0x359B8, c, graphics/tod_set]
+      # MoviePlayer, New_MoviePlayer (0x80045438) to GetMoviePlayerMethods.
+      - [0x35C38, c, graphics/movie_player]
       - [0x36654, asm, psyq_36654]     # libpress/libpress from DecDCTReset
       - [0x36D38, o, libc2/exit]       # exit
       - [0x36d48, asm, psyq_36d48]
@@ -1363,7 +1417,9 @@ segments:
       - [0x38EAC, o, libcd/c_009]      # StGetNext
       - [0x38F70, o, libcd/c_004]      # data_ready_callback
       - [0x38FD8, o, libcd/c_007]      # StFreeRing
-      - [0x39094, c, cd/game_files]       # game code (revision 18; was psyq_39094)
+      - [0x39094, c, cd/lbd_file]       # game code (revision 18; was psyq_39094, then game_files)
+      # The record-table getters, GetDefaultDataDirectory (0x80048CF0) to GetSpecialDayMovieSpan.
+      - [0x394F0, c, cd/game_files]
       # psyq_rand, retired whole. Its 4-byte .sbss seed is placed NOLOAD by
       # config/psyq-objects.ld at 0x8008AC68; the plain sbss slot below is
       # unchanged.
@@ -1374,7 +1430,11 @@ segments:
       # monolithic `asm` segment awaiting a carve (docs/PARALLEL-RUNS.md
       # Gate 2).
       - [0x39cb4, c, world/stage_grid]
-      - [0x39e08, c, world/dream_day]
+      - [0x39e08, c, world/day_task]
+      # TimedTask, New_TimedTask (0x8004A130) to GetTimedTaskMethods.
+      - [0x3A930, c, world/timed_task]
+      # StageMap, New_StageMap (0x8004A4C8) to GetStageMapMethods.
+      - [0x3ACC8, c, world/stage_map]
       # class_3bb8c is 365 functions -- the largest uncarved block in the
       # game, and the one holding all 13 PSX BIOS trampolines (`jr $t2`,
       # not expressible in C). Carved in slices from the front, like Entity.
@@ -1417,7 +1477,7 @@ segments:
       # never through the caller's frame.
       # Clear of both remainder hazards (zero `jlabel`, zero `jr $t2`), so
       # no rodata slot to attach and no hasm/.word disposition here either.
-      - [0x3DA54, c, ui/title_menu]
+      - [0x3DA54, c, world/node_guarded_viewport]
       # class_3bb8c_d / _e / _f: front of the 305-function class_3bb8c
       # remainder, split into three ~20-function C units in round 14. The
       # tail (#59 onward, 0x403E4) deliberately STAYS asm as class_3bb8c_g
@@ -1515,6 +1575,12 @@ segments:
       # 21, which sit in `psyq_*` segments -- but they are library code by
       # construction too, so the same remedy is the first thing to try there.
       # Six objects, 0x10 bytes each, tiling 0x410E8..0x41148 exactly:
+      # GridCell, New_GridCell (0x8004D38C) to GetGridCellMethods.
+      - [0x3DB8C, c, world/grid_cell]
+      # TitleMenu, New_TitleMenu (0x8004D518) to GetTitleMenuMethods.
+      - [0x3DD18, c, ui/title_menu]
+      # TaskObjF, New_TaskObjF (0x8004E2E0) to StampSaveTitleFileLetter; owns jtbl_8001157C and jtbl_80011594.
+      - [0x3EAE0, c, ui/task_objf]
       - [0x410E8, o, libapi/a51]        # lseek   (was func_800508E8)
       - [0x410F8, o, libapi/a54]        # close   (was func_800508F8)
       - [0x41108, o, libapi/a69]        # delete  (was func_80050908)
@@ -1615,7 +1681,7 @@ segments:
       # jump table, so expect the rodata attach/split from Gate 2). 18 clean,
       # none wanting 7+ callee-saved registers (the corrected threshold; the
       # one function at 5 is ordinary work, see DECOMPILATION_LEARNINGS).
-      - [0x413A8, c, ui/input_dialogs]
+      - [0x413A8, c, ui/text_entry]
       # class_3bb8c_j: first 20-function slice of the 193-function remainder,
       # 0x41F84..0x429D4. Carved round 15. Boundary checked on both sides:
       # func_8005217C closes `jr $ra; nop` + endlabel and func_800521D4 opens
@@ -1631,7 +1697,7 @@ segments:
       # Blocker profile: 2 of 20 -- func_800522DC (addiu-$at, and it OWNS
       # jtbl_800116F4, so the rodata slot at 0x1EF4 is attached here) and
       # func_80052644 (gp_rel). 18 clean.
-      - [0x429D4, c, ui/item_list]
+      - [0x4225C, c, ui/item_list]  # ItemList whole, New_ItemList (0x80051A5C) to GetItemListMethods
       # class_3bb8c_l: third 20-function slice, 0x435E0..0x44518. Carved
       # round 15. Boundary checked on both sides: func_80053C94 closes
       # `jr $ra; nop` + endlabel and func_80053D18 opens with its own
@@ -1868,22 +1934,46 @@ segments:
       - [0x5DB38, o, libetc/intr_vb, .data]
       - [0x5DB60, o, libetc/vsync, .data]
       - [0x5DB70, .data, app/pad]  # gPadMethods
-      - [0x5DBC8, .data, app/game_shell]  # gGameApplicationMethods .. sDataSourceClientGetters
+      - [0x5DBC8, .data, app/game_application]  # gGameApplicationMethods
+      - [0x5DC30, .data, app/file_resource]  # gFileResourceMethods
+      - [0x5DCAC, .data, app/data_source]  # sDataSourceClientGetters
       - [0x5DCE8, .data, cd/cd_driver]  # gCdDriverMethods, sCdSeekEntry
       - [0x5DD7C, o, libcd/sys, .data]       # 0x80 -> 0x5DDFC; D_8006D5FC (game data) follows exactly
       - [0x5DDFC, data]
       - [0x5E138, o, libcd/iso9660, .data]   # 8 bytes (two 0x1F8010xx DMA register addresses) -> 0x5E140
-      - [0x5E140, .data, sound/vab_sound]  # gPlacementGridMethods, gNullDriverMethods, gVabStreamObjMethods
+      - [0x5E140, .data, sound/placement_grid]  # gPlacementGridMethods
+      - [0x5E1BC, .data, sound/null_driver]  # gNullDriverMethods
+      - [0x5E234, .data, sound/vab_stream_obj]  # gVabStreamObjMethods
       - [0x5E2D4, data]
       - [0x5EC8C, .data, sound/wbgm]  # gWBgmMethods
       - [0x5ECF0, .data, app/application]  # gApplicationMethods
       - [0x5ED58, .data, graphics/tim_image]  # gTimImageMethods
-      - [0x5EDF8, .data, app/task]  # gStreamTaskMethods .. gViewportMethods
-      - [0x5F19C, .data, ui/screen_widgets]  # gFadeBoxMethods .. gTextRowMethods
+      - [0x5EDF8, .data, app/stream_task]  # gStreamTaskMethods
+      - [0x5EF30, .data, app/task_core]  # gTaskCoreMethods and its three constants
+      - [0x5F078, .data, app/intermediate_base]  # gIntermediateBaseMethods
+      - [0x5F0E4, .data, app/viewport]  # gViewportMethods
+      - [0x5F19C, .data, ui/fade_box]  # gFadeBoxMethods, its colour tables
+      - [0x5F2C0, .data, ui/box_fill]  # gBoxFillMethods
+      - [0x5F390, .data, ui/text_row]  # gTextRowMethods
       - [0x5F468, o, libc2/sprintf, .data]    # 0xC -> 0x5F474 (dlabel D_8006EC74)
-      - [0x5F474, .data, graphics/sprite]  # gCharSpriteMethods .. gLightRigMethods
+      - [0x5F474, .data, graphics/char_sprite]  # gCharSpriteMethods, sCharSpriteCellRect
+      - [0x5F54C, .data, graphics/screen_sprite]  # gScreenSpriteMethods, sVec3Zero
+      - [0x5F61C, .data, graphics/sprite]  # gSpriteMethods
+      - [0x5F6D8, .data, graphics/requested_file]  # gRequestedFileMethods
+      - [0x5F750, .data, graphics/frame_clock]  # gFrameClockMethods
+      - [0x5F7AC, .data, graphics/light_rig]  # gLightRigMethods
       - [0x5F86C, .data, graphics/flat_light_obj]  # gFlatLightObjMethods
-      - [0x5F8B8, .data, graphics/graphics_resources]  # gTimBlockSrcMethods .. gMoviePlayerMethods
+      - [0x5F8B8, .data, graphics/tim_block_src]  # gTimBlockSrcMethods
+      - [0x5F93C, .data, graphics/link_resource]  # gLinkResourceMethods
+      - [0x5F9C4, .data, graphics/tim_array_src]  # gTimArraySrcMethods
+      - [0x5FA40, .data, graphics/tod]  # gTodMethods
+      - [0x5FAC4, .data, graphics/bg_layer]  # gBgLayerMethods
+      - [0x5FB84, .data, graphics/model_data]  # gModelDataMethods
+      - [0x5FC0C, .data, graphics/trigger_world]  # gTriggerWorldMethods
+      - [0x5FC98, .data, graphics/tile_map]  # gTileMapMethods
+      - [0x5FD14, .data, graphics/tile_atlas]  # gTileAtlasMethods
+      - [0x5FD90, .data, graphics/tod_set]  # gTodSetMethods
+      - [0x5FE14, .data, graphics/movie_player]  # gMoviePlayerMethods
       - [0x5FE84, data]
       - [0x5FFC8, o, libpress/vlc, .data]     # 0x18 -> 0x5FFE0 (dlabel D_8006F7E0)
       - [0x5FFE0, data]
@@ -1893,11 +1983,17 @@ segments:
       - [0x72080, data]
       - [0x720A0, o, libcd/c_011, .data]      # 0x50 -> 0x720F0 (dlabel D_800818A0)
       - [0x720F0, data]
-      - [0x72140, .data, cd/game_files]  # gLbdFileMethods .. sMovieFrameCounts: the file table
+      - [0x72140, .data, cd/lbd_file]  # gLbdFileMethods
+      - [0x721CC, .data, cd/game_files]  # sSoundBankPaths .. sMovieFrameCounts: the file table
       - [0x769D4, .data, world/stage_grid]  # the stage grids and their chunk moods
-      - [0x76DC8, .data, world/dream_day]  # DayTask, TimedTask, StageMap: method tables and chunk tables
-      - [0x771D8, .data, ui/title_menu]  # gNodeGuardedViewportMethods .. sCardIconRect: the title menu, the card messages
-      - [0x776D0, .data, ui/input_dialogs]  # gTextEntryMethods, sTextEntryPanelRect
+      - [0x76DC8, .data, world/day_task]  # gDayTaskMethods, DayTask's view points
+      - [0x76E68, .data, world/timed_task]  # gTimedTaskMethods
+      - [0x76EE8, .data, world/stage_map]  # gStageMapMethods, the chunk and footprint tables
+      - [0x771D8, .data, world/node_guarded_viewport]  # gNodeGuardedViewportMethods
+      - [0x772A0, .data, world/grid_cell]  # gGridCellMethods
+      - [0x77360, .data, ui/title_menu]  # gTitleMenuMethods .. sDisplayBufferRects: the title menu
+      - [0x775C4, .data, ui/task_objf]  # gTaskObjFMethods .. sCardIconRect: the memory card's messages
+      - [0x776D0, .data, ui/text_entry]  # gTextEntryMethods, sTextEntryPanelRect
       - [0x77788, .data, ui/item_list]  # gItemListMethods, sItemListPanelRect
       - [0x77834, .data, world/objm]  # gObjMMethods, the view points, the per-stage pending extras
       - [0x77974, .data, world/style_layer]  # spawn tables, colours, configs, cue records

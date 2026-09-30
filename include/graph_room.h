@@ -44,7 +44,7 @@ struct GraphRoomMethods {
  * the DreamSys's 365-day mood ring. That it is the game's graph screen is
  * that reading; the mechanics are measured.
  *
- * Who makes one: GameApplication__RunTitleMenu (src/app/game_shell.c),
+ * Who makes one: GameApplication__RunTitleMenu (src/app/game_application.c),
  * through GameApplication__RunTask(New_GraphRoom, self->dreamSys, ...), so
  * the ctor's one argument is the game's DreamSys. Its getSaveBlock returns
  * the save block this class reads as DreamSaveBlock (include/dream_sys.h:

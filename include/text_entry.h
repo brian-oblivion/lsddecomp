@@ -4,7 +4,7 @@
  *
  * Declares the TextEntry class (object and method table), its mode, result
  * and state constants, and its methods, which are defined in
- * src/ui/input_dialogs.c.
+ * src/ui/text_entry.c.
  */
 #ifndef TEXT_ENTRY_H
 #define TEXT_ENTRY_H
@@ -88,7 +88,7 @@ struct TextEntryMethods {
  * @brief An on-screen editor for a caller-owned string, driven by the pad.
  *
  * Class id 0x10 (TEXTENTRY_CLASS_ID), method table gTextEntryMethods,
- * parent BasicClass; no class below it. Methods in src/ui/input_dialogs.c,
+ * parent BasicClass; no class below it. Methods in src/ui/text_entry.c,
  * New_TextEntry to GetTextEntryMethods.
  *
  * - setText (the ctor forwards to it) keeps the caller's buffer in
@@ -107,7 +107,7 @@ struct TextEntryMethods {
  *   `panelSprite` (CARD\COMINPUT.TIM), the text row and the '_' cursor
  *   (CARD\FONTICON.TIM).
  *
- * Its one maker is TaskObjF__AttachTextEntry (title_menu.c, mode 1), which
+ * Its one maker is TaskObjF__AttachTextEntry (task_objf.c, mode 1), which
  * edits the memory-card save title and also drives
  * loadCardResources/attachTarget/detachTarget/release.
  *

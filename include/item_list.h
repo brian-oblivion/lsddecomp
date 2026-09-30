@@ -8,8 +8,7 @@
  * @brief ItemList, a scrolling list of strings the player picks one from:
  *        the memory card's load-file picker.
  *
- * Methods in src/ui/input_dialogs.c (New_ItemList .. ItemList__DetachTarget)
- * and src/ui/item_list.c (ItemList__SetState .. GetItemListMethods).
+ * Methods in src/ui/item_list.c, New_ItemList through GetItemListMethods.
  */
 
 /* The objects it holds, by tag (`target` is TaskObjF's `sound`, a
@@ -121,7 +120,7 @@ struct ItemListMethods {
  * and two ticks later setState(ITEMLIST_STATE_REPORT) passes `result` to
  * notifyParents; the parent reads the chosen item with getCursorIndex.
  *
- * Lifecycle: its one maker is TaskObjF__AttachItemList (src/ui/title_menu.c):
+ * Lifecycle: its one maker is TaskObjF__AttachItemList (src/ui/task_objf.c):
  * New_ItemList(titles, ITEMLIST_MODE_FULLWIDTH), addChild, loadResources,
  * attachTarget(input source, tick source, sound); TaskObjF__DetachItemList
  * undoes it (detachTarget, releaseResources, release). The strings are the

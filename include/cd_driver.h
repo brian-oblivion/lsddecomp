@@ -86,7 +86,7 @@ struct CdDriverMethods {
  * FileResource subclass and NullDriver's sibling. No class derives from it.
  *
  * The driver runs on other classes' objects. Nothing calls New_CdDriver:
- * SetActiveDataSource (src/app/game_shell.c) copies this table's eleven
+ * SetActiveDataSource (src/app/data_source.c) copies this table's eleven
  * interface slots into FileResource's table and every client table, so
  * `self` in Open, Read and the rest is whichever FileResource object called
  * its own `open` or `read` (a TimImage, a TodSet, ...), and a queued
@@ -337,7 +337,7 @@ typedef struct CdRequestNode {
  * "File not found" and give up (OpenCdFile, ResolveFileEntries). */
 #define CD_SEARCH_ATTEMPTS 101
 
-/* ---- The drive and its state, as game_shell.c's data-source wrappers read it. */
+/* ---- The drive and its state, as data_source.c's wrappers read it. */
 
 /**
  * @brief Puts the drive in double-speed mode, once per boot; later calls
@@ -606,7 +606,7 @@ extern s32 ReadCdFile(CdDriver *self, void *buf, u32 size);
 
 /**
  * @brief Whether the service tick is driven from VSyncCallback, the CD half
- * of game_shell.c's GetActiveDataSourceUseVSyncCallback.
+ * of data_source.c's GetActiveDataSourceUseVSyncCallback.
  * @return SetCdDriverMode's `useVSyncCallback`.
  */
 extern s32 GetCdUseVSyncCallback(void);

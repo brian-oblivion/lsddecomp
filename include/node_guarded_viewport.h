@@ -4,7 +4,7 @@
  *
  * Declares the NodeGuardedViewport class (object, method table, and its
  * slot and field macros) and its methods, which are defined in
- * src/ui/title_menu.c.
+ * src/world/node_guarded_viewport.c.
  */
 #ifndef NODE_GUARDED_VIEWPORT_H
 #define NODE_GUARDED_VIEWPORT_H
@@ -47,7 +47,7 @@ struct NodeGuardedViewportMethods {
  *
  * Class id 0x17, method table gNodeGuardedViewportMethods, parent Viewport:
  * its ctor chains to Viewport's (GetViewportMethods()->ctor) first. Methods
- * in src/ui/title_menu.c. No class derives from it.
+ * in src/world/node_guarded_viewport.c. No class derives from it.
  *
  * What it changes:
  *  - update (+0x09C, NodeGuardedViewport__Update) calls Viewport__Update
@@ -61,7 +61,7 @@ struct NodeGuardedViewportMethods {
  *    the override makes that second call a no-op.
  *  - Four own slots, +0x0B8..+0x0C4, hold empty functions nothing calls.
  *
- * Lifecycle: DayTask__DayTask (src/world/dream_day.c), the one construction
+ * Lifecycle: DayTask__DayTask (src/world/day_task.c), the one construction
  * site, builds it as its IntermediateBaseInitArgs' viewport. DayTask__Init
  * hands it to the DreamSys (setViewport), and ObjM, built from the same init
  * args, drives it through Viewport's slots: InitStyleAndWorld and

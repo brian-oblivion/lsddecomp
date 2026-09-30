@@ -70,7 +70,7 @@ struct CdStreamMethods {
  * is (sectors a second / fps / 2) * 2054, and open divides the file's size by
  * it into `totalFrames`.
  *
- * Lifecycle: the one holder is MoviePlayer (src/graphics/graphics_resources.c),
+ * Lifecycle: the one holder is MoviePlayer (src/graphics/movie_player.c),
  * whose ctor builds one with New_CdStream(cdSpeed, MOVIE_FPS, 0) and drives it
  * through the slots. The callback fields are cleared by the ctor and written
  * nowhere else, so nothing ever reaches them; MoviePlayer hands its callback

@@ -48,10 +48,10 @@ struct FlatLightObjMethods {
  * Parent BasicClass; no class derives from it. Methods, the whole class, in
  * src/graphics/flat_light_obj.c. The object is 0x20 bytes (New_FlatLightObj).
  *
- * LightRig__LightRig (src/graphics/sprite.c) makes three, with light ids 0, 1
+ * LightRig__LightRig (src/graphics/light_rig.c) makes three, with light ids 0, 1
  * and 2, keeps them in LightRig::lights and adds each as a child;
  * LightRig__Finalize releases them. Their one caller of setColor and
- * setDirection is StageMap__SetChildParams (src/world/dream_day.c), through
+ * setDirection is StageMap__SetChildParams (src/world/stage_map.c), through
  * LightRig's getLight, with update = 1 and per-light sources of an r, g, b
  * and an s16 vx, vy, vz.
  */

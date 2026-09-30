@@ -12,7 +12,7 @@
  *
  * Declares the class (VIEWPORT_SLOTS, VIEWPORT_FIELDS for its subclass
  * NodeGuardedViewport), the ViewportRefView the view is kept in, and its
- * methods, defined in src/app/task.c except drawNode
+ * methods, defined in src/app/viewport.c except drawNode
  * (src/graphics/viewport_draw.c). The OT pair is Sony's (GsOT headers,
  * GsOT_TAG arrays, PACKET areas), so an includer takes Sony's headers first
  * (`common.h`, <libgte.h>, <libgpu.h>, <libgs.h>).
@@ -120,8 +120,8 @@ struct ViewportMethods {
 
 /**
  * Viewport -- the object that renders a scene: class id 0x7, method table
- * gViewportMethods, a BasicClass subclass. Its methods are in src/app/task.c,
- * except drawNode, in src/graphics/viewport_draw.c. IntermediateBase and
+ * gViewportMethods, a BasicClass subclass. Its methods are in
+ * src/app/viewport.c, except drawNode, in src/graphics/viewport_draw.c. IntermediateBase and
  * TaskCore hold one as `viewport` (New_Viewport, or the caller's own). The
  * ctor chains to BasicClass's first, and NodeGuardedViewport's (0x17,
  * node_guarded_viewport.h) chains to this one, so the id tree

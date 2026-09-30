@@ -50,6 +50,14 @@ enum VabStreamLoadState {
  * voice. A real voice is 0 or more. */
 #define VAB_NO_VOICE (-1)
 
+/** @name playTone's packed index
+ * program << VAB_TONE_BITS | tone: VabStreamObj__PlayTone unpacks it, and
+ * ServiceSoundCueSet packs a slot's program into it.
+ * @{ */
+#define VAB_TONE_BITS 4       /**< the tone's width in the index */
+#define VAB_TONES_PER_PROG 16 /**< 1 << VAB_TONE_BITS: tones a program spans */
+/** @} */
+
 /**
  * @brief The type VabStreamObj's processBuffer slot (+0x078) is called
  * through: FileResource declares that slot untyped, and this class's
@@ -82,7 +90,7 @@ struct VabStreamObjMethods {
  * @brief One VAB sound bank, loaded from disc through the active data source
  * and played through Sony's libsnd (class id 0xA03). A FileResource subclass
  * and a sibling of the drivers (CdDriver, NullDriver), not derived from
- * either; no class derives from it. Methods in src/sound/vab_sound.c.
+ * either; no class derives from it. Methods in src/sound/vab_stream_obj.c.
  *
  * **Loading.** Like every data-source client, its ctor and finalize chain to
  * the active driver's (GetActiveDataSourceMethods), and GetVabStreamObjMethods

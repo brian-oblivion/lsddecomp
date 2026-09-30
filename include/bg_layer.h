@@ -51,12 +51,12 @@ typedef void (*BgLayerResetFn)(BgLayer *self, struct TileMap *src, s32 mode);
  *        exactly libgs's GsBG, laid over a TileMap's GsMAP.
  *
  * Parent SceneNode (its ctor chains to SceneNode's first); no class derives
- * from it. Methods in src/graphics/graphics_resources.c. The object is 0x68
+ * from it. Methods in src/graphics/bg_layer.c. The object is 0x68
  * bytes (New_BgLayer).
  *
  * Viewport__DrawNode (src/graphics/viewport_draw.c) passes a BgLayer's GsBG,
  * from `bgAttribute` on, to GsSortBg. Its one owner is TaskCore
- * (src/app/task.c): TaskCore__TaskCore builds one over its TileMap
+ * (src/app/task_core.c): TaskCore__TaskCore builds one over its TileMap
  * (New_BgLayer(tileMap, BGLAYER_MODE_SCREEN)), OnInit attaches it to the LightRig and sets its
  * colour, OnDeinit detaches it, Finalize releases it, and the fades
  * (TaskCore__TickFadeIn, TaskCore__TickFadeOut) call setColor every frame.

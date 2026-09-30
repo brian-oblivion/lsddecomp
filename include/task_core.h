@@ -12,7 +12,7 @@
  *
  * Declares the class (TASKCORE_SLOTS, TASKCORE_FIELDS for its subclasses),
  * its states, input modes, tones and fade constants, the TaskCoreTarget menu
- * description, and its methods, defined in src/app/task.c.
+ * description, and its methods, defined in src/app/task_core.c.
  */
 
 typedef struct TaskCore TaskCore;
@@ -210,8 +210,8 @@ struct TaskCoreMethods {
 /**
  * TaskCore -- the base of the game's menu and screen tasks: class id 0x130,
  * method table gTaskCoreMethods, an IntermediateBase subclass
- * (intermediate_base.h). Methods in src/app/task.c. The object is 0xA4 bytes
- * (New_TaskCore). Three classes derive from it, each ctor calling
+ * (intermediate_base.h). Methods in src/app/task_core.c. The object is
+ * 0xA4 bytes (New_TaskCore). Three classes derive from it, each ctor calling
  * TaskCore__TaskCore first: StreamTask (0x1130, stream_task.h), TitleMenu
  * (0x1F130, title_menu.h) and GraphRoom (0x2F130, graph_room.h). Used on its
  * own, it shows one TIM image for a frame bound (GameApplication__ShowImage).
@@ -573,5 +573,11 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, s32 withSound);
  * @param self the task
  * @return the cursor */
 s32 TaskCore__GetActiveItemCursor(TaskCore *self);
+
+/** @brief The default movie frame, {x 640, y 0, w 320, h 240}: StreamTask's
+ * default initData and its MoviePlayer's frame, and the rectangle
+ * TaskCore__OnInit clears when the task has no sub handle.
+ * @return &sDefaultMovieFrame */
+DrawRect *GetDefaultMovieFrame(void);
 
 #endif

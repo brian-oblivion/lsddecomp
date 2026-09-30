@@ -1,0 +1,327 @@
+/*
+ * TimBlockSrc's methods (include/tim_block_src.h: a FileResource over a
+ * file of TIM blocks, read one CD read at a time, that also owns the four
+ * CLUT fade ramps), in ROM order: the allocator, ctor and finalize,
+ * AdvanceLoadState (onRequestDone) with FindMaxTimBlockSize, then the ramp
+ * setters and fades with FadeClutRow, which rebuilds one ramp, ending with
+ * its getter GetTimBlockSrcMethods; its method table closes the file. The
+ * other FileResource data sources that turn buffers into graphics objects
+ * each have their own file.
+ */
+#include "common.h"
+#include "tim_block_src.h"
+#include "tim_array_src.h"
+#include "bg_layer.h"
+#include "bmem_pmgr.h"
+#include "data_source.h"
+#include "cd_driver.h"
+#include <stdio.h>
+
+/* The fade CLUTs' rows (from CLUT_FADE_Y, include/tim_block_src.h). */
+#define CLUT_COLORS 256
+#define CLUT_STP 0x8000 /* a 15-bit colour's semi-transparency bit */
+
+/* Allocate a TimBlockSrc and construct it over the file `name`. */
+TimBlockSrc *New_TimBlockSrc(char *name) {
+    TimBlockSrc *obj = BMemPMgrAlloc(sizeof(TimBlockSrc));
+
+    if (obj != NULL) {
+        GetTimBlockSrcMethods()->ctor(obj, name);
+        return obj;
+    }
+    return NULL;
+}
+
+/** @brief A TIM-block file's header: a block count, then the blocks' file
+ * offsets and their sizes. */
+typedef struct TimBlockHeader {
+    /* +0x00 */ u32 count;      /**< how many TIM blocks the file holds */
+    /* +0x04 */ u32 offsets[4]; /**< each block's offset in the file, seeked to before its read */
+    /* +0x14 */ u32 sizes[4]; /**< each block's size in bytes; FindMaxTimBlockSize takes the largest */
+} TimBlockHeader;
+
+/** @brief The same header as AdvanceLoadState copies it out of the sector
+ * buffer. */
+/* MATCHING: bytes, so the copy is a byte-aligned block move; copying the
+ * TimBlockHeader itself loses retail's test of the pointers' alignment. */
+typedef struct TimBlockHeaderBytes {
+    u8 bytes[sizeof(TimBlockHeader)]; /**< a TimBlockHeader's bytes */
+} TimBlockHeaderBytes;
+
+extern s16 sTimBlockClutShift;
+
+/* ctor (+0x008): lay out the four fade ramps (2^sTimBlockClutShift rows
+ * each, one after another from CLUT_FADE_Y), then open `name` and read its
+ * first sector, whose header TIMBLOCK_LOAD_HEADER takes. */
+void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
+    TimBlockSrcEntry *e;
+    void *hdr;
+    s32 i;
+    u16 addr;
+    s16 shift;
+    u16 mask;
+
+    GetActiveDataSourceMethods()->ctor((FileResource *)self);
+    self->methods = GetTimBlockSrcMethods();
+    self->blockCount = 0;
+    self->blocks = NULL;
+    self->loaded = 0;
+    self->sector = NULL;
+    self->sectorSize = 0;
+    addr = 0;
+    mask = 1 << sTimBlockClutShift;
+    shift = sTimBlockClutShift;
+    for (i = 0; i < ARRAY_COUNT(self->entries); i++) {
+        e = &self->entries[i];
+        e->shift = shift;
+        e->mask = mask;
+        e->clutX = 0;
+        e->clutY = addr + CLUT_FADE_Y;
+        addr += mask;
+        e->clutW = CLUT_COLORS;
+        e->clutH = 1;
+    }
+    hdr = BMemPMgrAlloc(sizeof(TimBlockHeaderBytes));
+    if (hdr != NULL) {
+        self->sector = BMemPMgrAlloc(CD_SECTOR_SIZE);
+        if (self->sector != NULL) {
+            self->bufferSize = sizeof(TimBlockHeaderBytes);
+            self->buffer = hdr;
+            self->loadState = TIMBLOCK_LOAD_HEADER;
+            self->failed = 0;
+            self->methods->open(self, name, 1, 0);
+            self->methods->read(self, self->sector, CD_SECTOR_SIZE);
+        }
+    }
+}
+
+/* finalize (+0x00C): release the TimArraySrcs built so far. */
+void TimBlockSrc__Finalize(TimBlockSrc *self) {
+    ReleaseBasicClassArray((BasicClass **)self->blocks, self->blockCount);
+    BMemPMgrFree(self->blocks);
+    GetActiveDataSourceMethods()->finalize((FileResource *)self);
+}
+
+u32 FindMaxTimBlockSize(FileResource *self);
+
+/* onRequestDone (+0x064), run when a read completes: once the header sector is
+ * in, keep the header and read the first block into a buffer the size of
+ * the largest; once a block is in, build a TimArraySrc over it (its images
+ * take their CLUTs from `entries`), upload it, and read the next, until the
+ * last. An allocation failure sets `failed`. */
+void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
+    TimArraySrc **p;
+    s32 max;
+    s32 n;
+
+    LockActiveDataSource();
+    switch (self->loadState) {
+        case TIMBLOCK_LOAD_HEADER:
+            if (self->flags & CD_FLAG_READ_DONE) {
+                *(TimBlockHeaderBytes *)self->buffer = *(TimBlockHeaderBytes *)self->sector;
+                BMemPMgrFree(self->sector);
+                max = FindMaxTimBlockSize((FileResource *)self);
+                self->blocks =
+                    BMemPMgrAlloc(((TimBlockHeader *)self->buffer)->count * sizeof(*self->blocks));
+                if (self->blocks == NULL) {
+                    goto fail;
+                }
+                self->sector = BMemPMgrAlloc(max);
+                if (self->sector == NULL) {
+                    goto fail;
+                }
+                self->sectorSize = max;
+                self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[0], SEEK_SET);
+                self->methods->read(self, self->sector, max);
+                self->loadState = TIMBLOCK_LOAD_BLOCK;
+            }
+            break;
+        case TIMBLOCK_LOAD_BLOCK:
+            if (self->flags & CD_FLAG_READ_DONE) {
+                n = self->blockCount;
+                p = self->blocks + n;
+                *p = New_TimArraySrc(NULL);
+                (*p)->buffer = self->sector;
+                (*p)->bufferSize = 0;
+                (*p)->clutBase = (s32)self->entries;
+                n++;
+                (*p)->methods->onRequestDone(*p);
+                ((TimArraySrcUploadFn)(*p)->methods->processBuffer)(*p);
+                self->blockCount = n;
+                if (n < ((TimBlockHeader *)self->buffer)->count) {
+                    self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[n], SEEK_SET);
+                    self->methods->read(self, self->sector, self->sectorSize);
+                    self->loadState = TIMBLOCK_LOAD_BLOCK;
+                } else {
+                    BMemPMgrFree(self->sector);
+                    self->sector = NULL;
+                    self->sectorSize = 0;
+                    self->loadState = TIMBLOCK_LOAD_IDLE;
+                    self->loaded = 1;
+                    GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
+                }
+            }
+            break;
+    }
+    goto out;
+/* MATCHING: both failures jump to one tail after the switch; setting failed
+ * and breaking where each is found lays those stores out inside the case. */
+fail:
+    self->failed = 1;
+out:
+    UnlockActiveDataSource();
+}
+
+u32 FindMaxTimBlockSize(FileResource *self) {
+    TimBlockHeader *buf = self->buffer;
+    u32 i;
+    u32 max = 0;
+
+    for (i = 0; i < buf->count; i++) {
+        if (max < buf->sizes[i]) {
+            max = buf->sizes[i];
+        }
+    }
+    return max;
+}
+
+/* +0x078: set ramp `index`'s shift, and its row count from it. */
+void TimBlockSrc__SetEntryShift(TimBlockSrc *self, s32 index, s32 shift) {
+    TimBlockSrcEntry *e = &self->entries[index];
+
+    e->shift = shift;
+    e->mask = 1 << e->shift;
+}
+
+/* fadeAllEntries (+0x07C): fadeEntry every ramp toward `color`. */
+void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, ColorRgb *color) {
+    s32 i;
+
+    LockActiveDataSource();
+    for (i = 0; i < ARRAY_COUNT(self->entries); i++) {
+        self->methods->fadeEntry(self, i, color);
+    }
+    UnlockActiveDataSource();
+}
+
+/* fadeEntry (+0x080): set ramp `index`'s colour and rebuild it. */
+void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, ColorRgb *color) {
+    TimBlockSrcEntry *e;
+
+    LockActiveDataSource();
+    e = &self->entries[index];
+    e->color = *color;
+    FadeClutRow(e, index);
+    UnlockActiveDataSource();
+}
+
+/* Rebuild ramp `index` from its CLUT row: read the row back from VRAM, then
+ * write mask - 1 rows below it, row i + 1 blending every non-zero colour
+ * (i + 1) / mask of the way toward the ramp's colour (15-bit colours,
+ * worked in 8 bits and 20.12 fixed point; the semi-transparency bit kept). */
+void FadeClutRow(TimBlockSrcEntry *entry, s32 index) {
+    RECT dst;
+    RECT src;
+    u16 out[CLUT_COLORS];
+    u16 in[CLUT_COLORS];
+    s32 i;
+    s32 j;
+    s32 shift;
+    s32 r;
+    s32 g;
+    s32 b;
+    s32 f;
+    s32 rr;
+    s32 gg;
+    s32 bb;
+    u32 c;
+    s32 cr;
+    s32 cg;
+    s32 cb;
+
+    src.x = 0;
+    src.w = CLUT_COLORS;
+    src.h = 1;
+    src.y = (index << sTimBlockClutShift) + CLUT_FADE_Y;
+    StoreImage(&src, (u32 *)in);
+    DrawSync(0);
+    dst.h = 1;
+    dst.x = 0;
+    dst.y = 0;
+    dst.w = CLUT_COLORS;
+    r = entry->color.r;
+    g = entry->color.g;
+    b = entry->color.b;
+    shift = FIX12_SHIFT - entry->shift;
+    entry->clutH = entry->mask;
+    for (i = 0; i < entry->mask - 1; i++) {
+        f = (i + 1) << shift;
+        rr = r * f;
+        gg = g * f;
+        bb = b * f;
+        f = ONE - f;
+        for (j = 0; j < src.w; j++) {
+            c = in[j];
+            if (c == 0) {
+                out[j] = in[j];
+            } else {
+                cr = (in[j] & 0x1F) << 3;
+                cg = (c >> 2) & 0xF8;
+                cb = (c >> 7) & 0xF8;
+                cr = (cr * f + rr) >> (FIX12_SHIFT + 3);
+                cg = (cg * f + gg) >> (FIX12_SHIFT + 3);
+                cb = (cb * f + bb) >> (FIX12_SHIFT + 3);
+                out[j] = (in[j] & CLUT_STP) | cr | (cg << 5) | (cb << 10);
+            }
+        }
+        dst.y = src.y + i + src.h;
+        DrawSync(0);
+        LoadImage(&dst, (u32 *)out);
+    }
+}
+
+TimBlockSrcMethods *GetTimBlockSrcMethods(void) {
+    return &gTimBlockSrcMethods;
+}
+
+/* The method table fills the header's slots with the class's own method
+ * or the parent's. A (void *) entry is a method whose declared parameters differ
+ * from the slot's, usually one inherited from a parent class and declared
+ * on the parent's type. */
+
+/* TimBlockSrc: the block-by-block load step, then the CLUT fades. */
+TimBlockSrcMethods gTimBlockSrcMethods = {
+    /* +0x000 header */ TIMBLOCKSRC_CLASS_ID,
+    /* +0x004 release */ (void *)FileResource__Release,
+    /* +0x008 ctor */ TimBlockSrc__TimBlockSrc,
+    /* +0x00C finalize */ TimBlockSrc__Finalize,
+    /* +0x010 addChild */ (void *)BasicClass__AddChild,
+    /* +0x014 removeChild */ (void *)BasicClass__RemoveChild,
+    /* +0x018 removeAllChildren */ (void *)BasicClass__RemoveAllChildren,
+    /* +0x01C getNextChild */ (void *)BasicClass__GetNextChild,
+    /* +0x020 addParentRef */ (void *)BasicClass__AddParentRef,
+    /* +0x024 removeParentRef */ (void *)BasicClass__RemoveParentRef,
+    /* +0x028 clearParentRefs */ (void *)BasicClass__ClearParentRefs,
+    /* +0x02C getNextParentRef */ (void *)BasicClass__GetNextParentRef,
+    /* +0x030 notifyParents */ (void *)BasicClass__NotifyParents,
+    /* +0x034 slot34 */ BasicClass__NoOpSlot34,
+    /* +0x038 onNotify */ (void *)BasicClass__OnNotify,
+    /* +0x03C slot3C */ NULL,
+    /* +0x040 slot40 */ NULL,
+    /* +0x044 open */ NULL,
+    /* +0x048 close */ NULL,
+    /* +0x04C seek */ NULL,
+    /* +0x050 slot50 */ NULL,
+    /* +0x054 read */ NULL,
+    /* +0x058 loadFile */ NULL,
+    /* +0x05C freeBuffer */ (void *)FileResource__FreeBuffer,
+    /* +0x060 slot60 */ NoOp,
+    /* +0x064 onRequestDone */ TimBlockSrc__AdvanceLoadState,
+    /* +0x068 runRequestQueue */ NULL,
+    /* +0x06C requestLoadFile */ NULL,
+    /* +0x070 stopService */ NULL,
+    /* +0x074 cancelRequests */ NULL,
+    /* +0x078 processBuffer */ TimBlockSrc__SetEntryShift,
+    /* +0x07C fadeAllEntries */ TimBlockSrc__FadeAllEntries,
+    /* +0x080 fadeEntry */ TimBlockSrc__FadeEntry,
+};
