@@ -1182,14 +1182,14 @@ void DreamSys__OnPadEvent(DreamSys *self, s32 sender, s32 event) {
 }
 
 void DreamSys__TimerTick(DreamSys *self, s32 sender, s32 event) {
-    s32 old;
+    u32 old;
 
     if (event != FRAMECLOCK_EVENT_RUNNING)
         return;
 
     old = self->tick;
     self->tick = old + 1;
-    if ((u32)old >= (u32)self->dreamTimeLimit) { /* MATCHING: compared unsigned, as retail does */
+    if (old >= self->dreamTimeLimit) {
         if (self->isFlashbackSession) {
             if (self->state != DREAMSYS_NO_LINK || self->methods->loadNextFlashback(self, 0)) {
                 /* MATCHING: a barrier; without it this `tick = 0` jumps to the copy after notifyParents */
@@ -1317,7 +1317,7 @@ s32 DreamSys__GetSetDreamTimeLimit(DreamSys *self, s32 value) {
 }
 
 s32 DreamSys__GetDreamTimerScaled(DreamSys *self) {
-    return (u32)self->tick / DREAM_TICKS_PER_SECOND; /* MATCHING: an unsigned divide, as retail does */
+    return self->tick / DREAM_TICKS_PER_SECOND;
 }
 
 void DreamSys__SetSoundObj(DreamSys *self, VabStreamObj *value) {
@@ -1335,8 +1335,7 @@ void DreamSys__SetEtcTim(DreamSys *self, struct TimImage *value) {
 void DreamSys__UpdateTickState(DreamSys *self) {
     if (self->movementBlocked == 0) {
         self->linkCommandFlag = 0;
-        /* MATCHING: an unsigned remainder, as retail takes it; both fields are s32 */
-        self->tickBoundary = ((u32)self->tick % (u32)self->tickPeriod) == 0;
+        self->tickBoundary = (self->tick % self->tickPeriod) == 0;
     }
 }
 
@@ -2365,7 +2364,7 @@ void DreamSys__AddFlashback(DreamSys *self, s32 stage, PlayerSpawnPoint *pos, s3
     if (self->amountFlashbacksAvailable < ARRAY_COUNT(self->storedFlashbacks)) {
         entry += self->amountFlashbacksAvailable++;
     } else {
-        entry += (u32)self->tick % 9; /* MATCHING: an unsigned remainder, as retail takes it */
+        entry += self->tick % 9;
     }
     entry->stageID = stage;
     entry->position = *pos;

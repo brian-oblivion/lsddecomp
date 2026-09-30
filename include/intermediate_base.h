@@ -82,7 +82,7 @@ struct IntermediateBaseInitArgs {
     /* +0x010 */ BasicClass *frameClock; /**< initArgs->frameClock, or init's own New_FrameClock() object */ \
     /* +0x014 */ BasicClass *lightRig;  /**< initArgs->lightRig, or init's own New_LightRig() object */ \
     /* +0x018 */ BasicClass *viewport;  /**< initArgs->viewport, or init's own New_Viewport() */     \
-    /* +0x01C */ s32 frameCounter;      /**< update adds 1; resetCounters, onStart, onStop clear it */ \
+    /* +0x01C */ u32 frameCounter;      /**< update adds 1; resetCounters, onStart, onStop clear it */ \
     /* +0x020 */ s32 state;             /**< setState's argument; resetCounters clears it */         \
     /* +0x024 */ s32 initMode           /**< init's mode, an enum IntermediateBaseInitMode */
 /* clang-format on */
