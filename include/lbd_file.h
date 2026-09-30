@@ -57,7 +57,7 @@ struct LbdFileMethods {
 /**
  * @brief One of the stage's map-chunk files, STGnn\\Mnnn.LBD, loaded for one
  * element of the grid manager (class id 0x903). A FileResource subclass
- * with no subclasses; methods in src/cd/game_files.c.
+ * with no subclasses; methods in src/cd/lbd_file.c.
  *
  * The files it is handed are the record table entries
  * GetStageMapChunkRecord(stage, chunk) returns: StageMap__ComputeChunkLoadEntry

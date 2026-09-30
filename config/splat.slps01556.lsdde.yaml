@@ -1417,7 +1417,9 @@ segments:
       - [0x38EAC, o, libcd/c_009]      # StGetNext
       - [0x38F70, o, libcd/c_004]      # data_ready_callback
       - [0x38FD8, o, libcd/c_007]      # StFreeRing
-      - [0x39094, c, cd/game_files]       # game code (revision 18; was psyq_39094)
+      - [0x39094, c, cd/lbd_file]       # game code (revision 18; was psyq_39094, then game_files)
+      # The record-table getters, GetDefaultDataDirectory (0x80048CF0) to GetSpecialDayMovieSpan.
+      - [0x394F0, c, cd/game_files]
       # psyq_rand, retired whole. Its 4-byte .sbss seed is placed NOLOAD by
       # config/psyq-objects.ld at 0x8008AC68; the plain sbss slot below is
       # unchanged.
@@ -1981,7 +1983,8 @@ segments:
       - [0x72080, data]
       - [0x720A0, o, libcd/c_011, .data]      # 0x50 -> 0x720F0 (dlabel D_800818A0)
       - [0x720F0, data]
-      - [0x72140, .data, cd/game_files]  # gLbdFileMethods .. sMovieFrameCounts: the file table
+      - [0x72140, .data, cd/lbd_file]  # gLbdFileMethods
+      - [0x721CC, .data, cd/game_files]  # sSoundBankPaths .. sMovieFrameCounts: the file table
       - [0x769D4, .data, world/stage_grid]  # the stage grids and their chunk moods
       - [0x76DC8, .data, world/day_task]  # gDayTaskMethods, DayTask's view points
       - [0x76E68, .data, world/timed_task]  # gTimedTaskMethods
