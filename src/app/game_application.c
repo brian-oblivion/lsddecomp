@@ -18,6 +18,7 @@
 #include "title_menu.h"
 #include "day_task.h"
 #include "data_source.h"
+#include "bmem_pmgr.h"
 
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
 
@@ -32,9 +33,8 @@ typedef IntermediateBase *(*NewTaskFn)(struct DreamSys *dreamSys);
 s32 GameApplication__RunTask(NewTaskFn newTask, struct DreamSys *dreamSys,
                              IntermediateBaseInitArgs *initArgs);
 
-/* The original returns NULL on a failed allocation only because the
- * allocator's NULL is still the result; that path has no return statement. */
-#ifdef NON_MATCHING
+/* NULL on a failed allocation: the allocator's NULL is still the result. */
+/* MATCHING: the NULL path falls off the end; an explicit return there costs an instruction. */
 GameApplication *New_GameApplication(GameApplicationConfig *config) {
     GameApplication *self = BMemPMgrAlloc(sizeof(GameApplication));
 
@@ -42,11 +42,7 @@ GameApplication *New_GameApplication(GameApplicationConfig *config) {
         GetGameApplicationMethods()->ctor(self, config);
         return self;
     }
-    return NULL;
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/app/game_application", New_GameApplication);
-#endif
 
 /* ctor: Application's ctor with config->dataSource, this table, the config
  * kept, the data directory reset to its default, the DreamSys built from

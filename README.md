@@ -31,11 +31,8 @@ disassembly generated from your executable at build time).
 
 ## Progress
 
-**The rebuilt executable matches retail byte for byte.** 1443 of the game's
-1446 functions are C. The other three, `MoviePlayer__Advance`,
-`MoviePlayer__DecodeFrame` and `New_GameApplication`, have readable C under
-`#ifdef NON_MATCHING` that doesn't yet compile to the same bytes, so the
-build takes them from the disassembly (`make nonmatching` builds the C).
+**Done.** All 1446 of the game's own functions are C, and the rebuilt
+executable matches retail byte for byte.
 Sony's library code is linked from Sony's own objects (below) rather than
 decompiled. Every game header is
 documented, and every class has one definition.

@@ -189,16 +189,15 @@ void MoviePlayer__RequestRestart(MoviePlayer *self) {
  * one, or is neither starting nor started: the caller gets whatever result
  * was left over. For an inactive player that is non-zero (StreamTask__Update's
  * call leaves the slot's own address there), so StreamTask takes the movie as
- * done and fades out; the body below says so with a 1. Neither starting nor
- * started, it is the 0 just read from `started`. */
-#ifdef NON_MATCHING
+ * done and fades out. Neither starting nor started, it is the 0 just read
+ * from `started`. */
 s32 MoviePlayer__Advance(MoviePlayer *self) {
     MoviePlayer *cur = sActiveMoviePlayer;
 
     if (cur == self) {
         if (cur->pendingStart == 0) {
             if (cur->started == 0) {
-                return 0;
+                goto out;
             }
         } else {
             cur->stream->methods->startRead(cur->stream, 1, cur->frameCount);
@@ -213,11 +212,8 @@ s32 MoviePlayer__Advance(MoviePlayer *self) {
         }
         return cur->methods->decodeFrame(cur);
     }
-    return 1;
+out:; /* MATCHING: no return value on this path, as the original */
 }
-#else
-INCLUDE_ASM("asm/nonmatchings/graphics/movie_player", MoviePlayer__Advance);
-#endif
 
 /* abort (+0x04C): when active, close the stream and finish. */
 void MoviePlayer__Abort(MoviePlayer *self) {
@@ -308,7 +304,6 @@ s32 MoviePlayer__PollActive(MoviePlayer *self) {
  * frame to the MDEC once the last one is drawn, and pull the next. */
 /* The original has no return statement when another player is active: the
  * caller gets whatever result was left over. */
-#ifdef NON_MATCHING
 s32 MoviePlayer__DecodeFrame(MoviePlayer *self) {
     MoviePlayer *cur = sActiveMoviePlayer;
 
@@ -328,11 +323,7 @@ s32 MoviePlayer__DecodeFrame(MoviePlayer *self) {
         }
         return cur->methods->pollActive(cur);
     }
-    return 0;
-}
-#else
-INCLUDE_ASM("asm/nonmatchings/graphics/movie_player", MoviePlayer__DecodeFrame);
-#endif
+} /* MATCHING: no return when another player is active, as the original */
 
 /* The MDEC's DecDCTout callback: drawStrip of sActiveMoviePlayer, when
  * there is one. */
