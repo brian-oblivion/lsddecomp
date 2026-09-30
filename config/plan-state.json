@@ -618,6 +618,16 @@
           "note": "Phase 4 round 1. split-setup (head, premium): GraphRoom to graph_room.c plus a trial jump-table rodata cut; procedure. split-dream-scene: six files, dream_scene.c gone (item_list.c in src/ui).",
           "round": 108,
           "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-30",
+          "matches": 1,
+          "model": "opus",
+          "note": "Phase 4 round 3. split-rest: 12 multi-class units split into one class per file (33 new units, 7 renamed); bmem_pmgr.c and cd_driver.c keep their shape (allocator is not a class; cd_driver's edges are impossible). unitfile.py rewrites .data lines now. Head checked all 163 yaml subsegment offsets against the map: a wrong text offset builds green.",
+          "round": 110,
+          "runners": 1
         }
       ],
       "status": "auto"
