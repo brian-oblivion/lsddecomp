@@ -169,11 +169,60 @@ PHASE3 = {
                    "keeping it matching", "opus", ()),
         "lint": ("one disc-free lint (make format check, apidoc.py, readability.py) runnable as CI",
                  "opus", ()),
-        "licence": ("the operator's licence decision, recorded in PROGRESS.md", None, ()),
-        "process-docs": ("the operator's decision on docs/, CLAUDE.md and one-off tools, applied", None,
+        "licence": ("the operator's licence decision: LICENSE and README's Licence section", None, ()),
+        "process-docs": ("the operator's decision on docs/, CLAUDE.md and one-off tools, applied (docs/ to the archive/process branch)", None,
                          ("readme",)),
     }),
 }
+# Phase 4 (docs/CLEANUP.md): the code reads like the game's source, not like
+# a decompilation. The six tracks are independent and open together once
+# track 13 is done; each is an ordered checklist like phase 3's.
+_AREAS = (("world", "src/world"), ("graphics", "src/graphics"), ("rest", "src/app, src/cd, src/sound and src/ui"))
+PHASE4 = {
+    "14": ("data in C", {
+        "data-setup": ("one .data table defined in C instead of extern'd from the disassembly, byte-identical, "
+                       "and the procedure written into docs/CLEANUP.md (splat re-cut, section order, labels "
+                       "that split a table into columns); sEntityMoodTable is the first", "premium", ()),
+        **{f"data-{a}": (f"{d}'s tables defined in C where they are the file's own data; an extern stays only "
+                         "for data another file defines", "opus", ("data-setup",)) for a, d in _AREAS},
+    }),
+    "15": ("named literals, a pass", {
+        **{f"literals-{a}": (f"{d}: literals named where the name says more than the value (per-script states "
+                             "as local enums, flags, ids, sizes that recur); an enum used where one exists; a "
+                             "motion amount or timer value stays a number", "opus", ()) for a, d in _AREAS},
+    }),
+    "16": (".c comments", {
+        **{f"comments-{a}": (f"{d}: .c comments say what the code does in the game's terms, as the headers do; "
+                             "a MATCHING: line only where the spelling is not obviously the natural one, and "
+                             "phrased without registers or tools", "opus", ()) for a, d in _AREAS},
+    }),
+    "17": ("code bent to match", {
+        "ub-calls": ("the calls that rely on leftover argument registers and the functions that fall off "
+                     "their end: natural C if it matches, else the readable body in #ifdef NON_MATCHING",
+                     "opus", ()),
+        **{f"shape-{a}": (f"{d}: each goto, scheduling barrier, box struct and odd loop counter rewritten as "
+                          "natural C where that is byte-identical; the rest keep one MATCHING: line", "opus",
+                          ("ub-calls",)) for a, d in _AREAS},
+    }),
+    "18": ("behaviour names", {
+        "mood-cues": ("the Entity__MoodCueNN handlers named for what they do (a MoodCue row and its handler "
+                      "are the entity's script)", "opus", ()),
+        "noop-slots": ("the *__NoOpSlotNN occupants and remaining slotNN fields named for the slot's role, "
+                       "read from the callers and the classes that override it; a slot nothing calls and "
+                       "no class overrides keeps its position name, which is the only fact about it",
+                       "opus", ()),
+    }),
+    "19": ("one class, one file", {
+        "split-setup": ("a multi-class unit split into one file per class in ROM order, byte-identical, and "
+                        "the procedure written into docs/CLEANUP.md", "premium", ()),
+        "split-dream-scene": ("src/world/dream_scene.c split per class (ItemList's half, ObjM, the style "
+                              "layer, StyleEffect, Actor, VariantSprite, GraphRoom); file-private #defines at "
+                              "the top of each new file", "opus", ("split-setup",)),
+        "split-rest": ("every other unit holding more than one class split the same way where the rodata "
+                       "boundaries allow (tools/tuboundary.py)", "opus", ("split-setup",)),
+    }),
+}
+PHASE3.update(PHASE4)
 PHASE3_ITEMS = {k: {i: v[0] for i, v in items.items()} for k, (_, items) in PHASE3.items()}
 CHECK_ITEMS = {"5": TRACK5_ITEMS, "6": TRACK6_SETUP, "7": TRACK7_SETUP, "9": TRACK9_ITEMS, **PHASE3_ITEMS}
 TABLE_NAME = re.compile(r"^g[A-Z]\w*Methods$")
@@ -216,6 +265,8 @@ def phase3_status(tr, prev):
     out = {}
     for k, (title, items) in PHASE3.items():
         tk = tr[k]["checklist"]
+        if k in PHASE4:
+            prev = out["13"]["status"]  # phase 4's tracks open together
         if tr[k]["status"] != "auto":
             s = tr[k]["status"]
         elif prev != "done" and not any(tk.values()):
@@ -523,12 +574,15 @@ REVISITED_RE = re.compile(r"REVISITED[,:]?\s*\(?round (\d+)")
 
 def revisits_done(func):
     """How many revisits a stall has had: distinct rounds on its REVISITED
-    lines (the line format varies; a round mentioned twice is one revisit)."""
+    lines (the line format varies; a round mentioned twice is one revisit),
+    plus the rounds the ledger records (`plan.py revisited`), which is where
+    they go now that match reports live on archive/process."""
+    ledger = set(load_state()["tracks"]["1"].get("revisited", {}).get(func, {}))
     p = REPORTS / f"{func}.md"
     if not p.exists():
-        return 0
+        return len(ledger)
     t = p.read_text(errors="replace")
-    n = len(set(REVISITED_RE.findall(t)))
+    n = len(set(REVISITED_RE.findall(t)) | ledger)
     return n if n else (1 if "REVISITED" in t else 0)
 
 
@@ -649,6 +703,8 @@ def collect(st):
     fresh_funcs, stall_rows, promotable = [], [], []
     for words, unit, func, title in rows:
         state, has_body = report_state(func)
+        if state == "fresh" and func in nm_defined(unit):
+            state = "stalled"   # correct C kept under NON_MATCHING: attempted (progress.py)
         if state == "fresh":
             fresh_funcs.append((words, unit, func, title))
         else:
@@ -1465,7 +1521,7 @@ def jobs(d, n):
             if ck[i] or not all(ck[x] for x in after) or model is None:
                 continue
             if model == "premium":
-                q3.append((k, f"HEAD (premium) setup {i}: {desc} (FINISHING-PLAN track {k})",
+                q3.append((k, f"HEAD (premium) setup {i}: {desc} ({"docs/CLEANUP.md" if k in PHASE4 else "FINISHING-PLAN"} track {k})",
                            MODELS["head_when_new_procedure"]))
             elif k == "12":
                 us = [Path(f).stem for f in apidoc.areas().get(i, []) if f.endswith(".c")]
@@ -1560,7 +1616,7 @@ def select_jobs(d, order, n):
 def print_status(d, n, st):
     p = d["progress"]
     t = d["tracks"]
-    print("LSD: Dream Emulator finishing plan (docs/FINISHING-PLAN.md), measured now")
+    print("LSD: Dream Emulator plan (docs/CLEANUP.md; tracks 1-13 archived on archive/process), measured now")
     if not d["elf_present"]:
         print("  WARNING: build/lsdde.elf missing; run ./build-and-verify.sh first. Counts below are partial.")
     print(f"  game functions matched {p['matched']}/{p['game']}; queued {p['queued']} "
@@ -1620,6 +1676,8 @@ def print_status(d, n, st):
     for k in PHASE3:
         if k == "10":
             print("  -- phase 3: the tree is ready to publish (revisions 41, 43)")
+        if k == "14":
+            print("  -- phase 4: the code reads like the game's source (docs/CLEANUP.md)")
         ck = t[k]["checklist"]
         left = [i for i, v in ck.items() if not v]
         ops = [i for i in left if PHASE3[k][1][i][1] is None]
@@ -1792,6 +1850,10 @@ def main():
     c.add_argument("--item", required=True, choices=sorted({k for v in CHECK_ITEMS.values() for k in v}))
     c.add_argument("--track", choices=sorted(CHECK_ITEMS), help="only needed when two tracks share an item name")
     c.add_argument("--undo", action="store_true")
+    rv = sub.add_parser("revisited", help="record a track-1 revisit of a stall that did not close it")
+    rv.add_argument("--func", required=True)
+    rv.add_argument("--round", required=True, type=int)
+    rv.add_argument("--note", required=True, help="what was tried and why it did not match")
     sm = sub.add_parser("set-model")
     sm.add_argument("--role", required=True, choices=["match_runner", "naming_runner", "polish_runner"])
     sm.add_argument("--model", required=True, choices=["sonnet", "opus", "auto"])
@@ -1899,6 +1961,12 @@ def main():
         st["tracks"][owners[0]].setdefault("checklist", {})[a.item] = not a.undo
         save_state(st)
         print(f"track {owners[0]}: {a.item} {'un' if a.undo else ''}ticked")
+        return
+    if a.cmd == "revisited":
+        rec = st["tracks"]["1"].setdefault("revisited", {}).setdefault(a.func, {})
+        rec[str(a.round)] = a.note
+        save_state(st)
+        print(f"track 1: {a.func} revisited in round {a.round} ({len(rec)} revisit(s))")
         return
     if a.cmd == "set-model":
         st["models"][a.role] = None if a.model == "auto" else a.model

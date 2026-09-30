@@ -11,6 +11,20 @@
   "tracks": {
     "1": {
       "reason": "",
+      "revisited": {
+        "MoviePlayer__Advance": {
+          "108": "retail never writes the result when another player is active; any well-defined return adds an instruction",
+          "109": "retail never writes the result when another player is active; any well-defined return adds an instruction"
+        },
+        "MoviePlayer__DecodeFrame": {
+          "108": "retail never writes the result when another player is active; any well-defined return adds an instruction",
+          "109": "retail never writes the result when another player is active; any well-defined return adds an instruction"
+        },
+        "New_GameApplication": {
+          "108": "retail never writes the result on the NULL path; about 20 well-defined spellings all write it (one word differs)",
+          "109": "retail never writes the result on the NULL path; about 20 well-defined spellings all write it (one word differs)"
+        }
+      },
       "rounds": [
         {
           "attempts": 2,
@@ -341,6 +355,16 @@
           "note": "fresh revision-18 ground, finished: 19 opus matching sessions over code_10ee0, code_3770c, code_39094, code_322b4, code_fa50, code_33808; 213/213 byte-exact, no stalls, one permuter search (func_80043FE4, killed at ~31k iterations once a hand lever matched). Game code 100% matched; track 1 done again. Six sonnet naming passes and three opus track-4 classes (IntermediateBase, Sprite, Actor) ran alongside.",
           "round": 82,
           "runners": 19
+        },
+        {
+          "attempts": 5,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 2,
+          "model": "opus",
+          "note": "REVISIT of the five ub-calls stalls: StageMap__FindSlotByNeighbour (loop test as return value) and LbdFile__LoadDataBlock (both gates in one condition) match as well-defined C. New_GameApplication, MoviePlayer__Advance, MoviePlayer__DecodeFrame: retail returns a value it never set; no well-defined spelling can match. Advance's readable body returns 1 (done), as StreamTask sees it.",
+          "round": 109,
+          "runners": 3
         }
       ],
       "status": "open"
@@ -431,7 +455,9 @@
     },
     "13": {
       "checklist": {
+        "licence": true,
         "lint": true,
+        "process-docs": true,
         "readme": true
       },
       "reason": "",
@@ -445,13 +471,165 @@
           "note": "readme and lint (tools/lint.sh, disc-free: format, apidoc, readability, declcheck, snake_case) done; licence and process-docs are the operator's.",
           "round": 106,
           "runners": 2
+        },
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 2,
+          "model": "premium",
+          "note": "operator decisions applied: CC0 licence (LICENSE, README); docs/ and CREDITS.md to archive/process; CLAUDE.md reduced; Sony headers generated from the SDK disc",
+          "round": 107,
+          "runners": 0
         }
       ],
       "status": "auto"
     },
     "14": {
-      "checklist": {},
+      "checklist": {
+        "data-graphics": true,
+        "data-rest": true,
+        "data-setup": true,
+        "data-world": true
+      },
       "reason": "",
+      "rounds": [
+        {
+          "attempts": 4,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 4,
+          "model": "opus",
+          "note": "Phase 4 round 1. data-setup (head, premium): sEntityMoodTable in C, tools/datatable.py, procedure. data-world, data-graphics, data-rest moved every table their units own; method tables slot-per-line (head's style decision), RequestedFile/CdDriver/NullDriver via FILERESOURCE_BASE_SLOTS. Left: .sdata/.sbss/.rodata externs (gpsyms.py limit).",
+          "round": 108,
+          "runners": 3
+        }
+      ],
+      "status": "auto"
+    },
+    "15": {
+      "checklist": {
+        "literals-graphics": true,
+        "literals-rest": true,
+        "literals-world": true
+      },
+      "reason": "",
+      "rounds": [
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 3,
+          "model": "opus",
+          "note": "Phase 4 round 1. literals-graphics, literals-rest, literals-world (item_list.c covered by world after the split). Stage ids stay numbers until a stage table names them.",
+          "round": 108,
+          "runners": 3
+        }
+      ],
+      "status": "auto"
+    },
+    "16": {
+      "checklist": {
+        "comments-graphics": true,
+        "comments-rest": true,
+        "comments-world": true
+      },
+      "reason": "",
+      "rounds": [
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 3,
+          "model": "opus",
+          "note": "Phase 4 round 1. comments-rest, comments-graphics, comments-world: MATCHING notes without registers or tools; notes on natural spellings dropped. Rewritten notes mostly restate the old claim; no alternative spelling was re-measured.",
+          "round": 108,
+          "runners": 3
+        }
+      ],
+      "status": "auto"
+    },
+    "17": {
+      "checklist": {
+        "shape-graphics": true,
+        "shape-rest": true,
+        "shape-world": true,
+        "ub-calls": true
+      },
+      "reason": "",
+      "rounds": [
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 1,
+          "model": "opus",
+          "note": "Phase 4 round 1. ub-calls: 21 cases, 16 natural and byte-identical, 5 stalled under NON_MATCHING (now queued as track-1 revisits; progress.py/plan.py count a NON_MATCHING body as a stall).",
+          "round": 108,
+          "runners": 1
+        },
+        {
+          "attempts": 3,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 3,
+          "model": "opus",
+          "note": "Phase 4 round 2. shape-world (61 gotos -> 10, 6 barriers -> 1, 25 window tests natural), shape-graphics (50 gotos -> 41: SortTmdObject's packet loops stay), shape-rest (33 -> 22 gotos, 5 -> 4 barriers, size casts gone via u32 params). Left: tick/frame fields could be u32 in their base headers (cross-area).",
+          "round": 109,
+          "runners": 3
+        }
+      ],
+      "status": "auto"
+    },
+    "18": {
+      "checklist": {
+        "mood-cues": true,
+        "noop-slots": true
+      },
+      "reason": "",
+      "rounds": [
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 2,
+          "model": "opus",
+          "note": "Phase 4 round 1. mood-cues: 107 handlers named Entity__Cue<Behaviour>. noop-slots: 6 of 50 named; 44 never called or overridden keep their position name (done-when amended).",
+          "round": 108,
+          "runners": 2
+        }
+      ],
+      "status": "auto"
+    },
+    "19": {
+      "checklist": {
+        "split-dream-scene": true,
+        "split-rest": true,
+        "split-setup": true
+      },
+      "reason": "",
+      "rounds": [
+        {
+          "attempts": 2,
+          "calibration": false,
+          "date": "2026-09-29",
+          "matches": 2,
+          "model": "opus",
+          "note": "Phase 4 round 1. split-setup (head, premium): GraphRoom to graph_room.c plus a trial jump-table rodata cut; procedure. split-dream-scene: six files, dream_scene.c gone (item_list.c in src/ui).",
+          "round": 108,
+          "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-30",
+          "matches": 1,
+          "model": "opus",
+          "note": "Phase 4 round 3. split-rest: 12 multi-class units split into one class per file (33 new units, 7 renamed); bmem_pmgr.c and cd_driver.c keep their shape (allocator is not a class; cd_driver's edges are impossible). unitfile.py rewrites .data lines now. Head checked all 163 yaml subsegment offsets against the map: a wrong text offset builds green.",
+          "round": 110,
+          "runners": 1
+        }
+      ],
       "status": "auto"
     },
     "1b": {
@@ -871,42 +1049,81 @@
       ],
       "status": "open",
       "units_done": {
+        "actor": "2026-09-29",
         "application": "2026-09-25",
+        "bg_layer": "2026-09-30",
         "bmem_pmgr": "2026-09-24",
+        "box_fill": "2026-09-30",
         "cd_driver": "2026-09-21",
         "cd_stream": "2026-09-25",
+        "char_sprite": "2026-09-30",
+        "data_source": "2026-09-30",
+        "day_task": "2026-09-23",
         "draw_system": "2026-09-25",
         "dream_aux": "2026-09-21",
-        "dream_day": "2026-09-23",
-        "dream_scene": "2026-09-24",
         "dream_sys": "2026-09-22",
         "entity": "2026-09-19",
+        "fade_box": "2026-09-20",
+        "file_resource": "2026-09-30",
         "flat_light_obj": "2026-09-25",
+        "frame_clock": "2026-09-30",
+        "full_width_sjis": "2026-09-30",
+        "game_application": "2026-09-24",
         "game_files": "2026-09-25",
-        "game_shell": "2026-09-24",
-        "graphics_resources": "2026-09-25",
-        "input_dialogs": "2026-09-24",
+        "graph_room": "2026-09-29",
+        "grid_cell": "2026-09-30",
+        "intermediate_base": "2026-09-30",
+        "item_list": "2026-09-24",
+        "lbd_file": "2026-09-30",
         "libcard_card": "2026-09-23",
         "libcd_bios": "2026-09-23",
         "libgs_gs_101": "2026-09-24",
+        "libgs_gs_106": "2026-09-30",
         "libgs_gs_124": "2026-09-24",
         "libsnd_ssinit": "2026-09-24",
         "libsnd_ssinit_libapi_counter": "2026-09-23",
         "libsnd_vmanager": "2026-09-25",
         "libspu_s_ih": "2026-09-24",
+        "light_rig": "2026-09-30",
+        "link_resource": "2026-09-30",
         "main": "2026-09-25",
+        "model_data": "2026-09-30",
+        "movie_player": "2026-09-30",
+        "node_guarded_viewport": "2026-09-30",
+        "null_driver": "2026-09-30",
+        "objm": "2026-09-29",
         "pad": "2026-09-24",
+        "placement_grid": "2026-09-24",
+        "requested_file": "2026-09-30",
         "scene_node": "2026-09-23",
-        "screen_widgets": "2026-09-20",
+        "screen_sprite": "2026-09-30",
+        "sound_cue_set": "2026-09-30",
         "sprite": "2026-09-25",
         "stage_grid": "2026-09-23",
-        "task": "2026-09-23",
+        "stage_map": "2026-09-30",
+        "stream_task": "2026-09-23",
+        "style_effect": "2026-09-29",
+        "style_layer": "2026-09-29",
+        "task_core": "2026-09-30",
+        "task_objf": "2026-09-30",
+        "text_entry": "2026-09-24",
+        "text_row": "2026-09-30",
+        "tile_atlas": "2026-09-30",
+        "tile_map": "2026-09-30",
+        "tim_array_src": "2026-09-30",
+        "tim_block_src": "2026-09-25",
         "tim_image": "2026-09-25",
+        "timed_task": "2026-09-30",
         "title_menu": "2026-09-22",
         "tmd_model": "2026-09-25",
         "tmd_renderer": "2026-09-17",
+        "tod": "2026-09-30",
         "tod_actor": "2026-09-24",
-        "vab_sound": "2026-09-24",
+        "tod_set": "2026-09-30",
+        "trigger_world": "2026-09-30",
+        "vab_stream_obj": "2026-09-30",
+        "variant_sprite": "2026-09-29",
+        "viewport": "2026-09-30",
         "viewport_draw": "2026-09-25",
         "wbgm": "2026-09-25"
       }
@@ -1603,35 +1820,74 @@
       ],
       "status": "auto",
       "units_done": {
+        "actor": "2026-09-29",
         "application": "2026-09-28",
+        "bg_layer": "2026-09-30",
         "bmem_pmgr": "2026-09-27",
+        "box_fill": "2026-09-30",
         "cd_driver": "2026-09-27",
         "cd_stream": "2026-09-27",
+        "char_sprite": "2026-09-30",
+        "data_source": "2026-09-30",
+        "day_task": "2026-09-27",
         "draw_system": "2026-09-28",
         "dream_aux": "2026-09-27",
-        "dream_day": "2026-09-27",
-        "dream_scene": "2026-09-27",
         "dream_sys": "2026-09-26",
         "entity": "2026-09-27",
+        "fade_box": "2026-09-27",
+        "file_resource": "2026-09-30",
         "flat_light_obj": "2026-09-28",
+        "frame_clock": "2026-09-30",
+        "full_width_sjis": "2026-09-30",
+        "game_application": "2026-09-27",
         "game_files": "2026-09-27",
-        "game_shell": "2026-09-27",
-        "graphics_resources": "2026-09-26",
-        "input_dialogs": "2026-09-27",
+        "graph_room": "2026-09-29",
+        "grid_cell": "2026-09-30",
+        "intermediate_base": "2026-09-30",
+        "item_list": "2026-09-27",
+        "lbd_file": "2026-09-30",
+        "libgs_gs_106": "2026-09-30",
         "libsnd_vmanager": "2026-09-27",
+        "light_rig": "2026-09-30",
+        "link_resource": "2026-09-30",
         "main": "2026-09-28",
+        "model_data": "2026-09-30",
+        "movie_player": "2026-09-30",
+        "node_guarded_viewport": "2026-09-30",
+        "null_driver": "2026-09-30",
+        "objm": "2026-09-29",
         "pad": "2026-09-28",
+        "placement_grid": "2026-09-27",
+        "requested_file": "2026-09-30",
         "scene_node": "2026-09-28",
-        "screen_widgets": "2026-09-27",
+        "screen_sprite": "2026-09-30",
+        "sound_cue_set": "2026-09-30",
         "sprite": "2026-09-27",
         "stage_grid": "2026-09-28",
-        "task": "2026-09-27",
+        "stage_map": "2026-09-30",
+        "stream_task": "2026-09-27",
+        "style_effect": "2026-09-29",
+        "style_layer": "2026-09-29",
+        "task_core": "2026-09-30",
+        "task_objf": "2026-09-30",
+        "text_entry": "2026-09-27",
+        "text_row": "2026-09-30",
+        "tile_atlas": "2026-09-30",
+        "tile_map": "2026-09-30",
+        "tim_array_src": "2026-09-30",
+        "tim_block_src": "2026-09-26",
         "tim_image": "2026-09-27",
+        "timed_task": "2026-09-30",
         "title_menu": "2026-09-27",
         "tmd_model": "2026-09-26",
         "tmd_renderer": "2026-09-26",
+        "tod": "2026-09-30",
         "tod_actor": "2026-09-27",
-        "vab_sound": "2026-09-27",
+        "tod_set": "2026-09-30",
+        "trigger_world": "2026-09-30",
+        "vab_stream_obj": "2026-09-30",
+        "variant_sprite": "2026-09-29",
+        "viewport": "2026-09-30",
         "viewport_draw": "2026-09-27",
         "wbgm": "2026-09-28"
       }
