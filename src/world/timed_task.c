@@ -100,8 +100,7 @@ void TimedTask__NoOpOnPadEvent(void) {}
 
 void TimedTask__CheckTimeout(TimedTask *self, BasicClass *sender, s32 event) {
     GetIntermediateBaseMethods()->update((IntermediateBase *)self, sender, event);
-    /* MATCHING: compared unsigned, as retail does; the base class declares both s32 */
-    if ((u32)self->frameCounter > (u32)self->timeoutFrames) {
+    if (self->frameCounter > self->timeoutFrames) {
         self->methods->setState(self, TIMEDTASK_STATE_TIMED_OUT);
     }
 }
