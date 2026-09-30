@@ -17,6 +17,10 @@
 // Renaming a symbol here requires `make extract` afterwards, and the rename
 // must land BEFORE anything references the old name.
 
+// Not an address: CdStream__GetNextFrame builds the constant 0x7FFFFF with a
+// lui/addiu pair, which the disassembler would otherwise read as a pointer.
+D_7FFFFF = 0x7FFFFF; // ignore:true
+
 // psyq_2258, chunks A and B: Sony's own exported names, read out of the SDK
 // objects the build now links (_obj/malloc, libapi/c159, libc2/bcopy,
 // libgs/matrix, libc2/printf, libc2/prnt, libc2/memchr, libc2/strlen,
