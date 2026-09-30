@@ -8,8 +8,7 @@
  * @brief ItemList, a scrolling list of strings the player picks one from:
  *        the memory card's load-file picker.
  *
- * Methods in src/ui/input_dialogs.c (New_ItemList .. ItemList__DetachTarget)
- * and src/ui/item_list.c (ItemList__SetState .. GetItemListMethods).
+ * Methods in src/ui/item_list.c, New_ItemList through GetItemListMethods.
  */
 
 /* The objects it holds, by tag (`target` is TaskObjF's `sound`, a

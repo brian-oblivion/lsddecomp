@@ -116,4 +116,8 @@ extern char *GetDataDirectory(void);
  * @return dest */
 extern char *BuildFileName(char *dest, char *name, char *dir, char *ext);
 
+/** The path buffer TextEntry's and ItemList's resource loaders give
+ * BuildFileName as `dest` for a "CARD\\" + name + ".TIM" path. */
+#define CARD_TIM_PATH_SIZE 32
+
 #endif

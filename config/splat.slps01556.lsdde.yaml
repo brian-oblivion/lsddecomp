@@ -1695,7 +1695,7 @@ segments:
       # Blocker profile: 2 of 20 -- func_800522DC (addiu-$at, and it OWNS
       # jtbl_800116F4, so the rodata slot at 0x1EF4 is attached here) and
       # func_80052644 (gp_rel). 18 clean.
-      - [0x429D4, c, ui/item_list]
+      - [0x4225C, c, ui/item_list]  # ItemList whole, New_ItemList (0x80051A5C) to GetItemListMethods
       # class_3bb8c_l: third 20-function slice, 0x435E0..0x44518. Carved
       # round 15. Boundary checked on both sides: func_80053C94 closes
       # `jr $ra; nop` + endlabel and func_80053D18 opens with its own

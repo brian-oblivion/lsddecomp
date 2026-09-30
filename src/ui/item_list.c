@@ -1,17 +1,17 @@
 /*
- * ItemList's second half (include/item_list.h: the scrolling list of strings
- * the memory card's load-file picker shows); the first half, New_ItemList to
- * ItemList__DetachTarget, is in src/ui/input_dialogs.c. In ROM order:
+ * ItemList's methods (include/item_list.h: the scrolling list of strings
+ * the memory card's load-file picker shows), in ROM order: its life and
+ * resources (New_ItemList to ItemList__DetachTarget, introduced below),
  * closing and reporting (SetState, TickClosing), the Pad events
  * (HandleInputCode, PlaySound), the cursor and scroll methods, the four
  * visible rows (create, release, refresh, format), the view and cursor
  * helpers, the table getter GetItemListMethods, then the table and the
- * panel's cell.
+ * panel's cell. TextEntry, the save-title editor before it in ROM, is in
+ * text_entry.c.
  */
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
-#include <libgs.h>
 #include "text_row.h"
 #include "tim_image.h"
 #include "item_list.h"
@@ -19,6 +19,9 @@
 #include "pad.h"
 #include "bmem_pmgr.h"
 #include <strings.h>
+#include "frame_clock.h"
+#include "full_width_sjis.h"
+#include "data_source.h"
 
 /* The y step from one row to the next (createRows). */
 #define ITEMLIST_ROW_SPACING 10
@@ -27,6 +30,221 @@
  * addresses are taken (setColor). */
 extern struct ColorRgb sItemListRowColor;
 extern struct ColorRgb sItemListCursorColor;
+
+/*
+ * ItemList's life and resources: its allocator and ctor, BasicClass's
+ * overrides (finalize, child bookkeeping, onNotify), and the view and
+ * resource methods resetView, loadResources, releaseResources, attachTarget
+ * and detachTarget. Its list methods follow.
+ *
+ * Like TextEntry it keeps its input and tick children by kind (Pad,
+ * FrameClock) and draws through a ScreenSprite panel and TextRows built from
+ * CARD\ TIMs; its list methods do nothing until loading has made
+ * `panelSprite`. The base-class calls go through BasicClass's table
+ * (include/basic_class.h) and upcast `self`.
+ */
+
+ItemList *New_ItemList(char **items, s32 mode) {
+    ItemList *self = BMemPMgrAlloc(sizeof(ItemList));
+
+    if (self != NULL) {
+        GetItemListMethods()->ctor(self, items, mode);
+        return self;
+    }
+    return NULL;
+}
+
+/*
+ * The ctor. `items` is a NULL-terminated array of strings, copied into
+ * buffers of the list's own: `texts[i]` holds item i and `textLens[i]` its
+ * length in characters (bytes, halved for full-width SJIS), and
+ * `maxTextLen` is the longest. Ends with resetView.
+ */
+void ItemList__ItemList(ItemList *self, char **items, s32 mode) {
+    char **item;
+    s32 i;
+    s32 len;
+
+    /* MATCHING: both set before the base ctor call. */
+    i = 0;
+    item = items;
+    GetBasicClassMethods()->ctor((BasicClass *)self);
+    self->methods = GetItemListMethods();
+
+    while (*item++ != NULL) {
+        i++;
+    }
+
+    self->itemCount = i;
+    self->texts = BMemPMgrAlloc(i * sizeof(*self->texts));
+    item = items;
+    self->textLens = BMemPMgrAlloc(self->itemCount * sizeof(*self->textLens));
+    self->maxTextLen = 0;
+
+    for (i = 0; i < self->itemCount; i++) {
+        len = strlen(*item);
+        if (mode == ITEMLIST_MODE_FULLWIDTH) {
+            len /= 2;
+        }
+        self->textLens[i] = len;
+        self->texts[i] = BMemPMgrAlloc(len + 4);
+        if (mode == ITEMLIST_MODE_FULLWIDTH) {
+            DecodeFullWidthSjis(self->texts[i], *item);
+        } else {
+            strcpy(self->texts[i], *item);
+        }
+        /* MATCHING: a ternary, not an `if`: the old value is stored back. */
+        self->maxTextLen = (self->maxTextLen < len) ? len : self->maxTextLen;
+        item++;
+    }
+
+    self->mode = mode;
+    ItemList__ClearCachedRefs(self);
+    self->methods->resetView(self);
+}
+
+void ItemList__ClearCachedRefs(ItemList *self) {
+    self->inputSource = NULL;
+    self->tickSource = NULL;
+    self->panelSprite = NULL;
+}
+
+void ItemList__Finalize(ItemList *self) {
+    s32 i;
+
+    for (i = 0; i < self->itemCount; i++) {
+        BMemPMgrFree(self->texts[i]);
+    }
+    BMemPMgrFree(self->textLens);
+    BMemPMgrFree(self->texts);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
+}
+
+void ItemList__AddChild(ItemList *self, void *child) {
+    s32 tag;
+
+    if (child) {
+        GetBasicClassMethods()->addChild((BasicClass *)self, (BasicClass *)child);
+        tag = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
+        if (tag == PAD_CLASS_ID) {
+            self->inputSource = child;
+        } else if (tag == FRAMECLOCK_CLASS_ID) {
+            self->tickSource = child;
+        }
+    }
+}
+
+void ItemList__RemoveChild(ItemList *self, void *child) {
+    s32 tag;
+
+    if (child) {
+        tag = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
+        if (tag == PAD_CLASS_ID) {
+            self->inputSource = NULL;
+        } else if (tag == FRAMECLOCK_CLASS_ID) {
+            self->tickSource = NULL;
+        }
+        GetBasicClassMethods()->removeChild((BasicClass *)self, (BasicClass *)child);
+    }
+}
+
+void ItemList__RemoveAllChildren(ItemList *self) {
+    self->inputSource = NULL;
+    self->tickSource = NULL;
+    self->panelSprite = NULL;
+    GetBasicClassMethods()->removeAllChildren((BasicClass *)self);
+}
+
+void ItemList__OnNotify(ItemList *self, void *sender, s32 event) {
+    s32 tag;
+
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
+    tag = ((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK;
+    if (tag == PAD_CLASS_ID) {
+        self->methods->handleInputCode(self, sender, event);
+    } else if (tag == FRAMECLOCK_CLASS_ID) {
+        self->methods->tickClosing(self, sender, event);
+    }
+}
+
+void ItemList__ResetView(ItemList *self) {
+    self->topIndex = 0;
+    self->column = 0;
+    self->cursorIndex = 0;
+}
+
+extern char sStrSelect[];                 /* "SELECT" */
+extern char sItemListCardPathPrefix[];    /* "CARD\\" */
+extern char sItemListTimExt[];            /* ".TIM" */
+extern ScreenSpritePos sItemListPanelPos; /* (-100, -60) */
+extern char sItemListStrFontIcon[];       /* "FONTICON" */
+
+/*
+ * Loads CARD\SELECT.TIM as the panel sprite, placed at sItemListPanelPos
+ * under `parent`, and has createRows build the rows from CARD\FONTICON.TIM.
+ * Does nothing without a parent or when already loaded. The same shape as
+ * TextEntry__LoadCardResources, above.
+ */
+void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
+    char path[CARD_TIM_PATH_SIZE];
+    char *dir;
+    char *ext;
+    TimImage *panelTim;
+    TimImage *fontTim;
+
+    if (parent == NULL) {
+        return;
+    }
+    if (self->panelSprite != NULL) {
+        return;
+    }
+
+    dir = sItemListCardPathPrefix;
+    ext = sItemListTimExt;
+
+    panelTim = New_TimImage(BuildFileName(path, sStrSelect, dir, ext));
+    ((TimImageUploadFn)panelTim->methods->processBuffer)(panelTim);
+    self->panelSprite = New_ScreenSprite(panelTim, &sItemListPanelRect, 0);
+    panelTim->methods->release(panelTim);
+    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&sItemListPanelPos);
+
+    fontTim = New_TimImage(BuildFileName(path, sItemListStrFontIcon, dir, ext));
+    ((TimImageUploadFn)fontTim->methods->processBuffer)(fontTim);
+    self->methods->createRows(self, parent, fontTim, self->topIndex, self->column, self->cursorIndex);
+    fontTim->methods->release(fontTim);
+}
+
+void ItemList__ReleaseResources(ItemList *self) {
+    if (self->panelSprite) {
+        self->methods->releaseRows(self);
+        self->panelSprite = self->panelSprite->methods->release(self->panelSprite);
+    }
+}
+
+/* Adds the input and tick children, keeps the sound as `target` and zeroes
+ * `result`. The first addChild is handed all four words (its occupant reads
+ * only the first; ItemListAddChildWideFn). */
+void ItemList__AttachTarget(ItemList *self, void *inputSource, void *tickSource,
+                            struct VabStreamObj *target) {
+    ItemListAddChildWideFn addChildWide;
+    s32 zero;
+
+    /* MATCHING: the cached slot, `zero` and the do/while (0) give retail's order. */
+    zero = 0;
+    addChildWide = (ItemListAddChildWideFn)self->methods->addChild;
+    do {
+        addChildWide(self, inputSource, tickSource, target);
+        self->methods->addChild(self, tickSource);
+        self->target = target;
+        self->result = zero;
+    } while (0);
+}
+
+void ItemList__DetachTarget(ItemList *self) {
+    self->methods->removeChild(self, self->inputSource);
+    self->methods->removeChild(self, self->tickSource);
+    self->target = NULL;
+}
 
 void ItemList__SetState(ItemList *self, s32 state) {
     self->closeTicks = 0;
@@ -362,6 +580,6 @@ ItemListMethods gItemListMethods = {
 };
 /* clang-format on */
 
-/* SELECT's cell, the item-list panel ItemList__LoadResources
- * (input_dialogs.c) shows: 256 x 160 from (0, 0). */
+/* SELECT's cell, the item-list panel ItemList__LoadResources shows:
+ * 256 x 160 from (0, 0). */
 SpriteRect sItemListPanelRect = {0, 0, 256, 160};
