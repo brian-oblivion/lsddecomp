@@ -604,6 +604,7 @@
     "19": {
       "checklist": {
         "split-dream-scene": true,
+        "split-rest": true,
         "split-setup": true
       },
       "reason": "",
