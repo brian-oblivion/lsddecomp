@@ -124,7 +124,9 @@ class id. For example, TextRow `0x11144` sits under CharSprite `0x1144`,
 which sits under ScreenSprite `0x144`, then Sprite `0x44`, then SceneNode
 `0x4`, then BasicClass `0x0`.
 
-Each class has one header, `include/<class>.h`, which holds its object
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) is the map: the class tree,
+how a frame gets from `main` to the screen, and how a day of the dream
+runs. Each class has one header, `include/<class>.h`, which holds its object
 struct, its method-table struct and its prototypes, all documented for
 Doxygen (`doxygen Doxyfile`, output in `build/doxygen/`).
 `include/basic_class.h`, the root class, is the place to start. Each `.c`
