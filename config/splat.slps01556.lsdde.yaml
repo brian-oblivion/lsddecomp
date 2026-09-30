@@ -268,7 +268,7 @@ segments:
       # that unit's own function .s, so it MUST be attached);
       # D_800116A4 unreferenced; D_800116E4 -> class_3bb8c_j, still uncarved,
       # so it must stay in a standalone object.
-      - [0x1E28, .rodata, ui/input_dialogs]   # jtbl_80011628
+      - [0x1E28, .rodata, ui/text_entry]   # jtbl_80011628
       - [0x1EA4, rodata]                   # D_800116A4 / D_800116E4 -> not ours
       # Slot 0x1EF4 has THREE owners, so it splits twice (the shared-slot case
       # from PARALLEL-RUNS Gate 2). Ownership, one grep per symbol:
@@ -1679,7 +1679,7 @@ segments:
       # jump table, so expect the rodata attach/split from Gate 2). 18 clean,
       # none wanting 7+ callee-saved registers (the corrected threshold; the
       # one function at 5 is ordinary work, see DECOMPILATION_LEARNINGS).
-      - [0x413A8, c, ui/input_dialogs]
+      - [0x413A8, c, ui/text_entry]
       # class_3bb8c_j: first 20-function slice of the 193-function remainder,
       # 0x41F84..0x429D4. Carved round 15. Boundary checked on both sides:
       # func_8005217C closes `jr $ra; nop` + endlabel and func_800521D4 opens
@@ -1990,7 +1990,7 @@ segments:
       - [0x772A0, .data, world/grid_cell]  # gGridCellMethods
       - [0x77360, .data, ui/title_menu]  # gTitleMenuMethods .. sDisplayBufferRects: the title menu
       - [0x775C4, .data, ui/task_objf]  # gTaskObjFMethods .. sCardIconRect: the memory card's messages
-      - [0x776D0, .data, ui/input_dialogs]  # gTextEntryMethods, sTextEntryPanelRect
+      - [0x776D0, .data, ui/text_entry]  # gTextEntryMethods, sTextEntryPanelRect
       - [0x77788, .data, ui/item_list]  # gItemListMethods, sItemListPanelRect
       - [0x77834, .data, world/objm]  # gObjMMethods, the view points, the per-stage pending extras
       - [0x77974, .data, world/style_layer]  # spawn tables, colours, configs, cue records

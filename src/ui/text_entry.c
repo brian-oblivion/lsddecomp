@@ -1,5 +1,5 @@
 /*
- * input_dialogs.c -- TextEntry (include/text_entry.h), the pad-driven
+ * text_entry.c -- TextEntry (include/text_entry.h), the pad-driven
  * editor for the memory card's save title, in ROM order from New_TextEntry
  * to its getter GetTextEntryMethods; its method table and panel cell end
  * the file. ItemList, the list the player picks a save file from, follows
