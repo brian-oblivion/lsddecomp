@@ -234,6 +234,8 @@ def upper_globals():
         m = SYMLINE.match(line.strip())
         if not m or "type:func" in m.group(3) or rename.PLACEHOLDER.match(m.group(1)):
             continue
+        if "ignore:true" in m.group(3):   # an address banned as a symbol, not a global
+            continue
         if UPPER_GLOBAL.match(m.group(1)) and not rename.sony_data_owner(int(m.group(2), 16)):
             out.append(m.group(1))
     return out

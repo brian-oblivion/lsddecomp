@@ -510,10 +510,11 @@ def main():
         print("         that tree as ground truth. Fix: make extract\n")
 
     print("LSD: Dream Emulator (PSX) decomp progress")
-    if total:
+    # Every percentage here is of GAME code. Sony's library code is neither
+    # in the numerator nor the denominator (the library lines below say why).
+    if game:
         print(f"  matched (C, byte-verified): {matched:5d}"
-              f"  ({100 * matched / total:.2f}% of all,"
-              f" {100 * matched / game:.2f}% of game code)")
+              f"  of {game} game functions ({100 * matched / game:.2f}%)")
     print(f"  queued (INCLUDE_ASM):       {queued:5d}")
     print(f"    stalled (has report):     {stalled:5d}")
     print(f"    banked (unit unworked):   {banked:5d}")
@@ -527,10 +528,10 @@ def main():
               f"  (never was C — can never be matched)")
     # NOT A GOAL. The SDK is linked from Sony's objects where a disc has
     # them and otherwise left as disassembly; matching it proves nothing
-    # about this game (FINISHING-PLAN.md). What the plan does want from it
+    # about this game. What the plan does want from it
     # is NAMES for the functions game code calls, which tools/plan.py counts.
     print(f"  library (Psy-Q SDK):        {library:5d}  in the image as asm or C"
-          f"  (excluded from game %; NOT a matching goal, see git show archive/process:docs/FINISHING-PLAN.md)")
+          f"  (not counted; NOT a matching goal)")
     if library_matched or library_queued:
         print(f"    of which in C units:      {library_matched + library_queued:5d}  ({library_matched} written as C,"
               f" {library_queued} INCLUDE_ASM; Sony code in game segments: config/sdk-in-game.txt,"
@@ -570,9 +571,8 @@ def main():
 
     print()
     if total_b:
-        print(f"  matched bytes:  {matched_b:8d} / {total_b} code"
-              f"  ({100 * matched_b / total_b:.2f}% of all,"
-              f" {100 * matched_b / game_b:.2f}% of {game_b} game bytes)")
+        print(f"  matched bytes:  {matched_b:8d} / {game_b} game code bytes"
+              f"  ({100 * matched_b / game_b:.2f}%; {total_b} with the SDK, not counted)")
     else:
         print("  (no build/lsdde.elf — run ./build-and-verify.sh for byte "
               "metrics and the library split)")

@@ -3,6 +3,7 @@
 
     python3 tools/objdiff_report.py            # objdiff.json + build/objdiff/target/**.o
     python3 tools/objdiff_report.py --report   # ... then objdiff-cli report generate -o build/report.json
+    python3 tools/objdiff_report.py --with-sdk # also list Sony's code, to browse it in objdiff
 
 Run after ./build-and-verify.sh: the BASE objects are the matching build's
 own (build/src/**.c.o), and the TARGET objects are retail's bytes, from a
@@ -15,8 +16,12 @@ Units, in yaml order (decomp.dev integration guide, decomp.wiki/tools/decomp-dev
   c    target: its full disassembly;  base: build/src/<path>.c.o
   asm  target: its disassembly;       base: none (not decompiled)
   o    target = base: Sony's own object from lib/ (linked, not decompiled)
-Category `sdk` is Sony's code: every `o`, every `psyq_*`/crt0 `asm` segment,
-and src/psyq/; the rest is `game`.
+Sony's code is every `o`, every `psyq_*`/crt0 `asm` segment, and src/psyq/;
+the rest is game code. The report counts game code only, as progress.py
+does: Sony's objects compared with themselves would score as matched work
+nobody did, and the SDK code no shipped object matches would score as work
+left that isn't a goal. `--with-sdk` adds Sony's units under category `sdk`
+for browsing, and is never what CI publishes.
 
 Target sources have their `nonmatching` lines stripped: that macro emits a
 `.NON_MATCHING` label, which objdiff reads as "not decompiled", and retail's
@@ -83,7 +88,10 @@ def assemble(src, obj):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--report", action="store_true", help="also run objdiff-cli report generate")
+    ap.add_argument("--with-sdk", action="store_true", help="also list Sony's code (category sdk); not for the report")
     a = ap.parse_args()
+    if a.report and a.with_sdk:
+        sys.exit("FATAL: --with-sdk is for browsing; the published report counts game code only")
     if not (ROOT / "build/lsdde.elf").exists() and not list((ROOT / "build/src").glob("**/*.c.o")):
         sys.exit("FATAL: no build/; run ./build-and-verify.sh first (the base objects are its output)")
 
@@ -102,6 +110,8 @@ def main():
         if ty not in ("c", "asm", "o"):
             continue
         sdk = ty == "o" or name.startswith(("psyq/", "psyq_")) or name == "crt0"
+        if sdk and not a.with_sdk:
+            continue
         unit = {"name": f"{'sdk' if sdk else 'game'}/{name}",
                 "metadata": {"progress_categories": ["sdk" if sdk else "game"]}}
         if ty == "o":
@@ -124,7 +134,8 @@ def main():
         "build_target": False,
         "build_base": False,
         "units": units,
-        "progress_categories": [{"id": "game", "name": "Game"}, {"id": "sdk", "name": "Psy-Q SDK"}],
+        "progress_categories": [{"id": "game", "name": "Game"}]
+                               + ([{"id": "sdk", "name": "Psy-Q SDK"}] if a.with_sdk else []),
     }
     (ROOT / "objdiff.json").write_text(json.dumps(cfg, indent=2) + "\n")
     print(f"objdiff.json: {len(units)} units "

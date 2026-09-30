@@ -211,6 +211,8 @@ hash). Run `tools/lint.sh` before sending a change.
   headers, so they run only where the headers are available.
 - **`build`** rebuilds the executable, checks it against `check.sha1`, and
   publishes the objdiff report [decomp.dev](https://decomp.dev) reads. The
+  report, like `tools/progress.py`, counts the game's own code only; Sony's
+  library code is linked from Sony's objects and isn't a matching goal. The
   disc and the SDK never enter this repository, so the job reads them from a
   private repository the owner keeps (`disk/SLPS_015.56`, `lib/` and
   `include/psyq/`), named in the `LSD_DEPS_REPO` variable and read with the
