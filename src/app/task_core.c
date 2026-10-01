@@ -466,9 +466,10 @@ epilogue:
  * description in `target` (include/task_core.h, TaskCore's "picker").
  */
 
-/* New_BoxFill's size and colour for listView: (320, 240), (32, 32, 64). */
-extern s32 sListViewSize[2];
-extern ColorRgb sListViewColor;
+/* New_BoxFill's size and colour for listView: the whole 320 x 240 screen,
+ * a dark blue. */
+static s32 sListViewSize[2] SDATA = {320, 240};
+static ColorRgb sListViewColor SDATA = {32, 32, 64};
 
 /* The scrolled list's layout (RefreshSlotView, CommitElementScroll): item
  * rows are SLOT_LIST_ROW_PITCH apart, and listView, the frame behind them,

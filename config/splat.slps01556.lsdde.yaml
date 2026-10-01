@@ -2020,7 +2020,9 @@ segments:
       - [0x7B0AC, pad]                        # 4 zero bytes after ";1" that nothing reads
       - [0x7B0B0, sdata]
       - [0x7B0DC, .sdata, app/application]  # CdInit's once-flag, the default 320 x 240 screen
-      - [0x7B0E8, sdata]
+      - [0x7B0E8, .sdata, app/task_core]  # the list view's box: 320 x 240, (32, 32, 64)
+      - [0x7B0F3, pad]                        # 1 byte: task_core's .sdata ends with a 3-byte ColorRgb
+      - [0x7B0F4, sdata]
       - [0x7B128, o, libc2/itoa, .sdata]      # "%d", 3 bytes (dlabel D_8008A928);
                                               # 0x7B12B rounds to 0x7B12C under SUBALIGN(2), no pad
       - [0x7B12C, sdata]                      # dlabel D_8008A92C
