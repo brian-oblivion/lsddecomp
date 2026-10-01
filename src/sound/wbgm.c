@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include "vab_stream_obj.h"
 
-extern s32 sWBgmActive; /* 1 between WBgm__WBgm and WBgm__Finalize */
+static s32 sWBgmActive SDATA = 0; /* 1 between WBgm__WBgm and WBgm__Finalize */
 
 extern char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 
