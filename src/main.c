@@ -20,8 +20,10 @@
 #include "data_source.h"
 #include <kernel.h>
 
-extern BMemPMgr *sStartupBMemPMgr;
-extern GameApplication *sGameApplication;
+/* The game's one BMemPMgr pool and the root GameApplication, both made
+ * once, below. */
+static BMemPMgr *sStartupBMemPMgr SDATA = NULL;
+static GameApplication *sGameApplication SBSS = NULL;
 
 /* The shipped game's configuration (the fields are documented in
  * game_application.h): data from the CD-ROM, and the movies, intro logos

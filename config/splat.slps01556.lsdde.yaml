@@ -2007,7 +2007,8 @@ segments:
       - [0x7A2D2, pad]               # 2 bytes: dream_aux.c's .data ends 2 short of a word (SUBALIGN(2))
       - [0x7A2D4, .data, world/entity]    # gEntityMethods, the motion templates, sEntityMoodTable
       - [0x7AEC4, .data, world/tod_actor]  # gTodActorMethods
-      - [0x7B008, sdata]
+      - [0x7B008, .sdata, main]  # the startup pool
+      - [0x7B00C, pad]                        # 4 bytes: prnt.o's .sdata is 8-aligned (2**3)
       - [0x7B010, o, libc2/prnt, .sdata]      # "(null)", 7 bytes
       - [0x7B018, sdata]
       - [0x7B024, .sdata, graphics/tmd_renderer]  # the DIVPOLYGON clip, the face colour, the ndiv override
@@ -2020,7 +2021,8 @@ segments:
       - [0x7B12C, sdata]                      # dlabel D_8008A92C
       - [0x7b3c0, sdata]              # DreamSys's sdata slot
       - [0x7b3f8, sdata]
-      - [0x7b420, sbss]
+      - [0x7B420, .sbss, main]  # the root GameApplication
+      - [0x7B424, sbss]               # crt0's saved $ra (0x8008AC24), Sony's
       - [0x7B468, sbss]              # libc2/rand's seed (NOLOAD in config/psyq-objects.ld)
       - [0x7B46C, sbss]
       - [0x7B4A4, .sbss, world/style_effect]  # its model, TIM, viewport and base view height
