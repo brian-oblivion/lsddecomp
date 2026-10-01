@@ -2012,7 +2012,8 @@ segments:
       - [0x7B010, o, libc2/prnt, .sdata]      # "(null)", 7 bytes
       - [0x7B018, .sdata, app/bmem_pmgr]  # the default pool and the busy flag
       - [0x7B024, .sdata, graphics/tmd_renderer]  # the DIVPOLYGON clip, the face colour, the ndiv override
-      - [0x7B038, sdata]
+      - [0x7B038, .sdata, graphics/scene_node]  # the hit-height gate
+      - [0x7B03C, sdata]
       - [0x7B040, o, libc2/puts, .sdata]      # "<NULL>"
       - [0x7B048, .sdata, app/pad]  # the live-instance count
       - [0x7B04C, .sdata, app/data_source]  # the active driver, the table flag, the data directory

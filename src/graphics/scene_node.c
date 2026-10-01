@@ -578,7 +578,8 @@ s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, TmdVec3 *delta
     return overlap;
 }
 
-extern s32 sHitHeightGate;
+/* 0 at boot: no height gate until a stage sets one. */
+static s32 sHitHeightGate SDATA = 0;
 
 /* Ray-casts segments of the hull through the model's faces, each only
  * against the bounds records its segment crosses (ClipSegmentToBox).
