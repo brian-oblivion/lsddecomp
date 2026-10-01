@@ -34,7 +34,18 @@ typedef void *(*MethodsGetterFn)(void);
 
 extern MethodsGetterFn sDataSourceClientGetters[];
 
-extern s32 sActiveDataSource;
+/* The driver every FileResource method goes through: DATASOURCE_CD until
+ * main's GameApplication config says otherwise (SetActiveDataSource). */
+static s32 sActiveDataSource SDATA = DATASOURCE_CD;
+
+/* Set once RegisterFileTableEntries has handed the CD driver a table. */
+static s32 sFileTableRegistered SDATA = 0;
+
+/* The directory every file name is looked up under (SetDataDirectory).
+ * It starts as "": the zero word it points at is the NULL processBuffer
+ * slot that ends FileResource's table. */
+/* MATCHING: the slot's address, not a "" literal, which would land in .rodata. */
+static char *sDataDirectory SDATA = (char *)&gFileResourceMethods.processBuffer;
 
 FileResourceMethods *GetActiveDataSourceMethods(void) {
     if (sActiveDataSource == DATASOURCE_NULL) {
@@ -174,8 +185,6 @@ s32 GetActiveDataSourceUseVSyncCallback(void) {
     }
 }
 
-extern s32 sFileTableRegistered;
-
 s32 RegisterFileTableEntries(CdFileEntry *table, s32 count) {
     s32 first;
 
@@ -188,8 +197,6 @@ s32 RegisterFileTableEntries(CdFileEntry *table, s32 count) {
     }
     return 1;
 }
-
-extern char *sDataDirectory;
 
 void SetDataDirectory(char *dir) {
     sDataDirectory = dir;
