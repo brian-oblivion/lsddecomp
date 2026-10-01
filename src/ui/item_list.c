@@ -26,10 +26,28 @@
 /* The y step from one row to the next (createRows). */
 #define ITEMLIST_ROW_SPACING 10
 
-/* The row colours, two 3-byte RGBs in sdata, 4 bytes apart; only their
- * addresses are taken (setColor). */
-extern struct ColorRgb sItemListRowColor;
-extern struct ColorRgb sItemListCursorColor;
+extern u8 sItemListStrNameChars[]; /* a space, A to Z, a to z, 0 to 9, as TextEntry's */
+
+/* ItemList's small data, in address order. Positions are percent of half
+ * the screen from the centre (include/screen_sprite.h). */
+
+/* Where LoadResources attaches the panel sprite. */
+static ScreenSpritePos sItemListPanelPos SDATA = {-100, -60};
+/* The first row's position, read by value into CreateRows's `pos`; each
+ * further row is ITEMLIST_ROW_SPACING lower. */
+static s32 sItemListRowOriginX SDATA = -92;
+static s32 sItemListRowOriginY SDATA = -15;
+/* MATCHING: TextEntry's character-table pointer, copied with its code;
+ * nothing here reads it. */
+static u8 *sItemListNameCharTable SDATA = sItemListStrNameChars;
+/* The row colours, grey and the cursor's yellow; only their addresses are
+ * taken (setColor). */
+static ColorRgb sItemListRowColor SDATA = {80, 80, 80};
+static ColorRgb sItemListCursorColor SDATA = {128, 128, 0};
+/* LoadResources' path parts: CARD\SELECT.TIM. */
+static char sStrSelect[] SDATA = "SELECT";
+static char sItemListCardPathPrefix[] SDATA = "CARD\\";
+static char sItemListTimExt[] SDATA = ".TIM";
 
 /*
  * ItemList's life and resources: its allocator and ctor, BasicClass's
@@ -173,11 +191,7 @@ void ItemList__ResetView(ItemList *self) {
     self->cursorIndex = 0;
 }
 
-extern char sStrSelect[];                 /* "SELECT" */
-extern char sItemListCardPathPrefix[];    /* "CARD\\" */
-extern char sItemListTimExt[];            /* ".TIM" */
-extern ScreenSpritePos sItemListPanelPos; /* (-100, -60) */
-extern char sItemListStrFontIcon[];       /* "FONTICON" */
+extern char sItemListStrFontIcon[]; /* "FONTICON" */
 
 /*
  * Loads CARD\SELECT.TIM as the panel sprite, placed at sItemListPanelPos
@@ -388,12 +402,6 @@ void ItemList__CursorDown(ItemList *self, s32 unused1, s32 unused2, s32 forwarde
         self->methods->refreshRows(self, newTop, self->column, newCursor, 1);
     }
 }
-
-/* The first row's position, two sdata words (-92, -15). Read by value into
- * ItemList__CreateRows's `pos`; each further row is ITEMLIST_ROW_SPACING
- * lower. */
-extern s32 sItemListRowOriginX;
-extern s32 sItemListRowOriginY;
 
 void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32 top, s32 column,
                           s32 cursor) {
