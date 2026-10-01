@@ -34,9 +34,10 @@ void NullDriver__Seek(void) {}
 
 void NullDriver__NoOpSlot50(void) {}
 
-/* SetNullDriverMode's two words, read back by GetNullDriverMode. */
-extern s32 sNullDriverMode;
-extern s32 sNullDriverModeArg;
+/* SetNullDriverMode's two words, read back by GetNullDriverMode: 0 and 0
+ * until it is called. */
+static s32 sNullDriverMode SDATA = 0;
+static s32 sNullDriverModeArg SDATA = 0;
 
 s32 NullDriver__Read(void) {
     return 0;
