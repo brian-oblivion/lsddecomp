@@ -12,8 +12,8 @@
 #include "box_fill.h"
 #include "bmem_pmgr.h"
 
-/* {128, 128, 128}: BoxFill__Reset's colour when it is given none. */
-extern u8 sBoxFillDefaultColor[3];
+/* BoxFill__Reset's colour when it is given none: mid grey. */
+static u8 sBoxFillDefaultColor[3] SDATA = {128, 128, 128};
 
 BoxFill *New_BoxFill(void *size, void *color, s32 pri) {
     BoxFill *self;
