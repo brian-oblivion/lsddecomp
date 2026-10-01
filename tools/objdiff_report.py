@@ -102,7 +102,16 @@ def restore_tail(text, start, end, exe):
     return text
 
 
-def assemble(src, obj, tails=()):
+def local_data(base):
+    """The base object's file-local data symbols: the C's `static` variables."""
+    r = subprocess.run([makevar("CROSS") + "nm", str(base)], cwd=ROOT, capture_output=True, text=True)
+    if r.returncode:
+        sys.exit(f"FATAL: nm {base.relative_to(ROOT)}:\n{r.stderr[-2000:]}")
+    return {f[2] for f in (l.split() for l in r.stdout.splitlines())
+            if len(f) == 3 and f[1] in "bdgrsv" and not f[2].startswith(".")}
+
+
+def assemble(src, obj, tails=(), statics=()):
     """Assemble retail's disassembly with the Makefile's own as and flags."""
     as_ = makevar("CROSS") + "as"
     flags = makevar("AS_FLAGS").split()
@@ -129,6 +138,15 @@ def assemble(src, obj, tails=()):
     # bytes. splat follows a string with `.align 2`, which made retail's 0x54.
     # Drop an `.align` that ends a section.
     text = re.sub(r"^\s*\.align \d+\n(?=(?:\s*\n)*(?:\s*\.section\b|\Z))", "", text, flags=re.M)
+    # Static data: GCC's object holds a `static` as a local symbol, and as
+    # relocates a pointer to one against its section, the offset stored in
+    # the word (game_files' sSoundEffectDirPtr holds .sdata+0x18). splat's
+    # dlabel is global, so retail's word held 0 and differed. A data label
+    # the base object has as local is local on retail's side too.
+    if statics:
+        text = re.sub(r"^(\s*)dlabel (\w+)$",
+                      lambda m: f"{m.group(1)}dlabel {m.group(2)}" + (", local" if m.group(2) in statics else ""),
+                      text, flags=re.M)
     # Jump tables: GCC emits them under assembler-local labels, so the base
     # object has no symbol there, and a named `jtbl_` on retail's side pairs
     # with nothing. Make retail's local too; both sides then reach the table
@@ -182,12 +200,13 @@ def main():
             unit["target_path"] = unit["base_path"] = obj.relative_to(ROOT).as_posix()
         else:
             tobj = OUT / "target" / f"{name}.s.o"
-            assemble(OUT / "asm" / f"{name}.s", tobj, tails.get(name, ()))
-            unit["target_path"] = tobj.relative_to(ROOT).as_posix()
             base = ROOT / "build/src" / f"{name}.c.o"
+            if ty == "c" and not base.exists():
+                sys.exit(f"FATAL: {base.relative_to(ROOT)} missing; run ./build-and-verify.sh first")
+            assemble(OUT / "asm" / f"{name}.s", tobj, tails.get(name, ()),
+                     local_data(base) if ty == "c" else ())
+            unit["target_path"] = tobj.relative_to(ROOT).as_posix()
             if ty == "c":
-                if not base.exists():
-                    sys.exit(f"FATAL: {base.relative_to(ROOT)} missing; run ./build-and-verify.sh first")
                 unit["base_path"] = base.relative_to(ROOT).as_posix()
         units.append(unit)
 

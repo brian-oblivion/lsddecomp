@@ -58,12 +58,18 @@ enum MovieId {
  * last. What the frames are for is not established. */
 #define MOVIE_SPAN_GAP_FRAMES 10
 
-extern char *sDefaultDataDirectory; /* "CDI\\" */
-extern s32 sForcedSoundBank;
-extern s32 sForcedStageBgm;
+/* The game's data directory and the sound-effect directory, and the
+ * pickers' forced choices (SetPickOverrides: 1-based, 0 for random). */
+static char sSoundEffectDirName[];
+static char sDefaultDataDirectoryName[] SDATA = "CDI\\";
+static char *sDefaultDataDirectory SDATA = sDefaultDataDirectoryName;
+static s32 sForcedSoundBank SDATA = 0;
+static s32 sForcedStageBgm SDATA = 0;
+static char *sSoundEffectDirPtr SDATA = sSoundEffectDirName;
+static char sSoundEffectDirName[] SDATA = "SND\\SE";
+
 extern char *sSoundBankPaths[SOUND_BANK_COUNT];
 extern CdFileEntry sRecordTable[RECORD_COUNT];
-extern char *sSoundEffectDirPtr; /* -> "SND\\SE" */
 extern const char sAsmkMoviePath[];
 extern s16 sMovieFrameCounts[MOVIE_COUNT];
 extern s16 sStageFirstRecord[RECORD_STAGE_COUNT];
