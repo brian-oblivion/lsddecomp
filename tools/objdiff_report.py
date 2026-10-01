@@ -124,6 +124,11 @@ def assemble(src, obj, tails=()):
     # (the zeros are stored). splat's `.section .sbss` is NOBITS, which objdiff
     # scores as bss, so the base's 16 bytes of style_effect paired with nothing.
     text = re.sub(r'^(\s*\.section \.sbss, "wa")$', r"\1, @progbits", text, flags=re.M)
+    # A section's last object: GCC 2.6.3 aligns before each object and never
+    # after the last, so cd_driver's .sdata, which ends with ";1", is 0x53
+    # bytes. splat follows a string with `.align 2`, which made retail's 0x54.
+    # Drop an `.align` that ends a section.
+    text = re.sub(r"^\s*\.align \d+\n(?=(?:\s*\n)*(?:\s*\.section\b|\Z))", "", text, flags=re.M)
     # Jump tables: GCC emits them under assembler-local labels, so the base
     # object has no symbol there, and a named `jtbl_` on retail's side pairs
     # with nothing. Make retail's local too; both sides then reach the table

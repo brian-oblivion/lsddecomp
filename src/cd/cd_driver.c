@@ -28,22 +28,28 @@
 #include "bmem_pmgr.h"
 #include <stdio.h>
 
-/* The CD driver's module state. */
-extern s32 sCdAsyncEnabled;
-extern s32 sCdSyncQueueMode; /* nonzero with sCdAsyncEnabled 0: requests queue, then run blocking */
-extern s32 sCdBusy;          /* 0/1 */
-extern CdFileEntry *sFileTable;        /* SetFileTable */
-extern s32 sFileTableCount;            /* SetFileTableCount */
-extern s32 sCdIdle;                    /* 0/1 */
-extern s32 sCdOperation;               /* StartCdOperation's op, GetCdOperation's result */
-extern s32 sCdState;                   /* the state machine's phase */
-extern CdFileEntry *sCdSeekParam;      /* the state machines seek to &sCdSeekParam->pos */
-extern s32 sCdReadSectorCount;         /* CdRead sector count */
-extern void *sCdReadBuffer;            /* CdRead target buffer */
-extern CdFileEntry *sCdSavedSeekParam; /* LoadFile's saved sCdSeekParam */
-extern CdRequestNode *sCdRequestQueue; /* list head */
-extern s32 sCdTickStep;                /* CD_TICK_* */
-extern s32 sCdUseVSyncCallback;
+/* The CD driver's module state, all of it, in its .sdata order. */
+static s32 sCdDriveInited SDATA = 0; /* InitCdDrive has set the drive's mode */
+static s32 sCdAsyncEnabled SDATA = 0; /* nonzero: requests run on the tick's state machine, not blocking */
+static s32 sCdSyncQueueMode SDATA = 0; /* nonzero with sCdAsyncEnabled 0: requests queue, then run blocking */
+static s32 sCdBusy SDATA = 0;                       /* 0/1 */
+static CdFileEntry *sFileTable SDATA = NULL;        /* SetFileTable */
+static s32 sFileTableCount SDATA = 0;               /* SetFileTableCount */
+static s32 sCdIdle SDATA = 1;                       /* 0/1 */
+static s32 sCdOperation SDATA = CD_OPERATION_CLOSE; /* StartCdOperation's op, GetCdOperation's result */
+static s32 sCdState SDATA = CD_STATE_IDLE;          /* the state machine's phase */
+static CdFileEntry *sCdSeekParam SDATA = NULL; /* the state machines seek to &sCdSeekParam->pos */
+static s32 sCdReadSectorCount SDATA = 0;       /* CdRead sector count */
+static void *sCdReadBuffer SDATA = NULL;       /* CdRead target buffer */
+static CdFileEntry *sCdSavedSeekParam SDATA = NULL; /* LoadFile's saved sCdSeekParam */
+static s32 sCdLock SDATA = 0;                       /* LockCd / UnlockCd */
+static s32 sCdQueueEnabled SDATA = 0;               /* ServiceCdDriver runs the request queue */
+static CdRequestNode *sCdRequestQueue SDATA = NULL; /* list head */
+static s32 sCdTickStep SDATA = CD_TICK_NONE;        /* CD_TICK_* */
+static s32 sCdCallbackInstalled SDATA = 0; /* StartCdService has run, StopCdServiceIfIdle not since */
+static s32 sCdTimeoutCounter SDATA = 0;    /* CD_STATE_SETLOC_WAIT's polls; SetCdState clears it */
+static s32 sCdUseVSyncCallback SDATA = 1; /* ServiceCdDriver is the VSyncCallback; 0: the DrawSystem callback */
+static char sCdFileVersionSuffix[] SDATA = ";1"; /* the ISO9660 CD file-version suffix */
 
 /* `pos` (self->pos, CdFileEntry::pos) is Sony's CdlLOC; CdControl takes it
  * as the u_char * parameter bytes, hence those casts. */
@@ -383,13 +389,6 @@ void CdDriver__RunRequestQueue(void) {
 
 extern char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
 
-/* Part 3's module state; parts 2 and 4 see it only through the
- * functions below. */
-extern s32 sCdDriveInited;       /* InitCdDrive has set the drive's mode */
-extern s32 sCdLock;              /* LockCd / UnlockCd */
-extern s32 sCdCallbackInstalled; /* StartCdService has run, StopCdServiceIfIdle not since */
-extern s32 sCdQueueEnabled;      /* ServiceCdDriver runs the request queue */
-
 void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
     s32 *unassigned; /* never assigned */
     s32 fileIndex;
@@ -688,8 +687,6 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
 
 /* BMemPMgrFree is data_source.h's, included above. */
 
-extern s32 sCdTimeoutCounter; /* CD_STATE_SETLOC_WAIT's polls; SetCdState clears it */
-
 CdRequestNode *AllocCdRequestNode(void) {
     CdRequestNode *node;
     CdRequestNode *head;
@@ -941,8 +938,7 @@ void SetCdState(s32 state) {
  */
 /* FileResource and its table come from include/file_resource.h, through data_source.h. */
 
-extern char sCdFileNotFoundFmt[];   /* "File not found. path = %s\n" */
-extern char sCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix */
+extern char sCdFileNotFoundFmt[]; /* "File not found. path = %s\n" */
 
 void FileResource__InstallCdReadDriver(FileResource *self) {
     GetFileResourceMethods()->ctor(self);
