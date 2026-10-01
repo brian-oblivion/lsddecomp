@@ -2020,7 +2020,8 @@ segments:
       - [0x7B058, .sdata, cd/cd_driver]  # the CD driver's state, and ";1"
       - [0x7B0AC, pad]                        # 4 zero bytes after ";1" that nothing reads
       - [0x7B0B0, .sdata, sound/null_driver]  # SetNullDriverMode's two words
-      - [0x7B0B8, sdata]
+      - [0x7B0B8, .sdata, sound/vab_stream_obj]  # libsnd's set-up flags, the open-bank count, ".VH" and ".VB"
+      - [0x7B0D8, sdata]
       - [0x7B0DC, .sdata, app/application]  # CdInit's once-flag, the default 320 x 240 screen
       - [0x7B0E8, .sdata, app/task_core]  # the list view's box: 320 x 240, (32, 32, 64)
       - [0x7B0F3, pad]                        # 1 byte: task_core's .sdata ends with a 3-byte ColorRgb

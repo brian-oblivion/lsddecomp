@@ -18,20 +18,21 @@
 #include "wbgm.h"
 #include "data_source.h"
 
-/* ".VH" and ".VB". */
-extern char sVabHeaderSuffix[];
-extern char sVabBodySuffix[];
-
 /* libsnd set-up, done once and undone when the last bank closes: SsInit and
- * the size table; the tick mode; SsStart and the master volume. */
-extern s32 sVabSizeTableInited;
-extern s32 sVabStreamInited;
-extern s32 sVabVolumeInited;
-extern s32 sOpenVabCount;     /* VabStreamObjs constructed and not yet finalized */
-extern s32 sSsTicksPerSecond; /* the SsSetTickMode rate, for callers timing in ticks */
+ * the size table; the tick mode; SsStart and the master volume. All start
+ * at 0, nothing set up. */
+static s32 sVabSizeTableInited SDATA = 0;
+static s32 sVabStreamInited SDATA = 0;
+static s32 sVabVolumeInited SDATA = 0;
+static s32 sOpenVabCount SDATA = 0; /* VabStreamObjs constructed and not yet finalized */
 /* The .VH buffer, kept from the header state until LoadVagAttrs takes it
  * back as the object's buffer. */
-extern void *sPendingVabBuffer;
+static void *sPendingVabBuffer SDATA = NULL;
+static s32 sSsTicksPerSecond SDATA = 0; /* the SsSetTickMode rate, for callers timing in ticks */
+
+/* A bank's two files: its header and its body. */
+static char sVabHeaderSuffix[] SDATA = ".VH";
+static char sVabBodySuffix[] SDATA = ".VB";
 
 VabStreamObj *New_VabStreamObj(char *path) {
     VabStreamObj *self;
