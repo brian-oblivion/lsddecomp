@@ -21,7 +21,10 @@
 #include <strings.h>
 #include "data_source.h"
 
-extern CdStream *sActiveCdStream; /* the stream that owns the drive, or NULL */
+/* Set to SetupCdStreamAudio's 1 once a stream has opened: the SPU mixes CD audio. Nothing reads it. */
+static s32 sCdStreamAudioMixSet SDATA = 0;
+static CdStream *sActiveCdStream SDATA = NULL;     /* the stream that owns the drive, or NULL */
+static char sCdStreamVersionSuffix[] SDATA = ";1"; /* the ISO9660 CD file-version suffix */
 
 /* The ctor: a drive speed below this is double speed. */
 #define CDSTREAM_DOUBLE_SPEED_BELOW 4
@@ -43,9 +46,6 @@ extern CdStream *sActiveCdStream; /* the stream that owns the drive, or NULL */
 #define CDSTREAM_MODE_1X (CdlModeStream | CdlModeRT)
 /* getNextFrame's poll count when `tries` is negative. */
 #define CDSTREAM_NEXT_FRAME_TRIES 8388608
-
-extern s32 sCdStreamAudioMixSet;
-extern char sCdStreamVersionSuffix[]; /* ";1" */
 
 CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved) {
     CdStream *obj = BMemPMgrAlloc(sizeof(CdStream));
