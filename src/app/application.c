@@ -16,8 +16,8 @@
 #include "bmem_pmgr.h"
 #include "data_source.h"
 
-extern s32 sCdInitDone;               /* CdInit has been called */
-extern ScreenDims sDefaultScreenDims; /* {320, 240} */
+static s32 sCdInitDone SDATA = 0; /* CdInit has been called */
+static ScreenDims sDefaultScreenDims SDATA = {320, 240};
 
 void Application__Application(Application *self, s32 dataSource) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
