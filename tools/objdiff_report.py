@@ -75,27 +75,41 @@ def short_data_tails():
     whose length is not a whole number of words. splat's disassembly stops at
     the last whole word and drops the rest (two `s8` counts at the end of
     dream_aux and style_layer), so the target came out 2 bytes short of the
-    base. assemble() puts those bytes back from the executable."""
+    base. assemble() puts those bytes back from the executable. A range under
+    a word (box_fill's 3-byte colour) gets no lines at all."""
     rows = [(int(m.group(1), 16), m.group(2), m.group(3)) for m in re.finditer(
         r"^\s*- \[0x([0-9A-Fa-f]+),\s*(\.?\w+)(?:,\s*([\w/]+))?", YAML.read_text(), re.M)]
     out = {}
     for (start, ty, name), (end, _, _) in zip(rows, rows[1:]):
         if ty in (".data", ".rodata", ".sdata") and (end - start) % 4:
-            out.setdefault(name, []).append((start, end))
+            out.setdefault(name, []).append((start, end, ty))
     return out
 
 
 WIDTH = {".byte": 1, ".short": 2, ".half": 2, ".word": 4}
 
 
-def restore_tail(text, start, end, exe):
-    """Append retail's bytes from the last disassembled one up to `end`."""
+def restore_tail(text, start, end, ty, exe):
+    """Append retail's bytes from the last disassembled one up to `end`. A
+    range splat wrote nothing for gets all of its bytes, after its section's
+    header, under the symbols-file label at its start."""
     last, at = None, None
     for i, line in enumerate(text):
         m = re.match(r"\s*/\* ([0-9A-F]+) [0-9A-F]{8}(?: [0-9A-F]+)? \*/ (\.\w+)", line)
         if m and start <= int(m.group(1), 16) < end:
             last, at = (int(m.group(1), 16), m.group(2)), i
-    if last is None or last[1] not in WIDTH:
+    if last is None:
+        heads = [i for i, l in enumerate(text) if re.match(rf"\.section {re.escape(ty)},", l)]
+        if not heads:
+            sys.exit(f"FATAL: no {ty} section to put {start:#x}..{end:#x} in")
+        vram = start - 0x800 + 0x80010000
+        names = re.findall(rf"^(\w+) = 0x{vram:08X};", (ROOT / "config/symbols.slps01556.lsdde.txt").read_text(),
+                           re.M | re.I)
+        new = [f"dlabel {n}\n" for n in names[:1]]
+        new += [f"    /* {o:X} */ .byte 0x{exe[o]:02X}\n" for o in range(start, end)]
+        text[heads[0] + 1:heads[0] + 1] = new
+        return text
+    if last[1] not in WIDTH:
         sys.exit(f"FATAL: no word/half/byte line to extend for {start:#x}..{end:#x}")
     gap = range(last[0] + WIDTH[last[1]], end)
     text[at + 1:at + 1] = [f"    /* {o:X} */ .byte 0x{exe[o]:02X}\n" for o in gap]
@@ -120,8 +134,8 @@ def assemble(src, obj, tails=(), statics=()):
     lines = src.read_text().splitlines(True)
     if tails:
         exe = (ROOT / "disk" / VERSION).read_bytes()
-        for start, end in tails:
-            lines = restore_tail(lines, start, end, exe)
+        for start, end, ty in tails:
+            lines = restore_tail(lines, start, end, ty, exe)
     text = "".join(l for l in lines if not l.lstrip().startswith("nonmatching "))
     # Data sizes: GCC 2.6.3 emits no `.size` for data, so objdiff extends each
     # base data symbol to the next symbol. splat's `enddlabel` gives retail's
