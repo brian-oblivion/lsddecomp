@@ -19,7 +19,7 @@
 /* What only this file's bodies use; the class itself is include/pad.h. The
  * pad library it wraps (PadInit, PadRead, PadStop) is Sony's <libetc.h>. */
 
-extern s32 sPadRefCount; /* live instances: the first ctor calls PadInit, the last finalize PadStop */
+static s32 sPadRefCount SDATA = 0; /* live instances: the first ctor calls PadInit, the last finalize PadStop */
 extern u32 sButtonMasks[PAD_BUTTON_COUNT]; /* runtime copy of the button-mask table, filled by Pad__LoadButtonTable */
 
 /** @brief A 0x40-byte block: Pad__LoadButtonTable copies the default table
