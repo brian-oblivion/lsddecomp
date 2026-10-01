@@ -42,7 +42,7 @@ void BgLayer__BgLayer(BgLayer *self, TileMap *src, s32 mode) {
 /* reset (+0x040): lay the GsBG over `src`'s map, sized to the map
  * (BGLAYER_MODE_MAP, 8-bit CLUT) or to the screen (BGLAYER_MODE_SCREEN,
  * 15-bit), at the origin, unscaled, unrotated, pivoting on its centre. */
-extern ColorRgb sBgLayerDefaultColor;
+static ColorRgb sBgLayerDefaultColor SDATA = {128, 128, 128}; /* 128: the map's own colours, unshaded */
 
 void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
     if (mode == BGLAYER_MODE_MAP) {

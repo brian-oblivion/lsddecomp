@@ -2034,7 +2034,9 @@ segments:
       - [0x7B132, pad]                        # 2 zero bytes after tim_block_src's halfwords
       - [0x7B134, .sdata, graphics/tim_array_src]  # the fade ramps' row shift, 3
       - [0x7B136, pad]                        # 2 bytes: tim_array_src's .sdata is one halfword
-      - [0x7B138, sdata]
+      - [0x7B138, .sdata, graphics/bg_layer]  # the default colour, 128 each: unshaded
+      - [0x7B13B, pad]                        # 1 byte: bg_layer's .sdata is a 3-byte ColorRgb
+      - [0x7B13C, sdata]
       - [0x7B14C, .sdata, cd/cd_stream]  # the audio-mix flag, the drive's owner, ";1"
       - [0x7B158, .sdata, cd/game_files]  # "CDI\\" and "SND\\SE", the pickers' forced choices
       - [0x7B178, sdata]
