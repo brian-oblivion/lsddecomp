@@ -2048,7 +2048,9 @@ segments:
       - [0x7b3c0, sdata]              # DreamSys's sdata slot
       - [0x7b3f8, sdata]
       - [0x7B420, .sbss, main]  # the root GameApplication
-      - [0x7B424, sbss]               # crt0's saved $ra (0x8008AC24), Sony's
+      - [0x7B424, sbss]               # crt0's saved $ra (0x8008AC24), then malloc's and putchar's .sbss: Sony's
+      - [0x7B44C, .sbss, graphics/tmd_model]  # the bounds buffer's box count
+      - [0x7B450, sbss]               # libgte/patchgte's .sbss (0x8008AC50, NOLOAD in config/psyq-objects.ld), Sony's
       - [0x7B468, sbss]              # libc2/rand's seed (NOLOAD in config/psyq-objects.ld)
       - [0x7B46C, sbss]
       - [0x7B4A4, .sbss, world/style_effect]  # its model, TIM, viewport and base view height

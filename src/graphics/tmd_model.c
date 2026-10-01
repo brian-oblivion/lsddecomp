@@ -15,7 +15,7 @@
 #include "tmd_model.h"
 #include "bmem_pmgr.h"
 
-extern s32 sTmdModelBoundsCount; /* boxes in the bounds buffer: 1, set by the ctor */
+static s32 sTmdModelBoundsCount SBSS = 0; /* boxes in the bounds buffer: 1, set by the ctor */
 
 /** @brief A counted box list of one: TmdModel__GetHull's local (its count
  * is set to 1, as the hull's is, and never read). */
