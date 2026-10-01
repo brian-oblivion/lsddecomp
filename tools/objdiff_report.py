@@ -119,6 +119,11 @@ def assemble(src, obj, tails=()):
     # exact sizes, and the two then differ wherever padding or an anonymous
     # table follows. Drop them, so both sides are sized the same way.
     text = re.sub(r"^\s*enddlabel \w+\n", "", text, flags=re.M)
+    # Small zeroed data: a C unit's `.sbss` is its SBSS definitions, and GCC
+    # 2.6.3 emits an attributed definition with an initializer as PROGBITS
+    # (the zeros are stored). splat's `.section .sbss` is NOBITS, which objdiff
+    # scores as bss, so the base's 16 bytes of style_effect paired with nothing.
+    text = re.sub(r'^(\s*\.section \.sbss, "wa")$', r"\1, @progbits", text, flags=re.M)
     # Jump tables: GCC emits them under assembler-local labels, so the base
     # object has no symbol there, and a named `jtbl_` on retail's side pairs
     # with nothing. Make retail's local too; both sides then reach the table
