@@ -70,14 +70,67 @@ def derived_yaml():
     DERIVED.write_text(t)
 
 
-def assemble(src, obj):
+def short_data_tails():
+    """{unit: [(start, end)]} for each `.data`/`.rodata`/`.sdata` subsegment
+    whose length is not a whole number of words. splat's disassembly stops at
+    the last whole word and drops the rest (two `s8` counts at the end of
+    dream_aux and style_layer), so the target came out 2 bytes short of the
+    base. assemble() puts those bytes back from the executable."""
+    rows = [(int(m.group(1), 16), m.group(2), m.group(3)) for m in re.finditer(
+        r"^\s*- \[0x([0-9A-Fa-f]+),\s*(\.?\w+)(?:,\s*([\w/]+))?", YAML.read_text(), re.M)]
+    out = {}
+    for (start, ty, name), (end, _, _) in zip(rows, rows[1:]):
+        if ty in (".data", ".rodata", ".sdata") and (end - start) % 4:
+            out.setdefault(name, []).append((start, end))
+    return out
+
+
+WIDTH = {".byte": 1, ".short": 2, ".half": 2, ".word": 4}
+
+
+def restore_tail(text, start, end, exe):
+    """Append retail's bytes from the last disassembled one up to `end`."""
+    last, at = None, None
+    for i, line in enumerate(text):
+        m = re.match(r"\s*/\* ([0-9A-F]+) [0-9A-F]{8}(?: [0-9A-F]+)? \*/ (\.\w+)", line)
+        if m and start <= int(m.group(1), 16) < end:
+            last, at = (int(m.group(1), 16), m.group(2)), i
+    if last is None or last[1] not in WIDTH:
+        sys.exit(f"FATAL: no word/half/byte line to extend for {start:#x}..{end:#x}")
+    gap = range(last[0] + WIDTH[last[1]], end)
+    text[at + 1:at + 1] = [f"    /* {o:X} */ .byte 0x{exe[o]:02X}\n" for o in gap]
+    return text
+
+
+def assemble(src, obj, tails=()):
     """Assemble retail's disassembly with the Makefile's own as and flags."""
     as_ = makevar("CROSS") + "as"
     flags = makevar("AS_FLAGS").split()
     stripped = OUT / "target-src" / src.relative_to(OUT / "asm")
     stripped.parent.mkdir(parents=True, exist_ok=True)
-    stripped.write_text("".join(l for l in src.read_text().splitlines(True)
-                                if not l.lstrip().startswith("nonmatching ")))
+    lines = src.read_text().splitlines(True)
+    if tails:
+        exe = (ROOT / "disk" / VERSION).read_bytes()
+        for start, end in tails:
+            lines = restore_tail(lines, start, end, exe)
+    text = "".join(l for l in lines if not l.lstrip().startswith("nonmatching "))
+    # Data sizes: GCC 2.6.3 emits no `.size` for data, so objdiff extends each
+    # base data symbol to the next symbol. splat's `enddlabel` gives retail's
+    # exact sizes, and the two then differ wherever padding or an anonymous
+    # table follows. Drop them, so both sides are sized the same way.
+    text = re.sub(r"^\s*enddlabel \w+\n", "", text, flags=re.M)
+    # Jump tables: GCC emits them under assembler-local labels, so the base
+    # object has no symbol there, and a named `jtbl_` on retail's side pairs
+    # with nothing. Make retail's local too; both sides then reach the table
+    # through the section symbol, and the entries are `.L` labels already.
+    # The case labels they hold: splat's `jlabel` makes `.L` labels global, so
+    # a table word relocates against the label and holds 0, where GCC's local
+    # label relocates against .text and holds the offset. Inside a named object
+    # (a string just before the table) objdiff compares those bytes.
+    text = re.sub(r"^(\s*)jlabel (\.L\w+)$", r"\1\2:", text, flags=re.M)
+    text = re.sub(r"^(\s*)dlabel (jtbl_\w+)$", r"\1.L\2:", text, flags=re.M)
+    text = re.sub(r"(?<![.\w])(jtbl_[0-9A-Fa-f]{8})\b", r".L\1", text)
+    stripped.write_text(text)
     obj.parent.mkdir(parents=True, exist_ok=True)
     r = subprocess.run([as_, *flags, "-o", str(obj), str(stripped)], cwd=ROOT,
                        capture_output=True, text=True)
@@ -105,7 +158,7 @@ def main():
     if r.returncode:
         sys.exit(f"FATAL: splat split of the derived config:\n{(r.stdout + r.stderr)[-2000:]}")
 
-    units = []
+    units, tails = [], short_data_tails()
     for _, _, ty, name in unitfile.seg_rows(unitfile.yaml_lines()):
         if ty not in ("c", "asm", "o"):
             continue
@@ -119,7 +172,7 @@ def main():
             unit["target_path"] = unit["base_path"] = obj.relative_to(ROOT).as_posix()
         else:
             tobj = OUT / "target" / f"{name}.s.o"
-            assemble(OUT / "asm" / f"{name}.s", tobj)
+            assemble(OUT / "asm" / f"{name}.s", tobj, tails.get(name, ()))
             unit["target_path"] = tobj.relative_to(ROOT).as_posix()
             base = ROOT / "build/src" / f"{name}.c.o"
             if ty == "c":

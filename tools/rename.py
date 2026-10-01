@@ -153,6 +153,15 @@ def symbol_address(name):
     return None, None
 
 
+def linked_address(name):
+    """NEW's address in the last link's map (build/lsdde.map), or None."""
+    mp = ROOT / "build/lsdde.map"
+    if not mp.exists():
+        return None
+    m = re.search(rf"^\s+0x([0-9a-f]{{8}})\s+{re.escape(name)}$", mp.read_text(), re.M)
+    return int(m.group(1), 16) if m else None
+
+
 def name_in_use(name):
     """(code_hits, prose_hits): where NEW already appears as a whole word.
 
@@ -358,6 +367,15 @@ def main():
             continue
         t = re.sub(r"/\*.*?\*/", "", p.read_text(errors="replace"), flags=re.S)
         (hard if scope.search(t) or oldpat.search(t) else soft).append(rel)
+    # REGISTERING, not renaming: the C already defines NEW, the link puts it at
+    # OLD's address, and only the symbols file lacks it, so retail's
+    # disassembly still says OLD and objdiff pairs nothing (a C-defined table
+    # scored its whole .data section as unmatched). The definition IS the symbol.
+    registering = bool(hard) and bool(PLACEHOLDER.match(old)) and linked_address(new) == addr
+    if registering:
+        print(f"note: {new!r} is defined in C and linked at {addr:#x}; registering its name "
+              f"for retail's {old}.")
+        hard = []
     if hard:
         sys.exit(f"FATAL: {new!r} already exists in code: " + ", ".join(hard[:6]))
     if soft:
@@ -392,7 +410,7 @@ def main():
         print(f"    {n:4d}  {p.relative_to(ROOT)}")
     if report_old.exists():
         print(f"  report: {report_old.relative_to(ROOT)} -> {report_new.name}")
-    if not touched and symline is None and not report_old.exists():
+    if not touched and symline is None and not report_old.exists() and not registering:
         sys.exit("FATAL: nothing references the old name; is it spelled right?")
     for rel in sorted(RULE_DOCS):
         rp = ROOT / rel
