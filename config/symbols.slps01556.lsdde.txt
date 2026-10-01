@@ -3342,3 +3342,4 @@ sRotationYawPlus270 = 0x80089D30; // size:0xC
 sTranslateYMinus32 = 0x80089D84; // size:0xC
 sScaleXQuarterZHalf = 0x80089E68; // size:0xC
 sScaleDepthJitter = 0x80089E98; // size:0xC
+sBMemPMgrUnused = 0x8008A81C;

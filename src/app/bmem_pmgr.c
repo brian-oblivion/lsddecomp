@@ -28,7 +28,15 @@
 
 /* The pool SetupBMemPMgrFreeList, BMemPMgrAlloc and BMemPMgrFree work on;
  * set by SetDefaultBMemPMgr (main.c, right after BMemPMgrInit). */
-extern BMemPMgr *sDefaultBMemPMgr;
+static BMemPMgr *sDefaultBMemPMgr SDATA = NULL;
+
+/* MATCHING: a zero word nothing reads sits between the two in retail's .sdata. */
+static s32 sBMemPMgrUnused SDATA = 0;
+
+/* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
+ * work and back to 0 after (SetBMemPMgrBusy, GetBMemPMgrBusy below). Nothing
+ * in either waits on it. */
+static s32 sBMemPMgrBusy SDATA = 0;
 
 /* "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n", BMemPMgrInit's
  * malloc-failure message. */
@@ -392,11 +400,6 @@ void RemoveBasicClassListNode(BasicClassListNode **head, BasicClass *value) {
         node = node->next;
     }
 }
-
-/* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
- * work and back to 0 after (SetBMemPMgrBusy, GetBMemPMgrBusy below). Nothing
- * in either waits on it. */
-extern s32 sBMemPMgrBusy;
 
 void FreeBasicClassList(BasicClassListNode **head) {
     BasicClassListNode *node = *head;

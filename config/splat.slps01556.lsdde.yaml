@@ -2010,7 +2010,7 @@ segments:
       - [0x7B008, .sdata, main]  # the startup pool
       - [0x7B00C, pad]                        # 4 bytes: prnt.o's .sdata is 8-aligned (2**3)
       - [0x7B010, o, libc2/prnt, .sdata]      # "(null)", 7 bytes
-      - [0x7B018, sdata]
+      - [0x7B018, .sdata, app/bmem_pmgr]  # the default pool and the busy flag
       - [0x7B024, .sdata, graphics/tmd_renderer]  # the DIVPOLYGON clip, the face colour, the ndiv override
       - [0x7B038, sdata]
       - [0x7B040, o, libc2/puts, .sdata]      # "<NULL>"

@@ -18,6 +18,7 @@ sActiveMoviePlayer
 sActorLocalMove
 sActorLocalMoveZ
 sBMemPMgrBusy
+sBMemPMgrUnused
 sBgLayerDefaultColor
 sBoxFillDefaultColor
 sCardChangedIconName
