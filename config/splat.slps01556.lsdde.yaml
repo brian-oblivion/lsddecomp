@@ -2036,7 +2036,7 @@ segments:
       - [0x7B136, pad]                        # 2 bytes: tim_array_src's .sdata is one halfword
       - [0x7B138, .sdata, graphics/bg_layer]  # the default colour, 128 each: unshaded
       - [0x7B13B, pad]                        # 1 byte: bg_layer's .sdata is a 3-byte ColorRgb
-      - [0x7B13C, sdata]
+      - [0x7B13C, .sdata, graphics/movie_player]  # the MDEC once-flag, the playing movie, black, the poll count
       - [0x7B14C, .sdata, cd/cd_stream]  # the audio-mix flag, the drive's owner, ";1"
       - [0x7B158, .sdata, cd/game_files]  # "CDI\\" and "SND\\SE", the pickers' forced choices
       - [0x7B178, sdata]

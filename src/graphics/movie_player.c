@@ -17,11 +17,14 @@
 #include "bmem_pmgr.h"
 #include "cd_driver.h"
 
-
-extern MoviePlayer *sActiveMoviePlayer; /* the playing movie, or NULL (play sets it, pollActive clears it) */
-extern s32 sMdecInitialized;            /* set by the first ctor, which DecDCTReset(0)s the MDEC */
-extern s32 sMoviePollCounter;           /* pollActive's call count */
-extern u8 sMovieClearColor[4];          /* a zero word: play's clearImage color, black */
+/* Set by the first ctor, which DecDCTReset(0)s the MDEC. */
+static s32 sMdecInitialized SDATA = 0;
+/* The playing movie, or NULL: play sets it, pollActive clears it. */
+static MoviePlayer *sActiveMoviePlayer SDATA = NULL;
+/* Play's clearImage colour: black. */
+static u8 sMovieClearColor[4] SDATA = {0, 0, 0, 0};
+/* PollActive's call count, from 1. */
+static s32 sMoviePollCounter SDATA = 1;
 
 /* MoviePlayer's stream and decode geometry. */
 #define MOVIE_FPS 15                          /* New_CdStream's fps */
