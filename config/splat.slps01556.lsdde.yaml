@@ -2030,7 +2030,9 @@ segments:
       - [0x7B127, pad]                        # 1 byte: box_fill's .sdata ends with a 3-byte colour
       - [0x7B128, o, libc2/itoa, .sdata]      # "%d", 3 bytes (dlabel D_8008A928);
                                               # 0x7B12B rounds to 0x7B12C under SUBALIGN(2), no pad
-      - [0x7B12C, sdata]                      # dlabel D_8008A92C
+      - [0x7B12C, .sdata, graphics/tim_block_src]  # the fade ramps' row shift, 3
+      - [0x7B132, pad]                        # 2 zero bytes after tim_block_src's halfwords
+      - [0x7B134, sdata]
       - [0x7B14C, .sdata, cd/cd_stream]  # the audio-mix flag, the drive's owner, ";1"
       - [0x7B158, .sdata, cd/game_files]  # "CDI\\" and "SND\\SE", the pickers' forced choices
       - [0x7B178, sdata]

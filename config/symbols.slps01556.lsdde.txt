@@ -3346,3 +3346,5 @@ sBMemPMgrUnused = 0x8008A81C;
 sViewportUnusedWords = 0x8008A914;
 sDefaultDataDirectoryName = 0x8008A958;
 sSoundEffectDirName = 0x8008A970;
+sTimBlockSrcUnusedA = 0x8008A92E;
+sTimBlockSrcUnusedB = 0x8008A930;

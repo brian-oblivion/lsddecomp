@@ -48,7 +48,13 @@ typedef struct TimBlockHeaderBytes {
     u8 bytes[sizeof(TimBlockHeader)]; /**< a TimBlockHeader's bytes */
 } TimBlockHeaderBytes;
 
-extern s16 sTimBlockClutShift;
+/* Each fade ramp is 2^3 = 8 CLUT rows. */
+static s16 sTimBlockClutShift SDATA = 3;
+
+/* MATCHING: two halfwords nothing reads follow it in retail's .sdata. Not an
+ * array: GCC word-aligns one. */
+static s16 sTimBlockSrcUnusedA SDATA = -1;
+static s16 sTimBlockSrcUnusedB SDATA = 255;
 
 /* ctor (+0x008): lay out the four fade ramps (2^sTimBlockClutShift rows
  * each, one after another from CLUT_FADE_Y), then open `name` and read its

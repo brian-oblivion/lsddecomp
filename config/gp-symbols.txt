@@ -204,6 +204,8 @@ sTextEntryTextColor
 sTextEntryTextPos
 sTexturedFaceColor
 sTimBlockClutShift
+sTimBlockSrcUnusedA
+sTimBlockSrcUnusedB
 sTimClutRowShift
 sTimExt
 sTitleCardPathPrefix
