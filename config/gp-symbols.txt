@@ -4,7 +4,6 @@
 # --gp-symbols addresses these off $gp. Regenerate after any
 # sdata/sbss carve.
 D_8008AA1C
-D_8008AAE0
 D_8008AC24
 D_8008AC68
 D_8008ACA0

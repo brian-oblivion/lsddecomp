@@ -26,9 +26,25 @@
 #include "full_width_sjis.h"
 #include "data_source.h"
 
-/* The cursor sprite's position at index 0, (-62, -12): loadCardResources
- * attaches the cursor there, setCursorPos moves it to x + index * 7, y. */
-extern ScreenSpritePos sTextEntryCursorPos;
+/* The characters nextChar/prevChar step through, NUL-terminated: a space,
+ * A to Z, a to z, 0 to 9. */
+extern u8 sStrNameChars[];
+
+/* TextEntry's small data, in address order. Positions are percent of half
+ * the screen from the centre (include/screen_sprite.h). */
+
+/* LoadCardResources' text row colour, a yellow. */
+static ColorRgb sTextEntryTextColor SDATA = {128, 128, 0};
+/* Where LoadCardResources attaches the panel and the text row. */
+static ScreenSpritePos sTextEntryPanelPos SDATA = {-70, -60};
+static ScreenSpritePos sTextEntryTextPos SDATA = {-62, -15};
+/* The cursor sprite's position at index 0: loadCardResources attaches the
+ * cursor there, setCursorPos moves it to x + index * 7, y. */
+static ScreenSpritePos sTextEntryCursorPos SDATA = {-62, -12};
+static u8 *sNameCharTable SDATA = sStrNameChars;
+/* LoadCardResources' path parts: CARD\<name>.TIM. */
+static char sCardPathPrefix[] SDATA = "CARD\\";
+static char sTimExt[] SDATA = ".TIM";
 
 TextEntry *New_TextEntry(char *text, s32 mode) {
     TextEntry *self;
@@ -40,9 +56,6 @@ TextEntry *New_TextEntry(char *text, s32 mode) {
     }
     return NULL;
 }
-
-/* The characters nextChar/prevChar step through, NUL-terminated. */
-extern u8 *sNameCharTable;
 
 void TextEntry__TextEntry(TextEntry *self, char *text, s32 mode) {
     u8 *p;
@@ -140,17 +153,10 @@ void TextEntry__SetText(TextEntry *self, char *text, s32 mode) {
     }
 }
 
-/* LoadCardResources' data. Positions are percent of half the screen from
- * the centre (include/screen_sprite.h). */
-
-extern char sStrComInput[];                /* "COMINPUT" */
-extern char sStrFontIcon[];                /* "FONTICON" */
-extern char sCardPathPrefix[];             /* "CARD\\" */
-extern char sTimExt[];                     /* ".TIM" */
-extern SpriteRect sTextEntryPanelRect;     /* COMINPUT's cell: 224 x 120 from (0, 0) */
-extern ColorRgb sTextEntryTextColor;       /* the text row's colour: (128, 128, 0) */
-extern ScreenSpritePos sTextEntryPanelPos; /* (-70, -60) */
-extern ScreenSpritePos sTextEntryTextPos;  /* (-62, -15) */
+/* LoadCardResources' data. */
+extern char sStrComInput[];            /* "COMINPUT" */
+extern char sStrFontIcon[];            /* "FONTICON" */
+extern SpriteRect sTextEntryPanelRect; /* COMINPUT's cell: 224 x 120 from (0, 0) */
 
 void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
     char path[CARD_TIM_PATH_SIZE];

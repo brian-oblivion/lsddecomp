@@ -2040,6 +2040,9 @@ segments:
       - [0x7B14C, .sdata, cd/cd_stream]  # the audio-mix flag, the drive's owner, ";1"
       - [0x7B158, .sdata, cd/game_files]  # "CDI\\" and "SND\\SE", the pickers' forced choices
       - [0x7B178, sdata]
+      - [0x7B2C8, .sdata, ui/text_entry]  # the text colour, the panel, text and cursor places, CARD\\ and .TIM
+      - [0x7B2F5, pad]                        # 3 bytes: text_entry's .sdata ends with the 5-byte ".TIM"
+      - [0x7B2F8, sdata]
       - [0x7b3c0, sdata]              # DreamSys's sdata slot
       - [0x7b3f8, sdata]
       - [0x7B420, .sbss, main]  # the root GameApplication
