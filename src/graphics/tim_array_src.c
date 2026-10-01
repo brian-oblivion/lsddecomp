@@ -46,7 +46,8 @@ void TimArraySrc__Finalize(TimArraySrc *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-extern s16 sTimClutRowShift;
+/* A fade ramp is 2^3 = 8 CLUT rows, as TimBlockSrc lays them out. */
+static s16 sTimClutRowShift SDATA = 3;
 
 /** @brief A TimArraySrc's buffer: an image count, then each image's byte
  * offset from the start of the buffer. */
