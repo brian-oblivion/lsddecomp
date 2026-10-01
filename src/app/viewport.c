@@ -15,13 +15,24 @@
 #include "viewport.h"
 #include "frame_clock.h"
 
-/* Viewport's ctor data: sViewportFadeBoxSize is the (320, 240) it passes
- * New_FadeBox; sFadeBoxAttachPos the (-100, -100) screen position the ctor
- * and SetSubHandle attach the sub handle at; sDefaultViewTwist ({0, 1}) is
- * Viewport__AttachViewChild's twist when its own is NULL. */
-extern u8 sViewportFadeBoxSize[];
-extern u8 sFadeBoxAttachPos[];
-extern Ratio16 sDefaultViewTwist;
+/* Viewport__AttachViewChild's twist when its own is NULL: 0 / 1, none. */
+static Ratio16 sDefaultViewTwist SDATA = {0, 1};
+
+/* InitDefaults' screen size, 256 x 240, and both its colours, black. */
+static ColorRgb sDefaultViewportColor SDATA = {0, 0, 0};
+static s32 sDefaultViewportWidth SDATA = 256;
+static s32 sDefaultViewportHeight SDATA = 240;
+/* MATCHING: a second name for the same symbol, so its address is computed twice. */
+extern ColorRgb sDefaultViewportColorAlias __asm__("sDefaultViewportColor");
+
+/* Viewport's ctor data: sFadeBoxAttachPos is the (-100, -100) screen
+ * position the ctor and SetSubHandle attach the sub handle at, and
+ * sViewportFadeBoxSize the 320 x 240 it passes New_FadeBox. */
+static BoxFillPos sFadeBoxAttachPos SDATA = {-100, -100};
+static BoxFillSize sViewportFadeBoxSize SDATA = {320, 240};
+
+/* MATCHING: four words nothing reads end the unit's .sdata in retail. */
+static s32 sViewportUnusedWords[4] SDATA = {10, 10, -10, -10};
 
 Viewport *New_Viewport(void) {
     Viewport *self;
@@ -42,9 +53,9 @@ void Viewport__Viewport(Viewport *self) {
     self->drawSystem = NULL;
     self->viewNode = NULL;
     self->sceneRoot = New_SceneNode();
-    fadeBox = (SceneNode *)New_FadeBox(sViewportFadeBoxSize, 0, 0);
+    fadeBox = (SceneNode *)New_FadeBox(&sViewportFadeBoxSize, 0, 0);
     self->fadeBox = fadeBox;
-    fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)sFadeBoxAttachPos);
+    fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)&sFadeBoxAttachPos);
     self->methods->initDefaults(self);
 }
 
@@ -113,12 +124,6 @@ void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
         self->methods->onDrawSystemEvent(self, sender, event);
     }
 }
-
-extern s32 sDefaultViewportWidth;
-extern s32 sDefaultViewportHeight;
-extern ColorRgb sDefaultViewportColor;
-/* MATCHING: a second name for the same symbol, so its address is computed twice. */
-extern ColorRgb sDefaultViewportColorAlias __asm__("sDefaultViewportColor");
 
 /* InitDefaults' values. The OT has 1 << VIEWPORT_DEFAULT_OT_LENGTH (8192)
  * tags; with the near and far defaults Update's zDiv comes out 8. The packet
@@ -421,7 +426,7 @@ void Viewport__SetFadeBox(Viewport *self, SceneNode *fadeBox) {
 
     self->fadeBox = fadeBox;
     if (fadeBox != NULL) {
-        fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)sFadeBoxAttachPos);
+        fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)&sFadeBoxAttachPos);
     }
 }
 

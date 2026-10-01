@@ -221,4 +221,5 @@ sVabSizeTableInited
 sVabStreamInited
 sVabVolumeInited
 sViewportFadeBoxSize
+sViewportUnusedWords
 sWBgmActive
