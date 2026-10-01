@@ -20,7 +20,7 @@
 #include "draw_system.h"
 #include "bmem_pmgr.h"
 
-extern DrawSystem *sDrawSystem; /* sdata: the singleton GetDrawSystem returns */
+static DrawSystem *sDrawSystem SDATA = NULL; /* the singleton GetDrawSystem returns */
 
 void ConvertRect(RECT *dst, DrawRect *src);
 
