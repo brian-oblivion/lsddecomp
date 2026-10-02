@@ -23,7 +23,7 @@ static s32 sWBgmActive SDATA = 0; /* 1 between WBgm__WBgm and WBgm__Finalize */
 const char sSeqOpenErrorMsg[] = "Seq Open error in WBgmHandleMonitorEvent";
 
 extern u8 sSsSizeTableBuf[];
-#ifdef PLATFORM_PC
+#ifdef HOST_BUILD
 /* Placed by address in the PS1 link; defined here for the host. Sized for
  * VabStreamObj's SsSetTableSize: two scores of one track. */
 u8 sSsSizeTableBuf[SS_SEQ_TABSIZ * 2];

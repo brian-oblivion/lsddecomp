@@ -21,7 +21,7 @@
 
 static s32 sPadRefCount SDATA = 0; /* live instances: the first ctor calls PadInit, the last finalize PadStop */
 extern u32 sButtonMasks[PAD_BUTTON_COUNT]; /* runtime copy of the button-mask table, filled by Pad__LoadButtonTable */
-#ifdef PLATFORM_PC
+#ifdef HOST_BUILD
 u32 sButtonMasks[PAD_BUTTON_COUNT]; /* placed by address in the PS1 link; defined for the host */
 #endif
 

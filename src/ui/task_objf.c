@@ -19,7 +19,7 @@
 #include "tim_image.h"
 #include "task_objf.h"
 #include <kernel.h>
-#ifdef PLATFORM_PC
+#ifdef HOST_BUILD
 /* psyz declares the kernel's file, event and card calls in libapi.h, and
  * has delete() under its later Psy-Q name. */
 #include <libapi.h>

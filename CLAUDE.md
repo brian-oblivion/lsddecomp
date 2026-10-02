@@ -76,6 +76,8 @@ research notes) is on the `archive/process` branch; read it with
 - **Skipped unit:** after a *header* edit breaks a unit once, the pipeline
   leaves a stale `.o` that make then skips. A red build with no compile error
   means `rm -f build/src/<dir>/<unit>.c.o` and rebuild.
+- **Host-only code:** `#ifdef HOST_BUILD` branches never reach the PS1
+  build, so a green hash says nothing about them (README, "The host build").
 
 To localise a red build with no compile error, run
 `cmp -l build/SLPS_015.56 disk/SLPS_015.56 | head`. The offsets are 1-based,

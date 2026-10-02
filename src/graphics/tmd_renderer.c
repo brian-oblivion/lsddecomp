@@ -36,7 +36,7 @@ extern s32 sSortLightOff;           /* GsLOFF */
 extern s32 sSortNdiv;               /* GsDIV1..5: subdivision level */
 extern s32 sSortUseGlobalLightMode; /* GsLLMOD */
 extern s32 sSortLightMode;          /* GsFOG | GsMATE */
-#ifdef PLATFORM_PC
+#ifdef HOST_BUILD
 /* Placed by address in the PS1 link; defined here for the host. */
 s32 sSortLightOff;
 s32 sSortNdiv;

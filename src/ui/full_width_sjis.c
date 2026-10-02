@@ -90,7 +90,7 @@ u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
 
 /* Sony's itoa (libc2): the decimal digits of `n`, in the library's own buffer.
  * psyz's libc.h renames it, away from the host C library's itoa. */
-#ifdef PLATFORM_PC
+#ifdef HOST_BUILD
 #include <libc.h>
 #endif
 extern char *itoa(int n);

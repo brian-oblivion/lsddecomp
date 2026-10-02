@@ -177,10 +177,10 @@ The rules that break the image if you ignore them:
   touch.
 - **C89, as GCC 2.6.3 reads it.** Declarations go at the top of a block.
   Only `/* */` comments. `char` is unsigned, so a signed byte is `s8`.
-- **A rodata string is a symbol, not a literal.** The disassembly already
-  contains every rodata string, so writing the literal in C emits a second
-  copy and shifts the image. Declare the existing symbol instead
-  (`extern const char sTitleTimPath[];`).
+- **A rodata string is defined once, by name.** Each of the game's strings
+  is a `const` array in the unit that uses it, defined ahead of the unit's
+  functions in the image's order (`sTitleTimPath` in `title_menu.c`). A
+  literal written at a use emits a second copy and shifts the image.
 - **A struct edit is never local.** A field inserted without shrinking the
   padding beside it moves every later offset, and breaks functions in other
   files. Rebuild the whole image after any header change.
@@ -200,6 +200,27 @@ python3 tools/unitfile.py rename OLD NEW # a source file
 
 Never edit `asm/` (it is regenerated) or `check.sha1` (it is the retail
 hash). Run `tools/lint.sh` before sending a change.
+
+## The host build
+
+[lsd-port](https://github.com/brian-oblivion/lsd-port) compiles this C for
+other platforms, against [psyz](https://github.com/Xeeynamo/psyz), with
+`HOST_BUILD` defined. The PS1 build never sees that code, so the retail
+hash says nothing about it; lsd-port's CI builds it. The C is shared, so:
+
+- **Prefer C that is right on both.** `#ifdef HOST_BUILD` is only for what
+  cannot be shared, and each one says why.
+- **No address in an integer.** The host is 64-bit; a pointer type where an
+  `s32` held an address changes no PS1 bytes.
+- **A global the PS1 link places by address**
+  (`config/undefined_syms_auto.*.txt`) has no definition in the C, so it
+  also needs a host one: `#ifdef HOST_BUILD` beside its `extern`, sized
+  from the code. Symbols the code lays one structure over become that
+  structure's fields on the host (`sStyleSpawnParams` in `style_layer.c`).
+- **Read-only data the game writes** is `IMAGE_CONST`: `const` on the PS1,
+  writable on a host, whose `.rodata` is read-only memory.
+- **A pointer into `MATRIX.t` or a `VECTOR`** is a `GteLong *`: Sony's
+  headers declare those fields `long`, psyz's `int`.
 
 ## Continuous integration
 

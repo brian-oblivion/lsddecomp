@@ -26,12 +26,12 @@
  * each one. Code around the macros is ordinary C; a GTE operation this file
  * lacks is added here under Sony's name, not written out at a call site.
  *
- * The host build (PLATFORM_PC) has no COP2: it takes the same macros from
+ * The host build (HOST_BUILD) has no COP2: it takes the same macros from
  * psyz's <libgte.h>, which runs them on psyz's GTE emulation, and this file
  * defines none of its own.
  */
 
-#ifdef PLATFORM_PC
+#ifdef HOST_BUILD
 #include <libgte.h>
 #else
 
@@ -504,6 +504,6 @@
         : : "r" (r1), "r" (r2), "r" (r3) : "memory")
 /* clang-format on */
 
-#endif /* !PLATFORM_PC */
+#endif /* !HOST_BUILD */
 
 #endif

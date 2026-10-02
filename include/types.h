@@ -13,12 +13,12 @@
  * uses (`u8` .. `s64`), the C99 names (`uint8_t` .. `int64_t`), and Sony's
  * `u_char` .. `u_long` from <sys/types.h>.
  *
- * The host build (PLATFORM_PC) takes the C99 and Sony names from psyz,
+ * The host build (HOST_BUILD) takes the C99 and Sony names from psyz,
  * where `u_long` is as wide as a pointer, and defines only the short names
  * and bool here.
  */
 
-#ifdef PLATFORM_PC
+#ifdef HOST_BUILD
 #include <psyz/types.h>
 #endif
 
@@ -45,7 +45,7 @@ typedef float f32;
 /** @brief 64-bit float, software like f32. */
 typedef double f64;
 
-#ifndef PLATFORM_PC
+#ifndef HOST_BUILD
 
 /* C99 names, for the few places that read better with them. */
 
@@ -96,7 +96,7 @@ typedef u32 u_int;
 typedef u32 u_long;
 #endif
 
-#endif /* !PLATFORM_PC */
+#endif /* !HOST_BUILD */
 
 /** @brief An `int`-sized truth value: zero is false, anything else true. */
 typedef int bool;

@@ -61,7 +61,7 @@ typedef union VectorOrBox {
 } VectorOrBox;
 
 extern TmdBox sTmdModelBoundsBuf[];
-#ifdef PLATFORM_PC
+#ifdef HOST_BUILD
 TmdBox sTmdModelBoundsBuf[1]; /* placed by address in the PS1 link; defined for the host */
 #endif
 

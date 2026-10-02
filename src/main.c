@@ -19,7 +19,7 @@
 #include "bmem_pmgr.h"
 #include "data_source.h"
 #include <kernel.h>
-#ifdef PLATFORM_PC
+#ifdef HOST_BUILD
 #include <libapi.h> /* SetMem: psyz declares it here, not in kernel.h */
 #endif
 
@@ -66,7 +66,7 @@ void main(void) {
     sGameApplication->methods->runMainLoop(sGameApplication);
 }
 
-#ifndef PLATFORM_PC
+#ifndef HOST_BUILD
 /* Sony's _obj/none: empty. Its one call is the one generated at the top of
  * main. A host has its own __main, or none. */
 void __main(void) {}

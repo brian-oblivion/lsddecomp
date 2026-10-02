@@ -7,7 +7,7 @@
  *        small C89 helper macros and the dream chart's point type.
  */
 
-#ifdef PLATFORM_PC
+#ifdef HOST_BUILD
 /* The host build has no PS1 assembly: the macros that include it are empty,
  * and the PS1 linker's labels are left out. */
 #define INCLUDE_ASM(FOLDER, NAME)
@@ -32,7 +32,7 @@
  * Exact for multiples of 45 degrees; a constant expression. */
 #define ANGLE_DEG(deg) ((deg) * 4096 / 360)
 
-#if !defined(M2CTX) && !defined(PERMUTER) && !defined(PLATFORM_PC)
+#if !defined(M2CTX) && !defined(PERMUTER) && !defined(HOST_BUILD)
 /** Places a definition in small data, the `.sdata` section: the game's
  * small initialized globals, reached through one base register. Used as
  * `static s32 sName SDATA = 320;`. The definition must have an initializer,
@@ -47,15 +47,12 @@
 #define SBSS
 #endif
 
-#ifdef PLATFORM_PC
-/** Read-only data in the image that the game writes all the same: on the
- * PS1 it is `const`, to land in `.rodata` as in the image; on a host,
- * whose `.rodata` is read-only memory, it is writable. */
+/** Read-only data in the image that the game writes all the same: `const`
+ * on the PS1, so that it lands in `.rodata` as in the image; writable on a
+ * host build, whose `.rodata` is read-only memory. */
+#ifdef HOST_BUILD
 #define IMAGE_CONST
 #else
-/** Read-only data in the image that the game writes all the same: on the
- * PS1 it is `const`, to land in `.rodata` as in the image; on a host,
- * whose `.rodata` is read-only memory, it is writable. */
 #define IMAGE_CONST const
 #endif
 
@@ -63,17 +60,16 @@
  * is the integer n as a fixed-point value. */
 #define FIX12_SHIFT 12
 
-#ifdef PLATFORM_PC
-/** libgte's 32-bit integer, the type of MATRIX.t[] and of VECTOR's members:
- * `int` in psyz's headers. A pointer to one of those members is a
- * `GteLong *`. */
-typedef int GteLong;
+/** GteLong's type: `int` against psyz's libgte, `long` against Sony's. */
+#ifdef HOST_BUILD
+#define GTE_LONG_BASE int
 #else
-/** libgte's 32-bit integer, the type of MATRIX.t[] and of VECTOR's members:
- * `long` in Sony's headers. A pointer to one of those members is a
- * `GteLong *`. */
-typedef long GteLong;
+#define GTE_LONG_BASE long
 #endif
+/** libgte's 32-bit integer, the type of MATRIX.t[] and of VECTOR's members:
+ * `long` in Sony's headers, `int` in psyz's (the host build). A pointer to
+ * one of those members is a `GteLong *`. */
+typedef GTE_LONG_BASE GteLong;
 
 /**
  * @brief A position on the dream chart, the two-axis mood graph the game
