@@ -270,9 +270,9 @@ typedef struct CdFileEntry {
  * FreeCdRequestNode unlinks and frees it.
  */
 typedef struct CdRequestNode {
-    /* +0x00 */ s32 active; /**< Set by StartCdOperation when the request starts. */
-    /* +0x04 */ s32 unk4; /**< Zeroed at allocation; nonzero sets bit 0 of the owner's flags on completion. */
-    /* +0x08 */ s32 op;          /**< CD_OP_*. */
+    /* +0x00 */ s32 active;  /**< Set by StartCdOperation when the request starts. */
+    /* +0x04 */ s32 unused4; /**< Zeroed at allocation and never set, so RunRequestQueue's "nonzero: set bit 0 of the owner's flags" never fires. */
+    /* +0x08 */ s32 op;      /**< CD_OP_*. */
     /* +0x0C */ CdDriver *owner; /**< The requesting object (any FileResource client). */
     /* +0x10 */ s32 fileIndex; /**< File table index (FindCdFileIndex) for open and loadFile, 0 otherwise. */
     /* +0x14 */ s32 param0; /**< First argument passed back on dispatch (seek's offset, read's buffer). */

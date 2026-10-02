@@ -408,10 +408,10 @@ void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable) {
 /* baseColor is where the fade-in starts; clearColor is what onDeinit clears the
  * screen to (TaskCore__Reset's defaults: black, black, 128 grey). */
 /* MATCHING: each colour copied as one ColorRgb; byte-by-byte copies compile differently. */
-void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *clear, u8 *color96) {
+void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *clear, u8 *unusedColor) {
     *(ColorRgb *)self->baseColor = *(ColorRgb *)base;
     *(ColorRgb *)self->clearColor = *(ColorRgb *)clear;
-    *(ColorRgb *)self->unk96 = *(ColorRgb *)color96;
+    *(ColorRgb *)self->unusedColor = *(ColorRgb *)unusedColor;
 }
 
 void TaskCore__SetFadeRate(TaskCore *self, s32 rate) {

@@ -22,7 +22,7 @@ typedef struct PlacementGridMethods PlacementGridMethods;
  */
 typedef struct PlacementGridRecord {
     /* +0x0 */ u8 present; /**< Zero: the cell is empty, and ResolveEntry returns -1. */
-    /* +0x1 */ u8 unk1;    /**< Copied to CellPlacement::unk2C; nothing else reads it. */
+    /* +0x1 */ u8 unused1; /**< Copied to CellPlacement::unused2C; nothing else reads it. */
     /* +0x2 */ u16 model;  /**< The model index passed to the LinkResource's getModel. */
     /* +0x4 */ u8 cellFlags; /**< Copied to CellPlacement::cellFlags, which becomes the GridCell's flags36. */
     /* +0x5 */ u8 rotY;  /**< Y rotation in quarter turns. */
@@ -43,7 +43,7 @@ typedef struct CellPlacement {
     /* +0x018 */ u8 pad18[0x1A - 0x18];
     /* +0x01A */ u16 rotY; /**< The record's rotY * 0x400. */
     /* +0x01C */ u8 pad1C[0x2C - 0x1C];
-    /* +0x02C */ u16 unk2C; /**< The record's unk1; nothing reads it. */
+    /* +0x02C */ u16 unused2C; /**< The record's unused1; nothing reads it. */
     /* +0x02E */ u16 cellFlags; /**< The record's cellFlags; the caller copies it to the GridCell's flags36. */
     /* +0x030 */ s32 chained; /**< 1 when this record came from the previous one's `next`. */
     /* +0x034 */ s32 next; /**< In: the offset to follow (0 starts at the cell); out: the record's `next`. */

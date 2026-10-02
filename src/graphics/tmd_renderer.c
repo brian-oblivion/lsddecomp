@@ -45,7 +45,7 @@ extern s32 sSortLightMode;          /* GsFOG | GsMATE */
 typedef struct PolyDrawCtx {
     /* +0x000 */ GsOT_TAG *otBase;  /**< the GsOT's org */
     /* +0x004 */ s32 otShift;       /**< otz >> otShift indexes otBase */
-    /* +0x008 */ s32 unk8;          /**< set to 10 per object; nothing reads it */
+    /* +0x008 */ s32 unused8;       /**< set to 10 per object; nothing reads it */
     /* +0x00C */ SVECTOR *vertices; /**< the TMD object's vertex array */
     /* +0x010 */ SVECTOR *normals;  /**< the TMD object's normal array */
     /* +0x014 */ u8 primLen;        /**< SetupPrimCode's cached P_TAG length byte */
@@ -233,12 +233,12 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     }
 
     /* MATCHING: obj->attribute read afresh for each global, not once into a local;
-     * all four reads come before the first store, and unk8 is stored after them. */
+     * all four reads come before the first store, and unused8 is stored after them. */
     sSortNdiv = (obj->attribute >> ATTR_DIV_SHIFT) & 0x7;
     sSortLightOff = (obj->attribute >> ATTR_LOFF_SHIFT) & 0x1;
     sSortUseGlobalLightMode = (obj->attribute >> ATTR_LLMOD_SHIFT) & 0x1;
     sSortLightMode = (obj->attribute >> ATTR_LIGHTMODE_SHIFT) & 0x3;
-    ctx->unk8 = 10;
+    ctx->unused8 = 10;
 
     ctx->faceColor = sTexturedFaceColor;
 

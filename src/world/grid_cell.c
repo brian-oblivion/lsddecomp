@@ -29,7 +29,7 @@ GridCell *New_GridCell(void) {
 void GridCell__GridCell(GridCell *self) {
     GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetGridCellMethods();
-    self->unk34 = 0;
+    self->unused34 = 0;
     self->flags36 = 0;
     self->nextInCell = NULL;
 }

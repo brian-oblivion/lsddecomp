@@ -220,7 +220,7 @@ typedef struct {
     PlayerSpawnPoint position;  /**< the position in it */
     FlashbackRotation rotation; /**< the orientation */
     s16 timeLimit;              /**< seconds; SpawnAtLink sets the dream's limit to this plus 4 */
-    s16 unk1C; /**< AddFlashback's fifth argument (FlashbackSaving always passes 0); nothing reads it */
+    s16 unused1C; /**< AddFlashback's fifth argument (FlashbackSaving always passes 0); nothing reads it */
     s32 day; /**< the day it was recorded; LoadNextFlashback makes it the current day */
 } FlashbackEntry;
 
@@ -411,7 +411,7 @@ struct DreamSys {
     s32 amountFlashbacksAvailable;       /**< entries in storedFlashbacks */
     FlashbackEntry storedFlashbacks[10]; /**< the flashbacks recorded (AddFlashback) */
 
-    s8 unk5D8; /**< InitNewGame clears it; nothing reads it */
+    s8 unused5D8; /**< InitNewGame clears it; nothing reads it */
     u8 pad5D9[6];
     s8 graphScored; /**< DreamSaveBlock's graphScored: GraphRoom__ScoreDayLog sets it; InitNewGame clears it */
 
@@ -421,9 +421,9 @@ struct DreamSys {
     u8 pad604[116];
 
     bool screenShakeOn; /**< the view bobs as the player walks (GetSetScreenShake; InitNewGame sets it) */
-    s32 unk67C;         /**< InitNewGame clears it; nothing else touches it */
-    s32 unk680;         /**< InitNewGame clears it; nothing else touches it */
-    s8 unk684[500]; /**< InitNewGame clears it; nothing else touches it */
+    s32 unused67C;     /**< InitNewGame clears it; nothing else touches it */
+    s32 unused680;     /**< InitNewGame clears it; nothing else touches it */
+    s8 unused684[500]; /**< InitNewGame clears it; nothing else touches it */
 
     /** Set by the ctor and by EndDay's new-game outcome, cleared by
      * ClearNewGameFlag; the save block ends before it. */
@@ -618,8 +618,8 @@ struct DreamSysMethods {
                                         MoodGraphPoint *ret); /**< @see DreamSys__GetMoodAverage */
     /* +0x210 */ void (*calcUnlockScore)(DreamSys *self);     /**< @see DreamSys__CalcUnlockScore */
     /* +0x214 */ void (*addFlashback)(DreamSys *self, s32 stage, PlayerSpawnPoint *pos, s32 *angles,
-                                      s32 unknown, s32 time, s32 day); /**< @see DreamSys__AddFlashback */
-    /* +0x218 */ void (*flashbackSaving)(DreamSys *self, s32 unknown,
+                                      s32 unused, s32 time, s32 day); /**< @see DreamSys__AddFlashback */
+    /* +0x218 */ void (*flashbackSaving)(DreamSys *self, s32 unused,
                                          s32 timeLimit);     /**< @see DreamSys__FlashbackSaving */
     /* +0x21C */ void (*resetFlashbackList)(DreamSys *self); /**< @see DreamSys__ResetFlashbackList */
     /* +0x220 */ void (*saveLinkSnapshot)(DreamSys *self);   /**< @see DreamSys__SaveLinkSnapshot */
@@ -1006,12 +1006,12 @@ void DreamSys__CalcUnlockScore(DreamSys *self);
  * @param stage   The stage.
  * @param pos     The position in it.
  * @param angles  The orientation, a FlashbackRotation.
- * @param unknown Stored in the entry and never read.
+ * @param unused Stored in the entry and never read.
  * @param time    The time limit, in seconds.
  * @param day     The day.
  */
 void DreamSys__AddFlashback(DreamSys *self, s32 stage, PlayerSpawnPoint *pos, s32 *angles,
-                            s32 unknown, s32 time, s32 day);
+                            s32 unused, s32 time, s32 day);
 
 /**
  * @brief Slot +0x21C: forgets every stored flashback (the Grey Man's doing).
@@ -1557,10 +1557,10 @@ s32 DreamSys__GetCurrentStage(DreamSys *self);
  * @brief Slot +0x218: one time in three, records the present moment as a
  *        flashback (stage, position, orientation, day).
  * @param self      The DreamSys.
- * @param unknown   Stored in the entry and never read.
+ * @param unused   Stored in the entry and never read.
  * @param timeLimit The flashback's time limit, in seconds.
  */
-void DreamSys__FlashbackSaving(DreamSys *self, s32 unknown, s32 timeLimit);
+void DreamSys__FlashbackSaving(DreamSys *self, s32 unused, s32 timeLimit);
 
 /**
  * @brief Slot +0x220: keeps the coordinate and its parameters, so a step can

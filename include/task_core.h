@@ -125,7 +125,7 @@ struct TaskCoreItemList {
     /* +0x098 */ void (*setExitCallback)(Self *self, void (*callback)(void *ctx), void *ctx); /**< @see TaskCore__SetExitCallback */ \
     /* +0x09C */ void (*setFadeInCallbackEnabled)(Self *self, s32 enable);    /**< @see TaskCore__SetFadeInCallbackEnabled */ \
     /* +0x0A0 */ void (*setFadeOutCallbackEnabled)(Self *self, s32 enable); /**< @see TaskCore__SetFadeOutCallbackEnabled */ \
-    /* +0x0A4 */ void (*setColors)(Self *self, u8 *base, u8 *clear, u8 *color96); /**< @see TaskCore__SetColors */ \
+    /* +0x0A4 */ void (*setColors)(Self *self, u8 *base, u8 *clear, u8 *unusedColor); /**< @see TaskCore__SetColors */ \
     /* +0x0A8 */ void (*setFadeRate)(Self *self, s32 rate);      /**< @see TaskCore__SetFadeRate */       \
     /* +0x0AC */ s32 (*tickFadeInCallback)(Self *self);            /**< @see TaskCore__TickFadeInCallback: update's state 4 */ \
     /* +0x0B0 */ s32 (*tickFadeIn)(Self *self);               /**< @see TaskCore__TickFadeIn: the fade-in callback */ \
@@ -193,7 +193,7 @@ struct TaskCoreItemList {
     /* +0x08C */ s32 (*fadeOutCallback)(TaskCore *self); /**< setFadeOutCallbackEnabled: NULL or tickFadeOut */ \
     /* +0x090 */ u8 baseColor[3];       /**< setColors; the fade-in's start colour */                \
     /* +0x093 */ u8 clearColor[3];      /**< setColors; onDeinit (clearOnDeinit set) and TitleMenu's clear the screen to it */                                            \
-    /* +0x096 */ u8 unk96[3];           /**< setColors (reset: 128 grey); no code reads it */                                            \
+    /* +0x096 */ u8 unusedColor[3];           /**< setColors (reset: 128 grey); no code reads it */                                            \
     /* +0x099 */ u8 pad099[3];                                                                     \
     /* +0x09C */ void (*exitCallback)(void *ctx); /**< setExitCallback; exit calls it */     \
     /* +0x0A0 */ void *exitCallbackCtx  /**< exitCallback's argument */
@@ -427,8 +427,8 @@ void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable);
  * @param self the task
  * @param base the new baseColor
  * @param clear the new clearColor
- * @param color96 the new unk96 */
-void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *clear, u8 *color96);
+ * @param unusedColor the new unusedColor */
+void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *clear, u8 *unusedColor);
 
 /** @brief Sets the colour step per frame of both fades.
  * @param self the task

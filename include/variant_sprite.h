@@ -44,7 +44,7 @@ typedef struct VariantSpriteMethods VariantSpriteMethods;
 #define VARIANTSPRITE_FIELDS(Methods)                                                              \
     SPRITE_FIELDS(Methods);                                                                        \
     /* +0x0A0 */ s32 variant; /* the ctor's first argument, 0 or 1 (SetVariantClut); never read */ \
-    /* +0x0A4 */ s32 unkA4    /* zeroed by the ctor; nothing else reads or writes it */
+    /* +0x0A4 */ s32 unusedA4    /* zeroed by the ctor; nothing else reads or writes it */
 /* clang-format on */
 
 /** @brief VariantSprite's method table (see VARIANTSPRITE_SLOTS). */
@@ -71,7 +71,7 @@ struct VariantSpriteMethods {
  * setDisplay, the semi-transparency pair, and sprite.rotate directly.
  *
  * Lifecycle: the ctor runs Sprite's ctor with the texture and the variant's
- * cell, installs this table, clears `unkA4` and calls reset with the
+ * cell, installs this table, clears `unusedA4` and calls reset with the
  * variant, which records it and replaces the CLUT Sprite's reset took from
  * the texture.
  */

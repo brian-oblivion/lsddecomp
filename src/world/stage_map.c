@@ -103,7 +103,7 @@ StageMapMethods gStageMapMethods = {
     /* +0x124 findSlotIndexByChunk */ StageMap__FindSlotIndexByChunk,
     /* +0x128 refreshFootprint */ StageMap__RefreshFootprint,
     /* +0x12C applyToSenderFootprint */ StageMap__ApplyToSenderFootprint,
-    /* +0x130 getUnk1CC */ StageMap__GetUnk1CC,
+    /* +0x130 getUnused1CC */ StageMap__GetUnused1CC,
     /* +0x134 setBounds */ StageMap__SetBounds,
     /* +0x138 startScaleRamp */ StageMap__StartScaleRamp,
     /* +0x13C stepScaleRamp */ StageMap__StepScaleRamp,
@@ -259,7 +259,7 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
         slot->loader->methods->setAutoLoadData(slot->loader, autoLoad);
 
         slot->heldObj = NULL;
-        slot->unk18 = 0;
+        slot->unused18 = 0;
         slot->neighbour = i;
         slot->loadPending = 0;
 
@@ -370,10 +370,10 @@ void StageMap__Reset(StageMap *self) {
     self->acceptedTags = NULL;
     self->rectCount = 0;
     self->methods->setGridSpan(self, sDefaultGridSpan);
-    self->unk1CC = -1;
-    self->unk1D0 = -1;
-    self->unk1D4 = -1;
-    self->unk1D8 = -1;
+    self->unused1CC = -1;
+    self->unused1D0 = -1;
+    self->unused1D4 = -1;
+    self->unused1D8 = -1;
 }
 
 void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *slot) {
@@ -1482,8 +1482,8 @@ void StageMap__SetFootprintVisible(StageMap *self, s32 visible) {
     }
 }
 
-void *StageMap__GetUnk1CC(StageMap *self) {
-    return &self->unk1CC;
+void *StageMap__GetUnused1CC(StageMap *self) {
+    return &self->unused1CC;
 }
 
 void StageMap__SetBounds(StageMap *self, CellBounds *bounds) {

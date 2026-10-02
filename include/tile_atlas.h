@@ -52,7 +52,7 @@ struct TileAtlas {
     /* +0x02C */ GsCELL *cells; /**< 300 of them, from TileAtlas__BuildCells; a TileMap's map.base */
     /* +0x030 */ u16 defaultCells; /**< 1 from the ctor when `source` is 0; BuildCells builds only when set */
     /* +0x032 */ u16 loaded; /**< 0 from the ctor, 1 from TileAtlas__Load after BuildCells */
-    /* +0x034 */ void *unk34; /**< 0 from the ctor and freed by Finalize; no TileAtlas method sets it */
+    /* +0x034 */ void *unused34; /**< 0 from the ctor and freed by Finalize; no TileAtlas method sets it */
 };
 
 /** @brief TileAtlas__BuildCells as TileAtlas__Load calls it through the
@@ -85,7 +85,7 @@ TileAtlas *New_TileAtlas(s32 source);
 void TileAtlas__TileAtlas(TileAtlas *self, s32 source);
 
 /**
- * @brief Finalizer (slot +0x00C): frees `unk34` and the cells, then the
+ * @brief Finalizer (slot +0x00C): frees `unused34` and the cells, then the
  *        active driver's finalizer.
  * @param self The object being destroyed.
  */

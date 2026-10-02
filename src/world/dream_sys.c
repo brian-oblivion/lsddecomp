@@ -1789,12 +1789,12 @@ void DreamSys__InitNewGame(DreamSys *self) {
     self->instanceFlashbackUnlockScore = 0;
     self->amountFlashbacksAvailable = 0;
     self->graphScored = 0;
-    self->unk5D8 = 0;
+    self->unused5D8 = 0;
     self->screenShakeOn = 1;
-    self->unk67C = 0;
-    self->unk680 = 0;
+    self->unused67C = 0;
+    self->unused680 = 0;
     InitNavChallengesArray(&self->navChallengesArray, &self->amountDynamicLinksDone);
-    memset(self->unk684, 0, sizeof(self->unk684));
+    memset(self->unused684, 0, sizeof(self->unused684));
 }
 
 void DreamSys__GetSetScreenShake(DreamSys *self, bool *value) {
@@ -2374,7 +2374,7 @@ void DreamSys__CalcUnlockScore(DreamSys *self) {
 }
 
 void DreamSys__AddFlashback(DreamSys *self, s32 stage, PlayerSpawnPoint *pos, s32 *angles,
-                            s32 unknown, s32 time, s32 day) {
+                            s32 unused, s32 time, s32 day) {
     FlashbackEntry *entry;
 
     entry = self->storedFlashbacks;
@@ -2387,19 +2387,19 @@ void DreamSys__AddFlashback(DreamSys *self, s32 stage, PlayerSpawnPoint *pos, s3
     entry->position = *pos;
     entry->rotation =
         *(FlashbackRotation *)angles; /* MATCHING: one struct assignment: every load before every store */
-    entry->unk1C = unknown;
+    entry->unused1C = unused;
     entry->timeLimit = time;
     entry->day = day;
 }
 
-void DreamSys__FlashbackSaving(DreamSys *self, s32 unknown, s32 timeLimit) {
+void DreamSys__FlashbackSaving(DreamSys *self, s32 unused, s32 timeLimit) {
     PlayerSpawnPoint *pos;
     s32 rotation[4];
 
     if (self->grid != NULL && rand() % 3 == 0) {
         pos = (PlayerSpawnPoint *)self->grid->methods->getTargetDescriptor(self->grid, 0, 0);
         SceneNode__GetRotationDegrees((SceneNode *)self, (Ratio16 *)rotation);
-        self->methods->addFlashback(self, self->currentStage, pos, rotation, unknown, timeLimit,
+        self->methods->addFlashback(self, self->currentStage, pos, rotation, unused, timeLimit,
                                     self->currentDay);
     }
 }

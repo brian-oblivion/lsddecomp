@@ -145,7 +145,7 @@ struct Ratio16 {
     /* +0x028 */ SceneNode *linkTarget; /* dispatchLinkCommand's SCENENODE_EVENT_LINKED sender; TryAttachNearby's hit */ \
     /* +0x02C */ s32 hitMask; /* RaycastHullAgainstFaces: one bit per model bounds box (own) or hull box (the other's) */ \
     /* +0x030 */ TmdHull *notifyVerts; /* TransformAndNotifyParents's hull, set only while the parents are notified */ \
-    /* +0x034 */ u16 unk34; /* zeroed by GridCell's ctor */ \
+    /* +0x034 */ u16 unused34; /* zeroed by GridCell's ctor */ \
     /* +0x036 */ u16 flags36; /* bit 0x80 tested by StageMap's NotifyGridCell; zeroed by GridCell's ctor */ \
     /* +0x038 */ void *nextInCell; /* StageMap's grid-cell chain; zeroed by GridCell's ctor */ \
     /* +0x03C */ u8 pad3C[8] /* the object is 0x44 bytes (New_SceneNode) */

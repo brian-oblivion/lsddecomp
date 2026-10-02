@@ -43,7 +43,7 @@ void TileAtlas__TileAtlas(TileAtlas *self, s32 source) {
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTileAtlasMethods();
-    self->unk34 = 0;
+    self->unused34 = 0;
     self->loaded = 0;
     if (source == 0) {
         self->defaultCells = 1;
@@ -52,10 +52,10 @@ void TileAtlas__TileAtlas(TileAtlas *self, s32 source) {
     }
 }
 
-/* finalize (+0x00C): free unk34 (which no method here sets) and the
+/* finalize (+0x00C): free unused34 (which no method here sets) and the
  * cells. */
 void TileAtlas__Finalize(TileAtlas *self) {
-    BMemPMgrFree(self->unk34);
+    BMemPMgrFree(self->unused34);
     BMemPMgrFree(self->cells);
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }

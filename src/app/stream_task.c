@@ -46,7 +46,7 @@ void StreamTask__Reset(StreamTask *self) {
     self->loopCount = -1;
     self->keepActive = 0;
     self->skipOnConfirm = 1;
-    self->unkD0 = 0;
+    self->unusedD0 = 0;
     self->abortBeforeFade = 1;
 }
 
@@ -152,8 +152,8 @@ void StreamTask__SetSkipOnConfirm(StreamTask *self, s32 enable) {
     self->skipOnConfirm = enable;
 }
 
-void StreamTask__SetUnkD0(StreamTask *self, s32 value) {
-    self->unkD0 = value;
+void StreamTask__SetUnusedD0(StreamTask *self, s32 value) {
+    self->unusedD0 = value;
 }
 
 void StreamTask__SetAbortBeforeFade(StreamTask *self, s32 enable) {
@@ -248,6 +248,6 @@ StreamTaskMethods gStreamTaskMethods = {
     /* +0x124 setKeepActive */ StreamTask__SetKeepActive,
     /* +0x128 setLoopCount */ StreamTask__SetLoopCount,
     /* +0x12C setSkipOnConfirm */ StreamTask__SetSkipOnConfirm,
-    /* +0x130 setUnkD0 */ StreamTask__SetUnkD0,
+    /* +0x130 setUnusedD0 */ StreamTask__SetUnusedD0,
     /* +0x134 setAbortBeforeFade */ StreamTask__SetAbortBeforeFade,
 };

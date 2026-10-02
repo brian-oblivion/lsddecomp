@@ -107,7 +107,7 @@ VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture) {
 void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetArg, void *texture) {
     GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &sVariantSpriteCells[variant], resetArg, 0);
     self->methods = GetVariantSpriteMethods();
-    self->unkA4 = 0;
+    self->unusedA4 = 0;
     ((VariantSpriteResetFn)self->methods->reset)(self, variant);
 }
 

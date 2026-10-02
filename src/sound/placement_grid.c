@@ -92,7 +92,7 @@ s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s
             placement->y = (s32)rec->y << STAGE_CELL_SHIFT;
             placement->z = (row << STAGE_CELL_SHIFT) + STAGE_CELL_SIZE / 2;
             placement->rotY = rec->rotY * ANGLE_DEG(90);
-            placement->unk2C = rec->unk1;
+            placement->unused2C = rec->unused1;
             placement->cellFlags = rec->cellFlags;
             model = rec->model;
             placement->model = model;

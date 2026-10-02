@@ -42,7 +42,7 @@ struct StreamTaskMethods {
     /* +0x124 */ void (*setKeepActive)(StreamTask *self, s32 keepActive); /**< @see StreamTask__SetKeepActive */
     /* +0x128 */ void (*setLoopCount)(StreamTask *self, s32 count); /**< @see StreamTask__SetLoopCount */
     /* +0x12C */ void (*setSkipOnConfirm)(StreamTask *self, s32 enable); /**< @see StreamTask__SetSkipOnConfirm; game_application.c passes 0 */
-    /* +0x130 */ void (*setUnkD0)(StreamTask *self, s32 value); /**< @see StreamTask__SetUnkD0 */
+    /* +0x130 */ void (*setUnusedD0)(StreamTask *self, s32 value); /**< @see StreamTask__SetUnusedD0 */
     /* +0x134 */ void (*setAbortBeforeFade)(StreamTask *self, s32 enable); /**< @see StreamTask__SetAbortBeforeFade */
 };
 
@@ -67,7 +67,7 @@ struct StreamTaskMethods {
  *  - +0x00C finalize, StreamTask__Finalize: releases the player, then
  *    TaskCore's.
  *  - +0x040 resetCounters, StreamTask__Reset: loopCount -1, keepActive 0,
- *    skipOnConfirm 1, unkD0 0, abortBeforeFade 1. No up-call to
+ *    skipOnConfirm 1, unusedD0 0, abortBeforeFade 1. No up-call to
  *    TaskCore__Reset.
  *  - +0x044 init, StreamTask__Init(args, streamName, streamGroup, autoPlay):
  *    stores the three, then TaskCore's init(args, 0). The slot keeps
@@ -113,7 +113,7 @@ struct StreamTask {
     /* +0x0C4 */ s32 keepActive; /**< setKeepActive; reset 0; play's keepActive (MoviePlayer::keepActive) */
     /* +0x0C8 */ s32 loopCount; /**< setLoopCount; reset -1; play's fourth argument, the player's `loops` */
     /* +0x0CC */ s32 skipOnConfirm; /**< setSkipOnConfirm; reset 1; OnPadConfirm: nonzero ends the task with result 2 */
-    /* +0x0D0 */ s32 unkD0; /**< setUnkD0; reset 0; no method of this class reads it */
+    /* +0x0D0 */ s32 unusedD0; /**< setUnusedD0 (never called); reset 0; nothing reads it */
     /* +0x0D4 */ s32 abortBeforeFade; /**< setAbortBeforeFade; reset 1; Exit aborts at once, else after the fade */
     /* +0x0D8 */ s32 fadingOut; /**< SetState: ACTIVE clears, FADE_OUT sets; Update skips its setState(FADE_OUT) when set */
 };
@@ -231,10 +231,10 @@ void StreamTask__SetLoopCount(StreamTask *self, s32 count);
  * @param enable nonzero: confirm skips */
 void StreamTask__SetSkipOnConfirm(StreamTask *self, s32 enable);
 
-/** @brief Sets unkD0, which no method of this class reads.
+/** @brief Sets unusedD0, which nothing reads; nothing calls it.
  * @param self the task
  * @param value the value */
-void StreamTask__SetUnkD0(StreamTask *self, s32 value);
+void StreamTask__SetUnusedD0(StreamTask *self, s32 value);
 
 /** @brief Sets whether exit aborts the player before the fade-out.
  * @param self the task

@@ -91,7 +91,7 @@ struct GridCellMethods {
  *    dispatchLinkCommand and runs tryAttachNearby for events 5..8 (the body
  *    of Actor__OnActorLinkCommand); +0x0BC returnSelf, no caller.
  *
- * Fields: none of its own. The ctor zeroes SceneNode's unk34, flags36 and
+ * Fields: none of its own. The ctor zeroes SceneNode's unused34, flags36 and
  * nextInCell. The object is 0x3C bytes (New_GridCell), shorter than
  * SceneNode's 0x44: the struct expands SCENENODE_FIELDS whole, so sizeof
  * overstates the allocation by SceneNode's trailing pad3C[8]. No code takes
@@ -121,7 +121,7 @@ GridCell *New_GridCell(void);
 /**
  * @brief Constructs a GridCell: SceneNode's ctor, GridCell's table, and an empty cell.
  *
- * Zeroes unk34, flags36 and nextInCell.
+ * Zeroes unused34, flags36 and nextInCell.
  * @param self the object to construct.
  */
 void GridCell__GridCell(GridCell *self);

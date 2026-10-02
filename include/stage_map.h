@@ -280,7 +280,7 @@ struct ChunkSlot {
     /* +0x00C */ struct GridCell *cellParent; /**< New_GridCell(), attached to the StageMap at `origin`; every cell's parent */
     /* +0x010 */ struct GridCell **cells; /**< STAGE_SLOT_CELLS New_GridCell() cells, row stride 20 */
     /* +0x014 */ BasicClass *heldObj; /**< zeroed by the ctor; OnSlotEvent releases it on SLOT_RELEASE */
-    /* +0x018 */ s32 unk18;           /**< zeroed by the ctor */
+    /* +0x018 */ s32 unused18;        /**< zeroed by the ctor */
 };
 
 /** The ctor's callback pair (setCallback): ComputeChunkLoadEntry calls
@@ -346,7 +346,7 @@ struct StageMapMethods {
     /* +0x128 */ void (*refreshFootprint)(StageMap *self); /**< @see StageMap__RefreshFootprint */
     /* +0x12C */ void (*applyToSenderFootprint)(StageMap *self, SceneNode *sender,
                                                 s32 command); /**< @see StageMap__ApplyToSenderFootprint */
-    /* +0x130 */ void *(*getUnk1CC)(StageMap *self);          /**< @see StageMap__GetUnk1CC */
+    /* +0x130 */ void *(*getUnused1CC)(StageMap *self); /**< @see StageMap__GetUnused1CC */
     /* +0x134 */ void (*setBounds)(StageMap *self, CellBounds *bounds); /**< @see StageMap__SetBounds */
     /* +0x138 */ void (*startScaleRamp)(StageMap *self, s32 rate, s32 fast); /**< @see StageMap__StartScaleRamp */
     /* +0x13C */ void (*stepScaleRamp)(StageMap *self); /**< @see StageMap__StepScaleRamp */
@@ -442,10 +442,10 @@ struct StageMap {
     /* +0x1BC */ ChunkSlot *lastEventSlot; /**< OnSlotEvent's slot; GetLastEventSlotChunk reads it */
     /* +0x1C0 */ Descriptor10 curCell; /**< DispatchToRectCells: the cell being notified; getCurrentCellKey returns it */
     /* +0x1CA */ u8 pad1CA[0x1CC - 0x1CA];
-    /* +0x1CC */ s32 unk1CC;         /**< Reset: -1; GetUnk1CC returns its address */
-    /* +0x1D0 */ s32 unk1D0;         /**< Reset: -1 */
-    /* +0x1D4 */ s32 unk1D4;         /**< Reset: -1 */
-    /* +0x1D8 */ s32 unk1D8;         /**< Reset: -1 */
+    /* +0x1CC */ s32 unused1CC; /**< Reset: -1; GetUnused1CC (never called) returns its address */
+    /* +0x1D0 */ s32 unused1D0; /**< Reset: -1 */
+    /* +0x1D4 */ s32 unused1D4; /**< Reset: -1 */
+    /* +0x1D8 */ s32 unused1D8; /**< Reset: -1 */
     /* +0x1DC */ CellBounds *bounds; /**< setBounds; IsPointOutOfBounds */
     /* +0x1E0 */ s32 scaleRampTicks; /**< startScaleRamp: |rate| * the step's y den; stepScaleRamp counts it down (-1 when done), endScaleRamp zeroes it */
     /* +0x1E4 */ Ratio16 *scaleStep; /**< startScaleRamp: one of four Ratio16[3] steps (x, y, z) stepScaleRamp adds to every cell's scale; only y is nonzero */
@@ -511,7 +511,7 @@ void StageMap__OnNotify(StageMap *self, BasicClass *sender, s32 command);
 /**
  * @brief reset (slot +0x040): forgets the config and accepted tags, empties
  *        the drawn window, restores the default grid span and sets
- *        unk1CC..unk1D8 to -1.
+ *        unused1CC..unused1D8 to -1.
  * @param self The map.
  */
 void StageMap__Reset(StageMap *self);
@@ -991,11 +991,11 @@ s32 StageMap__InitFootprintRect(StageMap *self, s32 unused, s32 index, s32 chunk
 void StageMap__SetFootprintVisible(StageMap *self, s32 visible);
 
 /**
- * @brief getUnk1CC (slot +0x130).
+ * @brief getUnused1CC (slot +0x130); nothing calls it.
  * @param self The map.
- * @return &unk1CC, the first of the four words Reset sets to -1.
+ * @return &unused1CC, the first of the four words Reset sets to -1.
  */
-void *StageMap__GetUnk1CC(StageMap *self);
+void *StageMap__GetUnused1CC(StageMap *self);
 
 /**
  * @brief setBounds (slot +0x134): the box SetFootprintFromQuery tests the

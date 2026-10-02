@@ -174,7 +174,7 @@ void FileResource__FreeBuffer(FileResource *self);
  * Bits CdDriver__RunRequestQueue (cd_driver.c) ORs into a client's `flags`
  * when one of its requests completes; the clients poll them. Bit 0 (1) is
  * left a literal: it is also FileResource__OnRequestDone's bit, and the
- * queue node field that sets it (`unk4`) has no established meaning. @{ */
+ * queue node field that would set it (`unused4`) is never set. @{ */
 #define CD_FLAG_DONE 0x002           /**< some request completed */
 #define CD_FLAG_NONE_PENDING 0x004   /**< ... and pendingRequests reached 0 */
 #define CD_FLAG_OPEN_DONE 0x010      /**< an open request completed */

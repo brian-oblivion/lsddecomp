@@ -342,7 +342,7 @@ void CdDriver__RunRequestQueue(void) {
             }
             self->inQueueDispatch = 0;
         } else if (sCdIdle != 0) {
-            if (node->unk4 != 0) {
+            if (node->unused4 != 0) {
                 self->flags |= 1;
             }
             self->pendingRequests -= 1;
@@ -699,7 +699,7 @@ CdRequestNode *AllocCdRequestNode(void) {
         node->prev = NULL;
         node->next = NULL;
         node->active = 0;
-        node->unk4 = 0;
+        node->unused4 = 0;
         if (head != NULL) {
             cur = head;
             while (cur->next != NULL) {
