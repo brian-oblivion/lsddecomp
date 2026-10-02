@@ -129,11 +129,12 @@ static s32 sNdivOverrideSet SDATA = 1;
 static s32 sNdivOverride SDATA = 2;
 
 /* The two subdivision work buffers the SubmitPoly* wrappers hand Sony's
- * RCpoly* packers, a DIVPOLYGON3 and a DIVPOLYGON4 back to back (0x218
- * bytes apart, sizeof(DIVPOLYGON3)). Declared as bytes: InitDivPolygonPtrs
- * takes their addresses and the wrappers cast. */
-extern u8 sDivPolygon3[];
-extern u8 sDivPolygon4[];
+ * RCpoly* packers, a DIVPOLYGON3 and a DIVPOLYGON4 back to back, zeroed.
+ * Declared as bytes: InitDivPolygonPtrs takes their addresses and the
+ * wrappers cast. They are the last .sbss, and sDivPolygon4 runs past the
+ * end of the file image, which stops at its header's text size. */
+static u8 sDivPolygon3[sizeof(DIVPOLYGON3)] SBSS = {0};
+static u8 sDivPolygon4[sizeof(DIVPOLYGON4)] SBSS = {0};
 
 /* Defined at the bottom of this file, after SortTmdObject and
  * ProjectQuadFace, which call them. The submit wrappers link the finished

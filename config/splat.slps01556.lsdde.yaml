@@ -2069,5 +2069,5 @@ segments:
       - [0x7B4A4, .sbss, world/style_effect]  # its model, TIM, viewport and base view height
       - [0x7B4B4, .sbss, world/dream_sys]  # the navigation arrays, the last stage link
       - [0x7B4CC, .sbss, world/entity]  # CueStepForwardAndBack's done flag
-      - [0x7B4D0, sbss]
+      - [0x7B4D0, .sbss, graphics/tmd_renderer]  # the DIVPOLYGON3 and DIVPOLYGON4 work buffers; run past the file's end
   - [0x7B800]

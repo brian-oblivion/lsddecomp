@@ -86,6 +86,26 @@ def short_data_tails():
     return out
 
 
+def sbss_overruns():
+    """{unit: bytes} for the `.sbss` subsegment that ends the image. The file
+    stops at its header's text size (tools/exe_trim.py), inside that unit's
+    last object (TmdRenderer's sDivPolygon4), so splat disassembles only the
+    part in the file. The object really ends at the first symbols-file
+    address past the file's end; assemble() adds the missing zeros."""
+    rows = [(int(m.group(1), 16), m.group(2), m.group(3)) for m in re.finditer(
+        r"^\s*- \[0x([0-9A-Fa-f]+)(?:,\s*(\.?\w+))?(?:,\s*([\w/]+))?", YAML.read_text(), re.M)]
+    (start, ty, name), (end, _, _) = rows[-2], rows[-1]
+    if ty != ".sbss":
+        return {}
+    vram = end - 0x800 + 0x80010000
+    past = [int(a, 16) for a in re.findall(r"^\w+\s*=\s*(0x[0-9A-Fa-f]+)\s*;",
+                                           (ROOT / "config/symbols.slps01556.lsdde.txt").read_text(), re.M)
+            if int(a, 16) >= vram]
+    if not past:
+        sys.exit(f"FATAL: no symbol past the image's end {vram:#x} to end {name}'s .sbss")
+    return {name: min(past) - vram}
+
+
 WIDTH = {".byte": 1, ".short": 2, ".half": 2, ".word": 4}
 
 
@@ -125,7 +145,7 @@ def local_data(base):
             if len(f) == 3 and f[1] in "bdgrsv" and not f[2].startswith(".")}
 
 
-def assemble(src, obj, tails=(), statics=()):
+def assemble(src, obj, tails=(), statics=(), overrun=0):
     """Assemble retail's disassembly with the Makefile's own as and flags."""
     as_ = makevar("CROSS") + "as"
     flags = makevar("AS_FLAGS").split()
@@ -136,6 +156,10 @@ def assemble(src, obj, tails=(), statics=()):
         exe = (ROOT / "disk" / VERSION).read_bytes()
         for start, end, ty in tails:
             lines = restore_tail(lines, start, end, ty, exe)
+    if overrun:
+        # inside the last object's label, so its size takes the zeros too
+        last = max(i for i, l in enumerate(lines) if l.startswith("enddlabel "))
+        lines[last:last] = [f"    .space 0x{overrun:X}\n"]
     text = "".join(l for l in lines if not l.lstrip().startswith("nonmatching "))
     # Data sizes: GCC 2.6.3 emits no `.size` for data, so objdiff extends each
     # base data symbol to the next symbol. splat's `enddlabel` gives retail's
@@ -200,7 +224,7 @@ def main():
     if r.returncode:
         sys.exit(f"FATAL: splat split of the derived config:\n{(r.stdout + r.stderr)[-2000:]}")
 
-    units, tails = [], short_data_tails()
+    units, tails, overruns = [], short_data_tails(), sbss_overruns()
     for _, _, ty, name in unitfile.seg_rows(unitfile.yaml_lines()):
         if ty not in ("c", "asm", "o"):
             continue
@@ -218,7 +242,7 @@ def main():
             if ty == "c" and not base.exists():
                 sys.exit(f"FATAL: {base.relative_to(ROOT)} missing; run ./build-and-verify.sh first")
             assemble(OUT / "asm" / f"{name}.s", tobj, tails.get(name, ()),
-                     local_data(base) if ty == "c" else ())
+                     local_data(base) if ty == "c" else (), overruns.get(name, 0))
             unit["target_path"] = tobj.relative_to(ROOT).as_posix()
             if ty == "c":
                 unit["base_path"] = base.relative_to(ROOT).as_posix()

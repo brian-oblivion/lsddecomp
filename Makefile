@@ -93,8 +93,11 @@ check:
 	sha1sum --check build.sha1
 
 # --- link ------------------------------------------------------------------
+# The image ends where its header says (tools/exe_trim.py): the last .sbss
+# object runs past it, and only its zeros are cut.
 $(EXE): $(ELF)
 	$(OBJCOPY) -O binary $< $@
+	$(PYTHON) tools/exe_trim.py $@
 
 # psyq-objects.ld goes FIRST: it claims the Sony objects' bss sections (NOLOAD,
 # pinned) before the splat script's trailing /DISCARD/ would swallow them.
