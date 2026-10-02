@@ -32,12 +32,49 @@
  * OpenEvent, and the value WaitForReadyEvent returns for that slot. */
 extern s32 sCardEventSpecs[4];
 
-extern McDevicePath sMcDevicePath1; /* "bu10:" */
-extern McDevicePath sMcDevicePath0; /* "bu00:" */
+/* The full-width letters a..o, then three full-width spaces and "Day", in
+ * the image's read-only data. */
+extern FullWidthChar sSaveTitleGlyphTable[];
+
+/* TaskObjF's small data, in address order. */
 
 /* TaskObjF__TaskObjF's construction count: InitCARD/StartCARD/_bu_init run
  * only on the first construction, when it was 0 before the increment. */
-extern s32 sTaskObjFCount;
+static s32 sTaskObjFCount SDATA = 0;
+
+/* The message icons' names, CARD\<name>.TIM, that are small data; the
+ * other three ("NOCONECT", "SAVEEMPT", "NOTFOUND") are read-only data.
+ * sCardIconNames lists them all by state. */
+static char sLoadErrorIconName[] SDATA = "LOADERR";
+static char sLoadingIconName[] SDATA = "LOADING";
+static char sLoadWarningIconName[] SDATA = "LOADWAR";
+static char sSaveErrorIconName[] SDATA = "SAVEERR";
+static char sSavingIconName[] SDATA = "SAVING";
+static char sSaveOverwriteIconName[] SDATA = "SAVEWAR";
+static char sFormatErrorIconName[] SDATA = "FORMERR";
+static char sFormattingIconName[] SDATA = "FORMING";
+static char sUnformattedSaveIconName[] SDATA = "UNFORM2";
+static char sUnformattedLoadIconName[] SDATA = "UNFORM1";
+static char sCardChangedIconName[] SDATA = "CHANGE";
+static char sCardErrorIconName[] SDATA = "ERROR";
+
+/* Where TaskObjF__LoadCardIcon attaches the message icon, percent of half
+ * the screen from the centre. */
+static ScreenSpritePos sCardIconPos SDATA = {-70, -60};
+
+/* The two card slots' device names. */
+static McDevicePath sMcDevicePath1 SDATA = {'b', 'u', '1', '0', ':', '\0'};
+static McDevicePath sMcDevicePath0 SDATA = {'b', 'u', '0', '0', ':', '\0'};
+
+/* "TEMP": the name TaskObjF__ProbeCardFreeSpace creates to test for space. */
+static char sMcTempFileSuffix[] SDATA = "TEMP";
+
+/* TaskObjF__LoadCardIcon's path parts: CARD\<name>.TIM. */
+static char sTitleCardPathPrefix[] SDATA = "CARD\\";
+static char sCardPathSuffix[] SDATA = ".TIM";
+
+/* StampSaveTitleFileLetter's glyphs (see SAVE_TITLE_GLYPH_SPACES below). */
+static FullWidthChar *sSaveTitleGlyphs SDATA = sSaveTitleGlyphTable;
 
 TaskObjF *New_TaskObjF(s32 padEnable, s32 cardSlot) {
     TaskObjF *self;
@@ -86,9 +123,6 @@ void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
 /* Defined below, after the file I/O: writes the device name into `dest`,
  * appends `suffix`, and returns `dest`. */
 char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix);
-
-/* "TEMP": the name TaskObjF__ProbeCardFreeSpace creates to test for space. */
-extern char sMcTempFileSuffix[];
 
 void TaskObjF__ClearLinks(TaskObjF *self) {
     self->inputSource = NULL;
@@ -852,12 +886,8 @@ void TaskObjF__SetState(TaskObjF *self, s32 state) {
  * ("NOCONECT" .. "LOADERR" for states 2..16). */
 #define CARD_ICON_COUNT (TASKOBJF_STATE_EDIT_TITLE - TASKOBJF_STATE_NO_CARD)
 extern char *sCardIconNames[CARD_ICON_COUNT];
-extern char sTitleCardPathPrefix[]; /* "CARD\\" */
-extern char sCardPathSuffix[];      /* ".TIM" */
 /* {0, 0, 160, 120} */
 extern SpriteRect sCardIconRect;
-/* (-70, -60), percent of half the screen from the centre */
-extern ScreenSpritePos sCardIconPos;
 
 void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
     char pathBuf[32];
@@ -1091,8 +1121,6 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
  * the first digit of NN. */
 #define SAVE_FILE_NAME_NUMBER 13
 
-extern FullWidthChar *sSaveTitleGlyphs;
-
 /* Writes a save file's letter into the full-width `title`: the letter
  * field becomes a space, the letter for the file name's -NN (a for -01 ..
  * o for -15) and a space, followed by "Day", and a space goes after the day
@@ -1181,22 +1209,10 @@ TaskObjFMethods gTaskObjFMethods = {
 s32 sCardEventSpecs[4] = {EvSpIOE, EvSpERROR, EvSpTIMOUT, EvSpNEW};
 
 /* The message icons' names, CARD\<name>.TIM, for states NO_CARD to
- * LOAD_ERROR. */
-extern char sNoCardIconName[];          /* "NOCONECT" */
-extern char sCardErrorIconName[];       /* "ERROR" */
-extern char sCardChangedIconName[];     /* "CHANGE" */
-extern char sUnformattedLoadIconName[]; /* "UNFORM1" */
-extern char sUnformattedSaveIconName[]; /* "UNFORM2" */
-extern char sFormattingIconName[];      /* "FORMING" */
-extern char sFormatErrorIconName[];     /* "FORMERR" */
-extern char sSaveNoSpaceIconName[];     /* "SAVEEMPT" */
-extern char sSaveOverwriteIconName[];   /* "SAVEWAR" */
-extern char sSavingIconName[];          /* "SAVING" */
-extern char sSaveErrorIconName[];       /* "SAVEERR" */
-extern char sLoadNotFoundIconName[];    /* "NOTFOUND" */
-extern char sLoadWarningIconName[];     /* "LOADWAR" */
-extern char sLoadingIconName[];         /* "LOADING" */
-extern char sLoadErrorIconName[];       /* "LOADERR" */
+ * LOAD_ERROR; these three are read-only data, the rest small data. */
+extern char sNoCardIconName[];       /* "NOCONECT" */
+extern char sSaveNoSpaceIconName[];  /* "SAVEEMPT" */
+extern char sLoadNotFoundIconName[]; /* "NOTFOUND" */
 
 /* clang-format off */
 char *sCardIconNames[CARD_ICON_COUNT] = {

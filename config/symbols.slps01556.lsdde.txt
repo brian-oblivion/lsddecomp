@@ -3359,3 +3359,4 @@ sTitleMenuUnusedPosA = 0x8008A9BC;
 sTitleMenuUnusedPosB = 0x8008A9C4;
 sTitleMenuUnusedWord = 0x8008A9CC;
 sDayDigitsText = 0x8008AA1C;
+sSaveTitleGlyphTable = 0x80011550;
