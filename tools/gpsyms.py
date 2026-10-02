@@ -33,8 +33,9 @@ FILE_BASE, VRAM_BASE = 0x800, 0x80010000
 LABEL = re.compile(r'^(?:dlabel|glabel)\s+(\S+)')
 SEG = re.compile(r'^\s*- \[\s*(0x[0-9A-Fa-f]+)\s*(?:,\s*([.\w]+)\s*)?(?:,\s*([\w/]+)\s*)?[,\]]')
 SYMLINE = re.compile(r'^\s*([A-Za-z_]\w*)\s*=\s*(0x[0-9A-Fa-f]+)\s*;')
-# `static s32 sName SDATA = ...;`, `ColorRgb sName[2] SBSS;`, one per line
-C_DEF = re.compile(r'^[\w\s\*]*?\b([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*(SDATA|SBSS)\b', re.M)
+# `static s32 sName SDATA = ...;`, `ColorRgb sName[2] SBSS;`, one per line;
+# also a pointer to an array, `s8 (*gpName)[30] SBSS = NULL;`
+C_DEF = re.compile(r'^[\w\s\*]*?(?:\(\s*\*\s*)?\b([A-Za-z_]\w*)\s*\)?\s*(?:\[[^\]]*\]\s*)*(SDATA|SBSS)\b', re.M)
 
 
 def asm_labels():
