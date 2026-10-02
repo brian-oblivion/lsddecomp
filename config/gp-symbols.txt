@@ -3,7 +3,6 @@
 # .sdata/.sbss ranges in config/splat.slps01556.lsdde.yaml. maspsx
 # --gp-symbols addresses these off $gp. Regenerate after any
 # sdata/sbss carve.
-D_8008AA1C
 D_8008AB2C
 D_8008AC24
 D_8008AC50
@@ -52,6 +51,7 @@ sCueBlueSkyClearColor
 sCueStepForwardAndBackDone
 sDataDirectory
 sDayDigits
+sDayDigitsText
 sDefaultBMemPMgr
 sDefaultDataDirectory
 sDefaultDataDirectoryName
@@ -216,6 +216,9 @@ sTitleMenuLoadName
 sTitleMenuSaveName
 sTitleMenuShakeName
 sTitleMenuStartName
+sTitleMenuUnusedPosA
+sTitleMenuUnusedPosB
+sTitleMenuUnusedWord
 sTmdModelBoundsCount
 sUnformattedLoadIconName
 sUnformattedSaveIconName

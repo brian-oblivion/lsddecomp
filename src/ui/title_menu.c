@@ -42,48 +42,91 @@ extern const char sSaveIconTimPath[];
  * TitleMenu__OnDeinit clears each with the DrawSystem's clearImage. */
 extern DrawRect sDisplayBufferRects[2];
 
-/* TitleMenu__AttachSaveTitle's position for the save title's attachToParent
- * (-4, -23: percent of half the screen from the centre). A TextRow's
- * position is a ScreenSpritePos (include/text_row.h), passed through
- * SceneNode's LongVec3 slot. */
-extern struct ScreenSpritePos sSaveTitleOffset;
+/* The product code and the save file's name and title, in the image's
+ * read-only data; the code writes through the pointers below all the same
+ * (SaveToCard empties the name, StampSaveTitleDay writes the day). */
+extern char sCardFilePrefixText[];  /* "BISLPS-01556" */
+extern char sSaveFileNameText[];    /* "BISLPS-01556xxx" */
+extern char sSaveTitleBlanksText[]; /* 19 full-width spaces */
+extern char sSaveTitleText[];       /* the full-width "LSD   Day001", 19 spaces */
 
-/*
- * The save file's name and title, as TaskObjF's beginSave/beginLoad take
- * them (`fileName`, `title`): TitleMenu__SaveToCard and
- * TitleMenu__LoadFromCard pass both. sSaveFileName points at
- * "BISLPS-01556xxx", which SaveToCard empties on a new game; sSaveTitle at
- * the full-width "LSD   Day001" followed by 19 full-width spaces, which
- * TitleMenu__CreateSaveTitle reblanks from its 12th character on a new game
- * and StampSaveTitleDay writes the day into.
- */
-extern char *sSaveFileName;
-extern char *sSaveTitle;
+/* TitleMenu's small data, in address order. Positions are percent of half
+ * the screen from the centre (include/screen_sprite.h). */
 
-/* The buffer StampSaveTitleDay formats the day into
- * (FormatFullWidthNumber) before copying it into sSaveTitle's title; it
- * starts as the string "7654321". */
-extern void *sDayDigits;
+/* The menu's slot names and SHAKE's two settings. Plain char: the tables'
+ * fields are char *. */
+static char sShakeOnName[] SDATA = "On";
+static char sShakeOffName[] SDATA = "Off";
+static char sTitleMenuShakeName[] SDATA = "SHAKE";
+static char sTitleMenuGraphName[] SDATA = "GRAPH";
+static char sTitleMenuLoadName[] SDATA = "LOAD";
+static char sTitleMenuSaveName[] SDATA = "SAVE";
+static char sTitleMenuStartName[] SDATA = "START";
 
-/* 19 full-width spaces, the tail TitleMenu__CreateSaveTitle copies over
- * sSaveTitle's on a new game (the ROM image points it just past
- * sSaveFileName's string). */
-extern char *sSaveTitleBlanks;
+/* TitleMenu__AttachSaveTitle's position for the save title's attachToParent.
+ * A TextRow's position is a ScreenSpritePos (include/text_row.h), passed
+ * through SceneNode's LongVec3 slot. */
+static ScreenSpritePos sSaveTitleOffset SDATA = {-4, -23};
+
+/* MATCHING: two more positions and a word nothing reads follow it in
+ * retail's .sdata. */
+static ScreenSpritePos sTitleMenuUnusedPosA SDATA = {-62, -80};
+static ScreenSpritePos sTitleMenuUnusedPosB SDATA = {-22, -80};
+static s32 sTitleMenuUnusedWord SDATA = 0xFFFF;
 
 /* TaskObjF's init `namePrefix` (TitleMenu__BeginCardAccess): the product
- * code "BISLPS-01556", a string of its own 16 bytes before sSaveFileName's. */
-extern char *sCardFilePrefix;
+ * code, a string of its own 16 bytes before sSaveFileName's. */
+static char *sCardFilePrefix SDATA = sCardFilePrefixText;
 
 /* TaskObjF's init `nameSuffixes` (TitleMenu__BeginCardAccess): the 15 file
  * suffixes "-01" to "-15", then NULL. */
 extern char *sSaveFileSuffixes[];
 
-/* TitleMenu__CycleSaveTitleColor's index (0, 1, 2) into its 3-byte colour,
- * read and written as a byte of a word. */
-extern u8 sSaveTitleColorChannel;
+/* The save files' suffixes, stored "-15" down to "-01";
+ * sSaveFileSuffixes lists them up. */
+static char sSaveFileSuffix15[] SDATA = "-15";
+static char sSaveFileSuffix14[] SDATA = "-14";
+static char sSaveFileSuffix13[] SDATA = "-13";
+static char sSaveFileSuffix12[] SDATA = "-12";
+static char sSaveFileSuffix11[] SDATA = "-11";
+static char sSaveFileSuffix10[] SDATA = "-10";
+static char sSaveFileSuffix09[] SDATA = "-09";
+static char sSaveFileSuffix08[] SDATA = "-08";
+static char sSaveFileSuffix07[] SDATA = "-07";
+static char sSaveFileSuffix06[] SDATA = "-06";
+static char sSaveFileSuffix05[] SDATA = "-05";
+static char sSaveFileSuffix04[] SDATA = "-04";
+static char sSaveFileSuffix03[] SDATA = "-03";
+static char sSaveFileSuffix02[] SDATA = "-02";
+static char sSaveFileSuffix01[] SDATA = "-01";
 
-/* TitleMenu__CycleSaveTitleColor's frame counter (wraps to 0 at 0x101). */
-extern s32 sSaveTitleColorFrame;
+/*
+ * The save file's name and title, as TaskObjF's beginSave/beginLoad take
+ * them (`fileName`, `title`): TitleMenu__SaveToCard and
+ * TitleMenu__LoadFromCard pass both. sSaveFileName starts as
+ * "BISLPS-01556xxx", which SaveToCard empties on a new game; sSaveTitle as
+ * the full-width "LSD   Day001" followed by 19 full-width spaces, which
+ * TitleMenu__CreateSaveTitle reblanks from its 12th character on a new game
+ * and StampSaveTitleDay writes the day into.
+ */
+static char *sSaveFileName SDATA = sSaveFileNameText;
+
+/* 19 full-width spaces, the tail TitleMenu__CreateSaveTitle copies over
+ * sSaveTitle's on a new game (just past sSaveFileName's string). */
+static char *sSaveTitleBlanks SDATA = sSaveTitleBlanksText;
+
+static char *sSaveTitle SDATA = sSaveTitleText;
+
+/* The buffer StampSaveTitleDay formats the day into
+ * (FormatFullWidthNumber) before copying it into sSaveTitle's title; it
+ * starts as "7654321". */
+static char sDayDigitsText[] SDATA = "7654321";
+static void *sDayDigits SDATA = sDayDigitsText;
+
+/* TitleMenu__CycleSaveTitleColor's index (0, 1, 2) into its 3-byte colour,
+ * and its frame counter (wraps to 0 at 0x101); both start at 0. */
+static u8 sSaveTitleColorChannel SDATA = 0;
+static s32 sSaveTitleColorFrame SDATA = 0;
 
 TitleMenu *New_TitleMenu(struct DreamSys *dreamSys) {
     TitleMenu *self;
@@ -498,16 +541,9 @@ TitleMenuMethods gTitleMenuMethods = {
     /* +0x138 onCardEvent */ TitleMenu__OnCardEvent,
 };
 
-/* The title menu's strings. They are the image's read-only data and small
- * data, declared plain char because the tables' fields are char *. */
-extern char sTitleMenuStartName[];      /* "START" */
+/* The title menu's read-only strings. FLASHBACK's is plain char because the
+ * tables' fields are char *. */
 extern char sTitleMenuFlashbackName[];  /* "FLASHBACK" */
-extern char sTitleMenuSaveName[];       /* "SAVE" */
-extern char sTitleMenuLoadName[];       /* "LOAD" */
-extern char sTitleMenuGraphName[];      /* "GRAPH" */
-extern char sTitleMenuShakeName[];      /* "SHAKE" */
-extern char sShakeOffName[];            /* "Off" */
-extern char sShakeOnName[];             /* "On" */
 extern const char sTitleMenuFontPath[]; /* "ETC\FONTICON.TIM" */
 
 /* SHAKE's two settings, the item list its slot opens. */
@@ -564,23 +600,6 @@ TaskCoreTarget sTitleMenuTarget = {
     sTitleMenuSlotPositions,
     sTitleMenuSlotLists,
 };
-
-/* The save files' suffixes, "-01" to "-15". */
-extern char sSaveFileSuffix01[]; /* "-01" */
-extern char sSaveFileSuffix02[]; /* "-02" */
-extern char sSaveFileSuffix03[]; /* "-03" */
-extern char sSaveFileSuffix04[]; /* "-04" */
-extern char sSaveFileSuffix05[]; /* "-05" */
-extern char sSaveFileSuffix06[]; /* "-06" */
-extern char sSaveFileSuffix07[]; /* "-07" */
-extern char sSaveFileSuffix08[]; /* "-08" */
-extern char sSaveFileSuffix09[]; /* "-09" */
-extern char sSaveFileSuffix10[]; /* "-10" */
-extern char sSaveFileSuffix11[]; /* "-11" */
-extern char sSaveFileSuffix12[]; /* "-12" */
-extern char sSaveFileSuffix13[]; /* "-13" */
-extern char sSaveFileSuffix14[]; /* "-14" */
-extern char sSaveFileSuffix15[]; /* "-15" */
 
 /* clang-format off */
 char *sSaveFileSuffixes[] = {
