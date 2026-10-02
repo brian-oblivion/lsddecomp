@@ -45,8 +45,16 @@ GameApplicationConfig sGameApplicationConfig = {
 #define CONSOLE_RAM_MB 2
 
 /* Bytes of blocks in the game's one BMemPMgr pool, BMemPMgrInit's poolSize
- * (0x166C00): every BMemPMgrAlloc in the game is carved from it. */
+ * (0x166C00 on the PS1): every BMemPMgrAlloc in the game is carved from it. */
+#ifdef HOST_BUILD
+/* The host's primitives and ordering tables are larger than the console's
+ * (psyz's tags are two words), so the console's pool runs out: the first
+ * dream's 194 KB texture read buffer could not be had. 4 MB is room
+ * enough; nothing in the game depends on an allocation failing. */
+#define DEFAULT_POOL_SIZE (4096 * 1024)
+#else
 #define DEFAULT_POOL_SIZE (1435 * 1024)
+#endif
 
 void main(void) {
     DrawSystem *drawSystem;

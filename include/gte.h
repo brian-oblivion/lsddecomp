@@ -449,12 +449,12 @@
 
 /**
  * @brief Reads the FLAG control register (control 31), keeps bit 18
- * (0x40000, the SZ3/OTZ saturation flag Sony's macro tests) and stores it at
- * `r1`. Operand: `r1` by "r"; clobbers general registers 12 and 13 and
- * memory.
+ * (0x40000, the SZ3/OTZ saturation flag) and stores it at `r1`: Sony's
+ * gte_stflg_4, not gte_stflg, which stores the whole register. Operand:
+ * `r1` by "r"; clobbers general registers 12 and 13 and memory.
  */
 /* clang-format off */
-#define gte_stflg(r1) \
+#define gte_stflg_4(r1) \
     __asm__ volatile ( \
         "cfc2 $12, $31\n\t" \
         "addi $13, $zero, 0x4\n\t" \
