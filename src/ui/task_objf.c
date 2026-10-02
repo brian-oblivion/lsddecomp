@@ -19,7 +19,14 @@
 #include "tim_image.h"
 #include "task_objf.h"
 #include <kernel.h>
+#ifdef PLATFORM_PC
+/* psyz declares the kernel's file, event and card calls in libapi.h, and
+ * has delete() under its later Psy-Q name. */
+#include <libapi.h>
+#define delete erase
+#else
 #include <sys/file.h>
+#endif
 #include "pad.h"
 #include "frame_clock.h"
 #include "text_entry.h"
@@ -330,7 +337,7 @@ s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destTitle, char *suff
     McSaveHeader *header;
 
     path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, suffix);
-    handle = open(path, O_RDONLY);
+    handle = open(path, FREAD);
     if (handle == -1) {
         return 0;
     }
@@ -398,7 +405,7 @@ s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size) {
     /* MATCHING: the u32 cast makes it an unsigned shift, as retail's is. */
     blocks = (u32)(size + MEMCARD_SAVE_HEADER_SIZE + MEMCARD_BLOCK_SIZE - 1) >> MEMCARD_BLOCK_SHIFT;
     path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, sMcTempFileSuffix);
-    handle = open(path, MEMCARD_OPEN_BLOCKS(blocks) | O_CREAT);
+    handle = open(path, MEMCARD_OPEN_BLOCKS(blocks) | FCREAT);
     if (handle == -1) {
         return 0;
     }
@@ -454,7 +461,7 @@ s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32
     u8 iconFlag;
 
     path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, suffix);
-    handle = open(path, O_RDONLY);
+    handle = open(path, FREAD);
     if (handle == -1) {
         return 0;
     }
@@ -511,14 +518,14 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
     delete (path);
     openMode = MEMCARD_OPEN_BLOCKS(((u32)size + (MEMCARD_SAVE_HEADER_SIZE + MEMCARD_BLOCK_SIZE - 1)) >>
                                    MEMCARD_BLOCK_SHIFT) |
-               O_CREAT;
+               FCREAT;
     fileHandle = open(path, openMode);
     if (fileHandle == -1) {
         printf(sFileNotCreatedMsg);
         return 0;
     }
     close(fileHandle);
-    fileHandle = open(path, O_WRONLY);
+    fileHandle = open(path, FWRITE);
     if (fileHandle == -1) {
         return 0;
     }

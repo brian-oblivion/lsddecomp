@@ -88,7 +88,11 @@ u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
     return dst;
 }
 
-/* Sony's itoa (libc2): the decimal digits of `n`, in the library's own buffer. */
+/* Sony's itoa (libc2): the decimal digits of `n`, in the library's own buffer.
+ * psyz's libc.h renames it, away from the host C library's itoa. */
+#ifdef PLATFORM_PC
+#include <libc.h>
+#endif
 extern char *itoa(int n);
 
 /* MATCHING: the declaration order text/fill/padded and `fill` set in two

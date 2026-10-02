@@ -19,6 +19,9 @@
 #include "bmem_pmgr.h"
 #include "data_source.h"
 #include <kernel.h>
+#ifdef PLATFORM_PC
+#include <libapi.h> /* SetMem: psyz declares it here, not in kernel.h */
+#endif
 
 /* The game's one BMemPMgr pool and the root GameApplication, both made
  * once, below. */
