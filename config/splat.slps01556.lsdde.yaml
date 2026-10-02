@@ -2049,7 +2049,8 @@ segments:
       - [0x7B329, pad]                        # 3 bytes: item_list's .sdata ends with the 5-byte ".TIM"
       - [0x7B32C, .sdata, world/objm]  # two unread grid spans, the projection bias, the "Pause" text's place and colour
       - [0x7B34A, pad]                        # 2 bytes: objm's .sdata ends with the 6-byte "Pause"
-      - [0x7B34C, sdata]
+      - [0x7B34C, .sdata, world/style_layer]  # the decoration box and set, the greys, four stages' fixed configs
+      - [0x7B394, sdata]
       - [0x7b3c0, sdata]              # DreamSys's sdata slot
       - [0x7b3f8, sdata]
       - [0x7B420, .sbss, main]  # the root GameApplication
@@ -2057,7 +2058,7 @@ segments:
       - [0x7B44C, .sbss, graphics/tmd_model]  # the bounds buffer's box count
       - [0x7B450, sbss]               # libgte/patchgte's .sbss (0x8008AC50, NOLOAD in config/psyq-objects.ld), Sony's
       - [0x7B468, sbss]              # libc2/rand's seed (NOLOAD in config/psyq-objects.ld)
-      - [0x7B46C, sbss]
+      - [0x7B46C, .sbss, world/style_layer]  # the stage, day and tick, the config, the decoration's colours, the cue slots
       - [0x7B4A4, .sbss, world/style_effect]  # its model, TIM, viewport and base view height
       - [0x7b4b4, sbss]               # DreamSys's sbss slot
       - [0x7b4cc, sbss]

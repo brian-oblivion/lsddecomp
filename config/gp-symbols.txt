@@ -6,7 +6,6 @@
 D_8008AC24
 D_8008AC50
 D_8008AC68
-D_8008ACA0
 gpDinamicLinkPenalty
 gpNavChallengesComplete
 sActiveCdStream

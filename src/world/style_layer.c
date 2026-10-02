@@ -64,16 +64,8 @@
  * sStyleDecorColorsB instead of sStyleDecorColorsA (PickStyleFallbackConfig). */
 #define STYLE_DECOR_B_PALETTE_INDEX 18
 
-extern s32 sStyleGrid;
-extern s32 sStyleStage;
-extern s32 sStyleTickCount;
-extern s32 sStyleDay;
-extern s32 sStyleUnreadArg;
-extern s32 sStyleSceneRefs; /* a StyleSceneRefs * (below) */
-extern s32 sStyleVariant;
 /* StyleCueSlot is defined with the cue functions below; this only clears the slots. */
 typedef struct StyleCueSlot StyleCueSlot;
-extern StyleCueSlot *sStyleCueSlots[2];
 
 extern void *ApplyStyleConfig(void);
 
@@ -100,14 +92,43 @@ typedef struct StyleCueRecord {
     u8 pad7;        /* +0x7 */
 } StyleCueRecord;
 
-/* The fixed configs of the stages whose config is in .sdata, and the two
- * greys sStyleConfig points at (+0x008 ambientColor and +0x010). */
-extern s32 sStyleAmbientGrey;
-extern s32 sStyleGrey10;
-extern StyleStageConfig sStyleStage06Configs[];
-extern StyleStageConfig sStyleStage08Configs[];
-extern StyleStageConfig sStyleStage10Configs[];
-extern StyleStageConfig sStyleStage11Configs[];
+/* StyleLayer's small data, in address order: .sdata, then .sbss. */
+
+/* RegisterStyleConfig's grid; it registers only while this is 0. */
+static s32 sStyleGrid SDATA = 0;
+static s32 sStyleDecorVariant SDATA = STYLE_DECOR_NONE;
+static const u8 *sStyleDecorColor SDATA = NULL;
+/* The fade box ApplyStyleDecorationIfSet builds: at (-100, -100), as
+ * Viewport's own fade box, 320 x 240, the screen. */
+static BoxFillPos sStyleDecorBoxPos SDATA = {-100, -100};
+static s32 sStyleDecorBoxSize[2] SDATA = {320, 240};
+/* The decoration set's place and size (StyleBuildDecorSet). */
+static s32 sStyleDecorPosX SDATA = -100;
+static s32 sStyleDecorPosY SDATA = -60;
+static s32 sStyleDecorSizeW SDATA = 320;
+static s32 sStyleDecorSizeH SDATA = 144;
+/* The two greys sStyleConfig points at (+0x008 ambientColor and +0x010). */
+static s32 sStyleAmbientGrey SDATA = 0x808080;
+static s32 sStyleGrey10 SDATA = 0x808080;
+/* The fixed configs of the stages whose config is in .sdata. */
+static StyleStageConfig sStyleStage06Configs[] SDATA = {{0, 0, 0, 0}};
+static StyleStageConfig sStyleStage11Configs[] SDATA = {{0, 0, 0, 0}, {0, 2, 3, 12}};
+static StyleStageConfig sStyleStage08Configs[] SDATA = {{0, 2, 11, 11}};
+static StyleStageConfig sStyleStage10Configs[] SDATA = {{0, 2, 3, 3}};
+
+static s32 sStyleStage SBSS = 0;
+static s32 sStyleTickCount SBSS = 0;
+static s32 sStyleDay SBSS = 0;
+static s32 sStyleUnreadArg SBSS = 0;
+static s32 sStyleSceneRefs SBSS = 0; /* a StyleSceneRefs * (below) */
+static s32 sStyleVariant SBSS = 0;
+static s32 sStyleConfigIndex SBSS = 0;
+static s32 sStyleEffectSlotCount SBSS = 0;
+static const u8 *sStyleDecorColors SBSS = NULL;
+static const u8 *sStyleClearColor SBSS = NULL;
+static s32 sStyleDecorObj SBSS = 0; /* a BoxFill * */
+static s32 sStyleCueRecordIndex SBSS = 0;
+static StyleCueSlot *sStyleCueSlots[2] SBSS = {NULL, NULL};
 
 /* Defined below: the cue callbacks sStyleCueCallbacks lists. */
 void StyleCue00(StyleCueSlot *ctx, SoundCueSet *set);
@@ -392,7 +413,6 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
 
 extern void *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg);
-extern const u8 *sStyleDecorColor;
 
 /* The stage's fixed config, or with none PickStyleFallbackConfig's, into
  * sStyleConfig, whose first three words (the StageMap's light settings)
@@ -426,10 +446,6 @@ typedef struct StyleSceneRefs {
     void *etcTim;     /**< +0x008, ObjM::etcTim */
     Viewport *viewport; /**< +0x00C, ObjM::cachedViewport */
 } StyleSceneRefs;
-
-extern s32 sStyleDecorObj;           /* a BoxFill * */
-extern s32 sStyleDecorBoxSize[2];    /* 320 x 240, the screen */
-extern BoxFillPos sStyleDecorBoxPos; /* (-100, -100), as Viewport's own fade box */
 
 void ApplyStyleDecorationIfSet(void) {
     SceneNode *fadeBox;
@@ -476,11 +492,6 @@ void StyleFlushDecoration(void) {
     }
 }
 
-extern s32 sStyleConfigIndex;
-extern const u8 *sStyleClearColor;
-extern const u8 *sStyleDecorColors;
-extern s32 sStyleDecorVariant;
-
 /* The config for a stage without a fixed one: the variant from
  * sStyleVariantPicks[(day + stage) & 0xF], then record (day + stage) % count
  * of that variant's table. For variant 0 it also sets the clear colour, the
@@ -521,10 +532,6 @@ void *PickStyleFallbackConfig(void) {
     return config;
 }
 
-extern s32 sStyleDecorPosX;
-extern s32 sStyleDecorPosY;
-extern s32 sStyleDecorSizeW;
-extern s32 sStyleDecorSizeH;
 extern BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
 
 /* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs, a
@@ -629,7 +636,6 @@ void StyleReleaseDecorSet(void) {
     }
 }
 
-extern s32 sStyleEffectSlotCount;
 extern StyleEffect *sStyleEffectSlots[];
 extern StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos);
 extern StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos);
@@ -925,8 +931,6 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
     }
     return 0;
 }
-
-extern s32 sStyleCueRecordIndex;
 
 /* From sStyleCueRecordIndex on, the first free record of the stage's list
  * whose X+Z distance from the target is under its cue's distance; each
