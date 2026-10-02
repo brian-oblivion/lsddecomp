@@ -237,7 +237,13 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
     switch (state) {
         case TASKCORE_STATE_ACTIVE:
             methods->broadcastToSlots(self, self->target->unselectedColor);
+#ifdef HOST_BUILD
+            /* An image's task has no target. The PS1 reads initialSlot from
+             * low memory without faulting, and setActiveSlot ignores it. */
+            methods->setActiveSlot(self, self->target != NULL ? self->target->initialSlot : 0, 0);
+#else
             methods->setActiveSlot(self, self->target->initialSlot, 0);
+#endif
             self->frameCounter = 0;
             self->inputMode = TASKCORE_INPUT_CHOOSING_SLOT;
             break;
