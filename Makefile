@@ -161,15 +161,17 @@ $(NM_DIR)/%.c.o: %.c $(HEADERS) config/gp-symbols.txt $$(wildcard asm/nonmatchin
 # splat NEVER deletes what it stops generating, and asm/ is gitignored, so
 # orphaned .s files accumulate in a working checkout forever. They corrupt
 # every tool that treats the nonmatchings tree as ground truth (ownership,
-# hazard scans, retail-side instruction counts). Wiping first makes the tree
-# mean what it looks like it means.
+# hazard scans, retail-side instruction counts), and asm/data/ the same way:
+# a plain sdata segment handed to a C unit left its .s behind, and
+# tools/smalldata.py went on counting it. Wiping all of asm/ first makes the
+# tree mean what it looks like it means.
 #
 # config/gp-symbols.txt is derived from the sdata/sbss labels this writes, and
 # maspsx reads it, so it is regenerated here and every object depends on it:
 # round 73 went red at a merge because the file was stale after an extract and
 # nothing recompiled when it was fixed by hand.
 extract:
-	rm -rf asm/nonmatchings
+	rm -rf asm
 	$(SPLAT) $(CONFIG)/splat.$(GAME_ID).$(GAME).yaml
 	$(PYTHON) tools/gpsyms.py
 
