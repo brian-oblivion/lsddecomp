@@ -394,16 +394,22 @@ void CdDriver__RunRequestQueue(void) {
  */
 
 void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
+#ifndef HOST_BUILD
     s32 *unassigned; /* never assigned */
+#endif
     s32 fileIndex;
 
     LockCd();
 
     if (name != NULL) {
         if (sCdAsyncEnabled != 0) {
+            /* Not on the host, where the pointer is a stack slot's leftover
+             * and the store lands on a return address. */
+#ifndef HOST_BUILD
             /* MATCHING: retail's bug: a store through a pointer never set, so to
              * whatever address the caller left behind */
             unassigned[1] = 1;
+#endif
             fileIndex = FindCdFileIndex(name);
             EnqueueCdRequest(self, fileIndex, CD_OP_LOAD_FILE, 0, 0);
         } else {
