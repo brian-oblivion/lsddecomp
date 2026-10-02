@@ -724,6 +724,13 @@ void StyleTeardown(void) {
     StyleReleaseDecorSet();
     StyleReleaseEffectSlots();
     for (i = 0; i < ARRAY_COUNT(sStyleCueSlots); i++) {
+#ifdef HOST_BUILD
+        /* An empty slot is flushed too. The PS1 reads and writes low memory
+         * for it without faulting; the host skips it. */
+        if (sStyleCueSlots[i] == NULL) {
+            continue;
+        }
+#endif
         sStyleCueSlots[i] = FlushStyleCue(sStyleCueSlots[i]);
     }
     if (sStyleGrid != 0) {
