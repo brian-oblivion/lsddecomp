@@ -66,6 +66,8 @@ void main(void) {
     sGameApplication->methods->runMainLoop(sGameApplication);
 }
 
+#ifndef PLATFORM_PC
 /* Sony's _obj/none: empty. Its one call is the one generated at the top of
- * main. */
+ * main. A host has its own __main, or none. */
 void __main(void) {}
+#endif

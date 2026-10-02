@@ -188,7 +188,8 @@ void FileResource__FreeBuffer(FileResource *self);
 /** @brief A method table's ctor slot, unprototyped: the allocators that
  * check the ctor's result call it through this. */
 typedef struct UnprototypedCtorTable {
-    /* +0x000 */ u8 pad0[8];
+    /* +0x000 */ s32 header;    /**< the class id, as in every method table */
+    /* +0x004 */ void *release; /**< the release slot */
     /* +0x008 */ s32 (*ctor)(); /**< the class's ctor; nonzero when it succeeded */
 } UnprototypedCtorTable;
 
