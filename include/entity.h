@@ -517,7 +517,7 @@ void Entity__CueWalkWithTurnsMaybeGiant(Entity *self, SoundCueSet *out);
 /**
  * @brief Row 71's handler, run by row 108's before it scales the entity
  *        (Entity__CueWalkInRandomLaneGiant): on the cue's first tick plays program 0 and
- *        moves 0, 51200 or 102400 in local x at random; faces the player
+ *        moves 0, 25 or 50 cells (STAGE_CELL_SIZE) in local x at random; faces the player
  *        after moodTimer 2400; moves -30 a tick in local z.
  * @param self The entity.
  * @param out Its sound cue set.

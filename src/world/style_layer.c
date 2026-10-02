@@ -790,15 +790,15 @@ typedef struct PtrBoxK3 {
 
 /* Appends one kind-3 effect. With decor variant active and band colours B
  * its offset and colour are fixed; otherwise its z offset is folded to
- * -30720..0 and its colour is random. */
+ * -15..0 cells and its colour is random. */
 StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     s32 *offsetZ;
     PtrBoxK3 *rotation;
 
     SetupStyleSpawnParamsRandom(pos, sStyleSpawnYChoices[2]);
     if (sStyleDecorVariant != STYLE_DECOR_NONE && sStyleDecorColors == sStyleDecorColorsB) {
-        sStyleSpawnOffsetX = -45056;
-        sStyleSpawnOffsetY = -8192;
+        sStyleSpawnOffsetX = -22 * STAGE_CELL_SIZE;
+        sStyleSpawnOffsetY = -4 * STAGE_CELL_SIZE;
         sStyleSpawnOffsetZ = 0;
         sStyleSpawnColors[0] = (s32)sStyleKind3Colors[1];
     } else {
@@ -806,8 +806,8 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
         if (*offsetZ > 0) {
             *offsetZ = -*offsetZ;
         }
-        if (*offsetZ < -30720) {
-            *offsetZ = -30720;
+        if (*offsetZ < -15 * STAGE_CELL_SIZE) {
+            *offsetZ = -15 * STAGE_CELL_SIZE;
         }
         sStyleSpawnColors[0] = (s32)sStyleKind3Colors[(u32)rand() % 3];
     }
@@ -888,8 +888,8 @@ void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
     sStyleSpawnModelLayout = rand() % 5;
 }
 
-/* The every-seventh-day setup: fixed offset y, x of 0..19 steps of 2048, z
- * by day % 3 (40960, -40960, 2048), then the same rotation and layout
+/* The every-seventh-day setup: fixed offset y, x of 0..19 cells, z
+ * by day % 3 (20, -20 or 1 cell), then the same rotation and layout
  * picks as SetupStyleSpawnParamsRandom. Both parameters are unused; it has
  * that function's signature because StyleFillEffectKind0 calls either
  * through one pointer. */
@@ -899,13 +899,13 @@ void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
 
     rand();
     sStyleSpawnOffsetY = sStyleSpawnYChoices[1];
-    sStyleSpawnOffsetX = (rand() % 20) << 11;
+    sStyleSpawnOffsetX = (rand() % 20) << STAGE_CELL_SHIFT;
     dayMod3 = sStyleDay % 3;
-    sStyleSpawnOffsetZ = 40960;
+    sStyleSpawnOffsetZ = 20 * STAGE_CELL_SIZE;
     if (dayMod3 == 1) {
-        sStyleSpawnOffsetZ = -40960;
+        sStyleSpawnOffsetZ = -20 * STAGE_CELL_SIZE;
     } else if (dayMod3 == 2) {
-        sStyleSpawnOffsetZ = 2048;
+        sStyleSpawnOffsetZ = STAGE_CELL_SIZE;
     }
     sStyleSpawnRotation = sStyleSpawnRotations[(u32)rand() % 7];
     sStyleSpawnModelLayout = rand() % 5;

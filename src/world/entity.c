@@ -3,6 +3,10 @@
  * the MoodCue handlers of its mood rows, in sections by row. The class doc in
  * include/entity.h says what an Entity is, how its mood row drives it and
  * what a MoodCue handler does.
+ *
+ * Positions and distances are world units. A distance that is a whole map
+ * cell, or a half or quarter of one, is written in STAGE_CELL_SIZE (2048
+ * units), and "a cell" in a comment means that distance.
  */
 #include "common.h"
 #include <libgte.h>
@@ -795,7 +799,7 @@ void Entity__CueChordThenWalk(Entity *self, SoundCueSet *out) {
 /* Row 11: walks a route at 20 a tick, climbing what it meets, and at moodTimer 1560 turns left or
  * right at random; each branch turns again later. If the dreamer presses the link button between
  * moodTimer 3421 and 3540 on the right-hand branch, it shrinks to half size, faces the dreamer and
- * chases at 120 a tick, and within 1024 of it ends the dream into the row's video. */
+ * chases at 120 a tick, and within half a cell of it ends the dream into the row's video. */
 void Entity__CueWanderThenChaseIfLinkPressed(Entity *self, SoundCueSet *out) {
     enum { WANDER_RIGHT = 11, WANDER_LEFT = 12, WANDER_CHASE = 13 };
 
@@ -832,7 +836,7 @@ void Entity__CueWanderThenChaseIfLinkPressed(Entity *self, SoundCueSet *out) {
         self->lastOffsetValue = -120;
         SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
         self->methods->updateScale(self, 1, sScaleHalf);
-        if (self->methods->distanceToPeer(self, self->peer) < 1024) {
+        if (self->methods->distanceToPeer(self, self->peer) < STAGE_CELL_SIZE / 2) {
             self->methods->notifyParents(self, ENTITY_EFFECT_EVENT_VIDEO);
         }
     }
@@ -1132,13 +1136,13 @@ void Entity__CueSixfoldSizeRow119(Entity *self, SoundCueSet *out) {
     self->methods->updateScale(self, 1, sScaleSix);
 }
 
-/* Row 29: in a white dream, triples its size and rises 30720 at the start; one time in five turns 1
+/* Row 29: in a white dream, triples its size and rises 15 cells at the start; one time in five turns 1
  * degree a tick. */
 void Entity__CueTripleAloftOnWhiteMaybeTurn(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         if (((DreamSys *)self->peer)->methods->getDreamColor((DreamSys *)self->peer) == DREAM_COLOR_WHITE) {
             self->methods->updateScale(self, 1, sScaleTriple);
-            self->methods->moveLocalY(self, -30720, 0);
+            self->methods->moveLocalY(self, -15 * STAGE_CELL_SIZE, 0);
         }
         self->state = rand() % 5;
     }
@@ -1285,7 +1289,7 @@ void Entity__CueWobble(Entity *self, SoundCueSet *out) {
 }
 
 /* Row 36: at the start grows to six or two times its size at random; faces the dreamer and backs
- * away 256 a tick while it is within 28672. */
+ * away 256 a tick while it is within 14 cells. */
 void Entity__CueGrowThenBackAwayFromDreamer(Entity *self, SoundCueSet *out) {
     enum { GROWN = 11 };
 
@@ -1302,7 +1306,7 @@ void Entity__CueGrowThenBackAwayFromDreamer(Entity *self, SoundCueSet *out) {
         self->state = GROWN;
     }
     SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
-    if (self->methods->distanceToPeer(self, self->peer) < 28672) {
+    if (self->methods->distanceToPeer(self, self->peer) < 14 * STAGE_CELL_SIZE) {
         self->methods->moveLocalZ(self, 256, 0);
     }
 }
@@ -1729,7 +1733,7 @@ void Entity__CueLiftOnce(Entity *self, SoundCueSet *out) {
     }
 }
 
-/* Row 57: one time in three it starts still and 6144 underground, runs forward 512 a tick with
+/* Row 57: one time in three it starts still and 3 cells underground, runs forward 512 a tick with
  * program 12, climbs out from moodTimer 128 to 321, and at 322 animates and is done. Otherwise it
  * plays its animation with tones; at frame 48, if the dreamer is near, it fades the screen down and
  * half the time ends the dream into the row's video; at frame 59 it deactivates and is done. */
@@ -1740,7 +1744,7 @@ void Entity__CueSurfaceRunningOrFadeOutNearDreamer(Entity *self, SoundCueSet *ou
         self->state = rand() % 3;
         if (self->state == 0) {
             self->methods->stopTod(self);
-            self->methods->moveLocalY(self, 6144, 0);
+            self->methods->moveLocalY(self, 3 * STAGE_CELL_SIZE, 0);
         }
     }
     out->attenuation = self->methods->getProximityRatio(self);
@@ -1781,9 +1785,9 @@ void Entity__CueSurfaceRunningOrFadeOutNearDreamer(Entity *self, SoundCueSet *ou
     }
 }
 
-/* Row 58: sounds program 12 now and then. In a yellow dream, once the dreamer is within 1024, it
+/* Row 58: sounds program 12 now and then. In a yellow dream, once the dreamer is within half a cell, it
  * takes the dreamer's movement, lifts it for 50 ticks, sways it side to side and ends the dream at
- * moodTimer 500. Otherwise one time in three, once the dreamer is within 1024, it stops, sinks for
+ * moodTimer 500. Otherwise one time in three, once the dreamer is within half a cell, it stops, sinks for
  * 10 ticks, then falls on its side with programs 18 and 3, hides its second part and is done. */
 void Entity__CueLevitateDreamerOnYellowOrCollapse(Entity *self, SoundCueSet *out) {
     enum { LEVITATE_ARMED = 11, COLLAPSE_ARMED = 12, LEVITATING = 13, COLLAPSING = 14 };
@@ -1804,13 +1808,13 @@ void Entity__CueLevitateDreamerOnYellowOrCollapse(Entity *self, SoundCueSet *out
         out->slots[0].octave = -1;
     }
     if (self->state == LEVITATE_ARMED) {
-        if (self->methods->distanceToPeer(self, self->peer) < 1024) {
+        if (self->methods->distanceToPeer(self, self->peer) < STAGE_CELL_SIZE / 2) {
             ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, false);
             self->state = LEVITATING;
             self->moodTimer = 0;
         }
     } else if (self->state == COLLAPSE_ARMED) {
-        if (self->methods->distanceToPeer(self, self->peer) < 1024) {
+        if (self->methods->distanceToPeer(self, self->peer) < STAGE_CELL_SIZE / 2) {
             self->methods->stopTod(self);
             self->state = COLLAPSING;
             self->moodTimer = 0;
@@ -1844,16 +1848,16 @@ void Entity__CueLevitateDreamerOnYellowOrCollapse(Entity *self, SoundCueSet *out
     }
 }
 
-/* Row 115: waits, inactive, for the dreamer to come within 2048; then it and the dreamer turn to
+/* Row 115: waits, inactive, for the dreamer to come within a cell; then it and the dreamer turn to
  * face each other, it activates, takes the dreamer's movement and look, and bounces. Half the time,
  * at moodTimer 100, it stops, sinks, steps forward and at last walks at the dreamer; at 240 the
- * dreamer's control is given back. Within 512 of the dreamer it deactivates and links to the row's
+ * dreamer's control is given back. Within a quarter cell of the dreamer it deactivates and links to the row's
  * stage. */
 void Entity__CueConfrontDreamerThenLinkOnTouch(Entity *self, SoundCueSet *out) {
     enum { CONFRONTING = 11, CONFRONT_ADVANCE = 12 };
 
     if (self->state == 0) {
-        if (Entity__IsTargetInRange(self, 2048) != 0) {
+        if (Entity__IsTargetInRange(self, STAGE_CELL_SIZE) != 0) {
             self->state = CONFRONTING;
             SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
             SceneNode__FaceTarget((SceneNode *)self->peer, (SceneNode *)self, 1, 1, 0);
@@ -1901,7 +1905,7 @@ void Entity__CueConfrontDreamerThenLinkOnTouch(Entity *self, SoundCueSet *out) {
             }
         }
     }
-    if (self->methods->distanceToPeer(self, self->peer) < 512) {
+    if (self->methods->distanceToPeer(self, self->peer) < STAGE_CELL_SIZE / 4) {
         self->methods->deactivate(self);
         self->methods->notifyParents(self, ENTITY_EFFECT_LINK_STAGE);
     }
@@ -1914,7 +1918,7 @@ void Entity__CueConfrontDreamerThenLinkOnTouch(Entity *self, SoundCueSet *out) {
  * to sScaleSix.
  */
 
-/* Row 59: half the time sinks 2048 at the start; walks forward 128 a tick with program 12 every
+/* Row 59: half the time sinks a cell at the start; walks forward 128 a tick with program 12 every
  * tenth tick; one time in ten starts the stage's scale ramp at moodTimer 300. */
 void Entity__CueWalkMaybeSunkMaybeStretchStage(Entity *self, SoundCueSet *out) {
     enum { STRETCH_ARMED = 12 };
@@ -1929,7 +1933,7 @@ void Entity__CueWalkMaybeSunkMaybeStretchStage(Entity *self, SoundCueSet *out) {
     }
     if (self->moodTimer == 0) {
         if (rand() & 1) {
-            self->methods->moveLocalY(self, 2048, 0);
+            self->methods->moveLocalY(self, STAGE_CELL_SIZE, 0);
         }
     }
     self->methods->moveLocalZ(self, -128, 0);
@@ -1948,8 +1952,8 @@ void Entity__CueTone18AtFrame30(Entity *self, SoundCueSet *out) {
 }
 
 /* Row 62: creeps forward 5 a tick, facing the dreamer from moodTimer 101, with program 3 every 30
- * animation frames; at 300, if the dreamer is within 4096, takes its movement, and at 500 gives it
- * back. Once the dreamer is within 1024, half the time it sounds program 6, maybe shrinks the stage
+ * animation frames; at 300, if the dreamer is within two cells, takes its movement, and at 500 gives it
+ * back. Once the dreamer is within half a cell, half the time it sounds program 6, maybe shrinks the stage
  * (its scale ramp), and 70 ticks later ends the dream, plainly or into the row's video. */
 void Entity__CueCreepUpAndHoldDreamer(Entity *self, SoundCueSet *out) {
     enum { CREEP_ENDING = 10, CREEP_SPARED = 11 };
@@ -1963,7 +1967,7 @@ void Entity__CueCreepUpAndHoldDreamer(Entity *self, SoundCueSet *out) {
         SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
     }
     self->methods->moveLocalZ(self, -5, 0);
-    if (self->moodTimer == 300 && self->methods->distanceToPeer(self, self->peer) < 4096) {
+    if (self->moodTimer == 300 && self->methods->distanceToPeer(self, self->peer) < 2 * STAGE_CELL_SIZE) {
         ((DreamSys *)self->peer)->methods->clearTickCallbacks((DreamSys *)self->peer, false);
     } else if (self->moodTimer == 500) {
         ((DreamSys *)self->peer)
@@ -1971,7 +1975,7 @@ void Entity__CueCreepUpAndHoldDreamer(Entity *self, SoundCueSet *out) {
                                         LOOK_CALLBACK_STEP_LOOK);
     }
     if (self->state == 0) {
-        if (self->methods->distanceToPeer(self, self->peer) < 1024) {
+        if (self->methods->distanceToPeer(self, self->peer) < STAGE_CELL_SIZE / 2) {
             if (rand() & 1) {
                 out->slots[1].program = 6;
                 out->attenuation = 0;
@@ -2035,7 +2039,7 @@ void Entity__CueTone13Every30(Entity *self, SoundCueSet *out) {
     }
 }
 
-/* Row 67: one time in three runs forward 512 a tick from moodTimer 501, dropping 2048 and facing
+/* Row 67: one time in three runs forward 512 a tick from moodTimer 501, dropping a cell and facing
  * the dreamer at 502. */
 void Entity__CueMaybeDropAndRunAt500(Entity *self, SoundCueSet *out) {
     enum { RUNNER = 11 };
@@ -2047,7 +2051,7 @@ void Entity__CueMaybeDropAndRunAt500(Entity *self, SoundCueSet *out) {
     }
     if (self->state == RUNNER) {
         if (self->moodTimer == 502) {
-            self->methods->moveLocalY(self, 2048, 0);
+            self->methods->moveLocalY(self, STAGE_CELL_SIZE, 0);
             SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
         }
         if (self->moodTimer >= 501) {
@@ -2150,7 +2154,7 @@ void Entity__CueWalkInRandomLane(Entity *self, SoundCueSet *out) {
     if (out->tick == 0) {
         out->slots[0].program = 0;
         lane = rand() % 3;
-        self->methods->moveLocalX(self, lane * 51200, 0);
+        self->methods->moveLocalX(self, lane * (25 * STAGE_CELL_SIZE), 0);
     }
     if (self->moodTimer >= 2401) {
         SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
@@ -2393,9 +2397,9 @@ void Entity__CueAnimateThenShootUp(Entity *self, SoundCueSet *out) {
 
 /* Row 81's handler, and row 120's (its data words differ). It walks forward 20 a tick, climbing
  * what it meets, with program 28, faces the dreamer from moodTimer 501, and moves the dreamer 2048
- * along its facing when it comes within 2048. One time in three, once the dreamer has reached it,
+ * along its facing when it comes within a cell. One time in three, once the dreamer has reached it,
  * it instead faces the dreamer with a tone pattern and either grows and chases at 374 a tick until
- * within 512, or takes the dreamer's movement, turns the dreamer to face it, and approaches at 96 a
+ * within a quarter cell, or takes the dreamer's movement, turns the dreamer to face it, and approaches at 96 a
  * tick (or not at all), ending the dream within 2400. */
 void Entity__CueWalkThenChaseOrHoldDreamer(Entity *self, SoundCueSet *out) {
     enum { HOLD_ENDED = 11 };
@@ -2427,7 +2431,7 @@ void Entity__CueWalkThenChaseOrHoldDreamer(Entity *self, SoundCueSet *out) {
         if (state == 1) {
             self->methods->updateScale(self, 0, sScaleEightSevenths);
             dz = -374;
-            if (self->methods->distanceToPeer(self, self->peer) < 512) {
+            if (self->methods->distanceToPeer(self, self->peer) < STAGE_CELL_SIZE / 4) {
                 self->methods->deactivate(self);
                 self->state = state;
             }
@@ -2452,7 +2456,7 @@ void Entity__CueWalkThenChaseOrHoldDreamer(Entity *self, SoundCueSet *out) {
         if (self->moodTimer >= 501) {
             SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
         }
-        if (self->methods->distanceToPeer(self, self->peer) < 2048) {
+        if (self->methods->distanceToPeer(self, self->peer) < STAGE_CELL_SIZE) {
             ((DreamSys *)self->peer)->methods->moveLocalZ((DreamSys *)self->peer, -2048, 0);
         }
         dz = -20;
@@ -2478,10 +2482,10 @@ void Entity__CueWalkThenChaseOrHoldDreamer(Entity *self, SoundCueSet *out) {
 void SetCueTones7_7_7(SoundCueSet *out);
 void SetCueTones18_3_3(SoundCueSet *out);
 
-/* Row 82: one time in three it ends its cue at once and jumps 20480 ahead. Otherwise, at random, it
+/* Row 82: one time in three it ends its cue at once and jumps 10 cells ahead. Otherwise, at random, it
  * either faces the dreamer, takes the dreamer's movement at moodTimer 20 with programs 18 and 3,
  * walks forward 40 a tick and links to the row's stage at 40; or stands still, and when the dreamer
- * comes within 512 deactivates (two times in three) or ends its cue. */
+ * comes within a quarter cell deactivates (two times in three) or ends its cue. */
 void Entity__CueJumpAheadHoldDreamerOrStand(Entity *self, SoundCueSet *out) {
     enum { STAND_GUARD = 11, HOLD_AND_LINK = 12 };
 
@@ -2490,7 +2494,7 @@ void Entity__CueJumpAheadHoldDreamerOrStand(Entity *self, SoundCueSet *out) {
             self->state = (rand() & 1) ? STAND_GUARD : HOLD_AND_LINK;
         } else {
             self->methods->stopSoundCue(self);
-            self->methods->moveLocalZ(self, -20480, 0);
+            self->methods->moveLocalZ(self, -10 * STAGE_CELL_SIZE, 0);
             rand();
         }
     }
@@ -2510,7 +2514,7 @@ void Entity__CueJumpAheadHoldDreamerOrStand(Entity *self, SoundCueSet *out) {
         }
     } else if (self->state == STAND_GUARD) {
         self->methods->stopTod(self);
-        if (self->methods->distanceToPeer(self, self->peer) < 512) {
+        if (self->methods->distanceToPeer(self, self->peer) < STAGE_CELL_SIZE / 4) {
             if (rand() % 3 != 0) {
                 self->methods->deactivate(self);
             } else {
@@ -2802,7 +2806,7 @@ void Entity__CueAnimateThenRun(Entity *self, SoundCueSet *out) {
 }
 
 /* Row 94: as Entity__CueAnimateThenRun with program 14, and when it switches animation it may grow
- * to six times its size and sink 2048 (half the time, and only outside a white dream) and may turn
+ * to six times its size and sink a cell (half the time, and only outside a white dream) and may turn
  * about (one time in three). */
 void Entity__CueAnimateThenRunMaybeGiantOrTurn(Entity *self, SoundCueSet *out) {
     enum { MAY_GROW = 11 };
@@ -2821,7 +2825,7 @@ void Entity__CueAnimateThenRunMaybeGiantOrTurn(Entity *self, SoundCueSet *out) {
         if (self->state != 0) {
             if ((rand() & 1) == 0) {
                 self->methods->updateScale(self, 1, sScaleSix);
-                self->methods->moveLocalY(self, 2048, 0);
+                self->methods->moveLocalY(self, STAGE_CELL_SIZE, 0);
             }
         }
         if (rand() % 3 == 0) {
@@ -3012,7 +3016,7 @@ void Entity__CueHalfSizeCreep(Entity *self, SoundCueSet *out) {
     self->methods->moveLocalZ(self, -10, 0);
 }
 
-/* Row 110: stands still at two fifths of its size; when the dreamer comes within 2048 it turns
+/* Row 110: stands still at two fifths of its size; when the dreamer comes within a cell it turns
  * about (4 degrees a tick for 45 ticks), and 500 ticks later it can turn again. */
 void Entity__CueTurnAroundWhenApproached(Entity *self, SoundCueSet *out) {
     enum { TURNING_ABOUT = 10 };
@@ -3020,7 +3024,7 @@ void Entity__CueTurnAroundWhenApproached(Entity *self, SoundCueSet *out) {
     self->methods->updateScale(self, 1, sScaleTwoFifths);
     self->methods->stopTod(self);
     if (self->state == 0) {
-        if (self->methods->distanceToPeer(self, self->peer) < 2048) {
+        if (self->methods->distanceToPeer(self, self->peer) < STAGE_CELL_SIZE) {
             self->state = TURNING_ABOUT;
             self->moodTimer = 0;
         }
