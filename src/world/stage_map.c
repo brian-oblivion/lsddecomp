@@ -361,7 +361,9 @@ void StageMap__OnNotify(StageMap *self, BasicClass *sender, s32 command) {
     }
 }
 
-extern s32 sDefaultGridSpan;
+/* StageMap's small data: the grid span Reset sets, 0xA000 (ObjM's
+ * DEFAULT_GRID_SPAN is the same value). */
+static s32 sDefaultGridSpan SDATA = 0xA000;
 
 void StageMap__Reset(StageMap *self) {
     self->config = NULL;

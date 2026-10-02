@@ -2040,7 +2040,7 @@ segments:
       - [0x7B14C, .sdata, cd/cd_stream]  # the audio-mix flag, the drive's owner, ";1"
       - [0x7B158, .sdata, cd/game_files]  # "CDI\\" and "SND\\SE", the pickers' forced choices
       - [0x7B178, .sdata, world/day_task]  # the record tables' call count and first batch
-      - [0x7B180, sdata]
+      - [0x7B180, .sdata, world/stage_map]  # the default grid span, 0xA000
       - [0x7B184, .sdata, ui/title_menu]  # the slot names, On and Off, the save title's place, the save file's suffixes, name and title
       - [0x7B230, .sdata, ui/task_objf]  # the construction count, the message icons' names, the card devices, CARD\\ and .TIM
       - [0x7B2C8, .sdata, ui/text_entry]  # the text colour, the panel, text and cursor places, CARD\\ and .TIM
