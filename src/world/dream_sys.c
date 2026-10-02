@@ -1379,7 +1379,7 @@ extern s32 InterpolateYAtZ(LongVec3 *from, LongVec3 *to, s32 at);
 s32 DreamSys__ProjectPointAtDistance(DreamSys *self, s32 *out, s32 dist, s32 *reference, s32 tolerance) {
     s32 worldPos[3];
     s32 height;
-    long *worldTrans;
+    GteLong *worldTrans;
     s32 *offsetZ;
 
     offsetZ = &sProjectOffset.z;

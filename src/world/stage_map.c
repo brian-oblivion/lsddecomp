@@ -430,16 +430,16 @@ void StageMap__UnloadAllSlots(StageMap *self) {
     self->methods->endScaleRamp(self);
 }
 
-void StageMap__SetChildParams(StageMap *self, s32 count, s32 dirs, s32 colors) {
+void StageMap__SetChildParams(StageMap *self, s32 count, s16 *dirs, ColorRgb *colors) {
     s32 i;
     FlatLightObj *light;
 
     for (i = 0; i < count; i++) {
         light = (FlatLightObj *)self->methods->getLight(self, i);
-        light->methods->setColor(light, 1, (ColorRgb *)colors);
-        colors += sizeof(ColorRgb);
-        light->methods->setDirection(light, 1, (s16 *)dirs);
-        dirs += 3 * sizeof(s16);
+        light->methods->setColor(light, 1, colors);
+        colors++;
+        light->methods->setDirection(light, 1, dirs);
+        dirs += 3;
     }
 }
 

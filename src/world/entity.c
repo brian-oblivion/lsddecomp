@@ -394,7 +394,7 @@ s32 Entity__IsNearTarget(Entity *self, void *pos, s32 range, s32 tolerance) {
 }
 
 s32 Entity__DistanceToPeer(Entity *self, TodActor *peer) {
-    long *peerPos;
+    GteLong *peerPos;
     GsCOORDINATE2 *coord;
     s32 dx;
     s32 dz;
@@ -578,7 +578,7 @@ s32 Entity__UpdateDeactivationState(Entity *self) {
 
 s32 Entity__UpdateTargetProximity(Entity *self) {
     EntityMoodRow *row;
-    long *pos;
+    GteLong *pos;
     s32 dist;
 
     row = &sEntityMoodTable[self->moodIndex];
@@ -602,7 +602,7 @@ s32 Entity__UpdateTargetProximity(Entity *self) {
 
 s32 Entity__UpdateSoundCueStart(Entity *self) {
     EntityMoodRow *row;
-    long *pos;
+    GteLong *pos;
     s32 dist;
 
     if (self->active != 0 && self->soundCueActive == 0 && self->state != ENTITY_STATE_DONE) {
@@ -651,7 +651,7 @@ s32 Entity__IsTargetInRange(Entity *self, s32 range) {
 
 s32 Entity__UpdateSoundCueStop(Entity *self) {
     EntityMoodRow *row;
-    long *pos;
+    GteLong *pos;
     s32 dist;
 
     if (self->active != 0 && self->soundCueActive != 0) {

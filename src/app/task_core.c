@@ -557,7 +557,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *target) {
         } while (*names != NULL);
     }
 
-    self->listView = New_BoxFill(sListViewSize, &sListViewColor, 0);
+    self->listView = (BasicClass *)New_BoxFill(sListViewSize, &sListViewColor, 0);
     target->handle = (BasicClass *)texture;
 }
 

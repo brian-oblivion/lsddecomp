@@ -39,9 +39,9 @@ struct TextRow;
  * colour to the TimBlockSrc.
  */
 typedef struct StyleConfig {
-    s32 lightDirs;    /**< +0x000: the StageMap's setChildParams `dirs` (SetupSceneStyle). */
-    s32 lightColors;  /**< +0x004: setChildParams `colors` (SetupSceneStyle). */
-    s32 ambientColor; /**< +0x008: setAmbientColor's rgb, a pointer (SetupSceneStyle). */
+    void *lightDirs;    /**< +0x000: the StageMap's setChildParams `dirs` (SetupSceneStyle). */
+    void *lightColors;  /**< +0x004: setChildParams `colors` (SetupSceneStyle). */
+    void *ambientColor; /**< +0x008: setAmbientColor's rgb (SetupSceneStyle). */
     void *clearColor; /**< +0x00C: the viewport's clear colour (EnterStyleSession); a sStylePalette entry. */
     void *grey;    /**< +0x010: a grey, 0x808080 (sStyleGrey10); nothing reads it. */
     s32 colorMode; /**< +0x014: 1 makes the far colour clearColor; 2 fades the TIM block to clearColor, else farColor. */

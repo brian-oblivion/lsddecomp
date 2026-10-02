@@ -308,8 +308,8 @@ typedef void *(*ChunkFileFn)(void *ctx, s32 chunk, s32 x, s32 y);
 struct StageMapMethods {
     LIGHTRIG_SLOTS(StageMap, (StageMap * self, LongVec3 *origin, s32 autoLoad));
     /* +0x0C0 */ void (*unloadAllSlots)(StageMap *self); /**< @see StageMap__UnloadAllSlots */
-    /* +0x0C4 */ void (*setChildParams)(StageMap *self, s32 count, s32 dirs,
-                                        s32 colors); /**< @see StageMap__SetChildParams */
+    /* +0x0C4 */ void (*setChildParams)(StageMap *self, s32 count, s16 *dirs,
+                                        ColorRgb *colors); /**< @see StageMap__SetChildParams */
     /* +0x0C8 */ void (*setCallback)(StageMap *self, ChunkFileFn fn, void *ctx); /**< @see StageMap__SetCallback */
     /* +0x0CC */ void (*setAcceptedTags)(StageMap *self, s32 *tags); /**< @see StageMap__SetAcceptedTags */
     /* +0x0D0 */ void (*forwardAcceptedCommand)(StageMap *self, void *sender,
@@ -556,10 +556,10 @@ void StageMap__UnloadAllSlots(StageMap *self);
  *        first `count` of the inherited lights.
  * @param self The map.
  * @param count How many lights to set.
- * @param dirs The address of `count` directions, three s16 each.
- * @param colors The address of `count` ColorRgb colours.
+ * @param dirs `count` directions, three s16 each.
+ * @param colors `count` colours.
  */
-void StageMap__SetChildParams(StageMap *self, s32 count, s32 dirs, s32 colors);
+void StageMap__SetChildParams(StageMap *self, s32 count, s16 *dirs, ColorRgb *colors);
 
 /**
  * @brief setCallback (slot +0x0C8): the function that turns a chunk index

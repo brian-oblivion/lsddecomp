@@ -274,7 +274,7 @@ StyleStageConfig *sStyleStageConfigs[14] = {
 /* The one StyleConfig the layer fills (FillStyleFromConfig writes the last
  * four words; clearColor is also the kind-2 effects' alternate colour). */
 StyleConfig sStyleConfig = {
-    (s32)sStyleLightDirs, (s32)sStyleLightColors, (s32)&sStyleAmbientGrey, NULL,
+    sStyleLightDirs, sStyleLightColors, &sStyleAmbientGrey, NULL,
     &sStyleGrey10, -1, NULL, 0,
 };
 

@@ -840,7 +840,7 @@ void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src) {
 /* MATCHING: the parent test is repeated per axis; testing it once changes the code */
 void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 unused) {
     MATRIX rot;
-    long *worldPos;
+    GteLong *worldPos;
 
     self->methods->getRotMatrix(self, &rot, 0);
     ApplyMatrixToLVArray(dst, src, 1, &rot);
@@ -901,7 +901,7 @@ extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
  * along -y, then, on a miss, along +y. */
 /* MATCHING: one coord.t copy, the ternary twice per axis, one hit branch per probe, the workm.t test */
 s32 SceneNode__RaycastVertical(SceneNode *self, s32 *offset, s32 *target) {
-    long *worldPos;
+    GteLong *worldPos;
     SVECTOR origin;
     SVECTOR end;
     SVECTOR hit;
@@ -918,14 +918,14 @@ s32 SceneNode__RaycastVertical(SceneNode *self, s32 *offset, s32 *target) {
                 cur = self->parent;
                 if (cur != NULL) {
                     do {
-                        ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (long *)0))->x =
-                            ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (long *)0))->x +
+                        ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (GteLong *)0))->x =
+                            ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (GteLong *)0))->x +
                             cur->coord2->coord.t[0];
-                        ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (long *)0))->y =
-                            ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (long *)0))->y +
+                        ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (GteLong *)0))->y =
+                            ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (GteLong *)0))->y +
                             cur->coord2->coord.t[1];
-                        ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (long *)0))->z =
-                            ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (long *)0))->z +
+                        ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (GteLong *)0))->z =
+                            ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (GteLong *)0))->z +
                             cur->coord2->coord.t[2];
 
                         cur = cur->parent;
@@ -975,8 +975,8 @@ void SubVec3S16(s32 *dest, s16 *from, s16 *to) {
  * its position through NULL. */
 void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 zeroPitch, s32 noHalfTurn,
                            void *extraRotation) {
-    long *pos;
-    long *targetPos;
+    GteLong *pos;
+    GteLong *targetPos;
     s32 dx;
     s32 dy;
     s32 dz;

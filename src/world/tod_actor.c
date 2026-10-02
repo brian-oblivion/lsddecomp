@@ -474,7 +474,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     data += 3;
                 }
                 if (head.flag & TOD_COORD_SCALE) {
-                    long *scale = &param->scale.vx;
+                    GteLong *scale = &param->scale.vx;
 
                     for (i = 0; i < 3; i++, scale++) {
                         *scale = (((s16 *)data)[i] * *scale) / ONE;
@@ -485,7 +485,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     break;
                 }
                 {
-                    long *trans = &param->trans.vx;
+                    GteLong *trans = &param->trans.vx;
 
                     for (i = 0; i < 3; i++, trans++) {
                         *trans += data[i];
@@ -501,7 +501,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     data += 3;
                 }
                 if (head.flag & TOD_COORD_SCALE) {
-                    long *scale = &param->scale.vx;
+                    GteLong *scale = &param->scale.vx;
 
                     for (i = 0; i < 3; i++, scale++) {
                         *scale = ((s16 *)data)[i];
@@ -512,7 +512,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     break;
                 }
                 {
-                    long *trans = &param->trans.vx;
+                    GteLong *trans = &param->trans.vx;
 
                     for (i = 0; i < 3; i++, trans++) {
                         *trans = data[i];
