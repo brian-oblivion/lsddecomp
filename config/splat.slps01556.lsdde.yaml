@@ -2055,7 +2055,8 @@ segments:
       - [0x7B3AA, pad]                        # 2 bytes: actor's .sdata is three halfwords
       - [0x7B3AC, .sdata, world/graph_room]  # the graph point's size and colours
       - [0x7B3BF, pad]                        # 1 byte: graph_room's .sdata ends with a 3-byte ColorRgb
-      - [0x7b3c0, sdata]              # DreamSys's sdata slot
+      - [0x7B3C0, .sdata, world/dream_sys]  # the staircase offsets, the save magic, the link angle
+      - [0x7B3F6, pad]                        # 2 bytes: dream_sys's .sdata ends with the 2-byte MoodGraphPoint
       - [0x7b3f8, sdata]
       - [0x7B420, .sbss, main]  # the root GameApplication
       - [0x7B424, sbss]               # crt0's saved $ra (0x8008AC24), then malloc's and putchar's .sbss: Sony's
@@ -2064,6 +2065,6 @@ segments:
       - [0x7B468, sbss]              # libc2/rand's seed (NOLOAD in config/psyq-objects.ld)
       - [0x7B46C, .sbss, world/style_layer]  # the stage, day and tick, the config, the decoration's colours, the cue slots
       - [0x7B4A4, .sbss, world/style_effect]  # its model, TIM, viewport and base view height
-      - [0x7b4b4, sbss]               # DreamSys's sbss slot
+      - [0x7B4B4, .sbss, world/dream_sys]  # the navigation arrays, the last stage link
       - [0x7b4cc, sbss]
   - [0x7B800]

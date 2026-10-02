@@ -33,10 +33,48 @@
 #include "viewport.h"
 #include "bmem_pmgr.h"
 
-extern s32 sLinkSrcStage;
-extern s32 sLinkTriggerIndex;
-extern s32 sLinkDstStage;
-extern s32 sLinkSpawnIndex;
+/* DreamSys's small data, in address order: .sdata, then .sbss. */
+
+/* The `struct RelativePos` constants DreamSys__ApplyRelativeOffset gets as
+ * its `a` argument from the staircase ticks: Yaw+90 passes 0, Yaw-135 1,
+ * Yaw+45 2 and Yaw-90 3. */
+static struct RelativePos sStaircaseOffset0 SDATA = {0, 0, 0};
+static struct RelativePos sStaircaseOffset1 SDATA = {0, 0, 1000};
+static struct RelativePos sStaircaseOffset2 SDATA = {0, 0, 0};
+static struct RelativePos sStaircaseOffset3 SDATA = {-1000, 0, 800};
+
+/* The word every save block starts with: the bytes "J01". */
+static s32 sSaveMagic SDATA = 0x0031304A;
+
+/* Set by SetInstantTeleportersEnabled (dream_aux.c calls it), tested by
+ * TestForInstantTeleporters; on at boot. */
+static s32 sInstantTeleportersEnabled SDATA = 1;
+
+/* TestForStageTransition compares it against the leading 4 bytes
+ * (chunk+tile) of `currentPos` as a raw word, never field by field: chunk
+ * (1, 3), tile (12, 14). */
+static s32 sStage5TriggerGridPos SDATA = 0x0E0C0301;
+/* MATCHING: a zero word nothing reads follows it in retail's .sdata. */
+static s32 sStage5TriggerGridPosTail SDATA = 0;
+
+/* The rotation TryStageTimerLink stores in stageLinkAngle for every
+ * destination but Black Space: 180 degrees, a Ratio16 as in
+ * sCardinalRotations. */
+static Ratio16 sLinkAngle180 SDATA = {180, 1};
+
+/* The fixed "special day" mood, returned by IsDaySpecial on a match; only
+ * its address is used. */
+static MoodGraphPoint sSpecialDayMood SDATA = {{0, 0}};
+
+/* The arrays InitNavChallengesArray was last given (include/dream_sys.h). */
+s8 (*gpNavChallengesComplete)[NAV_CHALLENGE_COUNT] SBSS = NULL;
+s32 *gpDinamicLinkPenalty SBSS = NULL;
+/* The last stage link taken: where from, by which trigger, where to and at
+ * which spawn. */
+static s32 sLinkSrcStage SBSS = 0;
+static s32 sLinkTriggerIndex SBSS = 0;
+static s32 sLinkDstStage SBSS = 0;
+static s32 sLinkSpawnIndex SBSS = 0;
 
 /* The number of stages: every per-stage table below has one entry each. */
 
@@ -975,23 +1013,6 @@ s8 sStaircaseTriggersCount[STAGE_COUNT] = {8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 s16 sSpecialDays[42] = {2, 15, 43, 81, 120, 126, 202, 259, 267, 284, 308, 328, 358, 7, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91, 98, 105, 112, 119, 126, 134, 141, 148, 155, 162, 169, 176, 183, 190, 197, 204};
 /* clang-format on */
 
-/* A `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a` argument
-   by DreamSys__TickStaircaseYawPlus45. */
-extern struct RelativePos sStaircaseOffset2;
-
-/* The same, for DreamSys__TickStaircaseYawPlus90. */
-extern struct RelativePos sStaircaseOffset0;
-
-/* The same, for DreamSys__TickStaircaseYawMinus135. */
-extern struct RelativePos sStaircaseOffset1;
-
-/* The same, for DreamSys__TickStaircaseYawMinus90. */
-extern struct RelativePos sStaircaseOffset3;
-
-/* The fixed "special day" mood, returned by IsDaySpecial on a match;
-   only its address is used. */
-extern MoodGraphPoint sSpecialDayMood;
-
 /* With no look command pending, StepLookOffset springs the view height back
  * towards 0 by this much a tick (the size of one sLookOffsetSteps step), and
  * StepLookYaw turns back by this many degrees (one sLookYawSteps step). */
@@ -1758,9 +1779,6 @@ void DreamSys__SoundCueCallback(void *owner, SoundCueSet *set) {
         }
     }
 }
-
-/* The word every save block starts with. */
-extern s32 sSaveMagic;
 
 void DreamSys__InitNewGame(DreamSys *self) {
     self->saveMagic = sSaveMagic;
@@ -2534,10 +2552,6 @@ s32 IsHeadingAligned(Ratio16 *rotation, u8 heading) {
     return (u16)(diff + 44) < 89;
 }
 
-/* Compared against the leading 4 bytes (chunk+tile) of `currentPos` as a
-   raw word; only ever compared here, never dereferenced field-by-field. */
-extern s32 sStage5TriggerGridPos;
-
 /* The stage links that TryStageTimerLink takes: only Pit & Temple, The
  * Natural World, Violence District, Clockwork Machines and Black Space have
  * one. Violence District links below y -4095 or at the one grid position
@@ -2566,10 +2580,6 @@ s32 TestForStageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint
     return result;
 }
 
-/* The rotation TryStageTimerLink stores in stageLinkAngle for every
-   destination but Black Space. */
-extern s32 sLinkAngle180;
-
 s32 GetStageLinkAngle(void) {
     s32 result;
 
@@ -2578,10 +2588,6 @@ s32 GetStageLinkAngle(void) {
         result = (s32)&sLinkAngle180;
     return result;
 }
-
-/* Set by SetInstantTeleportersEnabled (dream_aux.c calls it), tested by
-   TestForInstantTeleporters. */
-extern s32 sInstantTeleportersEnabled;
 
 void SetInstantTeleportersEnabled(bool value) {
     sInstantTeleportersEnabled = value;

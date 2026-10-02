@@ -159,6 +159,7 @@ sSoundEffectDirPtr
 sSpecialDayMood
 sSsTicksPerSecond
 sStage5TriggerGridPos
+sStage5TriggerGridPosTail
 sStaircaseOffset0
 sStaircaseOffset1
 sStaircaseOffset2
