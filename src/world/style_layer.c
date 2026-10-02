@@ -735,8 +735,8 @@ void StyleTeardown(void) {
 /* The StyleEffectParams block every effect is built from. The PS1 image has
  * it as nine separate symbols at fixed addresses, sStyleSpawnOffsetX ..
  * sStyleSpawnColors, which the code lays the block over; the host has no
- * such layout, so the names are the block's fields. sStyleSpawnColors holds
- * the two colour pointers as s32 words, which is right only at 32 bits. */
+ * such layout, so the names are the block's fields. sStyleSpawnColors is
+ * its two colour pointers, color and altColor, addressed from the block. */
 static StyleEffectParams sStyleSpawnParams;
 #define sStyleSpawnOffsetX (sStyleSpawnParams.offset.x)
 #define sStyleSpawnOffsetY (sStyleSpawnParams.offset.y)
@@ -745,7 +745,8 @@ static StyleEffectParams sStyleSpawnParams;
 #define sStyleSpawnScale (sStyleSpawnParams.scale)
 #define sStyleSpawnModelLayout (sStyleSpawnParams.modelChildLayout)
 #define sStyleSpawnTableIndex (sStyleSpawnParams.tableIndex)
-#define sStyleSpawnColors ((s32 *)&sStyleSpawnParams.color)
+#define sStyleSpawnColors \
+    ((ColorRgb **)((u8 *)&sStyleSpawnParams + offsetof(StyleEffectParams, color)))
 #else
 extern Ratio16 *sStyleSpawnScale;
 extern s32 sStyleSpawnTableIndex;
@@ -802,7 +803,7 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
 }
 
 #ifndef HOST_BUILD
-extern s32 sStyleSpawnColors[];
+extern ColorRgb *sStyleSpawnColors[];
 extern Ratio16 *sStyleSpawnRotation;
 extern s32 sStyleSpawnOffsetY;
 extern s32 sStyleSpawnOffsetZ;
@@ -828,7 +829,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
         sStyleSpawnOffsetX = -22 * STAGE_CELL_SIZE;
         sStyleSpawnOffsetY = -4 * STAGE_CELL_SIZE;
         sStyleSpawnOffsetZ = 0;
-        sStyleSpawnColors[0] = (s32)sStyleKind3Colors[1];
+        sStyleSpawnColors[0] = (ColorRgb *)sStyleKind3Colors[1];
     } else {
         offsetZ = &sStyleSpawnOffsetZ;
         if (*offsetZ > 0) {
@@ -837,7 +838,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
         if (*offsetZ < -15 * STAGE_CELL_SIZE) {
             *offsetZ = -15 * STAGE_CELL_SIZE;
         }
-        sStyleSpawnColors[0] = (s32)sStyleKind3Colors[(u32)rand() % 3];
+        sStyleSpawnColors[0] = (ColorRgb *)sStyleKind3Colors[(u32)rand() % 3];
     }
     rotation = (PtrBoxK3 *)&sStyleSpawnRotation;
     rotation->p = sStyleSpawnRotations[0];
@@ -850,32 +851,33 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     return slots;
 }
 
-/** @brief One word of sStyleSpawnColors seen as a one-field struct, through
+/** @brief One entry of sStyleSpawnColors seen as a one-field struct, through
  * which StyleFillEffectKind2 stores the effect's two colours. */
 /* MATCHING: the first colour store goes through a one-field struct, as
  * PtrBoxK3's does, so the sStyleDay read can come before it. */
-typedef struct S32BoxK2 {
-    s32 v; /**< +0x000 a colour: first an RGB triple's address, then sStyleConfig.clearColor or 0 */
-} S32BoxK2;
+typedef struct ColorPtrBoxK2 {
+    ColorRgb *v; /**< +0x000 a colour: first an RGB triple, then sStyleConfig.clearColor or NULL */
+} ColorPtrBoxK2;
 
 /* Appends one kind-2 effect with a random colour and, except on every
  * twentieth day, sStyleConfig.clearColor as its alternate colour. */
 StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     s32 r;
-    s32 altColor;
-    S32BoxK2 *color;
+    s32 day;
+    ColorRgb *altColor;
+    ColorPtrBoxK2 *color;
     Ratio16 **rotation;
     s32 offsetY;
 
     r = rand();
-    color = (S32BoxK2 *)sStyleSpawnColors;
-    color->v = (s32)sStyleKind2Colors[(u32)r % 3];
+    color = (ColorPtrBoxK2 *)sStyleSpawnColors;
+    color->v = (ColorRgb *)sStyleKind2Colors[(u32)r % 3];
     color++;
-    altColor = (sStyleDay / 20) * 20; /* MATCHING: not `sStyleDay % 20`, which compiles differently */
-    if (sStyleDay != altColor) {
-        altColor = (s32)sStyleConfig.clearColor;
+    day = (sStyleDay / 20) * 20; /* MATCHING: not `sStyleDay % 20`, which compiles differently */
+    if (sStyleDay != day) {
+        altColor = sStyleConfig.clearColor;
     } else {
-        altColor = 0;
+        altColor = NULL;
     }
     /* MATCHING: the height is read before the colour is stored */
     offsetY = sStyleSpawnYChoices[2];
