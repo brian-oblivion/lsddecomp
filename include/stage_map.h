@@ -69,34 +69,41 @@ enum StageMapEvent {
                                             (OnDrawSystemEvent, on `dataReady`) */
 };
 
+/** @brief A cell's position inside its chunk. Signed: ComputeCellWorldOffsets
+ *         and IsPointOutOfBounds read it so. */
+typedef struct StageCell {
+    s8 column; /**< the cell's column */
+    s8 row;    /**< the cell's row */
+} StageCell;
+
 /**
  * @brief A grid-cell descriptor, 10 bytes, alignment 2: which chunk, which
  *        cell in it, and where in the cell.
  *
  * Every member is s8 or s16, so the struct is 2-byte aligned
- * (SetTargetAndLoadChunks copies it whole). UpdateFootprintTracking and DispatchToRectCells read b0/b1 as one u16.
+ * (SetTargetAndLoadChunks copies it whole). UpdateFootprintTracking and
+ * DispatchToRectCells read `chunk` as one u16.
  *
  * It has the shape of dream_sys.h's PlayerSpawnPoint (chunk col/row, tile
  * col/row, s16 x/y/z): DreamSys__WallLink copies getCurrentCellKey's result
- * into its linkCoordinates whole. The two are not one type: this class reads
- * the leading bytes signed (ComputeCellWorldOffsets), PlayerSpawnPoint
- * declares them u8.
+ * into its linkCoordinates whole. Both hold the chunk as a StageChunk; they
+ * are not one type because this class reads the cell bytes signed
+ * (ComputeCellWorldOffsets) and PlayerSpawnPoint declares its tile u8.
  */
 typedef struct Descriptor10 {
-    s8 b0;  /**< chunk column (SplitChunkIndex: index % columns) */
-    s8 b1;  /**< chunk row (index / columns) */
-    s8 b2;  /**< cell column inside the chunk */
-    s8 b3;  /**< cell row inside the chunk */
-    s16 h4; /**< x offset from the cell's centre */
-    s16 h6; /**< y */
-    s16 h8; /**< z offset from the cell's centre */
+    StageChunk chunk; /**< the chunk (SplitChunkIndex: index % columns, index / columns) */
+    StageCell cell;   /**< the cell inside the chunk */
+
+    s16 x; /**< x offset from the cell's centre */
+    s16 y; /**< the height: ComputeFootprintDescriptor stores the world y, ComputeCellWorldOffsets adds the grid origin's */
+    s16 z; /**< z offset from the cell's centre */
 } Descriptor10;
 
 /** @brief A Descriptor10's first half: the chunk's column/row bytes as one
  *         u16, then the cell's. */
 typedef struct CellKey {
-    u16 chunk; /**< b0/b1: chunk column, row */
-    u16 cell;  /**< b2/b3: cell column, row */
+    u16 chunk; /**< Descriptor10::chunk: column, row */
+    u16 cell;  /**< Descriptor10::cell: column, row */
 } CellKey;
 
 /** @brief A Descriptor10's second half: the s16 x/y/z offset inside the
@@ -338,7 +345,7 @@ struct StageMapMethods {
                                                       void **outPos); /**< @see StageMap__GetTargetDescriptor */
     /* +0x110 */ s32 (*computeFootprintDescriptor)(StageMap *self, Descriptor10Ext *out,
                                                    SplitLongVec3 *pos); /**< @see StageMap__ComputeFootprintDescriptor */
-    /* +0x114 */ ChunkSlot *(*getLastEventSlotChunk)(StageMap *self, u8 *out); /**< @see StageMap__GetLastEventSlotChunk */
+    /* +0x114 */ ChunkSlot *(*getLastEventSlotChunk)(StageMap *self, StageChunk *out); /**< @see StageMap__GetLastEventSlotChunk */
     /* +0x118 */ ChunkSlot *(*findSlotByNeighbour)(StageMap *self, s32 key); /**< @see StageMap__FindSlotByNeighbour */
     /* +0x11C */ ChunkSlot *(*findSlotForPosition)(StageMap *self, LongVec3 *pos); /**< @see StageMap__FindSlotForPosition */
     /* +0x120 */ s32 (*findSlotIndexByNeighbour)(StageMap *self, s32 key); /**< @see StageMap__FindSlotIndexByNeighbour */
@@ -698,11 +705,11 @@ s32 StageMap__ComputeCellOffsets(StageMap *self, void *outPos, void *cell);
  * @param chunkPos Receives the chunk's centre (three s32).
  * @param dims The stage's grid dimensions.
  * @param origin The grid's centre.
- * @param cell The cell descriptor.
+ * @param desc The cell descriptor.
  * @return The chunk's index, row * columns + column (0 in a vertical grid).
  */
 s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dims, LongVec3 *origin,
-                            Descriptor10 *cell);
+                            Descriptor10 *desc);
 
 /**
  * @brief enable (slot +0x0EC): starts the per-tick tracking.
@@ -852,19 +859,19 @@ s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, S
 /**
  * @brief A chunk index to its column and row.
  * @param self The map (for its config's columns).
- * @param out Receives the column, then the row, a byte each.
+ * @param out Receives the column and the row.
  * @param chunkIndex The chunk's index.
  */
-void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 chunkIndex);
+void StageMap__SplitChunkIndex(StageMap *self, StageChunk *out, s32 chunkIndex);
 
 /**
  * @brief getLastEventSlotChunk (slot +0x114): the slot the last slot event
  *        was about, and its chunk's column and row.
  * @param self The map.
- * @param out Receives the column, then the row, a byte each.
+ * @param out Receives the column and the row.
  * @return lastEventSlot.
  */
-ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, u8 *out);
+ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, StageChunk *out);
 
 /**
  * @brief findSlotByNeighbour (slot +0x118): the slot whose loader holds a
@@ -966,10 +973,10 @@ void StageMap__SetFootprintFromQuery(StageMap *self);
 /**
  * @brief Whether a cell lies outside a box of cells.
  * @param bounds The box, inclusive, or NULL.
- * @param point The cell's column and row, a signed byte each.
+ * @param cell The cell.
  * @return 1 when there is no box or the cell lies outside it, else 0.
  */
-s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point);
+s32 IsPointOutOfBounds(CellBounds *bounds, StageCell *cell);
 
 /**
  * @brief Makes rects[index] the whole lattice (sFullSlotRect) of the slot

@@ -162,11 +162,7 @@ typedef struct {
  *        player's current position (StageMap's getTargetDescriptor).
  */
 typedef struct PlayerSpawnPoint {
-    /** @brief A chunk of the stage's grid (StageChunk's layout). */
-    struct MapChunk {
-        u8 col; /**< the chunk's column */
-        u8 row; /**< the chunk's row */
-    } chunk;    /**< the chunk */
+    StageChunk chunk; /**< the chunk of the stage's grid */
 
     /** @brief A tile within a chunk. */
     struct MapTile {
@@ -191,8 +187,8 @@ typedef struct PlayerSpawnPoint {
  *        other (staircaseOrigin).
  */
 typedef struct PlayerSpawnGridPos {
-    struct MapChunk chunk; /**< the chunk */
-    struct MapTile tile;   /**< the tile */
+    StageChunk chunk;    /**< the chunk */
+    struct MapTile tile; /**< the tile */
 } PlayerSpawnGridPos;
 
 /**
@@ -637,9 +633,9 @@ typedef void (*DreamSysAttachToParentFn)(DreamSys *self, void *parent);
  *        index of the relative position to land at, and a per-table extra.
  */
 typedef struct StageSpawn {
-    struct MapChunk chunk; /**< the chunk */
-    struct MapTile tile;   /**< the tile */
-    u8 adjustment;         /**< an index into sSpawnPosAdjust: the relative position to land at */
+    StageChunk chunk;    /**< the chunk */
+    struct MapTile tile; /**< the tile */
+    u8 adjustment;       /**< an index into sSpawnPosAdjust: the relative position to land at */
     /** Per table: a navigation challenge's index (GetStaticSpawn's flag
      * marks it complete), or a staircase's walk (GetLastSpawnExtra). */
     s8 extra;
@@ -650,7 +646,7 @@ typedef struct StageSpawn {
  *        that triggers it and the spawn it leads to.
  */
 typedef struct StaticLinkTrigger {
-    struct MapChunk chunk; /**< the chunk that triggers the link */
+    StageChunk chunk; /**< the chunk that triggers the link */
 
     /** @brief The tile that triggers it, or a negative `value` for any tile
      *         of the chunk. */

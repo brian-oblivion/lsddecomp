@@ -2271,7 +2271,7 @@ void DreamSys__InitMoodContributors(DreamSys *self, MoodGraphPoint *special) {
 void DreamSys__LogChunkMood(DreamSys *self, PlayerSpawnPoint *currentPos) {
     MoodGraphPoint *mood;
 
-    mood = GetMoodFromStageChunk(self->currentStage, (StageChunk *)currentPos);
+    mood = GetMoodFromStageChunk(self->currentStage, &currentPos->chunk);
     self->methods->logMood(self, &self->areaMoods, mood);
 }
 

@@ -52,7 +52,7 @@ typedef struct DreamAuxSlot {
  * @brief One chunk trigger of a stage's table (sDreamAuxTriggerEntries).
  */
 typedef struct DreamAuxTriggerEntry {
-    s16 key;             /**< The chunk's MapChunk (column, then row) read as one s16. */
+    s16 key;             /**< The chunk's StageChunk (column, then row) read as one s16. */
     s8 dayParity;        /**< 0 any day, 1 odd days, 2 even days (CheckTriggerDayParity). */
     s8 recordIndices[3]; /**< Up to three records of the stage's TriggerRecord table; -1 ends the list. */
 } DreamAuxTriggerEntry;

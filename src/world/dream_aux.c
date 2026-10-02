@@ -28,7 +28,7 @@ typedef struct {
     s8 offsetIndex;   /**< the offset in the cell, an index into sDreamAuxPosTable */
 } DreamAuxSpawnInfo;
 
-/* A trigger entry's chunk, a MapChunk (column, then row) read as one s16. */
+/* A trigger entry's chunk, a StageChunk (column, then row) read as one s16. */
 #define CHUNK_KEY(col, row) ((row) << 8 | (col))
 
 /* dream_aux.c's data, in address order. */

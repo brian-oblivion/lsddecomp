@@ -640,10 +640,10 @@ void ObjM__OnStageMapNotify(ObjM *self, BasicClass *sender, s32 event) {
  * with the slot's chunk coordinates and the day; the block is released
  * unless that returns an object, which the slot keeps as heldObj. */
 s32 ObjM__CheckAuxTrigger(ObjM *self) {
-    struct MapChunk coord; /* SplitChunkIndex writes the column, then the row */
+    StageChunk coord;
     s32 held;
-    ChunkSlot *slot = ((StageMap *)self->lightRig)
-                          ->methods->getLastEventSlotChunk((StageMap *)self->lightRig, &coord.col);
+    ChunkSlot *slot =
+        ((StageMap *)self->lightRig)->methods->getLastEventSlotChunk((StageMap *)self->lightRig, &coord);
     s32 day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     held = TryDreamAuxTrigger((s32)slot->loader->dataBuffer, (s16 *)&coord, day); /* the coord is the trigger key */
     slot->heldObj = (BasicClass *)held;

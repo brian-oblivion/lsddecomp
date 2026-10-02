@@ -516,8 +516,8 @@ void StageMap__ApplyToSenderFootprint(StageMap *self, SceneNode *sender, s32 com
 void StageMap__SetFootprintFromCell(StageMap *self, Descriptor10Ext *desc, s32 span) {
     s16 row;
 
-    self->footprintCol = desc->base.b2 - 1;
-    row = desc->base.b3 - 1;
+    self->footprintCol = desc->base.cell.column - 1;
+    row = desc->base.cell.row - 1;
     self->footprintWidth = span;
     self->footprintHeight = span;
     self->footprintRow = row;
@@ -534,8 +534,8 @@ void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span)
     s32 origRow;
 
     width = span;
-    col = desc->base.b2;
-    row = desc->base.b3;
+    col = desc->base.cell.column;
+    row = desc->base.cell.row;
     origCol = col;
     origRow = row;
 
@@ -582,10 +582,10 @@ void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 comman
             cell = (slot->cells + rect->col) + rect->row * STAGE_CHUNK_CELLS;
             for (row = 0; row < rect->height; row++) {
                 for (col = 0; col < rect->width; cell++, col++) {
-                    /* MATCHING: b0/b1 copied as one halfword, not as two bytes */
-                    *(u16 *)&self->curCell = *(u16 *)&self->targetCell;
-                    self->curCell.b2 = rect->col + col;
-                    self->curCell.b3 = rect->row + row;
+                    /* MATCHING: the chunk copied as one halfword, not as two bytes */
+                    *(u16 *)&self->curCell.chunk = *(u16 *)&self->targetCell.base.chunk;
+                    self->curCell.cell.column = rect->col + col;
+                    self->curCell.cell.row = rect->row + row;
                     NotifyGridCell(*cell, sender, command);
                     for (chained = (*cell)->nextInCell; chained != NULL; chained = chained->nextInCell) {
                         NotifyGridCell(chained, sender, command);
@@ -654,7 +654,7 @@ s32 StageMap__ComputeCellOffsets(StageMap *self, void *outPos, void *cell) {
 }
 
 s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dims, LongVec3 *origin,
-                            Descriptor10 *cell) {
+                            Descriptor10 *desc) {
     s32 row;
     s32 rowSpan;
     s32 chunkIndex;
@@ -663,15 +663,15 @@ s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dim
     s32 halfCell;
 
     if (dims->isVertical == 0) {
-        row = cell->b1;
+        row = desc->chunk.row;
         rowSpan = dims->rows;
-        chunkIndex = cell->b0 + dims->columns * row;
+        chunkIndex = desc->chunk.column + dims->columns * row;
     } else {
         rowSpan = 1;
         row = 0;
         chunkIndex = 0;
     }
-    x = (origin->x - dims->columns * (STAGE_CHUNK_SIZE / 2)) + cell->b0 * STAGE_CHUNK_SIZE;
+    x = (origin->x - dims->columns * (STAGE_CHUNK_SIZE / 2)) + desc->chunk.column * STAGE_CHUNK_SIZE;
     z = origin->z - rowSpan * (STAGE_CHUNK_SIZE / 2);
     chunkPos[0] = x;
     if (row & 1) {
@@ -680,9 +680,9 @@ s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dim
     chunkPos[1] = origin->y;
     halfCell = STAGE_CELL_SIZE / 2; /* MATCHING: a local set here; the literal at each use differs */
     chunkPos[2] = z + row * STAGE_CHUNK_SIZE;
-    outPos[0] = (cell->b2 << STAGE_CELL_SHIFT) + chunkPos[0] + (cell->h4 + halfCell);
-    outPos[1] = cell->h6 + chunkPos[1];
-    outPos[2] = (cell->b3 << STAGE_CELL_SHIFT) + chunkPos[2] + (cell->h8 + halfCell);
+    outPos[0] = (desc->cell.column << STAGE_CELL_SHIFT) + chunkPos[0] + (desc->x + halfCell);
+    outPos[1] = desc->y + chunkPos[1];
+    outPos[2] = (desc->cell.row << STAGE_CELL_SHIFT) + chunkPos[2] + (desc->z + halfCell);
     chunkPos[0] += STAGE_CHUNK_SIZE / 2;
     chunkPos[2] = chunkPos[2] + STAGE_CHUNK_SIZE / 2;
     return chunkIndex;
@@ -719,10 +719,10 @@ s32 StageMap__UpdateFootprintTracking(StageMap *self) {
 
     self->methods->refreshFootprint(self);
 
-    oldChunk = *(u16 *)&self->targetCell;
+    oldChunk = *(u16 *)&self->targetCell.base.chunk;
     self->targetCell = desc;
 
-    if ((s16)oldChunk != *(s16 *)&desc) {
+    if ((s16)oldChunk != *(s16 *)&desc.base.chunk) {
         self->methods->notifyParents(self, STAGEMAP_EVENT_CHUNK_CHANGED);
     }
 
@@ -1071,7 +1071,7 @@ s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, S
     if (slot != 0) {
         chunkIndex = slot->loader->chunkIndex;
         out->chunkIndex = chunkIndex;
-        StageMap__SplitChunkIndex(self, (u8 *)out, chunkIndex);
+        StageMap__SplitChunkIndex(self, &out->base.chunk, chunkIndex);
 
         chunkOrigin = (SplitCoord2 *)self->methods->findSlotByNeighbour(self, slot->loader->elemKey)
                           ->cellParent->coord2;
@@ -1088,19 +1088,19 @@ s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, S
         if (rel < 0) {
             rel += STAGE_CELL_SIZE - 1;
         }
-        out->base.b2 = rel >> STAGE_CELL_SHIFT;
+        out->base.cell.column = rel >> STAGE_CELL_SHIFT;
 
         rel = pos->z.w - origin->tz.w;
         if (rel < 0) {
             rel += STAGE_CELL_SIZE - 1;
         }
-        out->base.b3 = rel >> STAGE_CELL_SHIFT;
+        out->base.cell.row = rel >> STAGE_CELL_SHIFT;
 
-        cellCol = out->base.b2;
-        out->base.h4 = pos->x.h - (origin->tx.h + (cellCol << STAGE_CELL_SHIFT) + STAGE_CELL_SIZE / 2);
-        out->base.h6 = pos->y.h;
-        cellRow = out->base.b3;
-        out->base.h8 = pos->z.h - (origin->tz.h + (cellRow << STAGE_CELL_SHIFT) + STAGE_CELL_SIZE / 2);
+        cellCol = out->base.cell.column;
+        out->base.x = pos->x.h - (origin->tx.h + (cellCol << STAGE_CELL_SHIFT) + STAGE_CELL_SIZE / 2);
+        out->base.y = pos->y.h;
+        cellRow = out->base.cell.row;
+        out->base.z = pos->z.h - (origin->tz.h + (cellRow << STAGE_CELL_SHIFT) + STAGE_CELL_SIZE / 2);
         out->slot = slot;
 
         return 0;
@@ -1108,12 +1108,12 @@ s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, S
     return 1;
 }
 
-void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 chunkIndex) {
-    out[0] = chunkIndex % self->config->columns;
-    out[1] = chunkIndex / self->config->columns;
+void StageMap__SplitChunkIndex(StageMap *self, StageChunk *out, s32 chunkIndex) {
+    out->column = chunkIndex % self->config->columns;
+    out->row = chunkIndex / self->config->columns;
 }
 
-ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, u8 *out) {
+ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, StageChunk *out) {
     StageMap__SplitChunkIndex(self, out, self->lastEventSlot->loader->chunkIndex);
     return self->lastEventSlot;
 }
@@ -1239,8 +1239,8 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32
     param = self->target->coord2->param;
     rot = &param->rotate; /* MATCHING: here, before the call, not after it */
     self->methods->getTargetDescriptor(self, &desc, 0);
-    cellCol = desc.base.b2;
-    cellRow = desc.base.b3;
+    cellCol = desc.base.cell.column;
+    cellRow = desc.base.cell.row;
     angle = param->rotate.vy;
     if (param->rotate.vy < 0) {
         angle += ONE;
@@ -1414,7 +1414,7 @@ void StageMap__SetFootprintFromQuery(StageMap *self) {
     self->methods->getTargetDescriptor(self, &desc, 0);
     self->rectCount = 0;
     self->rectCount = StageMap__InitFootprintRect(self, junk, 0, desc.chunkIndex);
-    if (IsPointOutOfBounds(self->bounds, &desc.base.b2) != 0) {
+    if (IsPointOutOfBounds(self->bounds, &desc.base.cell) != 0) {
         if (desc.chunkIndex + 1 < self->config->rows) {
             self->rectCount =
                 StageMap__InitFootprintRect(self, junk, self->rectCount, desc.chunkIndex + 1);
@@ -1426,9 +1426,9 @@ void StageMap__SetFootprintFromQuery(StageMap *self) {
 }
 
 /* MATCHING: the in-range test returns 0 and `return 1` follows; the other order differs */
-s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
-    if (bounds != NULL && point[0] >= bounds->minCol && bounds->maxCol >= point[0] &&
-        point[1] >= bounds->minRow && bounds->maxRow >= point[1]) {
+s32 IsPointOutOfBounds(CellBounds *bounds, StageCell *cell) {
+    if (bounds != NULL && cell->column >= bounds->minCol && bounds->maxCol >= cell->column &&
+        cell->row >= bounds->minRow && bounds->maxRow >= cell->row) {
         return 0;
     }
     return 1;

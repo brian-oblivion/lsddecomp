@@ -287,8 +287,8 @@ s32 Actor__FindNearbyLink(Actor *self) {
  * chunk's edges (FindNearbyLink, the one caller, passes 1). */
 s32 Actor__BuildLinkQueries(Actor *self, GridQuery *queries, ChunkSlot **slots,
                             Descriptor10Ext *desc, s32 span) {
-    s32 cellCol = desc->base.b2;
-    s32 cellRow = desc->base.b3;
+    s32 cellCol = desc->base.cell.column;
+    s32 cellRow = desc->base.cell.row;
     s32 numCols;
     s32 numRows;
     s32 col;
