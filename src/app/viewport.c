@@ -22,8 +22,14 @@ static Ratio16 sDefaultViewTwist SDATA = {0, 1};
 static ColorRgb sDefaultViewportColor SDATA = {0, 0, 0};
 static s32 sDefaultViewportWidth SDATA = 256;
 static s32 sDefaultViewportHeight SDATA = 240;
-/* MATCHING: a second name for the same symbol, so its address is computed twice. */
+/* MATCHING: a second name for the same symbol, so its address is computed twice.
+ * The host needs no second address, and an assembler name would miss the
+ * symbol where C names get a prefix (32-bit Windows' "_"). */
+#ifdef HOST_BUILD
+#define sDefaultViewportColorAlias sDefaultViewportColor
+#else
 extern ColorRgb sDefaultViewportColorAlias __asm__("sDefaultViewportColor");
+#endif
 
 /* Viewport's ctor data: sFadeBoxAttachPos is the (-100, -100) screen
  * position the ctor and SetSubHandle attach the sub handle at, and
