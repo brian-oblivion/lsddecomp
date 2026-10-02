@@ -22,6 +22,11 @@ static s32 sWBgmActive SDATA = 0; /* 1 between WBgm__WBgm and WBgm__Finalize */
 extern char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 
 extern u8 sSsSizeTableBuf[];
+#ifdef PLATFORM_PC
+/* Placed by address in the PS1 link; defined here for the host. Sized for
+ * VabStreamObj's SsSetTableSize: two scores of one track. */
+u8 sSsSizeTableBuf[SS_SEQ_TABSIZ * 2];
+#endif
 
 /* The volume, left and right, a SEQ gets when it opens and again on every
  * play (libsnd's range is 0 to 127). */

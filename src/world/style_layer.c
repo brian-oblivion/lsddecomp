@@ -533,6 +533,10 @@ void *PickStyleFallbackConfig(void) {
 }
 
 extern BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
+#ifdef PLATFORM_PC
+/* Placed by address in the PS1 link; defined here for the host. */
+BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
+#endif
 
 /* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs, a
  * BoxFillPos and a BoxFillSize. */
@@ -637,6 +641,11 @@ void StyleReleaseDecorSet(void) {
 }
 
 extern StyleEffect *sStyleEffectSlots[];
+#ifdef PLATFORM_PC
+/* Placed by address in the PS1 link; defined here for the host. At most
+ * every kind-0 and kind-1 effect of variant 2, and one kind-2 or kind-3. */
+StyleEffect *sStyleEffectSlots[STYLE_VARIANT2_EFFECTS + 1];
+#endif
 extern StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos);
 extern StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos);
 extern StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos);
@@ -722,11 +731,28 @@ void StyleTeardown(void) {
     }
 }
 
+#ifdef PLATFORM_PC
+/* The StyleEffectParams block every effect is built from. The PS1 image has
+ * it as nine separate symbols at fixed addresses, sStyleSpawnOffsetX ..
+ * sStyleSpawnColors, which the code lays the block over; the host has no
+ * such layout, so the names are the block's fields. sStyleSpawnColors holds
+ * the two colour pointers as s32 words, which is right only at 32 bits. */
+static StyleEffectParams sStyleSpawnParams;
+#define sStyleSpawnOffsetX (sStyleSpawnParams.offset.x)
+#define sStyleSpawnOffsetY (sStyleSpawnParams.offset.y)
+#define sStyleSpawnOffsetZ (sStyleSpawnParams.offset.z)
+#define sStyleSpawnRotation (sStyleSpawnParams.rotation)
+#define sStyleSpawnScale (sStyleSpawnParams.scale)
+#define sStyleSpawnModelLayout (sStyleSpawnParams.modelChildLayout)
+#define sStyleSpawnTableIndex (sStyleSpawnParams.tableIndex)
+#define sStyleSpawnColors ((s32 *)&sStyleSpawnParams.color)
+#else
 extern Ratio16 *sStyleSpawnScale;
 extern s32 sStyleSpawnTableIndex;
 /* The first word of the StyleEffectParams block every effect is built from
  * (sStyleSpawnOffsetX .. sStyleSpawnColors, separate symbols in the image). */
 extern s32 sStyleSpawnOffsetX;
+#endif
 extern void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY);
 extern void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY);
 
@@ -775,10 +801,12 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
     return slots;
 }
 
+#ifndef PLATFORM_PC
 extern s32 sStyleSpawnColors[];
 extern Ratio16 *sStyleSpawnRotation;
 extern s32 sStyleSpawnOffsetY;
 extern s32 sStyleSpawnOffsetZ;
+#endif
 
 /** @brief sStyleSpawnRotation seen as a one-field struct, through which
  * StyleFillEffectKind3 stores the effect's rotation. */
@@ -865,7 +893,9 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     return slots;
 }
 
+#ifndef PLATFORM_PC
 extern s32 sStyleSpawnModelLayout;
+#endif
 
 /* Randomises the spawn parameters: offset y (offsetY, or a random choice
  * when 0), x and z offsets of 0..22 steps of 2048 either side, a rotation
@@ -1026,6 +1056,11 @@ extern void StyleBuildDecorSet(void);
 extern void StyleUpdateDecorSet(void);
 extern void StyleScrollVramStrips(void);
 extern StyleCueSlot sStyleCueSlotPool[];
+#ifdef PLATFORM_PC
+/* Placed by address in the PS1 link; defined here for the host. One per
+ * sStyleCueSlots entry. */
+StyleCueSlot sStyleCueSlotPool[ARRAY_COUNT(sStyleCueSlots)];
+#endif
 extern StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *target, void *unused);
 extern s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused);
 
