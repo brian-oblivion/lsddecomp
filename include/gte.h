@@ -25,7 +25,15 @@
  * Names follow Sony's include/psyq/inline.h, so the SDK manual describes
  * each one. Code around the macros is ordinary C; a GTE operation this file
  * lacks is added here under Sony's name, not written out at a call site.
+ *
+ * The host build (PLATFORM_PC) has no COP2: it takes the same macros from
+ * psyz's <libgte.h>, which runs them on psyz's GTE emulation, and this file
+ * defines none of its own.
  */
+
+#ifdef PLATFORM_PC
+#include <libgte.h>
+#else
 
 /**
  * @brief Loads vertex 0: the SVECTOR at `r1` into VXY0/VZ0 (data 0, 1).
@@ -223,13 +231,12 @@
 /* clang-format on */
 
 /**
- * @brief MVMVA with the local (rotation) matrix and the IR vector, no
- * translation, shifted by 12: IR1-IR3 := rotation * IR. The name is Sony's
- * scheme: "ll" local matrix, "ir" IR vector, no suffix for no added vector.
- * No operands, no clobbers.
+ * @brief MVMVA with the rotation matrix and the IR vector, no translation,
+ * shifted by 12: IR1-IR3 := rotation * IR. Sony's rtir; its llir uses the
+ * light matrix instead. No operands, no clobbers.
  */
 /* clang-format off */
-#define gte_llir() \
+#define gte_rtir() \
     __asm__ volatile ( \
         "nop\n\t" \
         "nop\n\t" \
@@ -408,7 +415,7 @@
 /**
  * @brief Loads one column of a 3x3 s16 matrix at `r1` (three u16 at a
  * 6-byte stride: +0x0, +0x6, +0xC) into IR1-IR3 (data 9-11). With
- * gte_llir() and gte_stclmv(), three calls multiply a matrix a column at a
+ * gte_rtir() and gte_stclmv(), three calls multiply a matrix a column at a
  * time. Operand: `r1` by "r"; clobbers general registers 12-14.
  */
 /* clang-format off */
@@ -496,5 +503,7 @@
         "swc2 $14, 0x0(%2)" \
         : : "r" (r1), "r" (r2), "r" (r3) : "memory")
 /* clang-format on */
+
+#endif /* !PLATFORM_PC */
 
 #endif

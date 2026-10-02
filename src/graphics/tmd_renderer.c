@@ -218,15 +218,15 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
         gte_SetRotMatrix(&obj->coord2->super->workm);
 
         gte_ldclmv(&obj->coord2->workm.m[0][0]);
-        gte_llir();
+        gte_rtir();
         gte_stclmv(&obj->coord2->workm.m[0][0]);
 
         gte_ldclmv(&obj->coord2->workm.m[0][1]);
-        gte_llir();
+        gte_rtir();
         gte_stclmv(&obj->coord2->workm.m[0][1]);
 
         gte_ldclmv(&obj->coord2->workm.m[0][2]);
-        gte_llir();
+        gte_rtir();
         gte_stclmv(&obj->coord2->workm.m[0][2]);
 
         gte_SetRotMatrix(&ctx->savedRotMatrix);
@@ -865,16 +865,18 @@ void StoreSxyPolyG4(void *dst, s32 storeFirst3) {
  * of one texture page. */
 #define MAX_UNDIVIDED_SPAN 256
 
-/* Sony's prototypes, copied from libgte.h, where they sit commented out
- * because that header does not include libgpu.h's POLY_* types. */
-extern u_long *RCpolyF3(POLY_F3 *s, DIVPOLYGON3 *divp);
-extern u_long *RCpolyF4(POLY_F4 *s, DIVPOLYGON4 *divp);
-extern u_long *RCpolyFT3(POLY_FT3 *s, DIVPOLYGON3 *divp);
-extern u_long *RCpolyFT4(POLY_FT4 *s, DIVPOLYGON4 *divp);
-extern u_long *RCpolyG3(POLY_G3 *s, DIVPOLYGON3 *divp);
-extern u_long *RCpolyG4(POLY_G4 *s, DIVPOLYGON4 *divp);
-extern u_long *RCpolyGT3(POLY_GT3 *s, DIVPOLYGON3 *divp);
-extern u_long *RCpolyGT4(POLY_GT4 *s, DIVPOLYGON4 *divp);
+/* libgte's subdividers. Sony's libgte.h has these prototypes commented out,
+ * since it does not include libgpu.h's POLY_* types; psyz's declares them
+ * with the primitive as a void pointer, and so do these, so that both
+ * headers agree with them. */
+extern u_long *RCpolyF3(void *s, DIVPOLYGON3 *divp);
+extern u_long *RCpolyF4(void *s, DIVPOLYGON4 *divp);
+extern u_long *RCpolyFT3(void *s, DIVPOLYGON3 *divp);
+extern u_long *RCpolyFT4(void *s, DIVPOLYGON4 *divp);
+extern u_long *RCpolyG3(void *s, DIVPOLYGON3 *divp);
+extern u_long *RCpolyG4(void *s, DIVPOLYGON4 *divp);
+extern u_long *RCpolyGT3(void *s, DIVPOLYGON3 *divp);
+extern u_long *RCpolyGT4(void *s, DIVPOLYGON4 *divp);
 
 void FillDivPolygonHeader(void *divp, PolyDrawCtx *ctx, CVECTOR *rgbc, s32 textured, u_short clut,
                           u_short tpage);
