@@ -1,7 +1,9 @@
 #ifndef INCLUDE_ASM_H
 #define INCLUDE_ASM_H
 
-#if !defined(M2CTX) && !defined(PERMUTER)
+/* The host build (PLATFORM_PC) has no PS1 assembly: the game's C has no
+ * INCLUDE_ASM, and the labels are the PS1 linker's. */
+#if !defined(M2CTX) && !defined(PERMUTER) && !defined(PLATFORM_PC)
 
 #ifndef INCLUDE_ASM
 #define INCLUDE_ASM(FOLDER, NAME) \
@@ -38,6 +40,6 @@ __asm__(".include \"include/labels.inc\"\n");
 #define INCLUDE_RODATA(FOLDER, NAME)
 #endif
 
-#endif /* !defined(M2CTX) && !defined(PERMUTER) */
+#endif /* !defined(M2CTX) && !defined(PERMUTER) && !defined(PLATFORM_PC) */
 
 #endif /* INCLUDE_ASM_H */

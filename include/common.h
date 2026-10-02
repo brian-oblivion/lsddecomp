@@ -25,7 +25,7 @@
  * Exact for multiples of 45 degrees; a constant expression. */
 #define ANGLE_DEG(deg) ((deg) * 4096 / 360)
 
-#if !defined(M2CTX) && !defined(PERMUTER)
+#if !defined(M2CTX) && !defined(PERMUTER) && !defined(PLATFORM_PC)
 /** Places a definition in small data, the `.sdata` section: the game's
  * small initialized globals, reached through one base register. Used as
  * `static s32 sName SDATA = 320;`. The definition must have an initializer,
@@ -43,6 +43,18 @@
 /** 20.12 fixed point: libgte's ONE is 1 << FIX12_SHIFT, so `n << FIX12_SHIFT`
  * is the integer n as a fixed-point value. */
 #define FIX12_SHIFT 12
+
+#ifdef PLATFORM_PC
+/** libgte's 32-bit integer, the type of MATRIX.t[] and of VECTOR's members:
+ * `int` in psyz's headers. A pointer to one of those members is a
+ * `GteLong *`. */
+typedef int GteLong;
+#else
+/** libgte's 32-bit integer, the type of MATRIX.t[] and of VECTOR's members:
+ * `long` in Sony's headers. A pointer to one of those members is a
+ * `GteLong *`. */
+typedef long GteLong;
+#endif
 
 /**
  * @brief A position on the dream chart, the two-axis mood graph the game

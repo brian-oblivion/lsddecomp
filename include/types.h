@@ -12,7 +12,15 @@
  * The same types go by three names here: the short names the game code
  * uses (`u8` .. `s64`), the C99 names (`uint8_t` .. `int64_t`), and Sony's
  * `u_char` .. `u_long` from <sys/types.h>.
+ *
+ * The host build (PLATFORM_PC) takes the C99 and Sony names from psyz,
+ * where `u_long` is as wide as a pointer, and defines only the short names
+ * and bool here.
  */
+
+#ifdef PLATFORM_PC
+#include <psyz/types.h>
+#endif
 
 /* Short names: what the game code is written in. */
 
@@ -36,6 +44,8 @@ typedef signed long long s64;
 typedef float f32;
 /** @brief 64-bit float, software like f32. */
 typedef double f64;
+
+#ifndef PLATFORM_PC
 
 /* C99 names, for the few places that read better with them. */
 
@@ -85,6 +95,8 @@ typedef u32 u_int;
 /** @brief Sony's unsigned 32-bit `long`, the same type as u32 here. */
 typedef u32 u_long;
 #endif
+
+#endif /* !PLATFORM_PC */
 
 /** @brief An `int`-sized truth value: zero is false, anything else true. */
 typedef int bool;
