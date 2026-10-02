@@ -38,6 +38,22 @@
  * gridSpan >> 12). */
 #define DEFAULT_GRID_SPAN 40960
 
+/* ObjM's small data, in address order. */
+
+/* MATCHING: two grid spans nothing reads open retail's .sdata. */
+static s32 sObjMUnusedGridSpanA SDATA = DEFAULT_GRID_SPAN;
+static s32 sObjMUnusedGridSpanB SDATA = DEFAULT_GRID_SPAN;
+
+/* Added to the viewport's projection distance; 0, and never written. */
+static s32 sObjMProjectionBias SDATA = 0;
+
+/* ObjM__AdvancePauseSetup's literals, all reached by address: the TextRow's
+ * position (attachToParent, percent of half the screen from the centre),
+ * its colour, red (setColor), and the text. */
+static ScreenSpritePos sPauseTextPos SDATA = {-20, -50};
+static ColorRgb sPauseTextColor SDATA = {255, 0, 0};
+static char sPauseText[] SDATA = "Pause";
+
 /* ObjM's data, in address order. A method-table slot whose function is
  * declared for another class's `self` takes a `void *` cast. */
 
@@ -372,10 +388,6 @@ void ObjM__TogglePause(ObjM *self) {
 
 void ObjM__NoOpOnTimedOut(void) {}
 
-/* Added to the viewport's projection distance; 0 in the image and never
- * written. */
-extern s32 sObjMProjectionBias;
-
 void ObjM__SetupSceneStyle(ObjM *self) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
     StyleConfig *style = self->styleConfig;
@@ -552,12 +564,6 @@ void ObjM__EnterLinkWall(ObjM *self) {
     ObjM__StartFadeUp(self, color, 0, 30, 1);
     self->dreamSys->methods->blockMovement(self->dreamSys);
 }
-
-/* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"
- * text, the TextRow's position (attachToParent) and its colour (setColor). */
-extern char sPauseText[];             /* "Pause" */
-extern ScreenSpritePos sPauseTextPos; /* (-20, -50) */
-extern ColorRgb sPauseTextColor;      /* red: (255, 0, 0) */
 
 void ObjM__EnterLinkFlashback(ObjM *self) {
     DreamColors color;

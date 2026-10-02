@@ -2047,7 +2047,9 @@ segments:
       - [0x7B2F5, pad]                        # 3 bytes: text_entry's .sdata ends with the 5-byte ".TIM"
       - [0x7B2F8, .sdata, ui/item_list]  # the panel and first row's places, the row colours, SELECT, CARD\\ and .TIM
       - [0x7B329, pad]                        # 3 bytes: item_list's .sdata ends with the 5-byte ".TIM"
-      - [0x7B32C, sdata]
+      - [0x7B32C, .sdata, world/objm]  # two unread grid spans, the projection bias, the "Pause" text's place and colour
+      - [0x7B34A, pad]                        # 2 bytes: objm's .sdata ends with the 6-byte "Pause"
+      - [0x7B34C, sdata]
       - [0x7b3c0, sdata]              # DreamSys's sdata slot
       - [0x7b3f8, sdata]
       - [0x7B420, .sbss, main]  # the root GameApplication

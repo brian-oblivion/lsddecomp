@@ -3,7 +3,6 @@
 # .sdata/.sbss ranges in config/splat.slps01556.lsdde.yaml. maspsx
 # --gp-symbols addresses these off $gp. Regenerate after any
 # sdata/sbss carve.
-D_8008AB2C
 D_8008AC24
 D_8008AC50
 D_8008AC68
@@ -118,6 +117,8 @@ sNdivOverrideSet
 sNullDriverMode
 sNullDriverModeArg
 sObjMProjectionBias
+sObjMUnusedGridSpanA
+sObjMUnusedGridSpanB
 sOpenVabCount
 sPadRefCount
 sPauseText
