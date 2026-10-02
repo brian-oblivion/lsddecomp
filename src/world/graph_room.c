@@ -170,11 +170,13 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
     }
 }
 
-/* A graph point's colour is New_BoxFill's colour argument, a ColorRgb
- * (include/box_fill.h). */
-extern s32 sGraphPointSize[2];
-extern ColorRgb sGraphPointNewestColor;
-extern ColorRgb sGraphPointBaseColor;
+/* GraphRoom's small data. A graph point is a 10 x 10 BoxFill; its colour is
+ * New_BoxFill's colour argument, a ColorRgb (include/box_fill.h): the
+ * newest point red, the others white, the highlighted one green. */
+static s32 sGraphPointSize[2] SDATA = {10, 10};
+static ColorRgb sGraphPointNewestColor SDATA = {255, 0, 0};
+static ColorRgb sGraphPointBaseColor SDATA = {255, 255, 255};
+static ColorRgb sGraphPointHighlightColor SDATA = {0, 255, 0};
 
 void GraphRoom__BuildGraphPoints(GraphRoom *self) {
     ColorRgb rgb;
@@ -328,8 +330,6 @@ s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
 fail:
     return 0;
 }
-
-extern ColorRgb sGraphPointHighlightColor;
 
 void GraphRoom__TickHighlight(GraphRoom *self) {
     if (self->scored != 0) {
