@@ -20,10 +20,8 @@
 #include "task_objf.h"
 #include <kernel.h>
 #ifdef HOST_BUILD
-/* psyz declares the kernel's file, event and card calls in libapi.h, and
- * has delete() under its later Psy-Q name. */
+/* psyz declares the kernel's file, event and card calls in libapi.h. */
 #include <libapi.h>
-#define delete erase
 #else
 #include <sys/file.h>
 #endif
@@ -428,7 +426,11 @@ s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size) {
     }
     close(handle);
     /* MATCHING: delete(path), the same address, changes the code. */
+#ifdef HOST_BUILD
+    erase(pathBuf); /* psyz has the call under its later Psy-Q name */
+#else
     delete (pathBuf);
+#endif
     return 1;
 }
 
@@ -530,7 +532,11 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
     McSaveHeader *header;
 
     path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, fileName);
+#ifdef HOST_BUILD
+    erase(path); /* psyz has the call under its later Psy-Q name */
+#else
     delete (path);
+#endif
     openMode = MEMCARD_OPEN_BLOCKS(((u32)size + (MEMCARD_SAVE_HEADER_SIZE + MEMCARD_BLOCK_SIZE - 1)) >>
                                    MEMCARD_BLOCK_SHIFT) |
                FCREAT;
