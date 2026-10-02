@@ -789,7 +789,7 @@ s32 TransformAndCullPoly(void *primIn, void *ctxIn) {
     ctx->divide = 0;
     gte_rtpt();
     setlen(primIn, ctx->primLen);
-    gte_stflg(&ctx->flag);
+    gte_stflg_4(&ctx->flag);
     if (ctx->flag != 0) {
         if (ctx->flag != GTE_FLAG_SZ3_OTZ_SAT) {
             return 1;
