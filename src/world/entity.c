@@ -21,11 +21,22 @@
 /* MATCHING: tod_actor.h's moveLocalZ/moveLocalY must return void, or the handlers'
  * identical calls are no longer shared */
 
-/* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
- * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what
- * Viewport gives its FadeBox (fade_box.h). */
-extern s32 sEntityFadeBoxDefaultSize[2];
-extern s32 sEntityFadeBoxDefaultOffset[2];
+/* Entity's small data, in address order: .sdata, then .sbss. */
+
+/* The attach offset and size Entity__GetOrCreateFadeBox substitutes when
+ * its `offset`/`size` arguments are NULL: what Viewport gives its FadeBox
+ * (fade_box.h). */
+static s32 sEntityFadeBoxDefaultOffset[2] SDATA = {-100, -100};
+static s32 sEntityFadeBoxDefaultSize[2] SDATA = {320, 240};
+
+/* The clear colour Entity__CueBlueSkyPushDreamer gives the peer's viewport,
+ * sky blue. */
+static ColorRgb sCueBlueSkyClearColor SDATA = {0, 100, 190};
+
+/* Entity__CueStepForwardAndBack's: cleared on the cue's first tick, set when
+ * its phase 11 ends the cue at tick 510; at tick 520 a set flag ends it
+ * again. */
+static s32 sCueStepForwardAndBackDone SBSS = 0;
 
 /* Defined at the end of this file, after the handlers it lists. */
 extern EntityMoodRow sEntityMoodTable[ENTITY_MOOD_ROW_COUNT];
@@ -2165,9 +2176,6 @@ void Entity__CueTurnAndHoldDreamer(Entity *self, SoundCueSet *out) {
     }
 }
 
-/* {0, 100, 190}: the clear colour Entity__CueBlueSkyPushDreamer gives the peer's viewport. */
-extern ColorRgb sCueBlueSkyClearColor;
-
 /* Row 74: turns the sky blue (the viewport's clear colour) at the start. Two times in three, unless
  * the dreamer's z is below 610, it pushes the dreamer back 128 a tick from mid-animation and links
  * to the row's stage 30 ticks before the animation ends; otherwise it pushes the dreamer forward
@@ -2274,10 +2282,6 @@ void Entity__CueWalkTurningRoute(Entity *self, SoundCueSet *out) {
         self->state = ENTITY_STATE_DONE;
     }
 }
-
-/* Entity__CueStepForwardAndBack's: cleared on the cue's first tick, set when its phase
- * 11 ends the cue at tick 510; at tick 520 a set flag ends it again. */
-extern s32 sCueStepForwardAndBackDone;
 
 /* Row 78: each animation cycle rests, steps forward 110 a tick, steps back 110 a tick, then
  * animates; sounds program 28 while animating. One time in three it rises 380, pitches up 90

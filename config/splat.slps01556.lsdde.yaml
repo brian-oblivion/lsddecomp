@@ -2058,7 +2058,8 @@ segments:
       - [0x7B3C0, .sdata, world/dream_sys]  # the staircase offsets, the save magic, the link angle
       - [0x7B3F6, pad]                        # 2 bytes: dream_sys's .sdata ends with the 2-byte MoodGraphPoint
       - [0x7B3F8, .sdata, world/dream_aux]  # the installed stage, StageMap, player, sound bank and FrameClock
-      - [0x7B40C, sdata]
+      - [0x7B40C, .sdata, world/entity]  # the fade box's default place and size, the blue sky
+      - [0x7B41F, pad]                        # 1 byte: entity's .sdata ends with a 3-byte ColorRgb
       - [0x7B420, .sbss, main]  # the root GameApplication
       - [0x7B424, sbss]               # crt0's saved $ra (0x8008AC24), then malloc's and putchar's .sbss: Sony's
       - [0x7B44C, .sbss, graphics/tmd_model]  # the bounds buffer's box count
@@ -2067,5 +2068,6 @@ segments:
       - [0x7B46C, .sbss, world/style_layer]  # the stage, day and tick, the config, the decoration's colours, the cue slots
       - [0x7B4A4, .sbss, world/style_effect]  # its model, TIM, viewport and base view height
       - [0x7B4B4, .sbss, world/dream_sys]  # the navigation arrays, the last stage link
-      - [0x7b4cc, sbss]
+      - [0x7B4CC, .sbss, world/entity]  # CueStepForwardAndBack's done flag
+      - [0x7B4D0, sbss]
   - [0x7B800]
