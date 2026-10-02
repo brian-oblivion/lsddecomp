@@ -512,15 +512,16 @@ void ReleaseDreamAuxModels(void) {
     }
 }
 
-/* What SetDreamAuxWorld installs: the stage, its StageMap (the parent every
- * Entity here attaches to), the player (each Entity's peer), the sound bank
- * each Entity is built with and the FrameClock each attaches as its
- * companion. */
-extern s32 sDreamAuxStage;
-extern StageMap *sDreamAuxStageMap;
-extern DreamSys *sDreamAuxWorld;
-extern struct VabStreamObj *sDreamAuxSound;
-extern struct FrameClock *sDreamAuxFrameClock;
+/* DreamAux's small data, what SetDreamAuxWorld installs: the stage, its
+ * StageMap (the parent every Entity here attaches to), the player (each
+ * Entity's peer), the sound bank each Entity is built with and the
+ * FrameClock each attaches as its companion. No stage (-1) and NULL until
+ * then. */
+static s32 sDreamAuxStage SDATA = -1;
+static StageMap *sDreamAuxStageMap SDATA = NULL;
+static DreamSys *sDreamAuxWorld SDATA = NULL;
+static struct VabStreamObj *sDreamAuxSound SDATA = NULL;
+static struct FrameClock *sDreamAuxFrameClock SDATA = NULL;
 
 void SetTeleportsEnabled(s32 stage);
 

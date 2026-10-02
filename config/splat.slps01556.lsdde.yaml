@@ -2057,7 +2057,8 @@ segments:
       - [0x7B3BF, pad]                        # 1 byte: graph_room's .sdata ends with a 3-byte ColorRgb
       - [0x7B3C0, .sdata, world/dream_sys]  # the staircase offsets, the save magic, the link angle
       - [0x7B3F6, pad]                        # 2 bytes: dream_sys's .sdata ends with the 2-byte MoodGraphPoint
-      - [0x7b3f8, sdata]
+      - [0x7B3F8, .sdata, world/dream_aux]  # the installed stage, StageMap, player, sound bank and FrameClock
+      - [0x7B40C, sdata]
       - [0x7B420, .sbss, main]  # the root GameApplication
       - [0x7B424, sbss]               # crt0's saved $ra (0x8008AC24), then malloc's and putchar's .sbss: Sony's
       - [0x7B44C, .sbss, graphics/tmd_model]  # the bounds buffer's box count
