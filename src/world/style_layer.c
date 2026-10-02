@@ -379,11 +379,11 @@ StyleCueRecord sStyleStage13Cues[1] = {
 };
 
 /* The per-stage cue lists and their lengths. */
-u8 *sStyleCueRecordLists[14] = {
-    (u8 *)sStyleStage00Cues, NULL, (u8 *)sStyleStage02Cues, (u8 *)sStyleStage03Cues,
-    (u8 *)sStyleStage04Cues, (u8 *)sStyleStage05Cues, NULL, NULL,
-    NULL, NULL, (u8 *)sStyleStage10Cues, (u8 *)sStyleStage11Cues,
-    NULL, (u8 *)sStyleStage13Cues,
+StyleCueRecord *sStyleCueRecordLists[14] = {
+    sStyleStage00Cues, NULL, sStyleStage02Cues, sStyleStage03Cues,
+    sStyleStage04Cues, sStyleStage05Cues, NULL, NULL,
+    NULL, NULL, sStyleStage10Cues, sStyleStage11Cues,
+    NULL, sStyleStage13Cues,
 };
 u8 sStyleCueRecordCounts[14] = {1, 0, 9, 29, 5, 9, 0, 0, 0, 0, 1, 1, 0, 1};
 /* clang-format on */
@@ -573,7 +573,7 @@ void StyleBuildDecorSet(void) {
                                                                             parent, &pos);
 }
 
-void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta);
+void AdjustRgbByDelta(u8 *dst, const u8 *src, s32 delta);
 
 /* Every tick, once the view point's y exceeds the reference point's by a
  * fade step: each band's colour
@@ -608,7 +608,7 @@ void StyleUpdateDecorSet(void) {
     colorOfs = 0;
     pos.y += fade * 3;
     for (; i < STYLE_DECOR_BANDS; i++) {
-        AdjustRgbByDelta(rgb, (u8 *)(colorOfs + sStyleDecorColors), fade);
+        AdjustRgbByDelta(rgb, colorOfs + sStyleDecorColors, fade);
         band = *slot;
         band->methods->setColor(band, 1, rgb);
         band = *slot;
@@ -617,12 +617,12 @@ void StyleUpdateDecorSet(void) {
         pos.y += 3;
         slot++;
     }
-    AdjustRgbByDelta(rgb, (u8 *)sStyleClearColor, fade);
+    AdjustRgbByDelta(rgb, sStyleClearColor, fade);
     viewport->methods->setClearColor(viewport, (ColorRgb *)rgb);
 }
 
 /* dst = src with red and green less `delta`, blue more. */
-void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
+void AdjustRgbByDelta(u8 *dst, const u8 *src, s32 delta) {
     dst[0] = src[0] - delta;
     dst[1] = src[1] - delta;
     dst[2] = src[2] + delta;
@@ -939,7 +939,7 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
  * Writes the record's world position and distance. */
 StyleCueRecord *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
     s32 j, remaining;
-    u8 *records;
+    StyleCueRecord *records;
     StyleCueRecord *entry;
     CellKeyDesc buf;
     s32 dx, dz, dist;

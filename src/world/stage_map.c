@@ -948,14 +948,14 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     PlacementGrid *grid;
     LinkResource *oldResource;
     GridCell **cell;
-    u8 *cells;
+    GridCell **cells;
     GsCOORD2PARAM *param;
     s32 rotY;
     s32 model;
     s32 hidden;
     s32 i;
-    s32 cellOff;
-    s32 overflowOff;
+    s32 cellIndex;
+    s32 overflowIndex;
     CellPlacement rec;
     ResourceRequest req; /* MATCHING: mode is never set; a bare ResourceSource shrinks the frame */
 
@@ -975,8 +975,8 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
 
     i = 0;
     hidden = GsDOFF;
-    cellOff = 0;
-    overflowOff = STAGE_SLOT_LATTICE_CELLS * sizeof(GridCell *);
+    cellIndex = 0;
+    overflowIndex = STAGE_SLOT_LATTICE_CELLS;
     for (;;) {
         model = ((PlacementGridResolveEntryFn)grid->methods->processBuffer)(grid, &rec, i);
         if (model == 0) {
@@ -984,18 +984,18 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
         }
         if (model == -1) {
             s32 attr;
-            cell = (GridCell **)((u8 *)slot->cells + cellOff);
+            cell = &slot->cells[cellIndex];
             attr = (*cell)->attribute;
             (*cell)->attribute = attr | hidden;
             (*cell)->model = 0;
             (*cell)->tmd = 0;
         } else {
-            cells = (u8 *)slot->cells;
+            cells = slot->cells;
             if (rec.chained != 0) {
-                cell = (GridCell **)(cells + overflowOff);
-                overflowOff += sizeof(GridCell *);
+                cell = &cells[overflowIndex];
+                overflowIndex++;
             } else {
-                cell = (GridCell **)(cells + cellOff);
+                cell = &cells[cellIndex];
             }
             (*cell)->model = (void *)model;
             (*cell)->tmd = (s32)((TmdModel *)(*cell)->model)->object;
@@ -1016,11 +1016,11 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
             }
         }
         if (rec.next) {
-            GridCell **overflow = (GridCell **)((u8 *)slot->cells + overflowOff);
+            GridCell **overflow = &slot->cells[overflowIndex];
             (*cell)->nextInCell = *overflow;
             continue;
         }
-        cellOff += sizeof(GridCell *);
+        cellIndex++;
         (*cell)->nextInCell = 0;
         i++;
     }

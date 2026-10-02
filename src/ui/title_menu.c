@@ -347,7 +347,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, ColorRgb *color) {
     u8 *channels;
 
     channels = (u8 *)&rgb;
-    GetTaskCoreMethods()->broadcastToSlots((TaskCore *)self, (u8 *)color);
+    GetTaskCoreMethods()->broadcastToSlots((TaskCore *)self, &color->r);
     if (self->inputMode != TASKCORE_INPUT_NONE) {
         channels[0] = 0;
         channels[1] = 0;
