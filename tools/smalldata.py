@@ -6,7 +6,7 @@
 
 A run is a stretch of consecutive labels whose users (the src/ files that
 name them) are the same. A run with one user is ready to move into that
-unit (docs/SDATA.md). The lines to read by hand are flagged:
+unit (SDATA and SBSS in include/common.h). The lines to read by hand are flagged:
 
   SHARED   more than one unit names it: the owner is the unit whose range
            it sits in (link order), and the others keep an `extern`
