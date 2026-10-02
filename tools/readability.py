@@ -33,8 +33,10 @@ Per-unit debt (track 8), over game bodies:
   - slot: `->slotNN(` calls;
   - magic: integer literals of 10 or more (0x10 and up in hex) outside
     `#define` and `enum` lines -- the ones a reader has to decode;
-  - rawoff: byte-pointer casts `(u8 *)`, `(s8 *)`, `(char *)`, the signature
-    of offset arithmetic that should be a field access;
+  - rawoff: byte-pointer casts `(u8 *)`, `(s8 *)`, `(char *)` whose result
+    is offset with `+`/`-`, the signature of arithmetic that may be a field
+    or array access (a cast that only converts a pointer's type, for a
+    const-less or Sony prototype, is not counted);
   - m2c: m2c-style local names (`var_s0`, `temp_v0`, `sp10`, `arg0`; m2c writes stack slots in uppercase hex, so `speed` is not one),
     counted once per function they appear in;
   - history: project history inside comments, `round NN` and retail
@@ -147,6 +149,33 @@ SLOT_RE = re.compile(r"->slot_?0?x?[0-9A-Fa-f]+\s*\(")
 D_RE = re.compile(r"\bD_800[0-9A-F]{5}\b")
 
 
+def rawoff_casts(text):
+    """The byte-pointer casts in `text` whose operand is then offset: the
+    operand is a parenthesised group or a name/member/index chain, and the
+    next token is a binary `+` or `-` (not `->`, `++` or `--`)."""
+    out = []
+    for m in RAWOFF_RE.finditer(text):
+        i = m.end()
+        while i < len(text) and text[i].isspace():
+            i += 1
+        if i < len(text) and text[i] == "(":
+            depth = 0
+            while i < len(text):
+                depth += {"(": 1, ")": -1}.get(text[i], 0)
+                i += 1
+                if depth == 0:
+                    break
+        else:
+            op = re.compile(r"[&*]*\w+(?:\s*(?:->|\.)\s*\w+|\s*\[[^\]]*\])*").match(text, i)
+            if not op:
+                continue
+            i = op.end()
+        rest = text[i:i + 3].lstrip()
+        if rest[:1] in "+-" and rest[:2] not in ("->", "++", "--"):
+            out.append(m.group(0))
+    return out
+
+
 def game_bodies(live, info):
     """[(name, body text)] for each GAME definition in comment-free live code."""
     ms = [m for m in progress.DEF_RE.finditer(live) if m.group(1) not in NOT_DEF]
@@ -193,7 +222,7 @@ def unit_debt(unit_path, info, detail=False):
         "unk": len(UNK_RE.findall(text)),
         "slot": len(SLOT_RE.findall(text)),
         "magic": sum(len(magic_literals(b)) for _, b in bodies),
-        "rawoff": len(RAWOFF_RE.findall(text)),
+        "rawoff": len(rawoff_casts(text)),
         "m2c": sum(len(set(M2C_RE.findall(b))) for _, b in bodies),
         "history": history(raw),
         "ph_prefix": sum(1 for n, _ in bodies if ph_prefix(n)),
@@ -204,7 +233,7 @@ def unit_debt(unit_path, info, detail=False):
             "func_": [n for n, _ in bodies if FUNC_PH.match(n)],
             "D_": sorted(set(D_RE.findall(text))),
             "m2c": sorted({f"{n}: {v}" for n, b in bodies for v in M2C_RE.findall(b)}),
-            "rawoff": [n for n, b in bodies if RAWOFF_RE.search(b)],
+            "rawoff": [n for n, b in bodies if rawoff_casts(b)],
             "magic": [f"{n}: {', '.join(magic_literals(b))}" for n, b in bodies if magic_literals(b)],
         }
     return row
