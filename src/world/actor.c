@@ -174,19 +174,16 @@ void Actor__AddLocalTranslation(Actor *self, s16 *local) {
     self->methods->addTranslation(self, &delta);
 }
 
-/* The z of the s16 local move vector whose x and y are sActorLocalMove
- * (below, with MoveLocalX/Y and MoveAlongLocalAxis). */
-extern s16 sActorLocalMoveZ;
+/* Actor's small data: the s16 local move vector, its x and y, then its z,
+ * the next halfword. All three stay 0 between moves: a move sets one
+ * component, addLocalTranslation rotates the whole vector by the actor's
+ * orientation, and the component is cleared again. */
+static s16 sActorLocalMove[2] SDATA = {0, 0};
+static s16 sActorLocalMoveZ SDATA = 0;
 
 void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
     Actor__MoveAlongLocalAxis(self, &sActorLocalMoveZ, val, notify, ACTOR_EVENT_MOVED_Z);
 }
-
-/* The local move vector's x and y (s16; the z, sActorLocalMoveZ, is the next
- * halfword, above). All three stay 0 between moves: a move sets
- * one component, addLocalTranslation rotates the whole vector by the
- * actor's orientation, and the component is cleared again. */
-extern s16 sActorLocalMove[2];
 
 void Actor__MoveLocalX(Actor *self, s32 val, void *notify) {
     Actor__MoveAlongLocalAxis(self, &sActorLocalMove[0], val, notify, ACTOR_EVENT_MOVED_X);
