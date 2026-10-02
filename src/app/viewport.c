@@ -22,10 +22,10 @@ static Ratio16 sDefaultViewTwist SDATA = {0, 1};
 static ColorRgb sDefaultViewportColor SDATA = {0, 0, 0};
 static s32 sDefaultViewportWidth SDATA = 256;
 static s32 sDefaultViewportHeight SDATA = 240;
-/* MATCHING: a second name for the same symbol, so its address is computed twice.
- * The host needs no second address, and an assembler name would miss the
- * symbol where C names get a prefix (32-bit Windows' "_"). */
+/* MATCHING: a second name for the same symbol, so its address is computed twice. */
 #ifdef HOST_BUILD
+/* The host needs no second address, and an assembler name misses the symbol
+ * where C names get a prefix (32-bit Windows' "_"). */
 #define sDefaultViewportColorAlias sDefaultViewportColor
 #else
 extern ColorRgb sDefaultViewportColorAlias __asm__("sDefaultViewportColor");
