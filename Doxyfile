@@ -36,6 +36,8 @@ INCLUDE_PATH           = include include/psyq
 PREDEFINED             = "INCLUDE_ASM(dir, name)=" \
                          "INCLUDE_RODATA(dir, name)=" \
                          __attribute__(x)= \
+                         SDATA= \
+                         SBSS= \
                          __asm__(x)= \
                          "ACTOR_FIELDS(Methods):=" \
                          "ACTOR_SLOTS(Self, CtorParams):=" \
