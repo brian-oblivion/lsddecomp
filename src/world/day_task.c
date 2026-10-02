@@ -270,10 +270,11 @@ DayTaskMethods *GetDayTaskMethods(void) {
     return &gDayTaskMethods;
 }
 
-/* How many times RegisterRecordTableFiles has run (a call with `all` set
- * counts as two), and how many records its first, half-table batch took. */
-extern s32 sRecordRegisterCalls;
-extern s32 sRecordFirstBatchCount;
+/* DayTask's small data. How many times RegisterRecordTableFiles has run (a
+ * call with `all` set counts as two), and how many records its first,
+ * half-table batch took; both start at 0. */
+static s32 sRecordRegisterCalls SDATA = 0;
+static s32 sRecordFirstBatchCount SDATA = 0;
 
 s32 RegisterRecordTableFiles(s32 all) {
     s32 count;
