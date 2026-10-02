@@ -28,27 +28,38 @@
 #define TITLE_MENU_SLOT_COUNT (TITLEMENU_SHAKE + 1)
 extern TaskCoreTarget sTitleMenuTarget;
 
+/* The title menu's read-only strings, in the image's order. */
+
+/* FLASHBACK's slot name (the tables' fields are char *, hence the cast where
+ * it is used) and the menu's font image. */
+const char sTitleMenuFlashbackName[] = "FLASHBACK";
+const char sTitleMenuFontPath[] = "ETC\\FONTICON.TIM";
+
+/* The product code and the save file's name and title. The code writes
+ * through the pointers below all the same (SaveToCard empties the name,
+ * StampSaveTitleDay writes the day), so they are IMAGE_CONST. */
+IMAGE_CONST char sCardFilePrefixText[] = "BISLPS-01556";
+IMAGE_CONST char sSaveFileNameText[] = "BISLPS-01556xxx";
+/* 19 full-width spaces. */
+IMAGE_CONST char sSaveTitleBlanksText[] =
+    "\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@";
+/* The full-width "LSD   Day001", then 19 full-width spaces. */
+IMAGE_CONST char sSaveTitleText[] =
+    "\202k\202r\202c\201@\201@\201@\202c\202\201\202\231\202O\202O\202P\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@\201@";
+
 /* "ETC\ETCSE", TitleMenu__TitleMenu's soundBankPath for TaskCore's ctor
  * (the ctor casts away the const for its `char *`). */
-extern const char sTitleMenuSoundBankPath[];
+const char sTitleMenuSoundBankPath[] = "ETC\\ETCSE";
 
 /* "ETC\TITLE.TIM", TitleMenu__Reset's path for setSubHandle. */
-extern const char sTitleTimPath[];
+const char sTitleTimPath[] = "ETC\\TITLE.TIM";
 
 /* "CARD\FILEICN1.TIM", TitleMenu__BeginCardAccess's path for New_TimImage. */
-extern const char sSaveIconTimPath[];
+const char sSaveIconTimPath[] = "CARD\\FILEICN1.TIM";
 
 /* The two 320 x 240 display buffers, stacked in VRAM at y 0 and y 240:
  * TitleMenu__OnDeinit clears each with the DrawSystem's clearImage. */
 extern DrawRect sDisplayBufferRects[2];
-
-/* The product code and the save file's name and title, in the image's
- * read-only data; the code writes through the pointers below all the same
- * (SaveToCard empties the name, StampSaveTitleDay writes the day). */
-extern char sCardFilePrefixText[];  /* "BISLPS-01556" */
-extern char sSaveFileNameText[];    /* "BISLPS-01556xxx" */
-extern char sSaveTitleBlanksText[]; /* 19 full-width spaces */
-extern char sSaveTitleText[];       /* the full-width "LSD   Day001", 19 spaces */
 
 /* TitleMenu's small data, in address order. Positions are percent of half
  * the screen from the centre (include/screen_sprite.h). */
@@ -76,7 +87,7 @@ static s32 sTitleMenuUnusedWord SDATA = 0xFFFF;
 
 /* TaskObjF's init `namePrefix` (TitleMenu__BeginCardAccess): the product
  * code, a string of its own 16 bytes before sSaveFileName's. */
-static char *sCardFilePrefix SDATA = sCardFilePrefixText;
+static char *sCardFilePrefix SDATA = (char *)sCardFilePrefixText;
 
 /* TaskObjF's init `nameSuffixes` (TitleMenu__BeginCardAccess): the 15 file
  * suffixes "-01" to "-15", then NULL. */
@@ -109,13 +120,13 @@ static char sSaveFileSuffix01[] SDATA = "-01";
  * TitleMenu__CreateSaveTitle reblanks from its 12th character on a new game
  * and StampSaveTitleDay writes the day into.
  */
-static char *sSaveFileName SDATA = sSaveFileNameText;
+static char *sSaveFileName SDATA = (char *)sSaveFileNameText;
 
 /* 19 full-width spaces, the tail TitleMenu__CreateSaveTitle copies over
  * sSaveTitle's on a new game (just past sSaveFileName's string). */
-static char *sSaveTitleBlanks SDATA = sSaveTitleBlanksText;
+static char *sSaveTitleBlanks SDATA = (char *)sSaveTitleBlanksText;
 
-static char *sSaveTitle SDATA = sSaveTitleText;
+static char *sSaveTitle SDATA = (char *)sSaveTitleText;
 
 /* The buffer StampSaveTitleDay formats the day into
  * (FormatFullWidthNumber) before copying it into sSaveTitle's title; it
@@ -541,11 +552,6 @@ TitleMenuMethods gTitleMenuMethods = {
     /* +0x138 onCardEvent */ TitleMenu__OnCardEvent,
 };
 
-/* The title menu's read-only strings. FLASHBACK's is plain char because the
- * tables' fields are char *. */
-extern char sTitleMenuFlashbackName[];  /* "FLASHBACK" */
-extern const char sTitleMenuFontPath[]; /* "ETC\FONTICON.TIM" */
-
 /* SHAKE's two settings, the item list its slot opens. */
 char *sShakeItemNames[] = {sShakeOffName, sShakeOnName, NULL};
 
@@ -570,7 +576,7 @@ void *sTitleMenuHiddenSlots[TITLE_MENU_SLOT_COUNT + 1] = {
 /* The menu, top to bottom, NULL-terminated. */
 char *sTitleMenuSlotNames[TITLE_MENU_SLOT_COUNT + 1] = {
     sTitleMenuStartName,
-    sTitleMenuFlashbackName,
+    (char *)sTitleMenuFlashbackName,
     sTitleMenuSaveName,
     sTitleMenuLoadName,
     sTitleMenuGraphName,

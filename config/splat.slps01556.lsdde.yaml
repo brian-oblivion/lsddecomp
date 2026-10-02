@@ -81,7 +81,12 @@ segments:
       # dlabel is the confirmation. The 0x800 slot is now tiled exactly and
       # psyq_2258 owns no plain rodata at all.
       - [0xA68, o, libgte/geo, .rdata]
-      - [0xA8C, rodata]   # code_8220
+      # The game's strings are C, each in the unit that uses it, defined in
+      # the image's order and ahead of the unit's functions, so that a unit's
+      # .rodata is its strings, then its jump tables. GCC does not pad after a
+      # unit's last string and SUBALIGN(2) aligns only to 2, so a `pad` line
+      # restores retail's 4-byte alignment where a unit ends unaligned.
+      - [0xA8C, .rodata, app/bmem_pmgr]   # sBMemPMgrInitFailFmt
       - [0xABC, rodata]   # psyq_GsLinkObject4 (D_800102BC, jtbl_800102DC)
       # jtbl_80010354 is TmdModel.c's switch table: `.L` labels local to its
       # function's own `.s`, so the sub-slot is ATTACHED (Gate 2). 0x80 bytes.
@@ -90,17 +95,11 @@ segments:
       - [0xF28, o, libetc/intr_dma, .rdata]   # "DMA bus error" strings
       - [0xF54, o, libetc/vsync, .rdata]      # "VSync: timeout"
       - [0xF64, .rodata, app/pad]   # Pad's sDefaultButtonMasks: the only object between vsync and 0xFA4 that can own rodata
-      - [0xFA4, rodata]   # GameApplicationFileResource
-      # 0xFD8 slot, SPLIT at 0x1010 by ownership (round 47 carve of
-      # code_179d8_s).  The two strings belong to OTHER units --
-      # D_800107D8 is %hi-taken by code_179d8_q, D_800107F4 by
-      # code_179d8_h -- so they stay STANDALONE; a dlabel symbol resolves
-      # from a standalone rodata object.  The two jump tables hold `.L`
-      # labels local to func_80027A24's own `.s`, which only an ATTACHED
-      # slot can see, so they are attached to the unit that owns them.
-      # (Round 14's shared-slot dance, docs/PARALLEL-RUNS.md Gate 2.)
-      - [0xFD8, rodata]   # D_800107D8, D_800107F4 -> code_179d8_q / _h, NOT ours
-      - [0x1010, .rodata, cd/cd_driver]   # jtbl_80010810, jtbl_80010828
+      - [0xFA4, .rodata, app/game_application]   # its three file paths
+      # cd_driver.c's two "file not found" messages, then its two jump tables
+      # (func_80027A24's): the whole slot is that unit's .rodata. The strings
+      # were standalone while their users were still asm.
+      - [0xFD8, .rodata, cd/cd_driver]
       # ROUND 34 (head): libcd/sys's .rdata is the 5-byte "none" at 0x1040
       # (vram 0x80010840, D_80010840 -- referenced only from sys's own text).
       # It ends at 0x1045; retail has three zero bytes and the plain
@@ -149,7 +148,10 @@ segments:
       # own two dlabels is the evidence. The plain remainder below shrinks as
       # later chunks of the segment land their pieces.
       - [0x1764, o, libspu/s_sca, .rdata]
-      - [0x17A4, rodata]  # D_80010FA4 .. D_80011054; owners not placed
+      - [0x17A4, rodata]  # D_80010FA4 .. D_80010FD8, libspu's (psyq_281a0)
+      - [0x17EC, .rodata, sound/wbgm]   # sSeqOpenErrorMsg, 0x29 bytes
+      - [0x1815, pad]
+      - [0x1818, rodata]  # D_80011018 .. D_80011054, libsnd's (psyq_2ae70)
       - [0x1878, o, libcd/event, .rdata]  # "CdInit: Init failed\n", 0x15
       # 0x1878 + 0x15 = 0x188D, and the next slot starts at 0x1890. Under the
       # splat script's SUBALIGN(2) the following section would land at 0x188E,
@@ -239,49 +241,24 @@ segments:
       - [0x1B50, o, libpress/vlc2, .rdata]
       - [0x1B6C, o, libcd/c_011, .rdata]      # 0x15, "DMA STATUS ERROR %x\n" -> 0x1B81
       - [0x1B81, pad]                         # 3 bytes; the next string ("SND\STANDERD") is at 0x1B84
-      - [0x1B84, rodata]
-      # jtbl_8001140C -- 10 words, all targets inside func_80049EB4, which
-      # the class_39e08 carve moved into C. Attached with the dot form so
-      # migrate_rodata_to_functions puts the table in that function's own
-      # .s, where its .L labels are in scope. The REST of the old 0x1C0C
-      # slot (strings, then jtbl_8001157C and jtbl_80011594, whose targets
-      # are at 0x8004Fxxx/0x8005xxx and still live in `asm`) stays a
-      # standalone rodata object from 0x1C34.
-      - [0x1C0C, .rodata, world/day_task]
-      # Slot 0x1C34 is shared by FIVE units. Only the two JUMP TABLES need
-      # attaching -- they hold `.L` labels local to class_3bb8c_g's own
-      # function .s files, which a standalone rodata object cannot resolve.
-      # Every `D_` symbol in the slot is referenced BY SYMBOL and resolves
-      # from a standalone object just fine, so attaching the whole slot would
-      # strand four other units' data (see PARALLEL-RUNS Gate 2). Ownership,
-      # measured one grep per symbol at carve time:
-      #   D_80011434  (unreferenced)      D_800114DC  class_3bb8c_c
-      #   D_800114E8  class_3bb8c_d       D_800114F8  class_3bb8c_d
-      #   D_80011530  class_3bb8c_f       jtbl_8001157C/jtbl_80011594  _g
-      #   D_800115D0  (unreferenced)      D_80011610/D_8001161C  class_3bb8c_h
-      - [0x1C34, rodata]
-      - [0x1D7C, .rodata, ui/task_objf]   # jtbl_8001157C + jtbl_80011594
-      - [0x1DD0, rodata]
-      # Split at the ownership boundary (third instance of the shared-slot
-      # case this round -- see PARALLEL-RUNS Gate 2). Ownership, one grep per
-      # symbol: jtbl_80011628 -> class_3bb8c_i (its .L labels are local to
-      # that unit's own function .s, so it MUST be attached);
-      # D_800116A4 unreferenced; D_800116E4 -> class_3bb8c_j, still uncarved,
-      # so it must stay in a standalone object.
-      - [0x1E28, .rodata, ui/text_entry]   # jtbl_80011628
-      - [0x1EA4, rodata]                   # D_800116A4 / D_800116E4 -> not ours
-      # Slot 0x1EF4 has THREE owners, so it splits twice (the shared-slot case
-      # from PARALLEL-RUNS Gate 2). Ownership, one grep per symbol:
-      #   jtbl_800116F4 -> func_800522DC, class_3bb8c_k  (must be ATTACHED:
-      #     its words are .L labels local to that function's own .s)
-      #   jtbl_8001174C -> func_80053984, class_3bb8c_l  (same, ATTACHED)
-      #   D_8001176C / D_80011778 -> referenced ONLY from func_80057FEC and
-      #     func_80058084, both still in the uncarved class_3bb8c_m
-      #     remainder, so they must stay in a STANDALONE object -- attaching
-      #     them to _l would strand them (nowhere to migrate to).
-      - [0x1EF4, .rodata, ui/item_list]   # jtbl_800116F4
+      - [0x1B84, .rodata, cd/game_files]   # the sound-bank paths and sAsmkMoviePath
+      - [0x1BE9, pad]
+      # day_task.c's two paths, then jtbl_8001140C (func_80049EB4's ten
+      # words). GCC aligns a jump table to 8, which is the zero word at 0x1C08.
+      - [0x1BEC, .rodata, world/day_task]
+      # 0x1C34..0x1DD0 is two units' .rodata: title_menu.c's strings, then
+      # task_objf.c's icon names, message and glyph table followed by its two
+      # jump tables (jtbl_8001157C, jtbl_80011594).
+      - [0x1C34, .rodata, ui/title_menu]
+      - [0x1D0A, pad]
+      - [0x1D0C, .rodata, ui/task_objf]   # icon names, message, glyphs; jtbl_8001157C + jtbl_80011594
+      # text_entry.c's three strings, then jtbl_80011628.
+      - [0x1DD0, .rodata, ui/text_entry]   # its strings, then jtbl_80011628
+      # item_list.c's two strings, then jtbl_800116F4 (aligned to 8: the zero
+      # word at 0x1EF0).
+      - [0x1EA4, .rodata, ui/item_list]   # its strings, then jtbl_800116F4
       - [0x1F4C, .rodata, world/objm]   # jtbl_8001174C: ObjM__OnDreamSysNotify's
-      - [0x1F6C, rodata]                   # two strings -> remainder, NOT ours
+      - [0x1F6C, .rodata, world/graph_room]   # its two paths
       # JUMP TABLES, and the one rodata slot that MUST stay attached to its
       # unit. Its words are pointers to `.L8005....` labels INSIDE DreamSys's
       # functions -- labels that are local to each function's .s file -- so a

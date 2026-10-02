@@ -40,7 +40,7 @@ static s32 sBMemPMgrBusy SDATA = 0;
 
 /* "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n", BMemPMgrInit's
  * malloc-failure message. */
-extern char sBMemPMgrInitFailFmt[];
+const char sBMemPMgrInitFailFmt[] = "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n";
 
 /* MATCHING: bmem_pmgr.h declares this without a prototype, so main() can pass
  * its dead second argument. */
@@ -56,7 +56,7 @@ void *BMemPMgrInit(u32 poolSize) {
         pool->poolSize = poolSize;
         SetupBMemPMgrFreeList(pool);
     } else {
-        printf(sBMemPMgrInitFailFmt, NULL, poolSize);
+        printf((char *)sBMemPMgrInitFailFmt, NULL, poolSize);
     }
     return pool;
 }

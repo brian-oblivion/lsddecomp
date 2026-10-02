@@ -22,8 +22,8 @@
 #include "dream_aux.h"
 
 /* "ETC\\ETC.TIM" and "ETC\\DREAMER.TMD", the files DayTask's ctor loads. */
-extern const char sEtcTimPath[];
-extern const char sDreamerTmdPath[];
+const char sEtcTimPath[] = "ETC\\ETC.TIM";
+const char sDreamerTmdPath[] = "ETC\\DREAMER.TMD";
 
 /* DayTask's data. A method-table slot whose function is declared for
  * another class's `self` (a parent's method, or an override that keeps the

@@ -51,6 +51,12 @@ static s32 sCdTimeoutCounter SDATA = 0;    /* CD_STATE_SETLOC_WAIT's polls; SetC
 static s32 sCdUseVSyncCallback SDATA = 1; /* ServiceCdDriver is the VSyncCallback; 0: the DrawSystem callback */
 static char sCdFileVersionSuffix[] SDATA = ";1"; /* the ISO9660 CD file-version suffix */
 
+/* The two "file not found" messages, LoadFile's and Open's. Read-only data,
+ * defined ahead of the functions so that they come before the unit's jump
+ * tables in .rodata, as in the image. */
+const char sFileNotFoundMsg[] = "File not found. file = %s\n";
+const char sCdFileNotFoundFmt[] = "File not found. path = %s\n";
+
 /* `pos` (self->pos, CdFileEntry::pos) is Sony's CdlLOC; CdControl takes it
  * as the u_char * parameter bytes, hence those casts. */
 
@@ -387,8 +393,6 @@ void CdDriver__RunRequestQueue(void) {
  * wrappers while the active data source is DATASOURCE_CD.
  */
 
-extern char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
-
 void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
     s32 *unassigned; /* never assigned */
     s32 fileIndex;
@@ -560,7 +564,7 @@ s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
             }
         }
 
-        printf(sFileNotFoundMsg, path);
+        printf((char *)sFileNotFoundMsg, path);
 
     found:
         entries->pos = info.pos;
@@ -938,8 +942,6 @@ void SetCdState(s32 state) {
  */
 /* FileResource and its table come from include/file_resource.h, through data_source.h. */
 
-extern char sCdFileNotFoundFmt[]; /* "File not found. path = %s\n" */
-
 void FileResource__InstallCdReadDriver(FileResource *self) {
     GetFileResourceMethods()->ctor(self);
     self->methods = (FileResourceMethods *)GetCdDriverMethods();
@@ -967,7 +969,7 @@ void OpenCdFile(CdDriver *self, char *name) {
             if (retries++ < CD_SEARCH_ATTEMPTS - 1) {
                 goto retry;
             }
-            printf(sCdFileNotFoundFmt, path);
+            printf((char *)sCdFileNotFoundFmt, path);
             return;
         }
         self->pos = file.pos;

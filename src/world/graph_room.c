@@ -131,18 +131,18 @@ GraphRoom *New_GraphRoom(struct DreamSys *dreamSys) {
     return NULL;
 }
 
-extern char sGraphSoundBankPath[];
+/* GraphRoom's sound bank (for TaskCore's ctor) and its graph image (setSubHandle). */
+const char sGraphSoundBankPath[] = "ETC\\ETCSE";
+const char sGraphTimPath[] = "ETC\\HGRAPH.TIM";
 
 void GraphRoom__GraphRoom(GraphRoom *self, struct DreamSys *dreamSys) {
-    GetTaskCoreMethods()->ctor((TaskCore *)self, NULL, sGraphSoundBankPath, NULL);
+    GetTaskCoreMethods()->ctor((TaskCore *)self, NULL, (char *)sGraphSoundBankPath, NULL);
     self->methods = GetGraphRoomMethods();
     ((VabStreamObj *)self->sound)->methods->setPitchOffset((VabStreamObj *)self->sound, -1); /* TaskCore::sound is a VabStreamObj */
     self->dreamSys = dreamSys;
     self->methods->setTarget(self, NULL);
     ((GraphRoomResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
-
-extern char sGraphTimPath[];
 
 void GraphRoom__Reset(GraphRoom *self) {
     self->fadeRate = 5;

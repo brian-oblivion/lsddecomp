@@ -28,7 +28,10 @@
 
 /* The characters nextChar/prevChar step through, NUL-terminated: a space,
  * A to Z, a to z, 0 to 9. */
-extern u8 sStrNameChars[];
+const u8 sStrNameChars[] = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+/* LoadCardResources' two images, CARD\COMINPUT.TIM and CARD\FONTICON.TIM. */
+const char sStrComInput[] = "COMINPUT";
+const char sStrFontIcon[] = "FONTICON";
 
 /* TextEntry's small data, in address order. Positions are percent of half
  * the screen from the centre (include/screen_sprite.h). */
@@ -41,7 +44,7 @@ static ScreenSpritePos sTextEntryTextPos SDATA = {-62, -15};
 /* The cursor sprite's position at index 0: loadCardResources attaches the
  * cursor there, setCursorPos moves it to x + index * 7, y. */
 static ScreenSpritePos sTextEntryCursorPos SDATA = {-62, -12};
-static u8 *sNameCharTable SDATA = sStrNameChars;
+static u8 *sNameCharTable SDATA = (u8 *)sStrNameChars;
 /* LoadCardResources' path parts: CARD\<name>.TIM. */
 static char sCardPathPrefix[] SDATA = "CARD\\";
 static char sTimExt[] SDATA = ".TIM";
@@ -154,8 +157,6 @@ void TextEntry__SetText(TextEntry *self, char *text, s32 mode) {
 }
 
 /* LoadCardResources' data. */
-extern char sStrComInput[];            /* "COMINPUT" */
-extern char sStrFontIcon[];            /* "FONTICON" */
 extern SpriteRect sTextEntryPanelRect; /* COMINPUT's cell: 224 x 120 from (0, 0) */
 
 void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
@@ -175,14 +176,14 @@ void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
     dir = sCardPathPrefix;
     ext = sTimExt;
 
-    panelTim = New_TimImage(BuildFileName(path, sStrComInput, dir, ext));
+    panelTim = New_TimImage(BuildFileName(path, (char *)sStrComInput, dir, ext));
     ((TimImageUploadFn)panelTim->methods->processBuffer)(panelTim);
     self->panelSprite = New_ScreenSprite(panelTim, &sTextEntryPanelRect, 0);
     panelTim->methods->release(panelTim);
     self->panelSprite->methods->attachToParent(self->panelSprite, (SceneNode *)parent,
                                                (LongVec3 *)&sTextEntryPanelPos);
 
-    fontTim = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
+    fontTim = New_TimImage(BuildFileName(path, (char *)sStrFontIcon, dir, ext));
     ((TimImageUploadFn)fontTim->methods->processBuffer)(fontTim);
     self->textRow = New_TextRow(fontTim, self->textLen, self->editBuf);
     self->cursorSprite = New_CharSprite(fontTim, '_');

@@ -39,9 +39,26 @@
  * OpenEvent, and the value WaitForReadyEvent returns for that slot. */
 extern s32 sCardEventSpecs[4];
 
-/* The full-width letters a..o, then three full-width spaces and "Day", in
- * the image's read-only data. */
-extern FullWidthChar sSaveTitleGlyphTable[];
+/* TaskObjF's read-only data, in the image's order. */
+
+/* The three message icons' names (CARD\<name>.TIM) that are read-only data;
+ * sCardIconNames, at the end of the file, lists them with the rest. */
+const char sLoadNotFoundIconName[] = "NOTFOUND";
+const char sSaveNoSpaceIconName[] = "SAVEEMPT";
+const char sNoCardIconName[] = "NOCONECT";
+
+/* TryWriteMemcardSaveFile's message when it cannot create the file. */
+const char sFileNotCreatedMsg[] = "File not create in WriteFile\n";
+
+/* The full-width letters a..o, then three full-width spaces and "Day":
+ * StampSaveTitleFileLetter's glyphs. FW is one character, its Shift-JIS lead
+ * and trail bytes. */
+#define FW(lead, trail) {(s8)(lead), (s8)(trail)}
+const FullWidthChar sSaveTitleGlyphTable[22] = {
+    FW(0x82, 0x81), FW(0x82, 0x82), FW(0x82, 0x83), FW(0x82, 0x84), FW(0x82, 0x85), FW(0x82, 0x86),
+    FW(0x82, 0x87), FW(0x82, 0x88), FW(0x82, 0x89), FW(0x82, 0x8A), FW(0x82, 0x8B), FW(0x82, 0x8C),
+    FW(0x82, 0x8D), FW(0x82, 0x8E), FW(0x82, 0x8F), FW(0x81, 0x40), FW(0x81, 0x40), FW(0x81, 0x40),
+    FW(0x82, 0x63), FW(0x82, 0x81), FW(0x82, 0x99), FW(0x00, 0x00)};
 
 /* TaskObjF's small data, in address order. */
 
@@ -81,7 +98,7 @@ static char sTitleCardPathPrefix[] SDATA = "CARD\\";
 static char sCardPathSuffix[] SDATA = ".TIM";
 
 /* StampSaveTitleFileLetter's glyphs (see SAVE_TITLE_GLYPH_SPACES below). */
-static FullWidthChar *sSaveTitleGlyphs SDATA = sSaveTitleGlyphTable;
+static FullWidthChar *sSaveTitleGlyphs SDATA = (FullWidthChar *)sSaveTitleGlyphTable;
 
 TaskObjF *New_TaskObjF(s32 padEnable, s32 cardSlot) {
     TaskObjF *self;
@@ -500,8 +517,6 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, 
     return result;
 }
 
-extern char sFileNotCreatedMsg[]; /* "File not create in WriteFile\n" */
-
 /* Deletes the file, creates it at its full size in blocks, then reopens it
  * to write the save header and the data, each rounded up to whole sectors. */
 /* MATCHING: iconFrames is u8, so the incoming word and its zero-extended copy are both kept. */
@@ -521,7 +536,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
                FCREAT;
     fileHandle = open(path, openMode);
     if (fileHandle == -1) {
-        printf(sFileNotCreatedMsg);
+        printf((char *)sFileNotCreatedMsg);
         return 0;
     }
     close(fileHandle);
@@ -1216,28 +1231,25 @@ TaskObjFMethods gTaskObjFMethods = {
 s32 sCardEventSpecs[4] = {EvSpIOE, EvSpERROR, EvSpTIMOUT, EvSpNEW};
 
 /* The message icons' names, CARD\<name>.TIM, for states NO_CARD to
- * LOAD_ERROR; these three are read-only data, the rest small data. */
-extern char sNoCardIconName[];       /* "NOCONECT" */
-extern char sSaveNoSpaceIconName[];  /* "SAVEEMPT" */
-extern char sLoadNotFoundIconName[]; /* "NOTFOUND" */
-
+ * LOAD_ERROR: three are read-only data (at the top of the file), the rest
+ * small data. */
 /* clang-format off */
 char *sCardIconNames[CARD_ICON_COUNT] = {
-    sNoCardIconName,           /* TASKOBJF_STATE_NO_CARD */
-    sCardErrorIconName,        /* TASKOBJF_STATE_CARD_ERROR */
-    sCardChangedIconName,      /* TASKOBJF_STATE_CARD_CHANGED */
-    sUnformattedLoadIconName,  /* TASKOBJF_STATE_UNFORMATTED_LOAD */
-    sUnformattedSaveIconName,  /* TASKOBJF_STATE_UNFORMATTED_SAVE */
-    sFormattingIconName,       /* TASKOBJF_STATE_FORMATTING */
-    sFormatErrorIconName,      /* TASKOBJF_STATE_FORMAT_ERROR */
-    sSaveNoSpaceIconName,      /* TASKOBJF_STATE_SAVE_NO_SPACE */
-    sSaveOverwriteIconName,    /* TASKOBJF_STATE_SAVE_OVERWRITE_WARNING */
-    sSavingIconName,           /* TASKOBJF_STATE_SAVING */
-    sSaveErrorIconName,        /* TASKOBJF_STATE_SAVE_ERROR */
-    sLoadNotFoundIconName,     /* TASKOBJF_STATE_LOAD_NOT_FOUND */
-    sLoadWarningIconName,      /* TASKOBJF_STATE_LOAD_WARNING */
-    sLoadingIconName,          /* TASKOBJF_STATE_LOADING */
-    sLoadErrorIconName,        /* TASKOBJF_STATE_LOAD_ERROR */
+    (char *)sNoCardIconName,       /* TASKOBJF_STATE_NO_CARD */
+    sCardErrorIconName,            /* TASKOBJF_STATE_CARD_ERROR */
+    sCardChangedIconName,          /* TASKOBJF_STATE_CARD_CHANGED */
+    sUnformattedLoadIconName,      /* TASKOBJF_STATE_UNFORMATTED_LOAD */
+    sUnformattedSaveIconName,      /* TASKOBJF_STATE_UNFORMATTED_SAVE */
+    sFormattingIconName,           /* TASKOBJF_STATE_FORMATTING */
+    sFormatErrorIconName,          /* TASKOBJF_STATE_FORMAT_ERROR */
+    (char *)sSaveNoSpaceIconName,  /* TASKOBJF_STATE_SAVE_NO_SPACE */
+    sSaveOverwriteIconName,        /* TASKOBJF_STATE_SAVE_OVERWRITE_WARNING */
+    sSavingIconName,               /* TASKOBJF_STATE_SAVING */
+    sSaveErrorIconName,            /* TASKOBJF_STATE_SAVE_ERROR */
+    (char *)sLoadNotFoundIconName, /* TASKOBJF_STATE_LOAD_NOT_FOUND */
+    sLoadWarningIconName,          /* TASKOBJF_STATE_LOAD_WARNING */
+    sLoadingIconName,              /* TASKOBJF_STATE_LOADING */
+    sLoadErrorIconName,            /* TASKOBJF_STATE_LOAD_ERROR */
 };
 /* clang-format on */
 

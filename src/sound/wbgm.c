@@ -19,7 +19,8 @@
 
 static s32 sWBgmActive SDATA = 0; /* 1 between WBgm__WBgm and WBgm__Finalize */
 
-extern char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
+/* WBgm__HandleMonitorEvent's message when SsSeqOpen fails. */
+const char sSeqOpenErrorMsg[] = "Seq Open error in WBgmHandleMonitorEvent";
 
 extern u8 sSsSizeTableBuf[];
 #ifdef PLATFORM_PC
@@ -107,7 +108,7 @@ s32 WBgm__HandleMonitorEvent(WBgm *self) {
     }
     self->seqId = SsSeqOpen(seq->buffer, vab->vabId);
     if (self->seqId == -1) {
-        printf(sSeqOpenErrorMsg);
+        printf((char *)sSeqOpenErrorMsg);
     }
     SsSeqSetVol(self->seqId, WBGM_PLAY_VOL, WBGM_PLAY_VOL);
     self->openState = WBGM_OPEN_DONE;

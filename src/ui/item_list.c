@@ -26,7 +26,10 @@
 /* The y step from one row to the next (createRows). */
 #define ITEMLIST_ROW_SPACING 10
 
-extern u8 sItemListStrNameChars[]; /* a space, A to Z, a to z, 0 to 9, as TextEntry's */
+const u8 sItemListStrNameChars[] =
+    " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; /* a space, A to Z, a to z, 0 to 9, as TextEntry's */
+/* createRows' font image, CARD\FONTICON.TIM (LoadResources). */
+const char sItemListStrFontIcon[] = "FONTICON";
 
 /* ItemList's small data, in address order. Positions are percent of half
  * the screen from the centre (include/screen_sprite.h). */
@@ -39,7 +42,7 @@ static s32 sItemListRowOriginX SDATA = -92;
 static s32 sItemListRowOriginY SDATA = -15;
 /* MATCHING: TextEntry's character-table pointer, copied with its code;
  * nothing here reads it. */
-static u8 *sItemListNameCharTable SDATA = sItemListStrNameChars;
+static u8 *sItemListNameCharTable SDATA = (u8 *)sItemListStrNameChars;
 /* The row colours, grey and the cursor's yellow; only their addresses are
  * taken (setColor). */
 static ColorRgb sItemListRowColor SDATA = {80, 80, 80};
@@ -191,8 +194,6 @@ void ItemList__ResetView(ItemList *self) {
     self->cursorIndex = 0;
 }
 
-extern char sItemListStrFontIcon[]; /* "FONTICON" */
-
 /*
  * Loads CARD\SELECT.TIM as the panel sprite, placed at sItemListPanelPos
  * under `parent`, and has createRows build the rows from CARD\FONTICON.TIM.
@@ -222,7 +223,7 @@ void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
     panelTim->methods->release(panelTim);
     self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&sItemListPanelPos);
 
-    fontTim = New_TimImage(BuildFileName(path, sItemListStrFontIcon, dir, ext));
+    fontTim = New_TimImage(BuildFileName(path, (char *)sItemListStrFontIcon, dir, ext));
     ((TimImageUploadFn)fontTim->methods->processBuffer)(fontTim);
     self->methods->createRows(self, parent, fontTim, self->topIndex, self->column, self->cursorIndex);
     fontTim->methods->release(fontTim);

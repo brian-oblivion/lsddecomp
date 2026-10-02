@@ -20,10 +20,12 @@
 #include "data_source.h"
 #include "bmem_pmgr.h"
 
-extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
-
-extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
-extern const char sLogoPathOsd[];  /* "ETC\OSDLOGO.TIM" */
+/* The files GameApplication loads first: DREAME5.TMD, the DreamSys's link
+ * resource (ResourceSource's name is char *, hence the cast where it is
+ * used), and the two logo images. */
+const char sModelPathDreamE5[] = "ETC\\DREAME5.TMD";
+const char sLogoPathAsmk[] = "ETC\\ASMKLOGO.TIM";
+const char sLogoPathOsd[] = "ETC\\OSDLOGO.TIM";
 
 /* What GameApplication__RunTask builds: an IntermediateBase allocator taking
  * the DreamSys, New_GraphRoom or New_TitleMenu cast to this type. */
@@ -58,7 +60,7 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
     self->config = config;
     SetDataDirectory(GetDefaultDataDirectory());
     req.src.buffer = NULL;
-    req.src.name = sModelPathDreamE5;
+    req.src.name = (char *)sModelPathDreamE5;
     self->dreamSys = New_DreamSys(New_LinkResource(&req.src), 0, 0);
     self->skipGraphRoomPoll = 0;
     self->dreamSys->methods->getSetConfigOption(self->dreamSys, config->dreamSysConfigOption);

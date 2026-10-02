@@ -70,7 +70,17 @@ static char sSoundEffectDirName[] SDATA = "SND\\SE";
 
 extern char *sSoundBankPaths[SOUND_BANK_COUNT];
 extern CdFileEntry sRecordTable[RECORD_COUNT];
-extern const char sAsmkMoviePath[];
+/* The seven sound banks PickSoundBank picks among, as the SND\name paths
+ * WBgm opens (".VH"/".VB" appended; sSoundBankPaths below lists them, its
+ * char * elements hence the casts), then the ASMK logo movie. */
+const char sSoundBankStanderdPath[] = "SND\\STANDERD";
+const char sSoundBankLovelyPath[] = "SND\\LOVELY";
+const char sSoundBankHumanPath[] = "SND\\HUMAN";
+const char sSoundBankEthnovaPath[] = "SND\\ETHNOVA";
+const char sSoundBankElectroPath[] = "SND\\ELECTRO";
+const char sSoundBankCartoonPath[] = "SND\\CARTOON";
+const char sSoundBankAmbientPath[] = "SND\\AMBIENT";
+const char sAsmkMoviePath[] = "ETC\\ASMK.STR";
 extern s16 sMovieFrameCounts[MOVIE_COUNT];
 extern s16 sStageFirstRecord[RECORD_STAGE_COUNT];
 
@@ -289,26 +299,15 @@ CdFileEntry *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount) {
     return rec;
 }
 
-/* The seven sound banks PickSoundBank picks among, as the SND\name paths
- * WBgm opens (".VH"/".VB" appended). The strings are read-only data; the
- * table's element type is char *, so they are declared plain char. */
-extern char sSoundBankAmbientPath[];  /* "SND\\AMBIENT" */
-extern char sSoundBankCartoonPath[];  /* "SND\\CARTOON" */
-extern char sSoundBankElectroPath[];  /* "SND\\ELECTRO" */
-extern char sSoundBankEthnovaPath[];  /* "SND\\ETHNOVA" */
-extern char sSoundBankHumanPath[];    /* "SND\\HUMAN" */
-extern char sSoundBankLovelyPath[];   /* "SND\\LOVELY" */
-extern char sSoundBankStanderdPath[]; /* "SND\\STANDERD" */
-
 /* clang-format off */
 char *sSoundBankPaths[SOUND_BANK_COUNT] = {
-    sSoundBankAmbientPath,
-    sSoundBankCartoonPath,
-    sSoundBankElectroPath,
-    sSoundBankEthnovaPath,
-    sSoundBankHumanPath,
-    sSoundBankLovelyPath,
-    sSoundBankStanderdPath,
+    (char *)sSoundBankAmbientPath,
+    (char *)sSoundBankCartoonPath,
+    (char *)sSoundBankElectroPath,
+    (char *)sSoundBankEthnovaPath,
+    (char *)sSoundBankHumanPath,
+    (char *)sSoundBankLovelyPath,
+    (char *)sSoundBankStanderdPath,
 };
 /* clang-format on */
 

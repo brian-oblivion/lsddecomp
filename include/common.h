@@ -47,6 +47,18 @@
 #define SBSS
 #endif
 
+#ifdef PLATFORM_PC
+/** Read-only data in the image that the game writes all the same: on the
+ * PS1 it is `const`, to land in `.rodata` as in the image; on a host,
+ * whose `.rodata` is read-only memory, it is writable. */
+#define IMAGE_CONST
+#else
+/** Read-only data in the image that the game writes all the same: on the
+ * PS1 it is `const`, to land in `.rodata` as in the image; on a host,
+ * whose `.rodata` is read-only memory, it is writable. */
+#define IMAGE_CONST const
+#endif
+
 /** 20.12 fixed point: libgte's ONE is 1 << FIX12_SHIFT, so `n << FIX12_SHIFT`
  * is the integer n as a fixed-point value. */
 #define FIX12_SHIFT 12
