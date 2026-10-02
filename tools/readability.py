@@ -139,7 +139,8 @@ def placeholder_types():
 
 # --- per-unit debt ----------------------------------------------------------
 M2C_RE = re.compile(r"\b(var_[a-z][0-9a-z_]*|temp_[a-z][0-9a-z_]*|sp[0-9A-F]{2,3}|arg[0-9]+)\b")
-RAWOFF_RE = re.compile(r"\(\s*(?:u8|s8|char|u_char|unsigned char|signed char)\s*\*\s*\)")
+# `sizeof(char *)` is a size, not a cast.
+RAWOFF_RE = re.compile(r"(?<!sizeof)(?<!sizeof )\(\s*(?:u8|s8|char|u_char|unsigned char|signed char)\s*\*\s*\)")
 NUM_RE = re.compile(r"(?<![\w.])(0[xX][0-9A-Fa-f]+|\d+)[uUlL]*(?![\w.])")
 UNK_RE = re.compile(r"(?:->|\.)unk_?0?x?[0-9A-Fa-f]+\b")
 SLOT_RE = re.compile(r"->slot_?0?x?[0-9A-Fa-f]+\s*\(")
