@@ -163,12 +163,7 @@ typedef struct {
  */
 typedef struct PlayerSpawnPoint {
     StageChunk chunk; /**< the chunk of the stage's grid */
-
-    /** @brief A tile within a chunk. */
-    struct MapTile {
-        u8 col; /**< the tile's column */
-        u8 row; /**< the tile's row */
-    } tile;     /**< the tile */
+    StageCell tile;   /**< the tile (cell) within the chunk */
 
     /** @brief A position relative to a tile. */
     struct RelativePos {
@@ -187,8 +182,8 @@ typedef struct PlayerSpawnPoint {
  *        other (staircaseOrigin).
  */
 typedef struct PlayerSpawnGridPos {
-    StageChunk chunk;    /**< the chunk */
-    struct MapTile tile; /**< the tile */
+    StageChunk chunk; /**< the chunk */
+    StageCell tile;   /**< the tile */
 } PlayerSpawnGridPos;
 
 /**
@@ -633,9 +628,9 @@ typedef void (*DreamSysAttachToParentFn)(DreamSys *self, void *parent);
  *        index of the relative position to land at, and a per-table extra.
  */
 typedef struct StageSpawn {
-    StageChunk chunk;    /**< the chunk */
-    struct MapTile tile; /**< the tile */
-    u8 adjustment;       /**< an index into sSpawnPosAdjust: the relative position to land at */
+    StageChunk chunk; /**< the chunk */
+    StageCell tile;   /**< the tile */
+    u8 adjustment;    /**< an index into sSpawnPosAdjust: the relative position to land at */
     /** Per table: a navigation challenge's index (GetStaticSpawn's flag
      * marks it complete), or a staircase's walk (GetLastSpawnExtra). */
     s8 extra;
@@ -651,9 +646,9 @@ typedef struct StaticLinkTrigger {
     /** @brief The tile that triggers it, or a negative `value` for any tile
      *         of the chunk. */
     union TriggerTile {
-        struct MapTile axis; /**< the tile */
-        s16 value;           /**< both bytes as one value, for the compare */
-    } tile;                  /**< the tile */
+        StageCell axis; /**< the tile */
+        s16 value;      /**< both bytes as one value, for the compare */
+    } tile;             /**< the tile */
 
     s8 stage;           /**< the destination stage */
     s8 spawnpointIndex; /**< the destination spawn in that stage's spawn table */

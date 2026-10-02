@@ -50,6 +50,13 @@ typedef struct StageChunk {
     s8 row;    /**< the chunk's row */
 } StageChunk;
 
+/** @brief A cell's position inside its chunk (a spawn point's tile). Signed:
+ *         StageMap's ComputeCellWorldOffsets and IsPointOutOfBounds read it so. */
+typedef struct StageCell {
+    s8 column; /**< the cell's column */
+    s8 row;    /**< the cell's row */
+} StageCell;
+
 /**
  * @brief The number of stages, the length of both per-stage tables.
  * @return 14.

@@ -69,13 +69,6 @@ enum StageMapEvent {
                                             (OnDrawSystemEvent, on `dataReady`) */
 };
 
-/** @brief A cell's position inside its chunk. Signed: ComputeCellWorldOffsets
- *         and IsPointOutOfBounds read it so. */
-typedef struct StageCell {
-    s8 column; /**< the cell's column */
-    s8 row;    /**< the cell's row */
-} StageCell;
-
 /**
  * @brief A grid-cell descriptor, 10 bytes, alignment 2: which chunk, which
  *        cell in it, and where in the cell.
@@ -86,9 +79,8 @@ typedef struct StageCell {
  *
  * It has the shape of dream_sys.h's PlayerSpawnPoint (chunk col/row, tile
  * col/row, s16 x/y/z): DreamSys__WallLink copies getCurrentCellKey's result
- * into its linkCoordinates whole. Both hold the chunk as a StageChunk; they
- * are not one type because this class reads the cell bytes signed
- * (ComputeCellWorldOffsets) and PlayerSpawnPoint declares its tile u8.
+ * into its linkCoordinates whole: both are a StageChunk, a StageCell and
+ * three s16s.
  */
 typedef struct Descriptor10 {
     StageChunk chunk; /**< the chunk (SplitChunkIndex: index % columns, index / columns) */
