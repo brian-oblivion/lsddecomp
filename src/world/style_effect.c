@@ -197,6 +197,14 @@ extern void NoOpIgnoreArgs();
 
 /* New_VariantSprite: include/variant_sprite.h. */
 
+/* StyleEffect's .sdata: the CLUT SetStyleEffectSources points models 0
+ * and 2 at, (1008, 511) in VRAM, and the model per model kind
+ * (STYLE_EFFECT_MODEL_ROW, STYLE_EFFECT_MODEL). */
+static s16 sStyleEffectClutPos[2] SDATA = {1008, 511};
+static s32 sStyleEffectModelIds[2] SDATA = {0, 2};
+/* MATCHING: a word nothing reads follows it in retail's .sdata. */
+static s32 sStyleEffectUnusedWord SDATA = 0x80FFFF;
+
 /* What SetStyleEffectSources (at the end of the file) records: the
  * DREAMER.TMD Actor the model kinds fetch their
  * model from (setBackClip), the TIM image New_VariantSprite is handed, and
@@ -206,7 +214,6 @@ static Actor *sStyleEffectTmd SBSS = NULL; /* the Actor SetStyleEffectSources ra
 static void *sStyleEffectTim SBSS = NULL;
 static Viewport *sStyleEffectViewport SBSS = NULL;
 static s32 sStyleEffectBaseViewY SBSS = 0;
-extern s32 sStyleEffectModelIds[3];
 
 /* Called once, from the class's ctor (StyleEffect__StyleEffect): snapshot the
  * viewpoint y, place self under `parent` at pos + offset, then build the
@@ -502,7 +509,6 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
 /* SetStyleEffectSources records what StyleEffect's methods draw from: the
  * scene's TMD resource, its TIM image and the viewport. The TMD resource's
  * getModel slot sits where Actor has setBackClip, hence the Actor view. */
-extern s16 sStyleEffectClutPos[2];
 
 /* Records the three sources, then points the first primitive of the TMD's
  * models 0 and 2 (sStyleEffectModelIds) at the CLUT at sStyleEffectClutPos. */

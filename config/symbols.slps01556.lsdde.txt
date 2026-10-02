@@ -3362,3 +3362,4 @@ sDayDigitsText = 0x8008AA1C;
 sSaveTitleGlyphTable = 0x80011550;
 sObjMUnusedGridSpanA = 0x8008AB2C;
 sObjMUnusedGridSpanB = 0x8008AB30;
+sStyleEffectUnusedWord = 0x8008ABA0;

@@ -2050,7 +2050,8 @@ segments:
       - [0x7B32C, .sdata, world/objm]  # two unread grid spans, the projection bias, the "Pause" text's place and colour
       - [0x7B34A, pad]                        # 2 bytes: objm's .sdata ends with the 6-byte "Pause"
       - [0x7B34C, .sdata, world/style_layer]  # the decoration box and set, the greys, four stages' fixed configs
-      - [0x7B394, sdata]
+      - [0x7B394, .sdata, world/style_effect]  # the CLUT place, the model kinds' models
+      - [0x7B3A4, sdata]
       - [0x7b3c0, sdata]              # DreamSys's sdata slot
       - [0x7b3f8, sdata]
       - [0x7B420, .sbss, main]  # the root GameApplication

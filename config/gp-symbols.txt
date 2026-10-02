@@ -187,6 +187,7 @@ sStyleEffectModelIds
 sStyleEffectSlotCount
 sStyleEffectTim
 sStyleEffectTmd
+sStyleEffectUnusedWord
 sStyleEffectViewport
 sStyleGrey10
 sStyleGrid
