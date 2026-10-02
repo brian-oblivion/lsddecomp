@@ -7,7 +7,14 @@
  *        small C89 helper macros and the dream chart's point type.
  */
 
+#ifdef PLATFORM_PC
+/* The host build has no PS1 assembly: the macros that include it are empty,
+ * and the PS1 linker's labels are left out. */
+#define INCLUDE_ASM(FOLDER, NAME)
+#define INCLUDE_RODATA(FOLDER, NAME)
+#else
 #include "include_asm.h"
+#endif
 #include "types.h"
 
 /** The byte offset of `member` in `type`: C89's <stddef.h> offsetof, which
