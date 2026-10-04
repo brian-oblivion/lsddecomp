@@ -209,14 +209,24 @@ u8 sStylePalette[24][3] = {
 };
 s32 sStyleFogNears[6] = {26624, 20480, 14336, 8192, 4096, 2048};
 
-/* Kind 0's effect counts, and the spawn heights the kinds pick from. */
+/* Kind 0's effect counts. */
 s8 sStyleKind0Counts[4] = {0, 3, 8, 16};
-s32 sStyleSpawnYChoices[4] = {-6144, -10240, -14336, -20480};
 
-/* The fixed configs, {colorMode, fogLevel, farColorIndex, clearColorIndex}:
- * Violence District's (the others' are .sdata, declared above), then the four
- * fallback variants PickStyleFallbackConfig picks from, by day and stage. */
-StyleStageConfig sStyleStage05Configs[2] = {{0, 2, 10, 10}, {0, 1, 14, 13}};
+/* The spawn heights the kinds pick from, then the fixed configs,
+ * {colorMode, fogLevel, farColorIndex, clearColorIndex}: Violence District's
+ * (the others' are .sdata, declared above), then the four fallback variants
+ * PickStyleFallbackConfig picks from, by day and stage. The heights and
+ * Violence District's configs are one block: StyleFillEffectKind0 picks
+ * height 1..4, and 4 is the word after the heights, the first config read
+ * as an s32 (0x0A0A0200, far below the stage). */
+typedef struct StyleSpawnYBlock {
+    s32 choices[4];
+    StyleStageConfig stage05Configs[2];
+} StyleSpawnYBlock;
+StyleSpawnYBlock sStyleSpawnY = {
+    {-6144, -10240, -14336, -20480},
+    {{0, 2, 10, 10}, {0, 1, 14, 13}},
+};
 s8 sStyleVariant0Configs[7][4] = {
     {0, 1, 14, 13},
     {0, 2, 14, 13},
@@ -266,7 +276,7 @@ s8 sStyleVariantPicks[16] = {0, 1, 2, 3, 1, 2, 3, 0, 0, 0, 2, 2, 1, 3, 1, 0};
 /* Each stage's fixed configs, or NULL for the fallback. */
 StyleStageConfig *sStyleStageConfigs[14] = {
     NULL, NULL, NULL, NULL,
-    NULL, sStyleStage05Configs, sStyleStage06Configs, sStyleStage06Configs,
+    NULL, sStyleSpawnY.stage05Configs, sStyleStage06Configs, sStyleStage06Configs,
     sStyleStage08Configs, sStyleStage06Configs, sStyleStage10Configs, sStyleStage11Configs,
     sStyleStage11Configs, NULL,
 };
@@ -762,8 +772,9 @@ extern void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY);
 
 /* Fills `count` slots with kind-0 effects: a table index and scale for all
  * of them, an offset y (0: each setup picks one; a pick of 4 reads the word
- * after sStyleSpawnYChoices), and per slot SetupStyleSpawnParamsRandom, or
- * SetupStyleSpawnParamsDayMod7 on every seventh day. Returns the next slot. */
+ * after the heights, the first Violence District config), and per slot
+ * SetupStyleSpawnParamsRandom, or SetupStyleSpawnParamsDayMod7 on every
+ * seventh day. Returns the next slot. */
 StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
@@ -773,7 +784,7 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
     sStyleSpawnScale = sStyleSpawnScales[(u32)rand() % 5];
     offsetY = (u32)rand() % 5;
     if (offsetY != 0) {
-        offsetY = sStyleSpawnYChoices[offsetY];
+        offsetY = ((s32 *)&sStyleSpawnY)[offsetY]; /* 1..4, so through the block */
     }
     setup = SetupStyleSpawnParamsDayMod7;
     if (sStyleDay % 7 != 0) {
@@ -789,12 +800,12 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
 }
 
 /* Fills `count` slots with kind-1 effects: sStyleKind1Scale, offset y
- * sStyleSpawnYChoices[2]. */
+ * sStyleSpawnY.choices[2]. */
 StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
 
-    offsetY = sStyleSpawnYChoices[2];
+    offsetY = sStyleSpawnY.choices[2];
     sStyleSpawnScale = sStyleKind1Scale[0];
     for (i = 0; i < count; i++) {
         SetupStyleSpawnParamsRandom(pos, offsetY);
@@ -827,7 +838,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     s32 *offsetZ;
     PtrBoxK3 *rotation;
 
-    SetupStyleSpawnParamsRandom(pos, sStyleSpawnYChoices[2]);
+    SetupStyleSpawnParamsRandom(pos, sStyleSpawnY.choices[2]);
     if (sStyleDecorVariant != STYLE_DECOR_NONE && sStyleDecorColors == sStyleDecorColorsB) {
         sStyleSpawnOffsetX = -22 * STAGE_CELL_SIZE;
         sStyleSpawnOffsetY = -4 * STAGE_CELL_SIZE;
@@ -883,7 +894,7 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
         altColor = NULL;
     }
     /* MATCHING: the height is read before the colour is stored */
-    offsetY = sStyleSpawnYChoices[2];
+    offsetY = sStyleSpawnY.choices[2];
     color->v = altColor;
     SetupStyleSpawnParamsRandom(pos, offsetY);
     rotation = &sStyleSpawnRotation;
@@ -908,7 +919,7 @@ extern s32 sStyleSpawnModelLayout;
 /* MATCHING: sStyleSpawnOffsetX is declared a scalar, not an array. */
 void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
     if (offsetY == 0) {
-        offsetY = sStyleSpawnYChoices[rand() & 3];
+        offsetY = sStyleSpawnY.choices[rand() & 3];
     }
     sStyleSpawnOffsetY = offsetY;
     sStyleSpawnOffsetX = (rand() % 23) << 11;
@@ -933,7 +944,7 @@ void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     s32 dayMod3;
 
     rand();
-    sStyleSpawnOffsetY = sStyleSpawnYChoices[1];
+    sStyleSpawnOffsetY = sStyleSpawnY.choices[1];
     sStyleSpawnOffsetX = (rand() % 20) << STAGE_CELL_SHIFT;
     dayMod3 = sStyleDay % 3;
     sStyleSpawnOffsetZ = 20 * STAGE_CELL_SIZE;
