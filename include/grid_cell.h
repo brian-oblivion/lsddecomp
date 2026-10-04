@@ -36,9 +36,9 @@ typedef struct GridCellMethods GridCellMethods;
     SCENENODE_FIELDS(Methods) /* no own fields; the object is 0x3C bytes (New_GridCell) */
 /* clang-format on */
 
-/** The object's size, New_GridCell's allocation. sizeof(GridCell) overstates
- * it by SceneNode's trailing pad3C[8] (see GridCell). */
-#define GRIDCELL_SIZE 60
+/** The object's size, New_GridCell's allocation (0x3C on the PS1). sizeof(GridCell)
+ * overstates it by SceneNode's trailing pad3C[8] (see GridCell). */
+#define GRIDCELL_SIZE offsetof(GridCell, pad3C)
 
 /** A flags36 bit (a placement record's cellFlags, PopulateSlotCells): the
  * cell takes the commands StageMap hands the cells under a sender's

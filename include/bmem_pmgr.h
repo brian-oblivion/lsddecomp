@@ -46,17 +46,24 @@ struct BMemBlockHdr {
  * last word, its footer, points back at its header, which is how
  * BMemPMgrFree finds a free lower neighbour to merge with. A block is at
  * least BMEM_MIN_BLOCK bytes: a header word and a payload that can hold the
- * two free-list links and the footer. @{ */
-#define BMEM_HEADER_SIZE 4  /**< the header word before the payload */
-#define BMEM_MIN_PAYLOAD 12 /**< room for the two free-list links and the footer */
-#define BMEM_MIN_BLOCK 16   /**< BMEM_HEADER_SIZE plus BMEM_MIN_PAYLOAD */
+ * two free-list links and the footer. The sizes follow the pointer's: on the
+ * PS1 a word is 4 bytes and so are the links; a 64-bit host's links are 8, and
+ * its header word is padded to 8 so that every payload stays aligned for them.
+ * @{ */
+/** payload sizes and addresses are multiples of it: 4 on the PS1 */
+#define BMEM_ALIGN sizeof(BMemBlockHdr *)
+/** the header word before the payload: 4 on the PS1 */
+#define BMEM_HEADER_SIZE offsetof(BMemBlockHdr, prev)
+/** room for the two free-list links and the footer: 12 on the PS1 */
+#define BMEM_MIN_PAYLOAD (3 * sizeof(BMemBlockHdr *))
+#define BMEM_MIN_BLOCK (BMEM_HEADER_SIZE + BMEM_MIN_PAYLOAD)    /**< 16 on the PS1 */
 #define BMEM_BLOCK_SIZE(b) ((b)->sizeAndFlags & BMEM_SIZE_MASK) /**< block b's size in bytes */
 /** the block above b */
 #define BMEM_NEXT_BLOCK(b) ((BMemBlockHdr *)((u8 *)(b) + BMEM_BLOCK_SIZE(b)))
 /** free block b's last word */
-#define BMEM_FOOTER(b) (*(BMemBlockHdr **)((u8 *)(b) + BMEM_BLOCK_SIZE(b) - 4))
+#define BMEM_FOOTER(b) (*(BMemBlockHdr **)((u8 *)(b) + BMEM_BLOCK_SIZE(b) - sizeof(BMemBlockHdr *)))
 /** the footer of the block below b */
-#define BMEM_PREV_FOOTER(b) (*(BMemBlockHdr **)((u8 *)(b) - 4))
+#define BMEM_PREV_FOOTER(b) (*(BMemBlockHdr **)((u8 *)(b) - sizeof(BMemBlockHdr *)))
 /** what BMemPMgrAlloc returns for b */
 #define BMEM_PAYLOAD(b) ((void *)((u8 *)(b) + BMEM_HEADER_SIZE))
 /** the block a payload belongs to */
@@ -83,9 +90,10 @@ struct BMemPMgr {
 /** @name Pool area
  * The malloc'd area is this header, poolSize bytes of blocks, then a
  * zero-size sentinel block word that stops BMemPMgrFree's merge with the
- * block above. BMEMPMGR_HEADER_SIZE is where firstBlock starts; the struct
- * above names only the fields the code touches. @{ */
-#define BMEMPMGR_HEADER_SIZE 28     /**< the pool header's bytes, before firstBlock */
+ * block above. BMEMPMGR_HEADER_SIZE is where firstBlock starts: the struct
+ * above, then 8 bytes nothing touches (28 on the PS1). @{ */
+/** the pool header's bytes, before firstBlock */
+#define BMEMPMGR_HEADER_SIZE (sizeof(BMemPMgr) + 8)
 #define BMEMPMGR_SENTINEL_SIZE 4    /**< the zero-size block word past the last block */
 #define BMEMPMGR_MIN_POOL_SIZE 1024 /**< smaller requested pools are raised to this */
 /** @} */

@@ -118,10 +118,10 @@ void *BMemPMgrAlloc(size, pool)
         mgr = pool;
     }
     if (size != 0) {
-        if (size & 0x3) {
-            /* MATCHING: two statements; as one expression the + 4 folds into the subtract. */
-            padded = size + 4;
-            size = padded - (size & 0x3);
+        if (size & (BMEM_ALIGN - 1)) {
+            /* MATCHING: two statements; as one expression the addend folds into the subtract. */
+            padded = size + BMEM_ALIGN;
+            size = padded - (size & (BMEM_ALIGN - 1));
         }
         if (size < BMEM_MIN_PAYLOAD) {
             size = BMEM_MIN_PAYLOAD;
