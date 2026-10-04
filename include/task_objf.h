@@ -574,7 +574,7 @@ s32 TaskObjF__TestEvents(TaskObjF *self);
  * @param critical nonzero to run the loop in a critical section.
  * @return the last callback's result.
  */
-s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 critical);
+s32 TaskObjF__ForEachEvent(TaskObjF *self, long (*callback)(long), s32 critical);
 
 /**
  * @brief Spins until a card event tests ready.
