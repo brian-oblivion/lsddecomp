@@ -12,7 +12,6 @@ sActiveCdStream
 sActiveDataSource
 sActiveMoviePlayer
 sActorLocalMove
-sActorLocalMoveZ
 sBMemPMgrBusy
 sBMemPMgrUnused
 sBgLayerDefaultColor

@@ -3015,7 +3015,6 @@ sListViewSize = 0x8008A8E8;
 sListViewColor = 0x8008A8F0; // size:0x3 type:u8
 sCharSpriteCellRect = 0x8006ED40;
 sStyleEffectClutPos = 0x8008AB94;
-sActorLocalMoveZ = 0x8008ABA8;
 sCdStreamVersionSuffix = 0x8008A954;
 sCdStreamAudioMixSet = 0x8008A94C;
 RegisterRecordTableFiles = 0x8004A070; // type:func
