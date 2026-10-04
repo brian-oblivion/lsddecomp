@@ -212,17 +212,18 @@ s32 sStyleFogNears[6] = {26624, 20480, 14336, 8192, 4096, 2048};
 /* Kind 0's effect counts. */
 s8 sStyleKind0Counts[4] = {0, 3, 8, 16};
 
-/* The spawn heights the kinds pick from, then the fixed configs,
- * {colorMode, fogLevel, farColorIndex, clearColorIndex}: Violence District's
- * (the others' are .sdata, declared above), then the four fallback variants
- * PickStyleFallbackConfig picks from, by day and stage. The heights and
- * Violence District's configs are one block: StyleFillEffectKind0 picks
- * height 1..4, and 4 is the word after the heights, the first config read
- * as an s32 (0x0A0A0200, far below the stage). */
+/** @brief The spawn heights the kinds pick from, then Violence District's
+ * fixed configs, as one block: StyleFillEffectKind0 picks height 1..4, and
+ * 4 is the word after the heights, the first config read as an s32
+ * (0x0A0A0200, far below the stage). */
 typedef struct StyleSpawnYBlock {
-    s32 choices[4];
-    StyleStageConfig stage05Configs[2];
+    s32 choices[4];                     /**< the spawn heights */
+    StyleStageConfig stage05Configs[2]; /**< Violence District's fixed configs */
 } StyleSpawnYBlock;
+/* The fixed configs, {colorMode, fogLevel, farColorIndex, clearColorIndex}:
+ * Violence District's (in sStyleSpawnY; the others' are .sdata, declared
+ * above), then the four fallback variants PickStyleFallbackConfig picks
+ * from, by day and stage. */
 StyleSpawnYBlock sStyleSpawnY = {
     {-6144, -10240, -14336, -20480},
     {{0, 2, 10, 10}, {0, 1, 14, 13}},
