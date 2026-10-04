@@ -65,15 +65,6 @@ typedef struct TodSetBuffer {
 /* The i-th Tod of a TodSet (TodActor__SetTod, TodActor__Tick). */
 #define TODSET_TOD(set, i) (((TodSetBuffer *)(set)->buffer)->tods[i])
 
-/** @brief The ctor's descriptor, forwarded through setupModelData into
- * TodActor__AcquireModelData: the ModelData at +0x0C is borrowed; when there
- * is none, New_ModelData(&desc->src) makes one and the TodActor owns it. */
-typedef struct TodActorDesc {
-    /* +0x000 */ ResourceSource src; /**< the file to make a ModelData from when modelData is NULL */
-    /* +0x008 */ u8 pad8[4];
-    /* +0x00C */ ModelData *modelData; /**< a ModelData to borrow, or NULL */
-} TodActorDesc;
-
 void *New_TodActor(void *desc, void *sound) {
     TodActor *self;
     TodActorMethods *vt;
@@ -169,26 +160,26 @@ void TodActor__DetachFromParent(TodActor *self) {
     }
 }
 
-void TodActor__SetDisplay(TodActor *self, void *on) {
+void TodActor__SetDisplay(TodActor *self, s32 on) {
     Actor **p;
     s32 i;
 
     p = self->parts;
     for (i = 0; i < self->partCount; p++) {
         i++;
-        (*p)->methods->setDisplay(*p, (s32)on);
+        (*p)->methods->setDisplay(*p, on);
     }
 }
 
-void TodActor__SetLightMode(TodActor *self, void *mode) {
+void TodActor__SetLightMode(TodActor *self, u32 mode) {
     Actor **p;
     s32 i;
 
     p = self->parts;
     for (i = 0; i < self->partCount; i++, p++) {
-        (*p)->methods->setLightMode(*p, (u32)mode);
+        (*p)->methods->setLightMode(*p, mode);
     }
-    GetActorMethods()->setLightMode((Actor *)self, (u32)mode);
+    GetActorMethods()->setLightMode((Actor *)self, mode);
 }
 
 void TodActor__Update(TodActor *self, void *sender, s32 event) {

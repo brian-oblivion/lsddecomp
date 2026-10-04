@@ -2,6 +2,7 @@
 #define TOD_ACTOR_H
 
 #include "actor.h"
+#include "file_resource.h"
 
 /**
  * @file tod_actor.h
@@ -165,6 +166,15 @@ typedef void (*TodActorAttachToParentFn)(TodActor *self, TodActor *peer, void *c
 /* The class's own methods, in ROM order. A subclass reaches the base ones
  * through GetTodActorMethods() and upcasts. */
 
+/** @brief The ctor's descriptor, forwarded through setupModelData into
+ * TodActor__AcquireModelData: the ModelData at +0x0C is borrowed; when there
+ * is none, New_ModelData(&desc->src) makes one and the TodActor owns it. */
+typedef struct TodActorDesc {
+    /* +0x000 */ ResourceSource src; /**< the file to make a ModelData from when modelData is NULL */
+    /* +0x008 */ u8 pad8[4];
+    /* +0x00C */ struct ModelData *modelData; /**< a ModelData to borrow, or NULL */
+} TodActorDesc;
+
 /**
  * @brief Allocates a TodActor and runs its ctor through the table.
  * @param desc  The ctor's descriptor (a struct TodActorDesc).
@@ -235,7 +245,7 @@ void TodActor__DetachFromParent(TodActor *self);
  * @param self The object.
  * @param on   Non-zero to display, 0 to hide; passed on as an s32.
  */
-void TodActor__SetDisplay(TodActor *self, void *on);
+void TodActor__SetDisplay(TodActor *self, s32 on);
 
 /**
  * @brief Slot +0x070: calls setLightMode(mode) on every part, then Actor's
@@ -243,7 +253,7 @@ void TodActor__SetDisplay(TodActor *self, void *on);
  * @param self The object.
  * @param mode The light mode, passed on as a u32.
  */
-void TodActor__SetLightMode(TodActor *self, void *mode);
+void TodActor__SetLightMode(TodActor *self, u32 mode);
 
 /**
  * @brief Slot +0x098: the ticker's callback. FRAMECLOCK_EVENT_RUNNING runs

@@ -11,6 +11,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "entity.h"
+#include "tod_actor.h"
 #include "dream_aux.h"
 #include "scene_node.h"
 #include "model_data.h"
@@ -537,9 +538,9 @@ void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct Vab
     sDreamAuxFrameClock = frameClock;
 
     for (i = 0; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
-        s32 desc[4]; /* New_Entity's descriptor: word +0x00C the ModelData */
-        desc[3] = (s32)slot->model;
-        slot->entity = New_Entity(i + DREAM_AUX_FIRST_MOOD, desc, sDreamAuxSound);
+        TodActorDesc desc; /* New_Entity's descriptor: only the ModelData is set */
+        desc.modelData = slot->model;
+        slot->entity = New_Entity(i + DREAM_AUX_FIRST_MOOD, &desc, sDreamAuxSound);
         slot++;
     }
     SetTeleportsEnabled(stage);
@@ -586,7 +587,7 @@ TriggerWorld *TryDreamAuxTrigger(void *data, s16 *chunkKey, s32 day) {
 
     if (trigger != NULL) {
         if (CheckTriggerDayParity(day, trigger)) {
-            return (s32)FireDreamAuxTriggerEntries(day, trigger, data);
+            return FireDreamAuxTriggerEntries(day, trigger, data);
         }
         if (sDreamAuxStage != STAGE_BRIGHT_MOON_COTTAGE && rand() % 12 == 0 && (day & 1) == 0) {
             PlaceDreamAuxEntityByPlayer(sDreamAuxSlots);
@@ -676,7 +677,7 @@ bool ProcessDreamAuxTriggerRecord(s32 day, DreamAuxTriggerEntry *trigger, Trigge
     s8 *spawn;
     s8 *end;
     ModelData *model;
-    s32 desc[4]; /* New_Entity's descriptor: word +0x00C the ModelData */
+    TodActorDesc desc; /* New_Entity's descriptor: only the ModelData is set */
 
     if (!CheckDreamAuxTriggerCondition(day, record)) {
         return false;
@@ -687,14 +688,14 @@ bool ProcessDreamAuxTriggerRecord(s32 day, DreamAuxTriggerEntry *trigger, Trigge
     spawn = record->spawnIndices;
     end = record->spawnIndices + ARRAY_COUNT(record->spawnIndices);
     model = world->methods->getModelData(world, record->modelIndex);
-    desc[3] = (s32)model;
+    desc.modelData = model;
 
     if (model != NULL) {
         while (spawn < end) {
             if (*spawn == -1) {
                 break;
             }
-            if (SpawnDreamAuxTriggerEntity(record->moodIndex, desc, trigger, (u8)*spawn)) {
+            if (SpawnDreamAuxTriggerEntity(record->moodIndex, &desc, trigger, (u8)*spawn)) {
                 return true;
             }
             spawn++;
