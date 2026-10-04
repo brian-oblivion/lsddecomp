@@ -149,7 +149,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 *p = New_TimArraySrc(NULL);
                 (*p)->buffer = self->sector;
                 (*p)->bufferSize = 0;
-                (*p)->clutBase = (s32)self->entries;
+                (*p)->clutBase = (intptr_t)self->entries;
                 n++;
                 (*p)->methods->onRequestDone(*p);
                 ((TimArraySrcUploadFn)(*p)->methods->processBuffer)(*p);

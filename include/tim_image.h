@@ -57,8 +57,8 @@ struct TimImageMethods {
 struct TimImage {
     FILERESOURCE_FIELDS(TimImageMethods); /**< buffer: the TIM file */
     /* +0x02C */ GsIMAGE tim; /**< the TIM as TimImage__Upload describes it; a Sprite's reset keeps its address */
-    /* +0x048 */ s32 flag;     /**< 0 from the ctor, 1 from setFlag; nothing reads it */
-    /* +0x04C */ s32 clutBase; /**< 0 from the ctor; TimArraySrc sets it to the address of the fade ramp the image's CLUT row falls in */
+    /* +0x048 */ s32 flag;          /**< 0 from the ctor, 1 from setFlag; nothing reads it */
+    /* +0x04C */ intptr_t clutBase; /**< 0 from the ctor; TimArraySrc sets it to the address of the fade ramp the image's CLUT row falls in */
 };
 
 /** @brief TimImage__Upload as its callers reach it through the void-typed

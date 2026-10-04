@@ -47,8 +47,8 @@ struct TimArraySrc {
     FILERESOURCE_FIELDS(TimArraySrcMethods); /**< buffer: the block (count, then offsets) */
     /* +0x02C */ s32 count;                  /**< images built: the block's first word */
     /* +0x030 */ struct TimImage **images; /**< one TimImage per image, each over its TIM in the block */
-    /* +0x034 */ s32 clutBase; /**< the address of the TimBlockSrc's fade ramps (TimBlockSrcEntry[4]); each image's clutBase is the ramp its CLUT row falls in */
-    /* +0x038 */ s32 ready;    /**< 0 from the ctor, 1 once BuildImages built the array */
+    /* +0x034 */ intptr_t clutBase; /**< the address of the TimBlockSrc's fade ramps (TimBlockSrcEntry[4]); each image's clutBase is the ramp its CLUT row falls in */
+    /* +0x038 */ s32 ready;         /**< 0 from the ctor, 1 once BuildImages built the array */
 };
 
 /** @brief TimArraySrc__UploadImages as TimBlockSrc__AdvanceLoadState calls it

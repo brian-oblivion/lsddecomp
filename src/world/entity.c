@@ -955,7 +955,7 @@ void Entity__CueWalkAndTurnOrSpinFlickering(Entity *self, SoundCueSet *out) {
             self->methods->updateRotation(self, 0, turn);
             self->methods->addTranslation(self, &sTranslateYPlus256);
         } else {
-            self->methods->moveLocalZOrFindLink(self, -374, (void *)(rand() % 2));
+            self->methods->moveLocalZOrFindLink(self, -374, (void *)(intptr_t)(rand() % 2));
         }
     } else if (self->state == SPIN_FLICKERING) {
         if (self->moodTimer % 5 == 0) {

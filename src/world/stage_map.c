@@ -1131,7 +1131,7 @@ ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 neighbour) {
             return slot;
         }
     }
-    return (ChunkSlot *)inRange;
+    return (ChunkSlot *)(intptr_t)inRange;
 }
 
 /* MATCHING: `edge` is assigned inside each upper-bound test */

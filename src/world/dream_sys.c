@@ -1689,7 +1689,7 @@ void DreamSys__ApplyMoveCommand(DreamSys *self, s32 command) {
             !self->methods->tryTunnelLink(self, pos)) {
             self->methods->saveLinkSnapshot(self);
             /* MATCHING: staircaseMoveGate is u32 for this unsigned `< 1`; its writers store 0 or 1 */
-            sMoveCommandDispatch[command](self, delta, (void *)(self->staircaseMoveGate < 1));
+            sMoveCommandDispatch[command](self, delta, (void *)(intptr_t)(self->staircaseMoveGate < 1));
             if (self->currentStage == STAGE_BRIGHT_MOON_COTTAGE &&
                 self->coord2->coord.t[1] < -2000 && self->coord2->coord.t[0] >= -499) {
                 self->methods->onGridCellLinkCommand(self, self, 4);
