@@ -251,7 +251,7 @@ s32 MoviePlayer__PullFrame(MoviePlayer *self) {
         if (r != 0) {
             if (size != 0) {
                 self->frameIndex ^= 1;
-                DecDCTvlc(data, self->frames[self->frameIndex]);
+                DecDCTvlc((u_long *)data, (u_long *)self->frames[self->frameIndex]);
             }
             self->stream->methods->freeRing(self->stream, data);
             if (r < 0) {
@@ -277,7 +277,7 @@ void MoviePlayer__DrawStrip(MoviePlayer *self) {
         if (self->stripRect.h < MOVIE_SYNC_HEIGHT) {
             DrawSync(0);
         }
-        DecDCTout(self->strip, self->stripSize);
+        DecDCTout((u_long *)self->strip, self->stripSize);
     } else {
         self->frameDone = 1;
         self->stripRect.x = self->frame.x;
@@ -318,8 +318,8 @@ s32 MoviePlayer__DecodeFrame(MoviePlayer *self) {
                 if (cur->stripRect.h < MOVIE_SYNC_HEIGHT) {
                     DrawSync(0);
                 }
-                DecDCTin(cur->frames[cur->frameIndex], 2);
-                DecDCTout(cur->strip, cur->stripSize);
+                DecDCTin((u_long *)cur->frames[cur->frameIndex], 2);
+                DecDCTout((u_long *)cur->strip, cur->stripSize);
             }
             self->haveFrame = self->methods->pullFrame(self) == 0;
             return 0;

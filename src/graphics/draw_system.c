@@ -83,7 +83,7 @@ void DrawSystem__LoadImage(DrawSystem *self, DrawRect *rect, u32 *pixels) {
 
     if (self->running == 0 || self->syncMode != 0) {
         ConvertRect(&gpuRect, rect);
-        LoadImage(&gpuRect, pixels);
+        LoadImage(&gpuRect, (u_long *)pixels);
         if (self->syncMode != 0) {
             DrawSync(0);
         }
@@ -102,7 +102,7 @@ void DrawSystem__StoreImage(DrawSystem *self, u32 *pixels, DrawRect *rect) {
 
     if (self->running == 0 || self->syncMode != 0) {
         ConvertRect(&gpuRect, rect);
-        StoreImage(&gpuRect, pixels);
+        StoreImage(&gpuRect, (u_long *)pixels);
         if (self->syncMode != 0) {
             DrawSync(0);
         }

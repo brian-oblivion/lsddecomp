@@ -249,7 +249,7 @@ void FadeClutRow(TimBlockSrcEntry *entry, s32 index) {
     src.w = CLUT_COLORS;
     src.h = 1;
     src.y = (index << sTimBlockClutShift) + CLUT_FADE_Y;
-    StoreImage(&src, (u32 *)in);
+    StoreImage(&src, (u_long *)in);
     DrawSync(0);
     dst.h = 1;
     dst.x = 0;
@@ -282,7 +282,7 @@ void FadeClutRow(TimBlockSrcEntry *entry, s32 index) {
         }
         dst.y = src.y + i + src.h;
         DrawSync(0);
-        LoadImage(&dst, (u32 *)out);
+        LoadImage(&dst, (u_long *)out);
     }
 }
 

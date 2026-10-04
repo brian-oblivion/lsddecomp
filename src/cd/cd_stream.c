@@ -83,7 +83,7 @@ void CdStream__Finalize(CdStream *self) {
 
 void CdStream__SetRing(CdStream *self, u32 *ring, u32 size) {
     if (self->state == CDSTREAM_IDLE) {
-        StSetRing(ring, size >> CD_SECTOR_SHIFT);
+        StSetRing((u_long *)ring, size >> CD_SECTOR_SHIFT);
         self->ring = ring;
     }
 }
@@ -252,7 +252,7 @@ s32 CdStream__GetNextFrame(CdStream *self, u32 **addr, u32 *frame, s32 tries) {
     if (tries < 0) {
         tries = CDSTREAM_NEXT_FRAME_TRIES;
     }
-    while (StGetNext(addr, &header) != 0) {
+    while (StGetNext((u_long **)addr, (u_long **)&header) != 0) {
         if (--tries < 0) {
             self->methods->freeRing(self, (u32 *)addr);
             return 0;
@@ -291,7 +291,7 @@ void CdStream__OnStreamEnd(CdStream *self) {
 }
 
 u32 CdStream__FreeRing(CdStream *self, u32 *base) {
-    return StFreeRing(base);
+    return StFreeRing((u_long *)base);
 }
 
 void CdStream__UnsetRing(CdStream *self) {
