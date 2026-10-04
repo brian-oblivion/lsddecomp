@@ -136,10 +136,10 @@ struct Ratio16 {
 #define SCENENODE_FIELDS(Methods) \
     BASICCLASS_FIELDS(Methods); \
     /* +0x00C */ SceneNode *parent; /* attachToParent/detachFromParent; the chain ComposeAndApplyRotation walks */ \
-    /* +0x010 */ u32 attribute; /* GsDOBJ2.attribute: the setters' packed word (libgs.h's attribute bits) */ \
+    /* +0x010 */ u_long attribute; /* GsDOBJ2.attribute: the setters' packed word (libgs.h's attribute bits) */ \
     /* +0x014 */ GsCOORDINATE2 *coord2; /* GsDOBJ2.coord2: the ctor's 0x50-byte GsCOORDINATE2 */ \
-    /* +0x018 */ s32 tmd; /* GsDOBJ2.tmd: LinkModel copies the model's +0x10, UnlinkModel clears it */ \
-    /* +0x01C */ s32 id; /* GsDOBJ2.id; no accessor */ \
+    /* +0x018 */ u_long *tmd; /* GsDOBJ2.tmd: LinkModel copies the model's +0x10, UnlinkModel clears it */ \
+    /* +0x01C */ u_long id; /* GsDOBJ2.id; no accessor */ \
     /* +0x020 */ void *model; /* the TmdModel child LinkModel linked; NULL when none */ \
     /* +0x024 */ u32 tick; /* zeroed by Reset; gStyleEffectMethods's update increments it */ \
     /* +0x028 */ SceneNode *linkTarget; /* dispatchLinkCommand's SCENENODE_EVENT_LINKED sender; TryAttachNearby's hit */ \
@@ -644,7 +644,7 @@ void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
  * @param value The new field contents (not masked).
  * @return The field's old contents.
  */
-extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
+extern u32 GetSetBitField(u_long *word, s32 shift, s32 width, u32 value);
 
 /**
  * @brief Tests whether each component of `b` is within `range` of `a`'s.

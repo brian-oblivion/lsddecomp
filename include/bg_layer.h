@@ -63,13 +63,13 @@ typedef void (*BgLayerResetFn)(BgLayer *self, struct TileMap *src, s32 mode);
  */
 struct BgLayer {
     SCENENODE_FIELDS(BgLayerMethods);
-    /* +0x044 */ u32 bgAttribute; /**< GsBG.attribute: 8-bit CLUT (layer sized to the map) or 15-bit direct (320 x 240), set by BgLayer__Reset; SceneNode's +0x010 (GsDOBJ2.attribute) already has the plain name */
-    /* +0x048 */ s16 x;           /**< GsBG.x: screen position, 0 at reset */
-    /* +0x04A */ s16 y;           /**< GsBG.y: 0 at reset */
-    /* +0x04C */ s16 w;           /**< GsBG.w: the layer's width in pixels */
-    /* +0x04E */ s16 h;           /**< GsBG.h: its height */
-    /* +0x050 */ s16 scrollx;     /**< GsBG.scrollx: 0 at reset */
-    /* +0x052 */ s16 scrolly;     /**< GsBG.scrolly: 0 at reset */
+    /* +0x044 */ u_long bgAttribute; /**< GsBG.attribute: 8-bit CLUT (layer sized to the map) or 15-bit direct (320 x 240), set by BgLayer__Reset; SceneNode's +0x010 (GsDOBJ2.attribute) already has the plain name */
+    /* +0x048 */ s16 x;              /**< GsBG.x: screen position, 0 at reset */
+    /* +0x04A */ s16 y;              /**< GsBG.y: 0 at reset */
+    /* +0x04C */ s16 w;              /**< GsBG.w: the layer's width in pixels */
+    /* +0x04E */ s16 h;              /**< GsBG.h: its height */
+    /* +0x050 */ s16 scrollx;        /**< GsBG.scrollx: 0 at reset */
+    /* +0x052 */ s16 scrolly;        /**< GsBG.scrolly: 0 at reset */
     /* +0x054 */ ColorRgb color; /**< GsBG r, g, b as one ColorRgb, copied whole: sBgLayerDefaultColor at reset, then setColor */
     /* +0x057 */ u8 pad57;
     /* +0x058 */ void *map; /**< GsBG.map: the source TileMap's GsMAP (&src->map) */

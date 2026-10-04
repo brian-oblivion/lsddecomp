@@ -96,7 +96,7 @@ struct BoxFillPos {
     /* +0x04C */ s32 attachArg;    /* zeroed by Reset; attachAbsolute's fourth argument; no reader */ \
     /* +0x050 */ s32 posX;         /* setPosition; DrawNode's source for boxX */                   \
     /* +0x054 */ s32 posY;         /* setPosition; DrawNode's source for boxY */                   \
-    /* +0x058 */ u32 boxAttribute; /* GsBOXF.attribute: the setDisplay/setSemiTransOn/setSemiTransRate bits */ \
+    /* +0x058 */ u_long boxAttribute; /* GsBOXF.attribute: the setDisplay/setSemiTransOn/setSemiTransRate bits */ \
     /* +0x05C */ s16 boxX;         /* GsBOXF.x: zeroed by Reset, written by DrawNode */            \
     /* +0x05E */ s16 boxY;         /* GsBOXF.y */                                                  \
     /* +0x060 */ u16 boxW;         /* GsBOXF.w: Reset and setSize; FadeBox's pushPosition saves it */ \

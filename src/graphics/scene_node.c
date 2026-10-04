@@ -876,7 +876,7 @@ void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
 /* MATCHING: the call re-reads self->model instead of using `model` */
 void SceneNode__LinkModel(SceneNode *self, void *model) {
     self->model = model;
-    self->tmd = (s32)((TmdModel *)model)->object;
+    self->tmd = (u_long *)((TmdModel *)model)->object;
     /* Casts: Sony types tmd_base as an address (`unsigned long`), and
      * scene_node.h spells the embedded GsDOBJ2 as four separate fields. */
     GsLinkObject4((u_long)((TmdModel *)self->model)->data->objects, (GsDOBJ2 *)&self->attribute, 0);
@@ -1064,7 +1064,7 @@ s32 CalcBoxOutcode(TmdBox *box, TmdVec3 *point) {
  * the field's old contents. The attribute setters of SceneNode, Sprite and
  * BoxFill wrap it. */
 /* MATCHING: the mask is built by a loop, not as (1 << width) - 1 */
-u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value) {
+u32 GetSetBitField(u_long *word, s32 shift, s32 width, u32 value) {
     u32 mask;
     s32 i;
     u32 old;

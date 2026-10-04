@@ -998,7 +998,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
                 cell = &cells[cellIndex];
             }
             (*cell)->model = (void *)model;
-            (*cell)->tmd = (s32)((TmdModel *)(*cell)->model)->object;
+            (*cell)->tmd = (u_long *)((TmdModel *)(*cell)->model)->object;
             GsLinkObject4((u_long)((TmdModel *)(*cell)->model)->object,
                           (GsDOBJ2 *)&(*cell)->attribute, 0);
             /* MATCHING: one struct copy, every load before every store */
