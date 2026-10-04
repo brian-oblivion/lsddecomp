@@ -60,15 +60,34 @@ typedef struct TmdPrim {
     /* +0x004 */ u16 h[20]; /**< the packet's body */
 } TmdPrim;
 
-/** @brief One entry of a TMD's object table, 0x1C bytes. */
+/** @name A mapped TMD's lists
+ * GsMapModelingData turns the offsets in a TMD's object table into
+ * references to the object's lists, in the file's own 32-bit words. On the
+ * PS1 those are addresses. A host's addresses may not fit the words, so
+ * psyz maps them to offsets from the object's own entry (psyz's GsTMDAddr),
+ * at both widths. TMD_LIST is a list field's type and TMD_LIST_ADDR reads
+ * one, either way. @{ */
+#ifdef HOST_BUILD
+#define TMD_LIST(Type) s32 /**< an offset from the entry */
+/** the address of `obj`'s list `field` */
+#define TMD_LIST_ADDR(obj, field) ((void *)((u8 *)(obj) + (obj)->field))
+#else
+#define TMD_LIST(Type) Type * /**< an address */
+/** the address of `obj`'s list `field` */
+#define TMD_LIST_ADDR(obj, field) ((obj)->field)
+#endif
+/** @} */
+
+/** @brief One entry of a TMD's object table, 0x1C bytes, as
+ *         GsMapModelingData leaves it. */
 typedef struct TmdObject {
-    /* +0x000 */ TmdVertex *verts; /**< the vertex list */
-    /* +0x004 */ s32 nverts;       /**< its length */
-    /* +0x008 */ void *normals;    /**< the normal list */
-    /* +0x00C */ s32 nnormals;     /**< its length */
-    /* +0x010 */ TmdPrim *prims;   /**< the primitive list */
-    /* +0x014 */ u32 nprims;       /**< its length */
-    /* +0x018 */ s32 scale;        /**< the TMD scale exponent */
+    /* +0x000 */ TMD_LIST(TmdVertex) verts; /**< the vertex list (TMD_LIST_ADDR) */
+    /* +0x004 */ s32 nverts;                /**< its length */
+    /* +0x008 */ TMD_LIST(void) normals;    /**< the normal list (TMD_LIST_ADDR) */
+    /* +0x00C */ s32 nnormals;              /**< its length */
+    /* +0x010 */ TMD_LIST(TmdPrim) prims;   /**< the primitive list (TMD_LIST_ADDR) */
+    /* +0x014 */ u32 nprims;                /**< its length */
+    /* +0x018 */ s32 scale;                 /**< the TMD scale exponent */
 } TmdObject;
 
 /** @brief A TMD file: three header words, then the object table. */

@@ -123,7 +123,7 @@ void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box) {
     s16 *maxy = &box->max.y;
     s16 *maxz = &box->max.z;
 
-    v = self->object->verts;
+    v = TMD_LIST_ADDR(self->object, verts);
     n = self->object->nverts - 1;
     box->min.x = v->x;
     box->min.y = v->y;
@@ -432,7 +432,7 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
         return NULL;
     }
     if (*count == 0) {
-        p = rec->prims;
+        p = TMD_LIST_ADDR(rec, prims);
     }
     *n = 4;
     switch (p->mode) {
@@ -602,7 +602,7 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
             *n = 0;
             break;
     }
-    verts = self->object->verts;
+    verts = TMD_LIST_ADDR(self->object, verts);
     for (i = 0; i < *n; i++) {
         /* MATCHING: verts[idx[i]], and every other way of indexing it,
          * comes out a word longer. */
@@ -616,7 +616,7 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
  * +0x006, after tu0/tv0) the id of VRAM position (xy[0], xy[1]): x / 16 +
  * y * 64, libgpu's getClut() spelled with a division and an add. */
 void TmdModel__AddFirstPrimClut(TmdModel *self, s32 *xy) {
-    TMD_P_TF3 *t = (TMD_P_TF3 *)self->object->prims;
+    TMD_P_TF3 *t = (TMD_P_TF3 *)TMD_LIST_ADDR(self->object, prims);
 
     t->clut += xy[0] / 16;
     t->clut += xy[1] * 64;
@@ -624,7 +624,7 @@ void TmdModel__AddFirstPrimClut(TmdModel *self, s32 *xy) {
 
 /* Points the first primitive's CLUT id at the CLUT at VRAM (xy[0], xy[1]). */
 void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy) {
-    TMD_P_TF3 *t = (TMD_P_TF3 *)self->object->prims;
+    TMD_P_TF3 *t = (TMD_P_TF3 *)TMD_LIST_ADDR(self->object, prims);
     s32 v;
 
     v = xy[0] / 16;
