@@ -25,6 +25,7 @@
 #include "tod_actor.h"
 #include "model_data.h"
 #include "tod.h"
+#include "tod_set.h"
 #include "link_resource.h"
 #include "vab_stream_obj.h"
 #include "frame_clock.h"
@@ -54,16 +55,9 @@
 /* PlayTone's volume, both arguments of the bank's playTone (vol, endVol). */
 #define TODACTOR_TONE_VOLUME 110
 
-/** @brief A TodSet's buffer once TodSet__BuildTods has run: a word, a
- * count, then the table whose each entry (an offset into the buffer) it
- * replaced with the Tod it built over that sub-block. */
-typedef struct TodSetBuffer {
-    u8 pad00[0x08]; /* +0x000 a word and the entry count: not read here */
-    Tod *tods[1];   /**< +0x008 the Tods built over the sub-blocks */
-} TodSetBuffer;
-
-/* The i-th Tod of a TodSet (TodActor__SetTod, TodActor__Tick). */
-#define TODSET_TOD(set, i) (((TodSetBuffer *)(set)->buffer)->tods[i])
+/* The i-th Tod of a TodSet (TodActor__SetTod, TodActor__Tick): the object
+ * TodSet__BuildTods put in its buffer's table (include/tod_set.h). */
+#define TODSET_TOD(set, i) ((Tod *)SUBBLOCK_OBJ(((SubBlockTable *)(set)->buffer)->entries[i]))
 
 void *New_TodActor(void *desc, void *sound) {
     TodActor *self;
