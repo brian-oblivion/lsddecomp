@@ -485,6 +485,22 @@ typedef struct DreamSaveBlock {
     /* +0x467 */ s8 graphScored; /**< set once GraphRoom__ScoreDayLog's scan has succeeded */
 } DreamSaveBlock;
 
+/* The memory card holds DREAMSYS_SAVE_SIZE bytes of DreamSys from saveMagic
+ * on, so their layout is the card format's, at every width. */
+/** `field`'s offset in the save block (DreamSys__GetSaveBlock). */
+#define DREAMSYS_SAVE_OFFSET(field) (offsetof(DreamSys, field) - offsetof(DreamSys, saveMagic))
+COMPILE_ASSERT(DREAMSYS_SAVE_SIZE == 0x700, DreamSys_save_size);
+COMPILE_ASSERT(DREAMSYS_SAVE_OFFSET(currentDay) == offsetof(DreamSaveBlock, currentDay),
+               DreamSaveBlock_currentDay);
+COMPILE_ASSERT(DREAMSYS_SAVE_OFFSET(moodPreviousDays) == offsetof(DreamSaveBlock, moodPreviousDays),
+               DreamSaveBlock_moodPreviousDays);
+COMPILE_ASSERT(DREAMSYS_SAVE_OFFSET(amountFlashbacksAvailable) ==
+                   offsetof(DreamSaveBlock, amountFlashbacksAvailable),
+               DreamSaveBlock_amountFlashbacksAvailable);
+COMPILE_ASSERT(DREAMSYS_SAVE_OFFSET(graphScored) == offsetof(DreamSaveBlock, graphScored),
+               DreamSaveBlock_graphScored);
+COMPILE_ASSERT(offsetof(DreamSaveBlock, graphScored) == 0x467, DreamSaveBlock_graphScored_at);
+
 /**
  * @brief The `extra` of the staircase spawn the last GetStaticSpawn landed
  *        on: which of sStaircaseTickFns walks it.

@@ -22,6 +22,11 @@ typedef struct SubBlockTable {
     /* +0x08 */ s32 entries[1]; /**< each sub-block's offset, then the object built over it (SUBBLOCK_OBJ) */
 } SubBlockTable;
 
+/* The file's layout: the table stays 32-bit words at every width. */
+COMPILE_ASSERT(offsetof(SubBlockTable, count) == 0x04, SubBlockTable_count);
+COMPILE_ASSERT(offsetof(SubBlockTable, entries) == 0x08, SubBlockTable_entries);
+COMPILE_ASSERT(sizeof(((SubBlockTable *)0)->entries[0]) == 4, SubBlockTable_entry_size);
+
 /** @name A sub-block's object
  * The object built over a sub-block replaces its offset in the file's own
  * 32-bit word: its address on the PS1. A host's addresses may not fit the

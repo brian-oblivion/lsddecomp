@@ -70,6 +70,10 @@ typedef struct ModelDataHeader {
     /* +0x0C */ u8 tods[1];    /**< the TodSet's data */
 } ModelDataHeader;
 
+/* The MOM file's header. */
+COMPILE_ASSERT(offsetof(ModelDataHeader, tmdOffset) == 0x08, ModelDataHeader_tmdOffset);
+COMPILE_ASSERT(offsetof(ModelDataHeader, tods) == 0x0C, ModelDataHeader_tods);
+
 /* +0x078: when it owns them, build the LinkResource and the TodSet over
  * the buffer; 1, with both released, when either fails. */
 s32 ModelData__BuildResources(ModelData *self) {

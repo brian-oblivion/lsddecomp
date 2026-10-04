@@ -77,6 +77,12 @@ typedef struct TodPacket {
     /* +0x04 */ u16 tmdId;  /**< a model-id packet's TMD id */
 } TodPacket;
 
+/* The TOD format's layout, read in place. */
+COMPILE_ASSERT(offsetof(TodFile, frames) == 0x08, TodFile_frames);
+COMPILE_ASSERT(offsetof(TodFrame, packetCount) == 0x02, TodFrame_packetCount);
+COMPILE_ASSERT(offsetof(TodFrame, packets) == 0x08, TodFrame_packets);
+COMPILE_ASSERT(offsetof(TodPacket, tmdId) == 0x04, TodPacket_tmdId);
+
 typedef struct Tod Tod;
 typedef struct TodMethods TodMethods;
 

@@ -295,6 +295,13 @@ typedef struct McSaveHeader {
     IconFrame frame2;           /**< icon frame 3 */
 } McSaveHeader;
 
+/* The card format's header and the icon TIM it is built from. */
+COMPILE_ASSERT(sizeof(McSaveHeader) == MEMCARD_SAVE_HEADER_SIZE, McSaveHeader_size);
+COMPILE_ASSERT(offsetof(McSaveHeader, palette) == 0x60, McSaveHeader_palette);
+COMPILE_ASSERT(offsetof(McSaveHeader, frame0) == 0x80, McSaveHeader_frame0);
+COMPILE_ASSERT(offsetof(McIconSource, palette) == 0x14, McIconSource_palette);
+COMPILE_ASSERT(offsetof(McIconSource, frame0) == 0x40, McIconSource_frame0);
+
 /**
  * @brief Writes a save file's letter into a full-width save title, or blanks it.
  *

@@ -23,6 +23,12 @@
 #define offsetof(type, member) ((unsigned int)&((type *)0)->member)
 #endif
 
+/** Fails to compile unless `cond`, a constant expression, holds: C89's
+ * static assertion, a typedef of an array of size -1. `name` keeps the
+ * typedef unique in its unit. No code or data. Used for the layouts a file
+ * or the SDK fixes, which must hold on the PS1 and on every host. */
+#define COMPILE_ASSERT(cond, name) typedef char static_assert_##name[(cond) ? 1 : -1]
+
 /** The number of elements in the array `arr` (an array, never a pointer).
  * Signed, so `i < ARRAY_COUNT(a)` on an s32 compares signed, as a literal
  * would. */

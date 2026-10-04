@@ -30,6 +30,10 @@ typedef struct PlacementGridRecord {
     /* +0x8 */ s32 next; /**< Buffer offset of the cell's next record, 0 for none. */
 } PlacementGridRecord;
 
+/* A placement record's layout, read in place. */
+COMPILE_ASSERT(sizeof(PlacementGridRecord) == 0xC, PlacementGridRecord_size);
+COMPILE_ASSERT(offsetof(PlacementGridRecord, next) == 0x8, PlacementGridRecord_next);
+
 /**
  * @brief What PlacementGrid__ResolveEntry fills in: the caller's 0x40-byte
  * stack record (StageMap__PopulateSlotCells). x and z are the cell's centre,

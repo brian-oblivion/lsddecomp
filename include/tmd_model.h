@@ -90,6 +90,16 @@ typedef struct TmdObject {
     /* +0x018 */ s32 scale;                 /**< the TMD scale exponent */
 } TmdObject;
 
+/* The file's layout, at every width: the table's 32-bit words are the
+ * file's (GsMapModelingData maps them in place). */
+COMPILE_ASSERT(sizeof(TmdObject) == 0x1C, TmdObject_size);
+COMPILE_ASSERT(offsetof(TmdObject, nverts) == 0x04, TmdObject_nverts);
+COMPILE_ASSERT(offsetof(TmdObject, normals) == 0x08, TmdObject_normals);
+COMPILE_ASSERT(offsetof(TmdObject, prims) == 0x10, TmdObject_prims);
+COMPILE_ASSERT(offsetof(TmdObject, scale) == 0x18, TmdObject_scale);
+COMPILE_ASSERT(sizeof(TmdVertex) == 8, TmdVertex_size);
+COMPILE_ASSERT(offsetof(TmdPrim, h) == 4, TmdPrim_body);
+
 /** @brief A TMD file: three header words, then the object table. */
 typedef struct TmdFile {
     /* +0x000 */ u32 id;               /**< the TMD id word */
@@ -97,6 +107,8 @@ typedef struct TmdFile {
     /* +0x008 */ u32 nobj;             /**< the number of objects */
     /* +0x00C */ TmdObject objects[1]; /**< the object table */
 } TmdFile;
+
+COMPILE_ASSERT(offsetof(TmdFile, objects) == 0x0C, TmdFile_objects);
 
 /** @brief The four words setQuad copies in; nothing reads them. */
 typedef struct TmdModelQuad {

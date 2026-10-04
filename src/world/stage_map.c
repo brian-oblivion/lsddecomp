@@ -20,6 +20,10 @@
 #include "flat_light_obj.h"
 #include "bmem_pmgr.h"
 
+/* SplitCoord2 views a GsCOORDINATE2: its translation where libgs keeps it. */
+COMPILE_ASSERT(offsetof(SplitCoord2, tx) == offsetof(GsCOORDINATE2, coord.t[0]), SplitCoord2_tx);
+COMPILE_ASSERT(offsetof(SplitCoord2, tz) == offsetof(GsCOORDINATE2, coord.t[2]), SplitCoord2_tz);
+
 /* A method-table slot whose function is declared for another class's `self`
  * (a parent's method, or an override that keeps the parent's parameter
  * types) takes a `void *` cast. */

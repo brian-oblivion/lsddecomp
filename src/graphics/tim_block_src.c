@@ -40,6 +40,8 @@ typedef struct TimBlockHeader {
     /* +0x14 */ u32 sizes[4]; /**< each block's size in bytes; FindMaxTimBlockSize takes the largest */
 } TimBlockHeader;
 
+COMPILE_ASSERT(sizeof(TimBlockHeader) == 0x24, TimBlockHeader_size); /* the file's header */
+
 /** @brief The same header as AdvanceLoadState copies it out of the sector
  * buffer. */
 /* MATCHING: bytes, so the copy is a byte-aligned block move; copying the

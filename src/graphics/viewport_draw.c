@@ -20,6 +20,29 @@
 #include "viewport.h"
 #include "tmd_renderer.h"
 
+/* DrawNode hands these fields to libgs as its own structs, so they must lie
+ * as libgs lays those out, on the PS1 and on every host: `f`'s offset from
+ * `first` in T is `g`'s in libgs's U. */
+#define LIBGS_MIRROR(T, first, f, U, g) (offsetof(T, f) - offsetof(T, first) == offsetof(U, g))
+COMPILE_ASSERT(LIBGS_MIRROR(SceneNode, attribute, coord2, GsDOBJ2, coord2), SceneNode_GsDOBJ2_coord2);
+COMPILE_ASSERT(LIBGS_MIRROR(SceneNode, attribute, tmd, GsDOBJ2, tmd), SceneNode_GsDOBJ2_tmd);
+COMPILE_ASSERT(LIBGS_MIRROR(SceneNode, attribute, id, GsDOBJ2, id), SceneNode_GsDOBJ2_id);
+COMPILE_ASSERT(LIBGS_MIRROR(BgLayer, bgAttribute, x, GsBG, x), BgLayer_GsBG_x);
+COMPILE_ASSERT(LIBGS_MIRROR(BgLayer, bgAttribute, color, GsBG, r), BgLayer_GsBG_r);
+COMPILE_ASSERT(LIBGS_MIRROR(BgLayer, bgAttribute, map, GsBG, map), BgLayer_GsBG_map);
+COMPILE_ASSERT(LIBGS_MIRROR(BgLayer, bgAttribute, mx, GsBG, mx), BgLayer_GsBG_mx);
+COMPILE_ASSERT(LIBGS_MIRROR(BgLayer, bgAttribute, rotate, GsBG, rotate), BgLayer_GsBG_rotate);
+COMPILE_ASSERT(LIBGS_MIRROR(BoxFill, boxAttribute, boxX, GsBOXF, x), BoxFill_GsBOXF_x);
+COMPILE_ASSERT(LIBGS_MIRROR(BoxFill, boxAttribute, boxW, GsBOXF, w), BoxFill_GsBOXF_w);
+COMPILE_ASSERT(LIBGS_MIRROR(BoxFill, boxAttribute, color, GsBOXF, r), BoxFill_GsBOXF_r);
+COMPILE_ASSERT(sizeof(SpriteGs) == sizeof(GsSPRITE), SpriteGs_size);
+COMPILE_ASSERT(LIBGS_MIRROR(SpriteGs, attribute, x, GsSPRITE, x), SpriteGs_GsSPRITE_x);
+COMPILE_ASSERT(LIBGS_MIRROR(SpriteGs, attribute, tpage, GsSPRITE, tpage), SpriteGs_GsSPRITE_tpage);
+COMPILE_ASSERT(LIBGS_MIRROR(SpriteGs, attribute, cx, GsSPRITE, cx), SpriteGs_GsSPRITE_cx);
+COMPILE_ASSERT(LIBGS_MIRROR(SpriteGs, attribute, rgb, GsSPRITE, r), SpriteGs_GsSPRITE_r);
+COMPILE_ASSERT(LIBGS_MIRROR(SpriteGs, attribute, mx, GsSPRITE, mx), SpriteGs_GsSPRITE_mx);
+COMPILE_ASSERT(LIBGS_MIRROR(SpriteGs, attribute, rotate, GsSPRITE, rotate), SpriteGs_GsSPRITE_rotate);
+
 /* The bits of avsz3's OTZ that one OT spans: SortTmdObject files a face at
  * otBase[otz >> (OTZ_BITS - otLength)], so 1 << otLength tags cover OTZ
  * 0..(1 << 14) - 1; Sony's samples pass GsSortObject4 the same

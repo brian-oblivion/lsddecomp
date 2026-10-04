@@ -56,6 +56,8 @@ typedef struct TimArrayBuf {
     /* +0x04 */ s32 offsets[1]; /**< each image's offset from the buffer's start */
 } TimArrayBuf;
 
+COMPILE_ASSERT(offsetof(TimArrayBuf, offsets) == 4, TimArrayBuf_offsets); /* the file's header */
+
 /* onRequestDone (+0x064): once the buffer is in, build one TimImage over each of
  * its images, in place, each with the fade ramp (`clutBase`'s entries) its
  * CLUT row falls in. */
