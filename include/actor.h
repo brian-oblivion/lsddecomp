@@ -17,6 +17,8 @@ typedef struct ActorMethods ActorMethods;
 
 /* The grid manager (include/stage_map.h); only its address is kept here. */
 struct StageMap;
+struct LinkResource;
+struct Viewport;
 
 /** Actor's class id (gActorMethods word +0x000). Two nibbles, so
  * `(header & CLASS_ID_LEVEL2_MASK) == ACTOR_CLASS_ID` tests for Actor or a class below it
@@ -138,11 +140,11 @@ extern ActorMethods *GetActorMethods(void);
  * resource, its TIM image and its viewport; then points the first primitive
  * of the TMD's models 0 and 2 at the style CLUT (sStyleEffectClutPos).
  * @param unused   The style variant; not read.
- * @param tmd      ETC\\DREAMER.TMD's resource, whose setBackClip slot yields a model.
+ * @param tmd      ETC\\DREAMER.TMD's resource, whose getModel yields the models.
  * @param tim      ETC\\ETC.TIM's image, for New_VariantSprite.
  * @param viewport The scene's Viewport.
  */
-void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport);
+void SetStyleEffectSources(s32 unused, struct LinkResource *tmd, void *tim, struct Viewport *viewport);
 
 /**
  * @brief Allocates an Actor from the BMemPMgr pool and constructs it.

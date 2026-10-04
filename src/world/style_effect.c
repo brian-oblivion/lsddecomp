@@ -24,6 +24,7 @@
 #include "variant_sprite.h"
 #include "viewport.h"
 #include "tmd_model.h"
+#include "link_resource.h"
 #include "bmem_pmgr.h"
 #include <rand.h>
 
@@ -206,11 +207,11 @@ static s32 sStyleEffectModelIds[2] SDATA = {0, 2};
 static s32 sStyleEffectUnusedWord SDATA = 0x80FFFF;
 
 /* What SetStyleEffectSources (at the end of the file) records: the
- * DREAMER.TMD Actor the model kinds fetch their
- * model from (setBackClip), the TIM image New_VariantSprite is handed, and
+ * DREAMER.TMD LinkResource the model kinds fetch their
+ * model from (getModel), the TIM image New_VariantSprite is handed, and
  * the scene's Viewport, whose viewpoint y (refView.vp.y) InitByKind
  * snapshots into sStyleEffectBaseViewY and UpdateByKind follows. */
-static Actor *sStyleEffectTmd SBSS = NULL; /* the Actor SetStyleEffectSources ran on */
+static LinkResource *sStyleEffectTmd SBSS = NULL; /* the TMD resource SetStyleEffectSources ran on */
 static void *sStyleEffectTim SBSS = NULL;
 static Viewport *sStyleEffectViewport SBSS = NULL;
 static s32 sStyleEffectBaseViewY SBSS = 0;
@@ -233,8 +234,9 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
 
     kind = self->pendingExtra;
     if (kind <= STYLE_EFFECT_MODEL) {
-        s32 model = sStyleEffectTmd->methods->setBackClip(sStyleEffectTmd, sStyleEffectModelIds[kind]);
-        SceneNode__LinkModel((SceneNode *)self, (void *)model);
+        TmdModel *model =
+            sStyleEffectTmd->methods->getModel(sStyleEffectTmd, sStyleEffectModelIds[kind]);
+        SceneNode__LinkModel((SceneNode *)self, model);
         kind = self->pendingExtra;
     }
 
@@ -512,15 +514,15 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
 
 /* Records the three sources, then points the first primitive of the TMD's
  * models 0 and 2 (sStyleEffectModelIds) at the CLUT at sStyleEffectClutPos. */
-void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
+void SetStyleEffectSources(s32 unused, LinkResource *tmd, void *tim, Viewport *viewport) {
     s32 i;
     TmdModel *model;
 
     sStyleEffectTmd = tmd;
-    sStyleEffectTim = (void *)tim;
-    sStyleEffectViewport = (Viewport *)viewport;
+    sStyleEffectTim = tim;
+    sStyleEffectViewport = viewport;
     for (i = 0; i < 2; i++) {
-        model = (TmdModel *)tmd->methods->setBackClip(tmd, sStyleEffectModelIds[i]);
+        model = tmd->methods->getModel(tmd, sStyleEffectModelIds[i]);
         TmdModel__SetFirstPrimClut(model, sStyleEffectClutPos);
     }
 }
