@@ -50,8 +50,10 @@ GameApplicationConfig sGameApplicationConfig = {
 /* The host's primitives and ordering tables are larger than the console's
  * (psyz's tags are two words), so the console's pool runs out: the first
  * dream's 194 KB texture read buffer could not be had. 4 MB is room
- * enough; nothing in the game depends on an allocation failing. */
-#define DEFAULT_POOL_SIZE (4096 * 1024)
+ * enough at 32 bits; a 64-bit host's objects are larger again (a dream that
+ * peaks at 1.4 MB at 32 bits takes 1.9 MB), so the pool grows with the
+ * pointer. Nothing in the game depends on an allocation failing. */
+#define DEFAULT_POOL_SIZE (4096 * 1024 / 4 * sizeof(void *))
 #else
 #define DEFAULT_POOL_SIZE (1435 * 1024)
 #endif
