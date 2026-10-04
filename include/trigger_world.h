@@ -89,8 +89,9 @@ void TriggerWorld__Finalize(TriggerWorld *self);
 /**
  * @brief Slot +0x064 (onRequestDone): BuildResources.
  * @param self The object, its buffer loaded.
+ * @return BuildResources' result, which the ctor tests: 1 when it failed.
  */
-void TriggerWorld__Load(TriggerWorld *self);
+s32 TriggerWorld__Load(TriggerWorld *self);
 
 /**
  * @brief Slot +0x078: builds a ModelData over each of the buffer's

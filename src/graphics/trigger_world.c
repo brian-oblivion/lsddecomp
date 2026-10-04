@@ -45,9 +45,9 @@ void TriggerWorld__Finalize(TriggerWorld *self) {
     GetModelDataMethods()->finalize((ModelData *)self);
 }
 
-/* onRequestDone (+0x064): BuildResources. */
-void TriggerWorld__Load(TriggerWorld *self) {
-    ((s32 (*)())self->methods->processBuffer)(self);
+/* onRequestDone (+0x064): BuildResources, whose result the ctor tests. */
+s32 TriggerWorld__Load(TriggerWorld *self) {
+    return ((s32 (*)())self->methods->processBuffer)(self);
 }
 
 /* +0x078: build a ModelData over each of the buffer's sub-blocks, in place
@@ -128,7 +128,7 @@ TriggerWorldMethods gTriggerWorldMethods = {
     /* +0x058 loadFile */ NULL,
     /* +0x05C freeBuffer */ (void *)FileResource__FreeBuffer,
     /* +0x060 slot60 */ NoOp,
-    /* +0x064 onRequestDone */ TriggerWorld__Load,
+    /* +0x064 onRequestDone */ (void *)TriggerWorld__Load,
     /* +0x068 runRequestQueue */ NULL,
     /* +0x06C requestLoadFile */ NULL,
     /* +0x070 stopService */ NULL,

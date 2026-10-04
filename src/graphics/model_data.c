@@ -54,10 +54,11 @@ void ModelData__Finalize(ModelData *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* onRequestDone (+0x064): the driver's, then BuildResources. */
-void ModelData__Load(ModelData *self) {
+/* onRequestDone (+0x064): the driver's, then BuildResources, whose result
+ * the ctor tests. */
+s32 ModelData__Load(ModelData *self) {
     GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
-    ((s32 (*)())self->methods->processBuffer)(self);
+    return ((s32 (*)())self->methods->processBuffer)(self);
 }
 
 /** @brief A ModelData's buffer (a .MOM file: InitDreamAux requests
@@ -148,7 +149,7 @@ ModelDataMethods gModelDataMethods = {
     /* +0x058 loadFile */ NULL,
     /* +0x05C freeBuffer */ (void *)FileResource__FreeBuffer,
     /* +0x060 slot60 */ NoOp,
-    /* +0x064 onRequestDone */ ModelData__Load,
+    /* +0x064 onRequestDone */ (void *)ModelData__Load,
     /* +0x068 runRequestQueue */ NULL,
     /* +0x06C requestLoadFile */ NULL,
     /* +0x070 stopService */ NULL,
