@@ -308,7 +308,7 @@ typedef struct McSaveHeader {
  * @param fileName  the save file's name (namePrefix + "-NN"), or NULL.
  * @return a pointer into sSaveTitleGlyphs, which no caller reads.
  */
-extern s32 StampSaveTitleFileLetter(char *titleText, char *fileName);
+extern void *StampSaveTitleFileLetter(char *titleText, char *fileName);
 
 /* The class's own methods, in address order. */
 

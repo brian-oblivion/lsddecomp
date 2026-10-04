@@ -951,7 +951,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     GridCell **cells;
     GsCOORD2PARAM *param;
     s32 rotY;
-    s32 model;
+    intptr_t model;
     s32 hidden;
     s32 i;
     s32 cellIndex;

@@ -31,7 +31,8 @@ typedef struct PlacementGridBuffer {
 /* LinkResource__GetModel as PlacementGrid__ResolveEntry calls it through
  * `linkResource`'s getModel (+0x080). The occupant reads only (self, index). */
 /* MATCHING: all four arguments, as retail passes them, though the occupant reads two */
-typedef s32 (*PlacementGridGetModelFn)(LinkResource *self, s32 model, s32 cell, CellPlacement *placement);
+typedef intptr_t (*PlacementGridGetModelFn)(LinkResource *self, s32 model, s32 cell,
+                                            CellPlacement *placement);
 
 PlacementGrid *New_PlacementGrid(char *name) {
     PlacementGrid *self;
@@ -69,7 +70,7 @@ void PlacementGrid__OnRequestDone(PlacementGrid *self) {
  * placement->next is set, from the record it points at, and return the
  * record's model from linkResource. -1: the record is empty; 0: `cell` is
  * past the lattice, the caller's end of the walk. */
-s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s32 cell) {
+intptr_t PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s32 cell) {
     PlacementGridRecord *rec;
     LinkResource *link;
     s32 row;

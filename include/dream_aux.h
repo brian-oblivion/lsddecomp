@@ -3,6 +3,8 @@
 
 #include "common.h"
 
+struct TriggerWorld;
+
 /**
  * @file dream_aux.h
  * @brief The dream's auxiliary entities: one resident Entity kept near the
@@ -195,8 +197,8 @@ extern void ReleaseDreamAuxEntities(void);
  * @param data     The chunk's data block.
  * @param chunkKey The chunk's key (its column and row bytes).
  * @param day      The dream day.
- * @return The TriggerWorld, which the chunk keeps, or 0 when nothing fired.
+ * @return The TriggerWorld, which the chunk keeps, or NULL when nothing fired.
  */
-extern s32 TryDreamAuxTrigger(s32 data, s16 *chunkKey, s32 day);
+extern struct TriggerWorld *TryDreamAuxTrigger(void *data, s16 *chunkKey, s32 day);
 
 #endif

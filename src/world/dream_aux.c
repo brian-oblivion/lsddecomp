@@ -578,10 +578,10 @@ void ReleaseDreamAuxEntities(void) {
 
 DreamAuxTriggerEntry *LookupDreamAuxTrigger(s16 *chunkKey);
 bool CheckTriggerDayParity(s32 day, DreamAuxTriggerEntry *trigger);
-TriggerWorld *FireDreamAuxTriggerEntries(s32 day, DreamAuxTriggerEntry *trigger, s32 data);
+TriggerWorld *FireDreamAuxTriggerEntries(s32 day, DreamAuxTriggerEntry *trigger, void *data);
 void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *slot);
 
-s32 TryDreamAuxTrigger(s32 data, s16 *chunkKey, s32 day) {
+TriggerWorld *TryDreamAuxTrigger(void *data, s16 *chunkKey, s32 day) {
     DreamAuxTriggerEntry *trigger = LookupDreamAuxTrigger(chunkKey);
 
     if (trigger != NULL) {
@@ -592,7 +592,7 @@ s32 TryDreamAuxTrigger(s32 data, s16 *chunkKey, s32 day) {
             PlaceDreamAuxEntityByPlayer(sDreamAuxSlots);
         }
     }
-    return 0;
+    return NULL;
 }
 
 DreamAuxTriggerEntry *RemapTriggerForDreamColor(DreamAuxTriggerEntry *trigger, s32 index);
@@ -641,13 +641,13 @@ bool CheckTriggerDayParity(s32 day, DreamAuxTriggerEntry *trigger) {
 bool ProcessDreamAuxTriggerRecord(s32 day, DreamAuxTriggerEntry *trigger, TriggerRecord *record,
                                   TriggerWorld *world);
 
-TriggerWorld *FireDreamAuxTriggerEntries(s32 day, DreamAuxTriggerEntry *trigger, s32 data) {
+TriggerWorld *FireDreamAuxTriggerEntries(s32 day, DreamAuxTriggerEntry *trigger, void *data) {
     /* MATCHING: only src.buffer is set, but a bare ResourceSource shrinks
      * the frame by 8. */
     ResourceRequest req;
     TriggerWorld *world;
 
-    req.src.buffer = (void *)data;
+    req.src.buffer = data;
     world = New_TriggerWorld(&req.src);
 
     if (world != NULL) {

@@ -273,7 +273,7 @@ void Viewport__NoOpSlot88(void) {}
  * bytes of packet area. */
 void Viewport__InitOt(Viewport *self) {
     s32 size;
-    s32 buf;
+    u8 *buf;
     /* MATCHING: written inline, the constant reassociates out of the sum. */
     s32 hdrSize = sizeof(GsOT);
 
@@ -283,8 +283,8 @@ void Viewport__InitOt(Viewport *self) {
 
     size = (sizeof(GsOT_TAG) << self->otLength) + (self->packetSize * self->maxPackets + hdrSize);
 
-    buf = (s32)BMemPMgrAlloc(size * 2);
-    if (buf == 0) {
+    buf = BMemPMgrAlloc(size * 2);
+    if (buf == NULL) {
         return;
     }
 

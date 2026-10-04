@@ -1156,7 +1156,7 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
  * are parsed from their second digit, which atoi would otherwise read as
  * octal. Returns a pointer into sSaveTitleGlyphs that no caller reads. */
 /* MATCHING: `glyphs` is the return value, not a second read of the global. */
-s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
+void *StampSaveTitleFileLetter(char *titleText, char *fileName) {
     FullWidthChar *title = (FullWidthChar *)titleText;
     s32 numberPos;
     s32 letter;
@@ -1174,13 +1174,13 @@ s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
         letter = atoi(fileName + numberPos) - 1;
         glyph = &sSaveTitleGlyphs[letter];
         title[SAVE_TITLE_LETTER] = *glyph;
-        return (s32)glyph;
+        return glyph;
     } else {
         FullWidthChar *glyphs = sSaveTitleGlyphs;
 
         *(FullWidthChars3 *)&title[SAVE_TITLE_LETTER_FIELD] =
             *(FullWidthChars3 *)&glyphs[SAVE_TITLE_GLYPH_SPACES];
-        return (s32)glyphs;
+        return glyphs;
     }
 }
 

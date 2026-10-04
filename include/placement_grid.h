@@ -56,7 +56,7 @@ typedef struct CellPlacement {
  * through: FileResource declares that slot untyped, and this class's
  * occupant is PlacementGrid__ResolveEntry.
  */
-typedef s32 (*PlacementGridResolveEntryFn)(PlacementGrid *self, CellPlacement *placement, s32 cell);
+typedef intptr_t (*PlacementGridResolveEntryFn)(PlacementGrid *self, CellPlacement *placement, s32 cell);
 
 /**
  * @brief PlacementGrid's method table: FileResource's slots, with a ctor
@@ -146,6 +146,6 @@ void PlacementGrid__OnRequestDone(PlacementGrid *self);
  * @param cell      Cell index, 0..399.
  * @return The model, -1 for an empty record, or 0 once `cell` reaches 400.
  */
-s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s32 cell);
+intptr_t PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s32 cell);
 
 #endif
