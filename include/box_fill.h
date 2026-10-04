@@ -44,7 +44,7 @@ typedef struct BoxFillPos BoxFillPos;
  * pushPosition's. Only the low halfword of each word is kept, in the u16
  * boxW/boxH. Callers pass two-word arrays and pairs of their own
  * (sListViewSize, sGraphPointSize, sStyleDecorBoxSize, and style_layer.c's
- * BoxFillSize copied from sStyleDecorSizeW), so New_BoxFill and the ctor
+ * sStyleDecorSize), so New_BoxFill and the ctor
  * slot take `void *` and setSize `s32 *`. The same layout as BoxFillPos,
  * which is a position.
  */

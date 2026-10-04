@@ -47,7 +47,7 @@
 /* sStyleDecorVariant: whether there is a decoration set, and where it sits.
  * PickStyleFallbackConfig picks it for variant 0's records 0..5. */
 #define STYLE_DECOR_NONE 0    /* no bands */
-#define STYLE_DECOR_UPPER 1   /* records 0..3: the set at sStyleDecorPosX/Y */
+#define STYLE_DECOR_UPPER 1   /* records 0..3: the set at sStyleDecorPos */
 #define STYLE_DECOR_LOWERED 2 /* records 4..5: STYLE_DECOR_VARIANT2_DROP lower */
 
 /* How far down (pixels) STYLE_DECOR_LOWERED draws the set. */
@@ -102,11 +102,11 @@ static const u8 *sStyleDecorColor SDATA = NULL;
  * Viewport's own fade box, 320 x 240, the screen. */
 static BoxFillPos sStyleDecorBoxPos SDATA = {-100, -100};
 static s32 sStyleDecorBoxSize[2] SDATA = {320, 240};
-/* The decoration set's place and size (StyleBuildDecorSet). */
-static s32 sStyleDecorPosX SDATA = -100;
-static s32 sStyleDecorPosY SDATA = -60;
-static s32 sStyleDecorSizeW SDATA = 320;
-static s32 sStyleDecorSizeH SDATA = 144;
+/* The decoration set's place and size (StyleBuildDecorSet). Each is one
+ * struct, not two words: the code copies both words through the first, so
+ * the second must follow it on every platform. */
+static BoxFillPos sStyleDecorPos SDATA = {-100, -60};
+static BoxFillSize sStyleDecorSize SDATA = {320, 144};
 /* The two greys sStyleConfig points at (+0x008 ambientColor and +0x010). */
 static s32 sStyleAmbientGrey SDATA = 0x808080;
 static s32 sStyleGrey10 SDATA = 0x808080;
@@ -538,10 +538,6 @@ extern BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
 BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
 #endif
 
-/* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs, a
- * BoxFillPos and a BoxFillSize. */
-/* MATCHING: both are copied whole, never field by field. */
-
 /* Builds the bands: band 0 in sStyleDecorColors' first colour, bands 1..17
  * attached under it, each 3 pixels lower and 7 shorter than the one before;
  * band 0 then goes under the viewport's fade box. */
@@ -556,11 +552,11 @@ void StyleBuildDecorSet(void) {
     if (sStyleDecorVariant == STYLE_DECOR_NONE) {
         return;
     }
-    pos = *(BoxFillPos *)&sStyleDecorPosX;
+    pos = sStyleDecorPos;
     if (sStyleDecorVariant == STYLE_DECOR_LOWERED) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
-    size = *(BoxFillSize *)&sStyleDecorSizeW;
+    size = sStyleDecorSize;
     sStyleDecorSlots[0] = New_BoxFill(&size, (void *)sStyleDecorColors, STYLE_DECOR_PRI);
     for (i = 1; i < STYLE_DECOR_BANDS; i++) {
         band = New_BoxFill(&size, (void *)(sStyleDecorColors + i * 3), STYLE_DECOR_PRI);
@@ -603,7 +599,7 @@ void StyleUpdateDecorSet(void) {
     if (fade <= 0) {
         return;
     }
-    pos = *(BoxFillPos *)&sStyleDecorPosX;
+    pos = sStyleDecorPos;
     i = 0; /* MATCHING: set here; set in the for header the code differs */
     if (sStyleDecorVariant == STYLE_DECOR_LOWERED) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;

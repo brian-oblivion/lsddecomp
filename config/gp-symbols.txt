@@ -176,10 +176,8 @@ sStyleDecorBoxSize
 sStyleDecorColor
 sStyleDecorColors
 sStyleDecorObj
-sStyleDecorPosX
-sStyleDecorPosY
-sStyleDecorSizeH
-sStyleDecorSizeW
+sStyleDecorPos
+sStyleDecorSize
 sStyleDecorVariant
 sStyleEffectBaseViewY
 sStyleEffectClutPos
