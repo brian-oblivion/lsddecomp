@@ -268,9 +268,16 @@ void Viewport__NoOpSlot84(void) {}
 
 void Viewport__NoOpSlot88(void) {}
 
+/* How much larger a primitive can be than the console's, which packetSize
+ * and maxPackets budget for: 1 on the PS1. A host's tag (P_TAG) is two
+ * words where the console's is one, which makes the smallest primitives up to
+ * twice as large on a 32-bit host and three times on a 64-bit one; a dream
+ * on a busy stage overran the console's budget there. */
+#define VIEWPORT_PACKET_SCALE ((s32)((sizeof(P_TAG) + 7) / 8))
+
 /* One-time allocation of the two ordering tables. Each half of the buffer
  * is a GsOT header, its 1 << otLength tags, then packetSize * maxPackets
- * bytes of packet area. */
+ * bytes of packet area (times VIEWPORT_PACKET_SCALE). */
 void Viewport__InitOt(Viewport *self) {
     s32 size;
     u8 *buf;
@@ -281,7 +288,8 @@ void Viewport__InitOt(Viewport *self) {
         return;
     }
 
-    size = (sizeof(GsOT_TAG) << self->otLength) + (self->packetSize * self->maxPackets + hdrSize);
+    size = (sizeof(GsOT_TAG) << self->otLength) +
+           (self->packetSize * self->maxPackets * VIEWPORT_PACKET_SCALE + hdrSize);
 
     buf = BMemPMgrAlloc(size * 2);
     if (buf == NULL) {
