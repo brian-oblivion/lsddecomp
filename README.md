@@ -181,6 +181,11 @@ The rules that break the image if you ignore them:
   is a `const` array in the unit that uses it, defined ahead of the unit's
   functions in the image's order (`sTitleTimPath` in `title_menu.c`). A
   literal written at a use emits a second copy and shifts the image.
+- **Data stays in address order.** GCC 2.6.3 emits each section in source
+  order. A unit with long `.data` tables keeps them in
+  `<unit>_tables.inc` beside it and `#include`s that file at the tables'
+  place, so the `.c` is mostly code and not hundreds of lines of tables
+  (`dream_sys.c`).
 - **A struct edit is never local.** A field inserted without shrinking the
   padding beside it moves every later offset, and breaks functions in other
   files. Rebuild the whole image after any header change.

@@ -125,7 +125,8 @@ $(BUILD_DIR)/%.s.o: %.s
 # expansions are part of the retail bytes.
 #
 # A unit's .c depends on every .s it INCLUDE_ASMs, so re-extracting or matching
-# a function rebuilds the unit.
+# a function rebuilds the unit, and on its <unit>_tables.inc, the data tables
+# it #includes in place.
 #
 # IT ALSO DEPENDS ON EVERY HEADER, coarsely and on purpose. Without this a
 # header edit does not rebuild anything, `make` reports success, and the next
@@ -137,7 +138,7 @@ HEADERS := $(wildcard include/*.h include/*.inc include/psyq/*.h \
                       include/psyq/sys/*.h)
 
 .SECONDEXPANSION:
-$(BUILD_DIR)/%.c.o: %.c $(HEADERS) config/gp-symbols.txt $$(wildcard asm/nonmatchings/$$(notdir $$*)/*.s)
+$(BUILD_DIR)/%.c.o: %.c $(HEADERS) config/gp-symbols.txt $$(wildcard $$*_tables.inc) $$(wildcard asm/nonmatchings/$$(notdir $$*)/*.s)
 	@mkdir -p $(dir $@)
 	$(CPP) $(CPP_FLAGS) $< | $(CC1) $(CC_FLAGS) | $(MASPSX) $(MASPSX_FLAGS) | \
 		$(AS) $(AS_FLAGS) -o $@
@@ -155,7 +156,7 @@ NM_OBJS  := $(foreach f,$(C_FILES),$(NM_DIR)/$(f).o)
 .PHONY: nonmatching
 nonmatching: $(NM_OBJS)
 
-$(NM_DIR)/%.c.o: %.c $(HEADERS) config/gp-symbols.txt $$(wildcard asm/nonmatchings/$$(notdir $$*)/*.s)
+$(NM_DIR)/%.c.o: %.c $(HEADERS) config/gp-symbols.txt $$(wildcard $$*_tables.inc) $$(wildcard asm/nonmatchings/$$(notdir $$*)/*.s)
 	@mkdir -p $(dir $@)
 	$(CPP) $(CPP_FLAGS) -DNON_MATCHING $< | $(CC1) $(CC_FLAGS) | $(MASPSX) $(MASPSX_FLAGS) | \
 		$(AS) $(AS_FLAGS) -o $@
@@ -184,9 +185,9 @@ clean:
 	rm -f $(CONFIG)/undefined_syms_auto.*.txt $(CONFIG)/undefined_funcs_auto.*.txt
 
 format:
-	clang-format -i $$(find src include -name '*.c' -o -name '*.h' | grep -v -e include/psyq -e include/include_asm.h)
+	clang-format -i $$(find src include -name '*.c' -o -name '*.h' -o -name '*_tables.inc' | grep -v -e include/psyq -e include/include_asm.h)
 	@# clang-format never touches comment text (ReflowComments: Never), so a tab there survives it
-	@! grep -nP '\t' $$(find src include -name '*.c' -o -name '*.h' | grep -v -e include/psyq -e include/include_asm.h) \
+	@! grep -nP '\t' $$(find src include -name '*.c' -o -name '*.h' -o -name '*_tables.inc' | grep -v -e include/psyq -e include/include_asm.h) \
 		|| { echo "format: tab characters above (clang-format cannot fix tabs inside comments)"; exit 1; }
 
 expected: check

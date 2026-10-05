@@ -118,7 +118,7 @@ def is_code(path):
 def text_files():
     """Every file a symbol name may appear in, excluding generated and archive."""
     out = []
-    for pat in ("src/**/*.c", "include/*.h", "include/*.inc",
+    for pat in ("src/**/*.c", "src/**/*_tables.inc", "include/*.h", "include/*.inc",
                 "docs/*.md", "docs/match-reports/*.md", "docs/research/*.md",
                 "CLAUDE.md", "config/gp-symbols.txt", "config/typeviews-warnings.txt"):
         out.extend(ROOT.glob(pat))
