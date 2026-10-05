@@ -90,7 +90,7 @@ void TmdModel__SetQuad(TmdModel *self, TmdModelQuad *src) {
 }
 
 void TmdModel__MapModelingData(TmdModel *self) {
-    GsMapModelingData((unsigned long *)&self->data->flags);
+    GsMapModelingData((u_long *)&self->data->flags);
 }
 
 TmdObject *TmdModel__GetObject(TmdModel *self, s32 i) {

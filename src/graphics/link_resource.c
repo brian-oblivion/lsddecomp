@@ -98,7 +98,7 @@ s32 LinkResource__BuildModels(LinkResource *self) {
 /* +0x078: GsMapModelingData over the TMD in the buffer (from its flags
  * word, past the id). */
 void LinkResource__MapModel(LinkResource *self) {
-    GsMapModelingData((unsigned long *)&((TmdFile *)self->buffer)->flags);
+    GsMapModelingData((u_long *)&((TmdFile *)self->buffer)->flags);
 }
 
 /* +0x07C: the TMD's object `index`. */
