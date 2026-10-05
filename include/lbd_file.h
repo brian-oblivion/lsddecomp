@@ -41,6 +41,11 @@ typedef struct LbdFileHeader {
     /* +0x14 */ s32 dataSize;   /**< The data block's size, dataBuffer's allocation. */
 } LbdFileHeader;
 
+/* The LBD header's layout, read in place. */
+COMPILE_ASSERT(offsetof(LbdFileHeader, placementsOffset) == 0x04, LbdFileHeader_placementsOffset);
+COMPILE_ASSERT(offsetof(LbdFileHeader, dataOffset) == 0x10, LbdFileHeader_dataOffset);
+COMPILE_ASSERT(sizeof(LbdFileHeader) == 0x18, LbdFileHeader_size);
+
 /**
  * @brief LbdFile's method table: FileResource's slots, then four of its own.
  * +0x078 (processBuffer) is LbdFile__LoadHeader, called through

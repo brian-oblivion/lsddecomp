@@ -275,7 +275,7 @@ typedef struct CdRequestNode {
     /* +0x08 */ s32 op;      /**< CD_OP_*. */
     /* +0x0C */ CdDriver *owner; /**< The requesting object (any FileResource client). */
     /* +0x10 */ s32 fileIndex; /**< File table index (FindCdFileIndex) for open and loadFile, 0 otherwise. */
-    /* +0x14 */ s32 param0; /**< First argument passed back on dispatch (seek's offset, read's buffer). */
+    /* +0x14 */ intptr_t param0; /**< First argument passed back on dispatch (seek's offset, read's buffer). */
     /* +0x18 */ s32 param1; /**< Second argument passed back on dispatch (seek's mode, read's size). */
     /* +0x1C */ struct CdRequestNode *prev; /**< Previous node, NULL for the first. */
     /* +0x20 */ struct CdRequestNode *next; /**< Next node, NULL for the last. */
@@ -466,7 +466,7 @@ extern void DisableCdQueue(void);
  * @param param0    First argument passed back on dispatch.
  * @param param1    Second argument passed back on dispatch.
  */
-extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1);
+extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, intptr_t param0, s32 param1);
 
 /**
  * @brief Allocates a zeroed request node and links it at the queue's tail.

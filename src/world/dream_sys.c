@@ -334,8 +334,8 @@ void DreamSys__SpawnAtLink(DreamSys *self, StageMap *grid) {
         self->methods->getSetDreamTimeLimit(self, entry->timeLimit + 4);
         self->currentFlashbackIndex++;
     }
-    if (self->moveOverride != MOVE_OVERRIDE_NONE && self->exitRotation != 0) {
-        self->methods->updateRotation(self, 1, (void *)self->exitRotation);
+    if (self->moveOverride != MOVE_OVERRIDE_NONE && self->exitRotation != NULL) {
+        self->methods->updateRotation(self, 1, self->exitRotation);
     }
 }
 
@@ -507,8 +507,8 @@ void DreamSys__SetMoveOverride(DreamSys *self, s32 value) {
     self->moveOverride = value;
     if (value != 0) {
         self->methods->getSetMoveMode(self, 1);
-        if (self->enterRotation != 0)
-            self->methods->updateRotation(self, 1, (void *)self->enterRotation);
+        if (self->enterRotation != NULL)
+            self->methods->updateRotation(self, 1, self->enterRotation);
     }
 }
 
@@ -921,7 +921,7 @@ void DreamSys__ApplyMoveCommand(DreamSys *self, s32 command) {
             !self->methods->tryTunnelLink(self, pos)) {
             self->methods->saveLinkSnapshot(self);
             /* MATCHING: staircaseMoveGate is u32 for this unsigned `< 1`; its writers store 0 or 1 */
-            sMoveCommandDispatch[command](self, delta, (void *)(self->staircaseMoveGate < 1));
+            sMoveCommandDispatch[command](self, delta, (void *)(intptr_t)(self->staircaseMoveGate < 1));
             if (self->currentStage == STAGE_BRIGHT_MOON_COTTAGE &&
                 self->coord2->coord.t[1] < -2000 && self->coord2->coord.t[0] >= -499) {
                 self->methods->onGridCellLinkCommand(self, self, 4);
@@ -1182,8 +1182,8 @@ bool DreamSys__TryStageTimerLink(DreamSys *self, PlayerSpawnPoint *currentPos) {
     if (result < 0)
         return false;
     self->stageLinkAngle = GetStageLinkAngle();
-    self->enterRotation = 0;
-    self->exitRotation = 0;
+    self->enterRotation = NULL;
+    self->exitRotation = NULL;
     ExecuteLink(self, result, DREAMSYS_LINK_STAGE_TIMER, 0);
     return true;
 }
@@ -1252,7 +1252,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *self, PlayerSpawnPoint *currentPos) {
                 self->staircaseMoveGate = 1;
                 self->staircaseFrame = 0;
                 self->staircaseTickFn = sStaircaseTickFns[GetLastSpawnExtra()];
-                self->methods->updateRotation(self, 1, (void *)self->enterRotation);
+                self->methods->updateRotation(self, 1, self->enterRotation);
                 self->staircaseTickFn(self);
             }
         }
@@ -1749,7 +1749,7 @@ s32 TestForTunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s
 /* Defined below, in ROM order. */
 extern s32 IsHeadingAligned(Ratio16 *rotation, u8 heading);
 
-s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
+s32 DreamSys__CheckTunnelHeading(Ratio16 **outExit, Ratio16 **outEnter, void *rotation) {
     u8 heading;
     s32 idx;
     s32 result;
@@ -1757,11 +1757,11 @@ s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     heading = sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
     if (IsHeadingAligned(rotation, heading)) {
         if (outEnter != NULL)
-            *outEnter = (s32)sCardinalRotations[heading];
+            *outEnter = sCardinalRotations[heading];
 
         if (outExit != NULL) {
             idx = sTunnelExitHeadings[sLinkDstStage][sLinkSpawnIndex];
-            *outExit = (s32)sCardinalRotations[idx];
+            *outExit = sCardinalRotations[idx];
         }
         result = 1;
     } else {
@@ -1812,12 +1812,12 @@ s32 TestForStageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint
     return result;
 }
 
-s32 GetStageLinkAngle(void) {
-    s32 result;
+Ratio16 *GetStageLinkAngle(void) {
+    Ratio16 *result;
 
-    result = 0;
+    result = NULL;
     if (sLinkDstStage != STAGE_BLACK_SPACE)
-        result = (s32)&sLinkAngle180;
+        result = &sLinkAngle180;
     return result;
 }
 
@@ -1848,7 +1848,7 @@ s32 TestForStaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos
     return -1;
 }
 
-s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation) {
+s32 DreamSys__CheckStaircaseHeading(Ratio16 **outExit, Ratio16 **outEnter, void *rotation) {
     u8 heading;
     s32 idx;
     s32 result;
@@ -1856,11 +1856,11 @@ s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation)
     heading = sStaircaseEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
     if (IsHeadingAligned(rotation, heading)) {
         if (outEnter != NULL)
-            *outEnter = (s32)sCardinalRotations[heading];
+            *outEnter = sCardinalRotations[heading];
 
         if (outExit != NULL) {
             idx = sStaircaseExitHeadings[sLinkDstStage][sLinkSpawnIndex];
-            *outExit = (s32)sCardinalRotations[idx];
+            *outExit = sCardinalRotations[idx];
         }
         result = 1;
     } else {

@@ -295,6 +295,13 @@ typedef struct McSaveHeader {
     IconFrame frame2;           /**< icon frame 3 */
 } McSaveHeader;
 
+/* The card format's header and the icon TIM it is built from. */
+COMPILE_ASSERT(sizeof(McSaveHeader) == MEMCARD_SAVE_HEADER_SIZE, McSaveHeader_size);
+COMPILE_ASSERT(offsetof(McSaveHeader, palette) == 0x60, McSaveHeader_palette);
+COMPILE_ASSERT(offsetof(McSaveHeader, frame0) == 0x80, McSaveHeader_frame0);
+COMPILE_ASSERT(offsetof(McIconSource, palette) == 0x14, McIconSource_palette);
+COMPILE_ASSERT(offsetof(McIconSource, frame0) == 0x40, McIconSource_frame0);
+
 /**
  * @brief Writes a save file's letter into a full-width save title, or blanks it.
  *
@@ -308,7 +315,7 @@ typedef struct McSaveHeader {
  * @param fileName  the save file's name (namePrefix + "-NN"), or NULL.
  * @return a pointer into sSaveTitleGlyphs, which no caller reads.
  */
-extern s32 StampSaveTitleFileLetter(char *titleText, char *fileName);
+extern void *StampSaveTitleFileLetter(char *titleText, char *fileName);
 
 /* The class's own methods, in address order. */
 
@@ -574,7 +581,7 @@ s32 TaskObjF__TestEvents(TaskObjF *self);
  * @param critical nonzero to run the loop in a critical section.
  * @return the last callback's result.
  */
-s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 critical);
+s32 TaskObjF__ForEachEvent(TaskObjF *self, long (*callback)(long), s32 critical);
 
 /**
  * @brief Spins until a card event tests ready.

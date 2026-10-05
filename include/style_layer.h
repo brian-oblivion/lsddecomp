@@ -30,7 +30,8 @@
  * @return The StyleConfig (include/objm.h), or 0 when a scene is already
  *         registered.
  */
-extern s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadArg);
+extern void *RegisterStyleConfig(struct StageMap *grid, s32 stage, void *sceneRefs, s32 day,
+                                 s32 unreadArg);
 
 /**
  * @brief Releases everything TickStyle built and unregisters the scene.

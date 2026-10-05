@@ -154,13 +154,12 @@ typedef s32 (*DataSourceSetDriverModeFn)(s32, s32, s32);
 
 /* SetNullDriverMode takes two arguments and SetCdDriverMode three. Both are
  * called through the three-argument type, and the VAB driver ignores the
- * third. Assigning SetNullDriverMode to `fn` warns about incompatible pointer
- * types, and that is harmless. */
+ * third, hence the cast. */
 
 void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     DataSourceSetDriverModeFn fn;
 
-    fn = SetNullDriverMode;
+    fn = (DataSourceSetDriverModeFn)SetNullDriverMode;
     if (sActiveDataSource == DATASOURCE_CD) {
         fn = SetCdDriverMode;
     }

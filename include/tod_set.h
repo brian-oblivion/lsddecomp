@@ -18,9 +18,58 @@ typedef struct TodSetMethods TodSetMethods;
  * BuildTods / BuildResources overwrite with the objects built over them. */
 typedef struct SubBlockTable {
     /* +0x00 */ u8 pad0[4];
-    /* +0x04 */ u32 count;      /**< how many sub-blocks follow */
-    /* +0x08 */ s32 entries[1]; /**< each sub-block's offset, then the object built over it */
+    /* +0x04 */ u32 count; /**< how many sub-blocks follow */
+    /* +0x08 */ s32 entries[1]; /**< each sub-block's offset, then the object built over it (SUBBLOCK_OBJ) */
 } SubBlockTable;
+
+/* The file's layout: the table stays 32-bit words at every width. */
+COMPILE_ASSERT(offsetof(SubBlockTable, count) == 0x04, SubBlockTable_count);
+COMPILE_ASSERT(offsetof(SubBlockTable, entries) == 0x08, SubBlockTable_entries);
+COMPILE_ASSERT(sizeof(((SubBlockTable *)0)->entries[0]) == 4, SubBlockTable_entry_size);
+
+/** @name A sub-block's object
+ * The object built over a sub-block replaces its offset in the file's own
+ * 32-bit word: its address on the PS1. A host's addresses may not fit the
+ * word, so a host stores the object's offset from the word itself (the
+ * BMemPMgr pool holds both), 0 for NULL. @{ */
+#ifdef HOST_BUILD
+/** stores `obj` in the table word `word` */
+#define SUBBLOCK_SET_OBJ(word, obj) ((word) = SubBlockWordFor(&(word), (obj)))
+/** the object table word `word` holds, as a void * */
+#define SUBBLOCK_OBJ(word) ((word) != 0 ? (void *)((u8 *)&(word) + (word)) : NULL)
+#else
+/** stores `obj` in the table word `word` */
+#define SUBBLOCK_SET_OBJ(word, obj) ((word) = (s32)(obj))
+/** the object table word `word` holds, as a void * */
+#define SUBBLOCK_OBJ(word) ((void *)(word))
+#endif
+/** @} */
+
+#ifdef HOST_BUILD
+/**
+ * @brief What a host's table word at `word` holds for `obj`: its offset
+ *        from the word, or 0 for NULL (SUBBLOCK_SET_OBJ). Defined in
+ *        src/graphics/tod_set.c.
+ * @param word The table word.
+ * @param obj  The object, or NULL.
+ * @return The word's value.
+ */
+extern s32 SubBlockWordFor(s32 *word, void *obj);
+
+/**
+ * @brief Releases the objects in `count` table words and clears them, as
+ *        ReleaseBasicClassArray does with an array of pointers (the PS1's
+ *        spelling of this). Defined in src/graphics/tod_set.c.
+ * @param entries The first table word.
+ * @param count   How many.
+ */
+extern void ReleaseSubBlockObjects(s32 *entries, s32 count);
+#else
+/** Releases the objects in `count` table words and clears them: the words
+ * are pointers here, so this is ReleaseBasicClassArray. */
+#define ReleaseSubBlockObjects(entries, count) \
+    ReleaseBasicClassArray((BasicClass **)(entries), (count))
+#endif
 
 /** TodSet's class id (gTodSetMethods word +0x000). */
 #define TODSET_CLASS_ID 0x14F03

@@ -30,6 +30,10 @@ typedef struct PlacementGridRecord {
     /* +0x8 */ s32 next; /**< Buffer offset of the cell's next record, 0 for none. */
 } PlacementGridRecord;
 
+/* A placement record's layout, read in place. */
+COMPILE_ASSERT(sizeof(PlacementGridRecord) == 0xC, PlacementGridRecord_size);
+COMPILE_ASSERT(offsetof(PlacementGridRecord, next) == 0x8, PlacementGridRecord_next);
+
 /**
  * @brief What PlacementGrid__ResolveEntry fills in: the caller's 0x40-byte
  * stack record (StageMap__PopulateSlotCells). x and z are the cell's centre,
@@ -56,7 +60,7 @@ typedef struct CellPlacement {
  * through: FileResource declares that slot untyped, and this class's
  * occupant is PlacementGrid__ResolveEntry.
  */
-typedef s32 (*PlacementGridResolveEntryFn)(PlacementGrid *self, CellPlacement *placement, s32 cell);
+typedef intptr_t (*PlacementGridResolveEntryFn)(PlacementGrid *self, CellPlacement *placement, s32 cell);
 
 /**
  * @brief PlacementGrid's method table: FileResource's slots, with a ctor
@@ -146,6 +150,6 @@ void PlacementGrid__OnRequestDone(PlacementGrid *self);
  * @param cell      Cell index, 0..399.
  * @return The model, -1 for an empty record, or 0 once `cell` reaches 400.
  */
-s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s32 cell);
+intptr_t PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s32 cell);
 
 #endif

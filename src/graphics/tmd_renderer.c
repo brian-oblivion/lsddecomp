@@ -24,6 +24,7 @@
 #include "scene_node.h"
 #include "gte.h"
 #include "tmd_renderer.h"
+#include "tmd_model.h"
 
 /* The drawn object's attribute bits, as SortTmdObject publishes them for
  * SetupPrimCode and the submit wrappers. Sony's GsSortObject4 keeps the same
@@ -110,8 +111,8 @@ typedef struct TmdGroupHeader {
  * TransformAndCullPoly keeps a polygon for, routed to subdivision. */
 #define GTE_FLAG_SZ3_OTZ_SAT 0x40000
 
-/* GsDOBJ2 keeps its TMD object as a u_long *. */
-#define OBJ_TMD(obj) ((struct TMD_STRUCT *)(obj)->tmd)
+/* GsDOBJ2 keeps its TMD object (libgs's TMD_STRUCT) as a u_long *. */
+#define OBJ_TMD(obj) ((TmdObject *)(obj)->tmd)
 
 /* Move a textured primitive's CLUT `rows` palette rows down (one row is
  * 1 << 6 in libgpu's getClut encoding). */
@@ -215,10 +216,10 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     InitDivPolygonPtrs(ctx->divVtx3, sDivPolygon3, ARRAY_COUNT(ctx->divVtx3));
     InitDivPolygonPtrs(ctx->divVtx4, sDivPolygon4, ARRAY_COUNT(ctx->divVtx4));
 
-    packetsLeft = OBJ_TMD(obj)->primn;
-    packet = (u8 *)OBJ_TMD(obj)->primtop;
-    ctx->vertices = (SVECTOR *)OBJ_TMD(obj)->vertop;
-    ctx->normals = (SVECTOR *)OBJ_TMD(obj)->nortop;
+    packetsLeft = OBJ_TMD(obj)->nprims;
+    packet = (u8 *)TMD_LIST_ADDR(OBJ_TMD(obj), prims);
+    ctx->vertices = (SVECTOR *)TMD_LIST_ADDR(OBJ_TMD(obj), verts);
+    ctx->normals = TMD_LIST_ADDR(OBJ_TMD(obj), normals);
 
     if (obj->coord2->super != NULL) {
         gte_ReadRotMatrix(&ctx->savedRotMatrix);

@@ -57,14 +57,13 @@ struct SpriteRect {
 };
 
 /**
- * libgs's GsSPRITE, 0x24 bytes, field for field, with r, g, b as one
- * ColorRgb so Sprite__SetColor copies the colour whole, and `attribute` a
- * u32 so GetSetBitField takes its address as it is. Sony's own GsSPRITE
- * would cost a cast at each of those four sites to save the two in
- * Viewport__DrawNode.
+ * libgs's GsSPRITE, 0x24 bytes on the PS1, field for field and type for
+ * type, with r, g, b as one ColorRgb so Sprite__SetColor copies the colour
+ * whole. Sony's own GsSPRITE would cost a cast at each of those sites to
+ * save the two in Viewport__DrawNode.
  */
 struct SpriteGs {
-    /* +0x000 */ u32 attribute; /**< GetSetBitField's word: bit 31 GsDOFF, 30 GsALON, 28-29 rate, 24-25 colour mode */
+    /* +0x000 */ u_long attribute; /**< GetSetBitField's word: bit 31 GsDOFF, 30 GsALON, 28-29 rate, 24-25 colour mode */
     /* +0x004 */ s16 x;        /**< screen x (Viewport__DrawNode sets it each draw) */
     /* +0x006 */ s16 y;        /**< screen y */
     /* +0x008 */ u16 w;        /**< width, from the cell */

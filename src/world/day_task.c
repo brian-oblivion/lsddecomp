@@ -222,7 +222,7 @@ void DayTask__AdvancePhase(DayTask *self, BasicClass *sender, s32 event) {
 void DayTask__StartObjM(DayTask *self, s32 stage) {
     self->objM = New_ObjM(self->sound, self->bgm, self->etcTim, self->dreamerTmd, stage);
     self->methods->addChild(self, (BasicClass *)self->objM);
-    self->objM->methods->init(self->objM, self->initArgs, (s32)self->dreamSys);
+    ((ObjMAttachTargetFn)self->objM->methods->init)(self->objM, self->initArgs, self->dreamSys);
     self->phase = DAYTASK_PHASE_RUNNING;
 }
 

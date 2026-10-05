@@ -182,7 +182,7 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSy
         locked = (save->amountFlashbacksAvailable == 0);
     }
     /* A NULL entry is one the cursor can stop on. */
-    target->hiddenSlots[TITLEMENU_FLASHBACK] = (void *)locked;
+    target->hiddenSlots[TITLEMENU_FLASHBACK] = (void *)(intptr_t)locked;
 }
 
 /* Formats the day as three full-width digits in sDayDigits's buffer and

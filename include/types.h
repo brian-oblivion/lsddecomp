@@ -65,6 +65,10 @@ typedef s16 int16_t;
 typedef s32 int32_t;
 /** @brief Signed 64-bit integer (C99 spelling). */
 typedef s64 int64_t;
+/** @brief A signed integer that can hold an address (C99): 32 bits here. */
+typedef s32 intptr_t;
+/** @brief An unsigned integer that can hold an address (C99): 32 bits here. */
+typedef u32 uintptr_t;
 
 /* Sony's names. Each sits under the guard <sys/types.h> itself uses, so
  * that header skips it when a unit includes <libgte.h> and friends after

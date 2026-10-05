@@ -40,6 +40,8 @@ typedef struct TimBlockHeader {
     /* +0x14 */ u32 sizes[4]; /**< each block's size in bytes; FindMaxTimBlockSize takes the largest */
 } TimBlockHeader;
 
+COMPILE_ASSERT(sizeof(TimBlockHeader) == 0x24, TimBlockHeader_size); /* the file's header */
+
 /** @brief The same header as AdvanceLoadState copies it out of the sector
  * buffer. */
 /* MATCHING: bytes, so the copy is a byte-aligned block move; copying the
@@ -149,7 +151,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 *p = New_TimArraySrc(NULL);
                 (*p)->buffer = self->sector;
                 (*p)->bufferSize = 0;
-                (*p)->clutBase = (s32)self->entries;
+                (*p)->clutBase = (intptr_t)self->entries;
                 n++;
                 (*p)->methods->onRequestDone(*p);
                 ((TimArraySrcUploadFn)(*p)->methods->processBuffer)(*p);
@@ -249,7 +251,7 @@ void FadeClutRow(TimBlockSrcEntry *entry, s32 index) {
     src.w = CLUT_COLORS;
     src.h = 1;
     src.y = (index << sTimBlockClutShift) + CLUT_FADE_Y;
-    StoreImage(&src, (u32 *)in);
+    StoreImage(&src, (u_long *)in);
     DrawSync(0);
     dst.h = 1;
     dst.x = 0;
@@ -282,7 +284,7 @@ void FadeClutRow(TimBlockSrcEntry *entry, s32 index) {
         }
         dst.y = src.y + i + src.h;
         DrawSync(0);
-        LoadImage(&dst, (u32 *)out);
+        LoadImage(&dst, (u_long *)out);
     }
 }
 

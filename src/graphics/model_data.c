@@ -54,10 +54,11 @@ void ModelData__Finalize(ModelData *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* onRequestDone (+0x064): the driver's, then BuildResources. */
-void ModelData__Load(ModelData *self) {
+/* onRequestDone (+0x064): the driver's, then BuildResources, whose result
+ * the ctor tests. */
+s32 ModelData__Load(ModelData *self) {
     GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
-    ((s32 (*)())self->methods->processBuffer)(self);
+    return ((s32 (*)())self->methods->processBuffer)(self);
 }
 
 /** @brief A ModelData's buffer (a .MOM file: InitDreamAux requests
@@ -68,6 +69,10 @@ typedef struct ModelDataHeader {
     /* +0x08 */ s32 tmdOffset; /**< the TMD's offset from the buffer's start */
     /* +0x0C */ u8 tods[1];    /**< the TodSet's data */
 } ModelDataHeader;
+
+/* The MOM file's header. */
+COMPILE_ASSERT(offsetof(ModelDataHeader, tmdOffset) == 0x08, ModelDataHeader_tmdOffset);
+COMPILE_ASSERT(offsetof(ModelDataHeader, tods) == 0x0C, ModelDataHeader_tods);
 
 /* +0x078: when it owns them, build the LinkResource and the TodSet over
  * the buffer; 1, with both released, when either fails. */
@@ -148,7 +153,7 @@ ModelDataMethods gModelDataMethods = {
     /* +0x058 loadFile */ NULL,
     /* +0x05C freeBuffer */ (void *)FileResource__FreeBuffer,
     /* +0x060 slot60 */ NoOp,
-    /* +0x064 onRequestDone */ ModelData__Load,
+    /* +0x064 onRequestDone */ (void *)ModelData__Load,
     /* +0x068 runRequestQueue */ NULL,
     /* +0x06C requestLoadFile */ NULL,
     /* +0x070 stopService */ NULL,

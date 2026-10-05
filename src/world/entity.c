@@ -241,7 +241,7 @@ Entity *Entity__Entity(Entity *self, s32 moodIndex, void *desc, void *sound) {
     return NULL;
 }
 
-FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *size, void *offset, void *step, s32 pri) {
+FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *size, void *offset, s32 step, s32 pri) {
     FadeBox *cached;
     FadeBox *box;
     FadeBoxMethods *boxMethods;
@@ -267,7 +267,7 @@ FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *size, void *offset, void
         attachOffset = sEntityFadeBoxDefaultOffset;
     }
     boxMethods->attachToParent(box, (SceneNode *)self, attachOffset);
-    box->methods->setStep(box, (s32)step);
+    box->methods->setStep(box, step);
     return box;
 }
 
@@ -955,7 +955,7 @@ void Entity__CueWalkAndTurnOrSpinFlickering(Entity *self, SoundCueSet *out) {
             self->methods->updateRotation(self, 0, turn);
             self->methods->addTranslation(self, &sTranslateYPlus256);
         } else {
-            self->methods->moveLocalZOrFindLink(self, -374, (void *)(rand() % 2));
+            self->methods->moveLocalZOrFindLink(self, -374, (void *)(intptr_t)(rand() % 2));
         }
     } else if (self->state == SPIN_FLICKERING) {
         if (self->moodTimer % 5 == 0) {
@@ -1760,7 +1760,7 @@ void Entity__CueSurfaceRunningOrFadeOutNearDreamer(Entity *self, SoundCueSet *ou
             out->slots[2].octave = -2;
         } else if (frame == 48) {
             if (Entity__IsNearTarget(self, self->coord2->coord.t, 15, 10)) {
-                if (Entity__GetOrCreateFadeBox(self, NULL, NULL, (void *)10, 0) != NULL) {
+                if (Entity__GetOrCreateFadeBox(self, NULL, NULL, 10, 0) != NULL) {
                     self->fadeBox->methods->startFadeDown(self->fadeBox, (BasicClass *)self->ticker,
                                                           4, 0);
                 }
@@ -2612,7 +2612,7 @@ void Entity__CueFadeAndTurnDreamerThenLink(Entity *self, SoundCueSet *out) {
             self->methods->moveLocalZ(self, -10, 0);
         } else {
             SetCueTones7_7_7(out);
-            if (Entity__GetOrCreateFadeBox(self, NULL, NULL, (void *)30, 0) != NULL) {
+            if (Entity__GetOrCreateFadeBox(self, NULL, NULL, 30, 0) != NULL) {
                 self->fadeBox->methods->startFadeDown(self->fadeBox, (BasicClass *)self->ticker, 7, 0);
             }
             self->state = FADE_ROLL_DREAMER;
@@ -2621,7 +2621,7 @@ void Entity__CueFadeAndTurnDreamerThenLink(Entity *self, SoundCueSet *out) {
     } else if (self->state == FADE_ROLL_DREAMER) {
         if (self->moodTimer < 90) {
             if (self->moodTimer == 30) {
-                if (Entity__GetOrCreateFadeBox(self, NULL, NULL, (void *)10, 0) != NULL) {
+                if (Entity__GetOrCreateFadeBox(self, NULL, NULL, 10, 0) != NULL) {
                     self->fadeBox->methods->startFadeUp(self->fadeBox, (BasicClass *)self->ticker, 0, 0);
                 }
             }
@@ -2733,7 +2733,7 @@ void Entity__CueRandomHighToneOnce(Entity *self, SoundCueSet *out) {
  * and a link to the row's stage at 50. */
 void Entity__CueFadeSkipTodThenLink(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
-        if (Entity__GetOrCreateFadeBox(self, NULL, NULL, (void *)5, 0) != NULL) {
+        if (Entity__GetOrCreateFadeBox(self, NULL, NULL, 5, 0) != NULL) {
             if (rand() & 1) {
                 self->methods->addTranslation(self, &sTranslateYMinus256);
             }

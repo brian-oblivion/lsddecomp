@@ -133,8 +133,9 @@ void ModelData__Finalize(ModelData *self);
 /**
  * @brief Slot +0x064 (onRequestDone): the driver's, then BuildResources.
  * @param self The object, its buffer loaded.
+ * @return BuildResources' result, which the ctor tests: 1 when it failed.
  */
-void ModelData__Load(ModelData *self);
+s32 ModelData__Load(ModelData *self);
 
 /**
  * @brief Slot +0x078: when it owns them, builds the LinkResource and the

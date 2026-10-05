@@ -422,15 +422,15 @@ struct DreamSys {
     s32 currentFlashbackIndex; /**< the next flashback to play (StartDay rewinds it, SpawnAtLink advances it) */
     /** GetStageLinkAngle()'s result, stored by TryStageTimerLink right before
      * its ExecuteLink; no reader in src/. */
-    s32 stageLinkAngle;
+    Ratio16 *stageLinkAngle;
     /** A sCardinalRotations entry (its address, or 0): the heading a tunnel
      * or staircase is entered at (CheckTunnelHeading, CheckStaircaseHeading),
      * applied when forced movement starts (SetMoveOverride) and when a
      * staircase walk starts. */
-    s32 enterRotation;
+    Ratio16 *enterRotation;
     /** The same for the heading the link leaves the player at, applied by
      * SpawnAtLink under forced movement; TryStageTimerLink zeroes both. */
-    s32 exitRotation;
+    Ratio16 *exitRotation;
 
     s32 storedDay; /**< the day StartDay began; EndDay restores currentDay from it */
 
@@ -484,6 +484,22 @@ typedef struct DreamSaveBlock {
     u8 pad2F8[0x467 - 0x2F8];
     /* +0x467 */ s8 graphScored; /**< set once GraphRoom__ScoreDayLog's scan has succeeded */
 } DreamSaveBlock;
+
+/* The memory card holds DREAMSYS_SAVE_SIZE bytes of DreamSys from saveMagic
+ * on, so their layout is the card format's, at every width. */
+/** `field`'s offset in the save block (DreamSys__GetSaveBlock). */
+#define DREAMSYS_SAVE_OFFSET(field) (offsetof(DreamSys, field) - offsetof(DreamSys, saveMagic))
+COMPILE_ASSERT(DREAMSYS_SAVE_SIZE == 0x700, DreamSys_save_size);
+COMPILE_ASSERT(DREAMSYS_SAVE_OFFSET(currentDay) == offsetof(DreamSaveBlock, currentDay),
+               DreamSaveBlock_currentDay);
+COMPILE_ASSERT(DREAMSYS_SAVE_OFFSET(moodPreviousDays) == offsetof(DreamSaveBlock, moodPreviousDays),
+               DreamSaveBlock_moodPreviousDays);
+COMPILE_ASSERT(DREAMSYS_SAVE_OFFSET(amountFlashbacksAvailable) ==
+                   offsetof(DreamSaveBlock, amountFlashbacksAvailable),
+               DreamSaveBlock_amountFlashbacksAvailable);
+COMPILE_ASSERT(DREAMSYS_SAVE_OFFSET(graphScored) == offsetof(DreamSaveBlock, graphScored),
+               DreamSaveBlock_graphScored);
+COMPILE_ASSERT(offsetof(DreamSaveBlock, graphScored) == 0x467, DreamSaveBlock_graphScored_at);
 
 /**
  * @brief The `extra` of the staircase spawn the last GetStaticSpawn landed
@@ -695,10 +711,10 @@ extern s32 TestForStageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpa
 
 /**
  * @brief The rotation a stage-timer link leaves the player at.
- * @return A pointer to a half-turn rotation (as an s32), or 0 when the last
+ * @return A pointer to a half-turn rotation, or NULL when the last
  *         link's destination was Black Space.
  */
-extern s32 GetStageLinkAngle(void);
+extern Ratio16 *GetStageLinkAngle(void);
 
 /**
  * @brief Whether the player faces the way the tunnel GetStaticSpawn last
@@ -710,7 +726,7 @@ extern s32 GetStageLinkAngle(void);
  * @param rotation The player's rotation, SceneNode__GetRotationDegrees' form.
  * @return 1 when aligned (and the rotations written), 0 otherwise.
  */
-extern s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation);
+extern s32 DreamSys__CheckTunnelHeading(Ratio16 **outExit, Ratio16 **outEnter, void *rotation);
 
 /**
  * @brief The staircase link test: GetStaticSpawn over the staircase tables,
@@ -730,7 +746,7 @@ extern s32 TestForStaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *cur
  * @param rotation The player's rotation, SceneNode__GetRotationDegrees' form.
  * @return 1 when aligned (and the rotations written), 0 otherwise.
  */
-extern s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation);
+extern s32 DreamSys__CheckStaircaseHeading(Ratio16 **outExit, Ratio16 **outEnter, void *rotation);
 
 /**
  * @brief The instant-teleporter link test: GetStaticSpawn over the

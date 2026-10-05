@@ -20,6 +20,10 @@
 #include "flat_light_obj.h"
 #include "bmem_pmgr.h"
 
+/* SplitCoord2 views a GsCOORDINATE2: its translation where libgs keeps it. */
+COMPILE_ASSERT(offsetof(SplitCoord2, tx) == offsetof(GsCOORDINATE2, coord.t[0]), SplitCoord2_tx);
+COMPILE_ASSERT(offsetof(SplitCoord2, tz) == offsetof(GsCOORDINATE2, coord.t[2]), SplitCoord2_tz);
+
 /* A method-table slot whose function is declared for another class's `self`
  * (a parent's method, or an override that keeps the parent's parameter
  * types) takes a `void *` cast. */
@@ -951,7 +955,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     GridCell **cells;
     GsCOORD2PARAM *param;
     s32 rotY;
-    s32 model;
+    intptr_t model;
     s32 hidden;
     s32 i;
     s32 cellIndex;
@@ -998,7 +1002,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
                 cell = &cells[cellIndex];
             }
             (*cell)->model = (void *)model;
-            (*cell)->tmd = (s32)((TmdModel *)(*cell)->model)->object;
+            (*cell)->tmd = (u_long *)((TmdModel *)(*cell)->model)->object;
             GsLinkObject4((u_long)((TmdModel *)(*cell)->model)->object,
                           (GsDOBJ2 *)&(*cell)->attribute, 0);
             /* MATCHING: one struct copy, every load before every store */
@@ -1131,7 +1135,7 @@ ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 neighbour) {
             return slot;
         }
     }
-    return (ChunkSlot *)inRange;
+    return (ChunkSlot *)(intptr_t)inRange;
 }
 
 /* MATCHING: `edge` is assigned inside each upper-bound test */

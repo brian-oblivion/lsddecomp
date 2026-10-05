@@ -45,9 +45,9 @@ void TriggerWorld__Finalize(TriggerWorld *self) {
     GetModelDataMethods()->finalize((ModelData *)self);
 }
 
-/* onRequestDone (+0x064): BuildResources. */
-void TriggerWorld__Load(TriggerWorld *self) {
-    ((s32 (*)())self->methods->processBuffer)(self);
+/* onRequestDone (+0x064): BuildResources, whose result the ctor tests. */
+s32 TriggerWorld__Load(TriggerWorld *self) {
+    return ((s32 (*)())self->methods->processBuffer)(self);
 }
 
 /* +0x078: build a ModelData over each of the buffer's sub-blocks, in place
@@ -67,8 +67,8 @@ s32 TriggerWorld__BuildResources(TriggerWorld *self) {
     self->modelDataCount = 0;
     for (; i < n; i++) {
         req.src.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
-        *p = (s32)New_ModelData(&req.src);
-        if (*p == 0) {
+        SUBBLOCK_SET_OBJ(*p, New_ModelData(&req.src));
+        if (SUBBLOCK_OBJ(*p) == NULL) {
             goto fail; /* MATCHING: releasing and returning here lays the cleanup out inside the loop */
         }
         self->modelDataCount++;
@@ -82,7 +82,7 @@ fail:
 
 /* releaseResources (+0x07C): release the ModelData built so far. */
 void TriggerWorld__ReleaseResources(TriggerWorld *self) {
-    ReleaseBasicClassArray((BasicClass **)((SubBlockTable *)self->buffer)->entries, self->modelDataCount);
+    ReleaseSubBlockObjects(((SubBlockTable *)self->buffer)->entries, self->modelDataCount);
     self->modelDataCount = 0;
 }
 
@@ -91,7 +91,7 @@ ModelData *TriggerWorld__GetModelData(TriggerWorld *self, u32 index) {
     SubBlockTable *buf = self->buffer;
 
     if (index < buf->count) {
-        return (ModelData *)buf->entries[index];
+        return SUBBLOCK_OBJ(buf->entries[index]);
     }
     return NULL;
 }
@@ -128,7 +128,7 @@ TriggerWorldMethods gTriggerWorldMethods = {
     /* +0x058 loadFile */ NULL,
     /* +0x05C freeBuffer */ (void *)FileResource__FreeBuffer,
     /* +0x060 slot60 */ NoOp,
-    /* +0x064 onRequestDone */ TriggerWorld__Load,
+    /* +0x064 onRequestDone */ (void *)TriggerWorld__Load,
     /* +0x068 runRequestQueue */ NULL,
     /* +0x06C requestLoadFile */ NULL,
     /* +0x070 stopService */ NULL,

@@ -108,7 +108,7 @@ void TimImage__SetFlag(TimImage *self) {
 
 /* TimImage +0x09C: describe the TIM held in the buffer (past its id word). */
 void TimImage__GetTimInfo(TimImage *self, GsIMAGE *tim) {
-    GsGetTimInfo((unsigned long *)self->buffer + 1, tim);
+    GsGetTimInfo((u_long *)((u32 *)self->buffer + 1), tim);
 }
 
 /* The class's table getter (called by New_TimImage and TimImage__TimImage). */

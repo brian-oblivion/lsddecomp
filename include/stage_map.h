@@ -164,7 +164,8 @@ typedef struct SplitCoord2 SplitCoord2;
  * halfwords for the offset inside it.
  */
 struct SplitCoord2 {
-    u8 pad00[0x018]; /* +0x000, flg and coord.m */
+    u_long flg;  /**< +0x000, flg */
+    s16 m[3][3]; /**< +0x004, coord.m; coord.t follows, word-aligned */
 
     /** @brief coord.t[0], whole or as its low halfword. */
     union {

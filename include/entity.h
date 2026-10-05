@@ -266,7 +266,7 @@ Entity *Entity__Entity(Entity *self, s32 moodIndex, void *desc, void *sound);
  * @param pri The box's priority; used only when the box is made.
  * @return The FadeBox, or NULL when it could not be made.
  */
-FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *size, void *offset, void *step, s32 pri);
+FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *size, void *offset, s32 step, s32 pri);
 
 /**
  * @brief finalize (slot +0x00C): releases the fade box and ownedObject, then

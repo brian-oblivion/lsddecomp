@@ -42,7 +42,7 @@ void *TodSet__TodSet(TodSet *self, ResourceSource *src) {
 void TodSet__Finalize(TodSet *self) {
     SubBlockTable *buf = self->buffer;
 
-    ReleaseBasicClassArray((BasicClass **)buf->entries, buf->count);
+    ReleaseSubBlockObjects(buf->entries, buf->count);
     GetTodMethods()->finalize((Tod *)self);
 }
 
@@ -51,7 +51,7 @@ void TodSet__Finalize(TodSet *self) {
 s32 TodSet__BuildTods(TodSet *self) {
     ResourceRequest req;
     SubBlockTable *buf;
-    Tod **p;
+    s32 *p;
     s32 i;
     s32 n;
 
@@ -59,15 +59,15 @@ s32 TodSet__BuildTods(TodSet *self) {
     buf = self->buffer;
     i = 0;
     n = buf->count;
-    p = (Tod **)buf->entries;
+    p = buf->entries;
     for (; i < n; i++) {
         req.src.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
-        *p = New_Tod(&req.src);
-        if (*p == NULL) {
+        SUBBLOCK_SET_OBJ(*p, New_Tod(&req.src));
+        if (SUBBLOCK_OBJ(*p) == NULL) {
             while (i != 0) {
                 i--;
                 p--;
-                (*p)->methods->release(*p);
+                ((Tod *)SUBBLOCK_OBJ(*p))->methods->release(SUBBLOCK_OBJ(*p));
             }
             return 1;
         }
@@ -124,3 +124,18 @@ TodSetMethods gTodSetMethods = {
     /* +0x07C scanTodPackets */ (void *)ScanTodPackets,
     /* +0x080 decodePacketWord */ (void *)DecodeTodPacketWord,
 };
+
+#ifdef HOST_BUILD
+s32 SubBlockWordFor(s32 *word, void *obj) {
+    return obj != NULL ? (s32)((u8 *)obj - (u8 *)word) : 0;
+}
+
+void ReleaseSubBlockObjects(s32 *entries, s32 count) {
+    BasicClass *obj;
+
+    for (; count > 0; count--, entries++) {
+        obj = SUBBLOCK_OBJ(*entries);
+        SUBBLOCK_SET_OBJ(*entries, obj->methods->release(obj));
+    }
+}
+#endif

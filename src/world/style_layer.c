@@ -30,6 +30,7 @@
 #include "tim_image.h"
 #include "dream_aux.h"
 #include "style_layer.h"
+#include "link_resource.h"
 #include "bmem_pmgr.h"
 #include <rand.h>
 
@@ -94,8 +95,8 @@ typedef struct StyleCueRecord {
 
 /* StyleLayer's small data, in address order: .sdata, then .sbss. */
 
-/* RegisterStyleConfig's grid; it registers only while this is 0. */
-static s32 sStyleGrid SDATA = 0;
+/* RegisterStyleConfig's grid; it registers only while this is NULL. */
+static StageMap *sStyleGrid SDATA = NULL;
 static s32 sStyleDecorVariant SDATA = STYLE_DECOR_NONE;
 static const u8 *sStyleDecorColor SDATA = NULL;
 /* The fade box ApplyStyleDecorationIfSet builds: at (-100, -100), as
@@ -120,13 +121,13 @@ static s32 sStyleStage SBSS = 0;
 static s32 sStyleTickCount SBSS = 0;
 static s32 sStyleDay SBSS = 0;
 static s32 sStyleUnreadArg SBSS = 0;
-static s32 sStyleSceneRefs SBSS = 0; /* a StyleSceneRefs * (below) */
+static struct StyleSceneRefs *sStyleSceneRefs SBSS = NULL;
 static s32 sStyleVariant SBSS = 0;
 static s32 sStyleConfigIndex SBSS = 0;
 static s32 sStyleEffectSlotCount SBSS = 0;
 static const u8 *sStyleDecorColors SBSS = NULL;
 static const u8 *sStyleClearColor SBSS = NULL;
-static s32 sStyleDecorObj SBSS = 0; /* a BoxFill * */
+static BoxFill *sStyleDecorObj SBSS = NULL;
 static s32 sStyleCueRecordIndex SBSS = 0;
 static StyleCueSlot *sStyleCueSlots[2] SBSS = {NULL, NULL};
 
@@ -158,11 +159,11 @@ typedef struct StyleSpawnYBlock {
 /* The style layer's data, in address order. */
 #include "style_layer_tables.inc"
 
-s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadArg) {
+void *RegisterStyleConfig(StageMap *grid, s32 stage, void *sceneRefs, s32 day, s32 unreadArg) {
     StyleCueSlot **slot;
     s32 i;
 
-    if (sStyleGrid == 0) {
+    if (sStyleGrid == NULL) {
         i = ARRAY_COUNT(sStyleCueSlots) - 1; /* MATCHING: set here; set in the for header it differs */
         slot = &sStyleCueSlots[ARRAY_COUNT(sStyleCueSlots) - 1];
         sStyleGrid = grid;
@@ -176,9 +177,9 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
             *slot = 0;
             slot--;
         }
-        return (s32)ApplyStyleConfig();
+        return ApplyStyleConfig();
     }
-    return 0;
+    return NULL;
 }
 
 extern void *PickStyleFallbackConfig(void);
@@ -211,25 +212,24 @@ void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg) {
  * (ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
  * keeps it; include/objm.h). */
 typedef struct StyleSceneRefs {
-    void *sound;      /**< +0x000, ObjM::ctorSound: the sound object the cue functions take first */
-    void *dreamerTmd; /**< +0x004, ObjM::dreamerTmd */
-    void *etcTim;     /**< +0x008, ObjM::etcTim */
-    Viewport *viewport; /**< +0x00C, ObjM::cachedViewport */
+    void *sound; /**< +0x000, ObjM::ctorSound: the sound object the cue functions take first */
+    LinkResource *dreamerTmd; /**< +0x004, ObjM::dreamerTmd */
+    void *etcTim;             /**< +0x008, ObjM::etcTim */
+    Viewport *viewport;       /**< +0x00C, ObjM::cachedViewport */
 } StyleSceneRefs;
 
 void ApplyStyleDecorationIfSet(void) {
     SceneNode *fadeBox;
 
     if (sStyleDecorColor != 0) {
-        sStyleDecorObj = (s32)New_BoxFill(sStyleDecorBoxSize, (ColorRgb *)sStyleDecorColor, 0);
-        ((BoxFill *)sStyleDecorObj)->methods->setSemiTransOn((BoxFill *)sStyleDecorObj, 1);
-        ((BoxFill *)sStyleDecorObj)->methods->setSemiTransRate((BoxFill *)sStyleDecorObj, 0);
+        sStyleDecorObj = New_BoxFill(sStyleDecorBoxSize, (ColorRgb *)sStyleDecorColor, 0);
+        sStyleDecorObj->methods->setSemiTransOn(sStyleDecorObj, 1);
+        sStyleDecorObj->methods->setSemiTransRate(sStyleDecorObj, 0);
 
-        fadeBox = ((StyleSceneRefs *)sStyleSceneRefs)
-                      ->viewport->methods->getFadeBox(((StyleSceneRefs *)sStyleSceneRefs)->viewport);
+        fadeBox = sStyleSceneRefs->viewport->methods->getFadeBox(sStyleSceneRefs->viewport);
 
-        ((BoxFillAttachToParentFn)((BoxFill *)sStyleDecorObj)->methods->attachToParent)(
-            (BoxFill *)sStyleDecorObj, fadeBox, &sStyleDecorBoxPos);
+        ((BoxFillAttachToParentFn)sStyleDecorObj->methods->attachToParent)(sStyleDecorObj, fadeBox,
+                                                                           &sStyleDecorBoxPos);
     }
 }
 
@@ -257,7 +257,7 @@ void ApplyStyleDecorationIfSet(void) {
 /* Releases the decoration box, if ApplyStyleDecorationIfSet made one. */
 void StyleFlushDecoration(void) {
     if (sStyleDecorColor != 0) {
-        ((BoxFill *)sStyleDecorObj)->methods->release((BoxFill *)sStyleDecorObj);
+        sStyleDecorObj->methods->release(sStyleDecorObj);
         sStyleDecorColor = 0;
     }
 }
@@ -337,7 +337,7 @@ void StyleBuildDecorSet(void) {
         size.h -= 7;
     }
 
-    viewport = ((StyleSceneRefs *)sStyleSceneRefs)->viewport;
+    viewport = sStyleSceneRefs->viewport;
     parent = viewport->methods->getFadeBox(viewport);
     ((BoxFillAttachToParentFn)sStyleDecorSlots[0]->methods->attachToParent)(sStyleDecorSlots[0],
                                                                             parent, &pos);
@@ -363,7 +363,7 @@ void StyleUpdateDecorSet(void) {
     if (sStyleDecorVariant == STYLE_DECOR_NONE) {
         return;
     }
-    viewport = ((StyleSceneRefs *)sStyleSceneRefs)->viewport;
+    viewport = sStyleSceneRefs->viewport;
     height = viewport->refView.vp.y - viewport->refView.vr.y;
     fade = (height / STYLE_DECOR_FADE_HEIGHT) * 3;
     if (fade <= 0) {
@@ -430,9 +430,8 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
     if (sStyleVariant < 0) {
         return;
     }
-    refs = (StyleSceneRefs *)sStyleSceneRefs;
-    SetStyleEffectSources(sStyleVariant, (Actor *)refs->dreamerTmd, (s32)refs->etcTim,
-                          (s32)refs->viewport);
+    refs = sStyleSceneRefs;
+    SetStyleEffectSources(sStyleVariant, refs->dreamerTmd, refs->etcTim, refs->viewport);
     kind0Count = sStyleKind0Counts[rand() & 3];
     kind1Count = (sStyleVariant == 2) ? STYLE_VARIANT2_EFFECTS - kind0Count : 0;
     sStyleEffectSlotCount = kind0Count + kind1Count;
@@ -499,8 +498,8 @@ void StyleTeardown(void) {
 #endif
         sStyleCueSlots[i] = FlushStyleCue(sStyleCueSlots[i]);
     }
-    if (sStyleGrid != 0) {
-        sStyleGrid = 0; /* RegisterStyleConfig registers only while this is 0 */
+    if (sStyleGrid != NULL) {
+        sStyleGrid = NULL; /* RegisterStyleConfig registers only while this is NULL */
     }
 }
 
@@ -727,7 +726,7 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
     entry = FindNextStyleCueInRange(&slot->pos, &slot->lastDist, target);
     if (entry != 0) {
         slot->entry = entry;
-        InitSoundCueSet(((StyleSceneRefs *)sStyleSceneRefs)->sound, &slot->cueSet, entry->cue, slot,
+        InitSoundCueSet(sStyleSceneRefs->sound, &slot->cueSet, entry->cue, slot,
                         sStyleCueCallbacks[entry->cue]);
         if (entry->cue == *lastCue) {
             *lastCue = -entry->cue;
@@ -754,13 +753,13 @@ StyleCueRecord *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *t
     if (target != 0) {
         records = sStyleCueRecordLists[sStyleStage];
         remaining = sStyleCueRecordCounts[sStyleStage] - sStyleCueRecordIndex;
-        entry = (StyleCueRecord *)(sStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
+        entry = (StyleCueRecord *)(sStyleCueRecordIndex * 8 + (intptr_t)records); /* MATCHING: operand order */
         for (j = 0; j < remaining; j++, entry++) {
             sStyleCueRecordIndex++;
             if (entry->cue > 0) {
                 buf.key = entry->key;
                 buf.offset = sStyleCueOffsets[entry->offsetIndex];
-                grid = (StageMap *)sStyleGrid;
+                grid = sStyleGrid;
                 grid->methods->computeCellOffsets(grid, pos, &buf);
                 dx = pos->x - target->x;
                 if (dx < 0) {
@@ -784,7 +783,7 @@ StyleCueRecord *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *t
 
 /* Stops the slot's cue and frees its record. Returns NULL for the slot. */
 StyleCueSlot *FlushStyleCue(StyleCueSlot *slot) {
-    FlushSoundCueSet(((StyleSceneRefs *)sStyleSceneRefs)->sound, &slot->cueSet);
+    FlushSoundCueSet(sStyleSceneRefs->sound, &slot->cueSet);
     slot->entry->cue = -slot->entry->cue;
     return 0;
 }
@@ -794,7 +793,7 @@ extern s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target);
 /* One service pass of the slot's cue while the target is in range; 0 otherwise. */
 s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused) {
     if (IsStyleCueNear(slot, target) != 0) {
-        ServiceSoundCueSet(((StyleSceneRefs *)sStyleSceneRefs)->sound, &slot->cueSet);
+        ServiceSoundCueSet(sStyleSceneRefs->sound, &slot->cueSet);
         return 1;
     }
     return 0;
@@ -851,7 +850,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     target = 0;
     if (cell != 0) {
         target = &targetPos;
-        ((StageMap *)sStyleGrid)->methods->computeCellOffsets((StageMap *)sStyleGrid, target, cell);
+        sStyleGrid->methods->computeCellOffsets(sStyleGrid, target, cell);
     }
     if (sStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();

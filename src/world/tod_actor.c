@@ -25,6 +25,7 @@
 #include "tod_actor.h"
 #include "model_data.h"
 #include "tod.h"
+#include "tod_set.h"
 #include "link_resource.h"
 #include "vab_stream_obj.h"
 #include "frame_clock.h"
@@ -54,25 +55,9 @@
 /* PlayTone's volume, both arguments of the bank's playTone (vol, endVol). */
 #define TODACTOR_TONE_VOLUME 110
 
-/** @brief A TodSet's buffer once TodSet__BuildTods has run: a word, a
- * count, then the table whose each entry (an offset into the buffer) it
- * replaced with the Tod it built over that sub-block. */
-typedef struct TodSetBuffer {
-    u8 pad00[0x08]; /* +0x000 a word and the entry count: not read here */
-    Tod *tods[1];   /**< +0x008 the Tods built over the sub-blocks */
-} TodSetBuffer;
-
-/* The i-th Tod of a TodSet (TodActor__SetTod, TodActor__Tick). */
-#define TODSET_TOD(set, i) (((TodSetBuffer *)(set)->buffer)->tods[i])
-
-/** @brief The ctor's descriptor, forwarded through setupModelData into
- * TodActor__AcquireModelData: the ModelData at +0x0C is borrowed; when there
- * is none, New_ModelData(&desc->src) makes one and the TodActor owns it. */
-typedef struct TodActorDesc {
-    /* +0x000 */ ResourceSource src; /**< the file to make a ModelData from when modelData is NULL */
-    /* +0x008 */ u8 pad8[4];
-    /* +0x00C */ ModelData *modelData; /**< a ModelData to borrow, or NULL */
-} TodActorDesc;
+/* The i-th Tod of a TodSet (TodActor__SetTod, TodActor__Tick): the object
+ * TodSet__BuildTods put in its buffer's table (include/tod_set.h). */
+#define TODSET_TOD(set, i) ((Tod *)SUBBLOCK_OBJ(((SubBlockTable *)(set)->buffer)->entries[i]))
 
 void *New_TodActor(void *desc, void *sound) {
     TodActor *self;
@@ -169,26 +154,26 @@ void TodActor__DetachFromParent(TodActor *self) {
     }
 }
 
-void TodActor__SetDisplay(TodActor *self, void *on) {
+void TodActor__SetDisplay(TodActor *self, s32 on) {
     Actor **p;
     s32 i;
 
     p = self->parts;
     for (i = 0; i < self->partCount; p++) {
         i++;
-        (*p)->methods->setDisplay(*p, (s32)on);
+        (*p)->methods->setDisplay(*p, on);
     }
 }
 
-void TodActor__SetLightMode(TodActor *self, void *mode) {
+void TodActor__SetLightMode(TodActor *self, u32 mode) {
     Actor **p;
     s32 i;
 
     p = self->parts;
     for (i = 0; i < self->partCount; i++, p++) {
-        (*p)->methods->setLightMode(*p, (u32)mode);
+        (*p)->methods->setLightMode(*p, mode);
     }
-    GetActorMethods()->setLightMode((Actor *)self, (u32)mode);
+    GetActorMethods()->setLightMode((Actor *)self, mode);
 }
 
 void TodActor__Update(TodActor *self, void *sender, s32 event) {

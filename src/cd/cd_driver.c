@@ -203,7 +203,7 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
             }
         }
     } else {
-        EnqueueCdRequest(self, 0, CD_OP_SEEK, (s32)offset, mode);
+        EnqueueCdRequest(self, 0, CD_OP_SEEK, (intptr_t)offset, mode);
     }
     UnlockCd();
     return 0;
@@ -240,7 +240,7 @@ s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
             }
         }
     } else {
-        EnqueueCdRequest(self, 0, CD_OP_READ, (s32)buf, size);
+        EnqueueCdRequest(self, 0, CD_OP_READ, (intptr_t)buf, size);
     }
     UnlockCd();
     return 0;
@@ -660,7 +660,7 @@ void DisableCdQueue(void) {
 
 /* Fills a node AllocCdRequestNode has already linked onto sCdRequestQueue,
  * counts it against its owner and starts the service tick. */
-void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1) {
+void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, intptr_t param0, s32 param1) {
     CdRequestNode *node = AllocCdRequestNode();
 
     /* MATCHING: retail's store order, not field order; statement order sets it here */

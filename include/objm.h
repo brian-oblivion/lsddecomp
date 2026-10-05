@@ -74,6 +74,11 @@ enum ObjMState {
     OBJM_NOTIFY_CLOSE_NEW_GAME = 13 /**< Notified by closeAndNotifyNewGame; not kept. */
 };
 
+/** @brief The type init's occupant (ObjM__AttachTarget) is called through:
+ * the inherited slot's third parameter is an s32 `mode`. */
+typedef void (*ObjMAttachTargetFn)(struct ObjM *self, IntermediateBaseInitArgs *args,
+                                   struct DreamSys *dreamSys);
+
 /**
  * @brief ObjM's method table: TimedTask's slots, with a ctor that takes
  * (sound, bgm, etcTim, dreamerTmd, stage), then its own.
@@ -88,7 +93,7 @@ enum ObjMState {
  *
  * Overrides whose parameter list differs from the inherited slot keep the
  * slot's type: init's occupant takes (args, DreamSys *), and
- * DayTask__StartObjM passes the DreamSys as the slot's s32 `mode`; onInit's
+ * DayTask__StartObjM calls it through ObjMAttachTargetFn; onInit's
  * takes (gridSpan, style override, initOption), which IntermediateBase__Init
  * passes as (0, 0, 0); onDrawSystemEvent's and onPadEvent's take `void *`
  * for the unused sender.

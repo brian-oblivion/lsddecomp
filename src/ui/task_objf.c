@@ -232,8 +232,7 @@ s32 TaskObjF__OpenEvents(TaskObjF *self) {
 
 s32 TaskObjF__CloseEvents(TaskObjF *self) {
     TaskObjF__DisableEvents(self);
-    /* kernel.h spells CloseEvent with `long`, ForEachEvent's callback with s32. */
-    TaskObjF__ForEachEvent(self, (s32 (*)(s32))CloseEvent, 1);
+    TaskObjF__ForEachEvent(self, (long (*)(long))CloseEvent, 1);
     return 1;
 }
 
@@ -590,24 +589,24 @@ char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix) {
 
 /* Sony's kernel event calls (libapi/a11..a13, include/psyq/kernel.h). Each
  * takes an event descriptor and returns a status word, which is what lets
- * TaskObjF__ForEachEvent take them as its callback; kernel.h spells them with
- * `long`, hence the casts. */
+ * TaskObjF__ForEachEvent take them as its callback, with the type libapi.h
+ * gives them (the PS1 build has no declaration, hence the casts). */
 
 s32 TaskObjF__EnableEvents(TaskObjF *self) {
-    return TaskObjF__ForEachEvent(self, (s32 (*)(s32))EnableEvent, 1);
+    return TaskObjF__ForEachEvent(self, (long (*)(long))EnableEvent, 1);
 }
 
 s32 TaskObjF__DisableEvents(TaskObjF *self) {
-    return TaskObjF__ForEachEvent(self, (s32 (*)(s32))DisableEvent, 1);
+    return TaskObjF__ForEachEvent(self, (long (*)(long))DisableEvent, 1);
 }
 
 s32 TaskObjF__TestEvents(TaskObjF *self) {
-    return TaskObjF__ForEachEvent(self, (s32 (*)(s32))TestEvent, 0);
+    return TaskObjF__ForEachEvent(self, (long (*)(long))TestEvent, 0);
 }
 
 /* Calls `callback` on each event until one returns 0, inside a critical
  * section when `critical` is set; returns the last result. */
-s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 critical) {
+s32 TaskObjF__ForEachEvent(TaskObjF *self, long (*callback)(long), s32 critical) {
     s32 i;
     s32 result;
 
@@ -1156,7 +1155,7 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
  * are parsed from their second digit, which atoi would otherwise read as
  * octal. Returns a pointer into sSaveTitleGlyphs that no caller reads. */
 /* MATCHING: `glyphs` is the return value, not a second read of the global. */
-s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
+void *StampSaveTitleFileLetter(char *titleText, char *fileName) {
     FullWidthChar *title = (FullWidthChar *)titleText;
     s32 numberPos;
     s32 letter;
@@ -1174,13 +1173,13 @@ s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
         letter = atoi(fileName + numberPos) - 1;
         glyph = &sSaveTitleGlyphs[letter];
         title[SAVE_TITLE_LETTER] = *glyph;
-        return (s32)glyph;
+        return glyph;
     } else {
         FullWidthChar *glyphs = sSaveTitleGlyphs;
 
         *(FullWidthChars3 *)&title[SAVE_TITLE_LETTER_FIELD] =
             *(FullWidthChars3 *)&glyphs[SAVE_TITLE_GLYPH_SPACES];
-        return (s32)glyphs;
+        return glyphs;
     }
 }
 
