@@ -35,6 +35,7 @@ SEARCH_INCLUDES        = YES
 INCLUDE_PATH           = include include/psyq
 PREDEFINED             = "INCLUDE_ASM(dir, name)=" \
                          "INCLUDE_RODATA(dir, name)=" \
+                         "COMPILE_ASSERT(cond, name)=" \
                          __attribute__(x)= \
                          SDATA= \
                          SBSS= \

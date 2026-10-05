@@ -65,6 +65,8 @@ extern s32 SubBlockWordFor(s32 *word, void *obj);
  */
 extern void ReleaseSubBlockObjects(s32 *entries, s32 count);
 #else
+/** Releases the objects in `count` table words and clears them: the words
+ * are pointers here, so this is ReleaseBasicClassArray. */
 #define ReleaseSubBlockObjects(entries, count) \
     ReleaseBasicClassArray((BasicClass **)(entries), (count))
 #endif
