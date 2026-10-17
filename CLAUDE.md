@@ -3,7 +3,8 @@
 C source that compiles byte-for-byte to the retail `SLPS_015.56` (SLPS-01556).
 Every game function is matched, and the readability cleanup is finished; `python3
 tools/readability.py` measures what debt is left. README.md covers the
-layout, the build and the class framework; read it first. `tools/research/`
+build, docs/ARCHITECTURE.md the class framework and docs/CONTRIBUTING.md
+the workflow; read them first. `tools/research/`
 holds tools no current work uses, kept for reuse.
 
 **Keep this file short.** It holds rules and the loop, never project state,
@@ -77,7 +78,7 @@ research notes) is on the `archive/process` branch; read it with
   leaves a stale `.o` that make then skips. A red build with no compile error
   means `rm -f build/src/<dir>/<unit>.c.o` and rebuild.
 - **Host-only code:** `#ifdef HOST_BUILD` branches never reach the PS1
-  build, so a green hash says nothing about them (README, "The host build").
+  build, so a green hash says nothing about them (docs/CONTRIBUTING.md, "The host build").
 
 To localise a red build with no compile error, run
 `cmp -l build/SLPS_015.56 disk/SLPS_015.56 | head`. The offsets are 1-based,

@@ -1,76 +1,34 @@
-# lsddecomp
+# LSD: Dream Emulator decompilation
 
-A matching decompilation of **LSD: Dream Emulator** (PlayStation, 1998,
-Asmik Ace / OutSide Directors Company, SLPS-01556).
+A complete, matching decompilation of **LSD: Dream Emulator** (PlayStation,
+1998, Asmik Ace / OutSide Directors Company, SLPS-01556).
 
-"Matching" means the C in `src/` compiles, with the same Psy-Q GCC 2.6.3
-toolchain the game was built with, into an executable that is
-**byte-for-byte identical** to the one on the retail disc. A paraphrase of a
-program can be subtly wrong without anyone noticing. A byte-exact rebuild
-can't be.
+The C in `src/` compiles into an executable that is byte-for-byte identical
+to the one on the retail disc. Every one of the game's functions is done,
+named and documented.
 
-## What is and is not in this repository
-
-**This repository contains no game data and no Sony files.** There is no
-executable, disc image, asset, SDK library or SDK header in it, and there
-never will be. You bring your own copies, and the build reads them from
-directories git ignores:
-
-| you provide | where | what the build does with it |
-| --- | --- | --- |
-| the game executable `SLPS_015.56` (or the disc image it comes from) | `disk/` | disassembles it (`asm/`, generated), and checks the rebuilt image against it |
-| Sony's Psy-Q "Runtime Library" SDK discs | `sdk/` | converts Sony's library objects into `lib/` and copies Sony's headers into `include/psyq/`, both generated and ignored |
-
-What *is* committed is the reconstruction: the C source in `src/`, the
-headers in `include/` that describe the game's structures and classes, the
-splat configuration and symbol names in `config/`, and the tools. The C
-covers the game's own code, plus a few Sony library functions that no
-shipped SDK object matches (`src/psyq/`: C where it was rebuilt from the
-disassembly, and elsewhere an `INCLUDE_ASM` line that splices in the
-disassembly generated from your executable at build time).
-
-## Progress
-
-**Done.** All 1446 of the game's own functions are C, and the rebuilt
-executable matches retail byte for byte.
-Sony's library code is linked from Sony's own objects (below) rather than
-decompiled. Every game header is
-documented, and every class has one definition.
-
-The cleanup that made the code read like the game's own source (data tables
-written as C, comments in game terms, code shaped by the compiler rewritten,
-one class per file) is finished. Its plan, `docs/CLEANUP.md`, and the tools
-that ran it are on the `archive/process` branch with the rest of the
-project's history.
-
-To measure it yourself:
-
-```sh
-python3 tools/progress.py      # matched functions and bytes, per file
-python3 tools/readability.py   # remaining readability debt: magic numbers, raw offsets, unk fields
-```
+To play it on a PC rather than rebuild the PS1 executable, see
+[lsd-port](https://github.com/brian-oblivion/lsd-port), which builds this
+same C as a native program.
 
 ## Building it
 
-You need Linux, `python3`, `git`, `curl`, `make`, `sha1sum` and a
-host C compiler, plus:
+This repository contains no game data and no Sony files. You need your own:
 
-- **The game.** The Japanese retail release, SLPS-01556. Put the redump
-  `.bin`/`.cue` in the repository root, or extract the executable yourself
-  into `disk/`:
+- **The game**: the Japanese retail disc, SLPS-01556. Put the redump
+  `.bin`/`.cue` in the repository root, or extract the executable into
+  `disk/`:
 
   ```sh
-  python3 tools/extract_exe.py "LSD - Dream Emulator (Japan).bin"   # writes disk/SLPS_015.56
+  python3 tools/extract_exe.py "LSD - Dream Emulator (Japan).bin"
   ```
 
-  The expected file is `SLPS_015.56`, 505856 bytes, SHA1
-  `76322eeade5ebb22dca57fdeac7d68c30f06308d`. No other revision is
-  supported. A different hash is a different build, and every address in
-  `config/` would be wrong for it.
+  It must be `SLPS_015.56` with SHA1
+  `76322eeade5ebb22dca57fdeac7d68c30f06308d`. No other version works.
 
-- **The Psy-Q SDK.** The "Programmer Tool - Runtime Library" discs, as
-  redump zips (don't unpack them), in `sdk/`. They are on archive.org
-  (<https://archive.org/download/ps1_sdks>):
+- **Sony's Psy-Q SDK**: these three redump zips from
+  <https://archive.org/download/ps1_sdks>, in `sdk/`, still zipped and
+  with their original names:
 
   ```
   Programmer Tool - Runtime Library Version 3.3 (Japan)_DTL-S2190_redump.zip
@@ -78,241 +36,59 @@ host C compiler, plus:
   Programmer Tool - Runtime Library Version 3.6 (Japan)_DTL-S2310_redump.zip
   ```
 
-  The version is read from the file name, so keep the original names.
-  `python3 tools/psyq_sdk.py install` names any disc that is missing.
-
-Then:
+On Linux, with `python3`, `git`, `curl`, `make` and a C compiler:
 
 ```sh
-./tools/setup.sh          # toolchain, venv, SDK conversion, split, and a verified first build
-./build-and-verify.sh     # build, then compare the whole image with retail
+./tools/setup.sh          # one time: toolchain, SDK, first verified build
+./build-and-verify.sh     # every build after that
 ```
 
-`setup.sh` fetches the prebuilt GCC 2.6.3, builds `mipsel-linux-gnu`
-binutils, installs splat into a venv, and clones maspsx, m2c, asm-differ and
-decomp-permuter. It converts the SDK discs, runs `make extract`, and stops unless the result
-rebuilds byte for byte. After that, `./build-and-verify.sh` is the only build
-command. It ends `OK: build matches retail SLPS_015.56` when the image is
-exact. A bare `make` produces bytes but doesn't tell you whether they are
-right.
+A good build ends with `OK: build matches retail SLPS_015.56`.
 
-### Why the SDK discs
+## Reading the code
 
-The game links Sony's Psy-Q libraries (libapi, libc2, libcard, libcd, libetc,
-libgs, libgte, libpress, libsnd, libspu). The build doesn't re-derive that
-code as C. It links **Sony's own objects**, placed exactly where the game put
-them. The game mixed library builds from several SDK releases, so which disc
-supplies each object was measured against retail and recorded in
-`config/psyq-objects.txt`. `config/psyq-headers.txt` lists the headers the
-same way, each with the hash of the generated file. The handful of Sony
-functions no shipped object matches live in `src/psyq/`.
+Start with [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), a map of how the
+game is put together, then `include/basic_class.h`. The game is C written
+as objects with hand-made method tables; it looks like C++ but isn't.
 
-## What the code is
-
-The game is one plain PS-X executable: no overlays, no compression, and all
-of its code in one file. Its own code is C89, written on top of Sony's
-libraries around a **hand-rolled class framework**.
-
-**It looks like C++, but it isn't.** Every object starts with a pointer to
-its method table, which is a flat array of function pointers stored as
-ordinary data. Methods are plain C functions named `Class__Method` that
-take the object as an explicit first parameter, `self`. Calls go through the
-table: `self->methods->addChild(self, child)`. A class's constructor sits in
-table slot +0x008, and `New_Class` allocates an object and calls its
-constructor through the table. Word +0x000 of each table is a nibble-path
-class id. For example, TextRow `0x11144` sits under CharSprite `0x1144`,
-which sits under ScreenSprite `0x144`, then Sprite `0x44`, then SceneNode
-`0x4`, then BasicClass `0x0`.
-
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) is the map: the class tree,
-how a frame gets from `main` to the screen, and how a day of the dream
-runs. Each class has one header, `include/<class>.h`, which holds its object
-struct, its method-table struct and its prototypes, all documented for
-Doxygen (`doxygen Doxyfile`, output in `build/doxygen/`).
-`include/basic_class.h`, the root class, is the place to start. Each `.c`
-file opens with a banner saying what it holds.
-
-| directory | what it holds |
+| directory | what's in it |
 | --- | --- |
-| `src/main.c` | the entry point: memory pool, application, screen, pad, main loop |
-| `src/app/` | the application shell and the object framework: the `BMemPMgr` pool allocator and `BasicClass`, `Application`/`GameApplication`, `FileResource`, the task classes, `Viewport`, `Pad` |
-| `src/cd/` | CD access: `CdDriver`, `CdStream` streaming, `LbdFile`, the table of the game's files |
-| `src/graphics/` | the screen, scene graph and rendering: `DrawSystem`, `SceneNode`, sprites, lights, `TmdModel` and the TMD renderer, the TIM/TMD/TOD loaders, tile maps, the FMV player |
-| `src/world/` | the dream itself: `DreamSys` (dream clock, movement, the mood record, the "link" that moves you between stages), the stage grid, `DayTask`, `StageMap`, `Actor`, `Entity`, `ObjM`, the mood graph screen |
-| `src/sound/` | `WBgm` background music, VAB banks, sound cues |
-| `src/ui/` | the title menu and memory-card saves, text entry, list and box widgets |
-| `src/psyq/` | Sony library functions that no SDK object matches, under Sony's names |
+| `src/app/` | the application, memory pool, object framework, controller |
+| `src/cd/` | reading files from the disc |
+| `src/graphics/` | the screen, models, sprites, textures, FMV |
+| `src/world/` | the dream itself: the clock, stages, characters, the mood graph |
+| `src/sound/` | music and sound effects |
+| `src/ui/` | title menu, memory card, menus |
+| `src/psyq/` | the few Sony library functions rebuilt from the disassembly |
 
-To go from a function to its class and callers:
+To change the code and keep it matching, read
+[`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md).
 
-```sh
-grep -rn 'TaskObjF__SetState' src/ include/         # definition, prototype, direct calls
-.venv/bin/python3 tools/classtable.py gTaskObjFMethods   # the method-table slot it fills
-```
+## A note on AI
 
-## Changing the code and keeping it matching
-
-Every change is checked the same way: edit, build, verify.
-
-```sh
-./build-and-verify.sh > /tmp/build.log 2>&1; echo "build exit=$?"
-grep -nE 'error:|parse error|undefined reference|\*\*\* \[[^]]*\.o\]' /tmp/build.log | head
-.venv/bin/python3 tools/funcdiff.py <func>          # how many words match, for one function
-.venv/bin/python3 tools/asm-differ/diff.py <func>   # side-by-side diff against retail
-```
-
-- **exit 1**: `disk/SLPS_015.56` is missing or is the wrong dump.
-- **exit 2 with a grep hit**: the C didn't compile. GCC 2.6.3 predates the
-  `error:` prefix, so the `*** [...o]` pattern, which matches make failing
-  on an object file, is the reliable signal.
-- **exit 2 and no hit**: it compiled, but the image differs from retail.
-  `cmp -l build/SLPS_015.56 disk/SLPS_015.56 | head` gives 1-based file
-  offsets; the address is `(offset - 1) - 0x800 + 0x80010000`, and
-  `build/lsdde.map` names the function at that address.
-
-The rules that break the image if you ignore them:
-
-- **Functions stay in ROM-address order within a file.** A function out of
-  order still links, but the image comes out wrong in functions you didn't
-  touch.
-- **C89, as GCC 2.6.3 reads it.** Declarations go at the top of a block.
-  Only `/* */` comments. `char` is unsigned, so a signed byte is `s8`.
-- **A rodata string is defined once, by name.** Each of the game's strings
-  is a `const` array in the unit that uses it, defined ahead of the unit's
-  functions in the image's order (`sTitleTimPath` in `title_menu.c`). A
-  literal written at a use emits a second copy and shifts the image.
-- **Data stays in address order.** GCC 2.6.3 emits each section in source
-  order. A unit with long `.data` tables keeps them in
-  `<unit>_tables.inc` beside it and `#include`s that file at the tables'
-  place, so the `.c` is mostly code and not hundreds of lines of tables
-  (`dream_sys.c`).
-- **A struct edit is never local.** A field inserted without shrinking the
-  padding beside it moves every later offset, and breaks functions in other
-  files. Rebuild the whole image after any header change.
-- **An odd spelling that exists to match gets one `MATCHING:` comment**
-  beside it in the `.c` file.
-- **The toolchain is pinned.** The compiler, its flags and `maspsx` (which
-  reproduces Sony's assembler's macro expansions) are part of the retail
-  bytes, not knobs to turn.
-
-Rename through the tools, which update every reference and re-verify:
-
-```sh
-python3 tools/rename.py OLD NEW          # a function or global
-python3 tools/renametype.py OLD NEW      # a type or class family
-python3 tools/unitfile.py rename OLD NEW # a source file
-```
-
-Never edit `asm/` (it is regenerated) or `check.sha1` (it is the retail
-hash). Run `tools/lint.sh` before sending a change.
-
-## The host build
-
-[lsd-port](https://github.com/brian-oblivion/lsd-port) compiles this C for
-other platforms, against [psyz](https://github.com/Xeeynamo/psyz), with
-`HOST_BUILD` defined. The PS1 build never sees that code, so the retail
-hash says nothing about it; lsd-port's CI builds it. The C is shared, so:
-
-- **Prefer C that is right on both.** `#ifdef HOST_BUILD` is only for what
-  cannot be shared, and each one says why.
-- **No address in an integer.** The host is 64-bit; a pointer type where an
-  `s32` held an address changes no PS1 bytes.
-- **A global the PS1 link places by address**
-  (`config/undefined_syms_auto.*.txt`) has no definition in the C, so it
-  also needs a host one: `#ifdef HOST_BUILD` beside its `extern`, sized
-  from the code. Symbols the code lays one structure over become that
-  structure's fields on the host (`sStyleSpawnParams` in `style_layer.c`).
-- **Read-only data the game writes** is `IMAGE_CONST`: `const` on the PS1,
-  writable on a host, whose `.rodata` is read-only memory.
-- **A pointer into `MATRIX.t` or a `VECTOR`** is a `GteLong *`: Sony's
-  headers declare those fields `long`, psyz's `int`.
-
-## Continuous integration
-
-- **`lint`** runs on every push and pull request: formatting (clang-format
-  22), the API documentation check, the readability counters, one
-  declaration per name, snake_case file names, and a Doxygen build that fails
-  on any warning. The two checks that preprocess the source need Sony's
-  headers, so they run only where the headers are available.
-- **`build`** rebuilds the executable, checks it against `check.sha1`, and
-  publishes the objdiff report [decomp.dev](https://decomp.dev) reads. The
-  report, like `tools/progress.py`, counts the game's own code only; Sony's
-  library code is linked from Sony's objects and isn't a matching goal. The
-  disc and the SDK never enter this repository, so the job reads them from a
-  private repository the owner keeps (`disk/SLPS_015.56`, `lib/` and
-  `include/psyq/`), named in the `LSD_DEPS_REPO` variable and read with the
-  `LSD_DEPS_TOKEN` secret. Without the secret the job skips.
-
-## An experiment in AI-driven decompilation
-
-This project was an experiment to find out how far a matching decompilation
-could get if **the AI did all of the decompilation**. Every function in
-`src/`, every header, every name and comment, and nearly all of the tooling
-was written by Claude agents (Anthropic's Claude Code). The human operator
-supplied the disc and the SDK, set the goal, pasted the round prompt, and
-made the calls that were theirs to make: the licence, what to publish, and
-the plan's direction. The operator didn't write the C.
-
-It went from an empty splat split on 2026-08-28 to every game function
-matched, named and documented on 2026-09-29, in 106 rounds and about 6800
-commits. A round was one **head agent** reading a written plan, measuring
-the project with its own tools, and handing units of work to up to five
-**runner agents**, each in its own git worktree on one source file. The head
-then checked every claimed match against the whole-image SHA1 before
-merging anything. Cheaper models took mechanical work, stronger models took
-matching and naming, and the strongest one revised the plan and the rules
-between rounds.
-
-What made it work, and what the experiment taught:
-
-- **A byte-exact oracle.** An agent can't talk its way past a SHA1. Every
-  claim was checked by `./build-and-verify.sh` rather than by the agent that
-  made it. Hooks block the obvious ways around it: editing the hash files,
-  editing generated disassembly, or running a bare `make`.
-- **Measure, don't transcribe.** Project state lived in tools that measure
-  the tree (`progress.py`, `readability.py` and a plan tracker, `plan.py`, now
-  archived), never in prose.
-  Numbers written into documents went stale within a round and sent later
-  agents to redo finished work.
-- **Wrong causes cost more than wrong scores.** A wrong score gets corrected
-  the next time anyone measures. A wrong diagnosis (a stall blamed on the
-  compiler, a function blamed on the game that was really Sony's) is what
-  the next round acts on. Several stood for many rounds before a screen
-  caught them.
-- **The rules grew with the agents.** The working documents grew to
-  thousands of lines as each round wrote down what the last one got wrong.
-  They were distilled repeatedly, and at the end they moved off `main`.
-
-The whole process record is on the **`archive/process`** branch: the
-finishing plan, the parallel-run protocol, the round-by-round log, a report
-for every function saying how it matched and why it has its name, and the
-research notes behind the build and the class model.
+The decompilation was heavily assisted by AI (Claude Code), and checked at
+every step against the retail executable's SHA1. The history of how it was
+done is on the `archive/process` branch.
 
 ## Licence
 
-The original work in this repository (the C source, the project headers, the
-configuration and the tools) is dedicated to the public domain under
-[CC0 1.0](LICENSE). That covers only this project's own contribution. See
-`LICENSE` for what it doesn't cover: the game itself, Sony's SDK, and the
-maspsx patches in `tools/patches/`.
+This project's own work (the C, headers, configuration and tools) is
+[CC0 1.0](LICENSE). The game, Sony's SDK and the maspsx patches in
+`tools/patches/` are not; see `LICENSE`.
 
 ## Credits
 
-- **[FirecatFG/lsddecomp](https://github.com/FirecatFG/lsddecomp)**, the
-  first decompilation attempt on this game. This project started from its
-  splat segmentation, `$gp` value and symbol names: 146 names, which were
-  hand-written or inferred by `ghidra_psx_ldr` and never the developers' own,
-  so every one was treated as a hypothesis. The C and the headers here were
-  written independently. lsddecomp's own research notes live in its
-  repository.
-- **[parasite-eve-2-decomp](https://github.com/GabeRealB/parasite-eve-2-decomp)** (CC0), for linking Sony's
-  SDK objects instead of decompiling them, and for `include/gte_macros.inc`.
-- **The decomp toolchain:** [splat](https://github.com/ethteck/splat),
+- [FirecatFG/lsddecomp](https://github.com/FirecatFG/lsddecomp), the first
+  decompilation attempt on this game, for the starting segmentation and
+  symbol names.
+- [parasite-eve-2-decomp](https://github.com/GabeRealB/parasite-eve-2-decomp)
+  (CC0), for linking Sony's SDK objects and `include/gte_macros.inc`.
+- The decomp toolchain: [splat](https://github.com/ethteck/splat),
   [maspsx](https://github.com/mkst/maspsx),
   [m2c](https://github.com/matt-kempster/m2c),
   [asm-differ](https://github.com/simonlindholm/asm-differ),
   [decomp-permuter](https://github.com/simonlindholm/decomp-permuter),
-  [objdiff](https://github.com/encounter/objdiff) and pcsx-redux's
-  psyq-obj-parser, and the prebuilt GCC 2.6.3 from
+  [objdiff](https://github.com/encounter/objdiff), pcsx-redux's
+  psyq-obj-parser, and GCC 2.6.3 from
   [decompme/compilers](https://github.com/decompme/compilers).
-- **The [compu-lsd wiki](https://compu-lsd.com)**, for what the game does.
+- The [compu-lsd wiki](https://compu-lsd.com), for what the game does.

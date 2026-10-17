@@ -290,7 +290,7 @@ if [ "$VERIFY" = 1 ]; then
     ./build-and-verify.sh >/dev/null || die "the executable did not rebuild
       byte-for-byte. Do NOT start matching until this passes: every funcdiff
       score is meaningless against a toolchain that cannot reproduce retail."
-    printf '\n\033[32mSetup complete and verified.\033[0m See README.md, 'Changing the code'.\n'
+    printf '\n\033[32mSetup complete and verified.\033[0m See docs/CONTRIBUTING.md.\n'
 else
     printf '\n\033[33mSetup complete (verification skipped).\033[0m Run ./build-and-verify.sh before matching.\n'
 fi
