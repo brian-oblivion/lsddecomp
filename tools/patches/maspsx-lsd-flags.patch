@@ -1,8 +1,8 @@
 diff --git a/maspsx.py b/maspsx.py
-index 4e3a382..a6a24e9 100644
+index fbcc496..8661dce 100644
 --- a/maspsx.py
 +++ b/maspsx.py
-@@ -59,6 +59,9 @@ def main() -> None:
+@@ -69,6 +69,9 @@ def main() -> None:
      parser.add_argument("--macro-inc", action="store_true")
      parser.add_argument("--dont-expand-li", action="store_true")
      parser.add_argument("--addiu-at", action="store_true")
@@ -12,15 +12,10 @@ index 4e3a382..a6a24e9 100644
      parser.add_argument("--force-stdin", action="store_true")
      parser.add_argument("--passthrough", action="store_true")
      parser.add_argument("--use-comm-section", action="store_true")
-@@ -129,6 +132,19 @@ def main() -> None:
+@@ -142,6 +145,14 @@ def main() -> None:
  
-         filtered_as_args.append(arg)
+     force_G0 = not args.dont_force_G0
  
-+    # Symbols the retail link placed in .sdata/.sbss and therefore reaches
-+    # gp-relatively. With -G0 cc1 emits no size hints and the project's data
-+    # is defined in splat asm, not C, so maspsx's own sdata_entries table
-+    # (same-file .sdata/.comm only) can never learn them. Seed it explicitly.
-+    # See docs/research/gp-relative-blocker.md.
 +    gp_symbols: set = set()
 +    if args.gp_symbols:
 +        with open(args.gp_symbols) as f:
@@ -32,46 +27,38 @@ index 4e3a382..a6a24e9 100644
      if args.passthrough:
          processor = PassthroughProcessor(in_lines)
  
-@@ -146,10 +162,26 @@ def main() -> None:
-         # docs/research/addiu-at-blocker.md, "Options", option 1.
+@@ -157,6 +168,10 @@ def main() -> None:
+         # unfolded indexed form at 502 of 502 sites, so the flag is required.
          if args.addiu_at:
              version_config.addiu_at = True
-+        # Same decoupling for nop_mflo_mfhi: config_for_aspsx_version turns it
-+        # OFF only below 2.30. Retail never takes the hazard nops between an
-+        # mflo/mfhi and a following mult/div; cc1 emits them as commented
-+        # "#nop" hints and this flag leaves them commented. Byte-exact across
-+        # the whole image. See docs/research/addiu-at-blocker.md.
 +        if args.no_nop_mflo_mfhi:
 +            version_config.nop_mflo_mfhi = False
-+        # Fourth decoupling, same shape (lsddecomp2 round 62/63). ASPSX 2.34
-+        # decides the load-delay hazard BEFORE expanding a store-to-symbol
-+        # macro, so `lbu $2,0($4)` followed by `sb $2,G` gets a nop even though
-+        # the expansion interposes `lui $at`. Retail: 40 such sites with the
-+        # nop, 0 without. config_for_aspsx_version turns this on only below
-+        # 2.30; this flag turns it on alone.
 +        if args.nop_at_expansion:
 +            version_config.nop_at_expansion = True
  
+         # GNU as would otherwise use $gp itself
+         if not version_config.gp_allow:
+@@ -165,6 +180,7 @@ def main() -> None:
          processor = MaspsxProcessor(
              in_lines,
              sdata_limit=sdata_limit,
 +            gp_symbols=gp_symbols,
              expand_div=args.expand_div,
              expand_li=version_config.expand_li,
-             nop_at_expansion=version_config.nop_at_expansion,
+             li_small_uses_addiu=version_config.li_small_uses_addiu,
 diff --git a/maspsx/__init__.py b/maspsx/__init__.py
-index b351c8a..e9776e1 100644
+index 0aade6d..bb56797 100644
 --- a/maspsx/__init__.py
 +++ b/maspsx/__init__.py
-@@ -423,6 +423,7 @@ class MaspsxProcessor:
+@@ -469,6 +469,7 @@ class MaspsxProcessor:
          self,
-         lines: List[str],
+         lines: list[str],
          sdata_limit=0,
 +        gp_symbols=None,
          expand_div=False,
          expand_li=False,
          nop_at_expansion=False,
-@@ -439,6 +440,7 @@ class MaspsxProcessor:
+@@ -490,6 +491,7 @@ class MaspsxProcessor:
          self.lines = [x.strip() for x in lines]
  
          self.sdata_limit = sdata_limit
@@ -79,7 +66,7 @@ index b351c8a..e9776e1 100644
  
          self.expand_div = expand_div
          self.expand_li = expand_li
-@@ -568,6 +570,9 @@ class MaspsxProcessor:
+@@ -626,6 +628,9 @@ class MaspsxProcessor:
          self.sdata_entries = {}
  
          self.preprocess_lines()
@@ -89,12 +76,3 @@ index b351c8a..e9776e1 100644
  
          res = []
          in_include_asm_hack = False
-@@ -649,7 +654,7 @@ class MaspsxProcessor:
-         return ""  # warn user?
- 
-     def _uses_gp(self, line: str) -> bool:
--        if self.sdata_limit == 0:
-+        if self.sdata_limit == 0 and not self.gp_symbols:
-             return False
- 
-         line = strip_comments(line)
