@@ -11,6 +11,18 @@ To play it on a PC rather than rebuild the PS1 executable, see
 [lsd-port](https://github.com/brian-oblivion/lsd-port), which builds this
 same C as a native program.
 
+## Disc image
+
+`tools/build-iso.sh` repacks the full retail disc from your own extracted
+dump with the rebuilt executable in place: a 648,088,896 byte image byte
+identical to the Japanese retail track. It needs `mkpsxiso` on PATH and a
+full extraction of your dump (not just the executable) in `disk/extract`:
+
+```sh
+dumpsxiso "LSD - Dream Emulator (Japan).bin" -x disk/extract -s disk/extract.xml
+./tools/build-iso.sh
+```
+
 ## Building it
 
 This repository contains no game data and no Sony files. You need your own:

@@ -1,0 +1,762 @@
+<iso_project image_name="../build/lsdde-disc.bin" cue_sheet="../build/lsdde-disc.cue">
+    <track type="data" cdvd_style="false">
+        <identifiers system="PLAYSTATION" application="PLAYSTATION" creation_date="1998061514120000+36"/>
+        <license file="../disk/extract/license_data.dat"/>
+        <default_attributes gmt_offs="36" xa_attrib="32" xa_perm="1365" xa_gid="0" xa_uid="0"/>
+        <directory_tree source="../build/iso-root">
+            <file name="SYSTEM.CNF" type="data" date="19980515161558"/>
+            <file name="SLPS_015.56" type="data" date="19980701185914" source="../build/SLPS_015.56"/>
+            <dir name="CDI" date="19980615141200">
+                <dir name="SND" date="19971212215534">
+                    <file name="AMBIENT.VB" type="data" date="19970529142528"/>
+                    <file name="AMBIENT.VH" type="data" date="19970529142528"/>
+                    <file name="CARTOON.VB" type="data" date="19970529142534"/>
+                    <file name="CARTOON.VH" type="data" date="19970529142534"/>
+                    <file name="ELECTRO.VB" type="data" date="19970529142548"/>
+                    <file name="ELECTRO.VH" type="data" date="19970529142548"/>
+                    <file name="ETHNOVA.VB" type="data" date="19970529142500"/>
+                    <file name="ETHNOVA.VH" type="data" date="19970529142500"/>
+                    <file name="HUMAN.VB" type="data" date="19970529142542"/>
+                    <file name="HUMAN.VH" type="data" date="19970529142542"/>
+                    <file name="LOVELY.VB" type="data" date="19970529143316"/>
+                    <file name="LOVELY.VH" type="data" date="19970529143316"/>
+                    <file name="STANDERD.VB" type="data" date="19970529142518"/>
+                    <file name="STANDERD.VH" type="data" date="19970529142518"/>
+                    <file name="SE.VB" type="data" date="19970529142704"/>
+                    <file name="SE.VH" type="data" date="19970529142704"/>
+                </dir>
+                <dir name="STG00" date="19980212205910">
+                    <file name="TEXA.TIX" type="data" date="19971217153704"/>
+                    <file name="TEXB.TIX" type="data" date="19980519181216"/>
+                    <file name="TEXC.TIX" type="data" date="19971218184112"/>
+                    <file name="TEXD.TIX" type="data" date="19980519181216"/>
+                    <file name="BGA.SEQ" type="data" date="19970417153714"/>
+                    <file name="BGB.SEQ" type="data" date="19970417153724"/>
+                    <file name="BGC.SEQ" type="data" date="19970417153734"/>
+                    <file name="BGD.SEQ" type="data" date="19980207171720"/>
+                    <file name="BGE.SEQ" type="data" date="19970417153750"/>
+                    <file name="M000.LBD" type="data" date="19980519180832"/>
+                    <file name="M001.LBD" type="data" date="19980519180832"/>
+                    <file name="M002.LBD" type="data" date="19980519180832"/>
+                    <file name="M003.LBD" type="data" date="19980519180832"/>
+                    <file name="M004.LBD" type="data" date="19980519180832"/>
+                </dir>
+                <dir name="STG01" date="19980212205918">
+                    <file name="TEXA.TIX" type="data" date="19970314152638"/>
+                    <file name="TEXB.TIX" type="data" date="19980212151626"/>
+                    <file name="TEXC.TIX" type="data" date="19980210175212"/>
+                    <file name="TEXD.TIX" type="data" date="19980212151626"/>
+                    <file name="BGA.SEQ" type="data" date="19970417153808"/>
+                    <file name="BGB.SEQ" type="data" date="19970417153816"/>
+                    <file name="BGC.SEQ" type="data" date="19970417153824"/>
+                    <file name="BGD.SEQ" type="data" date="19970417153832"/>
+                    <file name="BGE.SEQ" type="data" date="19970417153840"/>
+                    <file name="M000.LBD" type="data" date="19980519180840"/>
+                    <file name="M001.LBD" type="data" date="19980519180840"/>
+                    <file name="M002.LBD" type="data" date="19980519180840"/>
+                    <file name="M003.LBD" type="data" date="19980519180840"/>
+                    <file name="M004.LBD" type="data" date="19980519180840"/>
+                    <file name="M005.LBD" type="data" date="19980519180840"/>
+                </dir>
+                <dir name="STG02" date="19980212205924">
+                    <file name="TEXA.TIX" type="data" date="19980516223332"/>
+                    <file name="TEXB.TIX" type="data" date="19980516222734"/>
+                    <file name="TEXC.TIX" type="data" date="19980516222504"/>
+                    <file name="TEXD.TIX" type="data" date="19980516222734"/>
+                    <file name="BGA.SEQ" type="data" date="19970417153900"/>
+                    <file name="BGB.SEQ" type="data" date="19970417153912"/>
+                    <file name="BGC.SEQ" type="data" date="19970417153922"/>
+                    <file name="BGD.SEQ" type="data" date="19970417153932"/>
+                    <file name="BGE.SEQ" type="data" date="19970417153940"/>
+                    <file name="M000.LBD" type="data" date="19980608202036"/>
+                    <file name="M001.LBD" type="data" date="19980608202036"/>
+                    <file name="M002.LBD" type="data" date="19980608202036"/>
+                    <file name="M003.LBD" type="data" date="19980608202036"/>
+                    <file name="M004.LBD" type="data" date="19980608202036"/>
+                    <file name="M005.LBD" type="data" date="19980608202036"/>
+                    <file name="M006.LBD" type="data" date="19980608202036"/>
+                    <file name="M007.LBD" type="data" date="19980608202038"/>
+                    <file name="M008.LBD" type="data" date="19980608202038"/>
+                    <file name="M009.LBD" type="data" date="19980608202038"/>
+                    <file name="M010.LBD" type="data" date="19980608202038"/>
+                    <file name="M011.LBD" type="data" date="19980608202038"/>
+                    <file name="M012.LBD" type="data" date="19980608202038"/>
+                    <file name="M013.LBD" type="data" date="19980608202040"/>
+                    <file name="M014.LBD" type="data" date="19980608202040"/>
+                    <file name="M015.LBD" type="data" date="19980608202040"/>
+                    <file name="M016.LBD" type="data" date="19980608202040"/>
+                    <file name="M017.LBD" type="data" date="19980608202040"/>
+                    <file name="M018.LBD" type="data" date="19980608202040"/>
+                    <file name="M019.LBD" type="data" date="19980608202040"/>
+                    <dir name="N1" date="19980212205924">
+                        <file name="M020.LBD" type="data" date="19980608202042"/>
+                        <file name="M021.LBD" type="data" date="19980608202042"/>
+                        <file name="M022.LBD" type="data" date="19980608202042"/>
+                        <file name="M023.LBD" type="data" date="19980608202042"/>
+                        <file name="M024.LBD" type="data" date="19980608202042"/>
+                        <file name="M025.LBD" type="data" date="19980608202042"/>
+                        <file name="M026.LBD" type="data" date="19980608202042"/>
+                        <file name="M027.LBD" type="data" date="19980608202042"/>
+                        <file name="M028.LBD" type="data" date="19980608202042"/>
+                        <file name="M029.LBD" type="data" date="19980608202042"/>
+                        <file name="M030.LBD" type="data" date="19980608202042"/>
+                        <file name="M031.LBD" type="data" date="19980608202042"/>
+                        <file name="M032.LBD" type="data" date="19980608202044"/>
+                        <file name="M033.LBD" type="data" date="19980608202044"/>
+                        <file name="M034.LBD" type="data" date="19980608202044"/>
+                        <file name="M035.LBD" type="data" date="19980608202044"/>
+                    </dir>
+                </dir>
+                <dir name="STG03" date="19980212205940">
+                    <file name="TEXA.TIX" type="data" date="19980304162806"/>
+                    <file name="TEXB.TIX" type="data" date="19980516213720"/>
+                    <file name="TEXC.TIX" type="data" date="19980304163236"/>
+                    <file name="TEXD.TIX" type="data" date="19980516213720"/>
+                    <file name="BGA.SEQ" type="data" date="19970417153956"/>
+                    <file name="BGB.SEQ" type="data" date="19970417154006"/>
+                    <file name="BGC.SEQ" type="data" date="19970417154012"/>
+                    <file name="BGD.SEQ" type="data" date="19980207171720"/>
+                    <file name="BGE.SEQ" type="data" date="19970417154028"/>
+                    <file name="M000.LBD" type="data" date="19980519180942"/>
+                    <file name="M001.LBD" type="data" date="19980519180942"/>
+                    <file name="M002.LBD" type="data" date="19980519180942"/>
+                    <file name="M003.LBD" type="data" date="19980519180942"/>
+                    <file name="M004.LBD" type="data" date="19980519180942"/>
+                    <file name="M005.LBD" type="data" date="19980519180942"/>
+                    <file name="M006.LBD" type="data" date="19980519180942"/>
+                    <file name="M007.LBD" type="data" date="19980519180942"/>
+                    <file name="M008.LBD" type="data" date="19980519180942"/>
+                    <file name="M009.LBD" type="data" date="19980519180942"/>
+                    <file name="M010.LBD" type="data" date="19980519180942"/>
+                    <file name="M011.LBD" type="data" date="19980519180944"/>
+                    <file name="M012.LBD" type="data" date="19980519180944"/>
+                    <dir name="N1" date="19980212205940">
+                        <file name="M013.LBD" type="data" date="19980519180944"/>
+                        <file name="M014.LBD" type="data" date="19980519180944"/>
+                        <file name="M015.LBD" type="data" date="19980519180944"/>
+                        <file name="M016.LBD" type="data" date="19980519180944"/>
+                        <file name="M017.LBD" type="data" date="19980519180944"/>
+                        <file name="M018.LBD" type="data" date="19980519180944"/>
+                        <file name="M019.LBD" type="data" date="19980519180944"/>
+                        <file name="M020.LBD" type="data" date="19980519180944"/>
+                        <file name="M021.LBD" type="data" date="19980519180944"/>
+                        <file name="M022.LBD" type="data" date="19980519180944"/>
+                        <file name="M023.LBD" type="data" date="19980519180946"/>
+                        <file name="M024.LBD" type="data" date="19980519180946"/>
+                        <file name="M025.LBD" type="data" date="19980519180946"/>
+                        <file name="M026.LBD" type="data" date="19980519180946"/>
+                        <file name="M027.LBD" type="data" date="19980519180946"/>
+                        <file name="M028.LBD" type="data" date="19980519180946"/>
+                        <file name="M029.LBD" type="data" date="19980519180946"/>
+                        <file name="M030.LBD" type="data" date="19980519180946"/>
+                        <file name="M031.LBD" type="data" date="19980519180946"/>
+                        <file name="M032.LBD" type="data" date="19980519180946"/>
+                        <file name="M033.LBD" type="data" date="19980519180946"/>
+                        <file name="M034.LBD" type="data" date="19980519180946"/>
+                        <file name="M035.LBD" type="data" date="19980519180946"/>
+                        <file name="M036.LBD" type="data" date="19980519180946"/>
+                        <file name="M037.LBD" type="data" date="19980519180946"/>
+                        <file name="M038.LBD" type="data" date="19980519180948"/>
+                        <file name="M039.LBD" type="data" date="19980519180948"/>
+                        <file name="M040.LBD" type="data" date="19980519180948"/>
+                        <file name="M041.LBD" type="data" date="19980519180948"/>
+                        <file name="M042.LBD" type="data" date="19980519180948"/>
+                    </dir>
+                    <dir name="N2" date="19980212205942">
+                        <file name="M043.LBD" type="data" date="19980519180948"/>
+                        <file name="M044.LBD" type="data" date="19980519180948"/>
+                        <file name="M045.LBD" type="data" date="19980519180948"/>
+                        <file name="M046.LBD" type="data" date="19980519180948"/>
+                        <file name="M047.LBD" type="data" date="19980519180948"/>
+                        <file name="M048.LBD" type="data" date="19980519180948"/>
+                        <file name="M049.LBD" type="data" date="19980519180948"/>
+                        <file name="M050.LBD" type="data" date="19980519180948"/>
+                        <file name="M051.LBD" type="data" date="19980519180950"/>
+                        <file name="M052.LBD" type="data" date="19980519180950"/>
+                        <file name="M053.LBD" type="data" date="19980519180950"/>
+                        <file name="M054.LBD" type="data" date="19980519180950"/>
+                        <file name="M055.LBD" type="data" date="19980519180950"/>
+                        <file name="M056.LBD" type="data" date="19980519180950"/>
+                        <file name="M057.LBD" type="data" date="19980519180950"/>
+                        <file name="M058.LBD" type="data" date="19980519180950"/>
+                        <file name="M059.LBD" type="data" date="19980519180950"/>
+                        <file name="M060.LBD" type="data" date="19980519180950"/>
+                        <file name="M061.LBD" type="data" date="19980519180950"/>
+                        <file name="M062.LBD" type="data" date="19980519180950"/>
+                        <file name="M063.LBD" type="data" date="19980519180952"/>
+                        <file name="M064.LBD" type="data" date="19980519180952"/>
+                        <file name="M065.LBD" type="data" date="19980519180952"/>
+                        <file name="M066.LBD" type="data" date="19980519180952"/>
+                        <file name="M067.LBD" type="data" date="19980519180952"/>
+                        <file name="M068.LBD" type="data" date="19980519180952"/>
+                        <file name="M069.LBD" type="data" date="19980519180952"/>
+                        <file name="M070.LBD" type="data" date="19980519180952"/>
+                        <file name="M071.LBD" type="data" date="19980519180952"/>
+                        <file name="M072.LBD" type="data" date="19980519180952"/>
+                    </dir>
+                    <dir name="N3" date="19980212205946">
+                        <file name="M073.LBD" type="data" date="19980519180952"/>
+                        <file name="M074.LBD" type="data" date="19980519180952"/>
+                        <file name="M075.LBD" type="data" date="19980519180952"/>
+                        <file name="M076.LBD" type="data" date="19980519180954"/>
+                        <file name="M077.LBD" type="data" date="19980519180954"/>
+                        <file name="M078.LBD" type="data" date="19980519180954"/>
+                        <file name="M079.LBD" type="data" date="19980519180954"/>
+                        <file name="M080.LBD" type="data" date="19980519180954"/>
+                        <file name="M081.LBD" type="data" date="19980519180954"/>
+                        <file name="M082.LBD" type="data" date="19980519180954"/>
+                        <file name="M083.LBD" type="data" date="19980519180954"/>
+                        <file name="M084.LBD" type="data" date="19980519180954"/>
+                        <file name="M085.LBD" type="data" date="19980519180954"/>
+                        <file name="M086.LBD" type="data" date="19980519180954"/>
+                        <file name="M087.LBD" type="data" date="19980519180954"/>
+                        <file name="M088.LBD" type="data" date="19980519180954"/>
+                        <file name="M089.LBD" type="data" date="19980519180954"/>
+                        <file name="M090.LBD" type="data" date="19980519180956"/>
+                        <file name="M091.LBD" type="data" date="19980519180956"/>
+                        <file name="M092.LBD" type="data" date="19980519180956"/>
+                        <file name="M093.LBD" type="data" date="19980519180956"/>
+                        <file name="M094.LBD" type="data" date="19980519180956"/>
+                        <file name="M095.LBD" type="data" date="19980519180956"/>
+                        <file name="M096.LBD" type="data" date="19980519180956"/>
+                        <file name="M097.LBD" type="data" date="19980519180956"/>
+                        <file name="M098.LBD" type="data" date="19980519180956"/>
+                        <file name="M099.LBD" type="data" date="19980519180956"/>
+                        <file name="M100.LBD" type="data" date="19980519180956"/>
+                        <file name="M101.LBD" type="data" date="19980519180956"/>
+                        <file name="M102.LBD" type="data" date="19980519180956"/>
+                    </dir>
+                    <dir name="N4" date="19980212205948">
+                        <file name="M103.LBD" type="data" date="19980519180958"/>
+                        <file name="M104.LBD" type="data" date="19980519180958"/>
+                        <file name="M105.LBD" type="data" date="19980519180958"/>
+                        <file name="M106.LBD" type="data" date="19980519180958"/>
+                        <file name="M107.LBD" type="data" date="19980519180958"/>
+                        <file name="M108.LBD" type="data" date="19980519180958"/>
+                        <file name="M109.LBD" type="data" date="19980519180958"/>
+                        <file name="M110.LBD" type="data" date="19980519180958"/>
+                        <file name="M111.LBD" type="data" date="19980519180958"/>
+                        <file name="M112.LBD" type="data" date="19980519180958"/>
+                        <file name="M113.LBD" type="data" date="19980519181000"/>
+                        <file name="M114.LBD" type="data" date="19980519181000"/>
+                        <file name="M115.LBD" type="data" date="19980519181000"/>
+                        <file name="M116.LBD" type="data" date="19980519181000"/>
+                        <file name="M117.LBD" type="data" date="19980519181000"/>
+                        <file name="M118.LBD" type="data" date="19980519181000"/>
+                        <file name="M119.LBD" type="data" date="19980519181000"/>
+                        <file name="M120.LBD" type="data" date="19980519181000"/>
+                        <file name="M121.LBD" type="data" date="19980519181000"/>
+                        <file name="M122.LBD" type="data" date="19980519181000"/>
+                        <file name="M123.LBD" type="data" date="19980519181000"/>
+                        <file name="M124.LBD" type="data" date="19980519181000"/>
+                        <file name="M125.LBD" type="data" date="19980519181002"/>
+                        <file name="M126.LBD" type="data" date="19980519181002"/>
+                        <file name="M127.LBD" type="data" date="19980519181002"/>
+                        <file name="M128.LBD" type="data" date="19980519181002"/>
+                        <file name="M129.LBD" type="data" date="19980519181002"/>
+                        <file name="M130.LBD" type="data" date="19980519181002"/>
+                        <file name="M131.LBD" type="data" date="19980519181002"/>
+                        <file name="M132.LBD" type="data" date="19980519181002"/>
+                    </dir>
+                    <dir name="N5" date="19980212205952">
+                        <file name="M133.LBD" type="data" date="19980519181002"/>
+                        <file name="M134.LBD" type="data" date="19980519181002"/>
+                        <file name="M135.LBD" type="data" date="19980519181002"/>
+                        <file name="M136.LBD" type="data" date="19980519181004"/>
+                        <file name="M137.LBD" type="data" date="19980519181004"/>
+                        <file name="M138.LBD" type="data" date="19980519181004"/>
+                        <file name="M139.LBD" type="data" date="19980519181004"/>
+                        <file name="M140.LBD" type="data" date="19980519181004"/>
+                        <file name="M141.LBD" type="data" date="19980519181004"/>
+                        <file name="M142.LBD" type="data" date="19980519181004"/>
+                        <file name="M143.LBD" type="data" date="19980519181004"/>
+                        <file name="M144.LBD" type="data" date="19980519181004"/>
+                        <file name="M145.LBD" type="data" date="19980519181004"/>
+                        <file name="M146.LBD" type="data" date="19980519181004"/>
+                        <file name="M147.LBD" type="data" date="19980519181004"/>
+                        <file name="M148.LBD" type="data" date="19980519181004"/>
+                        <file name="M149.LBD" type="data" date="19980519181006"/>
+                        <file name="M150.LBD" type="data" date="19980519181006"/>
+                        <file name="M151.LBD" type="data" date="19980519181006"/>
+                        <file name="M152.LBD" type="data" date="19980519181006"/>
+                        <file name="M153.LBD" type="data" date="19980519181006"/>
+                        <file name="M154.LBD" type="data" date="19980519181006"/>
+                        <file name="M155.LBD" type="data" date="19980519181006"/>
+                        <file name="M156.LBD" type="data" date="19980519181006"/>
+                        <file name="M157.LBD" type="data" date="19980519181006"/>
+                        <file name="M158.LBD" type="data" date="19980519181006"/>
+                        <file name="M159.LBD" type="data" date="19980519181006"/>
+                        <file name="M160.LBD" type="data" date="19980519181006"/>
+                        <file name="M161.LBD" type="data" date="19980519181006"/>
+                        <file name="M162.LBD" type="data" date="19980519181008"/>
+                    </dir>
+                    <dir name="N6" date="19980212205954">
+                        <file name="M163.LBD" type="data" date="19980519181008"/>
+                        <file name="M164.LBD" type="data" date="19980519181008"/>
+                        <file name="M165.LBD" type="data" date="19980519181008"/>
+                        <file name="M166.LBD" type="data" date="19980519181008"/>
+                        <file name="M167.LBD" type="data" date="19980519181008"/>
+                        <file name="M168.LBD" type="data" date="19980519181008"/>
+                        <file name="M169.LBD" type="data" date="19980519181008"/>
+                        <file name="M170.LBD" type="data" date="19980519181008"/>
+                        <file name="M171.LBD" type="data" date="19980519181008"/>
+                        <file name="M172.LBD" type="data" date="19980519181008"/>
+                        <file name="M173.LBD" type="data" date="19980519181008"/>
+                        <file name="M174.LBD" type="data" date="19980519181010"/>
+                        <file name="M175.LBD" type="data" date="19980519181010"/>
+                        <file name="M176.LBD" type="data" date="19980519181010"/>
+                        <file name="M177.LBD" type="data" date="19980519181010"/>
+                        <file name="M178.LBD" type="data" date="19980519181010"/>
+                        <file name="M179.LBD" type="data" date="19980519181010"/>
+                        <file name="M180.LBD" type="data" date="19980519181010"/>
+                        <file name="M181.LBD" type="data" date="19980519181010"/>
+                        <file name="M182.LBD" type="data" date="19980519181010"/>
+                        <file name="M183.LBD" type="data" date="19980519181010"/>
+                        <file name="M184.LBD" type="data" date="19980519181010"/>
+                        <file name="M185.LBD" type="data" date="19980519181010"/>
+                        <file name="M186.LBD" type="data" date="19980519181012"/>
+                        <file name="M187.LBD" type="data" date="19980519181012"/>
+                        <file name="M188.LBD" type="data" date="19980519181012"/>
+                        <file name="M189.LBD" type="data" date="19980519181012"/>
+                        <file name="M190.LBD" type="data" date="19980519181012"/>
+                        <file name="M191.LBD" type="data" date="19980519181012"/>
+                        <file name="M192.LBD" type="data" date="19980519181012"/>
+                    </dir>
+                    <dir name="N7" date="19980212205956">
+                        <file name="M193.LBD" type="data" date="19980519181012"/>
+                        <file name="M194.LBD" type="data" date="19980519181012"/>
+                        <file name="M195.LBD" type="data" date="19980519181012"/>
+                        <file name="M196.LBD" type="data" date="19980519181012"/>
+                        <file name="M197.LBD" type="data" date="19980519181012"/>
+                        <file name="M198.LBD" type="data" date="19980519181012"/>
+                        <file name="M199.LBD" type="data" date="19980519181014"/>
+                        <file name="M200.LBD" type="data" date="19980519181014"/>
+                        <file name="M201.LBD" type="data" date="19980519181014"/>
+                        <file name="M202.LBD" type="data" date="19980519181014"/>
+                        <file name="M203.LBD" type="data" date="19980519181014"/>
+                        <file name="M204.LBD" type="data" date="19980519181014"/>
+                        <file name="M205.LBD" type="data" date="19980519181014"/>
+                        <file name="M206.LBD" type="data" date="19980519181014"/>
+                        <file name="M207.LBD" type="data" date="19980519181014"/>
+                        <file name="M208.LBD" type="data" date="19980519181014"/>
+                        <file name="M209.LBD" type="data" date="19980519181014"/>
+                        <file name="M210.LBD" type="data" date="19980519181014"/>
+                        <file name="M211.LBD" type="data" date="19980519181014"/>
+                        <file name="M212.LBD" type="data" date="19980519181016"/>
+                        <file name="M213.LBD" type="data" date="19980519181016"/>
+                        <file name="M214.LBD" type="data" date="19980519181016"/>
+                        <file name="M215.LBD" type="data" date="19980519181016"/>
+                        <file name="M216.LBD" type="data" date="19980519181016"/>
+                        <file name="M217.LBD" type="data" date="19980519181016"/>
+                        <file name="M218.LBD" type="data" date="19980519181016"/>
+                        <file name="M219.LBD" type="data" date="19980519181016"/>
+                        <file name="M220.LBD" type="data" date="19980519181016"/>
+                        <file name="M221.LBD" type="data" date="19980519181016"/>
+                        <file name="M222.LBD" type="data" date="19980519181016"/>
+                    </dir>
+                    <dir name="N8" date="19980212210000">
+                        <file name="M223.LBD" type="data" date="19980519181018"/>
+                        <file name="M224.LBD" type="data" date="19980519181018"/>
+                        <file name="M225.LBD" type="data" date="19980519181018"/>
+                        <file name="M226.LBD" type="data" date="19980519181018"/>
+                        <file name="M227.LBD" type="data" date="19980519181018"/>
+                        <file name="M228.LBD" type="data" date="19980519181018"/>
+                        <file name="M229.LBD" type="data" date="19980519181018"/>
+                        <file name="M230.LBD" type="data" date="19980519181018"/>
+                        <file name="M231.LBD" type="data" date="19980519181018"/>
+                        <file name="M232.LBD" type="data" date="19980519181018"/>
+                        <file name="M233.LBD" type="data" date="19980519181018"/>
+                        <file name="M234.LBD" type="data" date="19980519181018"/>
+                        <file name="M235.LBD" type="data" date="19980519181018"/>
+                        <file name="M236.LBD" type="data" date="19980519181018"/>
+                        <file name="M237.LBD" type="data" date="19980519181020"/>
+                        <file name="M238.LBD" type="data" date="19980519181020"/>
+                        <file name="M239.LBD" type="data" date="19980519181020"/>
+                        <file name="M240.LBD" type="data" date="19980519181020"/>
+                        <file name="M241.LBD" type="data" date="19980519181020"/>
+                        <file name="M242.LBD" type="data" date="19980519181020"/>
+                        <file name="M243.LBD" type="data" date="19980519181020"/>
+                        <file name="M244.LBD" type="data" date="19980519181020"/>
+                        <file name="M245.LBD" type="data" date="19980519181020"/>
+                        <file name="M246.LBD" type="data" date="19980519181020"/>
+                        <file name="M247.LBD" type="data" date="19980519181020"/>
+                        <file name="M248.LBD" type="data" date="19980519181020"/>
+                        <file name="M249.LBD" type="data" date="19980519181022"/>
+                        <file name="M250.LBD" type="data" date="19980519181022"/>
+                        <file name="M251.LBD" type="data" date="19980519181022"/>
+                        <file name="M252.LBD" type="data" date="19980519181022"/>
+                    </dir>
+                    <dir name="N9" date="19980212210002">
+                        <file name="M253.LBD" type="data" date="19980519181022"/>
+                        <file name="M254.LBD" type="data" date="19980519181022"/>
+                        <file name="M255.LBD" type="data" date="19980519181022"/>
+                    </dir>
+                </dir>
+                <dir name="STG04" date="19980212210014">
+                    <file name="TEXA.TIX" type="data" date="19980320202530"/>
+                    <file name="TEXB.TIX" type="data" date="19980516214442"/>
+                    <file name="TEXC.TIX" type="data" date="19980306231638"/>
+                    <file name="TEXD.TIX" type="data" date="19980611190604"/>
+                    <file name="BGA.SEQ" type="data" date="19970417154050"/>
+                    <file name="BGB.SEQ" type="data" date="19970417154058"/>
+                    <file name="BGC.SEQ" type="data" date="19970417154104"/>
+                    <file name="BGD.SEQ" type="data" date="19970417154112"/>
+                    <file name="BGE.SEQ" type="data" date="19970417154124"/>
+                    <file name="M000.LBD" type="data" date="19980519181038"/>
+                    <file name="M001.LBD" type="data" date="19980519181038"/>
+                    <file name="M002.LBD" type="data" date="19980519181038"/>
+                    <file name="M003.LBD" type="data" date="19980519181038"/>
+                    <file name="M004.LBD" type="data" date="19980519181038"/>
+                    <file name="M005.LBD" type="data" date="19980519181038"/>
+                    <file name="M006.LBD" type="data" date="19980519181038"/>
+                    <file name="M007.LBD" type="data" date="19980519181038"/>
+                    <file name="M008.LBD" type="data" date="19980519181040"/>
+                    <file name="M009.LBD" type="data" date="19980519181040"/>
+                    <file name="M010.LBD" type="data" date="19980519181040"/>
+                    <file name="M011.LBD" type="data" date="19980519181040"/>
+                    <file name="M012.LBD" type="data" date="19980519181040"/>
+                    <file name="M013.LBD" type="data" date="19980519181040"/>
+                    <file name="M014.LBD" type="data" date="19980519181040"/>
+                    <file name="M015.LBD" type="data" date="19980519181040"/>
+                    <file name="M016.LBD" type="data" date="19980519181042"/>
+                    <file name="M017.LBD" type="data" date="19980519181042"/>
+                    <file name="M018.LBD" type="data" date="19980519181042"/>
+                    <file name="M019.LBD" type="data" date="19980519181042"/>
+                    <dir name="N1" date="19980212210014">
+                        <file name="M020.LBD" type="data" date="19980519181042"/>
+                        <file name="M021.LBD" type="data" date="19980519181042"/>
+                        <file name="M022.LBD" type="data" date="19980519181042"/>
+                        <file name="M023.LBD" type="data" date="19980519181042"/>
+                        <file name="M024.LBD" type="data" date="19980519181042"/>
+                        <file name="M025.LBD" type="data" date="19980519181044"/>
+                        <file name="M026.LBD" type="data" date="19980519181044"/>
+                        <file name="M027.LBD" type="data" date="19980519181044"/>
+                        <file name="M028.LBD" type="data" date="19980519181044"/>
+                        <file name="M029.LBD" type="data" date="19980519181044"/>
+                    </dir>
+                </dir>
+                <dir name="STG05" date="19980212210026">
+                    <file name="TEXA.TIX" type="data" date="19980603131114"/>
+                    <file name="TEXB.TIX" type="data" date="19980212152922"/>
+                    <file name="TEXC.TIX" type="data" date="19980603131932"/>
+                    <file name="TEXD.TIX" type="data" date="19980603131700"/>
+                    <file name="BGA.SEQ" type="data" date="19971209223208"/>
+                    <file name="BGB.SEQ" type="data" date="19970417154148"/>
+                    <file name="BGC.SEQ" type="data" date="19980207171720"/>
+                    <file name="BGD.SEQ" type="data" date="19970417154206"/>
+                    <file name="BGE.SEQ" type="data" date="19970417154216"/>
+                    <file name="M000.LBD" type="data" date="19980709205538"/>
+                    <file name="M001.LBD" type="data" date="19980709205538"/>
+                    <file name="M002.LBD" type="data" date="19980709205538"/>
+                    <file name="M003.LBD" type="data" date="19980709205540"/>
+                    <file name="M004.LBD" type="data" date="19980709205540"/>
+                    <file name="M005.LBD" type="data" date="19980709205540"/>
+                    <file name="M006.LBD" type="data" date="19980709205540"/>
+                    <file name="M007.LBD" type="data" date="19980709205540"/>
+                    <file name="M008.LBD" type="data" date="19980709205540"/>
+                    <file name="M009.LBD" type="data" date="19980709205540"/>
+                    <file name="M010.LBD" type="data" date="19980709205542"/>
+                    <file name="M011.LBD" type="data" date="19980709205542"/>
+                    <file name="M012.LBD" type="data" date="19980709205542"/>
+                    <file name="M013.LBD" type="data" date="19980709205542"/>
+                    <file name="M014.LBD" type="data" date="19980709205542"/>
+                    <file name="M015.LBD" type="data" date="19980709205542"/>
+                    <file name="M016.LBD" type="data" date="19980709205542"/>
+                    <file name="M017.LBD" type="data" date="19980709205542"/>
+                    <file name="M018.LBD" type="data" date="19980709205542"/>
+                    <file name="M019.LBD" type="data" date="19980709205544"/>
+                    <dir name="N1" date="19980212210026">
+                        <file name="M020.LBD" type="data" date="19980709205544"/>
+                        <file name="M021.LBD" type="data" date="19980709205544"/>
+                        <file name="M022.LBD" type="data" date="19980709205544"/>
+                        <file name="M023.LBD" type="data" date="19980709205544"/>
+                        <file name="M024.LBD" type="data" date="19980709205544"/>
+                        <file name="M025.LBD" type="data" date="19980709205544"/>
+                        <file name="M026.LBD" type="data" date="19980709205544"/>
+                        <file name="M027.LBD" type="data" date="19980709205544"/>
+                        <file name="M028.LBD" type="data" date="19980709205544"/>
+                        <file name="M029.LBD" type="data" date="19980709205546"/>
+                    </dir>
+                </dir>
+                <dir name="STG06" date="19980212210042">
+                    <file name="TEXA.TIX" type="data" date="19980105193852"/>
+                    <file name="TEXB.TIX" type="data" date="19980212153050"/>
+                    <file name="TEXC.TIX" type="data" date="19980105195144"/>
+                    <file name="TEXD.TIX" type="data" date="19980212153050"/>
+                    <file name="BGA.SEQ" type="data" date="19970417154228"/>
+                    <file name="BGB.SEQ" type="data" date="19970417154236"/>
+                    <file name="BGC.SEQ" type="data" date="19970417154246"/>
+                    <file name="BGD.SEQ" type="data" date="19970417154252"/>
+                    <file name="BGE.SEQ" type="data" date="19970417154302"/>
+                    <file name="M000.LBD" type="data" date="19980519181116"/>
+                    <file name="M001.LBD" type="data" date="19980519181116"/>
+                    <file name="M002.LBD" type="data" date="19980519181116"/>
+                    <file name="M003.LBD" type="data" date="19980519181116"/>
+                    <file name="M004.LBD" type="data" date="19980519181116"/>
+                    <file name="M005.LBD" type="data" date="19980519181116"/>
+                </dir>
+                <dir name="STG07" date="19980212210046">
+                    <file name="TEXA.TIX" type="data" date="19970625184854"/>
+                    <file name="TEXB.TIX" type="data" date="19980212153130"/>
+                    <file name="TEXC.TIX" type="data" date="19971218192202"/>
+                    <file name="TEXD.TIX" type="data" date="19980212153130"/>
+                    <file name="BGA.SEQ" type="data" date="19970417154314"/>
+                    <file name="BGB.SEQ" type="data" date="19970417154324"/>
+                    <file name="BGC.SEQ" type="data" date="19970417154332"/>
+                    <file name="BGD.SEQ" type="data" date="19970417154340"/>
+                    <file name="BGE.SEQ" type="data" date="19970417154348"/>
+                    <file name="M000.LBD" type="data" date="19980519181124"/>
+                    <file name="M001.LBD" type="data" date="19980519181124"/>
+                    <file name="M002.LBD" type="data" date="19980519181124"/>
+                    <file name="M003.LBD" type="data" date="19980519181124"/>
+                    <file name="M004.LBD" type="data" date="19980519181124"/>
+                </dir>
+                <dir name="STG08" date="19980212210052">
+                    <file name="TEXA.TIX" type="data" date="19970717144316"/>
+                    <file name="TEXB.TIX" type="data" date="19980212153228"/>
+                    <file name="TEXC.TIX" type="data" date="19971218192522"/>
+                    <file name="TEXD.TIX" type="data" date="19980212153228"/>
+                    <file name="BGA.SEQ" type="data" date="19970417154402"/>
+                    <file name="BGB.SEQ" type="data" date="19970417154408"/>
+                    <file name="BGC.SEQ" type="data" date="19970417154416"/>
+                    <file name="BGD.SEQ" type="data" date="19970417154422"/>
+                    <file name="BGE.SEQ" type="data" date="19970417154430"/>
+                    <file name="M000.LBD" type="data" date="19980519181132"/>
+                    <file name="M001.LBD" type="data" date="19980519181132"/>
+                    <file name="M002.LBD" type="data" date="19980519181132"/>
+                </dir>
+                <dir name="STG09" date="19980212210056">
+                    <file name="TEXA.TIX" type="data" date="19970312033008"/>
+                    <file name="TEXB.TIX" type="data" date="19980212153326"/>
+                    <file name="TEXC.TIX" type="data" date="19971218193422"/>
+                    <file name="TEXD.TIX" type="data" date="19980212153326"/>
+                    <file name="BGA.SEQ" type="data" date="19970417154448"/>
+                    <file name="BGB.SEQ" type="data" date="19970417154456"/>
+                    <file name="BGC.SEQ" type="data" date="19970417154502"/>
+                    <file name="BGD.SEQ" type="data" date="19970417154512"/>
+                    <file name="BGE.SEQ" type="data" date="19970417154518"/>
+                    <file name="M000.LBD" type="data" date="19980519181140"/>
+                    <file name="M001.LBD" type="data" date="19980519181140"/>
+                </dir>
+                <dir name="STG10" date="19980212210102">
+                    <file name="TEXA.TIX" type="data" date="19970312011458"/>
+                    <file name="TEXB.TIX" type="data" date="19980212153426"/>
+                    <file name="TEXC.TIX" type="data" date="19971218193738"/>
+                    <file name="TEXD.TIX" type="data" date="19980212153426"/>
+                    <file name="BGA.SEQ" type="data" date="19970417154536"/>
+                    <file name="BGB.SEQ" type="data" date="19970417154544"/>
+                    <file name="BGC.SEQ" type="data" date="19970417154550"/>
+                    <file name="BGD.SEQ" type="data" date="19970417154600"/>
+                    <file name="BGE.SEQ" type="data" date="19970417154606"/>
+                    <file name="M000.LBD" type="data" date="19980519181148"/>
+                    <file name="M001.LBD" type="data" date="19980519181148"/>
+                    <file name="M002.LBD" type="data" date="19980519181148"/>
+                </dir>
+                <dir name="STG11" date="19980212210108">
+                    <file name="TEXA.TIX" type="data" date="19970918183300"/>
+                    <file name="TEXB.TIX" type="data" date="19980212173450"/>
+                    <file name="TEXC.TIX" type="data" date="19971218194038"/>
+                    <file name="TEXD.TIX" type="data" date="19980212173450"/>
+                    <file name="BGA.SEQ" type="data" date="19970417154620"/>
+                    <file name="BGB.SEQ" type="data" date="19970417154628"/>
+                    <file name="BGC.SEQ" type="data" date="19970417154638"/>
+                    <file name="BGD.SEQ" type="data" date="19970417154644"/>
+                    <file name="BGE.SEQ" type="data" date="19970417154652"/>
+                    <file name="M000.LBD" type="data" date="19980519181156"/>
+                    <file name="M001.LBD" type="data" date="19980519181156"/>
+                    <file name="M002.LBD" type="data" date="19980519181156"/>
+                    <file name="M003.LBD" type="data" date="19980519181158"/>
+                    <file name="M004.LBD" type="data" date="19980519181158"/>
+                    <file name="M005.LBD" type="data" date="19980519181158"/>
+                    <file name="M006.LBD" type="data" date="19980519181158"/>
+                    <file name="M007.LBD" type="data" date="19980519181158"/>
+                    <file name="M008.LBD" type="data" date="19980519181158"/>
+                    <file name="M009.LBD" type="data" date="19980519181158"/>
+                    <file name="M010.LBD" type="data" date="19980519181158"/>
+                    <file name="M011.LBD" type="data" date="19980519181158"/>
+                </dir>
+                <dir name="STG12" date="19980212210114">
+                    <file name="TEXA.TIX" type="data" date="19970820162620"/>
+                    <file name="TEXB.TIX" type="data" date="19971119193932"/>
+                    <file name="TEXC.TIX" type="data" date="19971119193932"/>
+                    <file name="TEXD.TIX" type="data" date="19971119193932"/>
+                    <file name="BGA.SEQ" type="data" date="19970417154706"/>
+                    <file name="BGB.SEQ" type="data" date="19970417154712"/>
+                    <file name="BGC.SEQ" type="data" date="19970417154722"/>
+                    <file name="BGD.SEQ" type="data" date="19970417154728"/>
+                    <file name="BGE.SEQ" type="data" date="19970417154738"/>
+                    <file name="M000.LBD" type="data" date="19980519181208"/>
+                    <file name="M001.LBD" type="data" date="19980519181208"/>
+                    <file name="M002.LBD" type="data" date="19980519181208"/>
+                    <file name="M003.LBD" type="data" date="19980519181208"/>
+                    <file name="M004.LBD" type="data" date="19980519181208"/>
+                    <file name="M005.LBD" type="data" date="19980519181208"/>
+                    <file name="M006.LBD" type="data" date="19980519181208"/>
+                    <file name="M007.LBD" type="data" date="19980519181210"/>
+                    <file name="M008.LBD" type="data" date="19980519181210"/>
+                    <file name="M009.LBD" type="data" date="19980519181210"/>
+                    <file name="M010.LBD" type="data" date="19980519181210"/>
+                    <file name="M011.LBD" type="data" date="19980519181210"/>
+                    <file name="M012.LBD" type="data" date="19980519181210"/>
+                    <file name="M013.LBD" type="data" date="19980519181210"/>
+                    <file name="M014.LBD" type="data" date="19980519181210"/>
+                    <file name="M015.LBD" type="data" date="19980519181210"/>
+                    <file name="M016.LBD" type="data" date="19980519181210"/>
+                    <file name="M017.LBD" type="data" date="19980519181210"/>
+                    <file name="M018.LBD" type="data" date="19980519181210"/>
+                    <file name="M019.LBD" type="data" date="19980519181210"/>
+                </dir>
+                <dir name="STG13" date="19980212210120">
+                    <file name="TEXA.TIX" type="data" date="19980106144640"/>
+                    <file name="TEXB.TIX" type="data" date="19980212153940"/>
+                    <file name="TEXC.TIX" type="data" date="19980106144958"/>
+                    <file name="TEXD.TIX" type="data" date="19980212153940"/>
+                    <file name="BGA.SEQ" type="data" date="19970417154750"/>
+                    <file name="BGB.SEQ" type="data" date="19970417154758"/>
+                    <file name="BGC.SEQ" type="data" date="19970417154808"/>
+                    <file name="BGD.SEQ" type="data" date="19970417154814"/>
+                    <file name="BGE.SEQ" type="data" date="19970417154824"/>
+                    <file name="M000.LBD" type="data" date="19980519181218"/>
+                    <file name="M001.LBD" type="data" date="19980519181218"/>
+                    <file name="M002.LBD" type="data" date="19980519181220"/>
+                    <file name="M003.LBD" type="data" date="19980519181220"/>
+                </dir>
+                <dir name="IMG1" date="19971212215510">
+                    <file name="SPDAY01C.TIM" type="data" date="19970910213152"/>
+                    <file name="SPDAY01D.TIM" type="data" date="19970910213132"/>
+                    <file name="SPDAY01E.TIM" type="data" date="19970911132808"/>
+                    <file name="SPDAY01F.TIM" type="data" date="19970910213136"/>
+                    <file name="SPDAY02C.TIM" type="data" date="19970910213138"/>
+                    <file name="SPDAY02D.TIM" type="data" date="19970910213140"/>
+                    <file name="SPDAY02E.TIM" type="data" date="19970910213142"/>
+                    <file name="SPDAY02F.TIM" type="data" date="19970910213144"/>
+                    <file name="SPDAY03C.TIM" type="data" date="19970910213146"/>
+                    <file name="SPDAY03D.TIM" type="data" date="19970910213148"/>
+                    <file name="SPDAY03E.TIM" type="data" date="19970910213150"/>
+                    <file name="SPDAY03F.TIM" type="data" date="19970910213128"/>
+                    <file name="SPDAY04C.TIM" type="data" date="19970910213312"/>
+                    <file name="SPDAY04D.TIM" type="data" date="19970910213250"/>
+                    <file name="SPDAY04E.TIM" type="data" date="19970910213252"/>
+                    <file name="SPDAY04F.TIM" type="data" date="19970911132802"/>
+                    <file name="SPDAY05C.TIM" type="data" date="19970910213258"/>
+                    <file name="SPDAY05D.TIM" type="data" date="19970910213300"/>
+                    <file name="SPDAY05E.TIM" type="data" date="19970910213302"/>
+                    <file name="SPDAY05F.TIM" type="data" date="19970910213304"/>
+                    <file name="SPDAY06C.TIM" type="data" date="19970910213306"/>
+                    <file name="SPDAY06D.TIM" type="data" date="19980630223316"/>
+                    <file name="SPDAY06E.TIM" type="data" date="19970910213310"/>
+                    <file name="SPDAY06F.TIM" type="data" date="19970910213248"/>
+                </dir>
+                <dir name="IMG2" date="19971212215522">
+                    <file name="SPDAY07C.TIM" type="data" date="19970911132750"/>
+                    <file name="SPDAY07D.TIM" type="data" date="19970910213406"/>
+                    <file name="SPDAY07E.TIM" type="data" date="19970910213408"/>
+                    <file name="SPDAY07F.TIM" type="data" date="19970910213410"/>
+                    <file name="SPDAY08C.TIM" type="data" date="19970910213412"/>
+                    <file name="SPDAY08D.TIM" type="data" date="19970910213416"/>
+                    <file name="SPDAY08E.TIM" type="data" date="19970910213418"/>
+                    <file name="SPDAY08F.TIM" type="data" date="19970910213420"/>
+                    <file name="SPDAY09C.TIM" type="data" date="19970910213422"/>
+                    <file name="SPDAY09D.TIM" type="data" date="19970910213424"/>
+                    <file name="SPDAY09E.TIM" type="data" date="19970910213426"/>
+                    <file name="SPDAY09F.TIM" type="data" date="19970910213404"/>
+                    <file name="SPDAY10C.TIM" type="data" date="19970910213500"/>
+                    <file name="SPDAY10D.TIM" type="data" date="19970910213502"/>
+                    <file name="SPDAY10E.TIM" type="data" date="19970910213504"/>
+                    <file name="SPDAY10F.TIM" type="data" date="19970910213506"/>
+                    <file name="SPDAY11C.TIM" type="data" date="19970910213508"/>
+                    <file name="SPDAY11D.TIM" type="data" date="19970910213510"/>
+                    <file name="SPDAY11E.TIM" type="data" date="19970910213512"/>
+                    <file name="SPDAY11F.TIM" type="data" date="19970910213514"/>
+                    <file name="SPDAY12C.TIM" type="data" date="19970910213516"/>
+                    <file name="SPDAY12D.TIM" type="data" date="19970910213520"/>
+                    <file name="SPDAY12E.TIM" type="data" date="19970910213522"/>
+                    <file name="SPDAY12F.TIM" type="data" date="19970910213524"/>
+                </dir>
+                <dir name="CARD" date="19971212214358">
+                    <file name="CHANGE.TIM" type="data" date="19980603130120"/>
+                    <file name="COMINPUT.TIM" type="data" date="19980603130114"/>
+                    <file name="ERROR.TIM" type="data" date="19980603130116"/>
+                    <file name="FILEICN1.TIM" type="data" date="19970520194526"/>
+                    <file name="FONTICON.TIM" type="data" date="19980218132526"/>
+                    <file name="FORMERR.TIM" type="data" date="19980603130116"/>
+                    <file name="FORMING.TIM" type="data" date="19980603130116"/>
+                    <file name="LOADERR.TIM" type="data" date="19980603130116"/>
+                    <file name="LOADING.TIM" type="data" date="19980603130116"/>
+                    <file name="LOADWAR.TIM" type="data" date="19980603130116"/>
+                    <file name="NOCONECT.TIM" type="data" date="19980603130118"/>
+                    <file name="NOTFOUND.TIM" type="data" date="19980603130118"/>
+                    <file name="SAVEEMPT.TIM" type="data" date="19980630223226"/>
+                    <file name="SAVEERR.TIM" type="data" date="19980603130118"/>
+                    <file name="SAVEWAR.TIM" type="data" date="19980603130118"/>
+                    <file name="SAVING.TIM" type="data" date="19980603130120"/>
+                    <file name="SELECT.TIM" type="data" date="19980603130120"/>
+                    <file name="UNFORM1.TIM" type="data" date="19980603130120"/>
+                    <file name="UNFORM2.TIM" type="data" date="19980603130114"/>
+                </dir>
+                <dir name="FILM" date="19971212220830"/>
+                <dir name="ETC" date="19971212214400">
+                    <file name="ASMKLOGO.TIM" type="data" date="19970918182510"/>
+                    <file name="ETCSE.VB" type="data" date="19971216134638"/>
+                    <file name="ETCSE.VH" type="data" date="19971216134638"/>
+                    <file name="FONTICON.TIM" type="data" date="19980217221526"/>
+                    <file name="HGRAPH.TIM" type="data" date="19980206145218"/>
+                    <file name="DREAMER.TMD" type="data" date="19970616171554"/>
+                    <file name="DREAME5.TMD" type="data" date="19970401174024"/>
+                    <file name="ETC.TIM" type="data" date="19980206171850"/>
+                    <file name="ETC2.TIM" type="data" date="19980206171810"/>
+                    <file name="OSDLOGO.TIM" type="data" date="19970520212616"/>
+                    <file name="SYMDOG.MOM" type="data" date="19971120191832"/>
+                    <file name="SYMSPY.MOM" type="data" date="19970725204350"/>
+                    <file name="TITLE.TIM" type="data" date="19980207170842"/>
+                    <file name="ASMKLOG.TIM" type="data" date="19970520212616"/>
+                    <file name="ASMK.STR" type="mixed" date="19980413132624"/>
+                    <file name="OPENINGA.STR" type="mixed" date="19971107132640"/>
+                    <file name="OPENINGB.STR" type="mixed" date="19971107133106"/>
+                    <file name="OPENINGC.STR" type="mixed" date="19971107133446"/>
+                    <file name="OPENINGD.STR" type="mixed" date="19971107133948"/>
+                    <file name="OPENINGE.STR" type="mixed" date="19971107134406"/>
+                    <file name="OPENINGF.STR" type="mixed" date="19971107134854"/>
+                    <file name="OPENINGG.STR" type="mixed" date="19971107135326"/>
+                    <file name="ENDING.STR" type="mixed" date="19971209234226"/>
+                </dir>
+                <dir name="FILM">
+                    <file name="EVENT1.STR" type="mixed" date="19980427152416"/>
+                    <file name="EVENT2.STR" type="mixed" date="19971107123004"/>
+                    <file name="EVENT3.STR" type="mixed" date="19971107123146"/>
+                    <file name="EVENT4.STR" type="mixed" date="19971107123322"/>
+                    <file name="EVENT5.STR" type="mixed" date="19971107123454"/>
+                    <file name="EVENT6.STR" type="mixed" date="19971107123454"/>
+                    <file name="SPDAY01A.STR" type="mixed" date="19971107123648"/>
+                    <file name="SPDAY01B.STR" type="mixed" date="19971107124028"/>
+                    <file name="SPDAY02A.STR" type="mixed" date="19971107124254"/>
+                    <file name="SPDAY02B.STR" type="mixed" date="19971107124438"/>
+                    <file name="SPDAY03A.STR" type="mixed" date="19971107124622"/>
+                    <file name="SPDAY03B.STR" type="mixed" date="19971107124900"/>
+                    <file name="SPDAY04A.STR" type="mixed" date="19971107125002"/>
+                    <file name="SPDAY04B.STR" type="mixed" date="19971107125200"/>
+                    <file name="SPDAY05A.STR" type="mixed" date="19971107125446"/>
+                    <file name="SPDAY05B.STR" type="mixed" date="19971107125558"/>
+                    <file name="SPDAY06A.STR" type="mixed" date="19971107125738"/>
+                    <file name="SPDAY06B.STR" type="mixed" date="19971107125942"/>
+                    <file name="SPDAY07A.STR" type="mixed" date="19971107130154"/>
+                    <file name="SPDAY07B.STR" type="mixed" date="19971107130404"/>
+                    <file name="SPDAY08A.STR" type="mixed" date="19980422175356"/>
+                    <file name="SPDAY08B.STR" type="mixed" date="19971212225428"/>
+                    <file name="SPDAY09A.STR" type="mixed" date="19971107130944"/>
+                    <file name="SPDAY09B.STR" type="mixed" date="19971107131142"/>
+                    <file name="SPDAY10A.STR" type="mixed" date="19971107131330"/>
+                    <file name="SPDAY10B.STR" type="mixed" date="19971107131526"/>
+                    <file name="SPDAY11A.STR" type="mixed" date="19971212230438"/>
+                    <file name="SPDAY11B.STR" type="mixed" date="19971212230456"/>
+                    <file name="SPDAY12A.STR" type="mixed" date="19971107132044"/>
+                    <file name="SPDAY12B.STR" type="mixed" date="19980106161846"/>
+                </dir>
+                <dir name="ZDUMMY" date="19971212215548">
+                    <file name="ZDUMMY.STR" type="data" date="19950519143754"/>
+                    <dummy sectors="150" type="0"/>
+                </dir>
+            </dir>
+        </directory_tree>
+    </track>
+</iso_project>
