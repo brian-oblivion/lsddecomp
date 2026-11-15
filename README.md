@@ -39,6 +39,8 @@ This repository contains no game data and no Sony files. You need your own:
 On Linux, with `python3`, `git`, `curl`, `make` and a C compiler:
 
 ```sh
+python3 tools/map.py    # writes map.html: every function, box area = bytes,
+                        # green = C unit, gray = Sony object; click through to source
 ./tools/setup.sh          # one time: toolchain, SDK, first verified build
 ./build-and-verify.sh     # every build after that
 ```

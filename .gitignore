@@ -98,3 +98,4 @@ include/psyq
 # tools/objdiff_report.py (decomp.dev): generated, and objdiff-cli is fetched
 objdiff.json
 tools/objdiff-cli
+map.html
